@@ -31,7 +31,7 @@ export default function FinDashboard() {
   const impNext = () => {
     if(impCurrentStep === 4){
       setIsImportModalOpen(false);
-      alert('✓ 144 transactions imported successfully! 4 duplicates skipped.');
+      alert('Yes 144 transactions imported successfully! 4 duplicates skipped.');
       return;
     }
     if(impCurrentStep === 2 && !importedFile){

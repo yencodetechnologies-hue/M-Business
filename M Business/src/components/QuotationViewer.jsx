@@ -103,7 +103,7 @@ export default function QuotationViewer() {
   if (error) return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f0fdf4", fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 24 }}>
       <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 48, marginBottom: 12 }}>⚠️</div>
+        <div style={{ fontSize: 48, marginBottom: 12 }}>Warning</div>
         <div style={{ fontSize: 16, fontWeight: 700, color: "#064e3b" }}>{error}</div>
       </div>
     </div>
@@ -140,11 +140,11 @@ export default function QuotationViewer() {
       <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
         <button className="action-btn" onClick={() => window.print()}
           style={{ padding: "10px 22px", background: "linear-gradient(135deg,#059669,#065f46)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>
-          🖨️ Print / Save PDF
+          Print / Save PDF
         </button>
         <button className="action-btn" onClick={handleShare}
           style={{ padding: "10px 22px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>
-          🔗 Share Link
+           Share Link
         </button>
       </div>
 
@@ -241,19 +241,19 @@ export default function QuotationViewer() {
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {qt.notes && (
               <div style={{ background: "#f0fdf4", borderRadius: 11, padding: "14px 16px", border: "1px solid #d1fae5" }}>
-                <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>📝 NOTES</div>
+                <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>Edit NOTES</div>
                 <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{qt.notes}</div>
               </div>
             )}
             {qt.terms && (
               <div style={{ background: "#f0fdf4", borderRadius: 11, padding: "14px 16px", border: "1px solid #d1fae5" }}>
-                <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>📜 TERMS</div>
+                <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>Scroll TERMS</div>
                 <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{qt.terms}</div>
               </div>
             )}
             {qt.upiId && (
               <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
-                <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>💳 UPI PAYMENT</div>
+                <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}> UPI PAYMENT</div>
                 <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{qt.upiId}</div>
               </div>
             )}

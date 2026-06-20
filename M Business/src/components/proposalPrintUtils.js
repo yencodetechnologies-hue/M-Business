@@ -181,7 +181,7 @@ export function buildProposalHTML(proposal) {
         body = `<div style="padding:56px;text-align:center;color:#666;">This proposal has no content.</div>`;
     }
 
-    // ── Signature section (always appended) ──────────────────────
+    // ── Signature section (always appended) ----------------------
     const sigSection = `
   <div style="page-break-before:auto;padding:40px 56px;background:#fff;font-family:'Segoe UI',sans-serif;">
     <div style="border-top:2px solid #00BCD4;padding-top:28px;">
@@ -210,14 +210,14 @@ export function buildProposalHTML(proposal) {
             </div>
             <div style="height:1px;background:#15803D;margin-bottom:8px;"></div>
             <div style="font-size:12px;font-weight:700;color:#0D2027;">${proposal.clientName || proposal.client || "Client"}</div>
-            <div style="font-size:10px;color:#15803D;font-weight:700;margin-top:2px;">✓ Digitally Signed${proposal.clientSignedAt ? " · " + new Date(proposal.clientSignedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : ""}</div>
+            <div style="font-size:10px;color:#15803D;font-weight:700;margin-top:2px;">Digitally Signed${proposal.clientSignedAt ? " · " + new Date(proposal.clientSignedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : ""}</div>
           ` : `
             <div style="height:60px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
-              <span style="font-size:28px;color:#FCD34D;">✍</span>
+              <span style="font-size:28px;color:#FCD34D;">Sign</span>
             </div>
             <div style="height:1px;background:#FCD34D;margin-bottom:8px;"></div>
             <div style="font-size:12px;font-weight:700;color:#92400E;">${proposal.clientName || proposal.client || "Client"}</div>
-            <div style="font-size:10px;color:#D97706;font-weight:700;margin-top:2px;">⏳ Awaiting Signature</div>
+            <div style="font-size:10px;color:#D97706;font-weight:700;margin-top:2px;">Awaiting Signature</div>
           `}
         </div>
       </div>
@@ -282,5 +282,5 @@ export async function shareProposalAsPDF(proposal, companyName, onStatusUpdate) 
     // Last resort: open the rendered HTML in a new tab
     window.open(url, "_blank");
     navigator.clipboard.writeText(shareText).catch(() => { });
-    alert("📤 Proposal opened in a new tab — you can print it as PDF or share the link:\n\n" + link);
+    alert("Export Proposal opened in a new tab — you can print it as PDF or share the link:\n\n" + link);
 }

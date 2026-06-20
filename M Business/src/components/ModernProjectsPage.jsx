@@ -5,7 +5,7 @@ import ModernProjectDetails from './ModernProjectDetails';
 import InvoiceCreator from './InvoiceCreator';
 import { BASE_URL } from '../config';
 import './ModernProjectsPage.css';
-// ─── Avatar helpers ────────────────────────────────────────────
+// ─── Avatar helpers --------------------------------------------
 const AV_COLORS = ['#00BCD4', '#8B5CF6', '#F59E0B', '#26C281', '#EC4899', '#3B82F6', '#EF4444', '#10B981'];
 function avColor(name, i = 0) {
   if (!name) return AV_COLORS[i % AV_COLORS.length];
@@ -17,7 +17,7 @@ function initials(name) {
   return p.length >= 2 ? (p[0][0] + p[1][0]).toUpperCase() : name.substring(0, 2).toUpperCase();
 }
 
-// ─── Status normalise ────────────────────────────────────────────
+// ─── Status normalise --------------------------------------------
 function normStatus(raw) {
   const s = (raw || '').toLowerCase().replace(/[\s_-]/g, '');
   if (['active', 'inprogress', 'inreview', 'started'].includes(s)) return { label: 'Active', cls: 'active' };
@@ -41,7 +41,7 @@ function daysLeft(dateStr) {
   return Math.ceil((d - Date.now()) / (1000 * 60 * 60 * 24));
 }
 
-// ─── Color for progress bar ────────────────────────────────────
+// ─── Color for progress bar ------------------------------------
 function progGradient(cls) {
   if (cls === 'completed') return 'linear-gradient(90deg,#26C281,#059669)';
   if (cls === 'overdue') return 'linear-gradient(90deg,#FF6B6B,#DC2626)';
@@ -49,7 +49,7 @@ function progGradient(cls) {
   return 'linear-gradient(90deg,#00BCD4,#0097A7)';
 }
 
-// ─── Empty form state ──────────────────────────────────────────
+// ─── Empty form state ------------------------------------------
 const EMPTY_FORM = {
   name: '', client: '', purpose: '', description: '',
   start: '', end: '', budget: '', currency: 'INR',
@@ -58,12 +58,12 @@ const EMPTY_FORM = {
   contactPersonName: '', contactPersonNo: '',
 };
 
-// ─── Log Time empty ────────────────────────────────────────────
+// ─── Log Time empty --------------------------------------------
 const todayStr = () => new Date().toISOString().split('T')[0];
 const EMPTY_LOG = { date: todayStr(), hours: '', task: 'General / Other', notes: '' };
 
 export default function ModernProjectsPage({ user }) {
-  // ── Data ──────────────────────────────────────────────────────
+  // ── Data ------------------------------------------------------
   const navigate = useNavigate();
   const { projectId } = useParams();
   const [projects, setProjects] = useState([]);
@@ -72,11 +72,11 @@ export default function ModernProjectsPage({ user }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // ── Invoice ───────────────────────────────────────────────────
+  // ── Invoice ---------------------------------------------------
   const [showInvoiceCreator, setShowInvoiceCreator] = useState(false);
   const [invoicePrefill, setInvoicePrefill] = useState(null);
   const [prevActiveBeforeInvoice, setPrevActiveBeforeInvoice] = useState("dashboard");
-  // ── UI state ──────────────────────────────────────────────────
+  // ── UI state --------------------------------------------------
   const [selectedProject, setSelectedProject] = useState(() => {
     const saved = sessionStorage.getItem('selectedProjectId');
     return saved ? { _id: saved } : null;
@@ -84,7 +84,7 @@ export default function ModernProjectsPage({ user }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('All');
 
-  // ── Modals ────────────────────────────────────────────────────
+  // ── Modals ----------------------------------------------------
   const [showForm, setShowForm] = useState(false);  // create / edit
   const [editProject, setEditProject] = useState(null); // null = create
   const [form, setForm] = useState(EMPTY_FORM);
@@ -98,7 +98,7 @@ export default function ModernProjectsPage({ user }) {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
-  // ── Fetch ─────────────────────────────────────────────────────
+  // ── Fetch -----------------------------------------------------
   const fetchAll = useCallback(async () => {
     setLoading(true);
     setError('');
@@ -132,7 +132,7 @@ export default function ModernProjectsPage({ user }) {
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
-  // ── Auto-select project from URL param ───────────────────────
+  // ── Auto-select project from URL param -----------------------
   useEffect(() => {
     if (projectId && projects.length > 0) {
       const found = projects.find(p => p._id === projectId);
@@ -140,7 +140,7 @@ export default function ModernProjectsPage({ user }) {
     }
   }, [projectId, projects]);
 
-  // ── Stats ──────────────────────────────────────────────────────
+  // ── Stats ------------------------------------------------------
   const stats = useMemo(() => ({
     all: projects.length,
     active: projects.filter(p => ['active', 'inprogress', 'inreview', 'started'].includes((p.status || '').toLowerCase().replace(/[\s_-]/g, ''))).length,
@@ -148,7 +148,7 @@ export default function ModernProjectsPage({ user }) {
     onhold: projects.filter(p => ['onhold', 'hold', 'paused', 'suspended'].includes((p.status || '').toLowerCase().replace(/[\s_-]/g, ''))).length,
   }), [projects]);
 
-  // ── Filter ────────────────────────────────────────────────────
+  // ── Filter ----------------------------------------------------
   const filtered = useMemo(() => {
     return projects.filter(p => {
       const q = searchQuery.toLowerCase();
@@ -163,19 +163,19 @@ export default function ModernProjectsPage({ user }) {
     });
   }, [projects, searchQuery, activeTab]);
 
-  // ── Task counts per project ───────────────────────────────────
+  // ── Task counts per project -----------------------------------
   function tasksForProject(proj) {
     return tasks.filter(t => t.projectId === proj._id || t.project === proj.name);
   }
 
-  // ── Open create form ──────────────────────────────────────────
+  // ── Open create form ------------------------------------------
   function openCreate() {
     setEditProject(null);
     setForm(EMPTY_FORM);
     setShowForm(true);
   }
 
-  // ── Open edit form ────────────────────────────────────────────
+  // ── Open edit form --------------------------------------------
   function openEdit(p, e) {
     e && e.stopPropagation();
     setEditProject(p);
@@ -199,7 +199,7 @@ export default function ModernProjectsPage({ user }) {
     setShowForm(true);
   }
 
-  // ── Save project ──────────────────────────────────────────────
+  // ── Save project ----------------------------------------------
   async function handleSave(e) {
     e.preventDefault();
     if (!form.name.trim()) return;
@@ -241,7 +241,7 @@ export default function ModernProjectsPage({ user }) {
     }
   }
 
-  // ── Delete ────────────────────────────────────────────────────
+  // ── Delete ----------------------------------------------------
   async function handleDelete() {
     if (!deleteTarget) return;
     setDeleting(true);
@@ -257,7 +257,7 @@ export default function ModernProjectsPage({ user }) {
     }
   }
 
-  // ── Log Work Time ─────────────────────────────────────────────
+  // ── Log Work Time ---------------------------------------------
   function openLogTime(p, e) {
     e && e.stopPropagation();
     setLogTimeProject(p);
@@ -289,7 +289,7 @@ export default function ModernProjectsPage({ user }) {
     }
   }
 
-  // ─── Map backend project → ModernProjectDetails shape ─────────
+  // ─── Map backend project  ModernProjectDetails shape ---------
   function toDetailShape(p) {
     const pt = tasksForProject(p);
     return {
@@ -316,7 +316,7 @@ export default function ModernProjectsPage({ user }) {
     };
   }
 
-  // ─── RENDER: Detail view ──────────────────────────────────────
+  // ─── RENDER: Detail view --------------------------------------
   if (selectedProject) {
     return (
       <div className="modern-app">
@@ -326,7 +326,7 @@ export default function ModernProjectsPage({ user }) {
             <div className="m-profile-avatar">{initials(user?.name || 'P')}</div>
             <div>
               <div className="m-profile-name">{user?.name || 'Admin'}</div>
-              <div className="m-profile-logout" onClick={() => window.location.href = '/'}>Back Home →</div>
+              <div className="m-profile-logout" onClick={() => window.location.href = '/'}>Back Home </div>
             </div>
           </div>
           <nav className="m-nav">
@@ -390,7 +390,7 @@ export default function ModernProjectsPage({ user }) {
       </div>
     );
   }
-  // ─── RENDER: Projects list ─────────────────────────────────────
+  // ─── RENDER: Projects list -------------------------------------
   return (
     <div className="modern-app">
       {/* SIDEBAR */}
@@ -400,7 +400,7 @@ export default function ModernProjectsPage({ user }) {
           <div className="m-profile-avatar">{initials(user?.name || 'P')}</div>
           <div>
             <div className="m-profile-name">{user?.name || 'Admin'}</div>
-            <div className="m-profile-logout" onClick={() => window.location.href = '/'}>Back Home →</div>
+            <div className="m-profile-logout" onClick={() => window.location.href = '/'}>Back Home </div>
           </div>
         </div>
         <nav className="m-nav">
@@ -640,7 +640,7 @@ export default function ModernProjectsPage({ user }) {
   );
 }
 
-// ─── Project Form Modal ────────────────────────────────────────
+// ─── Project Form Modal ----------------------------------------
 function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit }) {
   const f = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
   return (
@@ -733,7 +733,7 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit }) {
   );
 }
 
-// ─── Delete Confirm Modal ──────────────────────────────────────
+// ─── Delete Confirm Modal --------------------------------------
 function DeleteModal({ name, onConfirm, onCancel, deleting }) {
   return (
     <div style={OVERLAY}>
@@ -756,7 +756,7 @@ function DeleteModal({ name, onConfirm, onCancel, deleting }) {
   );
 }
 
-// ─── Log Work Time Modal ───────────────────────────────────────
+// ─── Log Work Time Modal ---------------------------------------
 function LogTimeModal({ form, setForm, onSave, onClose, saving, projectName }) {
   const f = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
   return (
@@ -800,7 +800,7 @@ function LogTimeModal({ form, setForm, onSave, onClose, saving, projectName }) {
   );
 }
 
-// ─── Shared styles ─────────────────────────────────────────────
+// ─── Shared styles ---------------------------------------------
 const OVERLAY = {
   position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)', zIndex: 9999,
   display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,

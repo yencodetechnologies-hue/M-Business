@@ -78,20 +78,20 @@ const PRIORITY_CFG = {
 };
 const PRIORITY_LIST = ["Critical", "High", "Medium", "Low", "Manual"];
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    VIEW DEFINITIONS
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 const VIEW_LIST = [
-  { id: "table", icon: "⊞", label: "Main table", color: "var(--app-accent)" },
-  { id: "chart", icon: "◕", label: "Chart", color: "var(--app-accent)" },
-  { id: "gantt", icon: "≡", label: "Gantt", color: "var(--app-accent)" },
-  { id: "calendar", icon: "📅", label: "Calendar", color: "#e2445c" },
-  { id: "kanban", icon: "⊟", label: "Kanban", color: "#00c875" },
+  { id: "table", icon: "+", label: "Main table", color: "var(--app-accent)" },
+  { id: "chart", icon: "o", label: "Chart", color: "var(--app-accent)" },
+  { id: "gantt", icon: "-", label: "Gantt", color: "var(--app-accent)" },
+  { id: "calendar", icon: "Date", label: "Calendar", color: "#e2445c" },
+  { id: "kanban", icon: "x", label: "Kanban", color: "#00c875" },
 ];
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    CHART VIEW
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function ChartView({ groups, config }) {
   const S_LIST = config?.taskStatuses || STATUS_LIST;
   const P_LIST = config?.taskPriorities || PRIORITY_LIST;
@@ -131,7 +131,7 @@ function ChartView({ groups, config }) {
 
         {/* Status Bar Chart */}
         <div style={{ flex: 1, minWidth: 280, background: "var(--app-card)", borderRadius: 24, border: "1.5px solid var(--app-border)", padding: 22, boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
-          <div style={{ fontSize: 14, fontWeight: 800, color: "var(--app-text)", marginBottom: 3 }}>📊 Status Distribution</div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: "var(--app-text)", marginBottom: 3 }}>Status Distribution</div>
           <div style={{ fontSize: 12, color: "var(--app-muted)", marginBottom: 18 }}>Tasks by current status</div>
           {statusData.length === 0
             ? <div style={{ textAlign: "center", color: P.muted, fontSize: 12, padding: 20 }}>No tasks yet</div>
@@ -150,7 +150,7 @@ function ChartView({ groups, config }) {
 
         {/* Donut */}
         <div style={{ flex: 1, minWidth: 220, background: "var(--app-card)", borderRadius: 24, border: "1.5px solid var(--app-border)", padding: 22, boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
-          <div style={{ fontSize: 14, fontWeight: 800, color: "var(--app-text)", marginBottom: 3 }}>🍩 Overview</div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: "var(--app-text)", marginBottom: 3 }}>Overview</div>
           <div style={{ fontSize: 12, color: "var(--app-muted)", marginBottom: 16 }}>{total} total tasks</div>
           <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
             <svg width={160} height={160} style={{ flexShrink: 0 }}>
@@ -180,7 +180,7 @@ function ChartView({ groups, config }) {
 
       {/* Group Progress */}
       <div style={{ background: "#fff", borderRadius: 14, border: `1px solid ${P.border}`, padding: 22, boxShadow: "0 2px 12px rgba(124,58,237,0.07)" }}>
-        <div style={{ fontSize: 14, fontWeight: 800, color: P.text, marginBottom: 3 }}>📈 Group Progress</div>
+        <div style={{ fontSize: 14, fontWeight: 800, color: P.text, marginBottom: 3 }}>Group Progress</div>
         <div style={{ fontSize: 12, color: P.muted, marginBottom: 18 }}>Completion per group</div>
         <div style={{ display: "flex", gap: 16, alignItems: "flex-end", height: 160, overflowX: "auto" }}>
           {groupData.length === 0
@@ -208,7 +208,7 @@ function ChartView({ groups, config }) {
       {/* Priority breakdown */}
       {priorityData.length > 0 && (
         <div style={{ background: "#fff", borderRadius: 14, border: `1px solid ${P.border}`, padding: 22, boxShadow: "0 2px 12px rgba(124,58,237,0.07)" }}>
-          <div style={{ fontSize: 14, fontWeight: 800, color: P.text, marginBottom: 3 }}>🔥 Priority Breakdown</div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: P.text, marginBottom: 3 }}>Priority Breakdown</div>
           <div style={{ fontSize: 12, color: P.muted, marginBottom: 18 }}>Tasks by priority level</div>
           {priorityData.map(item => {
             const maxP = Math.max(...priorityData.map(x => x.count), 1);
@@ -229,16 +229,16 @@ function ChartView({ groups, config }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    GANTT VIEW
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function GanttView({ groups, config }) {
   const allTasks = groups.flatMap(g => (g.tasks || []).map(t => ({ ...t, groupColor: g.color })));
   const withDates = allTasks.filter(t => t.date);
 
   if (withDates.length === 0) return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 80, gap: 12 }}>
-      <div style={{ fontSize: 48 }}>📅</div>
+      <div style={{ fontSize: 48 }}>Date</div>
       <div style={{ fontSize: 16, fontWeight: 700, color: P.text }}>No dates set</div>
       <div style={{ fontSize: 13, color: P.muted }}>Add due dates to tasks to see Gantt view</div>
     </div>
@@ -326,9 +326,9 @@ function GanttView({ groups, config }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    CALENDAR VIEW
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function CalendarView({ groups, config }) {
   const allTasks = groups.flatMap(g => (g.tasks || []).map(t => ({ ...t, groupColor: g.color })));
   const [cur, setCur] = useState(new Date());
@@ -388,9 +388,9 @@ function CalendarView({ groups, config }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    KANBAN VIEW
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function KanbanView({ groups, onStatusChange, config }) {
   const S_LIST = config?.taskStatuses || STATUS_LIST;
   const allTasks = groups.flatMap(g => (g.tasks || []).map(t => ({ ...t, groupColor: g.color, groupLabel: g.label })));
@@ -429,7 +429,7 @@ function KanbanView({ groups, onStatusChange, config }) {
                     </div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                       <span style={{ fontSize: 10, color: P.muted, fontWeight: 600 }}>{task.groupLabel}</span>
-                      {task.date && <span style={{ fontSize: 10, color: P.muted }}>📅 {fmt(task.date)}</span>}
+                      {task.date && <span style={{ fontSize: 10, color: P.muted }}>Date {fmt(task.date)}</span>}
                     </div>
                     {task.priority && task.priority !== "—" && (
                       <div style={{ marginTop: 6 }}>
@@ -456,9 +456,9 @@ function KanbanView({ groups, onStatusChange, config }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    TOAST
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function Toast({ msg, type }) {
   const c = type === "error" ? "#e2445c" : type === "info" ? "var(--app-accent)" : "#00c875";
   return (
@@ -468,14 +468,14 @@ function Toast({ msg, type }) {
       fontWeight: 700, color: c, boxShadow: "0 8px 32px rgba(124,58,237,0.2)",
       display: "flex", alignItems: "center", gap: 8, animation: "toastIn .2s ease", fontFamily: "inherit"
     }}>
-      {type === "error" ? "❌" : type === "info" ? "ℹ️" : "✅"} {msg}
+      {type === "error" ? "Error" : type === "info" ? "Info" : "Success"} {msg}
     </div>
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    DROPDOWN
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function DD({ anchor, onClose, children, w = 180 }) {
   const ref = useRef();
   const [pos, setPos] = useState({ top: 0, left: 0 });
@@ -519,15 +519,15 @@ const MI = ({ onClick, icon, title, sub, active, danger }) => (
       <div style={{ fontWeight: active || sub ? 600 : 400 }}>{title}</div>
       {sub && <div style={{ fontSize: 11, color: P.muted, marginTop: 1 }}>{sub}</div>}
     </div>
-    {active && <span style={{ color: P.accent, fontSize: 12, flexShrink: 0 }}>✓</span>}
+    {active && <span style={{ color: P.accent, fontSize: 12, flexShrink: 0 }}>Yes</span>}
   </div>
 );
 
 const Sep = () => <div style={{ height: 1, background: P.border, margin: "4px 0" }} />;
 
-/* ══════════════════════════════════════════════════════════
-   VIEW SWITCHER DROPDOWN  ← THE KEY FIX
-══════════════════════════════════════════════════════════ */
+/* ----------------------------------------------------------
+   VIEW SWITCHER DROPDOWN   THE KEY FIX
+---------------------------------------------------------- */
 function ViewSwitcherDropdown({ anchor, currentView, onSelect, onClose }) {
   const ref = useRef();
   const [pos, setPos] = useState({ top: 0, left: 0 });
@@ -576,7 +576,7 @@ function ViewSwitcherDropdown({ anchor, currentView, onSelect, onClose }) {
           onMouseLeave={e => { e.currentTarget.style.background = currentView === v.id ? "#e8f4fd" : "transparent"; }}>
           <div style={{ width: 28, height: 28, borderRadius: 7, background: `${v.color}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, color: v.color }}>{v.icon}</div>
           <span style={{ fontSize: 13, color: P.text, fontWeight: currentView === v.id ? 700 : 400, flex: 1 }}>{v.label}</span>
-          {currentView === v.id && <span style={{ color: "var(--app-accent)", fontSize: 13 }}>✓</span>}
+          {currentView === v.id && <span style={{ color: "var(--app-accent)", fontSize: 13 }}>Yes</span>}
         </div>
       ))}
     </div>
@@ -689,9 +689,9 @@ function PriorityPicker({ anchor, currentValue, onSelect, onClose }) {
 
 
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    PERSON PICKER
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, onInvite, onAutoAssign }) {
   const [search, setSearch] = useState("");
   const [localEmployees, setLocalEmployees] = useState(employees || []);
@@ -768,7 +768,7 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
             border: `1px solid #0073ea`, borderRadius: 6,
             padding: "8px 12px", background: "#fff"
           }}>
-            <span style={{ fontSize: 14, color: P.muted }}>🔍</span>
+            <span style={{ fontSize: 14, color: P.muted }}>Search</span>
             <input
               ref={inputRef}
               value={search}
@@ -788,11 +788,11 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
               <span
                 onClick={() => setSearch("")}
                 style={{ color: P.muted, cursor: "pointer", fontSize: 14 }}
-              >✕</span>
+              >Close</span>
             )}
           </div>
 
-          {/* ➕ Add New Employee button — directly below search */}
+          {/* Add New Employee button — directly below search */}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -805,7 +805,7 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
               fontFamily: "inherit", marginTop: 8
             }}
           >
-            <span>➕ Add New Employee</span>
+            <span>Add New Employee</span>
           </button>
         </div>
 
@@ -849,7 +849,7 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
                     fontSize: 14, color: P.text, flex: 1,
                     fontWeight: isActive ? 500 : 400
                   }}>{emp}</span>
-                  {isActive && <span style={{ color: "var(--app-accent)", fontSize: 13 }}>✓</span>}
+                  {isActive && <span style={{ color: "var(--app-accent)", fontSize: 13 }}>Yes</span>}
                 </div>
               );
             })
@@ -881,16 +881,16 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
             border: "1px solid #e2e8f0"
           }} onClick={e => e.stopPropagation()}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#1e293b" }}>➕ Add New Employee</h3>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#1e293b" }}>Add New Employee</h3>
               <button 
                 onClick={() => setShowAddModal(false)} 
                 style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: "#64748b" }}
-              >✕</button>
+              >Close</button>
             </div>
 
             {saveError && (
               <div style={{ background: "#fef2f2", border: "1px solid #fee2e2", color: "#ef4444", borderRadius: 8, padding: "8px 12px", fontSize: 12, marginBottom: 14, fontWeight: 500 }}>
-                ⚠️ {saveError}
+                Warning {saveError}
               </div>
             )}
 
@@ -992,9 +992,9 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    TOOLBAR BUTTON
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 const TB = React.forwardRef(({ icon, label, active, onClick, badge }, ref) => (
   <button ref={ref} onClick={onClick} style={{
     display: "flex", alignItems: "center", gap: 5, padding: "5px 10px",
@@ -1013,9 +1013,9 @@ const TB = React.forwardRef(({ icon, label, active, onClick, badge }, ref) => (
   </button>
 ));
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    NEW TASK BTN
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function NewTaskBtn({ onAddTask, onTriggerGroup, showToast, onImport, groups, onAddTaskToGroup, setGroups, projects, defaultProjectId, autoOpenAddModal, onAddModalOpened }) {
   const quickAdd = async (pId = null) => {
     let gid = groups && groups[0] && (groups[0]._id || groups[0].id);
@@ -1050,9 +1050,9 @@ function NewTaskBtn({ onAddTask, onTriggerGroup, showToast, onImport, groups, on
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    IMPORT MODAL
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function ImportModal({ onClose, onImportTasks }) {
   const [dragOver, setDragOver] = useState(false); const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null); const [loading, setLoading] = useState(false);
@@ -1064,14 +1064,14 @@ function ImportModal({ onClose, onImportTasks }) {
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.35)", zIndex: 9000, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div style={{ background: "#fff", borderRadius: 16, width: 560, maxHeight: "85vh", boxShadow: "0 24px 80px rgba(0,0,0,0.18)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid #eef0f4", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div><div style={{ fontSize: 16, fontWeight: 800, color: "#323338" }}>📥 Import tasks</div><div style={{ fontSize: 12, color: "#676879", marginTop: 2 }}>Upload CSV or Excel file</div></div>
+          <div><div style={{ fontSize: 16, fontWeight: 800, color: "#323338" }}>Import tasks</div><div style={{ fontSize: 12, color: "#676879", marginTop: 2 }}>Upload CSV or Excel file</div></div>
           <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#676879" }}>×</button>
         </div>
         <div  style={{ flex: 1, overflowY: "auto", padding: "18px 22px" }}>
           {!file ? (
             <div onDragOver={e => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }} onClick={() => fileRef.current?.click()}
               style={{ border: `2px dashed ${dragOver ? "var(--app-accent)" : "#d0d4e4"}`, borderRadius: 12, padding: "36px 24px", textAlign: "center", cursor: "pointer", background: dragOver ? "#e8f4fd" : "#fafbfc" }}>
-              <div style={{ fontSize: 36, marginBottom: 10 }}>📂</div>
+              <div style={{ fontSize: 36, marginBottom: 10 }}>Folder</div>
               <div style={{ fontSize: 14, fontWeight: 700, color: "#323338", marginBottom: 6 }}>Drag & drop your file here</div>
               <button style={{ background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Browse files</button>
               <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
@@ -1091,9 +1091,9 @@ function ImportModal({ onClose, onImportTasks }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    SIDEKICK PANEL
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function SidekickPanel({ onClose, groups }) {
   const allTasks = groups.flatMap(g => g.tasks || []);
   const done = allTasks.filter(t => t.status === "Done").length;
@@ -1107,7 +1107,7 @@ function SidekickPanel({ onClose, groups }) {
       <div style={{ background: `linear-gradient(150deg,${P.dark} 0%,${P.mid} 60%,var(--app-accent) 100%)`, padding: "14px 16px 16px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 9, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17 }}>✨</div>
+            <div style={{ width: 32, height: 32, borderRadius: 9, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17 }}>Special</div>
             <div><div style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>Board Sidekick</div><div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }}>Live insights</div></div>
           </div>
           <button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 7, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff", fontSize: 16 }}>×</button>
@@ -1135,11 +1135,11 @@ function SidekickPanel({ onClose, groups }) {
       </div>
       <div  style={{ flex: 1, overflowY: "auto", padding: 14 }}>
         <div style={{ background: P.light, border: `1.5px solid ${P.border}`, borderRadius: 12, padding: "12px 13px", marginBottom: 12 }}>
-          <div style={{ fontSize: 10, color: P.muted, fontWeight: 700, letterSpacing: .8, textTransform: "uppercase", marginBottom: 6 }}>💡 Insight</div>
+          <div style={{ fontSize: 10, color: P.muted, fontWeight: 700, letterSpacing: .8, textTransform: "uppercase", marginBottom: 6 }}>Tip Insight</div>
           <div style={{ fontSize: 12, color: P.text, lineHeight: 1.65 }}>
             {stuck > 0 ? `${stuck} task${stuck > 1 ? "s are" : " is"} stuck.`
               : overdue > 0 ? `${overdue} overdue task${overdue > 1 ? "s" : ""}.`
-                : done === allTasks.length && allTasks.length > 0 ? "🎉 All tasks complete!"
+                : done === allTasks.length && allTasks.length > 0 ? "All tasks complete!"
                   : wip > 0 ? `${wip} task${wip > 1 ? "s are" : " is"} in progress!`
                     : "Add tasks to see insights."}
           </div>
@@ -1166,9 +1166,9 @@ function SidekickPanel({ onClose, groups }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    SHARE MODAL
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function ShareModal({ onClose }) {
   const shareLink = `${window.location.origin}/share/board/${Math.random().toString(36).substring(7)}`;
   const [copied, setCopied] = useState(false);
@@ -1182,7 +1182,7 @@ function ShareModal({ onClose }) {
         <div style={{ padding: "16px 24px 24px" }}>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <div style={{ flex: 1, background: "#f5f6f8", border: "1px solid #e6e9ef", borderRadius: 9, padding: "10px 14px", fontSize: 12, color: "#676879", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "monospace" }}>{shareLink}</div>
-            <button onClick={() => { navigator.clipboard.writeText(shareLink); setCopied(true); setTimeout(() => setCopied(false), 2000); }} style={{ background: copied ? "#00c875" : "var(--app-accent)", color: "#fff", border: "none", borderRadius: 9, padding: "10px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{copied ? "✓ Copied!" : "Copy link"}</button>
+            <button onClick={() => { navigator.clipboard.writeText(shareLink); setCopied(true); setTimeout(() => setCopied(false), 2000); }} style={{ background: copied ? "#00c875" : "var(--app-accent)", color: "#fff", border: "none", borderRadius: 9, padding: "10px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{copied ? "Copied!" : "Copy link"}</button>
           </div>
         </div>
       </div>
@@ -1190,11 +1190,11 @@ function ShareModal({ onClose }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    INTEGRATE MODAL
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function IntegrateModal({ onClose, showToast }) {
-  const integrations = [{ icon: "📧", name: "Gmail", desc: "Email notifications on status change", badge: "Popular" }, { icon: "💬", name: "Slack", desc: "Post updates to Slack channels", badge: "Popular" }, { icon: "📅", name: "Google Calendar", desc: "Sync due dates with your calendar", badge: null }, { icon: "🐙", name: "GitHub", desc: "Link commits and PRs to tasks", badge: null }, { icon: "🔗", name: "Zapier", desc: "Connect to 5000+ apps via Zapier", badge: "New" }];
+  const integrations = [{ icon: "", name: "Gmail", desc: "Email notifications on status change", badge: "Popular" }, { icon: "Comment", name: "Slack", desc: "Post updates to Slack channels", badge: "Popular" }, { icon: "Date", name: "Google Calendar", desc: "Sync due dates with your calendar", badge: null }, { icon: "", name: "GitHub", desc: "Link commits and PRs to tasks", badge: null }, { icon: "", name: "Zapier", desc: "Connect to 5000+ apps via Zapier", badge: "New" }];
   const [connecting, setConnecting] = useState(null);
 
   const handleConnect = (name) => {
@@ -1208,7 +1208,7 @@ function IntegrateModal({ onClose, showToast }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(30,10,60,0.45)", zIndex: 8000, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div style={{ background: "#fff", borderRadius: 16, width: 520, maxHeight: "80vh", boxShadow: "0 24px 80px rgba(124,58,237,0.25)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <div style={{ background: `linear-gradient(135deg,${P.dark},${P.mid})`, padding: "18px 20px" }}><div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}><div style={{ fontSize: 17, fontWeight: 800, color: "#fff" }}>🔗 Integrations</div><button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", color: "#fff", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button></div></div>
+        <div style={{ background: `linear-gradient(135deg,${P.dark},${P.mid})`, padding: "18px 20px" }}><div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}><div style={{ fontSize: 17, fontWeight: 800, color: "#fff" }}> Integrations</div><button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", color: "#fff", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button></div></div>
         <div  style={{ flex: 1, overflowY: "auto", padding: "4px 20px 16px" }}>
           {integrations.map(({ icon, name, desc, badge }) => (
             <div key={name} style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 0", borderBottom: `1px solid ${P.border}` }}>
@@ -1239,16 +1239,16 @@ function IntegrateModal({ onClose, showToast }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    AUTOMATE MODAL
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function AutomateModal({ onClose }) {
-  const automations = [{ icon: "⚡", title: "Status Change Alert", desc: "When status changes → notify assignee", active: true }, { icon: "📅", title: "Due Date Reminder", desc: "1 day before due date → send reminder", active: false }, { icon: "✅", title: "Mark Done on Check", desc: "When all sub-tasks done → mark parent Done", active: true }];
+  const automations = [{ icon: "Action", title: "Status Change Alert", desc: "When status changes  notify assignee", active: true }, { icon: "Date", title: "Due Date Reminder", desc: "1 day before due date  send reminder", active: false }, { icon: "Success", title: "Mark Done on Check", desc: "When all sub-tasks done  mark parent Done", active: true }];
   const [states, setStates] = useState(Object.fromEntries(automations.map(a => [a.title, a.active])));
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(30,10,60,0.45)", zIndex: 8000, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div style={{ background: "#fff", borderRadius: 16, width: 520, maxHeight: "80vh", boxShadow: "0 24px 80px rgba(124,58,237,0.25)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <div style={{ background: `linear-gradient(135deg,${P.dark},${P.mid})`, padding: "18px 20px" }}><div style={{ display: "flex", justifyContent: "space-between" }}><div style={{ fontSize: 17, fontWeight: 800, color: "#fff" }}>⚙️ Automations</div><button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", color: "#fff", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button></div></div>
+        <div style={{ background: `linear-gradient(135deg,${P.dark},${P.mid})`, padding: "18px 20px" }}><div style={{ display: "flex", justifyContent: "space-between" }}><div style={{ fontSize: 17, fontWeight: 800, color: "#fff" }}>Automations</div><button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", color: "#fff", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button></div></div>
         <div  style={{ flex: 1, overflowY: "auto", padding: "8px 20px 16px" }}>
           {automations.map(({ icon, title, desc }) => (
             <div key={title} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: `1px solid ${P.border}` }}>
@@ -1265,9 +1265,9 @@ function AutomateModal({ onClose }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    TAB DOTS MENU
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function TabDotsMenu({ anchor, onClose, showToast, onAction }) {
   const ref = useRef(); const [pos, setPos] = useState({ top: 0, left: 0 });
   useEffect(() => {
@@ -1278,9 +1278,9 @@ function TabDotsMenu({ anchor, onClose, showToast, onAction }) {
 
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    FILTER MENU
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function FilterMenu({ anchor, onClose, groups, filters, onToggle, onClear }) {
   const allTasks = groups.flatMap(g => g.tasks || []);
   const ref = useRef(); const [pos, setPos] = useState({ top: 60, left: 8, w: 600 });
@@ -1299,23 +1299,23 @@ function FilterMenu({ anchor, onClose, groups, filters, onToggle, onClear }) {
       <div style={{ display: "flex", gap: 0, padding: "14px 20px", overflowX: "auto" }}>
         <div style={{ minWidth: 160, flexShrink: 0, paddingRight: 14, borderRight: "1px solid #f0f1f4", marginRight: 14 }}>
           <div style={{ fontSize: 10, fontWeight: 700, color: "#9aadbd", letterSpacing: .7, textTransform: "uppercase", marginBottom: 8 }}>Employee</div>
-          {owners.map(o => { const on = filters.owner.has(o); return (<div key={o} onClick={() => onToggle("owner", o)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", borderRadius: 6, cursor: "pointer", background: on ? "#e8f4fd" : "transparent" }} onMouseEnter={e => { if (!on) e.currentTarget.style.background = "#f5f6f8"; }} onMouseLeave={e => { e.currentTarget.style.background = on ? "#e8f4fd" : "transparent"; }}><div style={{ width: 16, height: 16, borderRadius: 3, background: on ? "var(--app-accent)" : "#fff", border: on ? "none" : "1.5px solid #c5c9d6", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 800 }}>{on ? "✓" : ""}</div><span style={{ fontSize: 13, color: on ? "var(--app-accent)" : "#323338", fontWeight: on ? 600 : 400 }}>{o}</span></div>); })}</div>
+          {owners.map(o => { const on = filters.owner.has(o); return (<div key={o} onClick={() => onToggle("owner", o)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", borderRadius: 6, cursor: "pointer", background: on ? "#e8f4fd" : "transparent" }} onMouseEnter={e => { if (!on) e.currentTarget.style.background = "#f5f6f8"; }} onMouseLeave={e => { e.currentTarget.style.background = on ? "#e8f4fd" : "transparent"; }}><div style={{ width: 16, height: 16, borderRadius: 3, background: on ? "var(--app-accent)" : "#fff", border: on ? "none" : "1.5px solid #c5c9d6", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 800 }}>{on ? "Yes" : ""}</div><span style={{ fontSize: 13, color: on ? "var(--app-accent)" : "#323338", fontWeight: on ? 600 : 400 }}>{o}</span></div>); })}</div>
         <div style={{ minWidth: 160, flexShrink: 0 }}>
           <div style={{ fontSize: 10, fontWeight: 700, color: "#9aadbd", letterSpacing: .7, textTransform: "uppercase", marginBottom: 8 }}>Status</div>
-          {Object.entries(STATUS_CFG).map(([s, sc]) => { const on = filters.status.has(s); const n = allTasks.filter(t => t.status === s).length; return (<div key={s} onClick={() => onToggle("status", s)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", borderRadius: 6, cursor: "pointer", background: on ? "#e8f4fd" : "transparent" }} onMouseEnter={e => { if (!on) e.currentTarget.style.background = "#f5f6f8"; }} onMouseLeave={e => { e.currentTarget.style.background = on ? "#e8f4fd" : "transparent"; }}><div style={{ width: 16, height: 16, borderRadius: 3, background: on ? "var(--app-accent)" : "#fff", border: on ? "none" : "1.5px solid #c5c9d6", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 800 }}>{on ? "✓" : ""}</div><div style={{ width: 10, height: 10, borderRadius: 3, background: sc.bg, flexShrink: 0 }} /><span style={{ fontSize: 13, color: on ? "var(--app-accent)" : "#323338", fontWeight: on ? 600 : 400, flex: 1 }}>{s}</span><span style={{ fontSize: 11, color: "#9aadbd" }}>{n}</span></div>); })}
+          {Object.entries(STATUS_CFG).map(([s, sc]) => { const on = filters.status.has(s); const n = allTasks.filter(t => t.status === s).length; return (<div key={s} onClick={() => onToggle("status", s)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", borderRadius: 6, cursor: "pointer", background: on ? "#e8f4fd" : "transparent" }} onMouseEnter={e => { if (!on) e.currentTarget.style.background = "#f5f6f8"; }} onMouseLeave={e => { e.currentTarget.style.background = on ? "#e8f4fd" : "transparent"; }}><div style={{ width: 16, height: 16, borderRadius: 3, background: on ? "var(--app-accent)" : "#fff", border: on ? "none" : "1.5px solid #c5c9d6", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 800 }}>{on ? "Yes" : ""}</div><div style={{ width: 10, height: 10, borderRadius: 3, background: sc.bg, flexShrink: 0 }} /><span style={{ fontSize: 13, color: on ? "var(--app-accent)" : "#323338", fontWeight: on ? 600 : 400, flex: 1 }}>{s}</span><span style={{ fontSize: 11, color: "#9aadbd" }}>{n}</span></div>); })}
         </div>
       </div>
     </div>
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    HIDE MENU
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function HideMenu({ anchor, onClose, extraCols, hiddenCols, onToggleHide }) {
   const ref = useRef(); const [pos, setPos] = useState({ top: 0, left: 0 }); const [search, setSearch] = useState("");
-  const builtins = [{ id: "person", label: "Employee", bg: "var(--app-accent)", icon: "👤" }, { id: "status", label: "Status", bg: "#00c875", icon: "≡" }, { id: "date", label: "Due date", bg: "var(--app-accent)", icon: "📅" }];
-  const allCols = [...builtins, ...(extraCols || []).map(ec => ({ id: ec.id, label: ec.label, bg: P.accent, icon: "📝" }))];
+  const builtins = [{ id: "person", label: "Employee", bg: "var(--app-accent)", icon: "Profile" }, { id: "status", label: "Status", bg: "#00c875", icon: "-" }, { id: "date", label: "Due date", bg: "var(--app-accent)", icon: "Date" }];
+  const allCols = [...builtins, ...(extraCols || []).map(ec => ({ id: ec.id, label: ec.label, bg: P.accent, icon: "Edit" }))];
   const filtered = allCols.filter(c => !search || c.label.toLowerCase().includes(search.toLowerCase()));
   useEffect(() => { const calc = () => { if (anchor?.current) { const r = anchor.current.getBoundingClientRect(); let left = r.left; if (left + 290 > window.innerWidth - 8) left = window.innerWidth - 298; setPos({ top: r.bottom + 4, left }); } }; calc(); window.addEventListener('scroll', calc, true); window.addEventListener('resize', calc); return () => { window.removeEventListener('scroll', calc, true); window.removeEventListener('resize', calc); }; }, [anchor]);
   useEffect(() => { const h = e => { if (ref.current && !ref.current.contains(e.target) && !anchor?.current?.contains(e.target)) onClose(); }; document.addEventListener('mousedown', h); return () => document.removeEventListener('mousedown', h); }, [anchor, onClose]);
@@ -1324,15 +1324,15 @@ function HideMenu({ anchor, onClose, extraCols, hiddenCols, onToggleHide }) {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px 10px", borderBottom: "1px solid #eef0f4" }}><span style={{ fontSize: 14, fontWeight: 800, color: "#323338" }}>Display columns</span></div>
       <div style={{ padding: "10px 12px 6px" }}><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Find columns..." style={{ width: "100%", border: "1px solid #e6e9ef", borderRadius: 8, padding: "7px 10px", fontSize: 12.5, fontFamily: "inherit", outline: "none", color: "#323338", background: "#f5f6f8" }} /></div>
       <div style={{ maxHeight: 320, overflowY: "auto", padding: "4px 0 8px" }}>
-        {filtered.map(col => { const shown = !hiddenCols.has(col.id); return (<div key={col.id} onClick={() => onToggleHide(col.id)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 14px", cursor: "pointer" }} onMouseEnter={e => e.currentTarget.style.background = "#f5f6f8"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}><div style={{ width: 16, height: 16, borderRadius: 3, background: shown ? "var(--app-accent)" : "#fff", border: shown ? "none" : "1.5px solid #c5c9d6", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700 }}>{shown ? "✓" : ""}</div><div style={{ width: 24, height: 24, borderRadius: 6, background: col.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#fff", fontWeight: 700 }}>{col.icon}</div><span style={{ fontSize: 13, color: shown ? "#323338" : "#676879" }}>{col.label}</span></div>); })}
+        {filtered.map(col => { const shown = !hiddenCols.has(col.id); return (<div key={col.id} onClick={() => onToggleHide(col.id)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 14px", cursor: "pointer" }} onMouseEnter={e => e.currentTarget.style.background = "#f5f6f8"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}><div style={{ width: 16, height: 16, borderRadius: 3, background: shown ? "var(--app-accent)" : "#fff", border: shown ? "none" : "1.5px solid #c5c9d6", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700 }}>{shown ? "Yes" : ""}</div><div style={{ width: 24, height: 24, borderRadius: 6, background: col.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#fff", fontWeight: 700 }}>{col.icon}</div><span style={{ fontSize: 13, color: shown ? "#323338" : "#676879" }}>{col.label}</span></div>); })}
       </div>
     </div>
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    SORT MENU
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function SortMenu({ anchor, sort, onSort, onClose }) {
   const ref = useRef(); const [pos, setPos] = useState({ top: 0, left: 0 });
   const [col, setCol] = useState(sort ? sort.split('-')[0] : '');
@@ -1354,9 +1354,9 @@ function SortMenu({ anchor, sort, onSort, onClose }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    GROUP BY MENU
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function GrpByMenu({ anchor, groupBy, onGroupBy, onClose }) {
   const ref = useRef(); const [pos, setPos] = useState({ top: 0, left: 0 });
   useEffect(() => { const calc = () => { if (!anchor?.current) return; const r = anchor.current.getBoundingClientRect(); let left = r.left - 10; if (left + 320 > window.innerWidth - 8) left = window.innerWidth - 328; setPos({ top: r.bottom + 6, left }); }; calc(); window.addEventListener("scroll", calc, true); window.addEventListener("resize", calc); return () => { window.removeEventListener("scroll", calc, true); window.removeEventListener("resize", calc); }; }, [anchor]);
@@ -1377,16 +1377,16 @@ function GrpByMenu({ anchor, groupBy, onGroupBy, onClose }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    COLUMN TYPES
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 const COLUMN_TYPES = [
-  { type: "text", icon: "📝", label: "Text", desc: "Add notes or free text" },
-  { type: "number", icon: "🔢", label: "Numbers", desc: "Track progress, budget" },
-  { type: "date2", icon: "📅", label: "Date", desc: "Set another date" },
-  { type: "link", icon: "🔗", label: "Link", desc: "Add a URL" },
-  { type: "timeline", icon: "📊", label: "Timeline", desc: "Start date → end date" },
-  { type: "rating", icon: "⭐", label: "Rating", desc: "Rate 1–5 stars" },
+  { type: "text", icon: "Edit", label: "Text", desc: "Add notes or free text" },
+  { type: "number", icon: "", label: "Numbers", desc: "Track progress, budget" },
+  { type: "date2", icon: "Date", label: "Date", desc: "Set another date" },
+  { type: "link", icon: "", label: "Link", desc: "Add a URL" },
+  { type: "timeline", icon: "Metrics", label: "Timeline", desc: "Start date  end date" },
+  { type: "rating", icon: "Featured", label: "Rating", desc: "Rate 1–5 stars" },
 ];
 
 function AddColumnModal({ onAdd, onClose }) {
@@ -1397,7 +1397,7 @@ function AddColumnModal({ onAdd, onClose }) {
       <div style={{ background: "#fff", borderRadius: 16, width: 480, boxShadow: "0 24px 80px rgba(124,58,237,0.25)", overflow: "hidden" }}>
         <div style={{ background: `linear-gradient(135deg,${P.dark},${P.mid})`, padding: "16px 20px" }}>
           <div style={{ display: "flex", justifyContent: "space-between" }}><div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>Add Column</div><button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 7, width: 28, height: 28, cursor: "pointer", color: "#fff", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button></div>
-          <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.15)", borderRadius: 8, padding: "7px 11px" }}><span style={{ fontSize: 13, color: "rgba(255,255,255,0.6)" }}>🔍</span><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search column types…" style={{ border: "none", outline: "none", background: "transparent", fontSize: 13, color: "#fff", fontFamily: "inherit", flex: 1 }} /></div>
+          <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.15)", borderRadius: 8, padding: "7px 11px" }}><span style={{ fontSize: 13, color: "rgba(255,255,255,0.6)" }}>Search</span><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search column types…" style={{ border: "none", outline: "none", background: "transparent", fontSize: 13, color: "#fff", fontFamily: "inherit", flex: 1 }} /></div>
         </div>
         <div style={{ padding: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, maxHeight: 380, overflowY: "auto" }}>
           {filtered.map(ct => (
@@ -1412,33 +1412,33 @@ function AddColumnModal({ onAdd, onClose }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    COLUMN HEADER
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function ColHeader({ col, onRename, onDelete, onMoveLeft, onMoveRight, canMoveLeft, canMoveRight }) {
   const [editing, setEditing] = useState(false); const [val, setVal] = useState(col.label);
   const [menuOpen, setMenuOpen] = useState(false); const menuRef = useRef();
-  const ct = COLUMN_TYPES.find(c => c.type === col.type) || { icon: "📝" };
+  const ct = COLUMN_TYPES.find(c => c.type === col.type) || { icon: "Edit" };
   if (editing) return (<div style={{ display: "flex", alignItems: "center", padding: "0 6px", gap: 4, width: "100%" }}><input autoFocus value={val} onChange={e => setVal(e.target.value)} onBlur={() => { onRename(col.id, val || col.label); setEditing(false); }} onKeyDown={e => { if (e.key === "Enter") { onRename(col.id, val || col.label); setEditing(false); } if (e.key === "Escape") setEditing(false); }} style={{ flex: 1, border: `1.5px solid ${P.accent}`, borderRadius: 5, padding: "3px 7px", fontSize: 11, fontFamily: "inherit", outline: "none", color: P.text, background: "#fff" }} /></div>);
   return (
     <div className="col-hdr" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 3, padding: "7px 4px", position: "relative", width: "100%", cursor: "grab", userSelect: "none" }}>
       <span style={{ fontSize: 11 }}>{ct.icon}</span>
       <span style={{ fontSize: 11, color: P.muted, fontWeight: 700, letterSpacing: 0.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 70 }}>{col.label}</span>
       <div ref={menuRef} onClick={e => { e.stopPropagation(); setMenuOpen(v => !v); }} className="col-menu-btn" style={{ width: 13, height: 13, borderRadius: 3, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 9, color: P.muted, opacity: 0, transition: "opacity .1s", flexShrink: 0 }}>▾</div>
-      {menuOpen && (<DD anchor={menuRef} onClose={() => setMenuOpen(false)} w={160}><MI icon="Edit" title="Rename" onClick={() => { setEditing(true); setMenuOpen(false); }} />{canMoveLeft && <MI icon="‹" title="Move left" onClick={() => { onMoveLeft(); setMenuOpen(false); }} />}{canMoveRight && <MI icon="›" title="Move right" onClick={() => { onMoveRight(); setMenuOpen(false); }} />}<Sep /><MI icon="   Delete️️️️️" title="Delete column" danger onClick={() => { onDelete(col.id); setMenuOpen(false); }} /></DD>)}
+      {menuOpen && (<DD anchor={menuRef} onClose={() => setMenuOpen(false)} w={160}><MI icon="Edit" title="Rename" onClick={() => { setEditing(true); setMenuOpen(false); }} />{canMoveLeft && <MI icon="‹" title="Move left" onClick={() => { onMoveLeft(); setMenuOpen(false); }} />}{canMoveRight && <MI icon="›" title="Move right" onClick={() => { onMoveRight(); setMenuOpen(false); }} />}<Sep /><MI icon="Delete" title="Delete column" danger onClick={() => { onDelete(col.id); setMenuOpen(false); }} /></DD>)}
     </div>
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    CELL RENDERER
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function Cell({ col, value, onChange }) {
   const [localVal, setLocalVal] = useState(value ?? ""); const [open, setOpen] = useState(false); const ref = useRef();
   useEffect(() => { setLocalVal(value ?? ""); }, [value]);
-  if (col.type === "checkbox") { const checked = value === true || value === "true" || value === 1; return (<div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", cursor: "pointer" }} onClick={() => onChange(!checked)}><div style={{ width: 17, height: 17, borderRadius: 4, border: checked ? "none" : `1.5px solid ${P.muted}`, background: checked ? P.accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700 }}>{checked && "✓"}</div></div>); }
+  if (col.type === "checkbox") { const checked = value === true || value === "true" || value === 1; return (<div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", cursor: "pointer" }} onClick={() => onChange(!checked)}><div style={{ width: 17, height: 17, borderRadius: 4, border: checked ? "none" : `1.5px solid ${P.muted}`, background: checked ? P.accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700 }}>{checked && "Yes"}</div></div>); }
   if (col.type === "priority") { const v = value || "—"; const cfg = PRIORITY_CFG[v] || PRIORITY_CFG["—"]; return (<div ref={ref} style={{ height: "100%", display: "flex", alignItems: "stretch" }}><div onClick={() => setOpen(o => !o)} style={{ flex: 1, background: cfg.bg, color: cfg.fg, fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>{v}</div>{open && <PriorityPicker anchor={ref} currentValue={v} onSelect={v => { onChange(v); setOpen(false); }} onClose={() => setOpen(false)} />}</div>); }
-  if (col.type === "rating") { const v = Number(value) || 0; return (<div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 2, height: "100%" }}>{[1, 2, 3, 4, 5].map(n => (<span key={n} onClick={() => onChange(v === n ? 0 : n)} style={{ fontSize: 15, cursor: "pointer", color: n <= v ? "#f59e0b" : "#e2e8f0" }}>★</span>))}</div>); }
+  if (col.type === "rating") { const v = Number(value) || 0; return (<div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 2, height: "100%" }}>{[1, 2, 3, 4, 5].map(n => (<span key={n} onClick={() => onChange(v === n ? 0 : n)} style={{ fontSize: 15, cursor: "pointer", color: n <= v ? "#f59e0b" : "#e2e8f0" }}></span>))}</div>); }
   if (col.type === "date2") { return (<input type="date" value={localVal} onChange={e => { setLocalVal(e.target.value); onChange(e.target.value); }} style={{ width: "100%", height: "100%", border: "none", outline: "none", fontSize: 11, color: P.muted, fontFamily: "inherit", background: "transparent", cursor: "pointer", textAlign: "center", padding: "0 4px" }} />); }
   if (col.type === "status2") { const opts = ["—", "Done", "In Progress", "Blocked", "Review", "On Hold"]; const colorMap = { "Done": "#00c875", "In Progress": "#fdab3d", "Blocked": "#e2445c", "Review": "var(--app-accent)", "On Hold": "var(--app-accent)", "—": "#e2e8f0" }; const v = value || "—"; return (<div ref={ref} style={{ height: "100%", display: "flex", alignItems: "stretch" }}><div onClick={() => setOpen(o => !o)} style={{ flex: 1, background: colorMap[v] || "#e2e8f0", color: v === "—" ? "#94a3b8" : "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>{v}</div>{open && (<DD anchor={ref} onClose={() => setOpen(false)} w={160}>{opts.map(o => (<div key={o} onClick={() => { onChange(o); setOpen(false); }} style={{ borderRadius: 6, overflow: "hidden", marginBottom: 2, cursor: "pointer" }}><div style={{ background: colorMap[o] || "#e2e8f0", color: o === "—" ? "#94a3b8" : "#fff", padding: "6px 14px", fontSize: 12, fontWeight: 700, textAlign: "center" }}>{o}</div></div>))}</DD>)}</div>); }
   if (col.type === "tags") {
@@ -1450,16 +1450,16 @@ function Cell({ col, value, onChange }) {
 
           ...tags, e.target.value.trim()].join(",")); e.target.value = "";
       }
-    }} style={{ width: "100%", border: `1.5px solid ${P.border}`, borderRadius: 7, padding: "6px 9px", fontSize: 12, fontFamily: "inherit", outline: "none" }} /></div>{tags.map(t => (<div key={t} style={{ display: "flex", alignItems: "center", gap: 7, padding: "5px 8px", borderRadius: 6 }}><span style={{ fontSize: 11, background: "#e0e7ff", color: "#4338ca", borderRadius: 10, padding: "2px 8px", fontWeight: 600 }}>{t}</span><span onClick={e => { e.stopPropagation(); onChange(tags.filter(x => x !== t).join(",")); }} style={{ marginLeft: "auto", color: "#e2445c", fontSize: 12, cursor: "pointer" }}>✕</span></div>))}</DD>)}</div>);
+    }} style={{ width: "100%", border: `1.5px solid ${P.border}`, borderRadius: 7, padding: "6px 9px", fontSize: 12, fontFamily: "inherit", outline: "none" }} /></div>{tags.map(t => (<div key={t} style={{ display: "flex", alignItems: "center", gap: 7, padding: "5px 8px", borderRadius: 6 }}><span style={{ fontSize: 11, background: "#e0e7ff", color: "#4338ca", borderRadius: 10, padding: "2px 8px", fontWeight: 600 }}>{t}</span><span onClick={e => { e.stopPropagation(); onChange(tags.filter(x => x !== t).join(",")); }} style={{ marginLeft: "auto", color: "#e2445c", fontSize: 12, cursor: "pointer" }}>Close</span></div>))}</DD>)}</div>);
   }
   if (col.type === "link") { return (<input value={localVal} onChange={e => setLocalVal(e.target.value)} onBlur={() => onChange(localVal)} placeholder="https://…" style={{ width: "100%", height: "100%", border: "none", outline: "none", fontSize: 11, color: "var(--app-accent)", fontFamily: "inherit", background: "transparent", padding: "0 8px", textAlign: "center" }} />); }
-  if (col.type === "timeline") { const parts = (value || "").split("→").map(s => s.trim()); return (<div style={{ display: "flex", alignItems: "center", gap: 2, padding: "0 4px", height: "100%" }}><input type="date" defaultValue={parts[0] || ""} onChange={e => onChange(`${e.target.value}→${parts[1] || ""}`)} style={{ flex: 1, border: "none", outline: "none", fontSize: 10, color: P.muted, fontFamily: "inherit", background: "transparent", cursor: "pointer" }} /><span style={{ fontSize: 9, color: P.muted }}>→</span><input type="date" defaultValue={parts[1] || ""} onChange={e => onChange(`${parts[0] || ""}→${e.target.value}`)} style={{ flex: 1, border: "none", outline: "none", fontSize: 10, color: P.muted, fontFamily: "inherit", background: "transparent", cursor: "pointer" }} /></div>); }
+  if (col.type === "timeline") { const parts = (value || "").split("").map(s => s.trim()); return (<div style={{ display: "flex", alignItems: "center", gap: 2, padding: "0 4px", height: "100%" }}><input type="date" defaultValue={parts[0] || ""} onChange={e => onChange(`${e.target.value}${parts[1] || ""}`)} style={{ flex: 1, border: "none", outline: "none", fontSize: 10, color: P.muted, fontFamily: "inherit", background: "transparent", cursor: "pointer" }} /><span style={{ fontSize: 9, color: P.muted }}></span><input type="date" defaultValue={parts[1] || ""} onChange={e => onChange(`${parts[0] || ""}${e.target.value}`)} style={{ flex: 1, border: "none", outline: "none", fontSize: 10, color: P.muted, fontFamily: "inherit", background: "transparent", cursor: "pointer" }} /></div>); }
   return (<input value={localVal} onChange={e => setLocalVal(e.target.value)} type={col.type === "number" ? "number" : "text"} placeholder={col.type === "number" ? "0" : "—"} style={{ width: "100%", height: "100%", border: "none", outline: "none", fontSize: 12, color: P.text, fontFamily: "inherit", background: "transparent", padding: "0 8px", textAlign: col.type === "number" ? "center" : "left" }} onFocus={e => { e.target.style.background = "#fff"; e.target.style.boxShadow = `inset 0 0 0 1.5px ${P.accent}`; }} onBlur={e => { onChange(localVal); e.target.style.background = "transparent"; e.target.style.boxShadow = "none"; }} />);
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    STATUS BAR WITH TOOLTIP
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function StatusBarWithTooltip({ statusCounts, total }) {
   const [hovered, setHovered] = React.useState(null);
   return (
@@ -1473,12 +1473,12 @@ function StatusBarWithTooltip({ statusCounts, total }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    TASK ROW
-══════════════════════════════════════════════════════════ */
-/* ══════════════════════════════════════════════════════════
+---------------------------------------------------------- */
+/* ----------------------------------------------------------
    PROJECT CELL
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function ProjectCell({ task, projects, onField }) {
   const [open, setOpen] = useState(false);
   const ref = useRef();
@@ -1501,8 +1501,8 @@ function ProjectCell({ task, projects, onField }) {
         cursor: "pointer"
       }}
       onClick={(e) => {
-        e.stopPropagation(); // ← இது முக்கியம்
-        setOpen(v => !v);   // ← open ஆகும்போது மட்டும்
+        e.stopPropagation(); //  இது முக்கியம்
+        setOpen(v => !v);   //  open ஆகும்போது மட்டும்
       }}
       onMouseEnter={e => e.currentTarget.style.background = P.light}
       onMouseLeave={e => e.currentTarget.style.background = "transparent"}
@@ -1521,7 +1521,7 @@ function ProjectCell({ task, projects, onField }) {
 
       </div>
 
-      {/* ✅ open true ஆனா மட்டும் show */}
+      {/* Success open true ஆனா மட்டும் show */}
       {open && (
         <ProjectPicker
           anchor={ref}
@@ -1529,7 +1529,7 @@ function ProjectCell({ task, projects, onField }) {
           currentProjectId={task.projectId}
           onSelect={pid => {
             onField(task._id || task.id, "projectId", pid);
-            setOpen(false); // ← select பண்ணிட்டா close
+            setOpen(false); //  select பண்ணிட்டா close
           }}
           onClose={() => setOpen(false)}
         />
@@ -1538,9 +1538,9 @@ function ProjectCell({ task, projects, onField }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    TASK ROW
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, onOpen, selected, groupColor, employees, extraCols, onExtraField, hiddenCols, onInvite, onAutoAssign, projects, shareTask }) {
   const statusRef = useRef(); const dotsRef = useRef(); const personRef = useRef(); const priorityRef = useRef();
   const [spOpen, setSpOpen] = useState(false); const [ppOpen, setPpOpen] = useState(false);
@@ -1859,12 +1859,12 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
             e.currentTarget.style.opacity = hovered ? "1" : "0.6";
           }}
         >
-          Delete
+     Delete
         </button>
         <div ref={dotsRef} onClick={e => { e.stopPropagation(); setDotsOpen(v => !v); }} style={{ width: 26, height: 26, borderRadius: 5, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, color: P.muted, letterSpacing: 1, userSelect: "none" }} onMouseEnter={e => e.currentTarget.style.background = P.border} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>···</div>
         {dotsOpen && (<DD anchor={dotsRef} onClose={() => setDotsOpen(false)} w={180}>
           <MI icon="⎘" title="Duplicate" onClick={() => { onDup(task); setDotsOpen(false); }} />
-          <MI icon="💬" title="Share WhatsApp" onClick={() => { shareTask(task); setDotsOpen(false); }} />
+          <MI icon="Comment" title="Share WhatsApp" onClick={() => { shareTask(task); setDotsOpen(false); }} />
           <Sep />
           <MI title="Delete task" danger onClick={() => { onDel(id); setDotsOpen(false); }} />
         </DD>)}
@@ -1873,9 +1873,9 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    TASK UPDATE PANEL
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 // function TaskUpdatePanel({ task, onClose, onField }) {
 //   const [tab, setTab] = useState("updates"); const [updateText, setUpdateText] = useState(""); const [updates, setUpdates] = useState([]);
 //   const postUpdate = () => { if (!updateText.trim()) return; setUpdates(p => [{ id: Date.now(), text: updateText, time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }), date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }), ...p }]); setUpdateText(""); };
@@ -1909,9 +1909,9 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
 //   );
 // }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    ADD GROUP ROW
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function AddGroupRow({ onAdd, triggerRef }) {
   const [active, setActive] = useState(false); const [label, setLabel] = useState(""); const inputRef = useRef();
   useEffect(() => { if (triggerRef) triggerRef.current = { trigger: () => setActive(true) }; }, [triggerRef]);
@@ -1938,12 +1938,12 @@ function AddGroupRow({ onAdd, triggerRef }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    GROUP BLOCK
-══════════════════════════════════════════════════════════ */
-/* ══════════════════════════════════════════════════════════
+---------------------------------------------------------- */
+/* ----------------------------------------------------------
    GROUP BLOCK
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, onAddTask, onDup, onDel, onOpen, selectedId, isVirtual, onDelGroup, employees, showToast, extraCols, onExtraField, onAddCol, onRenameCol, onDeleteCol, hiddenCols, onMoveCol, onInvite, onAutoAssign, projects, shareTask }) {
   const [adding, setAdding] = useState(false); const [newTitle, setNewTitle] = useState("");
   const gid = group._id || group.id; const tasks = group.tasks || [];
@@ -1988,7 +1988,7 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
                 ))}
                 <div style={{ width: COL_W.dots, flexShrink: 0 }} />
 
-                {/* ✅ + Add Column button — HEADER ROW-ல */}
+                {/* Success + Add Column button — HEADER ROW-ல */}
                 <div
                   onClick={onAddCol}
                   style={{
@@ -2040,7 +2040,7 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
                   <div style={{ width: COL_W.task, flexShrink: 0, position: "sticky", left: 0, zIndex: 10, background: P.light, borderRight: `1px solid ${P.border}`, padding: "6px 8px", display: "flex", gap: 6, alignItems: "center" }}>
                     <input autoFocus placeholder="Task name…" value={newTitle} onChange={e => setNewTitle(e.target.value)} onKeyDown={e => { if (e.key === "Enter") submit(); if (e.key === "Escape") { setAdding(false); setNewTitle(""); } }} style={{ flex: 1, border: `1.5px solid ${P.accent}`, borderRadius: 6, padding: "5px 9px", fontSize: 13, fontFamily: "inherit", outline: "none", color: P.text, background: "#fff" }} />
                     <button onClick={submit} style={{ background: `linear-gradient(135deg,${P.accent},var(--app-accent))`, color: "#fff", border: "none", borderRadius: 6, padding: "5px 13px", fontSize: 12, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Add</button>
-                    <button onClick={() => { setAdding(false); setNewTitle(""); }} style={{ background: "#fff", color: P.mid, border: `1px solid ${P.border}`, borderRadius: 6, padding: "5px 9px", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>✕</button>
+                    <button onClick={() => { setAdding(false); setNewTitle(""); }} style={{ background: "#fff", color: P.mid, border: `1px solid ${P.border}`, borderRadius: 6, padding: "5px 9px", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>Close</button>
                   </div>
                   {!hcSet.has('person') && <div style={{ width: COL_W.person, flexShrink: 0, borderRight: `1px solid ${P.border}` }} />}
                   {!hcSet.has('status') && <div style={{ width: COL_W.status, flexShrink: 0, borderRight: `1px solid ${P.border}` }} />}
@@ -2079,7 +2079,7 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
                     {visibleExtraCols.map(col => {
                       if (col.type === "number") { const sum = tasks.reduce((a, t) => a + Number((t.extraData || {})[col.id] || 0), 0); return (<div key={col.id} style={{ width: extraColWidth(col.type), flexShrink: 0, borderRight: `1px solid ${P.border}`, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 6px" }}>{sum > 0 && <span style={{ fontSize: 11, color: "#323338", fontWeight: 600 }}>{sum}</span>}</div>); }
                       if (col.type === "checkbox") { const chk = tasks.filter(t => { const v = (t.extraData || {})[col.id]; return v === true || v === "true" || v === 1; }).length; return (<div key={col.id} style={{ width: extraColWidth(col.type), flexShrink: 0, borderRight: `1px solid ${P.border}`, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 6px" }}><span style={{ fontSize: 11, color: "#9aadbd", fontWeight: 600 }}>{chk}/{total}</span></div>); }
-                      if (col.type === "rating") { const rated = tasks.filter(t => Number((t.extraData || {})[col.id]) > 0); const avg = rated.length ? Math.round(rated.reduce((a, t) => a + Number((t.extraData || {})[col.id] || 0), 0) / rated.length) : 0; return (<div key={col.id} style={{ width: extraColWidth(col.type), flexShrink: 0, borderRight: `1px solid ${P.border}`, display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}>{avg > 0 && <><span style={{ fontSize: 12, color: "#f59e0b" }}>{"★".repeat(avg)}</span><span style={{ fontSize: 10, color: "#9aadbd" }}>{rated.length}</span></>}</div>); }
+                      if (col.type === "rating") { const rated = tasks.filter(t => Number((t.extraData || {})[col.id]) > 0); const avg = rated.length ? Math.round(rated.reduce((a, t) => a + Number((t.extraData || {})[col.id] || 0), 0) / rated.length) : 0; return (<div key={col.id} style={{ width: extraColWidth(col.type), flexShrink: 0, borderRight: `1px solid ${P.border}`, display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}>{avg > 0 && <><span style={{ fontSize: 12, color: "#f59e0b" }}>{"".repeat(avg)}</span><span style={{ fontSize: 10, color: "#9aadbd" }}>{rated.length}</span></>}</div>); }
                       return <div key={col.id} style={{ width: extraColWidth(col.type), flexShrink: 0, borderRight: `1px solid ${P.border}` }} />;
                     })}
                     <div style={{ width: COL_W.dots, flexShrink: 0 }} />
@@ -2094,9 +2094,9 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    DETAIL PANEL
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function DetailPanel({ task, onClose, onField, projects }) {
   const id = task._id || task.id; const sc = STATUS_CFG[task.status] || STATUS_CFG["Not Started"];
   const inp = { width: "100%", border: `1.5px solid ${P.border}`, borderRadius: 8, padding: "8px 11px", fontSize: 13, fontFamily: "inherit", color: P.text, outline: "none", background: P.light, boxSizing: "border-box" };
@@ -2106,7 +2106,7 @@ function DetailPanel({ task, onClose, onField, projects }) {
     <div style={{ width: 340, flexShrink: 0, background: "#fff", borderLeft: `1.5px solid ${P.border}`, display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
       <div style={{ background: P.light, borderBottom: `1.5px solid ${P.border}`, padding: "14px 16px", flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10 }}>
-          <div style={{ flex: 1, marginRight: 8 }}><div style={{ fontSize: 15, fontWeight: 700, color: P.text, lineHeight: 1.4, marginBottom: 8 }}>{task.title}</div><div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}><div style={{ background: sc.bg, color: sc.fg, borderRadius: 4, padding: "3px 10px", fontSize: 11, fontWeight: 700 }}>{task.status}</div>{task.date && <span style={{ fontSize: 11, color: P.muted }}>📅 {fmt(task.date)}</span>}</div></div>
+          <div style={{ flex: 1, marginRight: 8 }}><div style={{ fontSize: 15, fontWeight: 700, color: P.text, lineHeight: 1.4, marginBottom: 8 }}>{task.title}</div><div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}><div style={{ background: sc.bg, color: sc.fg, borderRadius: 4, padding: "3px 10px", fontSize: 11, fontWeight: 700 }}>{task.status}</div>{task.date && <span style={{ fontSize: 11, color: P.muted }}>Date {fmt(task.date)}</span>}</div></div>
           <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: P.muted, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>×</button>
         </div>
       </div>
@@ -2150,9 +2150,9 @@ function DetailPanel({ task, onClose, onField, projects }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    PERSON FILTER PANEL
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function PersonFilterPanel({ anchor, onClose, groups, filters, onToggle, onClear }) {
   const allTasks = groups.flatMap(g => g.tasks || []);
   const owners = [...new Set(allTasks.map(t => t.assignTo).filter(v => v && v !== "Unassigned" && v !== ""))];
@@ -2163,15 +2163,15 @@ function PersonFilterPanel({ anchor, onClose, groups, filters, onToggle, onClear
     <div ref={ref} style={{ position: "fixed", top: pos.top, left: pos.left, zIndex: 9500, background: "#fff", border: "1px solid #dde1ea", borderRadius: 12, boxShadow: "0 8px 40px rgba(0,0,0,0.14)", fontFamily: "inherit", width: 240, padding: "8px 0" }}>
       <div style={{ fontSize: 11, fontWeight: 700, color: "#9aadbd", letterSpacing: .7, textTransform: "uppercase", padding: "4px 14px 8px" }}>Filter by person</div>
       {owners.length === 0 && <div style={{ padding: "8px 14px", fontSize: 12, color: P.muted }}>No people assigned yet</div>}
-      {owners.map(o => { const on = filters.owner.has(o); return (<div key={o} onClick={() => onToggle("owner", o)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 14px", cursor: "pointer", background: on ? "#e8f4fd" : "transparent" }} onMouseEnter={e => { if (!on) e.currentTarget.style.background = "#f5f6f8"; }} onMouseLeave={e => { e.currentTarget.style.background = on ? "#e8f4fd" : "transparent"; }}><div style={{ width: 16, height: 16, borderRadius: 3, background: on ? "var(--app-accent)" : "#fff", border: on ? "none" : "1.5px solid #c5c9d6", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700 }}>{on ? "✓" : ""}</div><div style={{ width: 26, height: 26, borderRadius: "50%", background: getAvatarColor(o), display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 9, fontWeight: 700, flexShrink: 0 }}>{o.slice(0, 2).toUpperCase()}</div><span style={{ fontSize: 13, color: on ? "var(--app-accent)" : "#323338", fontWeight: on ? 600 : 400, flex: 1 }}>{o}</span><span style={{ fontSize: 11, color: "#9aadbd" }}>{allTasks.filter(t => t.assignTo === o).length}</span></div>); })}
+      {owners.map(o => { const on = filters.owner.has(o); return (<div key={o} onClick={() => onToggle("owner", o)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 14px", cursor: "pointer", background: on ? "#e8f4fd" : "transparent" }} onMouseEnter={e => { if (!on) e.currentTarget.style.background = "#f5f6f8"; }} onMouseLeave={e => { e.currentTarget.style.background = on ? "#e8f4fd" : "transparent"; }}><div style={{ width: 16, height: 16, borderRadius: 3, background: on ? "var(--app-accent)" : "#fff", border: on ? "none" : "1.5px solid #c5c9d6", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700 }}>{on ? "Yes" : ""}</div><div style={{ width: 26, height: 26, borderRadius: "50%", background: getAvatarColor(o), display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 9, fontWeight: 700, flexShrink: 0 }}>{o.slice(0, 2).toUpperCase()}</div><span style={{ fontSize: 13, color: on ? "var(--app-accent)" : "#323338", fontWeight: on ? 600 : 400, flex: 1 }}>{o}</span><span style={{ fontSize: 11, color: "#9aadbd" }}>{allTasks.filter(t => t.assignTo === o).length}</span></div>); })}
       {filters.owner.size > 0 && (<div onClick={onClear} style={{ borderTop: "1px solid #eef0f4", padding: "8px 14px", cursor: "pointer", fontSize: 12, color: "#e2445c", fontWeight: 600 }} onMouseEnter={e => e.currentTarget.style.background = "#fff5f5"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>Clear person filter</div>)}
     </div>
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    INVITE MODAL
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 function InviteModal({ task, onClose, onSend }) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -2217,9 +2217,9 @@ function InviteModal({ task, onClose, onSend }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ----------------------------------------------------------
    MAIN PAGE
-══════════════════════════════════════════════════════════ */
+---------------------------------------------------------- */
 export default function TaskPage({ projects = [], employees = [], config, user, selectedProjectId = null, selectedProjectName = null, onClearProjectFilter, onSelectProject, onUpdate, autoOpenAddModal = false, onAddModalOpened }) {
   const S_LIST = config?.taskStatuses || STATUS_LIST;
   const P_LIST = config?.taskPriorities || PRIORITY_LIST;
@@ -2357,7 +2357,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
           axios.post(`${BASE_URL}/api/notifications`, {
             userId: emp._id || emp.id,
             type: 'task',
-            icon: '📝',
+            icon: 'Edit',
             text: `Task assigned to you: "${(selected?.title || 'New Task')}"`,
             link: 'tasks'
           }).catch(() => {});
@@ -2371,7 +2371,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
   const dupTask = async (task) => addTask(task.groupId, task.title + " (copy)");
 
   const shareTask = (task) => {
-    const text = `📌 *Task Alert* 📌\n\n*Task:* ${task.title}\n*Status:* ${task.status}\n*Priority:* ${task.priority || "Medium"}\n*Due Date:* ${task.date || "Not set"}\n*Assignee:* ${task.assignTo || "Unassigned"}\n\n_Managed via ${user?.companyName || ""} _`;
+    const text = `Pin *Task Alert* Pin\n\n*Task:* ${task.title}\n*Status:* ${task.status}\n*Priority:* ${task.priority || "Medium"}\n*Due Date:* ${task.date || "Not set"}\n*Assignee:* ${task.assignTo || "Unassigned"}\n\n_Managed via ${user?.companyName || ""} _`;
     const url = `whatsapp://send?text=${encodeURIComponent(text)}`;
     window.open(url, "_blank");
   };
@@ -2406,7 +2406,7 @@ const assignedName = r.data.assignedTo?.[0]?.name ||
           axios.post(`${BASE_URL}/api/notifications`, {
             userId: emp._id || emp.id,
             type: 'task',
-            icon: '📝',
+            icon: 'Edit',
             text: `Task auto-assigned to you: "${task.title || 'New Task'}"`,
             link: 'tasks'
           }).catch(() => {});
@@ -2548,7 +2548,7 @@ const assignedName = r.data.assignedTo?.[0]?.name ||
                 onClick={onClearProjectFilter}
                 style={{ background: "#fef2f2", border: "1px solid #fee2e2", color: "#ef4444", borderRadius: 8, padding: "4px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}
               >
-                ✕ Exit Project View
+                Close Exit Project View
               </button>
             )}
 
@@ -2558,7 +2558,7 @@ const assignedName = r.data.assignedTo?.[0]?.name ||
               <div ref={projRef} onClick={() => { closeAll(); setProjOpen(v => !v); }}
                 style={{ display: "flex", alignItems: "center", gap: 0, cursor: "pointer", border: `1px solid ${projOpen ? P.accent : P.border}`, borderRadius: 8, overflow: "hidden", background: projOpen ? P.light : "#fff", marginRight: 8 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 7, padding: "6px 12px", fontSize: 13, fontWeight: 700, color: projOpen ? P.accent : P.text }}>
-                  <span style={{ fontSize: 15 }}>📁</span><span>{selectedProjectName || "All Projects"}</span>
+                  <span style={{ fontSize: 15 }}>Folder</span><span>{selectedProjectName || "All Projects"}</span>
                 </div>
                 <div style={{ padding: "6px 8px", borderLeft: `1px solid ${P.border}`, fontSize: 11, color: projOpen ? P.accent : P.muted }}>▾</div>
               </div>
@@ -2567,14 +2567,14 @@ const assignedName = r.data.assignedTo?.[0]?.name ||
                   <div style={{ padding: "10px 14px 6px", fontSize: 11, fontWeight: 700, color: P.muted, letterSpacing: .8, textTransform: "uppercase" }}>
                     Select Project
                   </div>
-                  <MI icon="🌐" title="All Projects (General)" active={!selectedProjectId} onClick={() => { onSelectProject(null); setProjOpen(false); }} />
+                  <MI icon="Web" title="All Projects (General)" active={!selectedProjectId} onClick={() => { onSelectProject(null); setProjOpen(false); }} />
                   <Sep />
                   <div style={{ maxHeight: 300, overflowY: "auto" }}>
                     {projects.length === 0 ? (
                       <div style={{ padding: "12px 14px", fontSize: 12, color: P.muted, fontStyle: "italic" }}>No projects found</div>
                     ) : (
                       projects.map(p => (
-                        <MI key={p._id || p.id} icon="📁" title={p.name} sub={p.client} active={selectedProjectId === (p._id || p.id)} onClick={() => { onSelectProject(p); setProjOpen(false); }} />
+                        <MI key={p._id || p.id} icon="Folder" title={p.name} sub={p.client} active={selectedProjectId === (p._id || p.id)} onClick={() => { onSelectProject(p); setProjOpen(false); }} />
                       ))
                     )}
                   </div>
@@ -2615,7 +2615,7 @@ const assignedName = r.data.assignedTo?.[0]?.name ||
 
 
               <div style={{ position: "relative", flexShrink: 0 }}>
-                <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 13, pointerEvents: "none", color: P.muted }}>🔍</span>
+                <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 13, pointerEvents: "none", color: P.muted }}>Search</span>
                 <input placeholder="Search tasks..." value={search} onChange={e => setSearch(e.target.value)}
                   style={{ border: `1.5px solid ${search ? P.accent : P.border}`, borderRadius: 8, padding: "5px 10px 5px 28px", fontSize: 13, color: P.text, outline: "none", width: search ? 360 : 100, minWidth: 160, background: search ? "#fff" : P.light, transition: "all .2s", fontFamily: "inherit" }}
                   onFocus={e => { e.target.style.borderColor = P.accent; e.target.style.background = "#fff"; e.target.style.width = "200px"; }}
@@ -2628,12 +2628,12 @@ const assignedName = r.data.assignedTo?.[0]?.name ||
             {sortOpen && <SortMenu anchor={sortRef} sort={sort} onSort={setSort} onClose={() => setSortOpen(false)} />}
             <TB ref={hideRef} icon="View" label="Hide" active={hiddenCols.size > 0} badge={hiddenCols.size > 0 ? hiddenCols.size : null} onClick={() => { closeAll(); setHideOpen(v => !v); }} />
             {hideOpen && <HideMenu anchor={hideRef} onClose={() => setHideOpen(false)} extraCols={extraCols} hiddenCols={hiddenCols} onToggleHide={toggleHideCol} />}
-            <TB ref={grpByRef} icon="⊟" label="Group by" active={groupBy !== "default"} onClick={() => { closeAll(); setGrpByOpen(v => !v); }} />
+            <TB ref={grpByRef} icon="x" label="Group by" active={groupBy !== "default"} onClick={() => { closeAll(); setGrpByOpen(v => !v); }} />
             {grpByOpen && <GrpByMenu anchor={grpByRef} groupBy={groupBy} onGroupBy={setGroupBy} onClose={() => setGrpByOpen(false)} />}
             <TB ref={moreRef} icon="···" onClick={() => { closeAll(); setMoreOpen(v => !v); }} />
             {moreOpen && (<DD anchor={moreRef} onClose={() => setMoreOpen(false)} w={200}>
-              <MI icon="📥" title="Import" sub="CSV or Excel" onClick={() => { setShowImport(true); setMoreOpen(false); }} />
-              <MI icon="📤" title="Export" sub="Download as CSV" onClick={() => {
+              <MI icon="Import" title="Import" sub="CSV or Excel" onClick={() => { setShowImport(true); setMoreOpen(false); }} />
+              <MI icon="Export" title="Export" sub="Download as CSV" onClick={() => {
                 const allT = groups.flatMap(g => (g.tasks || []).map(t => ({ ...t, groupName: g.label })));
                 const headers = ["Task", "Group", "Owner", "Status", "Due Date", "Priority"];
                 const rows = allT.map(t => [`"${(t.title || '').replace(/"/g, '""')}"`, `"${(t.groupName || '').replace(/"/g, '""')}"`, `"${(t.assignTo || '')}"`, "\"" + t.status + "\"", `"${t.date || ''}"`, `"${t.priority || ''}"`].join(","));
@@ -2661,7 +2661,7 @@ const assignedName = r.data.assignedTo?.[0]?.name ||
               </div>
             ) : (
               <div style={{ padding: "16px 18px" }}>
-                {displayGroups.length === 0 && (<div style={{ textAlign: "center", padding: 60 }}><div style={{ fontSize: 44, marginBottom: 10 }}>📋</div><div style={{ fontSize: 15, fontWeight: 700, color: P.text, marginBottom: 5 }}>No tasks found</div><div style={{ fontSize: 13, color: P.muted }}>Clear filters or add a new task</div></div>)}
+                {displayGroups.length === 0 && (<div style={{ textAlign: "center", padding: 60 }}><div style={{ fontSize: 44, marginBottom: 10 }}>Document</div><div style={{ fontSize: 15, fontWeight: 700, color: P.text, marginBottom: 5 }}>No tasks found</div><div style={{ fontSize: 13, color: P.muted }}>Clear filters or add a new task</div></div>)}
                 {displayGroups.map(g => (
                   <GroupBlock key={g._id || g.id} group={g} isVirtual={!!g.isVirtual}
                     onToggle={toggleGroup} onCheck={toggleCheck}

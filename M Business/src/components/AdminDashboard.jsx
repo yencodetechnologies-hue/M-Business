@@ -91,7 +91,7 @@ export default function AdminDashboard({ user, setUser }) {
   const [npkg, setNpkg] = useState({
     title: "",
     description: "",
-    icon: "📦",
+    icon: "Package",
     isFree: false,
     price: "",
     noOfDays: "30",
@@ -326,7 +326,7 @@ export default function AdminDashboard({ user, setUser }) {
       setNpkg({
         title: "",
         description: "",
-        icon: "📦",
+        icon: "Package",
         isFree: false,
         price: "",
         noOfDays: "30",
@@ -364,7 +364,7 @@ export default function AdminDashboard({ user, setUser }) {
     setNpkg({
       title: pkg.title || "",
       description: pkg.description || "",
-      icon: pkg.icon || "📦",
+      icon: pkg.icon || "Package",
       isFree: pkg.type === "free",
       price: pkg.price?.toString() || "",
       noOfDays: pkg.no_of_days?.toString() || pkg.noOfDays?.toString() || "30",
@@ -455,7 +455,7 @@ export default function AdminDashboard({ user, setUser }) {
                   border: "none", borderRadius: 14, color: on ? (darkMode ? "#fff" : "#3b82f6") : (darkMode ? "rgba(255,255,255,0.5)" : "#64748b"),
                   fontWeight: on ? 800 : 600, fontSize: 14, cursor: "pointer", marginBottom: 6, transition: "0.2s"
                 }}>
-                <span style={{ fontSize: 18 }}>{n.key === 'dashboard' ? '📊' : n.key === 'subadmins' ? '🛡️' : n.key === 'proposals' ? '📄' : n.key === 'reports' ? '📈' : n.key === 'subscriptions' ? '💳' : n.key === 'packages' ? '📦' : '💸'}</span>
+                <span style={{ fontSize: 18 }}>{n.key === 'dashboard' ? 'Metrics' : n.key === 'subadmins' ? 'Security' : n.key === 'proposals' ? 'Document' : n.key === 'reports' ? 'Trends' : n.key === 'subscriptions' ? '' : n.key === 'packages' ? 'Package' : 'Payment'}</span>
                 <span style={{ flex: 1, textAlign: "left" }}>{n.label}</span>
                 {on && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981" }} />}
               </button>
@@ -476,7 +476,7 @@ export default function AdminDashboard({ user, setUser }) {
             marginBottom: 12
           }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: T.textMuted }}>
-              {darkMode ? "🌙 Dark Mode" : "☀️ Light Mode"}
+              {darkMode ? "Dark Mode" : "Light Mode"}
             </span>
             <div style={{
               width: 36, height: 20,
@@ -490,7 +490,7 @@ export default function AdminDashboard({ user, setUser }) {
               }} />
             </div>
           </div>
-          <button onClick={handleLogout} style={{ width: "100%", background: "rgba(239,68,68,0.1)", border: "none", borderRadius: 12, padding: "12px", color: "#f87171", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>🚪 Logout</button>
+          <button onClick={handleLogout} style={{ width: "100%", background: "rgba(239,68,68,0.1)", border: "none", borderRadius: 12, padding: "12px", color: "#f87171", fontSize: 13, fontWeight: 800, cursor: "pointer" }}> Logout</button>
         </div>
       </div>
 
@@ -501,7 +501,7 @@ export default function AdminDashboard({ user, setUser }) {
 
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             {active === "packages" && (
-              <button onClick={() => { setEditPkg(null); setNpkg({ title: "", description: "", icon: "📦", isFree: false, price: "", noOfDays: "30", planDuration: "Monthly Plan", businessLimit: "Single business manage", managerLimit: "1", clientLimit: "3", employeeLimit: "10", assignedSubadmins: [] }); setPkgError({}); setModal("package_add"); }}
+              <button onClick={() => { setEditPkg(null); setNpkg({ title: "", description: "", icon: "Package", isFree: false, price: "", noOfDays: "30", planDuration: "Monthly Plan", businessLimit: "Single business manage", managerLimit: "1", clientLimit: "3", employeeLimit: "10", assignedSubadmins: [] }); setPkgError({}); setModal("package_add"); }}
                 style={{ background: THEME.accent, color: "#fff", border: "none", borderRadius: 12, padding: "10px 24px", fontWeight: 800, fontSize: 13, cursor: "pointer", boxShadow: "0 4px 12px rgba(99,102,241,0.2)" }}>
                 + Add Package
               </button>
@@ -588,7 +588,7 @@ export default function AdminDashboard({ user, setUser }) {
             }}>
               <div>
                 <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#fff" }}>
-                  {editPkg ? "✏️ Edit Package" : "📦 Add New Package"}
+                  {editPkg ? "Edit Edit Package" : "Package Add New Package"}
                 </h2>
                 <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
                   {editPkg ? "Update subscription plan details" : "Create a subscription plan for subadmins"}
@@ -600,7 +600,7 @@ export default function AdminDashboard({ user, setUser }) {
                 borderRadius: 8, width: 32, height: 32,
                 color: "#fff", fontSize: 16, cursor: "pointer",
                 display: "flex", alignItems: "center", justifyContent: "center"
-              }}>✕</button>
+              }}>Close</button>
             </div>
 
             {/* Body */}
@@ -625,7 +625,7 @@ export default function AdminDashboard({ user, setUser }) {
                     onFocus={e => e.target.style.borderColor = "#7c3aed"}
                     onBlur={e => e.target.style.borderColor = pkgError.title ? "#ef4444" : "#e2e8f0"}
                   />
-                  {pkgError.title && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>⚠️ {pkgError.title}</div>}
+                  {pkgError.title && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>Warning {pkgError.title}</div>}
                 </div>
                 <div style={{ width: 90 }}>
                   <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>Icon</label>
@@ -633,7 +633,7 @@ export default function AdminDashboard({ user, setUser }) {
                     type="text"
                     value={npkg.icon}
                     onChange={e => setNpkg({ ...npkg, icon: e.target.value })}
-                    placeholder="📦"
+                    placeholder="Package"
                     style={{
                       width: "100%", padding: "11px 10px",
                       border: "1.5px solid #e2e8f0",
@@ -661,7 +661,7 @@ export default function AdminDashboard({ user, setUser }) {
                     fontFamily: "inherit", boxSizing: "border-box"
                   }}
                 />
-                {pkgError.description && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>⚠️ {pkgError.description}</div>}
+                {pkgError.description && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>Warning {pkgError.description}</div>}
               </div>
 
               {/* Package Type + Price in one row */}
@@ -687,7 +687,7 @@ export default function AdminDashboard({ user, setUser }) {
                           transition: "all 0.15s"
                         }}
                       >
-                        {type === "Free" ? "🎁 Free" : "💳 Paid"}
+                        {type === "Free" ? "Free" : "Paid"}
                       </button>
                     ))}
                   </div>
@@ -718,7 +718,7 @@ export default function AdminDashboard({ user, setUser }) {
                       }}
                     />
                   </div>
-                  {pkgError.price && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>⚠️ {pkgError.price}</div>}
+                  {pkgError.price && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>Warning {pkgError.price}</div>}
                 </div>
               </div>
 
@@ -738,7 +738,7 @@ export default function AdminDashboard({ user, setUser }) {
                       background: "#f8fafc", boxSizing: "border-box"
                     }}
                   />
-                  {pkgError.noOfDays && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>⚠️ {pkgError.noOfDays}</div>}
+                  {pkgError.noOfDays && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>Warning {pkgError.noOfDays}</div>}
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Plan Duration</label>
@@ -751,7 +751,7 @@ export default function AdminDashboard({ user, setUser }) {
                         color: npkg.planDuration === d ? "var(--app-accent)" : "#64748b",
                         transition: "0.2s", display: "flex", alignItems: "center", gap: 4
                       }}>
-                        {npkg.planDuration === d && "✓"} {d}
+                        {npkg.planDuration === d && "Yes"} {d}
                       </button>
                     ))}
                   </div>
@@ -770,7 +770,7 @@ export default function AdminDashboard({ user, setUser }) {
                       color: npkg.businessLimit === b ? "var(--app-accent)" : "#64748b",
                       transition: "0.2s", display: "flex", alignItems: "center", justifyContent: "center", gap: 6
                     }}>
-                      {npkg.businessLimit === b && "✓"} {b}
+                      {npkg.businessLimit === b && "Yes"} {b}
                     </button>
                   ))}
                 </div>
@@ -858,7 +858,7 @@ export default function AdminDashboard({ user, setUser }) {
                 />
                 {/* {(npkg.assignedSubadmins?.length || 0) > 0 && (
             <div style={{ fontSize: 11, color: "#7c3aed", marginTop: 4, fontWeight: 600 }}>
-              ✓ {npkg.assignedSubadmins.length} subadmin(s) selected
+              Yes {npkg.assignedSubadmins.length} subadmin(s) selected
             </div>
           )} */}
               </div>
@@ -895,7 +895,7 @@ export default function AdminDashboard({ user, setUser }) {
                     transition: "all 0.2s"
                   }}
                 >
-                  {pkgSaveLoading ? (editPkg ? "Updating..." : "Creating...") : (editPkg ? "✨ Update Package" : "✨ Create Package")}
+                  {pkgSaveLoading ? (editPkg ? "Updating..." : "Creating...") : (editPkg ? "Special Update Package" : "Special Create Package")}
                 </button>
               </div>
             </div>
@@ -922,10 +922,10 @@ function OverviewPage({ THEME, subadmins, clients, employees, managers, projects
       {/* Premium Stats Grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20 }}>
         {[
-          { label: "Total Company Names", value: clients.length, icon: "🏢", iconBg: "#eff6ff", iconColor: "#3b82f6" },
-          { label: "Total Employees", value: employees.length, icon: "👥", iconBg: "#f0fdf4", iconColor: "#10b981" },
-          { label: "Recent Projects", value: projects.length, icon: "📋", iconBg: "#fdf4ff", iconColor: "#d946ef" },
-          { label: "Active Subadmins", value: subadmins.length, icon: "🛡️", iconBg: "#fff7ed", iconColor: "#f59e0b" },
+          { label: "Total Company Names", value: clients.length, icon: "Company", iconBg: "#eff6ff", iconColor: "#3b82f6" },
+          { label: "Total Employees", value: employees.length, icon: "Team", iconBg: "#f0fdf4", iconColor: "#10b981" },
+          { label: "Recent Projects", value: projects.length, icon: "Document", iconBg: "#fdf4ff", iconColor: "#d946ef" },
+          { label: "Active Subadmins", value: subadmins.length, icon: "Security", iconBg: "#fff7ed", iconColor: "#f59e0b" },
         ].map((s, idx) => (
           <div key={idx} className="premium-card" style={{
             background: THEME.card,
@@ -991,7 +991,7 @@ function OverviewPage({ THEME, subadmins, clients, employees, managers, projects
               invoices.slice(0, 5).map(inv => (
                 <div key={inv.id} className="premium-card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", borderRadius: 20, background: THEME.surface, cursor: "pointer" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 12, background: THEME.card, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, border: `1.5px solid ${THEME.border}` }}>📄</div>
+                    <div style={{ width: 44, height: 44, borderRadius: 12, background: THEME.card, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, border: `1.5px solid ${THEME.border}` }}>Document</div>
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 800, color: THEME.text }}>{inv.invoiceNo}</div>
                       <div style={{ fontSize: 12, color: THEME.muted, fontWeight: 600 }}>{inv.client}</div>
@@ -1162,8 +1162,8 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
                   <td style={{ padding: "14px 16px" }}><Badge label={s.status || "Active"} /></td>
                   <td style={{ padding: "14px 16px" }}>
                     <div style={{ display: "flex", gap: 8 }}>
-                      <button onClick={() => openEditModal(s)} style={{ background: `${THEME.accent}15`, color: THEME.accent, border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 800, cursor: "pointer" }}>✏️ Edit</button>
-                      <button onClick={() => openAssignModal(s)} style={{ background: `${THEME.accentSecondary}15`, color: THEME.accentSecondary, border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 800, cursor: "pointer" }}>📦 Assign</button>
+                      <button onClick={() => openEditModal(s)} style={{ background: `${THEME.accent}15`, color: THEME.accent, border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 800, cursor: "pointer" }}>Edit Edit</button>
+                      <button onClick={() => openAssignModal(s)} style={{ background: `${THEME.accentSecondary}15`, color: THEME.accentSecondary, border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 800, cursor: "pointer" }}>Package Assign</button>
                       <button onClick={async () => { if (window.confirm("Delete?")) { await axios.delete(`${BASE_URL}/api/subadmins/${s._id}`); refresh(); } }} style={{ background: "#ef444415", color: "#ef4444", border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 800, cursor: "pointer" }}>Delete</button>
                     </div>
                   </td>
@@ -1179,7 +1179,7 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
           <div style={{ background: THEME.card, padding: 32, borderRadius: 24, width: 800, maxHeight: "85vh", overflowY: "auto", border: `1.5px solid ${THEME.border}`, color: THEME.text }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
               <h3 style={{ margin: 0, fontWeight: 900 }}>{selectedCompany} Details</h3>
-              <button onClick={() => setCompanyModalOpen(false)} style={{ background: THEME.surface, border: "none", width: 32, height: 32, borderRadius: 8, cursor: "pointer", color: THEME.text }}>✕</button>
+              <button onClick={() => setCompanyModalOpen(false)} style={{ background: THEME.surface, border: "none", width: 32, height: 32, borderRadius: 8, cursor: "pointer", color: THEME.text }}>Close</button>
             </div>
             {companyLoading ? <div>Loading...</div> : (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
@@ -1221,7 +1221,7 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
       {editModalOpen && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
           <div style={{ background: THEME.card, padding: 32, borderRadius: 24, width: 440, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>
-            <h3 style={{ margin: "0 0 24px", fontWeight: 900, color: THEME.text }}>✏️ Edit Subadmin & Limits</h3>
+            <h3 style={{ margin: "0 0 24px", fontWeight: 900, color: THEME.text }}>Edit Edit Subadmin & Limits</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
                 <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: THEME.muted, marginBottom: 6 }}>NAME</label>
@@ -1273,8 +1273,8 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
             <div style={{ background: THEME.card, padding: 32, borderRadius: 24, width: 480, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow, maxHeight: "90vh", overflowY: "auto" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
-                <h3 style={{ margin: 0, fontWeight: 900, color: THEME.text }}>📦 Assign Package</h3>
-                <button onClick={() => setAssignModalOpen(false)} style={{ background: "transparent", border: "none", fontSize: 18, cursor: "pointer", color: THEME.muted }}>✕</button>
+                <h3 style={{ margin: 0, fontWeight: 900, color: THEME.text }}>Package Assign Package</h3>
+                <button onClick={() => setAssignModalOpen(false)} style={{ background: "transparent", border: "none", fontSize: 18, cursor: "pointer", color: THEME.muted }}>Close</button>
               </div>
               <p style={{ margin: "0 0 20px", color: THEME.muted, fontSize: 13 }}>Assigning to: <strong style={{ color: THEME.text }}>{selectedSubadmin.name}</strong> ({selectedSubadmin.email})</p>
               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -1290,9 +1290,9 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
                     <div style={{ fontSize: 11, fontWeight: 700, color: THEME.muted, marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>Package Limits Preview</div>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
                       {[
-                        { label: "👥 Clients", val: selPkg.clientLimit || "—" },
-                        { label: "🧑‍💼 Employees", val: selPkg.employeeLimit || "—" },
-                        { label: "🔑 Managers", val: selPkg.managerLimit || "—" }
+                        { label: "Clients", val: selPkg.clientLimit || "—" },
+                        { label: "Employees", val: selPkg.employeeLimit || "—" },
+                        { label: "Key Managers", val: selPkg.managerLimit || "—" }
                       ].map(({ label, val }) => (
                         <div key={label} style={{ background: THEME.card, borderRadius: 8, padding: "10px 12px", border: `1px solid ${THEME.border}` }}>
                           <div style={{ fontSize: 10, color: THEME.muted, marginBottom: 4 }}>{label}</div>
@@ -1307,12 +1307,12 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
                   <input type="number" value={durationDays} onChange={e => setDurationDays(e.target.value)} placeholder="30" style={{ width: "100%", padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text, fontSize: 13, boxSizing: "border-box" }} />
                 </div>
                 <div style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.2)", borderRadius: 10, padding: "10px 14px", fontSize: 12, color: "#b45309" }}>
-                  ⚠️ This will cancel any existing active subscription for this subadmin and replace it with the selected package.
+                  Warning This will cancel any existing active subscription for this subadmin and replace it with the selected package.
                 </div>
                 <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
                   <button onClick={() => setAssignModalOpen(false)} style={{ flex: 1, padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, fontWeight: 700, background: THEME.surface, color: THEME.text, cursor: "pointer" }}>Cancel</button>
                   <button onClick={handleAssignPackage} disabled={assignLoading} style={{ flex: 2, padding: 12, borderRadius: 12, border: "none", background: assignLoading ? "#a78bfa" : THEME.accent, color: "#fff", fontWeight: 700, cursor: assignLoading ? "not-allowed" : "pointer" }}>
-                    {assignLoading ? "Assigning..." : "✓ Assign Package"}
+                    {assignLoading ? "Assigning..." : "Yes Assign Package"}
                   </button>
                 </div>
               </div>
@@ -1492,7 +1492,7 @@ function SubadminDropdown({ value, options, onChange, darkMode }) {
                     <div style={{ fontWeight: isSelected ? 800 : 700 }}>{sub.name}</div>
                     <div style={{ fontSize: 11, opacity: 0.7 }}>{sub.email}</div>
                   </div>
-                  {isSelected && <span>✓</span>}
+                  {isSelected && <span>Yes</span>}
                 </div>
               );
             })}
@@ -1627,7 +1627,7 @@ function PackagesPage({ THEME, packages, onEdit, onDelete, darkMode }) {
                     e.currentTarget.style.transform = "translateY(0)";
                   }}
                 >
-                  Delete
+             Delete
                 </button>
               </div>
 
@@ -1684,7 +1684,7 @@ function PackagesPage({ THEME, packages, onEdit, onDelete, darkMode }) {
                       border: isPro ? "1px solid rgba(0,220,150,0.35)" : (darkMode ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(0,0,0,0.1)"),
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontSize: 8, color: isPro ? "#00dc96" : (darkMode ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)")
-                    }}>✓</div>
+                    }}>Yes</div>
                     <span style={{
                       fontSize: 12.5, color: THEME.text, opacity: 0.8,
                       fontWeight: 500
@@ -1932,7 +1932,7 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
             onClick={() => setViewTasksProj(null)}
             style={{ padding: "8px 16px", background: THEME.surface, color: THEME.text, border: `1px solid ${THEME.border}`, borderRadius: "8px", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
           >
-            ← Back to Projects
+             Back to Projects
           </button>
         </div>
         <div style={{ flex: 1 }}>
@@ -1974,7 +1974,7 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
           onClick={e => { if (e.target === e.currentTarget) setEditProj(null); }}>
           <div style={{ background: "#fff", borderRadius: 16, width: 560, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 24px 80px rgba(0,0,0,0.18)" }}>
             <div style={{ padding: "18px 24px 14px", borderBottom: "1px solid #eef0f4", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#1A2332" }}>✏️ Edit Project</h3>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#1A2332" }}>Edit Edit Project</h3>
               <button onClick={() => setEditProj(null)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#676879" }}>×</button>
             </div>
             <form onSubmit={handleEditSave} style={{ padding: "20px 24px" }}>
@@ -2054,7 +2054,7 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
                 </button>
                 <button type="submit" disabled={saving}
                   style={{ padding: "9px 22px", borderRadius: 9, border: "none", background: "var(--app-accent, #7c3aed)", color: "#fff", fontWeight: 700, cursor: saving ? "default" : "pointer", fontSize: 13, opacity: saving ? 0.7 : 1 }}>
-                  {saving ? "Saving…" : "✓ Next"}
+                  {saving ? "Saving…" : "Yes Next"}
                 </button>
               </div>
             </form>

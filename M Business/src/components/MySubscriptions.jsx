@@ -2,14 +2,14 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 
-// ─── Theme ──────────────────────────────────────────────────────────────────
+// ─── Theme ------------------------------------------------------------------
 const T = {
   primary: "var(--app-sidebar)", sidebar: "var(--app-sidebar)", accent: "var(--app-accent)",
   bg: "var(--app-bg)", card: "var(--app-card)", text: "var(--app-sidebar)", muted: "var(--app-accent)",
   border: "var(--app-border)", success: "#22C55E", warning: "#F59E0B", danger: "#EF4444"
 };
 
-// ─── Load Razorpay Script ────────────────────────────────────────────────────
+// ─── Load Razorpay Script ----------------------------------------------------
 const loadRazorpayScript = () =>
   new Promise((resolve) => {
     if (window.Razorpay) return resolve(true);
@@ -20,7 +20,7 @@ const loadRazorpayScript = () =>
     document.body.appendChild(s);
   });
 
-// ─── Mini Components ─────────────────────────────────────────────────────────
+// ─── Mini Components ---------------------------------------------------------
 const Badge = ({ label, color }) => {
   const c = color || T.muted;
   return (
@@ -53,21 +53,21 @@ const InfoRow = ({ label, value, icon }) => {
   );
 };
 
-// ─── Plan Data ───────────────────────────────────────────────────────────────
+// ─── Plan Data ---------------------------------------------------------------
 const DEFAULT_PLANS = [
   {
-    name: "Trial", price: 0, icon: "✨", color: "var(--app-accent)", duration: "30 days", isTrial: true,
+    name: "Trial", price: 0, icon: "Special", color: "var(--app-accent)", duration: "30 days", isTrial: true,
     features: ["30 Days Free Trial", "5 Projects", "5 Invoices", "Single business manage", "Managers: 1", "Clients: 5", "Employees: 20"],
     clientLimit: "5 Clients", employeeLimit: "20 Employees", managerLimit: "1 Manager manage",
     btnLabel: "Start Free Trial"
   },
   {
-    name: "Starter", price: 999, icon: "🌱", color: "var(--app-accent)",
+    name: "Starter", price: 999, icon: "Start", color: "var(--app-accent)",
     features: ["5 Projects", "10 Invoices", "Single business manage", "Managers: 1", "Clients: 3", "Employees: 10", "Email Support"],
     clientLimit: "3 Client manage", employeeLimit: "10 Employee manage", managerLimit: "1 Manager manage",
   },
   {
-    name: "Professional", price: 2999, icon: "🚀", color: "var(--app-accent)", popular: true,
+    name: "Professional", price: 2999, icon: "Launch", color: "var(--app-accent)", popular: true,
     features: ["Unlimited Projects", "Unlimited Invoices", "Multiple business manage", "Managers: 3", "Clients: 10", "Employees: 50", "Priority Support"],
     clientLimit: "10 Client manage", employeeLimit: "50 Employee manage", managerLimit: "3 Manager manage",
   },
@@ -83,7 +83,7 @@ const getDaysLeft = (endDate) => {
 const getStatusColor = (s) => ({ active: T.success, completed: T.success, paid: T.success, cancelled: T.danger, expired: T.danger, failed: T.danger, pending: T.warning, refunded: T.warning }[s?.toLowerCase()] || T.muted);
 
 
-// ─── Plan Picker Modal (Choose Your Plan) ────────────────────────────────────
+// ─── Plan Picker Modal (Choose Your Plan) ------------------------------------
 function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onStartTrial, PLANS }) {
   const currentPlan = subscription?.planName;
   return (
@@ -97,7 +97,7 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
       `}</style>
 
       {/* Close button */}
-      <button onClick={onClose} style={{ position:"fixed", top:18, right:22, zIndex:100000, background:"rgba(0,150,136,0.12)", border:"none", color:"#00796b", width:38, height:38, borderRadius:"50%", fontSize:20, cursor:"pointer", fontFamily:"inherit", fontWeight:700 }}>✕</button>
+      <button onClick={onClose} style={{ position:"fixed", top:18, right:22, zIndex:100000, background:"rgba(0,150,136,0.12)", border:"none", color:"#00796b", width:38, height:38, borderRadius:"50%", fontSize:20, cursor:"pointer", fontFamily:"inherit", fontWeight:700 }}>Close</button>
 
       <div style={{ maxWidth:1060, width:"100%", margin:"0 auto", padding:"48px 20px 60px", animation:"ppFadeUp 0.38s ease" }}>
 
@@ -160,7 +160,7 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
                 <div style={{ flex:1, display:"flex", flexDirection:"column", gap:11, marginBottom:28 }}>
                   {plan.features.map((f, i) => (
                     <div key={i} style={{ display:"flex", alignItems:"center", gap:9 }}>
-                      <span style={{ color:"#00897b", fontSize:15, flexShrink:0, fontWeight:700 }}>✓</span>
+                      <span style={{ color:"#00897b", fontSize:15, flexShrink:0, fontWeight:700 }}>Yes</span>
                       <span style={{ fontSize:13.5, color:"#475569", fontWeight:500 }}>{f}</span>
                     </div>
                   ))}
@@ -192,7 +192,7 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
                     boxShadow: isPopular && !isCurrent ? "0 6px 18px rgba(0,137,123,0.3)" : "none"
                   }}
                 >
-                  {isProcessing ? "Processing..." : isCurrent ? "✓ Current Plan" : plan.btnLabel || "Get Started"}
+                  {isProcessing ? "Processing..." : isCurrent ? "Yes Current Plan" : plan.btnLabel || "Get Started"}
                 </button>
               </div>
             );
@@ -200,14 +200,14 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
         </div>
 
         <div style={{ textAlign:"center", marginTop:32, color:"#80cbc4", fontSize:13, fontWeight:600 }}>
-          🔒 Secure payment · Cancel anytime · 24/7 support
+          Secure Secure payment · Cancel anytime · 24/7 support
         </div>
       </div>
     </div>
   );
 }
 
-// ─── Mock Payment Gateway ──────────────────────────────────────────────────────
+// ─── Mock Payment Gateway ------------------------------------------------------
 function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, onPay }) {
   const [method, setMethod] = useState("card");
   const [cardNum, setCardNum] = useState("");
@@ -247,16 +247,16 @@ function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, on
             <div style={{ color:"#fff", fontSize:22, fontWeight:900 }}>₹{plan.price?.toLocaleString("en-IN")}<span style={{ fontSize:13, fontWeight:600, opacity:0.8 }}>/month</span></div>
             <div style={{ color:"rgba(255,255,255,0.85)", fontSize:13, marginTop:2 }}>{plan.icon} {plan.name} Plan</div>
           </div>
-          <button onClick={onClose} style={{ background:"rgba(255,255,255,0.2)", border:"none", color:"#fff", width:36, height:36, borderRadius:"50%", fontSize:18, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>✕</button>
+          <button onClick={onClose} style={{ background:"rgba(255,255,255,0.2)", border:"none", color:"#fff", width:36, height:36, borderRadius:"50%", fontSize:18, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>Close</button>
         </div>
 
         <div style={{ padding:"24px 28px" }}>
           {/* Payment methods */}
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8, marginBottom:24 }}>
             {[
-              { id:"card", icon:"💳", label:"Card" },
-              { id:"upi",  icon:"📱", label:"UPI" },
-              { id:"netbanking", icon:"🏦", label:"Net Banking" }
+              { id:"card", icon:"", label:"Card" },
+              { id:"upi",  icon:"", label:"UPI" },
+              { id:"netbanking", icon:"Bank", label:"Net Banking" }
             ].map(m => (
               <div key={m.id} className={`pg-method${method===m.id?" active":""}`} onClick={() => setMethod(m.id)}
                 style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 12px", border:`2px solid ${method===m.id?"#6366f1":"#e2e8f0"}`, borderRadius:12, cursor:"pointer", background:method===m.id?"#f5f3ff":"#fafafa", color:method===m.id?"#6366f1":"#64748b", fontWeight:700, fontSize:12, transition:"all 0.2s" }}>
@@ -336,15 +336,15 @@ function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, on
           >
             {loading
               ? <><div style={{ width:18, height:18, border:"2.5px solid #fff", borderTopColor:"transparent", borderRadius:"50%", animation:"pgSpin 0.8s linear infinite" }} /> Processing...</>
-              : <>🔒 Pay ₹{plan.price?.toLocaleString("en-IN")} Now</>
+              : <>Secure Pay ₹{plan.price?.toLocaleString("en-IN")} Now</>
             }
           </button>
 
           {/* Security badges */}
           <div style={{ marginTop:16, display:"flex", justifyContent:"center", gap:20, color:"#94a3b8", fontSize:11, fontWeight:600 }}>
-            <span>🔒 256-bit SSL</span>
-            <span>🛡️ PCI DSS</span>
-            <span>✅ RBI Compliant</span>
+            <span>Secure 256-bit SSL</span>
+            <span>Security PCI DSS</span>
+            <span>Success RBI Compliant</span>
           </div>
         </div>
       </div>
@@ -352,7 +352,7 @@ function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, on
   );
 }
 
-// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
+// ─── MAIN COMPONENT -----------------------------------------------------------
 export default function MySubscriptions({ user, onSubscriptionSuccess, initialTab = "overview", preloadedSubscription = null, onTabChange, packagesList = [] }) {
   const sortedPackages = [...(packagesList || [])].sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0));
   const PLANS = sortedPackages.length > 0 
@@ -361,7 +361,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
         return {
           name: pkg.title || pkg.name || "Custom Plan",
           price: isFree ? 0 : parseFloat(pkg.price) || 0,
-          icon: pkg.icon || (index === 0 ? "✨" : index === sortedPackages.length - 1 ? "🚀" : "🌱"),
+          icon: pkg.icon || (index === 0 ? "Special" : index === sortedPackages.length - 1 ? "Launch" : "Start"),
           color: "var(--app-accent)",
           popular: (pkg.title || "").toLowerCase().includes("pro") || index === Math.floor(sortedPackages.length / 2),
           duration: pkg.no_of_days ? `${pkg.no_of_days} days` : "30 days",
@@ -432,10 +432,10 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
         await fetchData();
         if (onSubscriptionSuccess) onSubscriptionSuccess();
         setPaymentSuccessData({ name: planName || "Subscription" });
-        showToast("🎉 Payment Successful! Your plan is active.");
+        showToast("Celebration Payment Successful! Your plan is active.");
 
       } else if (paymentStatus === "failed") {
-        showToast("❌ Payment failed. Please try again.");
+        showToast("Error Payment failed. Please try again.");
       }
     };
 
@@ -605,7 +605,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
     }
   }, [paymentSuccessData, onSubscriptionSuccess]);
 
-  // ── Start Free Trial ────────────────────────────────────────────────────────
+  // ── Start Free Trial --------------------------------------------------------
   const startTrial = async (targetPkg = null) => {
     try {
       setPayLoading("Trial");
@@ -618,20 +618,20 @@ const payload = {
 };
 const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
       if (res.data.success) {
-        showToast(`🎉 30-day free trial started${targetPkg ? ` with ${targetPkg.title}` : ""}!`);
+        showToast(`Celebration 30-day free trial started${targetPkg ? ` with ${targetPkg.title}` : ""}!`);
         await fetchData();
         if (onSubscriptionSuccess) onSubscriptionSuccess();
         else window.location.href = "/";
       }
     } catch (err) {
       const msg = err.response?.data?.error || "Failed to start trial";
-      showToast("❌ " + msg);
+      showToast("Error " + msg);
     } finally {
       setPayLoading(null);
     }
   };
 
-  // ── Initiate PayU Payment ─────────────────────────────────────────────
+  // ── Initiate PayU Payment ---------------------------------------------
   const startPayUPayment = async (plan) => {
     if (plan.isTrial) { startTrial(plan); return; }
     if (!plan.price) { window.open(`mailto:billing@${(user?.companyName || "business").toLowerCase().replace(/\s+/g, "")}.com`); return; }
@@ -686,13 +686,13 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
       }
     } catch (err) {
       console.error("PayU init error:", err);
-      showToast("❌ Could not initialize payment. Please try again.");
+      showToast("Error Could not initialize payment. Please try again.");
       setPayLoading(null);
       payuInFlight.current = false; // Release the guard on error
     }
   };
 
-  // ── Complete mock payment → activate subscription ─────────────────────────
+  // ── Complete mock payment  activate subscription -------------------------
   const completeMockPayment = async (plan) => {
     try {
       setPayLoading(plan.name);
@@ -725,13 +725,13 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
       setPaymentSuccessData({ name: plan.name, price: plan.price });
       if (activated) { await fetchData(); if (onSubscriptionSuccess) onSubscriptionSuccess(); }
     } catch (err) {
-      showToast("❌ " + (err.response?.data?.error || err.message || "Payment failed"));
+      showToast("Error " + (err.response?.data?.error || err.message || "Payment failed"));
     } finally {
       setPayLoading(null);
     }
   };
 
-  // ── Plan Picker (Choose Your Plan overlay) ────────────────────────────────────
+  // ── Plan Picker (Choose Your Plan overlay) ------------------------------------
   if (showPlanPicker) {
     return (
       <PlanPickerModal
@@ -745,7 +745,7 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
     );
   }
 
-  // ── Success UI ───────────────────────────────────────────────────────────────
+  // ── Success UI ---------------------------------------------------------------
   if (paymentSuccessData) {
     console.log("Showing payment success popup for:", paymentSuccessData);
     return (
@@ -753,9 +753,9 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
         <style>{`@keyframes scaleIn { 0% { transform: scale(0); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } } @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } } @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
         <div style={{ background: "#fff", borderRadius: 24, padding: 48, maxWidth: 480, width: "100%", textAlign: "center", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", animation: "fadeIn 0.5s ease", position: "relative" }}>
           <div style={{ width: 100, height: 100, borderRadius: "50%", background: "linear-gradient(135deg, #10b981, #059669)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 48, marginBottom: 28, boxShadow: "0 10px 30px rgba(16,185,129,0.3)", animation: "scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)", margin: "0 auto 28px" }}>
-            ✓
+            Yes
           </div>
-          <h2 style={{ fontSize: 32, fontWeight: 800, color: "#1e293b", margin: "0 0 16px" }}>Payment Successful! 🎉</h2>
+          <h2 style={{ fontSize: 32, fontWeight: 800, color: "#1e293b", margin: "0 0 16px" }}>Payment Successful! Celebration</h2>
           <p style={{ fontSize: 16, color: "#64748b", lineHeight: 1.6, maxWidth: 380, margin: "0 auto 32px" }}>
             Your <strong>{paymentSuccessData.name}</strong> plan is now active. Your dashboard is ready!
           </p>
@@ -796,9 +796,9 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
     );
   }
 
-  // ── Loading removed to prevent spinner from showing ──────────────────────────
+  // ── Loading removed to prevent spinner from showing --------------------------
 
-  // ── No Subscription → Show Plans (Screenshot 2 Style) ─────────────────────────
+  // ── No Subscription  Show Plans (Screenshot 2 Style) -------------------------
   if (!subscription) {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 32, padding: "4px 0", animation: "fadeIn 0.6s ease-out" }}>
@@ -867,7 +867,7 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
                 <div style={{ display: "flex", flexDirection: "column", gap: 14, flex: 1, marginBottom: 32 }}>
                   {plan.features.map((f, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                      <div style={{ color: "#22C55E", fontSize: 16, marginTop: -2 }}>✓</div>
+                      <div style={{ color: "#22C55E", fontSize: 16, marginTop: -2 }}>Yes</div>
                       <span style={{ fontSize: 13, color: "var(--app-sidebar)", fontWeight: 500, lineHeight: 1.4 }}>{f}</span>
                     </div>
                   ))}
@@ -907,12 +907,12 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
     );
   }
 
-  // ── Has Subscription ─────────────────────────────────────────────────────────
+  // ── Has Subscription ---------------------------------------------------------
   const daysLeft = getDaysLeft(subscription.endDate);
   const usageRemaining = Math.max(0, (subscription.usageLimit || 999) - (subscription.usageCount || 0));
   const usagePct = Math.min(100, Math.round(((subscription.usageCount || 0) / (subscription.usageLimit || 999)) * 100));
 
-  // Expired > 60 days → Contact administrator
+  // Expired > 60 days  Contact administrator
   const daysSinceExpiry = subscription.endDate
     ? Math.max(0, Math.ceil((new Date() - new Date(subscription.endDate)) / 86400000))
     : 0;
@@ -924,17 +924,17 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
     } else {
       return (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 400, gap: 20, textAlign: "center", padding: 40 }}>
-          <div style={{ fontSize: 60 }}>🔒</div>
+          <div style={{ fontSize: 60 }}>Secure</div>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: "#1e293b", margin: 0 }}>Subscription Access Restricted</h2>
           <p style={{ color: "#64748b", fontSize: 14, maxWidth: 420, lineHeight: 1.7, margin: 0 }}>
             Your subscription expired {daysSinceExpiry} days ago. Access has been restricted. Please renew your plan to restore access.
           </p>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
             <button onClick={() => handleTabChange("upgrade")} style={{ display: "inline-block", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, fontSize: 14, border: "none", cursor: "pointer", fontFamily: "inherit" }}>
-              🚀 Renew Subscription
+              Launch Renew Subscription
             </button>
             <a href="tel:+919876543210" style={{ display: "inline-block", background: "#f1f5f9", color: "var(--app-sidebar)", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, fontSize: 14, border: "1.5px solid #e2e8f0" }}>
-              📞 Call Support
+              Call Call Support
             </a>
           </div>
         </div>
@@ -966,7 +966,7 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
               <div className="plan-features">
                 {plan.features.map((f, i) => (
                   <div key={i} className="plan-feature included">
-                    <i>✓</i> {f}
+                    <i>Yes</i> {f}
                   </div>
                 ))}
               </div>
@@ -1094,7 +1094,7 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
                     <div className="plan-features">
                       {plan.features.map((f, i) => (
                         <div key={i} className="plan-feature included">
-                          <i>✓</i> {f}
+                          <i>Yes</i> {f}
                         </div>
                       ))}
                     </div>
@@ -1116,7 +1116,7 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
               <div className="panel-header">
                 <div className="panel-title">Billing History</div>
                 <button className="panel-action" onClick={() => handleTabChange(activeTab === "payments" ? "overview" : "payments")}>
-                  {activeTab === "payments" ? "Hide all" : "View all"} <span>→</span>
+                  {activeTab === "payments" ? "Hide all" : "View all"} <span></span>
                 </button>
               </div>
               
@@ -1167,7 +1167,7 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
               </div>
               <div style={{ padding: "20px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-                  <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--teal-lighter)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🏢</div>
+                  <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--teal-lighter)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>Company</div>
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text)" }}>{subscription.providerCompany || user?.companyName || "M Business"}</div>
                     <div style={{ fontSize: 11, color: "var(--text3)", fontWeight: 600 }}>Service Provider</div>
@@ -1200,11 +1200,11 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
           <div style={{ background: "#fff", width: "100%", maxWidth: 440, borderRadius: 24, padding: 30, position: "relative", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }} onClick={e => e.stopPropagation()}>
             <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 20, color: "var(--text)", display: "flex", justifyContent: "space-between" }}>
               Payment Details
-              <button onClick={() => setViewPayment(null)} style={{ background: "var(--surface2)", border: "none", color: "var(--text2)", width: 28, height: 28, borderRadius: "50%", cursor: "pointer" }}>✕</button>
+              <button onClick={() => setViewPayment(null)} style={{ background: "var(--surface2)", border: "none", color: "var(--text2)", width: 28, height: 28, borderRadius: "50%", cursor: "pointer" }}>Close</button>
             </div>
             
             <div style={{ textAlign: "center", padding: 20, background: "var(--bg)", borderRadius: 14, marginBottom: 20, border: `1px solid var(--border)` }}>
-              <div style={{ fontSize: 36, marginBottom: 8 }}>{viewPayment.status === "completed" || viewPayment.status === "paid" ? "✅" : "⏳"}</div>
+              <div style={{ fontSize: 36, marginBottom: 8 }}>{viewPayment.status === "completed" || viewPayment.status === "paid" ? "Success" : "Pending"}</div>
               <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>{formatCurrency(viewPayment.amount, viewPayment.currency)}</div>
               <div style={{ fontSize: 13, color: "var(--text2)", marginTop: 4, textTransform: "capitalize" }}>{viewPayment.status}</div>
             </div>
@@ -1221,11 +1221,11 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
       {viewInvoice && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => setViewInvoice(null)}>
           <div style={{ background: "#fff", width: "100%", maxWidth: 440, borderRadius: 24, padding: 40, position: "relative", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }} onClick={e => e.stopPropagation()}>
-            <button onClick={() => setViewInvoice(null)} style={{ position: "absolute", top: 20, right: 20, background: "#f1f5f9", border: "none", color: "#64748b", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+            <button onClick={() => setViewInvoice(null)} style={{ position: "absolute", top: 20, right: 20, background: "#f1f5f9", border: "none", color: "#64748b", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>Close</button>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
               <div style={{ position: "relative", marginBottom: 20 }}>
-                <div style={{ width: 80, height: 80, background: "#f8fafc", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, border: "1px solid #e2e8f0" }}>🧾</div>
-                <div style={{ position: "absolute", bottom: -5, right: -5, width: 24, height: 24, background: "#22c55e", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 14, border: "3px solid #fff" }}>✓</div>
+                <div style={{ width: 80, height: 80, background: "#f8fafc", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, border: "1px solid #e2e8f0" }}></div>
+                <div style={{ position: "absolute", bottom: -5, right: -5, width: 24, height: 24, background: "#22c55e", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 14, border: "3px solid #fff" }}>Yes</div>
               </div>
               <div style={{ fontSize: 15, fontWeight: 600, color: "#64748b", marginBottom: 8 }}>Invoice paid</div>
               <div style={{ fontSize: 48, fontWeight: 800, color: "#1e293b", marginBottom: 12 }}>{formatCurrency(viewInvoice.amount, viewInvoice.currency)}</div>

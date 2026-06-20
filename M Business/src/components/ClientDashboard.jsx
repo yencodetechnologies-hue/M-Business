@@ -5,7 +5,7 @@ import SettingsPage from "./SettingsPage";
 import ModernEmployeeProjectDetails from "./ModernEmployeeProjectDetails";
 import { PROPOSAL_PREVIEW_CSS } from "./ProposalPreviewStyles";
 import { printProposal, shareProposalAsPDF } from "./proposalPrintUtils";
-// ── Teal Theme Colors ────────────────────      ──────────────────────
+// ── Teal Theme Colors --------------------      ----------------------
 const C = {
   bg: "#F3F8F9",
   surface: "#FFFFFF",
@@ -129,10 +129,10 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
       });
       setSaved(true);
       if (onSigned) onSigned(res.data);
-      alert("✅ Signature saved! The proposal has been signed successfully.");
+      alert("Success Signature saved! The proposal has been signed successfully.");
     } catch (err) {
       console.error("Signature save error:", err);
-      alert("❌ Failed to save signature. Please try again.");
+      alert("Error Failed to save signature. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -195,7 +195,7 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
                   {slide.body && <div style={{ fontSize: 13, color: "#4E6B75", lineHeight: 1.7 }}>{slide.body}</div>}
                   {slide.subtitle && <div style={{ fontSize: 13, color: "#4E6B75" }}>{slide.subtitle}</div>}
                   {slide.items && slide.items.map((item, ii) => (
-                    <div key={ii} style={{ fontSize: 13, color: "#4E6B75", padding: "4px 0", borderBottom: "1px solid #e0eef0" }}>✓ {item}</div>
+                    <div key={ii} style={{ fontSize: 13, color: "#4E6B75", padding: "4px 0", borderBottom: "1px solid #e0eef0" }}>Yes {item}</div>
                   ))}
                   {slide.rows && slide.rows.map((row, ri) => (
                     <div key={ri} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "4px 0", borderBottom: "1px solid #e0eef0" }}>
@@ -247,7 +247,7 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
                   </div>
                   <div style={{ height: 1, background: "#15803D", marginBottom: 8 }} />
                   <div style={{ fontSize: 12, fontWeight: 700, color: "#0D2027" }}>{prop.clientName || clientName}</div>
-                  <div style={{ fontSize: 10, color: "#15803D", fontWeight: 700, marginTop: 3 }}>✓ Digitally Signed & Accepted</div>
+                  <div style={{ fontSize: 10, color: "#15803D", fontWeight: 700, marginTop: 3 }}>Digitally Signed & Accepted</div>
                 </div>
               </div>
             ) : (
@@ -272,7 +272,7 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
               <div style={{ display: "flex", gap: 4, background: "#f5fafa", borderRadius: 10, padding: 4, marginBottom: 16, width: "fit-content" }}>
                 {["draw", "type"].map(mode => (
                   <button key={mode} onClick={() => setSigMode(mode)} style={{ padding: "6px 16px", borderRadius: 8, border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer", background: sigMode === mode ? "#00BCD4" : "transparent", color: sigMode === mode ? "#fff" : "#607D86" }}>
-                    {mode === "draw" ? "✍️ Draw" : "⌨️ Type"}
+                    {mode === "draw" ? "Draw" : "Type"}
                   </button>
                 ))}
               </div>
@@ -1157,7 +1157,7 @@ export default function ClientDashboard({ user, setUser }) {
     const milestones = proj?.milestones || [];
     const today = new Date();
 
-    // ── Milestone Steps ──────────────────────────────────────────
+    // ── Milestone Steps ------------------------------------------
     const stepNodes = milestones.length > 0 ? milestones.map((m, idx) => {
       const isDone = m.done === true;
       const isActive = !isDone && idx === milestones.findIndex(x => !x.done);
@@ -1180,8 +1180,8 @@ export default function ClientDashboard({ user, setUser }) {
       </div>
     );
 
-    // ── Gantt Chart ───────────────────────────────────────────────
-    // Compute month range from project start→end
+    // ── Gantt Chart -----------------------------------------------
+    // Compute month range from project startend
     const pStart = proj?.start ? new Date(proj.start) : new Date(today.getFullYear(), today.getMonth() - 1, 1);
     const pEnd = (proj?.end || proj?.deadline) ? new Date(proj.end || proj.deadline) : new Date(today.getFullYear(), today.getMonth() + 2, 0);
     // Build 6 month labels centered around today
@@ -1216,7 +1216,7 @@ export default function ClientDashboard({ user, setUser }) {
         <div key={idx} className="tl-row">
           <div>
             <div className="tl-task-name">{m.name}</div>
-            <div className="tl-task-sub">{m.done ? '✓ Done' : 'Pending'}</div>
+            <div className="tl-task-sub">{m.done ? 'Yes Done' : 'Pending'}</div>
           </div>
           {ganttMonths.map((gm, gi) => {
             const isToday = gi === todayColIdx;
@@ -1231,7 +1231,7 @@ export default function ClientDashboard({ user, setUser }) {
                 {gi === colIdx && mDate && (
                   <div className="tl-bar-wrap">
                     <div className="tl-bar" style={{ width: `${barWidth}%`, left: `${barLeft}%`, background: barColor, color: textColor }}>
-                      {m.done ? '✓' : ''}
+                      {m.done ? 'Yes' : ''}
                     </div>
                   </div>
                 )}
@@ -1271,7 +1271,7 @@ export default function ClientDashboard({ user, setUser }) {
                 <div className="tl-month"></div>
                 {ganttMonths.map((gm, gi) => (
                   <div key={gi} className="tl-month" style={gi === todayColIdx ? { color: C.teal, fontWeight: 800 } : {}}>
-                    {gm.label} {gi === todayColIdx ? '←' : ''}
+                    {gm.label} {gi === todayColIdx ? '' : ''}
                   </div>
                 ))}
               </div>
@@ -1588,7 +1588,7 @@ export default function ClientDashboard({ user, setUser }) {
           <div className="rating-row">
             {[1, 2, 3, 4, 5].map((star) => (
               <span key={star} className={`star ${feedbackRating >= star ? "active" : ""}`} onClick={() => setFeedbackRating(star)}>
-                ★
+                
               </span>
             ))}
           </div>
@@ -1755,7 +1755,7 @@ export default function ClientDashboard({ user, setUser }) {
               <div className="sec-action" onClick={async () => {
                 const links = allFiles.map(f => f.url).filter(Boolean);
                 if (links.length === 0) return;
-                // Single file → direct download
+                // Single file  direct download
                 if (links.length === 1) {
                   const a = document.createElement("a");
                   a.href = links[0];
@@ -1763,7 +1763,7 @@ export default function ClientDashboard({ user, setUser }) {
                   document.body.appendChild(a); a.click(); document.body.removeChild(a);
                   return;
                 }
-                // Multiple files → fetch as blob and download one by one
+                // Multiple files  fetch as blob and download one by one
                 for (let i = 0; i < links.length; i++) {
                   try {
                     const res = await fetch(links[i]);
@@ -1801,7 +1801,7 @@ export default function ClientDashboard({ user, setUser }) {
             </div>
             {proposals.length === 0 ? (
               <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 16, padding: "48px 24px", textAlign: "center" }}>
-                <div style={{ fontSize: 36, marginBottom: 12 }}>📋</div>
+                <div style={{ fontSize: 36, marginBottom: 12 }}>Document</div>
                 <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 6 }}>No Proposals Yet</div>
                 <div style={{ fontSize: 13, color: C.text3 }}>Project proposals sent to you will appear here.</div>
               </div>
@@ -1930,7 +1930,7 @@ export default function ClientDashboard({ user, setUser }) {
             </div>
             {projects.length === 0 ? (
               <div style={{ background: C.surface, border: '1.5px solid ' + C.border, borderRadius: 16, padding: '48px 24px', textAlign: 'center' }}>
-                <div style={{ fontSize: 36, marginBottom: 12 }}>📂</div>
+                <div style={{ fontSize: 36, marginBottom: 12 }}>Folder</div>
                 <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 6 }}>No Projects Yet</div>
                 <div style={{ fontSize: 13, color: C.text3 }}>Projects assigned to your account will appear here.</div>
               </div>

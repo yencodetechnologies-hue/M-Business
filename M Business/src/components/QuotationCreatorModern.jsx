@@ -121,11 +121,11 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
 
   // ── Status ──
   const statuses = [
-    { value: 'DRAFT', icon: '📝', label: 'Draft' },
-    { value: 'SENT', icon: '📤', label: 'Sent' },
-    { value: 'NEGOTIATION', icon: '🤝', label: 'Negotiation' },
-    { value: 'ACCEPTED', icon: '✅', label: 'Accepted' },
-    { value: 'REJECTED', icon: '❌', label: 'Rejected' },
+    { value: 'DRAFT', icon: 'Edit', label: 'Draft' },
+    { value: 'SENT', icon: 'Export', label: 'Sent' },
+    { value: 'NEGOTIATION', icon: 'Partnership', label: 'Negotiation' },
+    { value: 'ACCEPTED', icon: 'Success', label: 'Accepted' },
+    { value: 'REJECTED', icon: 'Error', label: 'Rejected' },
   ];
 
   // ── Save ──
@@ -370,7 +370,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
     .pvpb-desc{font-size:10px;color:var(--text2);line-height:1.6;margin-bottom:7px}
     .pvpb-features{display:flex;flex-direction:column;gap:3px}
     .pvpb-feat{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text2)}
-    .pvpb-feat::before{content:'✓';color:var(--teal);font-size:10px;font-weight:800;flex-shrink:0}
+    .pvpb-feat::before{content:'\\2713';color:var(--teal);font-size:10px;font-weight:800;flex-shrink:0}
     @media(max-width:1100px){.mqc-content{grid-template-columns:1fr}.mqc-preview-side{position:static}}
     @media(max-width:768px){.mqc-content{padding:14px 16px 40px;grid-template-columns:1fr}.mqc-form-row{grid-template-columns:1fr}}
   `;
@@ -392,19 +392,19 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
         <div className="mqc-actions">
           <button className="mqc-btn-outline" onClick={() => handleSave('draft')} disabled={saving}>
             <i className="ti ti-device-floppy" style={{ fontSize: 13 }}></i>
-            {saved ? '✅ Saved!' : saving ? 'Saving…' : 'Save Draft'}
+            {saved ? 'Success Saved!' : saving ? 'Saving…' : 'Save Draft'}
           </button>
           <button className="mqc-btn-teal mqc-btn-amber" onClick={() => handleSave('sent')} disabled={saving}>
             <i className="ti ti-send" style={{ fontSize: 13 }}></i> Send Quote
           </button>
           <button className="mqc-btn-teal mqc-btn-green" onClick={onBack}>
-            <i className="ti ti-receipt" style={{ fontSize: 13 }}></i> → Invoice
+            <i className="ti ti-receipt" style={{ fontSize: 13 }}></i>  Invoice
           </button>
         </div>
       </header>
 
       <div className="mqc-content">
-        {/* ═══════════ FORM SIDE ═══════════ */}
+        {/* ----------- FORM SIDE ----------- */}
         <div>
 
           {/* Quotation Details */}
@@ -600,7 +600,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
                         <div className="mqc-feat-label">Features / Deliverables in this phase:</div>
                         {ph.features.map(feat => (
                           <div key={feat.id} className="mqc-feat-row">
-                            <div className="mqc-feat-check">✓</div>
+                            <div className="mqc-feat-check">Yes</div>
                             <input type="text" className="mqc-feat-input" value={feat.text} placeholder="Feature description" onChange={e => updFeature(ph.id, feat.id, e.target.value)} />
                             <button className="mqc-feat-del" onClick={() => removeFeature(ph.id, feat.id)}><i className="ti ti-x"></i></button>
                           </div>
@@ -693,7 +693,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
               <div className="mqc-validity-grid">
                 {['7', '15', '30', '45', '60', 'Custom'].map(v => (
                   <div key={v} className={`mqc-val-opt ${qt.validity === v ? 'sel' : ''}`} onClick={() => upd('validity', v)}>
-                    <div className="mqc-val-days">{v === 'Custom' ? '✏️' : v}</div>
+                    <div className="mqc-val-days">{v === 'Custom' ? 'Edit' : v}</div>
                     <div className="mqc-val-label">{v === 'Custom' ? 'Custom' : 'days'}</div>
                   </div>
                 ))}
@@ -703,7 +703,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
                   onChange={e => { setCustomValidity(e.target.value); }} style={{ marginTop: 8 }} />
               )}
               <div style={{ fontSize: 11, color: 'var(--amber)', fontWeight: 700, marginTop: 8, background: 'var(--amber-bg)', padding: '6px 12px', borderRadius: 8, borderLeft: '3px solid var(--amber)' }}>
-                ⏰ Valid until: {validUntil}
+                Alarm Valid until: {validUntil}
               </div>
             </div>
           </div>
@@ -721,11 +721,11 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
 
         </div>
 
-        {/* ═══════════ LIVE PREVIEW ═══════════ */}
+        {/* ----------- LIVE PREVIEW ----------- */}
         <div className="mqc-preview-side">
           <div className="mqc-preview-card">
             <div className="mqc-preview-toolbar">
-              <span className="mqc-pt-title">📄 Live Preview</span>
+              <span className="mqc-pt-title">Document Live Preview</span>
               <div style={{ display: 'flex', gap: 6 }}>
                 <button className="mqc-pt-btn"><i className="ti ti-download" style={{ fontSize: 11 }}></i> PDF</button>
                 <button className="mqc-pt-btn"><i className="ti ti-share" style={{ fontSize: 11 }}></i> Share</button>
@@ -849,7 +849,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
               {/* Validity */}
               <div className="quo-validity">
                 <div className="quo-validity-text">
-                  ⏰ This quotation is valid for <strong>{qt.validity === 'Custom' ? 'Custom' : `${qt.validity} days`}</strong> from the date of issue
+                  Alarm This quotation is valid for <strong>{qt.validity === 'Custom' ? 'Custom' : `${qt.validity} days`}</strong> from the date of issue
                 </div>
               </div>
 
@@ -870,8 +870,8 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
               <div className="quo-cta">
                 <div className="quo-cta-text">Client action on this quotation:</div>
                 <div className="quo-cta-btns">
-                  <button className="quo-cta-btn accept">✅ Accept Quote</button>
-                  <button className="quo-cta-btn negotiate">🤝 Negotiate</button>
+                  <button className="quo-cta-btn accept">Success Accept Quote</button>
+                  <button className="quo-cta-btn negotiate">Partnership Negotiate</button>
                 </div>
               </div>
             </div>

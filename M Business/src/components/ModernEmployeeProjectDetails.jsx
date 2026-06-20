@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 
-// ── palette ───────────────────────────────────────────────────────
+// ── palette -------------------------------------------------------
 const P = {
   primary:'#00BCD4', primaryDark:'#0097A7', primaryLight:'#E0F7FA', primaryMid:'#B2EBF2',
   textDark:'#1A2332', textMid:'#4A5568', textLight:'#718096',
@@ -14,7 +14,7 @@ const P = {
   radius:'14px', shadow:'0 2px 12px rgba(0,188,212,.08)', shadowLg:'0 8px 32px rgba(0,188,212,.14)',
 };
 
-// ── CSS ────────────────────────────────────────────────────────────
+// ── CSS ------------------------------------------------------------
 const CSS = `
 .epd2 * { box-sizing:border-box; }
 .epd2 { font-family:'Nunito',sans-serif; }
@@ -156,7 +156,7 @@ const CSS = `
 @keyframes spin2 { to { transform:rotate(360deg) } }
 `;
 
-// ── helpers ───────────────────────────────────────────────────────
+// ── helpers -------------------------------------------------------
 function getInitials(name) {
   if (!name) return '?';
   const p = name.trim().split(' ').filter(Boolean);
@@ -192,7 +192,7 @@ function isLate(dateStr) {
   return new Date(dateStr) < new Date();
 }
 
-// ── UPDATE TYPE CONFIG ─────────────────────────────────────────────
+// ── UPDATE TYPE CONFIG ---------------------------------------------
 const UPDATE_TYPES = {
   progress:  { cls: 'prog', border: 'pr', icon: 'ti-chart-line',    label: 'Progress' },
   milestone: { cls: 'ms',   border: 'ms', icon: 'ti-flag',          label: 'Milestone' },
@@ -201,7 +201,7 @@ const UPDATE_TYPES = {
   delivery:  { cls: 'dl',   border: 'dl', icon: 'ti-package',       label: 'Delivery' },
 };
 
-// ── TOAST hook ─────────────────────────────────────────────────────
+// ── TOAST hook -----------------------------------------------------
 function useToast() {
   const [toasts, setToasts] = React.useState([]);
   const addToast = (msg, type = 'success') => {
@@ -212,11 +212,11 @@ function useToast() {
   return { toasts, addToast };
 }
 
-// ═══════════════════════════════════════════════════════════════════
+// -------------------------------------------------------------------
 export default function ModernEmployeeProjectDetails({ project, tasks, user, onBack, onMessageTeam }) {
   const { toasts, addToast } = useToast();
 
-  // ── Log Time modal state ──────────────────────────────────────────
+  // ── Log Time modal state ------------------------------------------
   const [logModal, setLogModal]   = useState(false);
   const [logDate, setLogDate]     = useState(new Date().toISOString().slice(0, 10));
   const [logHours, setLogHours]   = useState('');
@@ -224,7 +224,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
   const [logNotes, setLogNotes]   = useState('');
   const [logSaving, setLogSaving] = useState(false);
 
-  // ── Updates state ─────────────────────────────────────────────────
+  // ── Updates state -------------------------------------------------
   const [updates, setUpdates]   = useState([]);
   const readStorageKey = `read_updates_${user?._id || user?.id || 'guest'}_${project._id}`;
   const [readIds, setReadIds]   = useState(() => {
@@ -247,7 +247,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
 
   const [updLoading, setUpdLoading] = useState(false);
 
-  // ── Task done toggle (local) ───────────────────────────────────────
+  // ── Task done toggle (local) ---------------------------------------
   const [doneTasks, setDoneTasks] = useState(new Set());
 
   if (!project) return null;
@@ -294,12 +294,12 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
     { name: 'Final Delivery', done: false, date: project.end || project.deadline || '' }
   ];
 
-  // ── Sample updates (fallback when no backend updates exist) ────────
+  // ── Sample updates (fallback when no backend updates exist) --------
   const sampleUpdates = project._id ? [] : [
     { _id:'u1', type:'progress',  title:'Project progress updated', body:'Progress has been updated. Keep up the good work!', postedBy:'Admin', createdAt: new Date().toISOString(), unread:true },
   ];
 
-  // ── Fetch project details from backend ───────────
+  // ── Fetch project details from backend -----------
   useEffect(() => {
     if (!project._id) return;
     setUpdLoading(true);
@@ -331,7 +331,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
   const markAllRead = () => setReadIds(new Set(displayUpdates.map(u => getUpdKey(u)).filter(Boolean)));
   const isUnread    = (u) => !readIds.has(getUpdKey(u)) && u.unread !== false;
 
-  // ── Log Time save ──────────────────────────────────────────────────
+  // ── Log Time save --------------------------------------------------
   const handleSaveLog = async (e) => {
     e.preventDefault();
     if (!logHours) return;
@@ -353,22 +353,22 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
     }
   };
 
-  // ── Local task toggle ──────────────────────────────────────────────
+  // ── Local task toggle ----------------------------------------------
   const toggleTask = (taskId) => {
     setDoneTasks(prev => {
       const n = new Set(prev);
       if (n.has(taskId)) n.delete(taskId);
-      else { n.add(taskId); addToast('Task marked complete! ✓', 'success'); }
+      else { n.add(taskId); addToast('Task marked complete! Yes', 'success'); }
       return n;
     });
   };
 
-  // ── UPDATE type helper ─────────────────────────────────────────────
+  // ── UPDATE type helper ---------------------------------------------
   function getTypeConfig(type) {
     return UPDATE_TYPES[(type || 'general').toLowerCase()] || UPDATE_TYPES.general;
   }
 
-  // ── RENDER ─────────────────────────────────────────────────────────
+  // ── RENDER ---------------------------------------------------------
   return (
     <div className="epd2">
       <style>{CSS}</style>
@@ -497,7 +497,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
                         <span style={{ fontSize: 12, fontWeight: 700, color: P.textMid }}>Project completion</span>
                         <span style={{ fontSize: 13, fontWeight: 900, color: P.primary }}>
-                          {upd.oldProgress}% → {upd.newProgress}%
+                          {upd.oldProgress}%  {upd.newProgress}%
                         </span>
                       </div>
                       <div className="epd2-pb-bg">
@@ -598,7 +598,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                       className={`epd2-task-chk ${isDoneT ? 'done' : ''}`}
                       onClick={() => toggleTask(tid)}
                     >
-                      {isDoneT && <span style={{ color: '#fff', fontSize: 9, fontWeight: 900 }}>✓</span>}
+                      {isDoneT && <span style={{ color: '#fff', fontSize: 9, fontWeight: 900 }}>Yes</span>}
                     </div>
                     <div className={`epd2-task-prio ${priCls}`}></div>
                     <div className={`epd2-task-name ${isDoneT ? 'done' : ''}`}>{t.name || t.title}</div>

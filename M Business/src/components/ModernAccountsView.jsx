@@ -29,10 +29,10 @@ export default function ModernAccountsView({ THEME, income = [], expenses = [] }
         </div>
         <div style={{ display: "flex", gap: 12 }}>
           <button style={{ padding: "10px 16px", background: "var(--app-card)", border: "1px solid var(--app-border)", borderRadius: 12, fontWeight: 700, fontSize: 13, color: "var(--app-text)", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, boxShadow: "0 2px 5px rgba(0,0,0,0.02)" }}>
-            📅 {new Date().toLocaleDateString('default', { month: 'short', year: 'numeric' })}
+            Date {new Date().toLocaleDateString('default', { month: 'short', year: 'numeric' })}
           </button>
           <button style={{ padding: "10px 16px", background: "linear-gradient(135deg, var(--app-accent), var(--app-accent2, var(--app-accent)))", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 13, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 99, 102, 241), 0.3)" }}>
-            ⬇️ Statement
+             Statement
           </button>
         </div>
       </div>
@@ -43,7 +43,7 @@ export default function ModernAccountsView({ THEME, income = [], expenses = [] }
         <div style={{ background: "linear-gradient(135deg, #1e293b, #0f172a)", borderRadius: 24, padding: 24, color: "#fff", position: "relative", overflow: "hidden", boxShadow: "0 10px 30px rgba(15, 23, 42, 0.2)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30, position: "relative", zIndex: 1 }}>
             <div style={{ background: "rgba(255,255,255,0.1)", padding: "6px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, letterSpacing: 0.5 }}>Primary Account</div>
-            <div style={{ fontSize: 24 }}>💳</div>
+            <div style={{ fontSize: 24 }}></div>
           </div>
           
           <div style={{ position: "relative", zIndex: 1 }}>
@@ -60,7 +60,7 @@ export default function ModernAccountsView({ THEME, income = [], expenses = [] }
         <div style={{ background: "linear-gradient(135deg, var(--app-accent), var(--app-accent2, var(--app-accent)))", borderRadius: 24, padding: 24, color: "#fff", position: "relative", overflow: "hidden", boxShadow: "0 10px 30px rgba(var(--app-accent-rgb, 99, 102, 241), 0.25)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30, position: "relative", zIndex: 1 }}>
             <div style={{ background: "rgba(255,255,255,0.2)", padding: "6px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, letterSpacing: 0.5 }}>Secondary Account</div>
-            <div style={{ fontSize: 24 }}>🏦</div>
+            <div style={{ fontSize: 24 }}>Bank</div>
           </div>
           
           <div style={{ position: "relative", zIndex: 1 }}>
@@ -78,7 +78,7 @@ export default function ModernAccountsView({ THEME, income = [], expenses = [] }
         <div style={{ background: "var(--app-card)", border: "1px solid var(--app-border)", borderRadius: 24, padding: 24, position: "relative", overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.03)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30 }}>
             <div style={{ background: "rgba(16, 185, 129, 0.1)", color: "#10b981", padding: "6px 12px", borderRadius: 20, fontSize: 12, fontWeight: 800, letterSpacing: 0.5 }}>Savings Account</div>
-            <div style={{ fontSize: 24 }}>🌱</div>
+            <div style={{ fontSize: 24 }}>Start</div>
           </div>
           
           <div>
@@ -109,7 +109,7 @@ export default function ModernAccountsView({ THEME, income = [], expenses = [] }
               .map((item, idx) => (
                 <div key={idx} style={{ display: "flex", alignItems: "center", gap: 16, padding: "12px", borderRadius: 16, background: "var(--app-bg)", border: "1px solid var(--app-border)", transition: "transform 0.2s" }} onMouseEnter={e => e.currentTarget.style.transform="translateX(4px)"} onMouseLeave={e => e.currentTarget.style.transform="translateX(0)"}>
                   <div style={{ width: 48, height: 48, borderRadius: 14, background: item.type === "income" ? "rgba(16, 185, 129, 0.1)" : "rgba(239, 68, 68, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, color: item.type === "income" ? "#10b981" : "#ef4444" }}>
-                    {item.type === "income" ? "↓" : "↑"}
+                    {item.type === "income" ? "" : ""}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 15, fontWeight: 800, color: "var(--app-text)" }}>{item.title}</div>
@@ -122,7 +122,7 @@ export default function ModernAccountsView({ THEME, income = [], expenses = [] }
               ))}
             {(income.length === 0 && expenses.length === 0) && (
               <div style={{ textAlign: "center", padding: "40px 20px", color: "var(--app-muted)" }}>
-                <div style={{ fontSize: 32, marginBottom: 12 }}>📭</div>
+                <div style={{ fontSize: 32, marginBottom: 12 }}></div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>No recent transactions</div>
               </div>
             )}

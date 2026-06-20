@@ -203,7 +203,7 @@ export default function ProjectPaymentModals({
               <div style={{ background: '#E0F7FA', color: '#00BCD4', padding: 8, borderRadius: 8 }}><i className="ti ti-file-invoice"></i></div>
             {editData ? `Edit Invoice — ${editData.invoiceNo || ''}` : 'New Invoice'}
             </h3>
-            <button style={closeBtnStyle} onClick={closeModals}>✖</button>
+            <button style={closeBtnStyle} onClick={closeModals}>Close</button>
           </div>
           <form onSubmit={e => handleSave(e, 'invoice')}>
 
@@ -338,14 +338,14 @@ export default function ProjectPaymentModals({
                         <tr key={item.id}>
                           <td>
                             <input type="text" id={`item_${item.id}_description`} className="inv-creator-item-input desc" placeholder="Item description" value={item.description || ""} onChange={(e) => updItem(item.id, "description", e.target.value)} />
-                            {dErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
+                            {dErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>Warning Required</div>}
                           </td>
                           <td>
                             <input type="number" className="inv-creator-item-input num" value={item.quantity === 0 ? "" : item.quantity} onChange={(e) => updItem(item.id, "quantity", e.target.value === "" ? 0 : Number(e.target.value))} onWheel={(e) => e.target.blur()} />
                           </td>
                           <td>
                             <input type="number" id={`item_${item.id}_rate`} className="inv-creator-item-input num" value={item.rate === 0 ? "" : item.rate} onChange={(e) => updItem(item.id, "rate", e.target.value === "" ? 0 : Number(e.target.value))} onWheel={(e) => e.target.blur()} style={{ width: "90px" }} />
-                            {rErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
+                            {rErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>Warning Required</div>}
                           </td>
                           <td>
                             <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
@@ -416,11 +416,11 @@ export default function ProjectPaymentModals({
                   <div className="inv-creator-form-group">
                     <label className="inv-creator-form-label">Status</label>
                     <select className="inv-creator-form-select" value={form.status || "Pending"} onChange={(e) => handleInputChange("status", e.target.value)}>
-                      <option value="Pending">⏳ Pending</option>
-                      <option value="Paid">✔ Paid</option>
-                      <option value="Overdue">⚠ Overdue</option>
-                      <option value="Sent">📨 Sent</option>
-                      <option value="Draft">📝 Draft</option>
+                      <option value="Pending">Pending Pending</option>
+                      <option value="Paid">Yes Paid</option>
+                      <option value="Overdue">Warning Overdue</option>
+                      <option value="Sent"> Sent</option>
+                      <option value="Draft">Draft</option>
                     </select>
                   </div>
                   <div className="inv-creator-form-group">
@@ -489,7 +489,7 @@ export default function ProjectPaymentModals({
 
             <div style={btnRowStyle}>
               <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
-              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : editData ? '✔ Update Invoice' : '✔ Save Invoice'}</button>
+              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : editData ? 'Yes Update Invoice' : 'Yes Save Invoice'}</button>
             </div>
           </form>
         </div>
@@ -506,7 +506,7 @@ export default function ProjectPaymentModals({
               <div style={{ background: '#DCFCE7', color: '#22C55E', padding: 8, borderRadius: 8 }}><i className="ti ti-credit-card"></i></div>
               Record Payment
             </h3>
-            <button style={closeBtnStyle} onClick={closeModals}>✖</button>
+            <button style={closeBtnStyle} onClick={closeModals}>Close</button>
           </div>
           <form onSubmit={e => handleSave(e, 'payment')}>
             <div style={rowStyle}>
@@ -536,7 +536,7 @@ export default function ProjectPaymentModals({
 
             <div style={btnRowStyle}>
               <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
-              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : '✔ Record Payment'}</button>
+              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : 'Yes Record Payment'}</button>
             </div>
           </form>
         </div>
@@ -553,7 +553,7 @@ export default function ProjectPaymentModals({
               <div style={{ background: '#EDE9FE', color: '#8B5CF6', padding: 8, borderRadius: 8 }}><i className="ti ti-pig-money"></i></div>
               Add Advance Payment
             </h3>
-            <button style={closeBtnStyle} onClick={closeModals}>✖</button>
+            <button style={closeBtnStyle} onClick={closeModals}>Close</button>
           </div>
           <form onSubmit={e => handleSave(e, 'advance')}>
             <div style={rowStyle}>
@@ -599,7 +599,7 @@ export default function ProjectPaymentModals({
 
             <div style={btnRowStyle}>
               <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
-              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : '✔ Save Advance'}</button>
+              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : 'Yes Save Advance'}</button>
             </div>
           </form>
         </div>
@@ -618,7 +618,7 @@ export default function ProjectPaymentModals({
               </div>
               Add Milestone Payment
             </h3>
-            <button style={closeBtnStyle} onClick={closeModals}>✖</button>
+            <button style={closeBtnStyle} onClick={closeModals}>Close</button>
           </div>
           <form onSubmit={e => handleSave(e, 'milestone')}>
             <div style={rowStyle}>
@@ -696,7 +696,7 @@ export default function ProjectPaymentModals({
             <div style={btnRowStyle}>
               <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
               <button type="submit" style={submitBtnStyle} disabled={saving}>
-                {saving ? 'Saving...' : '✔ Save Milestone'}
+                {saving ? 'Saving...' : 'Yes Save Milestone'}
               </button>
             </div>
           </form>
@@ -714,7 +714,7 @@ export default function ProjectPaymentModals({
               <div style={{ background: '#FFEDD5', color: '#F97316', padding: 8, borderRadius: 8 }}><i className="ti ti-circle-plus"></i></div>
               Add Additional Charge
             </h3>
-            <button style={closeBtnStyle} onClick={closeModals}>✖</button>
+            <button style={closeBtnStyle} onClick={closeModals}>Close</button>
           </div>
           <form onSubmit={e => handleSave(e, 'additional')}>
             <div style={rowStyle}>
@@ -752,7 +752,7 @@ export default function ProjectPaymentModals({
 
             <div style={btnRowStyle}>
               <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
-              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : '✔ Save Charge'}</button>
+              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : 'Yes Save Charge'}</button>
             </div>
           </form>
         </div>
@@ -769,7 +769,7 @@ export default function ProjectPaymentModals({
               <div style={{ background: '#F3F4F6', color: '#6B7280', padding: 8, borderRadius: 8 }}><i className="ti ti-receipt"></i></div>
               Add Project Expense
             </h3>
-            <button style={closeBtnStyle} onClick={closeModals}>✖</button>
+            <button style={closeBtnStyle} onClick={closeModals}>Close</button>
           </div>
           <form onSubmit={e => handleSave(e, 'expense')}>
             <div style={rowStyle}>
@@ -815,7 +815,7 @@ export default function ProjectPaymentModals({
 
             <div style={btnRowStyle}>
               <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
-              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : '✔ Save Expense'}</button>
+              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : 'Yes Save Expense'}</button>
             </div>
           </form>
         </div>

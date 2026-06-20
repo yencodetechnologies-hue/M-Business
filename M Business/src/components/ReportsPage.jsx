@@ -1,8 +1,8 @@
-// ════════════════════════════════════════════════════════════
+// ------------------------------------------------------------
 //  ReportsPage.jsx  —  Drop-in component for Dashboard.jsx
 //  Usage:  import ReportsPage from "./ReportsPage";
 //  JSX:    {validActive === "reports" && <ReportsPage THEME={THEME} clients={clients} projects={projects} employees={employees} managers={managers} />}
-// ════════════════════════════════════════════════════════════
+// ------------------------------------------------------------
 
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -28,7 +28,7 @@ function StatCard({ THEME, icon, label, value, color, sub }) {
 
 function ReportCard({ THEME, r, idx, RPT_COLORS }) {
   const color = RPT_COLORS[idx % RPT_COLORS.length];
-  const icon = RPT_ICONS[r.type] || "📊";
+  const icon = RPT_ICONS[r.type] || "Metrics";
   const donePct = r.total > 0 ? Math.round((r.done / r.total) * 100) : 0;
 
   return (
@@ -48,7 +48,7 @@ function ReportCard({ THEME, r, idx, RPT_COLORS }) {
             {r.id}
           </div>
           <div style={{ fontSize: 18, fontWeight: 900, color: THEME.text, marginTop: 2 }}>{r.type}</div>
-          <div style={{ fontSize: 12, color: THEME.muted, marginTop: 4, fontWeight: 600 }}>📅 {r.range}</div>
+          <div style={{ fontSize: 12, color: THEME.muted, marginTop: 4, fontWeight: 600 }}>Date {r.range}</div>
         </div>
         {/* Revenue badge */}
         <div style={{ background:`${color}15`, border:`1px solid ${color}30`,
@@ -78,8 +78,8 @@ function ReportCard({ THEME, r, idx, RPT_COLORS }) {
         {[
           { k: "Total", v: r.total, c: THEME.accent },
           { k: "Revenue", v: r.revenue, c: color },
-          { k: "Done ✅", v: r.done, c: "#22C55E" },
-          { k: "Pending ⏳", v: r.pending, c: "#f59e0b" },
+          { k: "Done Success", v: r.done, c: "#22C55E" },
+          { k: "Pending Pending", v: r.pending, c: "#f59e0b" },
         ].map(({ k, v, c }) => (
           <div key={k} style={{ background: THEME.surface, borderRadius: 14,
             padding: "12px 14px", border: `1.5px solid rgba(0,0,0,0.1)` }}>
@@ -94,9 +94,9 @@ function ReportCard({ THEME, r, idx, RPT_COLORS }) {
   );
 }
 
-const RPT_ICONS = { "Monthly Revenue": "💰", "Project Summary": "📁", "Client Activity": "👥", "Team Overview": "👨‍💼", "Finance Overview": "📉" };
+const RPT_ICONS = { "Monthly Revenue": "Cost", "Project Summary": "Folder", "Client Activity": "Team", "Team Overview": "‍Job", "Finance Overview": "" };
 
-// ── MAIN COMPONENT ───────────────────────────────────────────
+// ── MAIN COMPONENT -------------------------------------------
 export default function ReportsPage({ THEME, clients=[], projects=[], employees=[], managers=[], income=[], expenses=[] }) {
   const [reports,  setReports]  = useState([]);
   const [loading,  setLoading]  = useState(false);
@@ -173,10 +173,10 @@ export default function ReportsPage({ THEME, clients=[], projects=[], employees=
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');`}</style>
       
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 20, marginBottom: 32 }}>
-        <StatCard THEME={THEME} icon="💰" label="Total Revenue" value="₹12.4L" color="#10b981" sub="+14% from last month" />
-        <StatCard THEME={THEME} icon="📁" label="Active Projects" value={projects.length} color={THEME.accent} sub="Across 8 categories" />
-        <StatCard THEME={THEME} icon="👥" label="Total Clients" value={clients.length} color="#f59e0b" sub="Active partnerships" />
-        <StatCard THEME={THEME} icon="🤝" label="Team Size" value={employees.length + managers.length} color="#6366f1" sub="Talented professionals" />
+        <StatCard THEME={THEME} icon="Cost" label="Total Revenue" value="₹12.4L" color="#10b981" sub="+14% from last month" />
+        <StatCard THEME={THEME} icon="Folder" label="Active Projects" value={projects.length} color={THEME.accent} sub="Across 8 categories" />
+        <StatCard THEME={THEME} icon="Team" label="Total Clients" value={clients.length} color="#f59e0b" sub="Active partnerships" />
+        <StatCard THEME={THEME} icon="Partnership" label="Team Size" value={employees.length + managers.length} color="#6366f1" sub="Talented professionals" />
       </div>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
@@ -184,7 +184,7 @@ export default function ReportsPage({ THEME, clients=[], projects=[], employees=
           <h2 style={{ margin: 0, fontSize: 24, fontWeight: 900, letterSpacing: "-0.5px" }}>Available Reports</h2>
           <p style={{ margin: "4px 0 0", color: THEME.muted, fontSize: 14, fontWeight: 600 }}>Real-time business insights and analytics</p>
         </div>
-        <button onClick={fetchReports} style={{ background: THEME.accent, color: "#fff", border: "none", borderRadius: 12, padding: "12px 24px", fontWeight: 800, fontSize: 14, cursor: "pointer", boxShadow: "0 4px 12px rgba(99,102,241,0.2)" }}>🔄 Refresh Reports</button>
+        <button onClick={fetchReports} style={{ background: THEME.accent, color: "#fff", border: "none", borderRadius: 12, padding: "12px 24px", fontWeight: 800, fontSize: 14, cursor: "pointer", boxShadow: "0 4px 12px rgba(99,102,241,0.2)" }}>Sync Refresh Reports</button>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))", gap: 24 }}>
@@ -212,7 +212,7 @@ export default function ReportsPage({ THEME, clients=[], projects=[], employees=
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
              <div>
                <h3 style={{ margin: 0, fontSize:20, fontWeight:900, color:THEME.text, letterSpacing: "-0.5px" }}>
-                 💰 Financial Records
+                 Cost Financial Records
                </h3>
                <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--app-muted)" }}>Detailed breakdown of recent income and expenditures</p>
              </div>
@@ -225,14 +225,14 @@ export default function ReportsPage({ THEME, clients=[], projects=[], employees=
                }}
                onMouseEnter={e => e.currentTarget.style.background = "#f1f5f9"}
                onMouseLeave={e => e.currentTarget.style.background = "var(--app-bg)"}
-             >Close Details ✕</button>
+             >Close Details Close</button>
           </div>
           
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: 30 }}>
             {/* Income Table */}
             <div style={{ background: THEME.surface, borderRadius: 16, padding: 20, border: `1.5px solid ${THEME.border}` }}>
               <h4 style={{ fontSize: 15, fontWeight: 800, color: "#16a34a", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ width: 32, height: 32, borderRadius: 10, background: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center" }}>📥</span>
+                <span style={{ width: 32, height: 32, borderRadius: 10, background: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center" }}>Import</span>
                 Recent Income
               </h4>
               <div style={{ overflowX: "auto" }}>
@@ -260,7 +260,7 @@ export default function ReportsPage({ THEME, clients=[], projects=[], employees=
             {/* Expense Table */}
             <div style={{ background: THEME.surface, borderRadius: 16, padding: 20, border: `1.5px solid ${THEME.border}` }}>
               <h4 style={{ fontSize: 15, fontWeight: 800, color: "#dc2626", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ width: 32, height: 32, borderRadius: 10, background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center" }}>📤</span>
+                <span style={{ width: 32, height: 32, borderRadius: 10, background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center" }}>Export</span>
                 Recent Expenses
               </h4>
               <div style={{ overflowX: "auto" }}>
@@ -293,7 +293,7 @@ export default function ReportsPage({ THEME, clients=[], projects=[], employees=
         <div style={{ background:"var(--app-card)", borderRadius:16, padding:22,
           boxShadow:"0 10px 30px rgba(0,0,0,0.05)", border:"1.5px solid rgba(0,0,0,0.1)" }}>
           <h3 style={{ margin:"0 0 16px", fontSize:15, fontWeight:700, color:"var(--app-text)" }}>
-            📋 Summary Table
+            Document Summary Table
           </h3>
           <div style={{ overflowX:"auto" }}>
             <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
@@ -319,7 +319,7 @@ export default function ReportsPage({ THEME, clients=[], projects=[], employees=
                       onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
                       <td style={{ padding:"12px 14px" }}>
                         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                          <span style={{ fontSize:16 }}>{RPT_ICONS[r.type]||"📊"}</span>
+                          <span style={{ fontSize:16 }}>{RPT_ICONS[r.type]||"Metrics"}</span>
                           <span style={{ fontWeight:700, color:"var(--app-text)" }}>{r.type}</span>
                         </div>
                       </td>

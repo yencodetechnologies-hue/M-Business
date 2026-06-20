@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 
-// ── Colour palette (matches M Business design system) ──────────
+// ── Colour palette (matches M Business design system) ----------
 const P = {
   primary:       '#00BCD4',
   primaryDark:   '#0097A7',
@@ -37,7 +37,7 @@ function getInitials2(name) {
   return name.substring(0, 2).toUpperCase();
 }
 
-// Normalise backend status → display label + badge class
+// Normalise backend status  display label + badge class
 function normaliseStatus(raw) {
   const s = (raw || '').toLowerCase().replace(/[\s_-]/g, '');
   if (['active','inprogress','inreview','started'].includes(s)) return { label: 'Active',    cls: 'active' };
@@ -73,7 +73,7 @@ function fmtDate(raw) {
   return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-// ── Inline CSS ─────────────────────────────────────────────────
+// ── Inline CSS -------------------------------------------------
 const CSS = `
 .mpv-root { font-family:'Nunito',sans-serif; }
 .mpv-root * { box-sizing:border-box; }
@@ -535,13 +535,13 @@ export default function ModernProjectsView({
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
             style={{ padding: '6px 14px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: page === 1 ? P.bg : '#fff', color: page === 1 ? P.textLight : P.textDark, cursor: page === 1 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700, fontFamily: "'Nunito',sans-serif" }}
-          >← Prev</button>
+          > Prev</button>
           <span style={{ fontSize: 12, color: P.textLight, fontWeight: 700 }}>Page {page} of {totalPages}</span>
           <button
             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
             style={{ padding: '6px 14px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: page === totalPages ? P.bg : '#fff', color: page === totalPages ? P.textLight : P.textDark, cursor: page === totalPages ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700, fontFamily: "'Nunito',sans-serif" }}
-          >Next →</button>
+          >Next </button>
         </div>
       )}
     </div>

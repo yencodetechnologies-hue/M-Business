@@ -115,7 +115,7 @@ function updateRisksPreview() {
     if (!inputs[0] || !inputs[0].value) return;
     const lik = sel ? sel.value : 'Medium';
     const cls = lik === 'High' ? 'h' : lik === 'Low' ? 'l' : 'm';
-    html += `<div class="risk-pi"><span class="risk-badge-p ${cls}">${lik}</span><div><div class="risk-pi-text">${inputs[0].value}</div>${inputs[1]?`<div class="risk-pi-mit">↳ ${inputs[1].value}</div>`:''}</div></div>`;
+    html += `<div class="risk-pi"><span class="risk-badge-p ${cls}">${lik}</span><div><div class="risk-pi-text">${inputs[0].value}</div>${inputs[1]?`<div class="risk-pi-mit"> ${inputs[1].value}</div>`:''}</div></div>`;
   });
   document.getElementById('pv-risks').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No risks added</span>';
 }
@@ -268,7 +268,7 @@ function addTestimonial() {
   d.innerHTML = `<i class="ti ti-quote tm-quote-icon"></i>
     <div class="fg"><label class="fl">Quote</label><textarea class="ta" style="min-height:56px" placeholder="Testimonial quote…" oninput="updateTmPreview()"></textarea></div>
     <div class="form-row"><div class="fg"><label class="fl">Name & Role</label><input class="fi" type="text" placeholder="Name, Title – Company" oninput="updateTmPreview()"></div>
-    <div class="fg"><label class="fl">Rating</label><select class="fs"><option>⭐⭐⭐⭐⭐ 5/5</option><option>⭐⭐⭐⭐ 4/5</option></select></div></div>
+    <div class="fg"><label class="fl">Rating</label><select class="fs"><option>5/5 (Excellent)</option><option>4/5 (Good)</option></select></div></div>
     <button class="icon-del" onclick="this.closest('.tm-item').remove();updateTmPreview()"><i class="ti ti-trash" style="font-size:13px"></i> Remove</button>`;
   c.appendChild(d);
   updateTmPreview();
@@ -343,7 +343,7 @@ function sendProposal() {
   selSt(document.querySelectorAll('.sc')[1],'SENT');
   alert('Proposal sent to ' + c + '!');
 }
-function markWon() { selSt(document.querySelectorAll('.sc')[3],'WON'); alert('Proposal marked as Won 🏆'); }
+function markWon() { selSt(document.querySelectorAll('.sc')[3],'WON'); alert('Proposal marked as Won Award'); }
 
 // Init
 calcTotal();

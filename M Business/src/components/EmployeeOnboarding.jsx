@@ -134,7 +134,7 @@ export default function EmployeeOnboarding() {
     return (
       <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
         <div style={{ maxWidth: 450, width: "100%", background: "#fff", padding: 40, borderRadius: 24, boxShadow: "0 20px 50px rgba(0,0,0,0.1)", textAlign: "center" }}>
-          <div style={{ width: 80, height: 80, background: "#dcfce7", color: "#22c55e", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, margin: "0 auto 24px" }}>✓</div>
+          <div style={{ width: 80, height: 80, background: "#dcfce7", color: "#22c55e", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, margin: "0 auto 24px" }}>Yes</div>
           <h2 style={{ fontSize: 24, fontWeight: 800, color: "#1e293b", marginBottom: 12 }}>Registration Successful!</h2>
           <p style={{ color: "#64748b", lineHeight: 1.6, marginBottom: 24 }}>Thank you for joining <strong>{companyName}</strong>. Your details have been submitted for approval. You will receive an email once your account is activated.</p>
           <div style={{ fontSize: 13, color: "#94a3b8" }}>Redirecting you to dashboard...</div>
@@ -154,7 +154,7 @@ export default function EmployeeOnboarding() {
         </div>
 
         <form onSubmit={handleSubmit} style={{ background: "#fff", padding: 32, borderRadius: 24, boxShadow: "0 20px 50px rgba(0,0,0,0.08)", border: "1px solid rgba(255,255,255,0.8)" }}>
-          {err.submit && <div style={{ background: "#fef2f2", color: "#ef4444", padding: "12px 16px", borderRadius: 10, fontSize: 14, fontWeight: 600, marginBottom: 20, border: "1px solid #fee2e2" }}>⚠️ {err.submit}</div>}
+          {err.submit && <div style={{ background: "#fef2f2", color: "#ef4444", padding: "12px 16px", borderRadius: 10, fontSize: 14, fontWeight: 600, marginBottom: 20, border: "1px solid #fee2e2" }}>Warning {err.submit}</div>}
 
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
             <div style={{ position: "relative" }}>
@@ -162,11 +162,11 @@ export default function EmployeeOnboarding() {
                 {form.photo ? (
                   <img src={form.photo} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 ) : (
-                  <span style={{ fontSize: 40 }}>👤</span>
+                  <span style={{ fontSize: 40 }}>Profile</span>
                 )}
               </div>
               <label style={{ position: "absolute", bottom: 0, right: 0, background: "#7c3aed", width: 36, height: 36, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "3px solid #fff", boxShadow: "0 4px 10px rgba(0,0,0,0.15)" }}>
-                <span style={{ fontSize: 18, color: "#fff" }}>📷</span>
+                <span style={{ fontSize: 18, color: "#fff" }}></span>
                 <input type="file" accept="image/*" style={{ display: "none" }} onChange={handlePhotoChange} />
               </label>
             </div>
@@ -267,9 +267,9 @@ export default function EmployeeOnboarding() {
 
           <div style={{ fontSize: 12, fontWeight: 800, color: "#94a3b8", letterSpacing: 1, marginBottom: 16, borderBottom: "1px solid #f1f5f9", paddingBottom: 8, marginTop: 32 }}>DOCUMENTS</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32 }}>
-            <DocInput label="Aadhaar Card" icon="🪪" file={docs.aadhaar} onChange={f => handleFileChange("aadhaar", f)} />
-            <DocInput label="PAN Card" icon="💳" file={docs.pan} onChange={f => handleFileChange("pan", f)} />
-            <DocInput label="Bank Passbook" icon="🏦" file={docs.passbook} onChange={f => handleFileChange("passbook", f)} />
+            <DocInput label="Aadhaar Card" icon="ID Card" file={docs.aadhaar} onChange={f => handleFileChange("aadhaar", f)} />
+            <DocInput label="PAN Card" icon="" file={docs.pan} onChange={f => handleFileChange("pan", f)} />
+            <DocInput label="Bank Passbook" icon="Bank" file={docs.passbook} onChange={f => handleFileChange("passbook", f)} />
           </div>
           <div style={{ display: "flex", justifyContent: "center" }}>
             <button
@@ -300,7 +300,7 @@ export default function EmployeeOnboarding() {
                   <span>Submitting...</span>
                 </>
               ) : (
-                <span>Complete Registration →</span>
+                <span>Complete Registration </span>
               )}
             </button></div>
         </form>
@@ -341,7 +341,7 @@ function Input({ label, value, onChange, error, type = "text", placeholder }) {
           background: "#f8fafc"
         }}
       />
-      {error && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4, fontWeight: 500 }}>⚠️ {error}</div>}
+      {error && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4, fontWeight: 500 }}>Warning {error}</div>}
     </div>
   );
 }

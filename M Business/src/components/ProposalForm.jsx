@@ -141,7 +141,7 @@ export default function ProposalForm({ onBack, onSave, initialData, clients }) {
             coverZone.style.backgroundSize = 'cover';
             coverZone.style.backgroundPosition = 'center';
             coverZone.style.borderColor = 'var(--teal)';
-            coverZone.innerHTML = `<div style="color:var(--teal);font-weight:700;font-size:12px">✓ Cover image uploaded</div><div style="font-size:10px;color:var(--text3)">Click to change</div>`;
+            coverZone.innerHTML = `<div style="color:var(--teal);font-weight:700;font-size:12px">Yes Cover image uploaded</div><div style="font-size:10px;color:var(--text3)">Click to change</div>`;
           };
           inp.click();
         };
@@ -397,7 +397,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 .eb-text{font-size:10px;color:var(--text2);line-height:1.6}
 .del-list{display:flex;flex-direction:column;gap:4px}
 .del-item-p{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text2)}
-.del-item-p::before{content:'✓';color:var(--teal);font-weight:800;font-size:11px;flex-shrink:0}
+.del-item-p::before{content:'\\2713';color:var(--teal);font-weight:800;font-size:11px;flex-shrink:0}
 .tl-p{display:flex;flex-direction:column;gap:0}
 .tl-pi{display:flex;gap:8px;padding-bottom:8px}
 .tl-pi:last-child{padding-bottom:0}
@@ -425,7 +425,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 .pricing-grand span:last-child{font-size:12px;font-weight:900;color:#fff}
 .val-p{display:flex;flex-direction:column;gap:4px}
 .val-pi{display:flex;align-items:flex-start;gap:6px;font-size:10px;color:var(--text2)}
-.val-pi::before{content:'→';color:var(--amber);font-weight:800;font-size:11px;flex-shrink:0}
+.val-pi::before{content:'';color:var(--amber);font-weight:800;font-size:11px;flex-shrink:0}
 .cs-p{padding:8px 10px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--teal);margin-bottom:7px}
 .cs-p:last-child{margin-bottom:0}
 .cs-p-title{font-size:10px;font-weight:800;color:var(--text);margin-bottom:3px}
@@ -482,13 +482,13 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
     <div class="section-picker">
       <div class="sp-title"><i class="ti ti-layout-grid" style="color:var(--teal);font-size:15px"></i> Proposal Sections — Toggle Optional Sections</div>
       <div class="sp-grid">
-        <button class="sp-toggle required" disabled>📋 Basics</button>
-        <button class="sp-toggle required" disabled>🏢 Parties</button>
-        <button class="sp-toggle required" disabled>📝 Summary</button>
-        <button class="sp-toggle required" disabled>✅ Deliverables</button>
-        <button class="sp-toggle required" disabled>🗓️ Timeline</button>
-        <button class="sp-toggle required" disabled>💰 Pricing</button>
-        <button class="sp-toggle required" disabled>✍️ Sign-off</button>
+        <button class="sp-toggle required" disabled>Basics</button>
+        <button class="sp-toggle required" disabled>Parties</button>
+        <button class="sp-toggle required" disabled>Summary</button>
+        <button class="sp-toggle required" disabled>Deliverables</button>
+        <button class="sp-toggle required" disabled>Timeline</button>
+        <button class="sp-toggle required" disabled>Pricing</button>
+        <button class="sp-toggle required" disabled>Sign-off</button>
         <button class="sp-toggle on" onclick="toggleSection(this,'sec-team')"><i class="ti ti-users"></i> Our Team</button>
         <button class="sp-toggle on" onclick="toggleSection(this,'sec-value')"><i class="ti ti-star"></i> Value & ROI</button>
         <button class="sp-toggle" onclick="toggleSection(this,'sec-casestudies')"><i class="ti ti-trophy"></i> Case Studies</button>
@@ -522,12 +522,12 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
         <div class="fg">
           <label class="fl" style="margin-bottom:7px">Status</label>
           <div class="status-row">
-            <button class="sc active-sc" onclick="selSt(this,'DRAFT')">📝 Draft</button>
-            <button class="sc sent" onclick="selSt(this,'SENT')">📤 Sent</button>
-            <button class="sc neg" onclick="selSt(this,'NEGOTIATION')">🤝 Negotiation</button>
-            <button class="sc won" onclick="selSt(this,'WON')">🏆 Won</button>
-            <button class="sc lost" onclick="selSt(this,'LOST')">❌ Lost</button>
-            <button class="sc exp" onclick="selSt(this,'EXPIRED')">⏰ Expired</button>
+            <button class="sc active-sc" onclick="selSt(this,'DRAFT')">Draft</button>
+            <button class="sc sent" onclick="selSt(this,'SENT')">Sent</button>
+            <button class="sc neg" onclick="selSt(this,'NEGOTIATION')">Negotiation</button>
+            <button class="sc won" onclick="selSt(this,'WON')">Won</button>
+            <button class="sc lost" onclick="selSt(this,'LOST')">Lost</button>
+            <button class="sc exp" onclick="selSt(this,'EXPIRED')">Expired</button>
           </div>
         </div>
       </div>
@@ -702,8 +702,8 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
         </div>
         <div id="sigModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
           <div style="background:#fff;border-radius:16px;padding:24px;width:480px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,0.18);">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:13px;font-weight:800;color:#0f1c2e">AUTHORISED SIGNATURE</div><button id="sigModalClose" style="background:none;border:none;font-size:20px;cursor:pointer;color:#607D86;">✕</button></div>
-            <div style="display:flex;border-bottom:2px solid #e5e7eb;margin-bottom:14px;"><button id="sigTab-draw" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:var(--teal);border-bottom:2px solid var(--teal);cursor:pointer;margin-bottom:-2px;">✍️ Draw</button><button id="sigTab-type" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:#607D86;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-2px;">⌨️ Type</button><button id="sigTab-upload" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:#607D86;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-2px;">📁 Upload</button></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:13px;font-weight:800;color:#0f1c2e">AUTHORISED SIGNATURE</div><button id="sigModalClose" style="background:none;border:none;font-size:20px;cursor:pointer;color:#607D86;">Close</button></div>
+            <div style="display:flex;border-bottom:2px solid #e5e7eb;margin-bottom:14px;"><button id="sigTab-draw" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:var(--teal);border-bottom:2px solid var(--teal);cursor:pointer;margin-bottom:-2px;">Draw</button><button id="sigTab-type" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:#607D86;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-2px;">Type</button><button id="sigTab-upload" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:#607D86;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-2px;">Upload</button></div>
             <div id="sigContent-draw"><div style="background:#F5FAFA;border:1.5px solid #E0EEF0;border-radius:10px;padding:10px;"><canvas id="sigCanvas" width="420" height="160" style="border:1.5px dashed #C5DDE0;border-radius:8px;background:#fff;cursor:crosshair;width:100%;height:160px;display:block;touch-action:none;"></canvas></div><div style="display:flex;gap:10px;margin-top:10px;"><button id="sigClearBtn" style="padding:6px 14px;font-size:11px;background:#fff;border:1.5px solid #e5e7eb;border-radius:6px;cursor:pointer;font-weight:700;color:#374151;">Clear</button><button id="sigApplyDrawBtn" style="padding:6px 14px;font-size:11px;background:var(--teal);color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:800;">Apply Signature</button></div></div>
             <div id="sigContent-type" style="display:none;"><div style="display:flex;gap:8px;align-items:center;"><input id="typedSigInput" type="text" placeholder="Type your name..." style="flex:1;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:18px;font-family:'Dancing Script',cursive;font-weight:bold;color:#1a2e35;outline:none;" /><button id="sigApplyTypeBtn" style="padding:10px 14px;background:var(--teal);border:none;border-radius:10px;color:#fff;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;">Apply</button></div><div id="typedSigPreview" style="margin-top:10px;font-size:11px;color:#64748b;display:none;">Preview: <span id="typedSigPreviewText" style="font-family:'Dancing Script',cursive;font-size:22px;color:#1a2e35;font-weight:bold;"></span></div></div>
             <div id="sigContent-upload" style="display:none;"><div style="background:#F5FAFA;border:1.5px dashed #C5DDE0;border-radius:10px;padding:24px;text-align:center;cursor:pointer;position:relative;"><input id="sigUploadInput" type="file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;" /><i class="ti ti-upload" style="font-size:24px;color:#607D86;"></i><div style="font-size:12px;font-weight:700;color:#607D86;margin-top:4px;">Click to upload signature image</div></div></div>
@@ -717,7 +717,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
   <!-- ══ RIGHT: LIVE PREVIEW ══ -->
   <div class="preview-panel">
     <div class="preview-toolbar">
-      <div class="pt-title-label">📋 Live Preview</div>
+      <div class="pt-title-label">Live Preview</div>
       <div class="pt-btns">
         <button class="pt-b"><i class="ti ti-download" style="font-size:11px"></i> PDF</button>
         <button class="pt-b"><i class="ti ti-share" style="font-size:11px"></i> Share</button>

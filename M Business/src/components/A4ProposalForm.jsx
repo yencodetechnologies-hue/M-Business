@@ -46,7 +46,7 @@ function Fld({ label, value, onChange, type = "text", error, placeholder, disabl
         placeholder={placeholder || ""}
         disabled={disabled}
       />
-      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {error}</div>}
+      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {error}</div>}
     </div>
   );
 }
@@ -133,7 +133,7 @@ function ClientDropdown({ clients, value, onChange, error }) {
                 top: "50%",
                 transform: "translateY(-50%)",
                 fontSize: 12
-              }}>🔍</span>
+              }}>Search</span>
               <input
                 autoFocus
                 placeholder="Search client..."
@@ -205,7 +205,7 @@ function ClientDropdown({ clients, value, onChange, error }) {
                         <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>
                       )}
                     </div>
-                    {isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}
+                    {isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>Yes</span>}
                   </div>
                 );
               })
@@ -221,7 +221,7 @@ function ClientDropdown({ clients, value, onChange, error }) {
         setOpen(false);
         setSearch("");
       }} />}
-      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {error}</div>}
+      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {error}</div>}
     </div>
   );
 }
@@ -302,7 +302,7 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
       try { await navigator.share({ title: `Proposal: ${data.projectType}`, text, url: link }); } catch (err) { console.log(err); }
     } else {
       navigator.clipboard.writeText(text);
-      alert("📋 Link copied to clipboard!");
+      alert("Document Link copied to clipboard!");
     }
   };
 
@@ -559,7 +559,7 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
             }}
             title="Share Link"
           >
-            🔗
+            
           </button>
           <button
             onClick={shareWhatsApp}
@@ -576,7 +576,7 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
             }}
             title="WhatsApp"
           >
-            💬
+            Comment
           </button>
           <button
             onClick={handlePrint}
@@ -592,7 +592,7 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
               fontFamily: "inherit"
             }}
           >
-            🖨️ Print
+            Print
           </button>
           <button
             onClick={onCancel}
@@ -608,7 +608,7 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
               fontFamily: "inherit"
             }}
           >
-            ✕
+            Close
           </button>
         </div>
       </div>

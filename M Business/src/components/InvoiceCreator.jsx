@@ -71,15 +71,15 @@ function formatDateTime(ts) {
   return new Date(ts).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
 }
 
-// ── Status Badge ─────────────────────────────────────────────
+// ── Status Badge ---------------------------------------------
 function StatusBadge({ status }) {
   const map = {
-    paid: { bg: "#dcfce7", color: "#16a34a", label: "✅ Paid" },
-    unpaid: { bg: "#fff7ed", color: "#ea580c", label: "⏳ Unpaid" },
-    overdue: { bg: "#fee2e2", color: "#dc2626", label: "🔴 Overdue" },
-    draft: { bg: "var(--app-surface)", color: "#64748b", label: "📝 Draft" },
-    sent: { bg: "#eff6ff", color: "#2563eb", label: "📤 Sent" },
-    part_paid: { bg: "var(--app-bg)", color: "var(--app-accent)", label: "💰 Part Payment" },
+    paid: { bg: "#dcfce7", color: "#16a34a", label: "Success Paid" },
+    unpaid: { bg: "#fff7ed", color: "#ea580c", label: "Pending Unpaid" },
+    overdue: { bg: "#fee2e2", color: "#dc2626", label: " Overdue" },
+    draft: { bg: "var(--app-surface)", color: "#64748b", label: "Draft" },
+    sent: { bg: "#eff6ff", color: "#2563eb", label: "Sent" },
+    part_paid: { bg: "var(--app-bg)", color: "var(--app-accent)", label: "Cost Part Payment" },
   };
   const s = map[(status || "draft").toLowerCase()] || map.draft;
   return (
@@ -89,7 +89,7 @@ function StatusBadge({ status }) {
   );
 }
 
-// ── Confirm Delete Modal ──────────────────────────────────────
+// ── Confirm Delete Modal --------------------------------------
 function ConfirmModal({ invoiceNo, onConfirm, onCancel }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
@@ -108,7 +108,7 @@ function ConfirmModal({ invoiceNo, onConfirm, onCancel }) {
   );
 }
 
-// ── Toast ─────────────────────────────────────────────────────
+// ── Toast -----------------------------------------------------
 function Toast({ msg }) {
   if (!msg) return null;
   return (
@@ -248,13 +248,13 @@ function Toast({ msg }) {
         .inv-creator-sig-pad { border: 2px dashed #C5DDE0; border-radius: 10px; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: all .15s; background: #F5FAFA; }
         .inv-creator-sig-pad:hover { border-color: #00BCD4; background: #F0FDFE; }
 `}</style>
-      <span>✨</span>
+      <span>Special</span>
       {msg}
     </div>
   );
 }
 
-// ── LocalStorage helpers ──────────────────────────────────────
+// ── LocalStorage helpers --------------------------------------
 const DRAFTS_KEY = "invoice_drafts";
 function loadAllDrafts() {
   try { const d = localStorage.getItem(DRAFTS_KEY); return d ? JSON.parse(d) : []; } catch { return []; }
@@ -306,11 +306,11 @@ function CompanyDropdown({ clients, value, onChange, error, onAddCompany }) {
       </div>
       {open && (
         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "var(--app-shadow)", zIndex: 999, overflow: "hidden" }}>
-          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search company name..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", color: T.text, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
+          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>Search</span><input autoFocus placeholder="Search company name..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", color: T.text, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
           {onAddCompany && <div onClick={() => { setOpen(false); setSearch(""); onAddCompany(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "var(--app-surface)", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Company Name</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "#64748b", fontSize: 13 }}>No companies found</div>
-              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "#64748b" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
+              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "#64748b" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>Yes</span>}</div>); })}
           </div>
         </div>
       )}
@@ -331,11 +331,11 @@ function ProjectDropdown({ projects, value, onChange, onAddProject, disabled }) 
       </div>
       {open && (
         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "var(--app-shadow)", zIndex: 999, overflow: "hidden" }}>
-          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search project..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", color: T.text, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
+          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>Search</span><input autoFocus placeholder="Search project..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", color: T.text, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
           {onAddProject && <div onClick={() => { setOpen(false); setSearch(""); onAddProject(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "var(--app-surface)", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Project</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "#64748b", fontSize: 13 }}>No projects found</div>
-              : filtered.map((p, i) => { const name = p.name || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div></div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
+              : filtered.map((p, i) => { const name = p.name || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div></div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>Yes</span>}</div>); })}
           </div>
         </div>
       )}
@@ -465,7 +465,7 @@ function CanvasSignature({ onSave }) {
   );
 }
 
-// ════════════════════════════════════════════════════════════
+// ------------------------------------------------------------
 export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack, jumpInvoice, newInvoicePrefill, onSaveLocalInvoice }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || "";
@@ -635,7 +635,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     customCurrencySymbol: "",
     status: "pending",
     template: "Classic",
-    footerMessage: "🙏 Thank you for considering us!",
+    footerMessage: " Thank you for considering us!",
     amountPaid: 0,
     paymentDate: "2026-06-01",
     paymentMode: "Bank Transfer / NEFT",
@@ -732,7 +732,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const amountPaid = parseFloat(inv.amountPaid) || 0;
   const balanceDue = total - amountPaid;
 
-  // ── Fetch list ──────────────────────────────────────────────
+  // ── Fetch list ----------------------------------------------
   const fetchList = async () => {
     setListLoading(true);
     try {
@@ -746,7 +746,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   useEffect(() => { fetchList(); }, []);
   useEffect(() => { if (step === "list") fetchList(); }, [step]);
 
-  // ── Items ───────────────────────────────────────────────────
+  // ── Items ---------------------------------------------------
   const addItem = () => setItems((p) => [...p, { id: Date.now(), description: "", quantity: 1, rate: "" }]);
   const removeItem = (id) => { if (items.length > 1) setItems((p) => p.filter((i) => i.id !== id)); };
   const updItem = (id, f, v) => {
@@ -754,7 +754,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     setErrors((prev) => { const n = { ...prev }; delete n[`item_${id}_${f}`]; return n; });
   };
 
-  // ── Validate ────────────────────────────────────────────────
+  // ── Validate ------------------------------------------------
   const validate = () => {
     const errs = {};
     let firstErrId = null;
@@ -790,7 +790,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     return true;
   };
 
-  // ── Load entry into form (EDIT) ─────────────────────────────
+  // ── Load entry into form (EDIT) -----------------------------
   const loadEntry = (entry) => {
     // entry.inv இருந்தா use பண்ணு, இல்லன்னா entry itself-ஐ inv-ஆ treat பண்ணு
     const invData = entry.inv || entry;
@@ -814,7 +814,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     setStep("form");
   };
 
-  // ── Clear ───────────────────────────────────────────────────
+  // ── Clear ---------------------------------------------------
   const clearForm = () => {
     setInv({ ...blank, invoiceNo: generateInvoiceNo() });
     setItems([
@@ -824,7 +824,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     setEditingId(null);
   };
 
-  // ── API save ────────────────────────────────────────────────
+  // ── API save ------------------------------------------------
   const apiSave = async (status = "draft") => {
     try {
       if (editingId) {
@@ -841,7 +841,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     }
   };
 
-  // ── Build record for project-local invoice array ─────────────
+  // ── Build record for project-local invoice array -------------
   const buildLocalInvoiceRecord = () => ({
     invoiceNo: inv.invoiceNo,
     description: items[0]?.description || inv.notes || 'Invoice',
@@ -855,14 +855,14 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     items,
   });
 
-  // ── Save Draft ──────────────────────────────────────────────
+  // ── Save Draft ----------------------------------------------
   const handleSaveDraft = async () => {
     if (!validate()) return;
     setSaving("draft");
     if (localEditTarget && onSaveLocalInvoice) {
       await onSaveLocalInvoice(localEditTarget.projectId, localEditTarget.index, buildLocalInvoiceRecord());
       setSaving(false);
-      showToast("💾 Invoice updated!");
+      showToast("Save Invoice updated!");
       setTimeout(() => { if (onBack) onBack(); }, 800);
       return;
     }
@@ -871,14 +871,14 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     if (data.success && data.invoice?._id) setEditingId(data.invoice._id);
     setDraftSaved(true);
     setSaving(false);
-    showToast("💾 Draft saved!");
+    showToast("Save Draft saved!");
     setTimeout(() => {
       setDraftSaved(false);
       setStep("list");
     }, 1000);
   };
 
-  // ── Save & Preview ──────────────────────────────────────────
+  // ── Save & Preview ------------------------------------------
   const handleSavePreview = async () => {
     if (!validate()) return;
     setSaving("preview");
@@ -897,7 +897,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     window.scrollTo(0, 0);
   };
 
-  // ── Delete invoice ──────────────────────────────────────────
+  // ── Delete invoice ------------------------------------------
   const handleDelete = async (entry) => {
     const id = entry._id || entry.id;
     // Try backend
@@ -907,10 +907,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     setInvoiceList(prev => prev.filter(e => (e.id || e.invoiceNo) !== (id || entry.invoiceNo)));
     setDeleteTarget(null);
     setStep("list");
-    showToast("     Delete️️️️️️️️️️️️️️️️ Invoice deleted!");
+    showToast("Delete Invoice deleted!");
   };
 
-  // ── Update status inline ────────────────────────────────────
+  // ── Update status inline ------------------------------------
   const handleStatusChange = async (entry, newStatus) => {
     if (newStatus === "paid" || newStatus === "part_paid") {
       const remaining = Math.max(0, (entry.total || 0) - (entry.amountPaid || 0));
@@ -950,13 +950,13 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     setStatusUpdating(null);
     if (newStatus === "paid" || newStatus === "part_paid") {
       const isPartial = (paymentDetails.amountPaid || 0) < (entry.total || 0);
-      showToast(isPartial ? "✅ Recorded as Part Payment in Accounts" : "✅ Recorded as Full Payment in Accounts");
+      showToast(isPartial ? "Success Recorded as Part Payment in Accounts" : "Success Recorded as Full Payment in Accounts");
     } else {
-      showToast(`✅ Status updated to ${newStatus}`);
+      showToast(`Success Status updated to ${newStatus}`);
     }
   };
 
-  // ── QR ──────────────────────────────────────────────────────
+  // ── QR ------------------------------------------------------
   const slimPayload = {
     no: inv.invoiceNo, date: inv.date, due: inv.dueDate,
     co: inv.companyName, email: inv.companyEmail, phone: inv.companyPhone, addr: inv.companyAddress,
@@ -980,12 +980,12 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       loadEntry(entry);
       setTimeout(() => {
         setStep("preview");
-        showToast("⏳ Loading invoice for PDF generation...");
+        showToast("Pending Loading invoice for PDF generation...");
         setTimeout(() => triggerPDFShare(entry, type, true), 1000);
       }, 0);
       return;
     }
-    showToast("⏳ Generating PDF...");
+    showToast("Pending Generating PDF...");
 
     // Helper: resolve CSS variables so html2canvas captures correct colours on all OS/browsers
     const resolveCssVars = (el) => {
@@ -1096,14 +1096,14 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       }
     } catch (err) {
       console.log(err);
-      showToast("❌ Failed to generate PDF");
+      showToast("Error Failed to generate PDF");
     }
   };
 
   const shareInvoice = (entry) => triggerPDFShare(entry, "link");
   const shareWhatsApp = (entry) => triggerPDFShare(entry, "wa");
 
-  // ── Shared styles ────────────────────────────────────────────
+  // ── Shared styles --------------------------------------------
   const inp = (err) => ({
     width: "100%", border: `1.5px solid ${err ? "#ef4444" : "var(--app-border)"}`, borderRadius: 10,
     padding: "10px 12px", fontSize: 14, color: "#0f1c2e", background: err ? "#fff5f5" : "var(--app-surface)",
@@ -1115,9 +1115,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     paid: "#16a34a", unpaid: "#ea580c", overdue: "#dc2626", draft: "#6b7280", sent: "#2563eb", part_paid: "var(--app-accent)",
   };
 
-  // ════════════════════════════════════════════════════════════
+  // ------------------------------------------------------------
   // RECEIPT VIEW
-  // ════════════════════════════════════════════════════════════
+  // ------------------------------------------------------------
   if (step === "receipt" && receiptEntry) {
     const r = receiptEntry;
     const pd = r.paymentData || {};
@@ -1135,15 +1135,15 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         `}</style>
 
         <div className="no-print" style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 30 }}>
-          <button onClick={() => jumpInvoice ? onBack() : (setEditingReceipt(false), setStep("list"))} style={{ padding: "12px 24px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>{jumpInvoice ? "← Back to Dashboard" : "← Back to List"}</button>
+          <button onClick={() => jumpInvoice ? onBack() : (setEditingReceipt(false), setStep("list"))} style={{ padding: "12px 24px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>{jumpInvoice ? " Back to Dashboard" : " Back to List"}</button>
           {!editingReceipt && <button onClick={() => setEditingReceipt(true)} style={{ padding: "12px 24px", background: "#fff7ed", border: "1.5px solid #fed7aa", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#ea580c", fontFamily: "inherit" }}>Edit</button>}
-          {!editingReceipt && <button onClick={() => window.print()} style={{ padding: "12px 28px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)" }}>🖨️ Print Receipt</button>}
+          {!editingReceipt && <button onClick={() => window.print()} style={{ padding: "12px 28px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)" }}>Print Receipt</button>}
         </div>
 
         <div className="receipt-paper" style={{ maxWidth: 500, margin: "0 auto", background: "var(--app-card)", borderRadius: 24, boxShadow: "var(--app-shadow)", overflow: "hidden", border: "1px solid var(--app-border)" }}>
           {/* Header */}
           <div style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", padding: "40px 32px", textAlign: "center", color: "#fff" }}>
-            <div style={{ width: 64, height: 64, background: "rgba(255,255,255,0.2)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 32 }}>💸</div>
+            <div style={{ width: 64, height: 64, background: "rgba(255,255,255,0.2)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 32 }}>Payment</div>
             <h2 style={{ margin: 0, fontSize: 24, fontWeight: 900, letterSpacing: 1 }}>{r.status === "part_paid" ? "PART PAYMENT RECEIPT" : "PAYMENT RECEIPT"}</h2>
             <div style={{ fontSize: 13, opacity: 0.8, marginTop: 4, fontWeight: 600 }}>{receiptNo}</div>
           </div>
@@ -1187,7 +1187,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                     <button onClick={async () => {
                       await updateStatusBackend(r, r.status, receiptEntry.paymentData);
                       setEditingReceipt(false);
-                      showToast("✅ Receipt updated!");
+                      showToast("Success Receipt updated!");
                     }} style={{ flex: 1, padding: "10px", background: "#0f1c2e", color: "#fff", border: "none", borderRadius: 10, fontWeight: 700, cursor: "pointer" }}>Save Changes</button>
                   </div>
                 </>
@@ -1245,9 +1245,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     );
   }
 
-  // ════════════════════════════════════════════════════════════
+  // ------------------------------------------------------------
   // LIST VIEW
-  // ════════════════════════════════════════════════════════════
+  // ------------------------------------------------------------
   if (step === "list") {
     const enriched = invoiceList.map((e) => {
       const dueDate = e.inv?.dueDate || e.dueDate;
@@ -1289,7 +1289,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             <div style={{ background: "var(--app-card)", borderRadius: 24, width: "100%", maxWidth: 400, padding: "32px", boxShadow: "var(--app-shadow)", border: "1px solid var(--app-border)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
                 <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#0f1c2e" }}>Payment Information</h3>
-                <button onClick={() => setPaymentModalEntry(null)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-accent)", padding: "4px 8px" }}>✕</button>
+                <button onClick={() => setPaymentModalEntry(null)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-accent)", padding: "4px 8px" }}>Close</button>
               </div>
 
               <div style={{ background: "var(--app-bg)", borderRadius: 12, padding: "14px", marginBottom: 20, border: "1.5px solid var(--app-border)" }}>
@@ -1724,9 +1724,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     );
   }
 
-  // ════════════════════════════════════════════════════════════
+  // ------------------------------------------------------------
   // PREVIEW / PRINT
-  // ════════════════════════════════════════════════════════════
+  // ------------------------------------------------------------
   if (step === "preview") {
     return (
       <div className="print-wrapper" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "var(--app-bg)", minHeight: "100vh", padding: "20px 12px" }}>
@@ -1765,12 +1765,12 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
         {/* Toolbar */}
         <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
-          <button onClick={() => (!internalNav && onBack) ? onBack() : setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>📋 Back</button>
+          <button onClick={() => (!internalNav && onBack) ? onBack() : setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Document Back</button>
           <button onClick={() => setStep("form")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Edit</button>
-          <button onClick={() => shareInvoice({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>🔗 Share</button>
-          <button onClick={() => shareWhatsApp({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 18px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }}>💬 WA</button>
+          <button onClick={() => shareInvoice({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}> Share</button>
+          <button onClick={() => shareWhatsApp({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 18px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }}>Comment WA</button>
           <button onClick={() => { setDeleteTarget({ id: editingId, invoiceNo: inv.invoiceNo }); }} style={{ padding: "10px 18px", background: "#fee2e2", border: "1.5px solid #fecaca", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#ef4444", fontFamily: "inherit" }}>Delete</button>
-          <button onClick={() => triggerPDFShare({ id: editingId, invoiceNo: inv.invoiceNo, total: total }, "print")} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>🖨️ Print / PDF</button>
+          <button onClick={() => triggerPDFShare({ id: editingId, invoiceNo: inv.invoiceNo, total: total }, "print")} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>Print / PDF</button>
         </div>
 
         {/* Pagination Logic */}
@@ -1878,9 +1878,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                         <div style={{ fontSize: 9, color: "#64748b", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>BILL TO</div>
                         <div style={{ fontSize: 17, fontWeight: 800, color: "#0f1c2e" }}>{inv.client || "—"}</div>
                         {selectedClient?.companyName && <div style={{ fontSize: 13, color: currentT.primaryColor || "var(--app-accent)", fontWeight: 600, marginTop: 2 }}>{selectedClient.companyName}</div>}
-                        {selectedClient?.email && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 5 }}>📧 {selectedClient.email}</div>}
-                        {selectedClient?.phone && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}>📱 {selectedClient.phone}</div>}
-                        {selectedClient?.gstNumber && <div style={{ fontSize: 12, color: currentT.primaryColor || "var(--app-accent)", marginTop: 4, fontWeight: 600 }}>💎 GST: {selectedClient.gstNumber}</div>}
+                        {selectedClient?.email && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 5 }}> {selectedClient.email}</div>}
+                        {selectedClient?.phone && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}> {selectedClient.phone}</div>}
+                        {selectedClient?.gstNumber && <div style={{ fontSize: 12, color: currentT.primaryColor || "var(--app-accent)", marginTop: 4, fontWeight: 600 }}> GST: {selectedClient.gstNumber}</div>}
                       </div>
                     </div>)}
 
@@ -2017,14 +2017,14 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     );
   }
 
-  // ════════════════════════════════════════════════════════════
+  // ------------------------------------------------------------
   // FORM (Create / Edit)
-  // ════════════════════════════════════════════════════════════
+  // ------------------------------------------------------------
   if (step === "template") {
     return (
       <div style={{ width: "100%", height: "80vh", display: "flex", flexDirection: "column" }}>
         <div style={{ padding: "10px 0", display: "flex", gap: 10, alignItems: "center" }}>
-          <button onClick={() => jumpInvoice ? onBack() : setStep("list")} style={{ padding: "8px 14px", background: "var(--app-bg)", border: "1.5px solid var(--app-border)", borderRadius: 8, cursor: "pointer", fontWeight: 700, color: "#64748b" }}>{jumpInvoice ? "← Back to Dashboard" : "← Back to List"}</button>
+          <button onClick={() => jumpInvoice ? onBack() : setStep("list")} style={{ padding: "8px 14px", background: "var(--app-bg)", border: "1.5px solid var(--app-border)", borderRadius: 8, cursor: "pointer", fontWeight: 700, color: "#64748b" }}>{jumpInvoice ? " Back to Dashboard" : " Back to List"}</button>
         </div>
         <div style={{ flex: 1, overflow: "hidden", borderRadius: 16 }}>
           <iframe src="/template-designer.html#inv" ref={iframeRef} onLoad={sendThemeToIframe} style={{ width: "100%", height: "100%", border: "none" }} title="Template Designer" />
@@ -2054,7 +2054,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <button onClick={() => (!internalNav && onBack) ? onBack() : setStep("list")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "var(--app-accent)", fontWeight: 700, padding: 0, fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4 }}>
-            ← Back
+             Back
           </button>
           <span style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>
 
@@ -2069,11 +2069,11 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           <button onClick={clearForm} style={{ padding: "8px 14px", background: "#fff", border: "1.5px solid #f3f4f6", borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: "pointer", color: "#6b7280", fontFamily: "inherit" }}>Clear</button>
           <button onClick={handleSaveDraft} disabled={!!saving}
             style={{ padding: "8px 18px", background: draftSaved ? "#22c55e" : "#fff", border: `1.5px solid ${draftSaved ? "#22c55e" : "#e5e7eb"}`, borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: saving ? "not-allowed" : "pointer", color: draftSaved ? "#fff" : "#374151", fontFamily: "inherit", transition: "all 0.3s" }}>
-            {saving === "draft" ? "Saving…" : draftSaved ? "✅ Saved!" : "💾 Save Draft"}
+            {saving === "draft" ? "Saving…" : draftSaved ? "Success Saved!" : "Save Save Draft"}
           </button>
           <button onClick={handleSavePreview} disabled={!!saving}
             style={{ padding: "8px 22px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
-            {saving === "preview" ? "Saving…" : "Preview →"}
+            {saving === "preview" ? "Saving…" : "Preview "}
           </button>
         </div>
       </div>
@@ -2081,7 +2081,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       {/* Error banner */}
       {hasErrors && (
         <div className="shake" style={{ background: "#fff5f5", border: "1.5px solid #fca5a5", borderRadius: 10, padding: "12px 16px", marginBottom: 16, fontSize: 13, color: "#b91c1c", fontWeight: 600 }}>
-          ⚠️ Please fill all required fields before saving.
+          Warning Please fill all required fields before saving.
         </div>
       )}
 
@@ -2101,10 +2101,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             <div className="inv-creator-card-body">
               <div className="inv-creator-template-row">
                 {[
-                  { name: "Classic", icon: "🟦" },
-                  { name: "Modern", icon: "🖤" },
-                  { name: "Minimal", icon: "🟩" },
-                  { name: "Bold", icon: "🟧" }
+                  { name: "Classic", icon: "" },
+                  { name: "Modern", icon: "" },
+                  { name: "Minimal", icon: "" },
+                  { name: "Bold", icon: "" }
                 ].map(t => (
                   <div key={t.name} className={`inv-creator-template-opt ${inv.template === t.name ? "selected" : ""}`} onClick={() => upd("template", t.name)}>
                     <div className="inv-creator-template-opt-icon">{t.icon}</div>
@@ -2233,7 +2233,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                     error={errors.client}
                     onAddCompany={onAddClient}
                   />
-                  {errors.client && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4, fontWeight: 600 }}>⚠ {errors.client}</div>}
+                  {errors.client && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4, fontWeight: 600 }}>Warning {errors.client}</div>}
                 </div>
                 <div className="inv-creator-form-group" style={{ marginBottom: 0 }}>
                   <label className="inv-creator-form-label">Project</label>
@@ -2248,7 +2248,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               </div>
               {selectedClient && (
                 <div style={{ marginTop: 14, padding: "8px 12px", background: "#f9fafb", borderRadius: 8, display: "flex", gap: 16, flexWrap: "wrap" }}>
-                  {[["📧", selectedClient.email], ["📱", selectedClient.phone], ["📍", selectedClient.address], ["💎", selectedClient.gstNumber]].filter(([, v]) => v).map(([icon, val], i) => (
+                  {[["", selectedClient.email], ["", selectedClient.phone], ["Location", selectedClient.address], ["", selectedClient.gstNumber]].filter(([, v]) => v).map(([icon, val], i) => (
                     <span key={i} style={{ fontSize: 12, color: "#6b7280" }}>{icon} {val}</span>
                   ))}
                 </div>
@@ -2287,14 +2287,14 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                       <tr key={item.id}>
                         <td>
                           <input type="text" id={`item_${item.id}_description`} className="inv-creator-item-input desc" placeholder="Item description" value={item.description || ""} onChange={(e) => updItem(item.id, "description", e.target.value)} />
-                          {dErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
+                          {dErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>Warning Required</div>}
                         </td>
                         <td>
                           <input type="number" className="inv-creator-item-input num" value={item.quantity === 0 ? "" : item.quantity} onChange={(e) => updItem(item.id, "quantity", e.target.value === "" ? 0 : Number(e.target.value))} onWheel={(e) => e.target.blur()} />
                         </td>
                         <td>
                           <input type="number" id={`item_${item.id}_rate`} className="inv-creator-item-input num" value={item.rate === 0 ? "" : item.rate} onChange={(e) => updItem(item.id, "rate", e.target.value === "" ? 0 : Number(e.target.value))} onWheel={(e) => e.target.blur()} style={{ width: "90px" }} />
-                          {rErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
+                          {rErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>Warning Required</div>}
                         </td>
                         <td>
                           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
@@ -2366,10 +2366,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <div className="inv-creator-form-group">
                   <label className="inv-creator-form-label">Status</label>
                   <select className="inv-creator-form-select" value={inv.status || "pending"} onChange={(e) => upd("status", e.target.value)}>
-                    <option value="pending">⏳ Pending</option>
-                    <option value="paid">✔ Paid</option>
-                    <option value="overdue">⚠ Overdue</option>
-                    <option value="sent">📨 Sent</option>
+                    <option value="pending">Pending Pending</option>
+                    <option value="paid">Yes Paid</option>
+                    <option value="overdue">Warning Overdue</option>
+                    <option value="sent"> Sent</option>
                   </select>
                 </div>
                 <div className="inv-creator-form-group">
@@ -2427,7 +2427,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                           <option value="EGP">EGP - Egyptian Pound</option>
                           <option value="TRY">TRY - Turkish Lira</option>
                           <option value="RUB">RUB - Russian Ruble</option>
-                          <option value="__custom__">✏️ Type Custom Currency Code...</option>
+                          <option value="__custom__">Edit Type Custom Currency Code...</option>
                         </select>
                         {isCustom || inv.currency === '' ? (
                           <div style={{ display: "flex", gap: 8 }}>
@@ -2511,7 +2511,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <label className="inv-creator-form-label">Authorised Signature</label>
                 {inv.signature ? (
                   <div style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 12, padding: "14px 18px", display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
-                    <button type="button" onClick={() => { upd("signature", ""); setTypedSig(""); }} style={{ position: "absolute", top: 10, right: 10, border: "none", background: "none", color: "#ef4444", fontSize: 12, cursor: "pointer", fontWeight: "800" }}>✕ Clear Signature</button>
+                    <button type="button" onClick={() => { upd("signature", ""); setTypedSig(""); }} style={{ position: "absolute", top: 10, right: 10, border: "none", background: "none", color: "#ef4444", fontSize: 12, cursor: "pointer", fontWeight: "800" }}>Close Clear Signature</button>
                     <div style={{ minHeight: 60, display: "flex", alignItems: "center", justifyContent: "center", width: "100%", marginTop: 12 }}>
                       {inv.signatureType === "image" ? (
                         <img src={inv.signature} alt="Signature Preview" style={{ maxHeight: 50, maxWidth: "100%", objectFit: "contain" }} />
@@ -2541,7 +2541,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                             textTransform: "capitalize"
                           }}
                         >
-                          {tab === "draw" ? "✍️ Draw" : tab === "type" ? "⌨️ Type" : "📁 Upload"}
+                          {tab === "draw" ? "Draw" : tab === "type" ? "Type" : "Upload"}
                         </button>
                       ))}
                     </div>
@@ -2626,10 +2626,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         <div style={{ position: "sticky", top: "0px", display: "flex", flexDirection: "column", gap: 12 }}>
           <div className="preview-card" style={{ background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: "14px", overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.06)" }}>
             <div className="preview-toolbar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1.5px solid var(--app-border)", background: "var(--app-surface-variant)" }}>
-              <div style={{ fontSize: "12px", fontWeight: "800", color: "#0f1c2e" }}>📄 Live Preview</div>
+              <div style={{ fontSize: "12px", fontWeight: "800", color: "#0f1c2e" }}>Document Live Preview</div>
               <div style={{ display: "flex", gap: "6px" }}>
                 <button onClick={handleSavePreview} style={{ display: "flex", alignItems: "center", gap: "4px", padding: "6px 10px", background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: "8px", fontSize: "10px", fontWeight: "700", color: "#0f1c2e", cursor: "pointer", fontFamily: "inherit" }}>
-                  🖨️ Print / PDF
+                  Print / PDF
                 </button>
               </div>
             </div>
@@ -2826,19 +2826,19 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       <div style={{ display: "flex", gap: 10, marginBottom: 32 }}>
         <button onClick={handleSaveDraft} disabled={!!saving}
           style={{ padding: "13px", background: draftSaved ? "#22c55e" : "#fff", border: `1.5px solid ${draftSaved ? "#22c55e" : "#e5e7eb"}`, borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: saving ? "not-allowed" : "pointer", color: draftSaved ? "#fff" : "#374151", fontFamily: "inherit", transition: "all 0.3s" }}>
-          {saving === "draft" ? "Saving…" : draftSaved ? "✅ Saved as Draft!" : "💾 Save Draft"}
+          {saving === "draft" ? "Saving…" : draftSaved ? "Success Saved as Draft!" : "Save Save Draft"}
         </button>
 
         {editingId && (
           <>
-            <button onClick={() => shareInvoice({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "13px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }} title="Share Link">🔗 Share</button>
-            <button onClick={() => shareWhatsApp({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "13px 18px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }} title="Share on WhatsApp">💬 WhatsApp</button>
+            <button onClick={() => shareInvoice({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "13px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }} title="Share Link"> Share</button>
+            <button onClick={() => shareWhatsApp({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "13px 18px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }} title="Share on WhatsApp">Comment WhatsApp</button>
           </>
         )}
 
         <button onClick={handleSavePreview} disabled={!!saving}
           style={{ padding: "13px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
-          {saving === "preview" ? "Saving…" : "Preview & Print →"}
+          {saving === "preview" ? "Saving…" : "Preview & Print "}
         </button>
       </div>
     </div>

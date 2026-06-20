@@ -65,7 +65,7 @@ export default function ReceiptViewer() {
   if (error) return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc", fontFamily: "sans-serif", padding: 24 }}>
       <div style={{ textAlign: "center", color: "#ef4444" }}>
-        <div style={{ fontSize: 48, marginBottom: 12 }}>⚠️</div>
+        <div style={{ fontSize: 48, marginBottom: 12 }}>Warning</div>
         <div style={{ fontSize: 16, fontWeight: 700 }}>{error}</div>
       </div>
     </div>
@@ -92,7 +92,7 @@ export default function ReceiptViewer() {
       `}</style>
 
       <div className="no-print" style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 30 }}>
-        <button onClick={() => window.print()} style={{ padding: "12px 28px", background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(99,102,241,0.3)" }}>🖨️ Print Receipt</button>
+        <button onClick={() => window.print()} style={{ padding: "12px 28px", background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(99,102,241,0.3)" }}>Print Receipt</button>
       </div>
 
       <div className="receipt-paper" style={{ maxWidth: 500, margin: "0 auto", background: "#fff", borderRadius: 24, boxShadow: "0 20px 50px rgba(0,0,0,0.05)", overflow: "hidden", border: "1px solid #e2e8f0" }}>
@@ -101,7 +101,7 @@ export default function ReceiptViewer() {
           {invData.logo && (
             <img src={invData.logo} alt="logo" style={{ height: 60, width: "auto", maxWidth: "220px", objectFit: "contain", marginBottom: "20px", margin: "0 auto", display: "block" }} />
           )}
-          <div style={{ width: 64, height: 64, background: "rgba(255,255,255,0.2)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 32 }}>💸</div>
+          <div style={{ width: 64, height: 64, background: "rgba(255,255,255,0.2)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 32 }}>Payment</div>
           <h2 style={{ margin: 0, fontSize: 24, fontWeight: 900, letterSpacing: 1 }}>{r.status === "part_paid" ? "PART PAYMENT RECEIPT" : "PAYMENT RECEIPT"}</h2>
           <div style={{ fontSize: 13, opacity: 0.8, marginTop: 4, fontWeight: 600 }}>{receiptNo}</div>
         </div>

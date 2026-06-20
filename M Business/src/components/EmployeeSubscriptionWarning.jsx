@@ -26,7 +26,7 @@ export default function EmployeeSubscriptionWarning({ user, onRenew, trigger }) 
 
   if (loading) return null; // silent loading — don't block the dashboard
 
-  // ── Hidden (60+ days expired) → locked message ──────────────────────────────
+  // ── Hidden (60+ days expired)  locked message ------------------------------
   if (status?.isHidden || status?.notification?.type === "hidden") {
     return (
       <div style={{
@@ -35,7 +35,7 @@ export default function EmployeeSubscriptionWarning({ user, onRenew, trigger }) 
         marginBottom: 18, display: "flex", alignItems: "center", gap: 14,
         flexWrap: "wrap"
       }}>
-        <div style={{ fontSize: 28 }}>🔒</div>
+        <div style={{ fontSize: 28 }}>Secure</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 14, fontWeight: 800, color: "#f1f5f9", marginBottom: 4 }}>Access Restricted</div>
           <div style={{ fontSize: 13, color: "#cbd5e1", wordBreak: "break-word" }}>
@@ -53,7 +53,7 @@ export default function EmployeeSubscriptionWarning({ user, onRenew, trigger }) 
     );
   }
 
-  // ── No subscription ──────────────────────────────────────────────────────────
+  // ── No subscription ----------------------------------------------------------
   if (!status?.hasSubscription && status?.notification?.type !== "renewal") {
     // Don't block employee dashboard — just show a subtle notice
     if (status?.notification?.type === "expired") {
@@ -64,7 +64,7 @@ export default function EmployeeSubscriptionWarning({ user, onRenew, trigger }) 
           marginBottom: 16, display: "flex", alignItems: "center", gap: 12,
           flexWrap: "wrap"
         }}>
-          <div style={{ fontSize: 22 }}>🚫</div>
+          <div style={{ fontSize: 22 }}>Block</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: "#991b1b", marginBottom: 3 }}>Subscription Expired</div>
             <div style={{ fontSize: 13, color: "#7f1d1d", wordBreak: "break-word" }}>
@@ -85,7 +85,7 @@ export default function EmployeeSubscriptionWarning({ user, onRenew, trigger }) 
   const { notification } = status || {};
   if (!notification || notification.type === "none") return null;
 
-  // ── 10-day renewal warning ───────────────────────────────────────────────────
+  // ── 10-day renewal warning ---------------------------------------------------
   if (notification.type === "renewal") {
     return (
       <div style={{
@@ -94,7 +94,7 @@ export default function EmployeeSubscriptionWarning({ user, onRenew, trigger }) 
         marginBottom: 18, display: "flex", alignItems: "center", gap: 14,
         boxShadow: "0 4px 16px rgba(245,158,11,0.15)", flexWrap: "wrap"
       }}>
-        <div style={{ fontSize: 28 }}>⏰</div>
+        <div style={{ fontSize: 28 }}>Alarm</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 14, fontWeight: 800, color: "#92400e", marginBottom: 4 }}>
             Subscription Renewal Required

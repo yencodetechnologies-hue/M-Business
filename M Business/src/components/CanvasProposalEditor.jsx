@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 
-// ─── THEMES ───────────────────────────────────────────────────────────────────
+// ─── THEMES -------------------------------------------------------------------
 const THEMES = [
   { name: "Violet", p: "var(--app-accent)", g: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", l: "var(--app-border)", t: "var(--app-accent)" },
   { name: "Cobalt", p: "#1d4ed8", g: "linear-gradient(135deg,#1e40af,#3b82f6)", l: "#dbeafe", t: "#1e3a8a" },
@@ -36,7 +36,7 @@ const PRESET_SIZES = [
   { name: "Square", width: 600, height: 600 },
 ];
 
-// ─── CANVAS ELEMENTS ─────────────────────────────────────────────────────────────
+// ─── CANVAS ELEMENTS -------------------------------------------------------------
 function CanvasElement({ element, isSelected, onSelect, onUpdate, onDelete, canvasRef }) {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -227,7 +227,7 @@ function CanvasElement({ element, isSelected, onSelect, onUpdate, onDelete, canv
   );
 }
 
-// ─── CANVAS SIZE CONTROLS ───────────────────────────────────────────────────────
+// ─── CANVAS SIZE CONTROLS -------------------------------------------------------
 function CanvasSizeControls({ currentSize, onSizeChange }) {
   const [customWidth, setCustomWidth] = useState(currentSize.width);
   const [customHeight, setCustomHeight] = useState(currentSize.height);
@@ -355,7 +355,7 @@ function CanvasSizeControls({ currentSize, onSizeChange }) {
   );
 }
 
-// ─── MAIN COMPONENT ──────────────────────────────────────────────────────────────
+// ─── MAIN COMPONENT --------------------------------------------------------------
 export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPreviewMode = false, proposalData: propDataProp = null }) {
   const [canvasSize, setCanvasSize] = useState({ width: A4_WIDTH, height: A4_HEIGHT });
   const [elements, setElements] = useState([]);
@@ -614,7 +614,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                 fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20,
                 background: '#f0fdf4', color: '#15803D',
               }}>
-                ✓ Client Signed
+                Yes Client Signed
               </span>
             )}
           </div>
@@ -679,7 +679,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
               display: 'flex', alignItems: 'center', gap: 6
             }}
           >
-            ← {isPreview ? 'Back' : 'Cancel'}
+             {isPreview ? 'Back' : 'Cancel'}
           </button>
 
           {/* Toggle Preview/Edit — only for non-preview mode editors */}
@@ -693,7 +693,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                 fontSize: 13, fontWeight: 600, cursor: 'pointer',
               }}
             >
-              {isPreview ? '✏️ Edit' : '👁 Preview'}
+              {isPreview ? 'Edit Edit' : 'View Preview'}
             </button>
           )}
 
@@ -707,7 +707,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                 fontWeight: 600, cursor: 'pointer',
               }}
             >
-              🖨️ Print
+              Print
             </button>
           )}
 
@@ -821,7 +821,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                   fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 }}
               >
-                📝 Add Text
+                Edit Add Text
               </button>
 
               <button
@@ -841,7 +841,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                   fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 }}
               >
-                📰 Add Heading
+                News Add Heading
               </button>
 
               <button
@@ -861,7 +861,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                   fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 }}
               >
-                📏 Add Line
+                 Add Line
               </button>
 
               <button
@@ -881,7 +881,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                   fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 }}
               >
-                ⬜ Add Rectangle
+                 Add Rectangle
               </button>
 
               <button
@@ -901,7 +901,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                   fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 }}
               >
-                ⭕ Add Circle
+                 Add Circle
               </button>
 
               <label style={{
@@ -911,7 +911,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                 fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 display: 'block', textAlign: 'center',
               }}>
-                🖼️ Add Image
+                Add Image
                 <input
                   type="file"
                   accept="image/*"
@@ -956,7 +956,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     }}
                   >
-                    <span>{element.type === 'text' ? '📝' : element.type === 'heading' ? '📰' : element.type === 'shape' ? '⬜' : '🖼️'} {element.type}</span>
+                    <span>{element.type === 'text' ? 'Edit' : element.type === 'heading' ? 'News' : element.type === 'shape' ? '' : 'Image'} {element.type}</span>
                     <span style={{ fontSize: 10, color: P.muted }}>
                       {Math.round(element.width || 0)}×{Math.round(element.height || 0)}
                     </span>
@@ -1096,7 +1096,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                         </span>
                       )
                     ) : (
-                      <span style={{ fontSize: 11, color: '#d97706', fontWeight: 600 }}>⏳ Awaiting Signature</span>
+                      <span style={{ fontSize: 11, color: '#d97706', fontWeight: 600 }}>Awaiting Signature</span>
                     )}
                   </div>
                   <div style={{
@@ -1108,7 +1108,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                     {proposalData?.clientName || propDataProp?.clientName || proposalData?.client || propDataProp?.client || 'Client'}
                   </div>
                   <div style={{ fontSize: 10, color: (proposalData?.clientSignature || propDataProp?.clientSignature) ? '#15803D' : '#d97706', fontWeight: 700 }}>
-                    {(proposalData?.clientSignature || propDataProp?.clientSignature) ? '✓ Signed Digitally' : 'Awaiting Client Signature'}
+                    {(proposalData?.clientSignature || propDataProp?.clientSignature) ? 'Yes Signed Digitally' : 'Awaiting Client Signature'}
                   </div>
                 </div>
               </div>

@@ -943,7 +943,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   };
 
   const handleShare = () => {
-    const text = `📂 Project Alert: ${projName}\nStatus: ${currProject.status}\nProgress: ${progressPct}%\nBudget: ${currency}${budgetAmt.toLocaleString()}`;
+    const text = `Folder Project Alert: ${projName}\nStatus: ${currProject.status}\nProgress: ${progressPct}%\nBudget: ${currency}${budgetAmt.toLocaleString()}`;
     const url = `whatsapp://send?text=${encodeURIComponent(text)}`;
     window.open(url, "_blank");
   };
@@ -1127,12 +1127,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     )}
                     <div onClick={() => handleToggleMilestone(idx)} title="Click to toggle done"
                       style={{ width: 36, height: 36, borderRadius: '50%', background: circleColor, border: `2.5px solid ${circleBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: isDone ? '#fff' : isActive ? P.primary : P.textLight, cursor: 'pointer', boxShadow: isActive ? `0 0 0 4px ${P.primaryLight}` : 'none', transition: 'all .2s', position: 'relative', zIndex: 1 }}>
-                      {isDone ? <span style={{ color: '#fff', fontSize: 14 }}>✓</span> : idx + 1}
+                      {isDone ? <span style={{ color: '#fff', fontSize: 14 }}>Yes</span> : idx + 1}
                     </div>
                     <div style={{ fontSize: 11, fontWeight: 700, color: P.textDark, textAlign: 'center', maxWidth: 80, wordBreak: 'break-word', position: 'relative', zIndex: 1 }}>{m.name}</div>
                     {m.date && <div style={{ fontSize: 10, color: P.textLight, textAlign: 'center', position: 'relative', zIndex: 1 }}>{new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</div>}
                     <div style={{ fontSize: 10, fontWeight: 700, color: textColor, position: 'relative', zIndex: 1 }}>{statusLabel}</div>
-                    <button onClick={e => { e.stopPropagation(); if (confirm('Delete milestone?')) { const ms = (currProject.milestones || []).filter((_, i) => i !== idx); axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms }).then(loadLatest); } }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 11, padding: 0, position: 'relative', zIndex: 1 }}>🗑️</button>
+                    <button onClick={e => { e.stopPropagation(); if (confirm('Delete milestone?')) { const ms = (currProject.milestones || []).filter((_, i) => i !== idx); axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms }).then(loadLatest); } }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 11, padding: 0, position: 'relative', zIndex: 1 }}>Delete</button>
                   </div>
                 );
               })}
@@ -1159,7 +1159,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 10, background: P.bg, border: `1.5px solid ${isDone ? P.green : isActive ? P.primary : P.border}`, transition: 'all .2s' }}>
                   <div onClick={() => handleToggleMilestone(idx)} title="Click to toggle done"
                     style={{ width: 30, height: 30, borderRadius: '50%', background: isDone ? P.green : '#fff', border: `2px solid ${statusColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, transition: 'all .2s' }}>
-                    {isDone ? <span style={{ color: '#fff', fontSize: 14 }}>✓</span> : <span style={{ fontSize: 11, color: P.textLight, fontWeight: 700 }}>{idx + 1}</span>}
+                    {isDone ? <span style={{ color: '#fff', fontSize: 14 }}>Yes</span> : <span style={{ fontSize: 11, color: P.textLight, fontWeight: 700 }}>{idx + 1}</span>}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>{m.name}</div>
@@ -1169,7 +1169,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     </div>
                   </div>
                   <span style={{ fontSize: 11, fontWeight: 700, color: statusColor, padding: '3px 10px', borderRadius: 6, background: statusBg, flexShrink: 0 }}>{statusLabel}</span>
-                  <button onClick={e => { e.stopPropagation(); if (confirm('Delete milestone?')) { const ms = (currProject.milestones || []).filter((_, i) => i !== idx); axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms }).then(loadLatest); } }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 13, padding: 0, flexShrink: 0 }}>🗑️</button>
+                  <button onClick={e => { e.stopPropagation(); if (confirm('Delete milestone?')) { const ms = (currProject.milestones || []).filter((_, i) => i !== idx); axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms }).then(loadLatest); } }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 13, padding: 0, flexShrink: 0 }}>Delete</button>
                 </div>
               );
             })}
@@ -1183,7 +1183,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               <input type="date" value={newMilestoneDate} onChange={e => setNewMilestoneDate(e.target.value)} style={{ padding: '6px 8px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', flex: 1 }} />
               <button type="submit" className="mpd-btn mpd-btn-primary" style={{ padding: '6px 12px', fontSize: 11 }}>Add</button>
-              <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMilestone(false)} style={{ padding: '6px 12px', fontSize: 11 }}>✕</button>
+              <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMilestone(false)} style={{ padding: '6px 12px', fontSize: 11 }}>Close</button>
             </div>
           </form>
         )}
@@ -1226,8 +1226,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         </div>
                         <div className="mpd-task-due">{t.date ? new Date(t.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}</div>
                       </div>
-                      <button onClick={e => { e.stopPropagation(); setEditingTask(t); setNewTaskTitle(t.title || ''); setNewTaskDesc(t.description || ''); setNewTaskPriority(t.priority || 'medium'); setNewTaskAssignTo(t.assignTo ? t.assignTo.split(', ').filter(Boolean) : []); setNewTaskDue(t.date || ''); setNewTaskMilestone(t.milestone || ''); setShowAddTaskModal(true); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.primary, fontSize: 13, padding: '2px 6px' }}>✏️</button>
-                      <button onClick={e => { e.stopPropagation(); if (confirm('Delete?')) axios.delete(`${BASE_URL}/api/tasks/${t._id}`).catch(() => axios.put(`${BASE_URL}/api/tasks/${t._id}`, { isDeleted: true })).then(loadLatest); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 13, padding: '2px 6px' }}>🗑️</button>
+                      <button onClick={e => { e.stopPropagation(); setEditingTask(t); setNewTaskTitle(t.title || ''); setNewTaskDesc(t.description || ''); setNewTaskPriority(t.priority || 'medium'); setNewTaskAssignTo(t.assignTo ? t.assignTo.split(', ').filter(Boolean) : []); setNewTaskDue(t.date || ''); setNewTaskMilestone(t.milestone || ''); setShowAddTaskModal(true); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.primary, fontSize: 13, padding: '2px 6px' }}>Edit</button>
+                      <button onClick={e => { e.stopPropagation(); if (confirm('Delete?')) axios.delete(`${BASE_URL}/api/tasks/${t._id}`).catch(() => axios.put(`${BASE_URL}/api/tasks/${t._id}`, { isDeleted: true })).then(loadLatest); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 13, padding: '2px 6px' }}>Delete</button>
                     </div>
                   );
                 })
@@ -1291,15 +1291,15 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         <div style={{ textAlign: 'left' }}>
                           {currProject.updates.slice(activityPage * 10, activityPage * 10 + 10).map((upd, idx) => (
                             <div key={idx} style={{ padding: '8px 0', borderBottom: `1px solid ${P.bg}`, fontSize: 12.5, color: P.textMid }}>
-                              📢 Update posted: <strong>{upd.text}</strong> by {upd.author} on {new Date(upd.date).toLocaleDateString()}
+                               Update posted: <strong>{upd.text}</strong> by {upd.author} on {new Date(upd.date).toLocaleDateString()}
                             </div>
                           ))}
                         </div>
                         {Math.ceil(currProject.updates.length / 10) > 1 && (
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 10, borderTop: `1px solid ${P.border}` }}>
-                            <button onClick={() => setActivityPage(p => Math.max(0, p - 1))} disabled={activityPage === 0} style={{ padding: '5px 14px', borderRadius: 6, border: `1px solid ${P.border}`, background: activityPage === 0 ? P.bg : '#fff', color: activityPage === 0 ? P.textLight : P.textDark, cursor: activityPage === 0 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700 }}>← Prev</button>
+                            <button onClick={() => setActivityPage(p => Math.max(0, p - 1))} disabled={activityPage === 0} style={{ padding: '5px 14px', borderRadius: 6, border: `1px solid ${P.border}`, background: activityPage === 0 ? P.bg : '#fff', color: activityPage === 0 ? P.textLight : P.textDark, cursor: activityPage === 0 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700 }}> Prev</button>
                             <span style={{ fontSize: 12, color: P.textLight }}>{activityPage + 1} / {Math.ceil(currProject.updates.length / 10)}</span>
-                            <button onClick={() => setActivityPage(p => Math.min(Math.ceil(currProject.updates.length / 10) - 1, p + 1))} disabled={activityPage === Math.ceil(currProject.updates.length / 10) - 1} style={{ padding: '5px 14px', borderRadius: 6, border: `1px solid ${P.border}`, background: activityPage === Math.ceil(currProject.updates.length / 10) - 1 ? P.bg : '#fff', color: activityPage === Math.ceil(currProject.updates.length / 10) - 1 ? P.textLight : P.textDark, cursor: activityPage === Math.ceil(currProject.updates.length / 10) - 1 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700 }}>Next →</button>
+                            <button onClick={() => setActivityPage(p => Math.min(Math.ceil(currProject.updates.length / 10) - 1, p + 1))} disabled={activityPage === Math.ceil(currProject.updates.length / 10) - 1} style={{ padding: '5px 14px', borderRadius: 6, border: `1px solid ${P.border}`, background: activityPage === Math.ceil(currProject.updates.length / 10) - 1 ? P.bg : '#fff', color: activityPage === Math.ceil(currProject.updates.length / 10) - 1 ? P.textLight : P.textDark, cursor: activityPage === Math.ceil(currProject.updates.length / 10) - 1 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700 }}>Next </button>
                           </div>
                         )}
                       </div>
@@ -1312,7 +1312,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 <div ref={composerRef} className="mpd-upd-composer" style={{ overflow: 'hidden', marginBottom: composerOpen ? 20 : 0, display: activeTab === 'updates' ? 'block' : 'none' }}>
                   <div className="mpd-uc-header" onClick={() => setComposerOpen(!composerOpen)} style={{ cursor: 'pointer' }}>
                     <h3><i className="ti ti-speakerphone"></i> Post Project Update</h3>
-                    <button className="mpd-uc-toggle" onClick={e => { e.stopPropagation(); setComposerOpen(!composerOpen); }}>{composerOpen ? 'Collapse ↑' : 'Expand ↓'}</button>
+                    <button className="mpd-uc-toggle" onClick={e => { e.stopPropagation(); setComposerOpen(!composerOpen); }}>{composerOpen ? 'Collapse ' : 'Expand '}</button>
                   </div>
                   {composerOpen && (
                     <div style={{ padding: '18px 22px' }}>
@@ -1440,9 +1440,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       ))}
                       {totalPages > 1 && (
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px', borderTop: `1px solid ${P.border}` }}>
-                          <button onClick={() => setUpdatesPage(p => Math.max(0, p - 1))} disabled={updatesPage === 0} style={{ padding: '5px 14px', borderRadius: 6, border: `1px solid ${P.border}`, background: updatesPage === 0 ? P.bg : '#fff', color: updatesPage === 0 ? P.textLight : P.textDark, cursor: updatesPage === 0 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700 }}>← Prev</button>
+                          <button onClick={() => setUpdatesPage(p => Math.max(0, p - 1))} disabled={updatesPage === 0} style={{ padding: '5px 14px', borderRadius: 6, border: `1px solid ${P.border}`, background: updatesPage === 0 ? P.bg : '#fff', color: updatesPage === 0 ? P.textLight : P.textDark, cursor: updatesPage === 0 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700 }}> Prev</button>
                           <span style={{ fontSize: 12, color: P.textLight }}>{updatesPage + 1} / {totalPages}</span>
-                          <button onClick={() => setUpdatesPage(p => Math.min(totalPages - 1, p + 1))} disabled={updatesPage === totalPages - 1} style={{ padding: '5px 14px', borderRadius: 6, border: `1px solid ${P.border}`, background: updatesPage === totalPages - 1 ? P.bg : '#fff', color: updatesPage === totalPages - 1 ? P.textLight : P.textDark, cursor: updatesPage === totalPages - 1 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700 }}>Next →</button>
+                          <button onClick={() => setUpdatesPage(p => Math.min(totalPages - 1, p + 1))} disabled={updatesPage === totalPages - 1} style={{ padding: '5px 14px', borderRadius: 6, border: `1px solid ${P.border}`, background: updatesPage === totalPages - 1 ? P.bg : '#fff', color: updatesPage === totalPages - 1 ? P.textLight : P.textDark, cursor: updatesPage === totalPages - 1 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700 }}>Next </button>
                         </div>
                       )}
                     </div>
@@ -1921,7 +1921,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     {employees.find(e => (e.name || e.employeeName) === a)?.role || 'Member'}
                   </div>
                 </div>
-                <button onClick={() => { if (window.confirm('Remove ' + a + ' from team?')) { const updated = (currProject.assignedTo || []).filter((_, idx) => idx !== i); axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated }).then(loadLatest); } }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 14, padding: '4px 6px' }} title="Remove">🗑️</button>
+                <button onClick={() => { if (window.confirm('Remove ' + a + ' from team?')) { const updated = (currProject.assignedTo || []).filter((_, idx) => idx !== i); axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated }).then(loadLatest); } }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 14, padding: '4px 6px' }} title="Remove">Delete</button>
               </div>
             ))}
           </div>
@@ -1980,7 +1980,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       {file.name}
                     </a>
                     <button onClick={() => handleDeleteFile(file._id)} style={{ background: 'transparent', border: 'none', color: P.red, cursor: 'pointer', fontSize: 14 }}>
-                      ✕
+                      Close
                     </button>
                   </div>
                 ))}
@@ -2048,7 +2048,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           setNewTaskAssignTo(selected ? cur.filter(n => n !== name) : [...cur, name]);
                         }} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 12px', cursor: 'pointer', background: selected ? P.primaryLight : 'transparent' }}>
                           <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${selected ? P.primary : P.border}`, background: selected ? P.primary : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            {selected && <span style={{ color: '#fff', fontSize: 10, fontWeight: 900, lineHeight: 1 }}>✓</span>}
+                            {selected && <span style={{ color: '#fff', fontSize: 10, fontWeight: 900, lineHeight: 1 }}>Yes</span>}
                           </div>
                           <span style={{ fontSize: 13, color: P.textDark, fontWeight: selected ? 700 : 500 }}>{name}</span>
                         </div>
@@ -2139,7 +2139,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <div style={{ background: '#fff', width: '100%', maxWidth: 400, borderRadius: 16, boxShadow: '0 20px 40px rgba(0,0,0,0.2)', overflow: 'hidden' }}>
               <div style={{ padding: '20px 24px', borderBottom: '1px solid #E8EDF2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ fontSize: 16, fontWeight: 900, color: '#0D1B2A' }}>Send to Client Portal</div>
-                <button onClick={() => setShowSendPopup(false)} style={{ background: 'none', border: 'none', fontSize: 20, color: '#7B8FA1', cursor: 'pointer' }}>✕</button>
+                <button onClick={() => setShowSendPopup(false)} style={{ background: 'none', border: 'none', fontSize: 20, color: '#7B8FA1', cursor: 'pointer' }}>Close</button>
               </div>
               <div style={{ padding: 24 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 8 }}>Select Client</div>
@@ -2192,7 +2192,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     <button onClick={() => window.print()} style={{ padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>
                       <i className="ti ti-printer"></i> Print / PDF
                     </button>
-                    <button onClick={() => setPreviewInvoice(null)} style={{ padding: '6px 14px', background: '#374151', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>✕ Close</button>
+                    <button onClick={() => setPreviewInvoice(null)} style={{ padding: '6px 14px', background: '#374151', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>Close Close</button>
                   </div>
                 </div>
                 <div id="invoice-print-area" style={{ padding: '36px 40px', background: '#fff' }}>
@@ -2290,12 +2290,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     {(() => {
                       const st = (inv.status || '').toLowerCase();
                       const cfg = st === 'paid'
-                        ? { label: 'Paid', bg: '#DCFCE7', color: '#15803D', icon: '✓' }
+                        ? { label: 'Paid', bg: '#DCFCE7', color: '#15803D', icon: '' }
                         : st === 'overdue'
-                          ? { label: 'Overdue', bg: '#FEE2E2', color: '#DC2626', icon: '⚠' }
+                          ? { label: 'Overdue', bg: '#FEE2E2', color: '#DC2626', icon: '' }
                           : st === 'sent'
-                            ? { label: 'Sent', bg: '#DBEAFE', color: '#1D4ED8', icon: '📨' }
-                            : { label: 'Pending', bg: '#FEF3C7', color: '#B45309', icon: '⏳' };
+                            ? { label: 'Sent', bg: '#DBEAFE', color: '#1D4ED8', icon: '' }
+                            : { label: 'Pending', bg: '#FEF3C7', color: '#B45309', icon: '' };
                       return (
                         <>
                           <span
@@ -2307,10 +2307,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           {showStatusDropdown && (
                             <div style={{ position: 'absolute', bottom: 36, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: '#fff', border: '1px solid #E8EDF2', borderRadius: 10, boxShadow: '0 4px 20px rgba(0,0,0,0.15)', minWidth: 150, overflow: 'hidden' }}>
                               {[
-                                { label: 'Pending', color: '#B45309', bg: '#FEF3C7', icon: '⏳' },
-                                { label: 'Paid', color: '#15803D', bg: '#DCFCE7', icon: '✓' },
-                                { label: 'Overdue', color: '#DC2626', bg: '#FEE2E2', icon: '⚠' },
-                                { label: 'Sent', color: '#1D4ED8', bg: '#DBEAFE', icon: '📨' },
+                                { label: 'Pending', color: '#B45309', bg: '#FEF3C7', icon: '' },
+                                { label: 'Paid', color: '#15803D', bg: '#DCFCE7', icon: '' },
+                                { label: 'Overdue', color: '#DC2626', bg: '#FEE2E2', icon: '' },
+                                { label: 'Sent', color: '#1D4ED8', bg: '#DBEAFE', icon: '' },
                               ].map(opt => (
                                 <div key={opt.label}
                                   onClick={async () => {
@@ -2328,7 +2328,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                 >
                                   <span>{opt.icon}</span>
                                   <span style={{ fontSize: 13, fontWeight: 700, color: opt.color }}>{opt.label}</span>
-                                  {st === opt.label.toLowerCase() && <span style={{ marginLeft: 'auto', fontSize: 11 }}>✓</span>}
+                                  {st === opt.label.toLowerCase() && <span style={{ marginLeft: 'auto', fontSize: 11 }}>Yes</span>}
                                 </div>
                               ))}
                             </div>
@@ -2358,7 +2358,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   <i className="ti ti-upload" style={{ color: '#fff', fontSize: 18 }}></i>
                   <span style={{ color: '#fff', fontWeight: 800, fontSize: 15 }}>Upload File</span>
                 </div>
-                <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>✕</button>
+                <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>Close</button>
               </div>
 
               {/* Body */}
@@ -2403,7 +2403,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 <div style={{ border: `1.5px solid ${uploadSendToClient ? P.primary : P.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 10, background: uploadSendToClient ? P.primaryLight : '#fff', transition: 'all .15s' }}>
                   <div onClick={() => { const newVal = !uploadSendToClient; setUploadSendToClient(newVal); setUploadClientName(newVal ? (currProject.client || clientName || '') : ''); }} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
                     <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${uploadSendToClient ? P.primary : P.border}`, background: uploadSendToClient ? P.primary : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      {uploadSendToClient && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>✓</span>}
+                      {uploadSendToClient && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>Yes</span>}
                     </div>
                     <i className="ti ti-building" style={{ color: P.primary, fontSize: 16 }}></i>
                     <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Client Portal</span>
@@ -2424,7 +2424,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 <div style={{ border: `1.5px solid ${uploadSendToEmployee ? P.purple : P.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 20, background: uploadSendToEmployee ? P.purpleLight : '#fff', transition: 'all .15s' }}>
                   <div onClick={() => { setUploadSendToEmployee(!uploadSendToEmployee); setUploadEmployeeName(''); }} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
                     <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${uploadSendToEmployee ? P.purple : P.border}`, background: uploadSendToEmployee ? P.purple : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      {uploadSendToEmployee && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>✓</span>}
+                      {uploadSendToEmployee && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>Yes</span>}
                     </div>
                     <i className="ti ti-users" style={{ color: P.purple, fontSize: 16 }}></i>
                     <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Employee Portal</span>

@@ -183,7 +183,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', background: '#fff', borderBottom: '1px solid #E0E6EA', position: 'sticky', top: 0, zIndex: 10 }}>
           <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>{isEdit ? 'Edit Client' : 'Add New Client'}</h2>
-          <button onClick={onBack} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#94A3B0' }}>✕</button>
+          <button onClick={onBack} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#94A3B0' }}>Close</button>
         </div>
 
         <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -191,16 +191,16 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           {/* Logo Section */}
           <div id="logo" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: 'linear-gradient(90deg, #E0F7FA 0%, #ffffff 100%)' }}>
-              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>🖼️</div>
+              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>Image</div>
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Client Logo</div><div style={{ fontSize: 12, color: '#94A3B0' }}>Upload a company logo or avatar</div></div>
               <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 20, background: '#F4F6F8', color: '#94A3B0', border: '1px solid #E0E6EA' }}>Optional</span>
             </div>
             <div style={{ padding: 20 }}>
               <div onClick={() => fileInputRef.current.click()} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: 24, border: '2px dashed #E0E6EA', borderRadius: 12, background: '#F4F6F8', cursor: 'pointer' }}>
                 <div style={{ width: 72, height: 72, borderRadius: 14, background: '#fff', border: '1.5px solid #E0E6EA', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                  {formData.logoUrl ? <img src={formData.logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }}/> : <span style={{ fontSize: 28, color: '#94A3B0' }}>🏢</span>}
+                  {formData.logoUrl ? <img src={formData.logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }}/> : <span style={{ fontSize: 28, color: '#94A3B0' }}>Company</span>}
                 </div>
-                <button type="button" style={{ background: '#00BCD4', color: 'white', padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer' }}>📷 Choose logo</button>
+                <button type="button" style={{ background: '#00BCD4', color: 'white', padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer' }}> Choose logo</button>
                 <span style={{ fontSize: 12, color: '#94A3B0' }}>PNG, JPG or SVG · Max 2MB · Recommended 200×200px</span>
               </div>
               <input type="file" ref={fileInputRef} accept="image/*" style={{ display: 'none' }} onChange={handleLogoUpload}/>
@@ -210,7 +210,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           {/* Basic Info */}
           <div id="basic" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: 'linear-gradient(90deg, #E0F7FA 0%, #ffffff 100%)' }}>
-              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>🏢</div>
+              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>Company</div>
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Basic Info</div><div style={{ fontSize: 12, color: '#94A3B0' }}>Core client identity and classification</div></div>
               <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 20, background: '#E0F7FA', color: '#0097A7' }}>Core</span>
             </div>
@@ -219,12 +219,12 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                 <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8, display: 'block' }}>Client type <span style={{ color: '#EF5350' }}>*</span></label>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
                   {[
-                    { id: 'b2b', icon: '🏢', label: 'B2B', sub: 'Company / Business' },
-                    { id: 'b2c', icon: '👤', label: 'B2C', sub: 'Individual person' },
-                    { id: 'freelancer', icon: '💼', label: 'Freelancer', sub: 'Consultant / Solo' }
+                    { id: 'b2b', icon: 'Company', label: 'B2B', sub: 'Company / Business' },
+                    { id: 'b2c', icon: 'Profile', label: 'B2C', sub: 'Individual person' },
+                    { id: 'freelancer', icon: 'Job', label: 'Freelancer', sub: 'Consultant / Solo' }
                   ].map(t => (
                     <div key={t.id} onClick={() => setFormData({ ...formData, clientType: t.id })} style={{ border: `2px solid ${formData.clientType === t.id ? '#00BCD4' : '#E0E6EA'}`, borderRadius: 12, padding: '14px 12px', textAlign: 'center', cursor: 'pointer', background: formData.clientType === t.id ? '#E0F7FA' : '#fff', position: 'relative' }}>
-                      {formData.clientType === t.id && <div style={{ position: 'absolute', top: 8, right: 8, width: 18, height: 18, borderRadius: '50%', background: '#00BCD4', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>✓</div>}
+                      {formData.clientType === t.id && <div style={{ position: 'absolute', top: 8, right: 8, width: 18, height: 18, borderRadius: '50%', background: '#00BCD4', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>Yes</div>}
                       <span style={{ fontSize: 24, color: formData.clientType === t.id ? '#00BCD4' : '#94A3B0', display: 'block', marginBottom: 6 }}>{t.icon}</span>
                       <div style={{ fontSize: 13, fontWeight: 600, color: formData.clientType === t.id ? '#0097A7' : '#5A6A7A' }}>{t.label}</div>
                       <div style={{ fontSize: 11, color: '#94A3B0', marginTop: 2 }}>{t.sub}</div>
@@ -248,7 +248,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                   {customInputMode.category ? (
                     <div style={{ display: 'flex', gap: 8 }}>
                       <input name="category" value={formData.category} onChange={handleChange} placeholder="Type custom category..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus/>
-                      <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, category: false })); setFormData(prev => ({ ...prev, category: '' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                      <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, category: false })); setFormData(prev => ({ ...prev, category: '' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Close</button>
                     </div>
                   ) : (
                     <select name="category" value={formData.category} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
@@ -267,7 +267,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                   {customInputMode.source ? (
                     <div style={{ display: 'flex', gap: 8 }}>
                       <input name="source" value={formData.source} onChange={handleChange} placeholder="Type custom source..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus/>
-                      <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, source: false })); setFormData(prev => ({ ...prev, source: '' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                      <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, source: false })); setFormData(prev => ({ ...prev, source: '' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Close</button>
                     </div>
                   ) : (
                     <select name="source" value={formData.source} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
@@ -284,8 +284,8 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                 <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</label>
                   <div style={{ display: 'flex', gap: 8, height: 42 }}>
-                    <button onClick={() => setFormData({ ...formData, status: 'Active' })} style={{ flex: 1, height: '100%', borderRadius: 8, border: `1.5px solid ${formData.status === 'Active' ? '#26A69A' : '#E0E6EA'}`, background: formData.status === 'Active' ? '#E0F2F1' : '#F4F6F8', color: formData.status === 'Active' ? '#26A69A' : '#94A3B0', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer' }}>✓ Active</button>
-                    <button onClick={() => setFormData({ ...formData, status: 'Inactive' })} style={{ flex: 1, height: '100%', borderRadius: 8, border: `1.5px solid ${formData.status === 'Inactive' ? '#EF9A9A' : '#E0E6EA'}`, background: formData.status === 'Inactive' ? '#FFEBEE' : '#F4F6F8', color: formData.status === 'Inactive' ? '#EF5350' : '#94A3B0', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer' }}>✕ Inactive</button>
+                    <button onClick={() => setFormData({ ...formData, status: 'Active' })} style={{ flex: 1, height: '100%', borderRadius: 8, border: `1.5px solid ${formData.status === 'Active' ? '#26A69A' : '#E0E6EA'}`, background: formData.status === 'Active' ? '#E0F2F1' : '#F4F6F8', color: formData.status === 'Active' ? '#26A69A' : '#94A3B0', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer' }}>Yes Active</button>
+                    <button onClick={() => setFormData({ ...formData, status: 'Inactive' })} style={{ flex: 1, height: '100%', borderRadius: 8, border: `1.5px solid ${formData.status === 'Inactive' ? '#EF9A9A' : '#E0E6EA'}`, background: formData.status === 'Inactive' ? '#FFEBEE' : '#F4F6F8', color: formData.status === 'Inactive' ? '#EF5350' : '#94A3B0', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer' }}>Close Inactive</button>
                   </div>
                 </div>
               </div>
@@ -295,7 +295,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           {/* Primary Contact */}
           <div id="contact" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: 'linear-gradient(90deg, #E0F7FA 0%, #ffffff 100%)' }}>
-              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>📞</div>
+              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>Call</div>
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Primary Contact</div><div style={{ fontSize: 12, color: '#94A3B0' }}>Main point of contact at this client</div></div>
               <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 20, background: '#E0F7FA', color: '#0097A7' }}>Core</span>
             </div>
@@ -312,7 +312,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           {/* Address */}
           <div id="address" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: 'linear-gradient(90deg, #E0F7FA 0%, #ffffff 100%)' }}>
-              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>📍</div>
+              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>Location</div>
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Address</div><div style={{ fontSize: 12, color: '#94A3B0' }}>Billing and office location</div></div>
             </div>
             <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -325,7 +325,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                 {customInputMode.country ? (
                   <div style={{ display: 'flex', gap: 8 }}>
                     <input name="country" value={formData.country} onChange={handleChange} placeholder="Type custom country..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus/>
-                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, country: false })); setFormData(prev => ({ ...prev, country: 'India' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, country: false })); setFormData(prev => ({ ...prev, country: 'India' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Close</button>
                   </div>
                 ) : (
                   <select name="country" value={formData.country} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
@@ -351,7 +351,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           {/* Billing & Terms */}
           <div id="billing" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: 'linear-gradient(90deg, #E0F7FA 0%, #ffffff 100%)' }}>
-              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>💳</div>
+              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}></div>
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Billing & Terms</div></div>
             </div>
             <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -361,7 +361,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                 {customInputMode.paymentTerms ? (
                   <div style={{ display: 'flex', gap: 8 }}>
                     <input name="paymentTerms" value={formData.paymentTerms} onChange={handleChange} placeholder="Type custom terms..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus/>
-                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, paymentTerms: false })); setFormData(prev => ({ ...prev, paymentTerms: '' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, paymentTerms: false })); setFormData(prev => ({ ...prev, paymentTerms: '' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Close</button>
                   </div>
                 ) : (
                   <select name="paymentTerms" value={formData.paymentTerms} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
@@ -375,7 +375,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                 {customInputMode.preferredPaymentMode ? (
                   <div style={{ display: 'flex', gap: 8 }}>
                     <input name="preferredPaymentMode" value={formData.preferredPaymentMode} onChange={handleChange} placeholder="Type custom mode..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus/>
-                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, preferredPaymentMode: false })); setFormData(prev => ({ ...prev, preferredPaymentMode: '' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, preferredPaymentMode: false })); setFormData(prev => ({ ...prev, preferredPaymentMode: '' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Close</button>
                   </div>
                 ) : (
                   <select name="preferredPaymentMode" value={formData.preferredPaymentMode} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
@@ -389,7 +389,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           {/* Portal Access */}
           <div id="portal" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: 'linear-gradient(90deg, #E0F7FA 0%, #ffffff 100%)' }}>
-              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>🔒</div>
+              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>Secure</div>
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Portal Access</div></div>
             </div>
             <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -414,7 +414,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           {/* Internal Notes */}
           <div id="notes" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: 'linear-gradient(90deg, #E0F7FA 0%, #ffffff 100%)' }}>
-              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>📝</div>
+              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>Edit</div>
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Internal Notes</div></div>
             </div>
             <div style={{ padding: 20 }}>
@@ -426,7 +426,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           </div>
 
           <div style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-            <div style={{ fontSize: 13, color: '#94A3B0', display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ color: '#00BCD4' }}>🛡️</span> All data is saved securely.</div>
+            <div style={{ fontSize: 13, color: '#94A3B0', display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ color: '#00BCD4' }}>Security</span> All data is saved securely.</div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={onBack} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 22px', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer', background: '#F4F6F8', color: '#5A6A7A', border: '1.5px solid #E0E6EA' }}>Cancel</button>
               <button onClick={submitForm} disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 22px', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer', background: '#00BCD4', color: 'white', border: '1.5px solid #00BCD4' }}>

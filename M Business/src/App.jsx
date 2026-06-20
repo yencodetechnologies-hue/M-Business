@@ -42,7 +42,7 @@ export default function App() {
     return null;
   });
 
-  // ── Normalize role on every login / logout ──────────────────────────────────
+  // ── Normalize role on every login / logout ----------------------------------
   const handleSetUser = (userData) => {
     if (userData) {
       const normalized = {
@@ -67,30 +67,30 @@ export default function App() {
     }
   };
 
-  // ── Loading state ───────────────────────────────────────────────────────────
+  // ── Loading state -----------------------------------------------------------
   // No longer needed, user is loaded synchronously
 
-  // ── Role-based root page ────────────────────────────────────────────────────
+  // ── Role-based root page ----------------------------------------------------
   const role = (user?.role || "").toLowerCase().trim();
   const getRootPage = () => {
-    console.log("🎯 getRootPage called, role:", JSON.stringify(role));
+    console.log("Target getRootPage called, role:", JSON.stringify(role));
 
     if (!user) return <AuthPage setUser={handleSetUser} />;
 
-    console.log("👤 User exists, role:", role);
+    console.log("Profile User exists, role:", role);
 
     if (role === "employee") {
-      console.log("✅ Routing to EmployeeDashboard");
+      console.log("Success Routing to EmployeeDashboard");
       return <EmployeeDashboard user={user} setUser={handleSetUser} />;
     }
 
     if (role === "admin") {
-      console.log("👑 Routing to AdminDashboard");
+      console.log(" Routing to AdminDashboard");
       return <AdminDashboard user={user} setUser={handleSetUser} />;
     }
 
     if (role === "subadmin") {
-      console.log("🛡️ Routing to Main Dashboard (Subadmin logic)");
+      console.log("Security Routing to Main Dashboard (Subadmin logic)");
       return <Dashboard user={user} setUser={handleSetUser} />;
     }
 

@@ -5,14 +5,14 @@ import ProposalForm from "./ProposalForm";
 import CanvasProposalEditor from "./CanvasProposalEditor";
 import { PROPOSAL_PREVIEW_CSS } from "./ProposalPreviewStyles";
 import { printProposal, shareProposalAsPDF } from "./proposalPrintUtils";
-// ─── UTILS ────────────────────────────────────────────────────────────────────
+// ─── UTILS --------------------------------------------------------------------
 const uid = () => `${Date.now()}_${Math.random().toString(36).slice(2)}`;
 const pid = () => `PROP-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
 const LS = "canva_proposals_v1";
 const load = () => { try { const d = localStorage.getItem(LS); return d ? JSON.parse(d) : []; } catch { return []; } };
 const save = d => { try { localStorage.setItem(LS, JSON.stringify(d)); } catch { } };
 
-// ─── THEMES ───────────────────────────────────────────────────────────────────
+// ─── THEMES -------------------------------------------------------------------
 const THEMES = [
   { name: "Violet", p: "var(--app-accent)", g: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", l: "var(--app-border)", t: "var(--app-accent)1d95" },
   { name: "Cobalt", p: "#1d4ed8", g: "linear-gradient(135deg,#1e40af,#3b82f6)", l: "var(--app-border)", t: "#1e3a8a" },
@@ -23,7 +23,7 @@ const THEMES = [
   { name: "Teal", p: "#0d9488", g: "linear-gradient(135deg,#134e4a,#2dd4bf)", l: "var(--app-border)", t: "#134e4a" },
   { name: "Fuchsia", p: "var(--app-accent)", g: "linear-gradient(135deg,#701a75,#e879f9)", l: "var(--app-border)", t: "#4a044e" },
 ];
-// ─── COVERS ───────────────────────────────────────────────────────────────────
+// ─── COVERS -------------------------------------------------------------------
 const COVERS = [
   "https://images.unsplash.com/photo-1497366216548-37526070297c?w=900&q=80",
   "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=900&q=80",
@@ -35,22 +35,22 @@ const COVERS = [
   "https://images.unsplash.com/photo-1497215842964-222b430dc094?w=900&q=80",
 ];
 
-// ─── SLIDE FACTORY ────────────────────────────────────────────────────────────
+// ─── SLIDE FACTORY ------------------------------------------------------------
 const SLIDE_TYPES = [
-  { id: "cover", label: "Cover Page", icon: "🎯", desc: "Title & hero image" },
-  { id: "overview", label: "Overview", icon: "📋", desc: "Project background" },
-  { id: "objectives", label: "Objectives", icon: "🏆", desc: "Goals & outcomes" },
-  { id: "timeline", label: "Timeline", icon: "📅", desc: "Project phases" },
-  { id: "budget", label: "Budget", icon: "💰", desc: "Cost breakdown" },
-  { id: "team", label: "Team", icon: "👥", desc: "Members & roles" },
-  { id: "process", label: "Our Process", icon: "⚙️", desc: "How we work" },
-  { id: "closing", label: "Next Steps", icon: "🚀", desc: "Call to action" },
-  { id: "blank_first_page", label: "Blank First Page", icon: "📄", desc: "Empty first page for proposal" },
-  { id: "proposal", label: "Proposal Page 1", icon: "📄", desc: "A4 format proposal document page 1" },
-  { id: "proposal_page2", label: "Proposal Page 2", icon: "📄", desc: "A4 format proposal document page 2" },
-  { id: "portrait", label: "Portrait Page", icon: "📱", desc: "Custom portrait page" },
-  { id: "landscape", label: "Landscape Page", icon: "🖼️", desc: "Custom landscape page" },
-  { id: "blank", label: "Blank Page", icon: "📄", desc: "Add custom content" },
+  { id: "cover", label: "Cover Page", icon: "Target", desc: "Title & hero image" },
+  { id: "overview", label: "Overview", icon: "Document", desc: "Project background" },
+  { id: "objectives", label: "Objectives", icon: "Award", desc: "Goals & outcomes" },
+  { id: "timeline", label: "Timeline", icon: "Date", desc: "Project phases" },
+  { id: "budget", label: "Budget", icon: "Cost", desc: "Cost breakdown" },
+  { id: "team", label: "Team", icon: "Team", desc: "Members & roles" },
+  { id: "process", label: "Our Process", icon: "Settings", desc: "How we work" },
+  { id: "closing", label: "Next Steps", icon: "Launch", desc: "Call to action" },
+  { id: "blank_first_page", label: "Blank First Page", icon: "Document", desc: "Empty first page for proposal" },
+  { id: "proposal", label: "Proposal Page 1", icon: "Document", desc: "A4 format proposal document page 1" },
+  { id: "proposal_page2", label: "Proposal Page 2", icon: "Document", desc: "A4 format proposal document page 2" },
+  { id: "portrait", label: "Portrait Page", icon: "", desc: "Custom portrait page" },
+  { id: "landscape", label: "Landscape Page", icon: "Image", desc: "Custom landscape page" },
+  { id: "blank", label: "Blank Page", icon: "Document", desc: "Add custom content" },
 ];
 
 function makeSlide(type, themeName = "Violet", companyName = "") {
@@ -63,7 +63,7 @@ function makeSlide(type, themeName = "Violet", companyName = "") {
     case "timeline": return { ...b, heading: "Project Timeline", phases: [{ label: "Discovery & Strategy", dur: "2 Weeks" }, { label: "Design & Prototyping", dur: "3 Weeks" }, { label: "Development & Testing", dur: "6 Weeks" }, { label: "Launch & Handover", dur: "1 Week" }] };
     case "budget": return { ...b, heading: "Budget Estimate", rows: [{ item: "UI/UX Design", cost: "₹80,000" }, { item: "Frontend Development", cost: "₹1,50,000" }, { item: "Backend & APIs", cost: "₹1,20,000" }, { item: "QA & Testing", cost: "₹40,000" }, { item: "Deployment", cost: "₹30,000" }], total: "₹4,20,000" };
     case "team": return { ...b, heading: "Meet Our Team", members: [{ name: "Arjun Sharma", role: "Project Lead", avatar: "AS" }, { name: "Priya Nair", role: "UI/UX Designer", avatar: "PN" }, { name: "Karthik Raj", role: "Full Stack Dev", avatar: "KR" }, { name: "Meena Iyer", role: "QA Engineer", avatar: "MI" }] };
-    case "process": return { ...b, heading: "Our Process", steps: [{ icon: "🔍", label: "Research", desc: "Deep dive into your needs" }, { icon: "Edit", label: "Design", desc: "Wireframes & prototypes" }, { icon: "⚡", label: "Build", desc: "Agile development" }, { icon: "🚀", label: "Launch", desc: "Deploy & support" }] };
+    case "process": return { ...b, heading: "Our Process", steps: [{ icon: "Search", label: "Research", desc: "Deep dive into your needs" }, { icon: "Edit", label: "Design", desc: "Wireframes & prototypes" }, { icon: "Action", label: "Build", desc: "Agile development" }, { icon: "Launch", label: "Launch", desc: "Deploy & support" }] };
     case "blank_first_page": return { ...b, pageTitle: "Blank First Page" };
     case "proposal": return {
       ...b,
@@ -72,7 +72,7 @@ function makeSlide(type, themeName = "Violet", companyName = "") {
       companyPhone: "", companyAddress: "",
       currency: "INR",
       template: "Modern",
-      footerMessage: "🙏 Thank you for considering us!",
+      footerMessage: " Thank you for considering us!",
       projectType: "",
       scopeOfWork: [],
       conceptStage: []
@@ -87,7 +87,7 @@ function makeSlide(type, themeName = "Violet", companyName = "") {
     };
     case "portrait": return { ...b, orientation: "portrait", heading: "Portrait Page", body: "This is a custom portrait page. Add your content here." };
     case "landscape": return { ...b, orientation: "landscape", heading: "Landscape Page", body: "This is a custom landscape page. Add your content here." };
-    case "closing": return { ...b, heading: "Ready to Begin?", body: "We're excited to bring your vision to life. Our team is prepared to start immediately and deliver results that exceed your expectations.", cta: "Schedule a Call →" };
+    case "closing": return { ...b, heading: "Ready to Begin?", body: "We're excited to bring your vision to life. Our team is prepared to start immediately and deliver results that exceed your expectations.", cta: "Schedule a Call " };
     case "blank": return { ...b, heading: "", body: "" };
     default: return { ...b, heading: "Slide", body: "" };
   }
@@ -103,12 +103,12 @@ function makeInitialProposal(theme = "Violet", companyName = "") {
   };
 }
 
-// ─── STATUS ───────────────────────────────────────────────────────────────────
+// ─── STATUS -------------------------------------------------------------------
 const STATUS = {
   draft: { label: "Draft", icon: "Edit", bg: "#f8fafc", fg: "#475569", br: "#cbd5e1" },
-  pending: { label: "Pending Approval", icon: "⏳", bg: "#fffbeb", fg: "#92400e", br: "#fcd34d" },
-  approved: { label: "Approved", icon: "✅", bg: "#f0fdf4", fg: "#14532d", br: "#86efac" },
-  rejected: { label: "Rejected", icon: "❌", bg: "#fff1f2", fg: "#9f1239", br: "#fda4af" },
+  pending: { label: "Pending Approval", icon: "Pending", bg: "#fffbeb", fg: "#92400e", br: "#fcd34d" },
+  approved: { label: "Approved", icon: "Success", bg: "#f0fdf4", fg: "#14532d", br: "#86efac" },
+  rejected: { label: "Rejected", icon: "Error", bg: "#fff1f2", fg: "#9f1239", br: "#fda4af" },
 };
 
 function formatCurrency(val, symbol = "INR", compact = false, disableCompact = false) {
@@ -138,7 +138,7 @@ function Badge({ status }) {
   return <span style={{ background: s.bg, color: s.fg, border: `1.5px solid ${s.br}`, borderRadius: 20, padding: "3px 12px", fontSize: 11, fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 5, whiteSpace: "nowrap" }}>{s.icon} {s.label}</span>;
 }
 
-// ─── CONFETTI ─────────────────────────────────────────────────────────────────
+// ─── CONFETTI -----------------------------------------------------------------
 function Confetti({ active }) {
   const ref = useRef();
   useEffect(() => {
@@ -156,7 +156,7 @@ function Confetti({ active }) {
   return <canvas ref={ref} style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 99999 }} />;
 }
 
-// ─── DRAGGABLE ELEMENT ────────────────────────────────────────────────────────
+// ─── DRAGGABLE ELEMENT --------------------------------------------------------
 function DraggableElement({ element, selected, onSelect, onUpdate, onDelete, children, canvasRef, slideH }) {
   const [dragging, setDragging] = useState(false);
   const [resizing, setResizing] = useState(null); // 'tl', 'tr', 'bl', 'br'
@@ -307,11 +307,11 @@ function DraggableElement({ element, selected, onSelect, onUpdate, onDelete, chi
               <button
                 onPointerDown={(e) => { e.stopPropagation(); setDragging(true); onSelect(element.id); }}
                 style={{ border: "none", background: "none", padding: "14px 22px", fontSize: 26, cursor: "move", color: "var(--app-accent)", transition: "all .2s", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" }}
-                title="Drag to Move" className="hb">✥</button>
+                title="Drag to Move" className="hb"></button>
               <div style={{ width: 1, height: 44, background: "#e5e7eb", alignSelf: "center" }} />
               <button onClick={(e) => { e.stopPropagation(); onDelete(element.id); }}
                 style={{ border: "none", background: "none", padding: "14px 22px", fontSize: 28, cursor: "pointer", color: "#ef4444", transition: "all .2s", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" }}
-                title="Delete" className="hb"> Delete️</button>
+                title="Delete" className="hb"> Delete</button>
               <div style={{ width: 1, height: 44, background: "#e5e7eb", alignSelf: "center" }} />
               <button onClick={(e) => { e.stopPropagation(); onUpdate({ fontWeight: (element.fontWeight === 800 ? 400 : 800) }); }}
                 style={{ border: "none", background: "none", padding: "14px 22px", fontSize: 26, fontWeight: 900, cursor: "pointer", color: element.fontWeight === 800 ? "var(--app-accent)" : "#374151", transition: "all .2s", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" }}
@@ -325,7 +325,7 @@ function DraggableElement({ element, selected, onSelect, onUpdate, onDelete, chi
     </div>
   );
 }
-// ─── SLIDE RENDERER ───────────────────────────────────────────────────────────
+// ─── SLIDE RENDERER -----------------------------------------------------------
 function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onSelectElement, onUpdateElement, onDelete, preview = false, canvasRef, companyLogo, companyName, footerMessage }) {
   const t = THEMES.find(x => x.name === tn) || THEMES[0];
   const upd = patch => onChange && onChange({ ...slide, ...patch });
@@ -480,7 +480,7 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
       {/* Footer Element */}
       <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(135deg,#020617,#1e1b4b)", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{slide.companyName || companyName}</div>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "#6ee7b7" }}>{footerMessage || slide.footerMessage || "🙏 Thank you for considering us!"}</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#6ee7b7" }}>{footerMessage || slide.footerMessage || " Thank you for considering us!"}</div>
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{slide.id}</div>
       </div>
 
@@ -500,7 +500,7 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
             <div style={{ flex: 1, fontSize: 14, color: "#1e293b", fontWeight: 600, paddingTop: 6 }}>
               <Txt val={item} onCh={v => { const a = [...slide.items]; a[i] = v; upd({ items: a }); }} />
             </div>
-            {editing && slide.items.length > 1 && <button onClick={() => upd({ items: slide.items.filter((_, j) => j !== i) })} style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: 16, position: "absolute", top: 8, right: 10 }}>✕</button>}
+            {editing && slide.items.length > 1 && <button onClick={() => upd({ items: slide.items.filter((_, j) => j !== i) })} style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: 16, position: "absolute", top: 8, right: 10 }}>Close</button>}
           </div>
         ))}
         {editing && <button onClick={() => upd({ items: [...slide.items, "New objective here"] })} style={{ background: "none", border: `1.5px dashed ${t.p}50`, borderRadius: 12, padding: 12, fontSize: 13, color: t.p, cursor: "pointer", fontWeight: 700, fontFamily: "inherit" }}>+ Add Objective</button>}
@@ -569,7 +569,7 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
             <div style={{ width: 56, height: 56, borderRadius: "50%", background: t.g, margin: "0 auto 14px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: "#fff", fontWeight: 900 }}>{m.avatar || m.name[0]}</div>
             <div style={{ fontSize: 14, fontWeight: 800, color: "#0f172a", marginBottom: 4 }}><Txt val={m.name} onCh={v => { const a = [...slide.members]; a[i] = { ...a[i], name: v, avatar: (v[0] || "?").toUpperCase() + (v.split(" ")[1]?.[0] || "") }; upd({ members: a }); }} /></div>
             <div style={{ fontSize: 12, color: t.p, fontWeight: 600 }}><Txt val={m.role} onCh={v => { const a = [...slide.members]; a[i] = { ...a[i], role: v }; upd({ members: a }); }} /></div>
-            {editing && <button onClick={() => upd({ members: slide.members.filter((_, j) => j !== i) })} style={{ position: "absolute", top: 8, right: 8, background: "rgba(239,68,68,0.1)", border: "none", color: "#ef4444", borderRadius: 6, width: 22, height: 22, cursor: "pointer", fontSize: 11 }}>✕</button>}
+            {editing && <button onClick={() => upd({ members: slide.members.filter((_, j) => j !== i) })} style={{ position: "absolute", top: 8, right: 8, background: "rgba(239,68,68,0.1)", border: "none", color: "#ef4444", borderRadius: 6, width: 22, height: 22, cursor: "pointer", fontSize: 11 }}>Close</button>}
           </div>
         ))}
         {editing && <div onClick={() => upd({ members: [...slide.members, { name: "New Member", role: "Role", avatar: "NM" }] })} style={{ flex: "1 1 170px", padding: "24px 18px", borderRadius: 16, border: `2px dashed ${t.p}40`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", color: t.p, gap: 8 }}>
@@ -621,7 +621,7 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
               fontWeight: "bold"
             }}
           >
-            🖨️ Print
+            Print
           </button>
         )}
 
@@ -706,7 +706,7 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
 
         {/* Footer */}
         <div style={{ position: "absolute", bottom: "40px", left: "60px", right: "60px", textAlign: "center", fontSize: "10px", color: "#666", borderTop: "2px solid #ff0000", paddingTop: "10px" }}>
-          <div style={{ fontWeight: "bold", color: "var(--app-accent)", marginBottom: 4 }}>{footerMessage || slide.footerMessage || "🙏 Thank you for considering us!"}</div>
+          <div style={{ fontWeight: "bold", color: "var(--app-accent)", marginBottom: 4 }}>{footerMessage || slide.footerMessage || " Thank you for considering us!"}</div>
           <Txt val={slide.companyAddress} onCh={v => upd({ companyAddress: v })} />
         </div>
 
@@ -772,7 +772,7 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
   );
 }
 
-// ─── SUBADMIN PROPOSAL VIEWER ─────────────────────────────────────────────────
+// ─── SUBADMIN PROPOSAL VIEWER -------------------------------------------------
 function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL, onUpdated }) {
   const prop = proposal;
   const st = (prop.status || "draft").toLowerCase();
@@ -956,7 +956,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                             padding: "8px 12px", background: "#fff",
                             borderRadius: 8, border: "1px solid #e0eef0", fontSize: 13, color: "#374151"
                           }}>
-                            <span style={{ color: "#00BCD4", fontWeight: 900, marginTop: 1 }}>✓</span> {item}
+                            <span style={{ color: "#00BCD4", fontWeight: 900, marginTop: 1 }}>Yes</span> {item}
                           </div>
                         ))}
                       </div>
@@ -1086,12 +1086,12 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                     </div>
                     <div style={{ height: 1, background: "#15803D", marginBottom: 8 }} />
                     <div style={{ fontSize: 12, fontWeight: 700, color: "#0D2027" }}>{prop.clientName || prop.client || "Client"}</div>
-                    <div style={{ fontSize: 10, color: "#15803D", fontWeight: 700, marginTop: 3 }}>✓ Digitally Signed</div>
+                    <div style={{ fontSize: 10, color: "#15803D", fontWeight: 700, marginTop: 3 }}>Digitally Signed</div>
                   </div>
                   <div style={{ background: "#fff", borderRadius: 10, border: "1px solid #e0eef0", padding: "16px 20px", textAlign: "center" }}>
                     <div style={{ fontSize: 10, fontWeight: 700, color: "#96B0B8", textTransform: "uppercase", letterSpacing: .6, marginBottom: 12 }}>Authorised Signatory</div>
                     <div style={{ height: 64, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
-                      <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg,#006E7F,#00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, color: "#fff" }}>✓</div>
+                      <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg,#006E7F,#00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, color: "#fff" }}>Yes</div>
                     </div>
                     <div style={{ height: 1, background: "#00BCD4", marginBottom: 8 }} />
                     <div style={{ fontSize: 12, fontWeight: 700, color: "#0D2027" }}>Company Representative</div>
@@ -1119,7 +1119,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
   );
 }
 
-// ─── MAIN APP ─────────────────────────────────────────────────────────────────
+// ─── MAIN APP -----------------------------------------------------------------
 export default function CanvaProposal({ clients = [], openNew = false, onOpenNewDone, companyLogo, companyName }) {
   const [view, setView] = useState(new URLSearchParams(window.location.search).get("edit") || new URLSearchParams(window.location.search).get("view") ? "editor" : "list");    // list | editor
   const [proposals, setProposals] = useState([]);
@@ -1203,7 +1203,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     const saved = await persist(nd);   // get back the DB-hydrated doc (with _id)
     if (saved) setDoc(saved);          // use the version with _id going forward
     setShowResizeMenu(false);
-    flash("📏 Page resized to " + (fmt === "a4-portrait" ? "A4 Portrait" : fmt === "a4-landscape" ? "A4 Landscape" : "Presentation"));
+    flash(" Page resized to " + (fmt === "a4-portrait" ? "A4 Portrait" : fmt === "a4-landscape" ? "A4 Landscape" : "Presentation"));
   };
   useEffect(() => {
     fetchProposals();
@@ -1244,10 +1244,10 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     try {
       const res = await axios.post(`${BASE_URL}/api/upload`, formData);
       setUploads([res.data, ...uploads]);
-      flash("✅ Upload successful!");
+      flash("Upload successful!");
     } catch (err) {
       console.error("Upload failed", err);
-      flash("❌ Upload failed", "err");
+      flash("Upload failed", "err");
     } finally {
       setUploading(false);
     }
@@ -1256,14 +1256,14 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   const fetchProposals = async () => {
     setLoading(true);
     try {
-      console.log("📡 Fetching proposals from backend...");
+      console.log(" Fetching proposals from backend...");
       const res = await axios.get(`${BASE_URL}/api/proposals`);
-      console.log(`📋 Found ${res.data.length} proposals in backend`);
+      console.log(`Document Found ${res.data.length} proposals in backend`);
 
       const list = res.data || [];
       if (list.length > 0) {
         setProposals(list);
-        console.log("✅ Proposals loaded successfully");
+        console.log("Proposals loaded successfully");
 
         // Auto-open based on URL
         const params = new URLSearchParams(window.location.search);
@@ -1284,14 +1284,14 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
         }
 
       } else {
-        console.log("📝 No proposals found in backend, showing empty state");
+        console.log("Edit No proposals found in backend, showing empty state");
         setProposals([]);
       }
     } catch (err) {
-      console.error("❌ Error fetching proposals:", err);
+      console.error("Error Error fetching proposals:", err);
       // Only show demo proposal in development mode
       if (process.env.NODE_ENV === 'development') {
-        console.log("🔧 Development mode: Showing demo proposal");
+        console.log(" Development mode: Showing demo proposal");
         const d = [makeDemo()];
         setProposals(d);
       } else {
@@ -1311,13 +1311,13 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
         const res = await axios.put(`${BASE_URL}/api/proposals/${d._id}`, d);
         setProposals(prev => prev.map(p => p._id === d._id ? res.data : p));
         setDoc(res.data);
-        return res.data;                     // ← return so callers can use it
+        return res.data;                     //  return so callers can use it
       } else {
         // First save — create in DB
         const res = await axios.post(`${BASE_URL}/api/proposals`, d);
         setProposals(prev => [res.data, ...prev.filter(p => p.id !== d.id)]);
         setDoc(res.data);
-        return res.data;                     // ← return the DB doc (now has _id)
+        return res.data;                     //  return the DB doc (now has _id)
       }
     } catch (err) {
       console.error("Error persisting proposal:", err);
@@ -1325,7 +1325,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
       return null;
     }
   }, []);
-  // ← empty deps — uses functional setters, no stale closure
+  //  empty deps — uses functional setters, no stale closure
 
   const openDoc = (d) => {
     // Always open the viewer when clicking a proposal card
@@ -1355,7 +1355,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     const nd = { ...d, updated: new Date().toISOString(), client: d.client || d.clientName || "" };
     persist(nd);
     setDoc(nd);
-    flash("💾 Saved!");
+    flash("Save Saved!");
   };
   const shareProposal = async (p = doc) => {
     await shareProposalAsPDF(p, companyName, async (proposal) => {
@@ -1390,7 +1390,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
       if (!currentDoc.title.trim()) {
         const t = window.prompt("Enter a title for this proposal before submitting:");
         if (!t || !t.trim()) {
-          flash("❌ Title is required to submit");
+          flash("Error Title is required to submit");
           return;
         }
         currentDoc.title = t.trim();
@@ -1402,18 +1402,18 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
         // Ensure doc is saved and has _id before submitting
         const savedDoc = await persist(currentDoc);
         if (!savedDoc || !savedDoc._id) {
-          flash("❌ Error saving proposal before submission", "err");
+          flash("Error Error saving proposal before submission", "err");
           return;
         }
 
         const res = await axios.put(`${BASE_URL}/api/proposals/${savedDoc._id}/submit`);
         setDoc(res.data);
         setProposals(prev => prev.map(p => p._id === savedDoc._id ? res.data : p));
-        flash("📤 Proposal submitted successfully!");
+        flash("Export Proposal submitted successfully!");
         setTimeout(() => setView("list"), 1500);
       } catch (err) {
         console.error("Error submitting proposal:", err);
-        flash("❌ Error submitting to server", "err");
+        flash("Error Error submitting to server", "err");
       }
       return;
     }
@@ -1424,11 +1424,11 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
         setDoc(res.data);
         setProposals(prev => prev.map(p => p._id === doc._id ? res.data : p));
         setConfetti(true);
-        flash("🎉 Proposal Approved!");
+        flash("Celebration Proposal Approved!");
         setTimeout(() => setConfetti(false), 4000);
       } catch (err) {
         console.error("Error approving proposal:", err);
-        flash("❌ Error approving", "err");
+        flash("Error Error approving", "err");
       }
       return;
     }
@@ -1438,10 +1438,10 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
         const res = await axios.put(`${BASE_URL}/api/proposals/${doc._id}/reject`, extra);
         setDoc(res.data);
         setProposals(prev => prev.map(p => p._id === doc._id ? res.data : p));
-        flash("❌ Proposal Rejected", "err");
+        flash("Error Proposal Rejected", "err");
       } catch (err) {
         console.error("Error rejecting proposal:", err);
-        flash("❌ Error rejecting", "err");
+        flash("Error Error rejecting", "err");
       }
       return;
     }
@@ -1476,14 +1476,14 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     const elements = [...(s.elements || []), { id: uid(), fontSize: 16, fontWeight: 400, x: xPos, y: yPos, w: 400, ...element }];
     updateSlide({ ...s, elements });
     setSelectedElementId(elements[elements.length - 1].id);
-    flash("✨ Added to page!");
+    flash("Special Added to page!");
   };
   const deleteElement = (elId) => {
     const s = doc.slides[page];
     const elements = s.elements.filter(e => e.id !== elId);
     updateSlide({ ...s, elements });
     setSelectedElementId(null);
-    flash("  Delete Removed");
+    flash("Delete Removed");
   };
   const addSlide = (type) => {
     const s = makeSlide(type, doc.theme);
@@ -1512,10 +1512,10 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
       if (dbId) await axios.delete(`${BASE_URL}/api/proposals/${dbId}`);
       const d = proposals.filter(p => p.id !== id);
       setProposals(d);
-      flash("  Delete Proposal deleted");
+      flash("Delete Proposal deleted");
     } catch (err) {
       console.error("Error deleting:", err);
-      flash("❌ Error deleting from server", "err");
+      flash("Error Error deleting from server", "err");
     }
   };
 
@@ -1721,7 +1721,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     return (
       <div style={{ width: "100%", height: "80vh", display: "flex", flexDirection: "column" }}>
         <div style={{ padding: "10px 0", display: "flex", gap: 10, alignItems: "center" }}>
-          <button onClick={() => setView("list")} style={{ padding: "8px 14px", background: "var(--app-bg)", border: "1.5px solid var(--app-border)", borderRadius: 8, cursor: "pointer", fontWeight: 700, color: "var(--app-muted)" }}>← Back to List</button>
+          <button onClick={() => setView("list")} style={{ padding: "8px 14px", background: "var(--app-bg)", border: "1.5px solid var(--app-border)", borderRadius: 8, cursor: "pointer", fontWeight: 700, color: "var(--app-muted)" }}> Back to List</button>
         </div>
         <div style={{ flex: 1, overflow: "hidden", borderRadius: 16 }}>
           <iframe src="/template-designer.html#prop" ref={iframeRef} onLoad={sendThemeToIframe} style={{ width: "100%", height: "100%", border: "none" }} title="Template Designer" />
@@ -1730,7 +1730,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     );
   }
 
-  // ══ FORM VIEW ══════════════════════════════════════════════════════════════
+  // ══ FORM VIEW --------------------------------------------------------------
   if (view === "form") {
     // Register the back-to-list callback so ProposalFormLogic can call it after Send
     window._onBackToProposals = () => setView("list");
@@ -1741,14 +1741,14 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
       onSave={async (data) => {
         await createNew(data);
         if (data.status === 'sent') {
-          flash("📤 Proposal sent — it will appear on the client's dashboard now.");
+          flash("Export Proposal sent — it will appear on the client's dashboard now.");
           setTimeout(() => setView("list"), 500);
         }
       }}
     />;
   }
 
-  // ══ LIST VIEW ══════════════════════════════════════════════════════════════
+  // ══ LIST VIEW --------------------------------------------------------------
 
 
   if (view === "list") {
@@ -2093,7 +2093,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                       <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text,#1A2E35)" }}>{tmpl.label}</div>
                       <div style={{ fontSize: 10, color: "var(--text3,#A0B8BE)" }}>{tmpl.meta}</div>
                     </div>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "var(--teal,#00BCD4)" }}>Use →</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "var(--teal,#00BCD4)" }}>Use </span>
                   </div>
                 ))}
               </div>

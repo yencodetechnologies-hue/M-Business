@@ -9,9 +9,9 @@ function hexToRgb(hex) {
   const b = bigint & 255;
   return `${r}, ${g}, ${b}`;
 }
-// ─────────────────────────────────────────────────────────────
+// -------------------------------------------------------------
 //  Reusable Components
-// ─────────────────────────────────────────────────────────────
+// -------------------------------------------------------------
 const Input = ({ label, value, onChange, type = "text", placeholder, required = false }) => {
   const [show, setShow] = useState(false);
   const isPassword = type === "password";
@@ -52,7 +52,7 @@ const Input = ({ label, value, onChange, type = "text", placeholder, required = 
             }}
             title={show ? "Hide password" : "Show password"}
           >
-            {show ? "👁️‍🗨️" : "👁️"}
+            {show ? "View‍" : "View"}
           </button>
         )}
       </div>
@@ -126,9 +126,9 @@ const AddInput = ({ onAdd, placeholder }) => {
   );
 };
 
-// ─────────────────────────────────────────────────────────────
+// -------------------------------------------------------------
 //  Main Settings Component
-// ─────────────────────────────────────────────────────────────
+// -------------------------------------------------------------
 export default function SettingsPage({ user, appTheme, setAppTheme, themes, customColor, setCustomColor, onLogoChange, triggerCrop, onProfileUpdate, THEME }) {
   const companyId = user?._id || user?.id;
   const [activeTab, setActiveTab] = useState("profile");
@@ -357,11 +357,11 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
 
   // Sidebar navigation items
   const navItems = [
-    { id: "profile", icon: "👤", label: "Profile" },
-    { id: "branding", icon: "🎨", label: "Branding" },
-    { id: "documents", icon: "📄", label: "Documents" },
-    { id: "security", icon: "🔒", label: "Security" },
-    { id: "bank", icon: "🏦", label: "Bank Details" }
+    { id: "profile", icon: "Profile", label: "Profile" },
+    { id: "branding", icon: "Theme", label: "Branding" },
+    { id: "documents", icon: "Document", label: "Documents" },
+    { id: "security", icon: "Secure", label: "Security" },
+    { id: "bank", icon: "Bank", label: "Bank Details" }
   ];
 
   const displayName = user?.companyName || user?.name || user?.email?.split("@")[0] || "Admin";
@@ -421,7 +421,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
             {activeTab === "profile" && (
               <div className="settings-section">
                 <div className="ss-header">
-                  <div className="ss-header-icon" style={{ background: "rgba(var(--app-accent-rgb), 0.15)", color: "var(--app-accent)" }}>👤</div>
+                  <div className="ss-header-icon" style={{ background: "rgba(var(--app-accent-rgb), 0.15)", color: "var(--app-accent)" }}>Profile</div>
                   <div>
                     <div className="ss-title">Profile & Company</div>
                     <div className="ss-sub">Update your personal and business information</div>
@@ -473,7 +473,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
             {activeTab === "branding" && (
               <div className="settings-section">
                 <div className="ss-header">
-                  <div className="ss-header-icon" style={{ background: "rgba(var(--app-accent-rgb), 0.15)", color: "var(--app-accent)" }}>🎨</div>
+                  <div className="ss-header-icon" style={{ background: "rgba(var(--app-accent-rgb), 0.15)", color: "var(--app-accent)" }}>Theme</div>
                   <div>
                     <div className="ss-title">Branding & Theme</div>
                     <div className="ss-sub">Customize the look and feel of your app</div>
@@ -666,7 +666,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
             {activeTab === "bank" && (
               <div className="settings-section">
                 <div className="ss-header">
-                  <div className="ss-header-icon" style={{ background: "rgba(0,188,212,0.12)", color: "#00BCD4" }}>🏦</div>
+                  <div className="ss-header-icon" style={{ background: "rgba(0,188,212,0.12)", color: "#00BCD4" }}>Bank</div>
                   <div>
                     <div className="ss-title">Payment Terms & Bank Details</div>
                     <div className="ss-sub">Used in invoices and proposals</div>
@@ -734,7 +734,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
             {activeTab === "security" && (
               <div className="settings-section">
                 <div className="ss-header">
-                  <div className="ss-header-icon" style={{ background: "rgba(var(--app-accent-rgb), 0.15)", color: "var(--app-accent)" }}>🔒</div>
+                  <div className="ss-header-icon" style={{ background: "rgba(var(--app-accent-rgb), 0.15)", color: "var(--app-accent)" }}>Secure</div>
                   <div>
                     <div className="ss-title">Security & Passwords</div>
                     <div className="ss-sub">Manage your password and security settings</div>

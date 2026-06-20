@@ -156,9 +156,9 @@ const printProposal = (proposal) => {
 
 const STATUS = {
   draft: { label: "Draft", icon: "Edit", bg: "#f8fafc", fg: "#475569", br: "#cbd5e1" },
-  pending: { label: "Pending Approval", icon: "⏳", bg: "#fffbeb", fg: "#92400e", br: "#fcd34d" },
-  approved: { label: "Approved", icon: "✅", bg: "#f0fdf4", fg: "#14532d", br: "#86efac" },
-  rejected: { label: "Rejected", icon: "❌", bg: "#fff1f2", fg: "#9f1239", br: "#fda4af" }
+  pending: { label: "Pending Approval", icon: "Pending", bg: "#fffbeb", fg: "#92400e", br: "#fcd34d" },
+  approved: { label: "Approved", icon: "Success", bg: "#f0fdf4", fg: "#14532d", br: "#86efac" },
+  rejected: { label: "Rejected", icon: "Error", bg: "#fff1f2", fg: "#9f1239", br: "#fda4af" }
 };
 
 function Badge({ status }) {
@@ -185,7 +185,7 @@ function Badge({ status }) {
 function Search({ value, onChange, placeholder }) {
   return (
     <div style={{ position: "relative", marginBottom: 16 }}>
-      <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>🔍</span>
+      <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>Search</span>
       <input
         type="text"
         placeholder={placeholder || "Search..."}
@@ -286,7 +286,7 @@ function CompanyDropdown({ clients, value, onChange, error }) {
                 top: "50%",
                 transform: "translateY(-50%)",
                 fontSize: 12
-              }}>🔍</span>
+              }}>Search</span>
               <input
                 autoFocus
                 placeholder="Search company name..."
@@ -358,7 +358,7 @@ function CompanyDropdown({ clients, value, onChange, error }) {
                         <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>
                       )}
                     </div>
-                    {isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}
+                    {isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>Yes</span>}
                   </div>
                 );
               })
@@ -452,7 +452,7 @@ function EmployeeDropdown({ employees, value, onChange, error }) {
                 top: "50%",
                 transform: "translateY(-50%)",
                 fontSize: 12
-              }}>🔍</span>
+              }}>Search</span>
               <input
                 autoFocus
                 placeholder="Search employee..."
@@ -520,7 +520,7 @@ function EmployeeDropdown({ employees, value, onChange, error }) {
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>
                     </div>
-                    {isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}
+                    {isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>Yes</span>}
                   </div>
                 );
               })
@@ -585,7 +585,7 @@ function Mdl({ title, onClose, children, maxWidth = 820 }) {
               padding: "4px 8px"
             }}
           >
-            ✕
+            Close
           </button>
         </div>
         <div style={{ overflowY: "auto", padding: "20px 22px", flex: 1 }}>
@@ -808,10 +808,10 @@ export default function AdminProposalManagement() {
         gap: 12
       }}>
         {[
-          { t: "Total Proposals", v: proposals.length, i: "📋", c: "var(--app-accent)" },
+          { t: "Total Proposals", v: proposals.length, i: "Document", c: "var(--app-accent)" },
           { t: "Draft", v: proposals.filter(p => p.status === "draft").length, i: "Edit", c: "#6b7280" },
-          { t: "Pending", v: proposals.filter(p => p.status === "pending").length, i: "⏳", c: "#f59e0b" },
-          { t: "Approved", v: proposals.filter(p => p.status === "approved").length, i: "✅", c: "#22c55e" }
+          { t: "Pending", v: proposals.filter(p => p.status === "pending").length, i: "Pending", c: "#f59e0b" },
+          { t: "Approved", v: proposals.filter(p => p.status === "approved").length, i: "Success", c: "#22c55e" }
         ].map(({ t, v, i, c }) => (
           <div key={t} style={{
             background: "#fff",
@@ -887,7 +887,7 @@ export default function AdminProposalManagement() {
                   transition: "all .2s"
                 }}
               >
-                ✨ Add Proposal
+                Special Add Proposal
               </button>
 
             </div>
@@ -1045,7 +1045,7 @@ export default function AdminProposalManagement() {
                             whiteSpace: "nowrap"
                           }}
                         >
-                          🖨️ Print
+                          Print
                         </button>
 
                         {proposal.status === "pending" && (
@@ -1090,7 +1090,7 @@ export default function AdminProposalManagement() {
                               whiteSpace: "nowrap"
                             }}
                           >
-                            🎨 Canvas
+                            Canvas
                           </button>
                         )}
 
@@ -1110,7 +1110,7 @@ export default function AdminProposalManagement() {
                               whiteSpace: "nowrap"
                             }}
                           >
-                            📤 Submit
+                            Export Submit
                           </button>
                         )}
 
@@ -1130,7 +1130,7 @@ export default function AdminProposalManagement() {
                               whiteSpace: "nowrap"
                             }}
                           >
-                            🔄 Resubmit
+                            Sync Resubmit
                           </button>
                         )}
                       </div>
@@ -1306,7 +1306,7 @@ export default function AdminProposalManagement() {
                   fontFamily: "inherit"
                 }}
               >
-                📤 Submit for Approval
+                Export Submit for Approval
               </button>
             )}
 
@@ -1346,7 +1346,7 @@ export default function AdminProposalManagement() {
                   fontFamily: "inherit"
                 }}
               >
-                🔄 Resubmit for Approval
+                Sync Resubmit for Approval
               </button>
             )}
 
@@ -1389,7 +1389,7 @@ export default function AdminProposalManagement() {
               fontSize: 22,
               margin: "0 auto 14px"
             }}>
-              Delete
+         Delete
             </div>
             <h3 style={{
               textAlign: "center",
@@ -1398,7 +1398,7 @@ export default function AdminProposalManagement() {
               fontWeight: 800,
               color: T.text
             }}>
-              Delete Proposal
+         Delete Proposal
             </h3>
             <p style={{
               textAlign: "center",
@@ -1441,7 +1441,7 @@ export default function AdminProposalManagement() {
                   fontFamily: "inherit"
                 }}
               >
-                Delete
+           Delete
               </button>
             </div>
           </div>
@@ -1467,7 +1467,7 @@ export default function AdminProposalManagement() {
               fontSize: 22,
               margin: "0 auto 14px"
             }}>
-              ❌
+              Error
             </div>
             <h3 style={{
               textAlign: "center",
@@ -1715,7 +1715,7 @@ export default function AdminProposalManagement() {
                   padding: "4px 8px"
                 }}
               >
-                ✕
+                Close
               </button>
             </div>
             <div style={{ flex: 1, overflow: "hidden" }}>

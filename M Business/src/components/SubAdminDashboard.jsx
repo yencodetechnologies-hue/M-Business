@@ -506,7 +506,7 @@ function Search({ value, onChange, placeholder }) {
 
     <div style={{ position: "relative", marginBottom: 16 }}>
 
-      <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>🔍</span>
+      <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>Search</span>
 
       <input type="text" placeholder={placeholder || "Search..."} value={value} onChange={e => onChange(e.target.value)}
 
@@ -538,7 +538,7 @@ function Mdl({ title, onClose, children, maxWidth = 820, zIndex = 1000 }) {
 
           <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: T.text }}>{title}</h2>
 
-          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-muted)", padding: "4px 8px" }}>✕</button>
+          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-muted)", padding: "4px 8px" }}>Close</button>
 
         </div>
 
@@ -620,7 +620,7 @@ function Fld({ label, value, onChange, options, type = "text", error, placeholde
 
       }} style={s} placeholder={placeholder || ""} disabled={disabled} />}
 
-      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {error}</div>}
+      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {error}</div>}
 
     </div>
 
@@ -746,7 +746,7 @@ function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel = "Del
 
         <div style={{ width: 52, height: 52, borderRadius: "50%", background: danger ? "rgba(var(--red-rgb),0.1)" : "rgba(var(--app-accent-rgb),0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, margin: "0 auto 14px" }}>
 
-          {danger ? "  Deleteï¸" : "✓"}
+          {danger ? "Deleteï¸" : "Yes"}
 
         </div>
 
@@ -782,11 +782,11 @@ function ActionBtns({ onView, onEdit, onDelete, onShare }) {
 
       {onView && <button onClick={(e) => { e.stopPropagation(); onView(); }} title="View" style={{ background: "var(--app-bg)", border: "1px solid #ddd6fe", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>View</button>}
 
-      {onShare && <button onClick={(e) => { e.stopPropagation(); onShare(); }} title="Share Onboarding Link" style={{ background: "#dcfce7", border: "1px solid #86efac", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#166534", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}><span>🔗</span></button>}
+      {onShare && <button onClick={(e) => { e.stopPropagation(); onShare(); }} title="Share Onboarding Link" style={{ background: "#dcfce7", border: "1px solid #86efac", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#166534", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}><span></span></button>}
 
       {onEdit && <button onClick={(e) => { e.stopPropagation(); onEdit(); }} title="Edit" style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#f59e0b", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>Edit</button>}
 
-      {onDelete && <button onClick={(e) => { e.stopPropagation(); onDelete(); }} title="Delete" style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>  Delete</button>}
+      {onDelete && <button onClick={(e) => { e.stopPropagation(); onDelete(); }} title="Delete" style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>Delete</button>}
 
     </div>
 
@@ -824,7 +824,7 @@ function InfoRow({ icon, label, value }) {
 
 function LimitReachedModal({ type, limit, onClose, onUpgrade }) {
 
-  const icons = { client: "👥", employee: "ðŸ‘¨â€ðŸ’¼", manager: "ðŸ§‘â€ðŸ’¼" };
+  const icons = { client: "Team", employee: "ðŸ‘¨â€ðŸ’¼", manager: "ðŸ§‘â€ðŸ’¼" };
 
   const labels = { client: "Clients", employee: "Employees", manager: "Managers" };
 
@@ -836,7 +836,7 @@ function LimitReachedModal({ type, limit, onClose, onUpgrade }) {
 
       <div style={{ textAlign: "center", padding: "10px 0" }}>
 
-        <div style={{ fontSize: 48, marginBottom: 16 }}>{icons[type] || "⚠️"}</div>
+        <div style={{ fontSize: 48, marginBottom: 16 }}>{icons[type] || "Warning"}</div>
 
         <h3 style={{ fontSize: 18, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 12 }}>
 
@@ -874,7 +874,7 @@ function LimitReachedModal({ type, limit, onClose, onUpgrade }) {
 
           >
 
-            🚀 Upgrade Plan
+            Launch Upgrade Plan
 
           </button>
 
@@ -916,7 +916,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 
         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)", zIndex: 999, overflow: "hidden" }}>
 
-          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search client..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
+          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>Search</span><input autoFocus placeholder="Search client..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
 
           {onAddClient && <div onClick={() => { setOpen(false); setSearch(""); onAddClient(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,var(--app-border),var(--app-bg))", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Client</div></div></div>}
 
@@ -1126,7 +1126,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
       setEditClient(null);
 
-      showToast("✓ Client updated successfully!");
+      showToast("Yes Client updated successfully!");
 
     } catch (err) {
 
@@ -1136,7 +1136,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
       setEditClient(null);
 
-      showToast("✓ Client updated locally!");
+      showToast("Yes Client updated locally!");
 
     } finally {
 
@@ -1156,7 +1156,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
     setDeleteTarget(null);
 
-    showToast("🗑️ Client deleted!");
+    showToast("Delete Client deleted!");
 
   };
 
@@ -1174,7 +1174,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
     setStatusDropOpen(false);
 
-    showToast(`✓ Status changed to ${newStatus}`);
+    showToast(`Yes Status changed to ${newStatus}`);
 
   };
 
@@ -1432,7 +1432,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                     <button onClick={() => onCreateProject && onCreateProject(p, true)} style={{ background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 6, padding: "4px 8px", fontSize: 10, color: "#F59E0B", cursor: "pointer", fontWeight: 700 }}>Edit</button>
 
-                    <button onClick={() => onViewProject && onViewProject(p)} style={{ background: "#E0F7FA", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 10, color: "#00BCD4", cursor: "pointer", fontWeight: 700 }}>View →</button>
+                    <button onClick={() => onViewProject && onViewProject(p)} style={{ background: "#E0F7FA", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 10, color: "#00BCD4", cursor: "pointer", fontWeight: 700 }}>View </button>
 
                     <button onClick={async (e) => {
 
@@ -1446,7 +1446,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                         setProjects && setProjects(prev => prev.filter(proj => proj._id !== p._id));
 
-                        showToast("🗑️ Project deleted!");
+                        showToast("Delete Project deleted!");
 
                       } catch (err) {
 
@@ -1524,7 +1524,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#E8FAF3", color: "#26C281" }}>{p.status || "Active"}</span>
 
-            {onViewProject && <button onClick={() => onViewProject(p)} style={{ background: "#E0F7FA", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#00BCD4", cursor: "pointer", fontWeight: 700 }}>View →</button>}
+            {onViewProject && <button onClick={() => onViewProject(p)} style={{ background: "#E0F7FA", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#00BCD4", cursor: "pointer", fontWeight: 700 }}>View </button>}
 
             <button onClick={() => onCreateProject && onCreateProject(p, true)} style={{ background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#F59E0B", cursor: "pointer", fontWeight: 700 }}>Edit</button>
 
@@ -1540,7 +1540,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                 setProjects && setProjects(prev => prev.filter(proj => proj._id !== p._id));
 
-                showToast("🗑️ Project deleted!");
+                showToast("Delete Project deleted!");
 
               } catch (err) {
 
@@ -1644,7 +1644,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
 
-          showToast("✓ Document uploaded!");
+          showToast("Yes Document uploaded!");
 
           setDocUploading(false);
 
@@ -2162,7 +2162,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
         <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}>
 
-          <div style={{ width: 56, height: 56, borderRadius: 14, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#00BCD4" }}>👥</div>
+          <div style={{ width: 56, height: 56, borderRadius: 14, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#00BCD4" }}>Team</div>
 
           <div style={{ fontSize: 15, fontWeight: 800, color: "#1A2E35" }}>Select a Client</div>
 
@@ -2438,7 +2438,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
       }
 
-      setEditEmp(null); showToast("✓ Employee updated successfully!");
+      setEditEmp(null); showToast("Yes Employee updated successfully!");
 
     } catch {
 
@@ -2452,7 +2452,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
       }
 
-      setEditEmp(null); showToast("✓ Updated locally!");
+      setEditEmp(null); showToast("Yes Updated locally!");
 
     } finally { setSaving(false); }
 
@@ -2474,7 +2474,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
       }
 
-      showToast("🗑️ Employee deleted!");
+      showToast("Delete Employee deleted!");
 
     } catch {
 
@@ -2488,7 +2488,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
       }
 
-      showToast("🗑️ Deleted locally!");
+      showToast("Delete Deleted locally!");
 
     }
 
@@ -2640,7 +2640,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
               <button onClick={() => setEditEmp(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
 
-              <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Savingâ€¦" : "Save Changes →"}</button>
+              <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Savingâ€¦" : "Save Changes "}</button>
 
             </div>
 
@@ -2700,7 +2700,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
       <div style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.2)", marginBottom: 6 }}>
 
-        <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🔗</div>
+        <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}></div>
 
         <div style={{ flex: 1, minWidth: 0 }}>
 
@@ -2712,7 +2712,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
 
-          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "✓ Copied!" : "ðŸ“‹ Copy Link"}</button>
+          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "Copied!" : "ðŸ“‹ Copy Link"}</button>
 
           <button onClick={() => {
 
@@ -3006,7 +3006,7 @@ ${onboardingLink}`;
 
             <button onClick={() => setEditEmp(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
 
-            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Savingâ€¦" : "Save Changes →"}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Savingâ€¦" : "Save Changes "}</button>
 
           </div>
 
@@ -3118,7 +3118,7 @@ function ManagersPage({ managers, setManagers }) {
 
       setEditMgr(null);
 
-      showToast("✓ Manager updated!");
+      showToast("Yes Manager updated!");
 
     } catch {
 
@@ -3126,7 +3126,7 @@ function ManagersPage({ managers, setManagers }) {
 
       setEditMgr(null);
 
-      showToast("✓ Updated locally!");
+      showToast("Yes Updated locally!");
 
     } finally { setSaving(false); }
 
@@ -3162,7 +3162,7 @@ function ManagersPage({ managers, setManagers }) {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
 
-        {[{ t: "Total Managers", v: managers.length, i: "ðŸ§‘â€ðŸ’¼", c: "#f59e0b" }, { t: "Active", v: managers.filter(m => m.status === "Active").length, i: "✓", c: "#22C55E" }, { t: "Inactive", v: managers.filter(m => m.status === "Inactive").length, i: "â›”", c: "#EF4444" }].map(({ t, v, i, c }) => (
+        {[{ t: "Total Managers", v: managers.length, i: "ðŸ§‘â€ðŸ’¼", c: "#f59e0b" }, { t: "Active", v: managers.filter(m => m.status === "Active").length, i: "Yes", c: "#22C55E" }, { t: "Inactive", v: managers.filter(m => m.status === "Inactive").length, i: "â›”", c: "#EF4444" }].map(({ t, v, i, c }) => (
 
           <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
 
@@ -3324,7 +3324,7 @@ function ManagersPage({ managers, setManagers }) {
 
             <button onClick={() => setEditMgr(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
 
-            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Savingâ€¦" : "Save Changes →"}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Savingâ€¦" : "Save Changes "}</button>
 
           </div>
 
@@ -3426,7 +3426,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
       setEditSub(null);
 
-      showToast("✓ Subadmin updated!");
+      showToast("Yes Subadmin updated!");
 
     } catch {
 
@@ -3434,7 +3434,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
       setEditSub(null);
 
-      showToast("✓ Subadmin updated locally!");
+      showToast("Yes Subadmin updated locally!");
 
     } finally { setSaving(false); }
 
@@ -3554,7 +3554,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
 
-        {[{ t: "Total Subadmins", v: subadmins.length, i: "ðŸ›¡ï¸", c: "#3b82f6" }, { t: "Active", v: subadmins.filter(s => (s.status || "Active") === "Active").length, i: "✓", c: "#22C55E" }, { t: "Inactive", v: subadmins.filter(s => s.status === "Inactive").length, i: "â›”", c: "#EF4444" }].map(({ t, v, i, c }) => (
+        {[{ t: "Total Subadmins", v: subadmins.length, i: "ðŸ›¡ï¸", c: "#3b82f6" }, { t: "Active", v: subadmins.filter(s => (s.status || "Active") === "Active").length, i: "Yes", c: "#22C55E" }, { t: "Inactive", v: subadmins.filter(s => s.status === "Inactive").length, i: "â›”", c: "#EF4444" }].map(({ t, v, i, c }) => (
 
           <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
 
@@ -3678,7 +3678,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
               <InfoRow icon="ðŸ’¼" label="Company Type" value={viewSub.companyType || "IT"} />
 
-              <InfoRow icon="👥" label="Employees" value={viewSub.employeeCount || "0-10"} />
+              <InfoRow icon="Team" label="Employees" value={viewSub.employeeCount || "0-10"} />
 
               <InfoRow icon="ðŸ“§" label="Email" value={viewSub.email} />
 
@@ -3902,7 +3902,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
             <button onClick={() => setEditSub(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
 
-            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#3b82f6,#60a5fa)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Savingâ€¦" : "Save Changes →"}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#3b82f6,#60a5fa)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Savingâ€¦" : "Save Changes "}</button>
 
           </div>
 
@@ -4049,7 +4049,7 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
       setAssignModal(null); setAssignTo([]);
 
-      showToast("✓ Employees assigned!");
+      showToast("Yes Employees assigned!");
 
     } catch (err) { alert(err.response?.data?.msg || "Failed to assign"); }
 
@@ -4433,7 +4433,7 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
             <button onClick={() => setAssignModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
 
-            <button onClick={doAssign} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Save Assignment →</button>
+            <button onClick={doAssign} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Save Assignment </button>
 
           </div>
 
@@ -4499,7 +4499,7 @@ function SearchDropdown({ label, items, displayKey, value, onChange, error, plac
 
       {open && <div style={{ position: "fixed", inset: 0, zIndex: 998 }} onClick={() => { setOpen(false); setSearch(""); }} />}
 
-      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {error}</div>}
+      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {error}</div>}
 
     </div>
 
@@ -4559,13 +4559,13 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
 
 
-  const tsStats = [{ t: "Total", v: trackList.length, i: "ðŸ“", c: "var(--app-accent)" }, { t: "In Progress", v: trackList.filter(p => p.status === "In Progress").length, i: "âš¡", c: "var(--app-muted)" }, { t: "Completed", v: trackList.filter(p => p.status === "Completed").length, i: "✓", c: "#22C55E" }, { t: "Pending", v: trackList.filter(p => p.status === "Pending").length, i: "ðŸ•", c: "#F59E0B" }, { t: "On Hold", v: trackList.filter(p => p.status === "On Hold").length, i: "â¸ï¸", c: "var(--app-accent)" }];
+  const tsStats = [{ t: "Total", v: trackList.length, i: "ðŸ“", c: "var(--app-accent)" }, { t: "In Progress", v: trackList.filter(p => p.status === "In Progress").length, i: "âš¡", c: "var(--app-muted)" }, { t: "Completed", v: trackList.filter(p => p.status === "Completed").length, i: "Yes", c: "#22C55E" }, { t: "Pending", v: trackList.filter(p => p.status === "Pending").length, i: "ðŸ•", c: "#F59E0B" }, { t: "On Hold", v: trackList.filter(p => p.status === "On Hold").length, i: "â¸ï¸", c: "var(--app-accent)" }];
 
   const openAdd = () => { setTsForm(EMPTY); setTsErr({}); setTsEditId(null); setTsModal("add"); };
 
   const openEdit = (p) => { setTsForm({ projectId: p.projectId || p.id || "", name: p.name || "", client: p.client || "", manager: p.manager || "", employee: p.employee || "", deadline: p.deadline || "", status: p.status || "In Progress", progress: p.progress || p.pct || 0, notes: p.notes || p.note || "" }); setTsErr({}); setTsEditId(p._id || p.id); setTsModal("edit"); };
 
-  const saveTs = async () => { const errs = {}; if (!tsForm.name.trim()) errs.name = "Project name required"; if (!tsForm.client.trim()) errs.client = "Company name required"; if (!tsForm.deadline) errs.deadline = "Deadline required"; const pv = Number(tsForm.progress); if (isNaN(pv) || pv < 0 || pv > 100) errs.progress = "0â€“100 only"; if (Object.keys(errs).length) { setTsErr(errs); return; } try { setTsSaving(true); const payload = { ...tsForm, progress: Number(tsForm.progress) }; if (tsModal === "add") { if (!payload.projectId) { const maxId = Math.max(...trackList.map(p => { const match = (p.projectId || p.id || "").match(/PRJ(\d+)/); return match ? parseInt(match[1]) : 0; }), 0); payload.projectId = `PRJ${String(maxId + 1).padStart(3, "0")}`; } const res = await axios.post(BASE_URL + "/api/project-status", payload); setTrackList(prev => [res.data, ...prev]); } else { const res = await axios.put(`${BASE_URL}/api/project-status/${tsEditId}`, payload); setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? res.data : p)); } showToast(tsModal === "add" ? "✓ Project added!" : "✓ Project updated!"); setTsModal(null); } catch { if (tsModal === "add") { const local = { ...tsForm, _id: Date.now().toString(), projectId: tsForm.projectId || `PRJ${String(trackList.length + 1).padStart(3, "0")}`, progress: Number(tsForm.progress) }; setTrackList(prev => [local, ...prev]); } else { setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? { ...p, ...tsForm, progress: Number(tsForm.progress) } : p)); } showToast("✓ Saved locally!"); setTsModal(null); } finally { setTsSaving(false); } };
+  const saveTs = async () => { const errs = {}; if (!tsForm.name.trim()) errs.name = "Project name required"; if (!tsForm.client.trim()) errs.client = "Company name required"; if (!tsForm.deadline) errs.deadline = "Deadline required"; const pv = Number(tsForm.progress); if (isNaN(pv) || pv < 0 || pv > 100) errs.progress = "0â€“100 only"; if (Object.keys(errs).length) { setTsErr(errs); return; } try { setTsSaving(true); const payload = { ...tsForm, progress: Number(tsForm.progress) }; if (tsModal === "add") { if (!payload.projectId) { const maxId = Math.max(...trackList.map(p => { const match = (p.projectId || p.id || "").match(/PRJ(\d+)/); return match ? parseInt(match[1]) : 0; }), 0); payload.projectId = `PRJ${String(maxId + 1).padStart(3, "0")}`; } const res = await axios.post(BASE_URL + "/api/project-status", payload); setTrackList(prev => [res.data, ...prev]); } else { const res = await axios.put(`${BASE_URL}/api/project-status/${tsEditId}`, payload); setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? res.data : p)); } showToast(tsModal === "add" ? "Yes Project added!" : "Yes Project updated!"); setTsModal(null); } catch { if (tsModal === "add") { const local = { ...tsForm, _id: Date.now().toString(), projectId: tsForm.projectId || `PRJ${String(trackList.length + 1).padStart(3, "0")}`, progress: Number(tsForm.progress) }; setTrackList(prev => [local, ...prev]); } else { setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? { ...p, ...tsForm, progress: Number(tsForm.progress) } : p)); } showToast("Yes Saved locally!"); setTsModal(null); } finally { setTsSaving(false); } };
 
   const deleteTs = async (id) => { if (!window.confirm("Delete?")) return; try { await axios.delete(`${BASE_URL}/api/project-status/${id}`); } catch { } setTrackList(prev => prev.filter(p => (p._id || p.id) !== id)); showToast(" Deleteï¸ Deleted!"); };
 
@@ -4587,7 +4587,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
 
-          <div style={{ position: "relative" }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>🔍</span><input placeholder="Searchâ€¦" value={tsSearch} onChange={e => setTsSearch(e.target.value)} style={{ padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", width: 240, color: T.text }} /></div>
+          <div style={{ position: "relative" }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>Search</span><input placeholder="Searchâ€¦" value={tsSearch} onChange={e => setTsSearch(e.target.value)} style={{ padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", width: 240, color: T.text }} /></div>
 
           {["All", "In Progress", "Pending", "Completed", "On Hold"].map(f => (<button key={f} onClick={() => setTsFilter(f)} style={{ padding: "7px 13px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: tsFilter === f ? "var(--app-accent)" : "var(--app-border)", background: tsFilter === f ? "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)" : "#fff", color: tsFilter === f ? "var(--app-accent)" : "var(--app-muted)" }}>{f}</button>))}
 
@@ -4643,7 +4643,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
                           setTrackList(prev => prev.map(track => (track._id || track.id) === (p._id || p.id) ? { ...track, status: newStatus } : track));
 
-                          showToast("✓ Status updated!");
+                          showToast("Yes Status updated!");
 
                         } catch {
 
@@ -4709,7 +4709,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
                       }} style={{ padding: "6px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 7, cursor: "pointer", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
 
-                        <span>🔗</span>
+                        <span></span>
 
                       </button>
 
@@ -4737,7 +4737,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
           <Fld label="Project Name *" value={tsForm.name} onChange={v => { setTsForm({ ...tsForm, name: v }); setTsErr(p => ({ ...p, name: "" })); }} error={tsErr.name} />
 
-          <div style={{ marginBottom: 14 }}><label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label><ClientDropdown clients={clientNames.length ? clients : []} value={tsForm.client} onChange={v => { setTsForm({ ...tsForm, client: v }); setTsErr(p => ({ ...p, client: "" })); }} error={tsErr.client} />{tsErr.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {tsErr.client}</div>}</div>
+          <div style={{ marginBottom: 14 }}><label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label><ClientDropdown clients={clientNames.length ? clients : []} value={tsForm.client} onChange={v => { setTsForm({ ...tsForm, client: v }); setTsErr(p => ({ ...p, client: "" })); }} error={tsErr.client} />{tsErr.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {tsErr.client}</div>}</div>
 
           <SearchDropdown label="Manager" items={managerNames} displayKey="name" value={tsForm.manager} onChange={v => setTsForm({ ...tsForm, manager: v })} placeholder="-- Select Manager --" />
 
@@ -4765,7 +4765,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
           <button onClick={() => setTsModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
 
-          <button onClick={saveTs} disabled={tsSaving} style={{ ...B2("var(--app-accent)"), opacity: tsSaving ? 0.7 : 1 }}>{tsSaving ? "Savingâ€¦" : tsModal === "add" ? "Save Project →" : "Next →"}</button>
+          <button onClick={saveTs} disabled={tsSaving} style={{ ...B2("var(--app-accent)"), opacity: tsSaving ? 0.7 : 1 }}>{tsSaving ? "Savingâ€¦" : tsModal === "add" ? "Save Project " : "Next "}</button>
 
         </div>
 
@@ -4853,7 +4853,7 @@ function InterviewPage({ companyId, companyName }) {
 
     if (id) axios.patch(`${API_URL}/api/interviews/${id}/status`, { status: finalVal }).catch(() => { });
 
-    showToast(`✓ Status → "${finalVal}"`);
+    showToast(`Yes Status  "${finalVal}"`);
 
     if (viewModal && (viewModal._id || viewModal.id) === id) setViewModal(updated[idx]);
 
@@ -4889,7 +4889,7 @@ function InterviewPage({ companyId, companyName }) {
 
       }
 
-      showToast("✓ Link copied!");
+      showToast("Yes Link copied!");
 
     } catch (err) {
 
@@ -4935,13 +4935,13 @@ function InterviewPage({ companyId, companyName }) {
 
       <div style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.25)" }}>
 
-        <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🔗</div>
+        <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}></div>
 
         <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Candidate Application Link</div><div style={{ fontSize: 12, color: "#ffffff", fontFamily: "monospace", wordBreak: "break-all" }}>{appLink}</div></div>
 
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
 
-          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "✓ Copied!" : "ðŸ“‹ Copy Link"}</button>
+          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "Copied!" : "ðŸ“‹ Copy Link"}</button>
 
           <button onClick={() => window.open(appLink, "_blank")} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 9, padding: "9px 16px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>View Preview Form</button>
 
@@ -4951,7 +4951,7 @@ function InterviewPage({ companyId, companyName }) {
 
       <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
 
-        {[{ t: "Total", v: counts.total, i: "ðŸŽ¯", c: "var(--app-accent)" }, { t: "Pending", v: counts.pending, i: "â³", c: "#F59E0B" }, { t: "Hired", v: counts.hired, i: "✓", c: "#22C55E" }, { t: "Rejected", v: counts.rejected, i: "âŒ", c: "#EF4444" }].map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${c},${c}88)` }} /><div style={{ width: 36, height: 36, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 26, fontWeight: 800, color: c }}>{v}</div></div>))}
+        {[{ t: "Total", v: counts.total, i: "ðŸŽ¯", c: "var(--app-accent)" }, { t: "Pending", v: counts.pending, i: "â³", c: "#F59E0B" }, { t: "Hired", v: counts.hired, i: "Yes", c: "#22C55E" }, { t: "Rejected", v: counts.rejected, i: "âŒ", c: "#EF4444" }].map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${c},${c}88)` }} /><div style={{ width: 36, height: 36, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 26, fontWeight: 800, color: c }}>{v}</div></div>))}
 
       </div>
 
@@ -4961,9 +4961,9 @@ function InterviewPage({ companyId, companyName }) {
 
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
 
-          <div style={{ position: "relative", flex: 1, minWidth: 200 }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>🔍</span><input placeholder="Search name, role, email, mobile..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", color: "var(--app-sidebar)", boxSizing: "border-box" }} /></div>
+          <div style={{ position: "relative", flex: 1, minWidth: 200 }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>Search</span><input placeholder="Search name, role, email, mobile..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", color: "var(--app-sidebar)", boxSizing: "border-box" }} /></div>
 
-          {["all", "pending", "hired", "rejected"].map(f => (<button key={f} onClick={() => setFilter(f)} style={{ padding: "7px 14px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-border)", background: filter === f ? `${f === "all" ? "var(--app-accent)" : sC(f)}15` : "#fff", color: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-muted)", transition: "all 0.15s" }}>{f === "all" ? "ðŸŽ¯ All" : f === "pending" ? "â³ Pending" : f === "hired" ? "✓ Hired" : "âŒ Rejected"}</button>))}
+          {["all", "pending", "hired", "rejected"].map(f => (<button key={f} onClick={() => setFilter(f)} style={{ padding: "7px 14px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-border)", background: filter === f ? `${f === "all" ? "var(--app-accent)" : sC(f)}15` : "#fff", color: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-muted)", transition: "all 0.15s" }}>{f === "all" ? "ðŸŽ¯ All" : f === "pending" ? "â³ Pending" : f === "hired" ? "Yes Hired" : "âŒ Rejected"}</button>))}
 
         </div>
 
@@ -4999,7 +4999,7 @@ function InterviewPage({ companyId, companyName }) {
 
                       <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-muted)", fontFamily: "monospace", whiteSpace: "nowrap" }}>{fmt(c.date || c.createdAt)}</td>
 
-                      <td style={{ padding: "12px 12px" }}><select value={status} onChange={e => updateStatus(idx, e.target.value)} style={{ background: status === "hired" ? "rgba(34,197,94,0.1)" : status === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(245,158,11,0.1)", border: `1.5px solid ${sC(status)}44`, borderRadius: 8, padding: "5px 10px", color: sC(status), fontSize: 12, fontWeight: 700, cursor: "pointer", outline: "none", fontFamily: "inherit" }}><option value="pending">â³ Pending</option><option value="hired">✓ Hired</option><option value="rejected">âŒ Rejected</option></select></td>
+                      <td style={{ padding: "12px 12px" }}><select value={status} onChange={e => updateStatus(idx, e.target.value)} style={{ background: status === "hired" ? "rgba(34,197,94,0.1)" : status === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(245,158,11,0.1)", border: `1.5px solid ${sC(status)}44`, borderRadius: 8, padding: "5px 10px", color: sC(status), fontSize: 12, fontWeight: 700, cursor: "pointer", outline: "none", fontFamily: "inherit" }}><option value="pending">â³ Pending</option><option value="hired">Yes Hired</option><option value="rejected">âŒ Rejected</option></select></td>
 
                       <td style={{ padding: "12px 12px" }}>{finalResumeUrl ? <button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap" }}>ðŸ“„</button> : <span style={{ fontSize: 11, color: "#ddd" }}>—</span>}</td>
 
@@ -5033,7 +5033,7 @@ function InterviewPage({ companyId, companyName }) {
 
               <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "var(--app-sidebar)" }}>ðŸ‘¤ Candidate Profile</h2>
 
-              <button onClick={() => setViewModal(null)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "var(--app-muted)", padding: "4px 8px" }}>✕</button>
+              <button onClick={() => setViewModal(null)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "var(--app-muted)", padding: "4px 8px" }}>Close</button>
 
             </div>
 
@@ -5057,7 +5057,7 @@ function InterviewPage({ companyId, companyName }) {
 
                 <span style={{ background: `${sC(viewModal.status || "Pending")}18`, color: sC(viewModal.status || "Pending"), border: `1px solid ${sC(viewModal.status || "Pending")}33`, padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
 
-                  {viewModal.status?.toLowerCase() === "hired" ? "✓ Hired" : viewModal.status?.toLowerCase() === "rejected" ? "âŒ Rejected" : "â³ Pending"}
+                  {viewModal.status?.toLowerCase() === "hired" ? "Yes Hired" : viewModal.status?.toLowerCase() === "rejected" ? "âŒ Rejected" : "â³ Pending"}
 
                 </span>
 
@@ -5101,7 +5101,7 @@ function InterviewPage({ companyId, companyName }) {
 
                       <a href={viewModal._resolvedResumeUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--app-accent)", color: "#fff", padding: "8px 16px", borderRadius: 8, textDecoration: "none", fontSize: 13, fontWeight: 600, fontFamily: "inherit" }}>
 
-                        🔗 Open in New Tab
+                         Open in New Tab
 
                       </a>
 
@@ -5229,7 +5229,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
         <div style={{ background: "linear-gradient(135deg,var(--app-muted),var(--app-accent),var(--app-accent))", padding: "28px 28px 22px", textAlign: "center", flexShrink: 0, position: "relative" }}>
 
-          <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.2)", border: "none", width: 30, height: 30, borderRadius: 8, color: "#fff", fontSize: 16, cursor: "pointer" }}>✕</button>
+          <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.2)", border: "none", width: 30, height: 30, borderRadius: 8, color: "#fff", fontSize: 16, cursor: "pointer" }}>Close</button>
 
           <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 8, margin: "0 auto 12px", position: "relative", width: "fit-content" }}>
 
@@ -5663,7 +5663,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
 
           <span className="logo-badge" style={{ position: "absolute", bottom: 2, right: 10, width: 20, height: 20, borderRadius: "50%", background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#fff", cursor: "pointer", border: "2px solid #fff", boxShadow: "0 2px 5px rgba(0,0,0,0.2)" }} onClick={onLogoUploadClick}>+</span>
 
-          <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--text3)", cursor: "pointer", marginLeft: "auto", fontSize: 16 }} className="sidebar-close">✕</button>
+          <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--text3)", cursor: "pointer", marginLeft: "auto", fontSize: 16 }} className="sidebar-close">Close</button>
 
         </div>
 
@@ -5679,7 +5679,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
 
             <div className="profile-name">{user?.name || "Admin"}</div>
 
-            <div className="profile-logout" onClick={onLogout}>Logout →</div>
+            <div className="profile-logout" onClick={onLogout}>Logout </div>
 
           </div>
 
@@ -5823,7 +5823,7 @@ const DEFAULT_PLANS = [
 
   {
 
-    title: "Professional", price: 2999, icon: "🚀", type: "pro",
+    title: "Professional", price: 2999, icon: "Launch", type: "pro",
 
     features: ["Unlimited Projects", "Unlimited Invoices", "Multiple business manage", "Managers: 3", "Clients: 10", "Employees: 50", "Priority Support"]
 
@@ -5973,7 +5973,7 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
 
 
 
-                <div style={{ width: 48, height: 48, borderRadius: 14, background: `${THEME.accent}10`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, marginBottom: 20 }}>{p.icon || "🚀"}</div>
+                <div style={{ width: 48, height: 48, borderRadius: 14, background: `${THEME.accent}10`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, marginBottom: 20 }}>{p.icon || "Launch"}</div>
 
 
 
@@ -6179,7 +6179,7 @@ function VendorsPage({ vendors, setVendors }) {
 
       setEditVendor(null);
 
-      showToast("✓ Vendor updated!");
+      showToast("Yes Vendor updated!");
 
     } catch (err) {
 
@@ -6365,7 +6365,7 @@ function VendorsPage({ vendors, setVendors }) {
 
             <button onClick={() => setEditVendor(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
 
-            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Savingâ€¦" : "Save Changes →"}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Savingâ€¦" : "Save Changes "}</button>
 
           </div>
 
@@ -8268,7 +8268,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       setModal(null);
 
-      toast.success("✓ Project created successfully!");
+      toast.success("Yes Project created successfully!");
 
     } catch (err) {
 
@@ -8502,7 +8502,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       setModal(null);
 
-      toast.success("✓ Package added!");
+      toast.success("Yes Package added!");
 
     } catch (err) {
 
@@ -8574,7 +8574,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       setModal(null);
 
-      toast.success("✓ Vendor Added Successfully!");
+      toast.success("Yes Vendor Added Successfully!");
 
     } catch (err) {
 
@@ -9392,7 +9392,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   }}>
 
-                    <div style={{ fontSize: 24 }}>⚠️</div>
+                    <div style={{ fontSize: 24 }}>Warning</div>
 
                     <div style={{ flex: 1 }}>
 
@@ -9768,7 +9768,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   <div onClick={() => setActive("clients")} style={{ fontSize: 13, fontWeight: 700, color: "#0097A7", cursor: "pointer" }}>
 
-                                    View All →
+                                    View All 
 
                                   </div>
 
@@ -10018,7 +10018,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   <div onClick={() => setActive("projects")} style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
 
-                                    View All →
+                                    View All 
 
                                   </div>
 
@@ -10114,7 +10114,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   <div style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
 
-                                    HR Panel →
+                                    HR Panel 
 
                                   </div>
 
@@ -10236,7 +10236,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   <div onClick={() => setActive("tasks")} style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
 
-                                    All Tasks →
+                                    All Tasks 
 
                                   </div>
 
@@ -11325,7 +11325,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 >
 
-                  ✕
+                  Close
 
                 </button>
 
@@ -11369,7 +11369,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {limitModal && <LimitReachedModal type={limitModal.type} limit={limitModal.limit} onClose={() => setLimitModal(null)} onUpgrade={() => { setLimitModal(null); setForceUpgradeTab(true); setActive("mysubscriptions"); }} />}
 
-            {modal === "client" && <Mdl title={clientSuccessData ? "✓ Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); }} maxWidth={clientSuccessData ? 460 : 780}>
+            {modal === "client" && <Mdl title={clientSuccessData ? "Yes Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); }} maxWidth={clientSuccessData ? 460 : 780}>
 
               {clientSuccessData ? (
 
@@ -11759,7 +11759,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>🔍’ Portal Access</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Search’ Portal Access</div>
 
                     <div style={{ position: 'relative', marginBottom: 4 }}>
 
@@ -11773,7 +11773,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     </div>
 
-                    {ncError.password && <div style={{ fontSize: 11, color: '#EF4444', marginTop: 4 }}>⚠️ {ncError.password}</div>}
+                    {ncError.password && <div style={{ fontSize: 11, color: '#EF4444', marginTop: 4 }}>Warning {ncError.password}</div>}
 
                   </div>
 
@@ -11871,7 +11871,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 </div>
 
-                {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {neError.password}</div>}
+                {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.password}</div>}
 
               </div>
 
@@ -11961,7 +11961,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   />
 
-                  {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {npError.client}</div>}
+                  {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {npError.client}</div>}
 
                 </div>
 
@@ -12247,7 +12247,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 </div>
 
-                {nmError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {nmError.password}</div>}
+                {nmError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {nmError.password}</div>}
 
               </div>
 
@@ -12255,7 +12255,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
 
-                <button onClick={addManager} disabled={mgrSaveLoading} style={{ ...B("var(--app-accent)"), opacity: mgrSaveLoading ? 0.7 : 1 }}>{mgrSaveLoading ? "Saving..." : "Save Manager →"}</button>
+                <button onClick={addManager} disabled={mgrSaveLoading} style={{ ...B("var(--app-accent)"), opacity: mgrSaveLoading ? 0.7 : 1 }}>{mgrSaveLoading ? "Saving..." : "Save Manager "}</button>
 
               </div>
 
@@ -12301,7 +12301,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 </div>
 
-                {nsError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {nsError.password}</div>}
+                {nsError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {nsError.password}</div>}
 
               </div>
 
@@ -12309,7 +12309,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
 
-                <button onClick={addSubadmin} disabled={subSaveLoading} style={{ ...B("var(--app-accent)"), opacity: subSaveLoading ? 0.7 : 1 }}>{subSaveLoading ? "Saving..." : "Save Subadmin →"}</button>
+                <button onClick={addSubadmin} disabled={subSaveLoading} style={{ ...B("var(--app-accent)"), opacity: subSaveLoading ? 0.7 : 1 }}>{subSaveLoading ? "Saving..." : "Save Subadmin "}</button>
 
               </div>
 
@@ -12491,7 +12491,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
 
-                <button onClick={addPackage} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Creating..." : "Create Package →"}</button>
+                <button onClick={addPackage} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Creating..." : "Create Package "}</button>
 
               </div>
 
@@ -12523,7 +12523,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
 
-                <button onClick={addVendor} disabled={vendorSaveLoading} style={{ ...B("var(--app-accent)"), opacity: vendorSaveLoading ? 0.7 : 1 }}>{vendorSaveLoading ? "Saving..." : "Save Vendor →"}</button>
+                <button onClick={addVendor} disabled={vendorSaveLoading} style={{ ...B("var(--app-accent)"), opacity: vendorSaveLoading ? 0.7 : 1 }}>{vendorSaveLoading ? "Saving..." : "Save Vendor "}</button>
 
               </div>
 
@@ -12571,7 +12571,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <InfoRow icon="ðŸ‘¨â€ðŸ’¼" label="Manager" value={viewPackage.managerLimit || ""} />
 
-                  <InfoRow icon="👥" label="Clients (Company Name)" value={viewPackage.clientLimit || ""} />
+                  <InfoRow icon="Team" label="Clients (Company Name)" value={viewPackage.clientLimit || ""} />
 
                   <InfoRow icon="ðŸ‘¤" label="Employee" value={viewPackage.employeeLimit || ""} />
 
@@ -12779,7 +12779,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <button onClick={() => setEditPackage(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
 
-                  <button onClick={savePackageEdit} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Saving..." : "Save Changes →"}</button>
+                  <button onClick={savePackageEdit} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Saving..." : "Save Changes "}</button>
 
                 </div>
 
@@ -12807,7 +12807,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                       <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--app-muted)", fontSize: 13, fontWeight: 600 }}>
 
-                        <span>👥</span> {viewProject.client}
+                        <span>Team</span> {viewProject.client}
 
                       </div>
 

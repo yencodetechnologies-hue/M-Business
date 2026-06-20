@@ -162,7 +162,7 @@ export default function InvoiceViewer() {
   if (error) return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc", fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 24 }}>
       <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 48, marginBottom: 12 }}>⚠️</div>
+        <div style={{ fontSize: 48, marginBottom: 12 }}>Warning</div>
         <div style={{ fontSize: 16, fontWeight: 700, color: "#0f172a" }}>{error}</div>
       </div>
     </div>
@@ -253,19 +253,19 @@ export default function InvoiceViewer() {
       <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
         <button className="action-btn" onClick={() => window.print()}
           style={{ padding: "10px 22px", background: currentT.logoColor || currentT.primaryColor, border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>
-          🖨️ Print / Save PDF
+          Print / Save PDF
         </button>
         {inv.upiId && balanceDue > 0 && (
           <button className="action-btn" onClick={() => {
             const upiLink = `upi://pay?pa=${inv.upiId}&pn=${encodeURIComponent(inv.companyName)}&am=${balanceDue.toFixed(2)}&cu=INR&tn=${encodeURIComponent("Invoice " + inv.invoiceNo)}`;
             window.location.href = upiLink;
           }} style={{ padding: "10px 22px", background: "linear-gradient(135deg,#065f46,#059669)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>
-            💳 Pay via UPI
+             Pay via UPI
           </button>
         )}
         <button className="action-btn" onClick={handleShare}
           style={{ padding: "10px 22px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>
-          🔗 Share Link
+           Share Link
         </button>
       </div>
 
@@ -412,25 +412,25 @@ export default function InvoiceViewer() {
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {inv.notes && (
                     <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
-                      <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>📝 NOTES</div>
+                      <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>Edit NOTES</div>
                       <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{inv.notes}</div>
                     </div>
                   )}
                   {inv.terms && (
                     <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
-                      <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>📜 TERMS</div>
+                      <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>Scroll TERMS</div>
                       <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{inv.terms}</div>
                     </div>
                   )}
                   {inv.upiId && (
                     <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
-                      <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>💳 UPI PAYMENT</div>
+                      <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}> UPI PAYMENT</div>
                       <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{inv.upiId}</div>
                     </div>
                   )}
                   {inv.paymentHistory?.length > 0 && (
                     <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
-                      <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 8 }}>💳 PAYMENT HISTORY</div>
+                      <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 8 }}> PAYMENT HISTORY</div>
                       {inv.paymentHistory.map((p, i) => (
                         <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 11, padding: "4px 0", borderBottom: i < inv.paymentHistory.length - 1 ? "1px solid #f1f5f9" : "none" }}>
                           <span style={{ color: "#64748b" }}>{formatDate(p.date)}{p.category === "Advance" ? " (Advance)" : ""}</span>

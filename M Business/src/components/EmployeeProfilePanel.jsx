@@ -1,6 +1,6 @@
-// ═══════════════════════════════════════════════════════════════════════════════
+// -------------------------------------------------------------------------------
 // EmployeeProfilePanel.jsx  (updated — exposes doc status to parent)
-// ═══════════════════════════════════════════════════════════════════════════════
+// -------------------------------------------------------------------------------
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
@@ -10,10 +10,10 @@ import { BASE_URL } from "../config";
 const BASE = `${BASE_URL}/api/employee-dashboard`;
 
 export const DOC_TYPES = [
-  { key: "aadhaar", label: "Aadhaar Card", icon: "🪪", desc: "Government issued identity card", color: "#f97316", accept: "image/*,application/pdf", maxMB: 5 },
-  { key: "pan", label: "PAN Card", icon: "💳", desc: "Permanent Account Number card", color: "var(--app-accent)", accept: "image/*,application/pdf", maxMB: 5 },
-  { key: "passbook", label: "Bank Passbook", icon: "🏦", desc: "First page of bank passbook", color: "#10b981", accept: "image/*,application/pdf", maxMB: 10 },
-  { key: "itr", label: "ITR", icon: "📄", desc: "Income Tax Return document", color: "var(--app-muted)", accept: "image/*,application/pdf", maxMB: 10 },
+  { key: "aadhaar", label: "Aadhaar Card", icon: "ID Card", desc: "Government issued identity card", color: "#f97316", accept: "image/*,application/pdf", maxMB: 5 },
+  { key: "pan", label: "PAN Card", icon: "", desc: "Permanent Account Number card", color: "var(--app-accent)", accept: "image/*,application/pdf", maxMB: 5 },
+  { key: "passbook", label: "Bank Passbook", icon: "Bank", desc: "First page of bank passbook", color: "#10b981", accept: "image/*,application/pdf", maxMB: 10 },
+  { key: "itr", label: "ITR", icon: "Document", desc: "Income Tax Return document", color: "var(--app-muted)", accept: "image/*,application/pdf", maxMB: 10 },
 ];
 
 const fmtSize = (bytes) => {
@@ -69,12 +69,12 @@ const [progress, setProgress] = useState(0);
       });
       const saved = res.data.document || { url: preview, docType: doc.key };
       setExisting(saved);
-      notify(`${doc.label} uploaded ✓`);
+      notify(`${doc.label} uploaded Yes`);
       if (onUploaded) onUploaded(doc.key, saved);
     } catch {
       const fallback = { url: preview, docType: doc.key, fileName: file.name, fileSize: file.size, uploadedAt: new Date().toISOString() };
       setExisting(fallback);
-      notify(`${doc.label} saved locally ✓`);
+      notify(`${doc.label} saved locally Yes`);
       if (onUploaded) onUploaded(doc.key, fallback);
     } finally { setUploading(false); }
   };
@@ -104,7 +104,7 @@ const [progress, setProgress] = useState(0);
         {loading
           ? <div style={{ width: 20, height: 20, borderRadius: "50%", border: "2px solid #e2e8f0", borderTopColor: doc.color, animation: "spin 0.8s linear infinite" }} />
           : hasDoc
-            ? <div style={{ display: "flex", alignItems: "center", gap: 4, background: `${doc.color}15`, border: `1px solid ${doc.color}30`, borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 700, color: doc.color }}>✓ Uploaded</div>
+            ? <div style={{ display: "flex", alignItems: "center", gap: 4, background: `${doc.color}15`, border: `1px solid ${doc.color}30`, borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 700, color: doc.color }}>Yes Uploaded</div>
             : <div style={{ fontSize: 11, color: "#cbd5e1", fontWeight: 600 }}>Not uploaded</div>}
       </div>
       {/* Body */}
@@ -121,7 +121,7 @@ const [progress, setProgress] = useState(0);
                 <img src={viewUrl} alt={doc.label} style={{ maxWidth: "100%", maxHeight: 120, objectFit: "contain" }} />
               </div>
               : <div style={{ borderRadius: 10, border: "1px solid #f1f5f9", padding: "14px", background: "#f8fafc", display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ fontSize: 28 }}>📄</div>
+                <div style={{ fontSize: 28 }}>Document</div>
                 <div>
                   <div style={{ fontSize: 12, fontWeight: 700, color: "#0f172a" }}>{existing?.fileName || `${doc.label}.pdf`}</div>
                   {existing?.fileSize && <div style={{ fontSize: 11, color: "#94a3b8" }}>{fmtSize(existing.fileSize)}</div>}
@@ -130,8 +130,8 @@ const [progress, setProgress] = useState(0);
             {existing?.uploadedAt && <div style={{ fontSize: 10, color: "#94a3b8" }}>Uploaded: {new Date(existing.uploadedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</div>}
             <div style={{ display: "flex", gap: 6 }}>
               <button onClick={() => window.open(viewUrl, "_blank")} style={{ flex: 1, padding: "7px 10px", background: `${doc.color}10`, border: `1px solid ${doc.color}30`, borderRadius: 8, fontSize: 11, fontWeight: 700, color: doc.color, cursor: "pointer", fontFamily: "inherit" }}>View</button>
-              <button onClick={() => inputRef.current?.click()} style={{ flex: 1, padding: "7px 10px", background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#475569", cursor: "pointer", fontFamily: "inherit" }}>🔄 Replace</button>
-              <button onClick={handleDelete} style={{ padding: "7px 10px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#ef4444", cursor: "pointer", fontFamily: "inherit" }}>   Delete️️️️️</button>
+              <button onClick={() => inputRef.current?.click()} style={{ flex: 1, padding: "7px 10px", background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#475569", cursor: "pointer", fontFamily: "inherit" }}>Sync Replace</button>
+              <button onClick={handleDelete} style={{ padding: "7px 10px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#ef4444", cursor: "pointer", fontFamily: "inherit" }}>Delete</button>
             </div>
           </div>
         ) : (
@@ -139,7 +139,7 @@ const [progress, setProgress] = useState(0);
             style={{ border: `2px dashed ${doc.color}40`, borderRadius: 10, padding: "18px 12px", textAlign: "center", cursor: "pointer", background: `${doc.color}05`, transition: "all 0.15s" }}
             onMouseEnter={e => { e.currentTarget.style.background = `${doc.color}10`; e.currentTarget.style.borderColor = `${doc.color}80`; }}
             onMouseLeave={e => { e.currentTarget.style.background = `${doc.color}05`; e.currentTarget.style.borderColor = `${doc.color}40`; }}>
-            <div style={{ fontSize: 24, marginBottom: 6 }}>☁️</div>
+            <div style={{ fontSize: 24, marginBottom: 6 }}>Cloud</div>
             <div style={{ fontSize: 12, fontWeight: 700, color: doc.color, marginBottom: 3 }}>Click or drag to upload</div>
             <div style={{ fontSize: 10, color: "#94a3b8" }}>JPG, PNG or PDF · Max {doc.maxMB}MB</div>
           </div>
@@ -151,10 +151,10 @@ const [progress, setProgress] = useState(0);
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// -------------------------------------------------------------------------------
 // EMPLOYEE PROFILE PANEL
 // NEW PROP: onDocStatusChange(statusMap) — called whenever any doc is uploaded/deleted
-// ═══════════════════════════════════════════════════════════════════════════════
+// -------------------------------------------------------------------------------
 export function EmployeeProfilePanel({ empName, user, notify, onDocStatusChange, forceOpen, onClose: onCloseExternal, THEME }) {
   const [open, setOpen] = useState(!!forceOpen);
 
@@ -204,7 +204,7 @@ export function EmployeeProfilePanel({ empName, user, notify, onDocStatusChange,
         <div style={{ background: THEME?.sidebar || "linear-gradient(135deg,#0f172a,#1e1b4b)", padding: "20px 18px 16px", flexShrink: 0 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase" }}>My Profile</div>
-            <button onClick={handleClose} style={{ background: "rgba(255,255,255,0.1)", border: "none", borderRadius: 8, width: 28, height: 28, cursor: "pointer", color: "rgba(255,255,255,0.6)", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+            <button onClick={handleClose} style={{ background: "rgba(255,255,255,0.1)", border: "none", borderRadius: 8, width: 28, height: 28, cursor: "pointer", color: "rgba(255,255,255,0.6)", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>Close</button>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 52, height: 52, borderRadius: 14, background: THEME?.accent ? `linear-gradient(135deg,${THEME.accent},var(--app-muted))` : "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 800, color: "#fff", flexShrink: 0, border: "2px solid rgba(255,255,255,0.2)" }}>{initials}</div>
@@ -228,7 +228,7 @@ export function EmployeeProfilePanel({ empName, user, notify, onDocStatusChange,
         {user && (
           <div style={{ padding: "14px 16px", borderBottom: "1px solid #f1f5f9", background: "#f8fafc" }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-              {[["📧", "Email", user.email], ["📱", "Phone", user.phone], ["🏢", "Dept", user.department], ["💰", "Salary", user.salary]]
+              {[["", "Email", user.email], ["", "Phone", user.phone], ["Company", "Dept", user.department], ["Cost", "Salary", user.salary]]
                 .filter(([, , v]) => v)
                 .map(([icon, label, value]) => (
                   <div key={label} style={{ background: "#fff", borderRadius: 8, padding: "8px 10px", border: "1px solid #f1f5f9" }}>
@@ -243,7 +243,7 @@ export function EmployeeProfilePanel({ empName, user, notify, onDocStatusChange,
         {/* Documents section */}
         <div style={{ padding: "14px 16px", flex: 1 }}>
           <div style={{ fontSize: 12, fontWeight: 800, color: "#0f172a", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
-            📂 My Documents
+            Folder My Documents
             {uploadedCount < DOC_TYPES.length && (
               <span style={{ background: "#fef3c7", border: "1px solid #fde68a", borderRadius: 20, padding: "2px 8px", fontSize: 10, fontWeight: 700, color: "#d97706" }}>{DOC_TYPES.length - uploadedCount} pending</span>
             )}
@@ -255,7 +255,7 @@ export function EmployeeProfilePanel({ empName, user, notify, onDocStatusChange,
           </div>
           {uploadedCount === DOC_TYPES.length && (
             <div style={{ marginTop: 14, background: "linear-gradient(135deg,#f0fdf4,#dcfce7)", border: "1px solid #bbf7d0", borderRadius: 12, padding: "12px 14px", display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ fontSize: 22 }}>🎉</div>
+              <div style={{ fontSize: 22 }}>Celebration</div>
               <div>
                 <div style={{ fontSize: 12, fontWeight: 800, color: "#166534" }}>All documents uploaded!</div>
                 <div style={{ fontSize: 11, color: "#15803d", marginTop: 2 }}>Your profile is complete.</div>
@@ -313,9 +313,9 @@ export function SubAdminDocumentsPage({ employees = [] }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <div style={{ background: "#fff", borderRadius: 16, border: "1px solid var(--app-border)", padding: "16px 18px" }}>
-        <div style={{ fontSize: 14, fontWeight: 800, color: "var(--app-text)", marginBottom: 14 }}>📂 Employee Documents</div>
+        <div style={{ fontSize: 14, fontWeight: 800, color: "var(--app-text)", marginBottom: 14 }}>Folder Employee Documents</div>
         <div style={{ position: "relative", marginBottom: 14 }}>
-          <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}>🔍</span>
+          <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}>Search</span>
           <input placeholder="Search employee..." value={search} onChange={e => setSearch(e.target.value)}
             style={{ width: "100%", padding: "9px 12px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, outline: "none", fontFamily: "inherit", background: "var(--app-bg)", boxSizing: "border-box" }} />
         </div>
@@ -352,7 +352,7 @@ export function SubAdminDocumentsPage({ employees = [] }) {
                         return (
                           <td key={dt.key} style={{ padding: "11px 12px" }}>
                             <span style={{ background: has ? `${dt.color}15` : "#f1f5f9", border: `1px solid ${has ? dt.color + "30" : "#e2e8f0"}`, borderRadius: 20, padding: "3px 10px", fontSize: 10, fontWeight: 700, color: has ? dt.color : "#94a3b8" }}>
-                              {has ? "✓ Done" : "✗ Missing"}
+                              {has ? "Yes Done" : "Cancel Missing"}
                             </span>
                           </td>
                         );
@@ -374,8 +374,8 @@ export function SubAdminDocumentsPage({ employees = [] }) {
       {selected && (
         <div style={{ background: "#fff", borderRadius: 16, border: "1px solid var(--app-border)", padding: "16px 18px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--app-text)" }}>📄 {selected.name} — Documents</div>
-            <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", fontSize: 16, cursor: "pointer", color: "var(--app-muted)" }}>✕</button>
+            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--app-text)" }}>Document {selected.name} — Documents</div>
+            <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", fontSize: 16, cursor: "pointer", color: "var(--app-muted)" }}>Close</button>
           </div>
           {loadingDocs ? (
             <div style={{ textAlign: "center", padding: "2rem", color: "var(--app-muted)" }}>Loading...</div>
@@ -390,15 +390,15 @@ export function SubAdminDocumentsPage({ employees = [] }) {
                       <span style={{ fontSize: 18 }}>{dt.icon}</span>
                       <div style={{ flex: 1, fontWeight: 700, fontSize: 13, color: "var(--app-text)" }}>{dt.label}</div>
                       {hasDoc
-                        ? <span style={{ background: `${dt.color}15`, border: `1px solid ${dt.color}30`, borderRadius: 20, padding: "3px 10px", fontSize: 10, fontWeight: 700, color: dt.color }}>✓ Uploaded</span>
-                        : <span style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 20, padding: "3px 10px", fontSize: 10, fontWeight: 700, color: "#ef4444" }}>✗ Missing</span>}
+                        ? <span style={{ background: `${dt.color}15`, border: `1px solid ${dt.color}30`, borderRadius: 20, padding: "3px 10px", fontSize: 10, fontWeight: 700, color: dt.color }}>Yes Uploaded</span>
+                        : <span style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 20, padding: "3px 10px", fontSize: 10, fontWeight: 700, color: "#ef4444" }}>Cancel Missing</span>}
                     </div>
                     {hasDoc && (
                       <div>
                         {isImage(doc.url)
                           ? <img src={doc.url} alt={dt.label} style={{ width: "100%", maxHeight: 140, objectFit: "contain", borderRadius: 8, border: "1px solid #f1f5f9" }} />
                           : <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "#fff", borderRadius: 8, border: "1px solid #f1f5f9" }}>
-                            <span style={{ fontSize: 22 }}>📄</span>
+                            <span style={{ fontSize: 22 }}>Document</span>
                             <div style={{ flex: 1 }}>
                               <div style={{ fontSize: 11, fontWeight: 700, color: "var(--app-text)" }}>{doc.fileName || `${dt.label}.pdf`}</div>
                               {doc.fileSize && <div style={{ fontSize: 10, color: "#94a3b8" }}>{fmtSize(doc.fileSize)}</div>}
@@ -406,7 +406,7 @@ export function SubAdminDocumentsPage({ employees = [] }) {
                           </div>}
                         <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
                           <button onClick={() => window.open(doc.url, "_blank")} style={{ flex: 1, padding: "6px 10px", background: `${dt.color}10`, border: `1px solid ${dt.color}30`, borderRadius: 7, fontSize: 11, fontWeight: 700, color: dt.color, cursor: "pointer", fontFamily: "inherit" }}>View</button>
-                          <a href={doc.url} download style={{ flex: 1, padding: "6px 10px", background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 7, fontSize: 11, fontWeight: 700, color: "#475569", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center" }}>⬇ Download</a>
+                          <a href={doc.url} download style={{ flex: 1, padding: "6px 10px", background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 7, fontSize: 11, fontWeight: 700, color: "#475569", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center" }}> Download</a>
                         </div>
                       </div>
                     )}

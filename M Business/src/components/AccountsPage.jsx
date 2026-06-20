@@ -1,10 +1,10 @@
-// ════════════════════════════════════════════════════════════
+// ------------------------------------------------------------
 //  AccountsPage.jsx  — exports BOTH AccountsPage & ExpensesPage
 //  Dashboard.jsx usage:
 //    import AccountsPage, { ExpensesPage } from "./AccountsPage";
 //    {validActive === "accounts" && <AccountsPage THEME={THEME} />}
 //    {validActive === "expenses" && <ExpensesPage THEME={THEME} />}
-// ════════════════════════════════════════════════════════════
+// ------------------------------------------------------------
 
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -20,7 +20,7 @@ import FinReports from "./FinReports";
 import AuditorLogin from "./AuditorLogin";
 import AuditorPortal from "./AuditorPortal";
 
-// ── Constants ─────────────────────────────────────────────
+// ── Constants ---------------------------------------------
 const ACCOUNTS_API = `${BASE_URL}/api/accounts`;
 const EXPENSES_API = `${BASE_URL}/api/expenses`;
 const INCOME_API = `${BASE_URL}/api/income`;
@@ -47,7 +47,7 @@ const formatCurrency = (amount, symbol = "INR", compact = false, disableCompact 
   return `${symbol}${num.toLocaleString(isINR ? "en-IN" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
-// ── Shared UI components ──────────────────────────────────────
+// ── Shared UI components --------------------------------------
 function Modal({ title, onClose, children, THEME }) {
   const isExpense = title.toLowerCase().includes("expense");
   const isIncome = title.toLowerCase().includes("income");
@@ -69,7 +69,7 @@ function Modal({ title, onClose, children, THEME }) {
           display: "flex", justifyContent: "space-between", alignItems: "center",
           background: `linear-gradient(135deg, ${accent}, ${accent}dd)`, flexShrink: 0, position: "relative", overflow: "hidden"
         }}>
-          <div style={{ position: "absolute", right: -15, top: -15, fontSize: 70, opacity: 0.12, transform: "rotate(-15deg)", pointerEvents: "none" }}>{isIncome ? "💰" : isExpense ? "💸" : "📝"}</div>
+          <div style={{ position: "absolute", right: -15, top: -15, fontSize: 70, opacity: 0.12, transform: "rotate(-15deg)", pointerEvents: "none" }}>{isIncome ? "Cost" : isExpense ? "Payment" : "Edit"}</div>
           <div style={{ position: "relative", zIndex: 1 }}>
             <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.5px" }}>{title}</h2>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, marginTop: 4 }}>Financial Entry</div>
@@ -77,7 +77,7 @@ function Modal({ title, onClose, children, THEME }) {
           <button onClick={onClose} style={{
             background: "rgba(255,255,255,0.15)", border: "none",
             fontSize: 14, cursor: "pointer", color: "#fff", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, fontWeight: 900, transition: "0.2s"
-          }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.25)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.15)"}>✕</button>
+          }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.25)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.15)"}>Close</button>
         </div>
         <div style={{ overflowY: "auto", padding: "28px 32px", flex: 1, background: "var(--app-card)" }}>{children}</div>
       </div>
@@ -126,7 +126,7 @@ function Fld({ label, value, onChange, options, type = "text", error, placeholde
           </select>
           : <input type={type} value={value} onChange={e => onChange(e.target.value)} style={s} placeholder={placeholder || ""} />}
       </div>
-      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {error}</div>}
+      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {error}</div>}
     </div>
   );
 }
@@ -164,7 +164,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient, THEME })
         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: THEME.card, border: `1.5px solid ${THEME.border}`, borderRadius: 12, boxShadow: THEME.shadow, zIndex: 999, overflow: "hidden" }}>
           <div style={{ padding: "10px 10px 6px" }}>
             <div style={{ position: "relative" }}>
-              <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span>
+              <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>Search</span>
               <input autoFocus placeholder="Search company..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: `1.5px solid ${THEME.border}`, borderRadius: 8, fontSize: 12, background: THEME.surface, color: THEME.text, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
             </div>
           </div>
@@ -190,16 +190,16 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient, THEME })
   );
 }
 
-// ── Financial Overview ──────────────────────────────────────────
+// ── Financial Overview ------------------------------------------
 function FinancialOverview({ THEME, income = [], expenses = [] }) {
   const totalIncome = income.reduce((s, i) => s + (Number(i.amount) || 0), 0);
   const totalExpenses = expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0);
   const netBalance = totalIncome - totalExpenses;
 
   const stats = [
-    { t: "Total Income", v: formatCurrency(totalIncome), f: formatCurrency(totalIncome, "₹", false, true), c: "#22c55e", i: "💰", desc: "Revenue generated" },
-    { t: "Total Expenses", v: formatCurrency(totalExpenses), f: formatCurrency(totalExpenses, "₹", false, true), c: "#ef4444", i: "💸", desc: "Operational costs" },
-    { t: "Net Balance", v: formatCurrency(netBalance), f: formatCurrency(netBalance, "₹", false, true), c: netBalance >= 0 ? THEME.accent : "#f43f5e", i: "🏦", desc: "Current liquidity" },
+    { t: "Total Income", v: formatCurrency(totalIncome), f: formatCurrency(totalIncome, "₹", false, true), c: "#22c55e", i: "Cost", desc: "Revenue generated" },
+    { t: "Total Expenses", v: formatCurrency(totalExpenses), f: formatCurrency(totalExpenses, "₹", false, true), c: "#ef4444", i: "Payment", desc: "Operational costs" },
+    { t: "Net Balance", v: formatCurrency(netBalance), f: formatCurrency(netBalance, "₹", false, true), c: netBalance >= 0 ? THEME.accent : "#f43f5e", i: "Bank", desc: "Current liquidity" },
   ];
 
   return (
@@ -275,7 +275,7 @@ function FinancialOverview({ THEME, income = [], expenses = [] }) {
               .map((item, idx) => (
                 <div key={idx} style={{ display: "flex", alignItems: "center", gap: 16, padding: "12px", borderRadius: 16, background: idx === 0 ? `${THEME.accent}08` : "transparent", transition: "background 0.2s" }}>
                   <div style={{ width: 44, height: 44, borderRadius: 14, background: item.type === "income" ? "#dcfce7" : "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: item.type === "income" ? "0 4px 12px #dcfce7" : "0 4px 12px #fee2e2" }}>
-                    {item.type === "income" ? "💰" : "💸"}
+                    {item.type === "income" ? "Cost" : "Payment"}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 14, fontWeight: 800, color: THEME.text }}>{item.title}</div>
@@ -294,7 +294,7 @@ function FinancialOverview({ THEME, income = [], expenses = [] }) {
   );
 }
 
-// ── Main Page Component ──────────────────────────────────────────
+// ── Main Page Component ------------------------------------------
 export default function AccountsPage({
   THEME: propTheme,
   initialTab = "overview",
@@ -363,7 +363,7 @@ export default function AccountsPage({
     boxShadow: on ? "0 4px 12px rgba(99,102,241,0.25)" : "none"
   });
 
-  if (loading) return <div style={{ textAlign: "center", padding: 100, color: THEME.muted, fontWeight: 800 }}>⚡ Generating Financial Dashboard...</div>;
+  if (loading) return <div style={{ textAlign: "center", padding: 100, color: THEME.muted, fontWeight: 800 }}>Action Generating Financial Dashboard...</div>;
 
   return (
     <div style={{ paddingBottom: 60 }}>
@@ -413,10 +413,10 @@ export default function AccountsPage({
   );
 }
 
-// ── Expenses Page Component ─────────────────────────────────────
+// ── Expenses Page Component -------------------------------------
 const CATEGORIES = ["Food", "Travel", "Office", "Utilities", "Marketing", "Salary", "Miscellaneous"];
 const CATEGORY_COLOR = { Food: "#f59e0b", Travel: "#3b82f6", Office: "#7c3aed", Utilities: "#06b6d4", Marketing: "#ec4899", Salary: "#22c55e", Miscellaneous: "#64748b" };
-const CATEGORY_ICON = { Food: "🍽️", Travel: "✈️", Office: "🏢", Utilities: "💡", Marketing: "📣", Salary: "💰", Miscellaneous: "📦" };
+const CATEGORY_ICON = { Food: "Food", Travel: "Travel", Office: "Company", Utilities: "Tip", Marketing: "Marketing", Salary: "Cost", Miscellaneous: "Package" };
 const STATUS_COLOR = { Pending: "#f59e0b", Approved: "#22c55e", Rejected: "#ef4444" };
 
 export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses }) {
@@ -431,7 +431,7 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
     try {
       const res = await axios.post(EXPENSES_API, { ...form, amount: Number(form.amount) });
       setExpenses(prev => [res.data, ...prev]);
-      setToast("✅ Expense Added!");
+      setToast("Success Expense Added!");
       setModal(null);
       setTimeout(() => setToast(""), 3000);
     } catch (e) {
@@ -586,7 +586,7 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
                       </td>
                       <td>
                         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                          <span style={{ fontSize: 16 }}>{CATEGORY_ICON[e.category] || "📦"}</span>
+                          <span style={{ fontSize: 16 }}>{CATEGORY_ICON[e.category] || "Package"}</span>
                           <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text)" }}>{e.category}</span>
                         </div>
                       </td>
@@ -683,7 +683,7 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
   );
 }
 
-// ── Income Page Component ──────────────────────────────────────
+// ── Income Page Component --------------------------------------
 export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({ title: "", client: "", amount: "", category: "Project Payment", status: "Received" });
@@ -699,7 +699,7 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
     try {
       const res = await axios.post(INCOME_API, { ...form, amount: Number(form.amount) });
       setIncome(prev => [res.data, ...prev]);
-      setToast("✅ Income Recorded!");
+      setToast("Success Income Recorded!");
       setModal(null);
       setTimeout(() => setToast(""), 3000);
     } catch (e) { alert("Failed to save"); }

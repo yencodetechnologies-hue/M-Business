@@ -86,7 +86,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
     ...filteredEvents.map(e => ({ ...e, _type: "event" })),
     ...projects.filter(p => p.deadline || p.end).map(p => ({
       _id: `proj-${p._id || p.id}`,
-      name: `🏁 Deadline: ${p.name}`,
+      name: `Finish Deadline: ${p.name}`,
       date: p.deadline || p.end,
       type: "Planning",
       project: p.name,
@@ -96,7 +96,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
     })),
     ...tasks.filter(t => t.date || t.dueDate).map(t => ({
       _id: `task-${t._id || t.id}`,
-      name: `📝 Task: ${t.title || t.name}`,
+      name: `Edit Task: ${t.title || t.name}`,
       date: t.date || t.dueDate,
       type: "Review",
       project: t.project,
@@ -146,25 +146,25 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
           const payload = { name: form.name, client: form.client, start: form.date, end: form.date, deadline: form.date, status: "Pending", budget: "0", currency: "INR" };
           const r = await axios.post(`${BASE_URL}/api/projects/add`, payload);
           if (onUpdateProject) onUpdateProject();
-          showToast("✅ Project added!");
+          showToast("Success Project added!");
           savedEvent = { ...r.data, _type: "project" };
         } else if (form.category === "Task") {
           const payload = { title: form.name, project: form.project, date: form.date, status: "Pending", priority: "Medium" };
           const r = await axios.post(`${BASE_URL}/api/tasks`, payload);
           if (onUpdateTask) onUpdateTask();
-          showToast("✅ Task added!");
+          showToast("Success Task added!");
           savedEvent = { ...r.data, _type: "task" };
         } else {
           const r = await axios.post(API, { ...form, companyId: companyId || "", createdBy: user?.name || user?.clientName || "", createdByRole: user?.role || user?.userRole || "" });
           savedEvent = r.data;
           setEvents(p => [savedEvent, ...p]);
-          showToast("✅ Event added!");
+          showToast("Success Event added!");
         }
       } else {
         const r = await axios.put(`${API}/${editId}`, form);
         savedEvent = r.data;
         setEvents(p => p.map(x => (x._id || x.id) === editId ? savedEvent : x));
-        showToast("✅ Event updated!");
+        showToast("Success Event updated!");
       }
 
       // Notification logic
@@ -179,7 +179,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
             axios.post(`${BASE_URL}/api/notifications`, {
               userId,
               type: 'event',
-              icon: '📅',
+              icon: 'Date',
               text: `New event scheduled: "${savedEvent.name || savedEvent.title || 'Meeting'}" on ${savedEvent.date}`,
               link: 'calendar'
             }).catch(() => {});
@@ -191,10 +191,10 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
     } catch {
       if (modal === "add") {
         setEvents(p => [{ ...form, _id: Date.now().toString(), createdBy: user?.name || user?.clientName || "", createdByRole: user?.role || user?.userRole || "" }, ...p]);
-        showToast("✅ Saved locally!");
+        showToast("Success Saved locally!");
       } else {
         setEvents(p => p.map(x => (x._id || x.id) === editId ? { ...x, ...form } : x));
-        showToast("✅ Updated locally!");
+        showToast("Success Updated locally!");
       }
       setModal(null);
     }
@@ -207,7 +207,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
       if (type === "project") {
         await axios.put(`${BASE_URL}/api/projects/${id}`, updates);
         if (onUpdateProject) onUpdateProject();
-        showToast("✅ Project updated!");
+        showToast("Success Project updated!");
       } else if (type === "task") {
         // Use PUT for full update if available, or stay with PATCH for status only
         if (updates.date || updates.dueDate) {
@@ -216,11 +216,11 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
           await axios.patch(`${BASE_URL}/api/tasks/${id}/status`, updates);
         }
         if (onUpdateTask) onUpdateTask();
-        showToast("✅ Task updated!");
+        showToast("Success Task updated!");
       }
       setModal(null);
     } catch (err) {
-      showToast("❌ Update failed!");
+      showToast("Error Update failed!");
     }
     setSaving(false);
   };
@@ -290,10 +290,10 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
   const shown = [...allDisplayEvents].filter(f).sort((a, b) => (a.date || "") < (b.date || "") ? -1 : 1);
 
   const stats = [
-    { t: "Total", v: allDisplayEvents.length, c: finalTheme.accent || "var(--app-accent)", i: "📅" },
-    { t: "Today", v: allDisplayEvents.filter(x => x.date === today).length, c: finalTheme.accent || "var(--app-accent)", i: "📌" },
-    { t: "Upcoming", v: allDisplayEvents.filter(x => x.date > today).length, c: "#10b981", i: "⏰" },
-    { t: "Past", v: allDisplayEvents.filter(x => x.date < today).length, c: "#ef4444", i: "✅" },
+    { t: "Total", v: allDisplayEvents.length, c: finalTheme.accent || "var(--app-accent)", i: "Date" },
+    { t: "Today", v: allDisplayEvents.filter(x => x.date === today).length, c: finalTheme.accent || "var(--app-accent)", i: "Pin" },
+    { t: "Upcoming", v: allDisplayEvents.filter(x => x.date > today).length, c: "#10b981", i: "Alarm" },
+    { t: "Past", v: allDisplayEvents.filter(x => x.date < today).length, c: "#ef4444", i: "Success" },
   ];
 
   const pNames = projects.map(p => p.name || "");
@@ -366,10 +366,10 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
         ))}
       </div>
 
-      {/* ── MAIN SPLIT LAYOUT ─────────────────────────────────────── */}
+      {/* ── MAIN SPLIT LAYOUT --------------------------------------- */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, alignItems: "start", maxWidth: 1200, margin: "0 auto", width: "100%" }}>
 
-        {/* ── LEFT: CALENDAR ──────────────────────────────────────── */}
+        {/* ── LEFT: CALENDAR ---------------------------------------- */}
         <div style={{
           background: finalTheme.card, borderRadius: 16, padding: 20,
           boxShadow: finalTheme.shadow || "var(--app-shadow)", border: `1px solid ${finalTheme.border}`,
@@ -398,7 +398,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                     style={{
                       marginLeft: 6, cursor: "pointer", color: finalTheme.accent,
                       textDecoration: "underline"
-                    }}>✕ Clear</span>
+                    }}>Close Clear</span>
                 </div>
               )}
             </div>
@@ -527,10 +527,10 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
           </div>
         </div>
 
-        {/* ── RIGHT: EVENT LIST ───────────────────────────────────── */}
+        {/* ── RIGHT: EVENT LIST ------------------------------------- */}
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
 
-          {/* ── EVENT LIST ───────────────────────────────────────── */}
+          {/* ── EVENT LIST ----------------------------------------- */}
           <div style={{
             background: finalTheme.card, borderRadius: 16, padding: 20,
             boxShadow: finalTheme.shadow || "var(--app-shadow)", border: `1px solid ${finalTheme.border}`
@@ -543,12 +543,12 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
             }}>
               <h3 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: finalTheme.text || "var(--app-text)" }}>
                 {selectedDate
-                  ? `📅 Events on ${selectedDate} (${shown.length})`
-                  : `📅 All Events (${shown.length})`}
+                  ? `Date Events on ${selectedDate} (${shown.length})`
+                  : `Date All Events (${shown.length})`}
               </h3>
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 <div style={{ position: "relative" }}>
-                  <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span>
+                  <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>Search</span>
                   <input placeholder="Search…" value={search}
                     onChange={e => { setSearch(e.target.value); setSelectedDate(null); }}
                     style={{ ...inp(false), paddingLeft: 30, width: 150, padding: "7px 10px 7px 30px" }} />
@@ -578,12 +578,12 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
 
             {loading ? (
               <div style={{ textAlign: "center", padding: 40, color: "var(--app-muted)" }}>
-                <div style={{ fontSize: 28, marginBottom: 8 }}>⏳</div>
+                <div style={{ fontSize: 28, marginBottom: 8 }}>Pending</div>
                 <div style={{ fontWeight: 600, fontSize: 13 }}>Loading events...</div>
               </div>
             ) : shown.length === 0 ? (
               <div style={{ textAlign: "center", padding: 40 }}>
-                <div style={{ fontSize: 40, marginBottom: 10 }}>📅</div>
+                <div style={{ fontSize: 40, marginBottom: 10 }}>Date</div>
                 <div style={{ fontSize: 14, fontWeight: 700, color: finalTheme.text || "var(--app-text)" }}>
                   {search || selectedDate ? "No events found" : "No events yet!"}
                 </div>
@@ -651,11 +651,11 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                           )}
                         </div>
                         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                          {ev.project && <span style={{ color: finalTheme.muted, fontSize: 11 }}>📁 {ev.project}</span>}
-                          {ev.client && <span style={{ color: finalTheme.muted, fontSize: 11 }}>👤 {ev.client}</span>}
+                          {ev.project && <span style={{ color: finalTheme.muted, fontSize: 11 }}>Folder {ev.project}</span>}
+                          {ev.client && <span style={{ color: finalTheme.muted, fontSize: 11 }}>Profile {ev.client}</span>}
                           {(ev.start || ev.end) && (
                             <span style={{ color: finalTheme.muted, fontSize: 11 }}>
-                              🕐 {ev.start || "--"} – {ev.end || "--"}
+                               {ev.start || "--"} – {ev.end || "--"}
                             </span>
                           )}
                         </div>
@@ -663,7 +663,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                           <div style={{
                             color: finalTheme.muted, fontSize: 10,
                             marginTop: 3, fontStyle: "italic"
-                          }}>📝 {ev.notes}</div>
+                          }}>Edit {ev.notes}</div>
                         )}
                       </div>
 
@@ -681,7 +681,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                                 borderRadius: 7, padding: "5px 12px", fontSize: 11,
                                 color: finalTheme.accent, cursor: "pointer", fontWeight: 700
                               }}>
-                                {ev._type ? "View️ View" : "Edit"}
+                                {ev._type ? "View" : "Edit"}
                               </button>
                               {!ev._type && (
                                 <button onClick={() => del(ev._id || ev.id)} style={{
@@ -689,7 +689,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                                   borderRadius: 7, padding: "5px 12px", fontSize: 11,
                                   color: "#ef4444", cursor: "pointer", fontWeight: 700
                                 }}>
-                                  Delete
+                             Delete
                                 </button>
                               )}
                             </>
@@ -716,11 +716,11 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
       </div>
       {/* END SPLIT LAYOUT */}
 
-      {/* ── MODALS ───────────────────────────────────────────────── */}
+      {/* ── MODALS ------------------------------------------------- */}
       {modal === "project" && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div style={{ background: finalTheme.card, borderRadius: 24, width: "100%", maxWidth: 450, padding: 28, boxShadow: "0 20px 50px rgba(0,0,0,0.15)", border: `1.5px solid ${finalTheme.border}` }}>
-            <h2 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 900, color: finalTheme.text || "var(--app-text)", display: "flex", alignItems: "center", gap: 10 }}>🏗️ Project Deadline</h2>
+            <h2 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 900, color: finalTheme.text || "var(--app-text)", display: "flex", alignItems: "center", gap: 10 }}>Build Project Deadline</h2>
             <div style={{ background: finalTheme.bg, padding: 20, borderRadius: 16, marginBottom: 24, border: `1px solid ${finalTheme.border}` }}>
               <div style={{ fontSize: 18, fontWeight: 800, color: finalTheme.text || "var(--app-text)" }}>{form._original.name}</div>
               <div style={{ fontSize: 13, color: finalTheme.muted, marginTop: 6, fontWeight: 600 }}>Deadline: {form.date}</div>
@@ -761,7 +761,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
       {modal === "task" && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div style={{ background: finalTheme.card, borderRadius: 24, width: "100%", maxWidth: 450, padding: 28, boxShadow: "0 20px 50px rgba(0,0,0,0.15)", border: `1.5px solid ${finalTheme.border}` }}>
-            <h2 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 900, color: finalTheme.text || "var(--app-text)", display: "flex", alignItems: "center", gap: 10 }}>📝 Task Details</h2>
+            <h2 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 900, color: finalTheme.text || "var(--app-text)", display: "flex", alignItems: "center", gap: 10 }}>Edit Task Details</h2>
             <div style={{ background: finalTheme.bg, padding: 20, borderRadius: 16, marginBottom: 24, border: `1px solid ${finalTheme.border}` }}>
               <div style={{ fontSize: 18, fontWeight: 800, color: finalTheme.text || "var(--app-text)" }}>{form._original.title || form._original.name}</div>
               <div style={{ fontSize: 13, color: finalTheme.muted, marginTop: 6, fontWeight: 600 }}>Due Date: {form.date}</div>
@@ -819,12 +819,12 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
               background: finalTheme.bg, flexShrink: 0
             }}>
               <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: finalTheme.text || "var(--app-text)" }}>
-                {modal === "add" ? "📅 Add New" : modal === "view" ? "View️ View Event" : "Edit"}
+                {modal === "add" ? "Add New" : modal === "view" ? "View Event" : "Edit"}
               </h2>
               <button onClick={() => { setModal(null); setForm(EMPTY); setErr({}); }} style={{
                 background: "none", border: "none", fontSize: 20,
                 cursor: "pointer", color: finalTheme.accent
-              }}>✕</button>
+              }}>Close</button>
             </div>
 
             {/* Modal body */}
@@ -848,7 +848,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                         cursor: "pointer"
                       }}
                     >
-                      {cat === "Event" ? "📅 Event" : cat === "Project" ? "🏗️ Project" : "📝 Task"}
+                      {cat === "Event" ? "Date Event" : cat === "Project" ? "Build Project" : "Edit Task"}
                     </button>
                   ))}
                 </div>
@@ -867,7 +867,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                     onChange={e => { setForm({ ...form, name: e.target.value }); setErr(p => ({ ...p, name: "" })); }}
                     placeholder={`e.g. ${form.category === "Project" ? "New Website Development" : form.category === "Task" ? "Design Homepage" : "Client Review Meeting"}`}
                     style={{ ...inp(err.name), background: finalTheme.bg }} />
-                  {err.name && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>⚠️ {err.name}</div>}
+                  {err.name && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>Warning {err.name}</div>}
                 </div>
 
                 {/* Type */}
@@ -891,7 +891,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                   <input type="date" value={form.date} disabled={modal === "view"}
                     onChange={e => { setForm({ ...form, date: e.target.value }); setErr(p => ({ ...p, date: "" })); }}
                     style={{ ...inp(err.date), background: finalTheme.bg }} />
-                  {err.date && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>⚠️ {err.date}</div>}
+                  {err.date && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>Warning {err.date}</div>}
                 </div>
 
                 {/* Time */}
@@ -977,7 +977,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                     <div style={{ fontSize: 12, color: finalTheme.muted, marginTop: 2 }}>
                       {form.type}
                       {form.start ? ` · ${form.start}${form.end ? ` – ${form.end}` : ""}` : ""}
-                      {form.client ? ` · 👤 ${form.client}` : ""}
+                      {form.client ? ` · Profile ${form.client}` : ""}
                     </div>
                   </div>
                 </div>
@@ -992,7 +992,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                 }}>{modal === "view" ? "Close" : "Cancel"}</button>
                 {modal !== "view" && (
                   <button onClick={save} disabled={saving} style={{ ...Btn, opacity: saving ? 0.7 : 1 }}>
-                    {saving ? "Saving…" : modal === "add" ? "💾 Save Event" : "✅ Update Event"}
+                    {saving ? "Saving…" : modal === "add" ? "Save Save Event" : "Success Update Event"}
                   </button>
                 )}
               </div>

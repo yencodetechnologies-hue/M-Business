@@ -136,10 +136,10 @@ tr:hover td{background:#FAFCFE;}
             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:'16px',paddingTop:'14px',borderTop:'1px solid var(--border)',fontSize:'13px',color:'var(--text-light)'}}>
               <span>Showing 6 of 48 records</span>
               <div style={{display:'flex',gap:'6px'}}>
-                <button className="btn btn-outline btn-sm">← Prev</button>
+                <button className="btn btn-outline btn-sm"> Prev</button>
                 <button className="btn btn-primary btn-sm">1</button>
                 <button className="btn btn-outline btn-sm">2</button>
-                <button className="btn btn-outline btn-sm">Next →</button>
+                <button className="btn btn-outline btn-sm">Next </button>
               </div>
             </div>
           </div>

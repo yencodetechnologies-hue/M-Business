@@ -60,7 +60,7 @@ export const PROPOSAL_PREVIEW_CSS = `
 /* DELIVERABLES IN PREVIEW */
 .del-list{display:flex;flex-direction:column;gap:4px}
 .del-item-p{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text2)}
-.del-item-p::before{content:'✓';color:var(--teal);font-weight:800;font-size:11px;flex-shrink:0}
+.del-item-p::before{content:'\\2713';color:var(--teal);font-weight:800;font-size:11px;flex-shrink:0}
 
 /* TIMELINE PREVIEW */
 .tl-p{display:flex;flex-direction:column;gap:0}
@@ -96,7 +96,7 @@ export const PROPOSAL_PREVIEW_CSS = `
 /* VALUE PREVIEW */
 .val-p{display:flex;flex-direction:column;gap:4px}
 .val-pi{display:flex;align-items:flex-start;gap:6px;font-size:10px;color:var(--text2)}
-.val-pi::before{content:'→';color:var(--amber);font-weight:800;font-size:11px;flex-shrink:0}
+.val-pi::before{content:'';color:var(--amber);font-weight:800;font-size:11px;flex-shrink:0}
 
 /* CASE STUDY PREVIEW */
 .cs-p{padding:8px 10px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--teal);margin-bottom:7px}

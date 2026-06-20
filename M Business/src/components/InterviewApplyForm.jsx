@@ -162,7 +162,7 @@ function RoleDropdown({ role, setRole, error, setErrors }) {
   );
 }
 
-// ── Main Form ─────────────────────────────────────────────
+// ── Main Form ---------------------------------------------
 export default function InterviewApplyForm() {
   const { companySlug } = useParams();
 
@@ -194,10 +194,10 @@ export default function InterviewApplyForm() {
     if (!file) return;
     const ext = "." + file.name.split(".").pop().toLowerCase();
     if (![".pdf", ".doc", ".docx"].includes(ext)) {
-      setErrors(e => ({ ...e, resume: "⚠️ Only PDF, DOC, DOCX allowed" })); return;
+      setErrors(e => ({ ...e, resume: "Warning Only PDF, DOC, DOCX allowed" })); return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      setErrors(e => ({ ...e, resume: "⚠️ File too large (max 5MB)" })); return;
+      setErrors(e => ({ ...e, resume: "Warning File too large (max 5MB)" })); return;
     }
     setResumeFile(file);
     setResumePreview({ name: file.name, size: (file.size / 1024).toFixed(0) + " KB" });
@@ -212,13 +212,13 @@ export default function InterviewApplyForm() {
 
   const validate = () => {
     const errs = {};
-    if (!form.name.trim()) errs.name = "⚠️ Name is required";
-    if (!form.email.trim()) errs.email = "⚠️ Required";
-    else if (!/\S+@\S+\.\S+/.test(form.email)) errs.email = "⚠️ Invalid email";
-    if (!form.mobile.trim()) errs.mobile = "⚠️ Mobile is required";
-    if (!role) errs.role = "⚠️ Please select a role";
-    if (exp === "Experienced" && !form.years) errs.years = "⚠️ Years required";
-    if (!resumeFile) errs.resume = "⚠️ Resume is required";
+    if (!form.name.trim()) errs.name = "Warning Name is required";
+    if (!form.email.trim()) errs.email = "Warning Required";
+    else if (!/\S+@\S+\.\S+/.test(form.email)) errs.email = "Warning Invalid email";
+    if (!form.mobile.trim()) errs.mobile = "Warning Mobile is required";
+    if (!role) errs.role = "Warning Please select a role";
+    if (exp === "Experienced" && !form.years) errs.years = "Warning Years required";
+    if (!resumeFile) errs.resume = "Warning Resume is required";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -243,7 +243,7 @@ export default function InterviewApplyForm() {
       if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.msg || "Submission failed"); }
       setSubmitted(true);
     } catch (err) {
-      setApiError("❗ " + err.message + ". Please try again.");
+      setApiError(" " + err.message + ". Please try again.");
     } finally {
       setLoading(false);
     }
@@ -255,18 +255,18 @@ export default function InterviewApplyForm() {
     style: sty.input(errors[id]),
   });
 
-  // ── Success ───────────────────────────────────────────
+  // ── Success -------------------------------------------
   if (submitted) {
     return (
       <div style={sty.page}>
         <style>{css}</style>
         <div style={{ ...sty.card, maxWidth: 460, textAlign: "center", padding: "52px 40px" }}>
-          <div style={{ fontSize: 64, marginBottom: 16 }}>🎉</div>
+          <div style={{ fontSize: 64, marginBottom: 16 }}>Celebration</div>
           <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 24, fontWeight: 800, color: "var(--app-text)", marginBottom: 10 }}>
             Application Submitted!
           </h2>
           <p style={{ color: "var(--app-accent)", fontSize: 14, lineHeight: 1.7, marginBottom: 24 }}>
-            Thank You🙏
+            Thank You
           </p>
           <div style={{ background: "var(--app-bg)", borderRadius: 12, padding: "12px 16px", border: "1px solid var(--app-border)", fontSize: 13, color: "var(--app-accent)" }}>
             <strong>{form.name}</strong> · {role} · {companyName}
@@ -277,7 +277,7 @@ export default function InterviewApplyForm() {
     );
   }
 
-  // ── Form ──────────────────────────────────────────────
+  // ── Form ----------------------------------------------
   return (
     <div style={sty.page}>
       <style>{css}</style>
@@ -285,7 +285,7 @@ export default function InterviewApplyForm() {
       <div style={sty.card}>
         {/* Header */}
         <div style={{ textAlign: "center", padding: "32px 32px 20px" }}>
-          <div style={sty.logoBox}>🏢</div>
+          <div style={sty.logoBox}>Company</div>
           <div style={{ fontSize: 19, fontWeight: 800, color: "var(--app-text)", fontFamily: "'Syne',sans-serif", textTransform: "capitalize" }}>
             {companyName}
           </div>
@@ -330,7 +330,7 @@ export default function InterviewApplyForm() {
                   background: exp === val ? "var(--app-bg)" : "var(--app-bg)",
                   color: exp === val ? "var(--app-accent)" : "var(--app-muted)",
                 }}>
-                  {val === "Fresher" ? "🎓 Fresher" : "💼 Experienced"}
+                  {val === "Fresher" ? "Education Fresher" : "Job Experienced"}
                 </button>
               ))}
             </div>
@@ -376,10 +376,10 @@ export default function InterviewApplyForm() {
                 background: drag || resumeFile ? "var(--app-bg)" : "var(--app-bg)",
                 transition: "all 0.2s", userSelect: "none",
               }}>
-              <div style={{ fontSize: 30, marginBottom: 6, pointerEvents: "none" }}>📄</div>
+              <div style={{ fontSize: 30, marginBottom: 6, pointerEvents: "none" }}>Document</div>
               {resumePreview ? (
                 <>
-                  <p style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)", pointerEvents: "none" }}>✅ {resumePreview.name}</p>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)", pointerEvents: "none" }}>Success {resumePreview.name}</p>
                   <p style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 4, pointerEvents: "none" }}>{resumePreview.size} · Click to change</p>
                 </>
               ) : (
@@ -429,7 +429,7 @@ export default function InterviewApplyForm() {
               boxShadow: loading ? "none" : "0 6px 20px rgba(var(--app-accent-rgb, 124, 58, 237),0.35)",
               transition: "all 0.2s",
             }}>
-            {loading ? "⏳ Submitting..." : "Submit Application →"}
+            {loading ? "Pending Submitting..." : "Submit Application "}
           </button>
         </div>
       </div>
@@ -437,7 +437,7 @@ export default function InterviewApplyForm() {
   );
 }
 
-// ── CSS ───────────────────────────────────────────────────
+// ── CSS ---------------------------------------------------
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap');
   * { box-sizing: border-box; }
@@ -450,7 +450,7 @@ const css = `
   button { transition: all 0.18s ease; }
 `;
 
-// ── Styles ────────────────────────────────────────────────
+// ── Styles ------------------------------------------------
 const sty = {
   page: {
     minHeight: "100vh",

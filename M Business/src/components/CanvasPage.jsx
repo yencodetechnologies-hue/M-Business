@@ -353,7 +353,7 @@ export default function CanvasPage() {
                 fontSize: 12, fontWeight: 600, cursor: 'pointer', marginBottom: 10,
               }}
             >
-              {isAddingItem ? '✕ Cancel — click canvas to place' : '+ Add Item'}
+              {isAddingItem ? 'Close Cancel — click canvas to place' : '+ Add Item'}
             </button>
 
             {isAddingItem && (

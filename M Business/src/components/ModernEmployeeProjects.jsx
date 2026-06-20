@@ -124,7 +124,7 @@ export default function ModernEmployeeProjects({ projects, tasks, user, onViewPr
 
       <div className="mep-welcome">
         <div>
-          <h2>Good morning, {firstName}! 👋</h2>
+          <h2>Good morning, {firstName}! </h2>
           <p>{activeCount} active projects · {pendingTasks} tasks due</p>
         </div>
         <div style={{ display:'flex', gap:24 }}>

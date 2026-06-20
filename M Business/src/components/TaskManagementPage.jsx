@@ -16,11 +16,11 @@ const P = {
 };
 
 const INTEGRATIONS = [
-  { id: "gmail", name: "Gmail", icon: "📧", description: "Email notifications on status change" },
-  { id: "slack", name: "Slack", icon: "💬", description: "Post updates to Slack channels" },
-  { id: "googleCalendar", name: "Google Calendar", icon: "📅", description: "Sync due dates with your calendar" },
-  { id: "github", name: "GitHub", icon: "🐙", description: "Link commits and PRs to tasks" },
-  { id: "zapier", name: "Zapier", icon: "🔗", description: "Connect to 5000+ apps via Zapier" }
+  { id: "gmail", name: "Gmail", icon: "", description: "Email notifications on status change" },
+  { id: "slack", name: "Slack", icon: "Comment", description: "Post updates to Slack channels" },
+  { id: "googleCalendar", name: "Google Calendar", icon: "Date", description: "Sync due dates with your calendar" },
+  { id: "github", name: "GitHub", icon: "", description: "Link commits and PRs to tasks" },
+  { id: "zapier", name: "Zapier", icon: "", description: "Connect to 5000+ apps via Zapier" }
 ];
 
 function TaskManagementPage() {
@@ -226,7 +226,7 @@ function TaskManagementPage() {
                         fontSize: "14px"
                       }}
                     >
-                      ✨ Invite Member
+                      Special Invite Member
                     </button>
                     <button
                       onClick={() => handleAutoAssign(selectedTask._id)}
@@ -240,7 +240,7 @@ function TaskManagementPage() {
                         fontSize: "14px"
                       }}
                     >
-                      🎲 Auto-Assign
+                       Auto-Assign
                     </button>
                     <button
                       onClick={() => setShowIntegrationsModal(true)}
@@ -254,13 +254,13 @@ function TaskManagementPage() {
                         fontSize: "14px"
                       }}
                     >
-                      🔗 Integrations
+                       Integrations
                     </button>
                   </div>
                 </div>
 
                 <div style={{ marginBottom: "20px" }}>
-                  <h4 style={{ color: P.dark, marginBottom: "10px" }}>👤 Members</h4>
+                  <h4 style={{ color: P.dark, marginBottom: "10px" }}>Profile Members</h4>
                   
                   <div style={{ marginBottom: "15px" }}>
                     <h5 style={{ color: P.muted, fontSize: "14px", marginBottom: "8px" }}>Assigned ({members.assigned?.length || 0})</h5>
@@ -334,7 +334,7 @@ function TaskManagementPage() {
                 </div>
 
                 <div>
-                  <h4 style={{ color: P.dark, marginBottom: "10px" }}>📋 Details</h4>
+                  <h4 style={{ color: P.dark, marginBottom: "10px" }}>Document Details</h4>
                   <div style={{ fontSize: "14px", lineHeight: "1.6" }}>
                     <p><strong>Status:</strong> {selectedTask.status}</p>
                     <p><strong>Priority:</strong> {selectedTask.priority}</p>
@@ -450,7 +450,7 @@ function TaskManagementPage() {
               overflowY: "auto",
               boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
             }}>
-              <h3 style={{ color: P.dark, marginBottom: "20px" }}>🔗 Integrations</h3>
+              <h3 style={{ color: P.dark, marginBottom: "20px" }}> Integrations</h3>
               <div style={{ display: "grid", gap: "15px" }}>
                 {INTEGRATIONS.map(integration => (
                   <div key={integration.id} style={{

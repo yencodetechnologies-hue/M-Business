@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 
-// 🔥 axios baseURL set pannalam (important)
+// Priority axios baseURL set pannalam (important)
 import axios from "axios";
 import { BASE_URL } from "./config";
 

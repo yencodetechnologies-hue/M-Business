@@ -16,30 +16,30 @@ import ModernEmployeeProjectDetails from "./ModernEmployeeProjectDetails";
 
 const BASE = "/api/employee-dashboard";
 
-// ── DESIGN TOKENS ────────────────────────────────────────────
+// ── DESIGN TOKENS --------------------------------------------
 const T = {
-  // ── BACKGROUNDS ──────────────────────────────────────────
+  // ── BACKGROUNDS ------------------------------------------
   bg: "#f5f0ff",                    // soft lavender page bg
   surface: "#ffffff",               // white cards
-  sidebar: "linear-gradient(180deg, #e8a0d0 0%, #c084e8 40%, #9b6fd4 70%, #7c5cbf 100%)",  // pink→purple gradient
+  sidebar: "linear-gradient(180deg, #e8a0d0 0%, #c084e8 40%, #9b6fd4 70%, #7c5cbf 100%)",  // pinkpurple gradient
   sidebarActive: "rgba(255,255,255,0.22)",
   sidebarText: "rgba(255,255,255,0.65)",
   sidebarTextActive: "#ffffff",
 
-  // ── BORDERS ──────────────────────────────────────────────
+  // ── BORDERS ----------------------------------------------
   border: "#ece5f8",
   borderDark: "#d4c4f0",
 
-  // ── TEXT ─────────────────────────────────────────────────
+  // ── TEXT -------------------------------------------------
   text: "#2d1b69",                  // deep purple text
   textMuted: "#7c6b9e",
   textFaint: "#b8aad4",
 
-  // ── ACCENT ───────────────────────────────────────────────
+  // ── ACCENT -----------------------------------------------
   accent: "#9b6fd4",                // main purple
   accentLight: "#f0e8ff",
 
-  // ── STATUS (unchanged) ───────────────────────────────────
+  // ── STATUS (unchanged) -----------------------------------
   success: "#16a34a",
   successBg: "#f0fdf4",
   successBorder: "#bbf7d0",
@@ -53,7 +53,7 @@ const T = {
   infoBg: "#eff6ff",
   infoBorder: "#bfdbfe",
 
-  // ── SHAPE ────────────────────────────────────────────────
+  // ── SHAPE ------------------------------------------------
   radius: "14px",
   radiusSm: "9px",
   radiusLg: "20px",
@@ -83,34 +83,34 @@ const scBg = (s) => ({
 }[(s || "").toLowerCase()] || T.accentLight);
 
 const NAV = [
-  { key: "dashboard", icon: "⊞", label: "Dashboard" },
+  { key: "dashboard", icon: "+", label: "Dashboard" },
   { key: "projects", icon: "◈", label: "My Projects" },
   { key: "tasks", icon: "◉", label: "Active Tasks" },
   { key: "calendar", icon: "◷", label: "Calendar" },
-  { key: "messaging", icon: "✉", label: "Messages" },
-  { key: "documents", icon: "📄", label: "Documents" },
+  { key: "messaging", icon: "Mail", label: "Messages" },
+  { key: "documents", icon: "Document", label: "Documents" },
   { key: "reports", icon: "▦", label: "Reports" },
   { key: "settings", icon: "◌", label: "Settings" },
 ];
 
 const PERMISSION_TYPES = [
-  { value: "late_arrival", label: "Late Arrival", icon: "🕐", desc: "Coming in late today" },
-  { value: "early_departure", label: "Early Departure", icon: "🚶", desc: "Leaving early today" },
-  { value: "od", label: "On Duty (OD)", icon: "🏢", desc: "Working outside office" },
-  { value: "wfh", label: "Work From Home", icon: "🏠", desc: "Working from home" },
-  { value: "half_day", label: "Half Day", icon: "🌗", desc: "Half day off" },
-  { value: "other", label: "Other", icon: "📝", desc: "Other reason" },
+  { value: "late_arrival", label: "Late Arrival", icon: "", desc: "Coming in late today" },
+  { value: "early_departure", label: "Early Departure", icon: "", desc: "Leaving early today" },
+  { value: "od", label: "On Duty (OD)", icon: "Company", desc: "Working outside office" },
+  { value: "wfh", label: "Work From Home", icon: "", desc: "Working from home" },
+  { value: "half_day", label: "Half Day", icon: "", desc: "Half day off" },
+  { value: "other", label: "Other", icon: "Edit", desc: "Other reason" },
 ];
 
 const todayStr = () => new Date().toISOString().split("T")[0];
 const fmt = (n, sym = "₹") => (sym || "₹") + Number(n || 0).toLocaleString("en-IN");
 const statusIcon = (s) => {
   const l = (s || "").toLowerCase();
-  if (l === "approved") return "✅"; if (l === "rejected") return "❌";
-  if (l === "cancelled") return "🚫"; return "⏳";
+  if (l === "approved") return "Success"; if (l === "rejected") return "Error";
+  if (l === "cancelled") return "Block"; return "Pending";
 };
 
-// ── ATOMS ────────────────────────────────────────────────────
+// ── ATOMS ----------------------------------------------------
 
 function Badge({ label }) {
   const c = sc(label), bg = scBg(label);
@@ -197,7 +197,7 @@ function InputField({ label, children }) {
 
 const inputStyle = { width: "100%", border: `1.5px solid ${T.border}`, borderRadius: T.radiusSm, padding: "9px 12px", fontSize: 13, color: T.text, background: T.surface, outline: "none", fontFamily: "inherit", transition: "border-color 0.15s" };
 
-// ── SIDEBAR ──────────────────────────────────────────────────
+// ── SIDEBAR --------------------------------------------------
 
 function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems }) {
   const displayName = user?.name || "Employee";
@@ -224,7 +224,7 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems })
               <div style={{ fontSize: 9, color: "#ffffff", letterSpacing: 1.5, fontWeight: 600, textTransform: "uppercase", marginTop: 2 }}>{user?.role || "EMPLOYEE"}</div>
             </div>
           </div>
-          <button onClick={onClose} className="emp-sb-close" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.4)", width: 26, height: 26, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 11 }}>✕</button>
+          <button onClick={onClose} className="emp-sb-close" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.4)", width: 26, height: 26, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 11 }}>Close</button>
         </div>
 
         {/* Nav */}
@@ -250,7 +250,7 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems })
           <button onClick={onLogout} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "11px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: T.radiusSm, color: "#fca5a5", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.18s" }}
             onMouseEnter={e => { e.currentTarget.style.background = "rgba(239,68,68,0.18)"; }}
             onMouseLeave={e => { e.currentTarget.style.background = "rgba(239,68,68,0.1)"; }}>
-            🚪 Logout
+             Logout
           </button>
         </div>
       </div>
@@ -259,7 +259,7 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems })
   );
 }
 
-// ── DOCUMENTS CARD ───────────────────────────────────────────
+// ── DOCUMENTS CARD -------------------------------------------
 
 function DocumentsCard({ docStatus, onOpenProfile }) {
   const uploadedCount = Object.values(docStatus).filter(Boolean).length;
@@ -298,7 +298,7 @@ function DocumentsCard({ docStatus, onOpenProfile }) {
                   : <div style={{ fontSize: 10, color: T.textFaint, marginTop: 1 }}>{dt.desc}</div>}
               </div>
               {hasDoc
-                ? <span style={{ background: T.successBg, border: `1px solid ${T.successBorder}`, borderRadius: 99, padding: "3px 10px", fontSize: 9, fontWeight: 800, color: T.success, textTransform: "uppercase", letterSpacing: "0.5px" }}>✓ Done</span>
+                ? <span style={{ background: T.successBg, border: `1px solid ${T.successBorder}`, borderRadius: 99, padding: "3px 10px", fontSize: 9, fontWeight: 800, color: T.success, textTransform: "uppercase", letterSpacing: "0.5px" }}>Yes Done</span>
                 : <button onClick={onOpenProfile}
                   style={{ background: T.warningBg, border: `1px solid ${T.warningBorder}`, borderRadius: 99, padding: "3px 12px", fontSize: 9, fontWeight: 800, color: T.warning, cursor: "pointer", fontFamily: "inherit", textTransform: "uppercase", letterSpacing: "0.5px", transition: "all 0.15s" }}>
                   Upload
@@ -310,7 +310,7 @@ function DocumentsCard({ docStatus, onOpenProfile }) {
 
       {allDone && (
         <div style={{ marginTop: 12, background: T.successBg, border: `1px solid ${T.successBorder}`, borderRadius: T.radiusSm, padding: "10px 14px", display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 16 }}>🎉</span>
+          <span style={{ fontSize: 16 }}>Celebration</span>
           <div style={{ fontSize: 12, fontWeight: 700, color: T.success }}>All documents uploaded — profile complete.</div>
         </div>
       )}
@@ -318,9 +318,9 @@ function DocumentsCard({ docStatus, onOpenProfile }) {
   );
 }
 
-// ── DASHBOARD PAGE ───────────────────────────────────────────
+// ── DASHBOARD PAGE -------------------------------------------
 
-// ── Employee Documents Page ──────────────────────────────────
+// ── Employee Documents Page ----------------------------------
 function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
   const [docs, setDocs] = useState([]);
   const [selectedDoc, setSelectedDoc] = useState(null);
@@ -350,7 +350,7 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
             .map(f => ({
               _id: f._id || f.url,
               docType: f.name || 'File',
-              htmlContent: `<div style="padding:20px"><h3>${f.name}</h3><p>From Project: <strong>${p.name}</strong></p><a href="${f.url}" target="_blank" style="color:#9b6fd4;font-weight:700">📎 Open / Download File</a></div>`,
+              htmlContent: `<div style="padding:20px"><h3>${f.name}</h3><p>From Project: <strong>${p.name}</strong></p><a href="${f.url}" target="_blank" style="color:#9b6fd4;font-weight:700">Attach Open / Download File</a></div>`,
               client: empName,
               fromProject: p.name,
               dateSent: f.uploadedAt,
@@ -429,7 +429,7 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
                   fontSize: 20,
                   color: "#D97706"
                 }}>
-                  📁
+                  Folder
                 </div>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 800, color: "#92400E" }}>Pending Document Request</div>
@@ -466,7 +466,7 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
           <div style={{ color:T.textMuted, padding: 20 }}>Loading documents...</div>
         ) : docs.length === 0 ? (
           <div style={{ background:T.surface, border:`1px solid ${T.border}`, padding:40, borderRadius:16, textAlign:"center" }}>
-            <div style={{ fontSize:40, marginBottom:16 }}>📭</div>
+            <div style={{ fontSize:40, marginBottom:16 }}></div>
             <div style={{ fontSize:16, fontWeight:700, color:T.text, marginBottom:8 }}>No Documents</div>
             <div style={{ color:T.textMuted, fontSize:14 }}>You haven't received any documents or letters yet.</div>
           </div>
@@ -504,12 +504,12 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
       {/* Welcome */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14, marginBottom: 4 }}>
         <div>
-          <h1 style={{ fontSize: 28, fontWeight: 900, color: T.text, margin: 0, letterSpacing: "-0.8px" }}>Good day, {name.split(' ')[0]}! 👋</h1>
+          <h1 style={{ fontSize: 28, fontWeight: 900, color: T.text, margin: 0, letterSpacing: "-0.8px" }}>Good day, {name.split(' ')[0]}! </h1>
           <p style={{ fontSize: 13, color: T.textMuted, marginTop: 5, fontWeight: 500 }}>Here's your workspace overview for today.</p>
         </div>
         {!todayAtt ? (
           <div style={{ background: T.dangerBg, border: `1px solid ${T.dangerBorder}`, borderRadius: T.radius, padding: "11px 18px", display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ fontSize: 16 }}>⏰</span>
+            <span style={{ fontSize: 16 }}>Alarm</span>
             <span style={{ fontSize: 13, color: T.danger, fontWeight: 700 }}>Attendance not marked</span>
             <button onClick={() => setPage("attendance")} style={{ background: T.accent, border: "none", borderRadius: T.radiusSm, padding: "7px 14px", color: "#fff", fontSize: 12, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>Mark Now</button>
           </div>
@@ -524,7 +524,7 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
       {/* Stat cards — first is dark */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 14 }} className="stat-grid">
         <StatCard icon="◈" label="Active Projects" value={activeProjectsCount} sub="Assigned to you" color={T.accent} onClick={() => setPage("projects")} dark />
-        <StatCard icon="📄" label="Proposals" value={proposals.length} sub="Assigned to you" color={T.accent} onClick={() => setPage("proposals")} />
+        <StatCard icon="Document" label="Proposals" value={proposals.length} sub="Assigned to you" color={T.accent} onClick={() => setPage("proposals")} />
         <StatCard icon="◉" label="Pending Tasks" value={pendingTasks} sub="Need attention" color={T.accent} onClick={() => setPage("tasks")} />
         <StatCard icon="◷" label="Present Days" value={presentDays} sub="This month" color={T.accent} onClick={() => setPage("attendance")} />
         <StatCard icon="◆" label="Last Payment" value={latestSalary ? fmt(latestSalary.net, latestSalary.currency) : "—"} sub={latestSalary?.month || "No records"} color={T.accent} onClick={() => setPage("salary")} />
@@ -534,7 +534,7 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
       <div style={{ display: "grid", gridTemplateColumns: "3fr 2fr", gap: 16 }} className="two-col">
         <Card title="My Projects" action={
           <button onClick={() => setPage("projects")} style={{ background: "none", border: "none", color: T.textMuted, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4 }}>
-            View all <span style={{ fontSize: 14 }}>→</span>
+            View all <span style={{ fontSize: 14 }}></span>
           </button>
         }>
           {projects.filter(p => !["done", "completed"].includes((p.status || "").toLowerCase())).slice(0, 4).map((p, i, arr) => (
@@ -577,7 +577,7 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
         </Card>
 
         <Card title="Active Tasks" action={
-          <button onClick={() => setPage("tasks")} style={{ background: "none", border: "none", color: T.textMuted, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>View all →</button>
+          <button onClick={() => setPage("tasks")} style={{ background: "none", border: "none", color: T.textMuted, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>View all </button>
         }>
           {tasks.filter(t => !["done", "completed"].includes((t.status || "").toLowerCase())).slice(0, 5).map((t, i, arr) => {
             const isDone = ["done", "completed"].includes((t.status || "").toLowerCase());
@@ -586,7 +586,7 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
             return (
               <div key={t._id || i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "9px 0", borderBottom: i < arr.length - 1 ? `1px solid ${T.border}` : "none" }}>
                 <div style={{ width: 16, height: 16, borderRadius: 4, border: `1.5px solid ${isDone ? T.success : T.borderDark}`, background: isDone ? T.success : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>
-                  {isDone && <span style={{ color: "#fff", fontSize: 9, fontWeight: 900 }}>✓</span>}
+                  {isDone && <span style={{ color: "#fff", fontSize: 9, fontWeight: 900 }}>Yes</span>}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 12, fontWeight: 600, color: isDone ? T.textFaint : T.text, textDecoration: isDone ? "line-through" : "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.title}</div>
@@ -635,7 +635,7 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
   );
 }
 
-// ── MY PROFILE FULL PAGE (Teal themed) ───────────────────────
+// ── MY PROFILE FULL PAGE (Teal themed) -----------------------
 function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
   const name = user?.name || "Employee";
   const role = user?.role || "Employee";
@@ -661,11 +661,11 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
   const TC = { teal: "#00BCD4", bg: "#f0f4f8", card: "#fff", border: "#e5eaf0", text: "#0f1c2e", textMid: "#4a5568", textSoft: "#94a3b8", green: "#16a34a", amber: "#d97706", red: "#dc2626", blue: "#2563eb" };
 
   const docItems = [
-    { name:"Offer Letter",  meta:"Jan 2024 · PDF", icon:"📄", color:"#6366F1" },
-    { name:"Aadhaar Card",  meta:"ID Proof · PDF",  icon:"🪪", color:"#0ea5e9" },
-    { name:"Contract",      meta:"Signed · PDF",     icon:"📋",color:"#f59e0b" },
-    { name:"Degree Cert",   meta:"Education · PDF",  icon:"🎓", color:"#8b5cf6" },
-    { name:"Resume",        meta:"Latest · PDF",     icon:"📝", color:"#ef4444" },
+    { name:"Offer Letter",  meta:"Jan 2024 · PDF", icon:"Document", color:"#6366F1" },
+    { name:"Aadhaar Card",  meta:"ID Proof · PDF",  icon:"ID Card", color:"#0ea5e9" },
+    { name:"Contract",      meta:"Signed · PDF",     icon:"Document",color:"#f59e0b" },
+    { name:"Degree Cert",   meta:"Education · PDF",  icon:"Education", color:"#8b5cf6" },
+    { name:"Resume",        meta:"Latest · PDF",     icon:"Edit", color:"#ef4444" },
   ];
 
   const cardStyle = { background: TC.card, borderRadius: 16, border: `1px solid ${TC.border}`, overflow: "hidden" };
@@ -685,7 +685,7 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
         <div style={{ width:56, height:56, borderRadius:16, background:"rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, fontWeight:900, border:"2px solid rgba(255,255,255,0.3)", flexShrink:0 }}>{initials}</div>
         <div style={{ flex:1 }}>
           <div style={{ fontSize:12, opacity:0.7, fontWeight:600 }}>My Profile</div>
-          <div style={{ fontSize:22, fontWeight:900, marginTop:2 }}>{name} 👋</div>
+          <div style={{ fontSize:22, fontWeight:900, marginTop:2 }}>{name} </div>
           <div style={{ fontSize:12, opacity:0.7, marginTop:4 }}>{role}{dept ? ` · ${dept} Department` : ""}</div>
         </div>
         <div style={{ textAlign:"right" }}>
@@ -700,10 +700,10 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
       {/* Quick Stats */}
       <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
         {[
-          { icon:"📅", val:presentDays, lbl:"Days Present", bg:"#e0f7fa", ic:TC.teal },
-          { icon:"💼", val:activeProj, lbl:"Active Projects", bg:"#dcfce7", ic:TC.green },
-          { icon:"☑️", val:pendingTasks, lbl:"Tasks Pending", bg:"#fef3c7", ic:TC.amber },
-          { icon:"🏖️", val:leaveTotal-leaveUsed, lbl:"Leave Days Left", bg:"#dbeafe", ic:TC.blue },
+          { icon:"Date", val:presentDays, lbl:"Days Present", bg:"#e0f7fa", ic:TC.teal },
+          { icon:"Job", val:activeProj, lbl:"Active Projects", bg:"#dcfce7", ic:TC.green },
+          { icon:"Checked", val:pendingTasks, lbl:"Tasks Pending", bg:"#fef3c7", ic:TC.amber },
+          { icon:"", val:leaveTotal-leaveUsed, lbl:"Leave Days Left", bg:"#dbeafe", ic:TC.blue },
         ].map((s,i) => (
           <div key={i} style={{ ...cardStyle, padding:"16px 18px", display:"flex", alignItems:"center", gap:12 }}>
             <div style={{ width:40, height:40, borderRadius:10, background:s.bg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18 }}>{s.icon}</div>
@@ -715,7 +715,7 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
       {/* Profile + Attendance */}
       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
         <div style={cardStyle}>
-          <div style={headStyle}><div style={titleStyle}>👤 My Profile</div></div>
+          <div style={headStyle}><div style={titleStyle}>Profile My Profile</div></div>
           <div style={bodyStyle}>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
               {[["Full Name",name],["Employee ID",empId,true],["Role",role],["Department",dept||"—"],["Email",email||"—"],["Phone",phone||"—"],["Date Joined",joinDate||"—"],["Employment",employment]].map(([l,v,teal],i)=>(
@@ -726,7 +726,7 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
         </div>
 
         <div style={cardStyle}>
-          <div style={headStyle}><div style={titleStyle}>📊 Attendance & Leave</div><span style={{ fontSize:11, color:TC.textSoft, fontWeight:700 }}>This Month</span></div>
+          <div style={headStyle}><div style={titleStyle}>Metrics Attendance & Leave</div><span style={{ fontSize:11, color:TC.textSoft, fontWeight:700 }}>This Month</span></div>
           <div style={bodyStyle}>
             <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8, marginBottom:16 }}>
               {[[presentDays,"Present",TC.green],[absentDays,"Absent",TC.red],[leaveDays,"On Leave",TC.amber],[wfhDays,"WFH",TC.blue]].map(([v,l,c],i)=>(
@@ -743,7 +743,7 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
               </div>
             ))}
             <div style={{ marginTop:14 }}>
-              <div style={{ fontSize:11, fontWeight:900, color:TC.text, marginBottom:8 }}>📋 My Leave History</div>
+              <div style={{ fontSize:11, fontWeight:900, color:TC.text, marginBottom:8 }}>Document My Leave History</div>
               <table style={{ width:"100%", fontSize:11, borderCollapse:"collapse" }}>
                 <thead><tr style={{ borderBottom:`1px solid ${TC.border}` }}>{["TYPE","DATES","STATUS"].map(h=><th key={h} style={{ padding:"6px 0", textAlign:"left", color:TC.textSoft, fontWeight:700, fontSize:10 }}>{h}</th>)}</tr></thead>
                 <tbody>
@@ -761,7 +761,7 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:16 }}>
         {/* Projects */}
         <div style={cardStyle}>
-          <div style={headStyle}><div style={titleStyle}>💼 My Projects</div><span style={{ fontSize:12, fontWeight:800, color:TC.teal }}>{activeProj} active</span></div>
+          <div style={headStyle}><div style={titleStyle}>Job My Projects</div><span style={{ fontSize:12, fontWeight:800, color:TC.teal }}>{activeProj} active</span></div>
           <div style={{ padding:"8px 18px" }}>
             {projects.slice(0,4).map((p,i)=>{
               const pTasks = tasks.filter(t => {
@@ -773,7 +773,7 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
               const pct=s==="done"||s==="completed"?100:pTasks.length>0?Math.round((pTasks.filter(t=>["done","completed"].includes((t.status||"").toLowerCase())).length/pTasks.length)*100):s==="in progress"?50:(p.progress||0);
               return(
                 <div key={p._id||i} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 0", borderBottom:i<Math.min(projects.length,4)-1?`1px solid ${TC.border}`:"none" }}>
-                  <div style={{ width:32, height:32, borderRadius:8, background:TC.teal+"15", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, color:TC.teal }}>🌐</div>
+                  <div style={{ width:32, height:32, borderRadius:8, background:TC.teal+"15", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, color:TC.teal }}>Web</div>
                   <div style={{ flex:1 }}><div style={{ fontSize:12, fontWeight:700, color:TC.text }}>{p.name}</div><div style={{ fontSize:10, color:TC.textSoft }}>{role}</div></div>
                   <div style={{ textAlign:"right" }}>
                     <div style={{ fontSize:12, fontWeight:800, color:TC.teal }}>{pct}%</div>
@@ -789,7 +789,7 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
 
         {/* Tasks */}
         <div style={cardStyle}>
-          <div style={headStyle}><div style={titleStyle}>☑️ My Tasks</div><span style={{ fontSize:11, color:TC.textSoft, fontWeight:700 }}>{pendingTasks} pending</span></div>
+          <div style={headStyle}><div style={titleStyle}>Checked My Tasks</div><span style={{ fontSize:11, color:TC.textSoft, fontWeight:700 }}>{pendingTasks} pending</span></div>
           <div style={{ borderBottom:`1px solid ${TC.border}`, display:"flex" }}>
             {["All","Pending","Done"].map((tab,i)=><button key={tab} style={{ flex:1, padding:"8px 0", background:"none", border:"none", borderBottom:i===0?`2px solid ${TC.teal}`:"2px solid transparent", fontSize:11, fontWeight:i===0?800:600, color:i===0?TC.teal:TC.textSoft, cursor:"pointer", fontFamily:"inherit" }}>{tab}</button>)}
           </div>
@@ -800,7 +800,7 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
               const priColor=pri==="high"?"#dc2626":pri==="medium"||pri==="mid"?"#d97706":"#16a34a";
               return(
                 <div key={t._id||i} style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 0", borderBottom:i<arr.length-1?`1px solid ${TC.border}`:"none" }}>
-                  <div style={{ width:16, height:16, borderRadius:4, border:`1.5px solid ${isDone?TC.green:TC.border}`, background:isDone?TC.green:"transparent", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{isDone&&<span style={{ color:"#fff", fontSize:9 }}>✓</span>}</div>
+                  <div style={{ width:16, height:16, borderRadius:4, border:`1.5px solid ${isDone?TC.green:TC.border}`, background:isDone?TC.green:"transparent", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{isDone&&<span style={{ color:"#fff", fontSize:9 }}>Yes</span>}</div>
                   <div style={{ flex:1 }}><div style={{ fontSize:12, fontWeight:600, color:isDone?TC.textSoft:TC.text, textDecoration:isDone?"line-through":"none" }}>{t.title}</div><div style={{ fontSize:10, color:TC.textSoft }}>{t.date||t.dueDate?`Due: ${t.date||t.dueDate}`:""}</div></div>
                   <span style={{ background:priColor+"15", color:priColor, padding:"2px 8px", borderRadius:10, fontSize:10, fontWeight:700 }}>{pri.charAt(0).toUpperCase()+pri.slice(1)}</span>
                 </div>
@@ -812,15 +812,15 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
 
         {/* Documents */}
         <div style={cardStyle}>
-          <div style={headStyle}><div style={titleStyle}>📂 My Documents</div><span style={{ fontSize:11, color:TC.textSoft, fontWeight:700 }}>5 files</span></div>
+          <div style={headStyle}><div style={titleStyle}>Folder My Documents</div><span style={{ fontSize:11, color:TC.textSoft, fontWeight:700 }}>5 files</span></div>
           <div style={bodyStyle}>
             {docItems.map((d,i)=>(
               <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 0", borderBottom:i<docItems.length-1?`1px solid ${TC.border}`:"none" }}>
                 <span style={{ fontSize:16 }}>{d.icon}</span>
                 <div style={{ flex:1 }}><div style={{ fontSize:12, fontWeight:700, color:TC.text }}>{d.name}</div><div style={{ fontSize:10, color:TC.textSoft }}>{d.meta}</div></div>
                 <div style={{ display:"flex", gap:4 }}>
-                  <button style={{ background:"#f0f4f8", border:`1px solid ${TC.border}`, borderRadius:6, padding:"4px 8px", cursor:"pointer", fontSize:10, fontWeight:700, color:TC.textMid, fontFamily:"inherit" }}>👁 View</button>
-                  <button style={{ background:TC.teal, border:"none", borderRadius:6, padding:"4px 8px", cursor:"pointer", color:"#fff", fontSize:10, fontFamily:"inherit" }}>⬇</button>
+                  <button style={{ background:"#f0f4f8", border:`1px solid ${TC.border}`, borderRadius:6, padding:"4px 8px", cursor:"pointer", fontSize:10, fontWeight:700, color:TC.textMid, fontFamily:"inherit" }}>View View</button>
+                  <button style={{ background:TC.teal, border:"none", borderRadius:6, padding:"4px 8px", cursor:"pointer", color:"#fff", fontSize:10, fontFamily:"inherit" }}></button>
                 </div>
               </div>
             ))}
@@ -831,7 +831,7 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
   );
 }
 
-// ── PROJECTS PAGE ────────────────────────────────────────────
+// ── PROJECTS PAGE --------------------------------------------
 
 function ProjectsPage({ projects, tasks }) {
   const [filter, setFilter] = useState("all");
@@ -853,7 +853,7 @@ function ProjectsPage({ projects, tasks }) {
   if (selected) return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <Card>
-        <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", color: T.textMuted, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", marginBottom: 16, display: "flex", alignItems: "center", gap: 4 }}>← Back</button>
+        <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", color: T.textMuted, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", marginBottom: 16, display: "flex", alignItems: "center", gap: 4 }}> Back</button>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
           <div>
             <h2 style={{ fontSize: 18, fontWeight: 900, color: T.text, margin: 0 }}>{selected.name}</h2>
@@ -974,7 +974,7 @@ function ProjectsPage({ projects, tasks }) {
   );
 }
 
-// ── TASKS PAGE ───────────────────────────────────────────────
+// ── TASKS PAGE -----------------------------------------------
 
 function TasksPage({ tasks, onToggle }) {
   const [filter, setFilter] = useState("all");
@@ -1020,14 +1020,14 @@ function TasksPage({ tasks, onToggle }) {
                   <div
                     onClick={(e) => { e.stopPropagation(); if (onToggle) onToggle(t); }}
                     style={{ width: 18, height: 18, borderRadius: 5, border: `2px solid ${t._isDone ? T.success : T.borderDark}`, background: t._isDone ? T.success : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1, cursor: "pointer", transition: "all 0.2s" }}>
-                    {t._isDone && <span style={{ color: "#fff", fontSize: 10, fontWeight: 900 }}>✓</span>}
+                    {t._isDone && <span style={{ color: "#fff", fontSize: 10, fontWeight: 900 }}>Yes</span>}
                   </div>
                   <div onClick={() => setExpanded(isOpen ? null : t._id)} style={{ flex: 1, minWidth: 0, cursor: "pointer" }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: t._isDone ? T.textFaint : T.text, textDecoration: t._isDone ? "line-through" : "none" }}>{t.title}</div>
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 5, alignItems: "center" }}>
                       <Badge label={t.priority || "medium"} />
                       <Badge label={t.status || "pending"} />
-                      <span style={{ fontSize: 10, color: T.textFaint }}>📁 {t._project}</span>
+                      <span style={{ fontSize: 10, color: T.textFaint }}>Folder {t._project}</span>
                       <span style={{ fontSize: 10, color: T.textFaint }}>⏱ {t._due}</span>
                     </div>
                   </div>
@@ -1037,7 +1037,7 @@ function TasksPage({ tasks, onToggle }) {
                   <div style={{ padding: "0 14px 14px", borderTop: `1px solid ${T.border}` }}>
                     {t.description && <p style={{ fontSize: 13, color: T.textMuted, marginTop: 12, lineHeight: 1.6 }}>{t.description}</p>}
                     {t.notes && <p style={{ fontSize: 12, color: T.textMuted, marginTop: 8, lineHeight: 1.5 }}><strong>Notes:</strong> {t.notes}</p>}
-                    {t.assignTo && t.assignTo !== "Unassigned" && <p style={{ fontSize: 12, color: T.textMuted, marginTop: 6 }}>👤 Assigned to: <strong>{t.assignTo}</strong></p>}
+                    {t.assignTo && t.assignTo !== "Unassigned" && <p style={{ fontSize: 12, color: T.textMuted, marginTop: 6 }}>Profile Assigned to: <strong>{t.assignTo}</strong></p>}
                   </div>
                 )}
               </div>
@@ -1050,7 +1050,7 @@ function TasksPage({ tasks, onToggle }) {
   );
 }
 
-// ── ATTENDANCE PAGE ─────────────────────────────── (ALL LOGIC UNCHANGED)
+// ── ATTENDANCE PAGE ------------------------------- (ALL LOGIC UNCHANGED)
 
 function AttendancePage({ attendance, setAttendance, empName, notify }) {
   const [activeTab, setActiveTab] = useState("attendance");
@@ -1141,7 +1141,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
     const rec = { date: today, status, employeeName: empName, markedAt: new Date().toISOString() };
     try { await axios.post(`${BASE}/attendance`, rec); } catch (e) { }
     setAttendance(prev => [...prev, rec]);
-    notify(`Marked as ${status} ✓`);
+    notify(`Marked as ${status} Yes`);
     setMarking(false);
   };
 
@@ -1153,7 +1153,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
     const rec = { date: addDate, status: addStatus, employeeName: empName, markedAt: new Date().toISOString(), note: addNote };
     try { await axios.post(`${BASE}/attendance`, rec); } catch (e) { }
     setAttendance(prev => [...prev, { ...rec, _id: `local_${Date.now()}` }]);
-    notify(`Attendance added for ${addDate} ✓`);
+    notify(`Attendance added for ${addDate} Yes`);
     setAddForm(false); setAddDate(todayStr()); setAddStatus("present"); setAddNote("");
     setAddSaving(false);
   };
@@ -1164,7 +1164,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
     const newLeave = { _id: `leave_${Date.now()}`, type: leaveType, from: leaveFrom, to: leaveTo, reason: leaveReason, employeeName: empName, status: "pending", appliedOn: new Date().toISOString() };
     try { const res = await axios.post(`${BASE}/leave`, newLeave); setLeaveHistory(prev => [{ ...newLeave, ...(res.data?.leave || {}) }, ...prev]); }
     catch { setLeaveHistory(prev => [newLeave, ...prev]); }
-    notify("Leave request submitted ✓");
+    notify("Leave request submitted Yes");
     setLeaveForm(false); setLeaveReason(""); setLeaveType("Sick Leave"); setLeaveFrom(todayStr()); setLeaveTo(todayStr());
     setLeaveSubmitting(false); setActiveTab("leaves");
   };
@@ -1176,7 +1176,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
     const newPerm = { _id: `perm_${Date.now()}`, type: permType, typeLabel, date: permDate, fromTime: permFromTime, toTime: permToTime, reason: permReason, employeeName: empName, status: "pending", appliedOn: new Date().toISOString() };
     try { const res = await axios.post(`${BASE}/permission`, newPerm); setPermHistory(prev => [{ ...newPerm, ...(res.data?.permission || {}) }, ...prev]); }
     catch { setPermHistory(prev => [newPerm, ...prev]); }
-    notify("Permission request submitted ✓");
+    notify("Permission request submitted Yes");
     setPermForm(false); setPermReason(""); setPermType("late_arrival"); setPermDate(todayStr()); setPermFromTime("09:00"); setPermToTime("10:00");
     setPermSubmitting(false); setActiveTab("permissions");
   };
@@ -1218,8 +1218,8 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button onClick={() => { setAddForm(v => !v); setPermForm(false); setLeaveForm(false); setActiveTab("attendance"); }} style={{ background: T.accent, color: "#fff", border: "none", borderRadius: T.radiusSm, padding: "9px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>+ Add Attendance</button>
-          <button onClick={() => { setPermForm(v => !v); setLeaveForm(false); setAddForm(false); setActiveTab("attendance"); }} style={{ background: T.surface, color: T.text, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, padding: "9px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>🔑 Permission</button>
-          <button onClick={() => { setLeaveForm(v => !v); setPermForm(false); setAddForm(false); setActiveTab("attendance"); }} style={{ background: T.surface, color: T.text, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, padding: "9px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>🌴 Apply Leave</button>
+          <button onClick={() => { setPermForm(v => !v); setLeaveForm(false); setAddForm(false); setActiveTab("attendance"); }} style={{ background: T.surface, color: T.text, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, padding: "9px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Key Permission</button>
+          <button onClick={() => { setLeaveForm(v => !v); setPermForm(false); setAddForm(false); setActiveTab("attendance"); }} style={{ background: T.surface, color: T.text, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, padding: "9px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Holiday Apply Leave</button>
         </div>
       </div>
 
@@ -1310,11 +1310,11 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
             <div style={{ background: T.bg, borderRadius: T.radiusSm, padding: "12px 16px", display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", border: `1px solid ${T.border}` }}>
               <div style={{ fontSize: 12, color: T.textMuted, fontWeight: 600 }}>Today — <span style={{ color: T.text, fontWeight: 800 }}>{today}</span></div>
               {todayRec ? (
-                <div style={{ background: scBg(todayRec.status), border: `1px solid ${sc(todayRec.status)}30`, borderRadius: T.radiusSm, padding: "7px 14px", fontSize: 12, fontWeight: 700, color: sc(todayRec.status) }}>✓ Marked as {todayRec.status}</div>
+                <div style={{ background: scBg(todayRec.status), border: `1px solid ${sc(todayRec.status)}30`, borderRadius: T.radiusSm, padding: "7px 14px", fontSize: 12, fontWeight: 700, color: sc(todayRec.status) }}>Yes Marked as {todayRec.status}</div>
               ) : (
                 <div style={{ display: "flex", gap: 8 }}>
-                  <button disabled={marking} onClick={() => markAttendance("present")} style={btnStyle(T.success)}>✅ Present</button>
-                  <button disabled={marking} onClick={() => markAttendance("absent")} style={btnStyle(T.danger)}>❌ Absent</button>
+                  <button disabled={marking} onClick={() => markAttendance("present")} style={btnStyle(T.success)}>Success Present</button>
+                  <button disabled={marking} onClick={() => markAttendance("absent")} style={btnStyle(T.danger)}>Error Absent</button>
                 </div>
               )}
             </div>
@@ -1326,7 +1326,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
                   <button onClick={prevCalMonth} style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 7, width: 28, height: 28, cursor: "pointer", fontSize: 13, color: T.text, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>‹</button>
                   <div style={{ textAlign: "center" }}>
                     <div style={{ fontSize: 12, fontWeight: 800, color: T.text }}>{FULL_MONTHS[calMonth]} {calYear}</div>
-                    {selectedDate && <div style={{ fontSize: 10, color: T.textMuted, marginTop: 2 }}>{selectedDate}<span onClick={() => setSelectedDate(null)} style={{ marginLeft: 6, cursor: "pointer", color: T.textFaint, textDecoration: "underline" }}>✕</span></div>}
+                    {selectedDate && <div style={{ fontSize: 10, color: T.textMuted, marginTop: 2 }}>{selectedDate}<span onClick={() => setSelectedDate(null)} style={{ marginLeft: 6, cursor: "pointer", color: T.textFaint, textDecoration: "underline" }}>Close</span></div>}
                   </div>
                   <div style={{ display: "flex", gap: 4 }}>
                     <button onClick={() => { setCalYear(new Date().getFullYear()); setCalMonth(new Date().getMonth()); setSelectedDate(null); }} style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 6, padding: "3px 7px", cursor: "pointer", fontSize: 9, color: T.text, fontWeight: 700 }}>Today</button>
@@ -1382,9 +1382,9 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
                       {availableMonths.map(m => <option key={m} value={m}>{m}</option>)}
                     </select>
                     <button onClick={() => setShowAdvFilter(v => !v)} style={{ padding: "7px 11px", borderRadius: T.radiusSm, fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: `1px solid ${showAdvFilter ? T.accent : T.border}`, background: showAdvFilter ? T.accentLight : T.surface, color: showAdvFilter ? T.text : T.textMuted, whiteSpace: "nowrap" }}>
-                      ⚙ {showAdvFilter ? "Hide" : "Date Range"}
+                      Settings {showAdvFilter ? "Hide" : "Date Range"}
                     </button>
-                    {hasActiveFilter && <button onClick={resetAllFilters} style={{ padding: "7px 11px", borderRadius: T.radiusSm, fontSize: 11, fontWeight: 700, cursor: "pointer", border: `1px solid ${T.dangerBorder}`, background: T.dangerBg, color: T.danger, fontFamily: "inherit", whiteSpace: "nowrap" }}>✕ Reset</button>}
+                    {hasActiveFilter && <button onClick={resetAllFilters} style={{ padding: "7px 11px", borderRadius: T.radiusSm, fontSize: 11, fontWeight: 700, cursor: "pointer", border: `1px solid ${T.dangerBorder}`, background: T.dangerBg, color: T.danger, fontFamily: "inherit", whiteSpace: "nowrap" }}>Close Reset</button>}
                   </div>
                   {showAdvFilter && (
                     <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 10, flexWrap: "wrap" }}>
@@ -1398,13 +1398,13 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
                 </div>
 
                 <div style={{ fontSize: 12, fontWeight: 700, color: T.text, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span>{selectedDate ? `📅 ${selectedDate} (${filteredHistory.length})` : `History (${filteredHistory.length}${hasActiveFilter ? " filtered" : ""})`}</span>
+                  <span>{selectedDate ? `Date ${selectedDate} (${filteredHistory.length})` : `History (${filteredHistory.length}${hasActiveFilter ? " filtered" : ""})`}</span>
                   {hasActiveFilter && <span style={{ fontSize: 11, color: T.textMuted }}>from {attendance.length} total</span>}
                 </div>
 
                 {filteredHistory.length === 0 ? (
                   <div style={{ textAlign: "center", padding: "2rem", color: T.textFaint, fontSize: 13, background: T.bg, borderRadius: T.radiusSm, border: `1px solid ${T.border}` }}>
-                    <div style={{ fontSize: 24, marginBottom: 8 }}>📋</div>
+                    <div style={{ fontSize: 24, marginBottom: 8 }}>Document</div>
                     {selectedDate ? `No records for ${selectedDate}` : `No records found`}
                   </div>
                 ) : (
@@ -1423,7 +1423,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
                               <Badge label={a.status} />
                             </div>
                             <div style={{ fontSize: 11, color: T.textFaint }}>
-                              {a.markedAt ? `🕐 ${new Date(a.markedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}` : "Not marked"}
+                              {a.markedAt ? ` ${new Date(a.markedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}` : "Not marked"}
                               {a.note ? ` · ${a.note}` : ""}
                             </div>
                           </div>
@@ -1450,7 +1450,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
             </div>
             {leaveHistory.length === 0 ? (
               <div style={{ textAlign: "center", padding: "3rem", color: T.textFaint, fontSize: 13 }}>
-                <div style={{ fontSize: 28, marginBottom: 10 }}>🌴</div>No leave requests yet.
+                <div style={{ fontSize: 28, marginBottom: 10 }}>Holiday</div>No leave requests yet.
               </div>
             ) : leaveHistory.map((lv, i) => {
               const s = (lv.status || "pending").toLowerCase(), sc2 = sc(s);
@@ -1495,7 +1495,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
             </div>
             {permHistory.length === 0 ? (
               <div style={{ textAlign: "center", padding: "3rem", color: T.textFaint, fontSize: 13 }}>
-                <div style={{ fontSize: 28, marginBottom: 10 }}>🔑</div>No permission requests yet.
+                <div style={{ fontSize: 28, marginBottom: 10 }}>Key</div>No permission requests yet.
               </div>
             ) : permHistory.map((perm, i) => {
               const s = (perm.status || "pending").toLowerCase(), sc2 = sc(s);
@@ -1506,13 +1506,13 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 8 }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
-                        <span style={{ fontSize: 18 }}>{pt?.icon || "📝"}</span>
+                        <span style={{ fontSize: 18 }}>{pt?.icon || "Edit"}</span>
                         <span style={{ fontSize: 13, fontWeight: 800, color: T.text }}>{perm.typeLabel || pt?.label || perm.type}</span>
                         <Badge label={s} />
                       </div>
                       <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 6 }}>
                         <span style={{ fontSize: 12, color: T.textMuted }}>Date: <strong style={{ color: T.text }}>{perm.date || "—"}</strong></span>
-                        {perm.fromTime && perm.toTime && <span style={{ fontSize: 12, color: T.textMuted }}>{perm.fromTime} → {perm.toTime}</span>}
+                        {perm.fromTime && perm.toTime && <span style={{ fontSize: 12, color: T.textMuted }}>{perm.fromTime}  {perm.toTime}</span>}
                       </div>
                       {perm.reason && <div style={{ fontSize: 12, color: T.textMuted, background: T.surface, borderRadius: T.radiusSm, padding: "7px 10px", border: `1px solid ${T.border}`, marginBottom: 5 }}>{perm.reason}</div>}
                       {perm.appliedOn && <div style={{ fontSize: 10, color: T.textFaint }}>Applied: {new Date(perm.appliedOn).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</div>}
@@ -1533,7 +1533,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
   );
 }
 
-// ── SALARY PAGE ──────────────────────────────────────────────
+// ── SALARY PAGE ----------------------------------------------
 
 function SalaryPage({ salary, user }) {
   const [selected, setSelected] = useState(salary[0] || null);
@@ -1602,7 +1602,7 @@ function SalaryPage({ salary, user }) {
               <div style={{ fontSize: 24, fontWeight: 900, color: "#fff" }}>{fmt(selected.net)}</div>
             </div>
             <button onClick={() => window.print()} style={{ marginTop: 12, width: "100%", padding: "10px", background: T.bg, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, fontSize: 13, color: T.text, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
-              🖨️ Print / Download Slip
+              Print / Download Slip
             </button>
           </Card>
         ) : (
@@ -1613,7 +1613,7 @@ function SalaryPage({ salary, user }) {
   );
 }
 
-// ── PROPOSALS PAGE ───────────────────────────────────────────
+// ── PROPOSALS PAGE -------------------------------------------
 
 function ProposalsPage({ proposals }) {
   return (
@@ -1637,7 +1637,7 @@ function ProposalsPage({ proposals }) {
               </div>
               <div style={{ display: "flex", gap: 8 }}>
                 <button onClick={() => window.location.href = `/project-proposal?edit=${p.id || p._id}`} style={{ background: T.accentLight, color: T.text, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, padding: "5px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Edit Edit</button>
-                <button onClick={() => window.open(`/project-proposal?view=${p._id || p.id}`, "_blank")} style={{ background: T.accentLight, color: T.text, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, padding: "5px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>🖨️ Print</button>
+                <button onClick={() => window.open(`/project-proposal?view=${p._id || p.id}`, "_blank")} style={{ background: T.accentLight, color: T.text, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, padding: "5px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Print</button>
               </div>
             </div>
           ))}
@@ -1648,7 +1648,7 @@ function ProposalsPage({ proposals }) {
   );
 }
 
-// ── ROOT ──────────────────────────────────────────────────────
+// ── ROOT ------------------------------------------------------
 
 export default function EmployeeDashboard({ user, setUser }) {
   const [page, setPage] = useState(() => localStorage.getItem("activeTab_employee") || "dashboard");
@@ -1808,7 +1808,7 @@ export default function EmployeeDashboard({ user, setUser }) {
         const savedTasks = JSON.parse(sessionStorage.getItem(`tasks_${n}`) || "[]");
         if (savedTasks.length > 0 && data.length > savedTasks.length) {
           const newTasks = data.filter(t => !savedTasks.find(st => st._id === t._id));
-          newTasks.forEach(t => addNotification({ id: `task_${t._id}_${Date.now()}`, type: "task", title: "New Task Assigned", msg: `You have a new task: "${t.title}"`, icon: "📝", color: T.success, time: new Date().toISOString() }));
+          newTasks.forEach(t => addNotification({ id: `task_${t._id}_${Date.now()}`, type: "task", title: "New Task Assigned", msg: `You have a new task: "${t.title}"`, icon: "Edit", color: T.success, time: new Date().toISOString() }));
         }
         sessionStorage.setItem(`tasks_${n}`, JSON.stringify(data));
       } else setTasks([]);
@@ -1819,7 +1819,7 @@ export default function EmployeeDashboard({ user, setUser }) {
         const savedEvents = JSON.parse(sessionStorage.getItem(`events_${n}`) || "[]");
         if (savedEvents.length > 0 && data.length > savedEvents.length) {
           const newEvents = data.filter(e => !savedEvents.find(se => se._id === e._id));
-          newEvents.forEach(e => addNotification({ id: `event_${e._id}_${Date.now()}`, type: "event", title: "New Event / Meeting", msg: `New event: "${e.name}" on ${e.date}`, icon: "📅", color: T.accent, time: new Date().toISOString() }));
+          newEvents.forEach(e => addNotification({ id: `event_${e._id}_${Date.now()}`, type: "event", title: "New Event / Meeting", msg: `New event: "${e.name}" on ${e.date}`, icon: "Date", color: T.accent, time: new Date().toISOString() }));
         }
         sessionStorage.setItem(`events_${n}`, JSON.stringify(data));
       } else setEvents([]);
@@ -1831,7 +1831,7 @@ export default function EmployeeDashboard({ user, setUser }) {
           type: dn.type || "warning",
           title: dn.type === "warning" ? "Document Request" : "Notification",
           msg: dn.text,
-          icon: dn.icon || "📁",
+          icon: dn.icon || "Folder",
           color: dn.type === "warning" ? T.warning : T.accent,
           time: dn.createdAt || new Date().toISOString(),
           isRead: dn.isRead,
@@ -1872,7 +1872,7 @@ export default function EmployeeDashboard({ user, setUser }) {
     if (!hasNotifiedLogin) {
       const isAlready = localStorage.getItem(`login_notified_ever_${empName}`) === "true";
       if (!isAlready) {
-        addNotification({ id: `login_${Date.now()}`, type: 'login', title: 'Login Successful', msg: `Welcome back, ${resolvedUser.name}!`, icon: '🔐', color: T.success, time: new Date().toISOString() });
+        addNotification({ id: `login_${Date.now()}`, type: 'login', title: 'Login Successful', msg: `Welcome back, ${resolvedUser.name}!`, icon: '', color: T.success, time: new Date().toISOString() });
         setHasNotifiedLogin(true);
         localStorage.setItem(`login_notified_ever_${empName}`, "true");
       }
@@ -1881,7 +1881,7 @@ export default function EmployeeDashboard({ user, setUser }) {
     if (dob) {
       const td = new Date(), bd = new Date(dob);
       if (td.getDate() === bd.getDate() && td.getMonth() === bd.getMonth()) {
-        addNotification({ id: `birthday_${empName}_${td.getFullYear()}`, type: 'birthday', title: 'Happy Birthday! 🎂', msg: `Wishing you a fantastic day, ${resolvedUser.name}!`, icon: '🎉', color: '#ec4899', time: new Date().toISOString() });
+        addNotification({ id: `birthday_${empName}_${td.getFullYear()}`, type: 'birthday', title: 'Happy Birthday! ', msg: `Wishing you a fantastic day, ${resolvedUser.name}!`, icon: 'Celebration', color: '#ec4899', time: new Date().toISOString() });
       }
     }
   }, [resolvedUser, empName, hasNotifiedLogin, addNotification]);
@@ -1924,7 +1924,7 @@ export default function EmployeeDashboard({ user, setUser }) {
     }
   };
 
-  // ── NOTIFICATION DROPDOWN ────────────────────────────────────
+  // ── NOTIFICATION DROPDOWN ------------------------------------
   const NotifDropdown = () => (
     <div data-notif-menu="true" style={{ position: "absolute", top: 46, right: 0, width: 310, background: T.surface, border: `1px solid ${T.border}`, borderRadius: T.radius, boxShadow: T.shadowLg, zIndex: 1000, overflow: "hidden" }}>
       <div style={{ padding: "13px 16px", borderBottom: `1px solid ${T.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: T.bg }}>
@@ -1934,7 +1934,7 @@ export default function EmployeeDashboard({ user, setUser }) {
       <div style={{ maxHeight: 380, overflowY: "auto" }}>
         {notifications.length === 0 ? (
           <div style={{ padding: "40px 20px", textAlign: "center", color: T.textFaint }}>
-            <div style={{ fontSize: 32, marginBottom: 10 }}>🔔</div>
+            <div style={{ fontSize: 32, marginBottom: 10 }}>Alert</div>
             <div style={{ fontSize: 12 }}>No new notifications</div>
           </div>
         ) : notifications.map((n, i) => (
@@ -1967,7 +1967,7 @@ export default function EmployeeDashboard({ user, setUser }) {
               <div style={{ fontSize: 11, color: T.textMuted, marginTop: 2, lineHeight: 1.5 }}>{n.msg}</div>
               <div style={{ fontSize: 10, color: T.textFaint, marginTop: 5 }}>{new Date(n.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
             </div>
-            <button onClick={(e) => { e.stopPropagation(); removeNotification(n.id, n.isDb); }} style={{ background: "none", border: "none", color: T.textFaint, cursor: "pointer", fontSize: 13, padding: 3 }} onMouseEnter={el => el.currentTarget.style.color = T.danger}>✕</button>
+            <button onClick={(e) => { e.stopPropagation(); removeNotification(n.id, n.isDb); }} style={{ background: "none", border: "none", color: T.textFaint, cursor: "pointer", fontSize: 13, padding: 3 }} onMouseEnter={el => el.currentTarget.style.color = T.danger}>Close</button>
           </div>
         ))}
       </div>
@@ -2023,7 +2023,7 @@ export default function EmployeeDashboard({ user, setUser }) {
                   style={{ background: T.bg, border: `1px solid ${T.border}`, borderRadius: 10, width: 38, height: 38, fontSize: 16, cursor: "pointer", color: T.text, position: "relative", display: "flex", alignItems: "center", justifyContent: "center", transition: "border-color 0.15s" }}
                   onMouseEnter={e => e.currentTarget.style.borderColor = T.accent}
                   onMouseLeave={e => e.currentTarget.style.borderColor = T.border}>
-                  🔔
+                  Alert
                   {unreadCount > 0 && <span style={{ position: "absolute", top: -3, right: -3, background: T.danger, color: "#fff", borderRadius: "50%", width: 16, height: 16, fontSize: 9, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #fff" }}>{unreadCount}</span>}
                 </button>
                 {notifDropdownOpen && <NotifDropdown />}
@@ -2049,11 +2049,11 @@ export default function EmployeeDashboard({ user, setUser }) {
 
           {/* Mobile topbar */}
           <div className="emp-mob-bar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: T.surface, borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 100 }}>
-            <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, cursor: "pointer", color: T.text }}>☰</button>
+            <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, cursor: "pointer", color: T.text }}></button>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ position: "relative" }} data-notif-anchor="true">
                 <button onClick={() => setNotifDropdownOpen(!notifDropdownOpen)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: T.text, position: "relative" }}>
-                  🔔
+                  Alert
                   {unreadCount > 0 && <span style={{ position: "absolute", top: -2, right: -2, background: T.danger, color: "#fff", borderRadius: "50%", width: 15, height: 15, fontSize: 9, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center" }}>{unreadCount}</span>}
                 </button>
                 {notifDropdownOpen && <NotifDropdown />}
@@ -2074,13 +2074,13 @@ export default function EmployeeDashboard({ user, setUser }) {
                     <div style={{ fontSize: 13, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{resolvedUser?.name || "Employee"}</div>
                     <div style={{ fontSize: 11, color: T.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{resolvedUser?.email}</div>
                   </div>
-                  <span style={{ fontSize: 12, color: T.success }}>✓</span>
+                  <span style={{ fontSize: 12, color: T.success }}>Yes</span>
                 </div>
               </div>
               {[
-                { icon: "👤", label: "Profile", action: () => { setProfileDropdownOpen(false); setPage("myprofile"); } },
-                ...(subscription?.businessLimit === "Multiple business manage" ? [{ icon: "➕", label: "Add account", action: () => { setProfileDropdownOpen(false); setAccountAuthOpen(true); } }] : []),
-                { icon: "🚪", label: "Logout", action: () => { setProfileDropdownOpen(false); handleLogout(); }, danger: true },
+                { icon: "Profile", label: "Profile", action: () => { setProfileDropdownOpen(false); setPage("myprofile"); } },
+                ...(subscription?.businessLimit === "Multiple business manage" ? [{ icon: "Add", label: "Add account", action: () => { setProfileDropdownOpen(false); setAccountAuthOpen(true); } }] : []),
+                { icon: "", label: "Logout", action: () => { setProfileDropdownOpen(false); handleLogout(); }, danger: true },
               ].map((item, idx) => (
                 <button key={idx} onClick={item.action}
                   style={{ width: "100%", background: "none", border: "none", padding: "10px 14px", cursor: "pointer", fontSize: 13, fontWeight: 700, fontFamily: "inherit", color: item.danger ? T.danger : T.text, display: "flex", alignItems: "center", gap: 10, borderTop: idx > 0 ? `1px solid ${T.border}` : "none", textAlign: "left", transition: "background 0.15s" }}
@@ -2152,7 +2152,7 @@ export default function EmployeeDashboard({ user, setUser }) {
 
         {accountAuthOpen && (
           <div style={{ position: "fixed", inset: 0, zIndex: 10060 }}>
-            <button onClick={() => setAccountAuthOpen(false)} style={{ position: "absolute", top: 16, right: 16, zIndex: 10061, background: "rgba(255,255,255,0.9)", border: `1px solid ${T.border}`, color: T.text, borderRadius: 9, width: 34, height: 34, cursor: "pointer", fontWeight: 900, fontSize: 13 }}>✕</button>
+            <button onClick={() => setAccountAuthOpen(false)} style={{ position: "absolute", top: 16, right: 16, zIndex: 10061, background: "rgba(255,255,255,0.9)", border: `1px solid ${T.border}`, color: T.text, borderRadius: 9, width: 34, height: 34, cursor: "pointer", fontWeight: 900, fontSize: 13 }}>Close</button>
             <AuthPage setUser={handleAuthSetUser} initialTab="login" />
           </div>
         )}

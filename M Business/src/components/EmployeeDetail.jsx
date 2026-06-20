@@ -216,7 +216,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         userId: emp._id || emp.employeeId,
         text: `Please upload your ${newDocName} (${newDocType})`,
         type: "warning",
-        icon: "📁",
+        icon: "Folder",
         companyId: emp.companyId || ""
       });
 
@@ -276,7 +276,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
 
   // Filter pending document request notifications (unread warnings or texts with upload/document)
   const dbRequested = dbNotifications
-    .filter(n => !n.isRead && (n.type === "warning" || n.text?.toLowerCase().includes("upload") || n.icon === "📁"))
+    .filter(n => !n.isRead && (n.type === "warning" || n.text?.toLowerCase().includes("upload") || n.icon === "Folder"))
     .map(n => {
       let name = "";
       const match = n.text.match(/Please upload your (.+?) \((.+?)\)/);

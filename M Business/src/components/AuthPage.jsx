@@ -163,7 +163,7 @@ const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData);
   const showMainTabs = isLogin || isRegister;
 
   // Purple panel position & clip based on tab
-  // register → left side; login → right side
+  // register  left side; login  right side
   const panelLeft = isRegister ? "0" : "58%";
   const panelClip = isRegister
     ? "polygon(0 0, 87% 0, 100% 100%, 0 100%)"
@@ -193,7 +193,7 @@ const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData);
   };
 
   const errMsg = (msg) => msg
-    ? <div style={{ fontSize: 11, color: "#fca5a5", marginTop: 4 }}>⚠ {msg}</div>
+    ? <div style={{ fontSize: 11, color: "#fca5a5", marginTop: 4 }}>Warning {msg}</div>
     : null;
 
   return (
@@ -365,7 +365,7 @@ const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData);
                   <input value={regData.name}
                     onChange={e => { setRegData(p => ({ ...p, name: e.target.value })); setRegErr(p => ({ ...p, name: "" })); }}
                     placeholder="Your full name" style={inp(regErr.name)} />
-                  <Icon>👤</Icon>
+                  <Icon>Profile</Icon>
                   {errMsg(regErr.name)}
                 </div>
               </Field>
@@ -384,7 +384,7 @@ const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData);
                     <input type="email" value={regData.email}
                       onChange={e => { setRegData(p => ({ ...p, email: e.target.value })); setRegErr(p => ({ ...p, email: "" })); }}
                       placeholder="you@email.com" style={inp(regErr.email)} />
-                    <Icon>✉️</Icon>
+                    <Icon>Mail</Icon>
                     {errMsg(regErr.email)}
                   </div>
                 </Field>
@@ -393,7 +393,7 @@ const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData);
                     <input value={regData.phone}
                       onChange={e => setRegData(p => ({ ...p, phone: e.target.value }))}
                       placeholder="+91 98765 43210" style={inp(false)} />
-                    <Icon>📱</Icon>
+                    <Icon></Icon>
                   </div>
                 </Field>
               </div>
@@ -425,7 +425,7 @@ const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData);
                     <input value={regData.companyName}
                       onChange={e => setRegData(p => ({ ...p, companyName: e.target.value }))}
                       placeholder="Your company name" style={inp(false)} />
-                    <Icon>🏢</Icon>
+                    <Icon>Company</Icon>
                   </div>
                 </Field>
                 <div className="grid2">
@@ -464,7 +464,7 @@ const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData);
                   <input type="email" value={loginData.email}
                     onChange={e => { setLoginData(p => ({ ...p, email: e.target.value })); setLoginErr(p => ({ ...p, email: "" })); }}
                     placeholder="you@email.com" style={inp(loginErr.email)} />
-                  <Icon>👤</Icon>
+                  <Icon>Profile</Icon>
                   {errMsg(loginErr.email)}
                 </div>
               </Field>
@@ -516,7 +516,7 @@ const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData);
                 {loading ? <><span className="spinner" />Verifying...</> : "Verify & Continue"}
               </button>
               <div style={{ textAlign: "center", marginTop: 14 }}>
-                <button className="link-btn" onClick={() => switchTab("login")}>← Back to Login</button>
+                <button className="link-btn" onClick={() => switchTab("login")}> Back to Login</button>
               </div>
             </div>
           )}
@@ -533,14 +533,14 @@ const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData);
                   <input type="email" value={forgotEmail} onChange={e => setForgotEmail(e.target.value)}
                     onKeyDown={e => e.key === "Enter" && handleForgotPassword()}
                     placeholder="you@email.com" style={inp(false)} />
-                  <Icon>✉️</Icon>
+                  <Icon>Mail</Icon>
                 </div>
               </Field>
               <button className="purple-btn" onClick={handleForgotPassword} disabled={loading}>
                 {loading ? <><span className="spinner" />Sending...</> : "Send Reset OTP"}
               </button>
               <div style={{ textAlign: "center", marginTop: 14 }}>
-                <button className="link-btn" onClick={() => switchTab("login")}>← Back to Login</button>
+                <button className="link-btn" onClick={() => switchTab("login")}> Back to Login</button>
               </div>
             </div>
           )}
@@ -640,7 +640,7 @@ function Alert({ type, msg }) {
       borderRadius: 8, padding: "9px 13px", marginBottom: 14,
       fontSize: 12.5, color: isSuccess ? "#86efac" : "#fca5a5",
     }}>
-      {isSuccess ? "✅" : "⚠"} {msg}
+      {isSuccess ? "Success" : "Warning"} {msg}
     </div>
   );
 }

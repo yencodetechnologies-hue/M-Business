@@ -108,30 +108,30 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
 
   // Form State
   const [name, setName] = useState(editProject?.name || '');
-const [description, setDescription] = useState(editProject?.description || editProject?.purpose || '');
+  const [description, setDescription] = useState(editProject?.description || editProject?.purpose || '');
   const [client, setClient] = useState(editProject?.client || '');
   const [category, setCategory] = useState(editProject?.category || 'Web Development');
   const [priority, setPriority] = useState(editProject?.priority || 'medium');
   const [status, setStatus] = useState(editProject?.status || 'Active');
   const [progress, setProgress] = useState(editProject?.progress || 0);
-  
-const safeDate = (d) => { try { return d ? new Date(d).toISOString().split('T')[0] : ''; } catch { return ''; } };
-const [start, setStart] = useState(safeDate(editProject?.start) || new Date().toISOString().split('T')[0]);
-const [end, setEnd] = useState(safeDate(editProject?.end) || safeDate(editProject?.deadline) || '');
-const [assigned, setAssigned] = useState(() => {
-  const a = editProject?.assignedTo;
-  if (!a) return [];
-  if (Array.isArray(a)) return a.map(x => typeof x === 'object' ? (x.name || x.employeeName || '') : String(x)).filter(Boolean);
-  return [String(a)];
-});
+
+  const safeDate = (d) => { try { return d ? new Date(d).toISOString().split('T')[0] : ''; } catch { return ''; } };
+  const [start, setStart] = useState(safeDate(editProject?.start) || new Date().toISOString().split('T')[0]);
+  const [end, setEnd] = useState(safeDate(editProject?.end) || safeDate(editProject?.deadline) || '');
+  const [assigned, setAssigned] = useState(() => {
+    const a = editProject?.assignedTo;
+    if (!a) return [];
+    if (Array.isArray(a)) return a.map(x => typeof x === 'object' ? (x.name || x.employeeName || '') : String(x)).filter(Boolean);
+    return [String(a)];
+  });
   const [budget, setBudget] = useState(editProject?.budget || '');
   const [currency, setCurrency] = useState(editProject?.currency || '₹');
   const [contactPersonName, setContactPersonName] = useState(editProject?.contactPersonName || '');
-const [contactPersonNo, setContactPersonNo] = useState(editProject?.contactPersonNo || '');
-const [contactEmail, setContactEmail] = useState(editProject?.contactEmail || editProject?.clientEmail || '');
+  const [contactPersonNo, setContactPersonNo] = useState(editProject?.contactPersonNo || '');
+  const [contactEmail, setContactEmail] = useState(editProject?.contactEmail || editProject?.clientEmail || '');
   const [billed, setBilled] = useState(editProject?.billed || '');
   const [received, setReceived] = useState(editProject?.received || '');
-const [pending, setPending] = useState(editProject?.pending || '');
+  const [pending, setPending] = useState(editProject?.pending || '');
   const [spent, setSpent] = useState(editProject?.spent || '');
 
   const defaultPortalOpts = {
@@ -206,10 +206,10 @@ const [pending, setPending] = useState(editProject?.pending || '');
       const payload = {
         name,
         description,
-      client,
-contactPersonName,
-contactPersonNo,
-contactEmail,
+        client,
+        contactPersonName,
+        contactPersonNo,
+        contactEmail,
         category,
         purpose: description,
         priority,
@@ -244,7 +244,7 @@ contactEmail,
       } else {
         res = await axios.post(`${BASE_URL}/api/projects/add`, payload, { headers });
       }
-      
+
       if (onSuccess) await onSuccess(res.data);
 
       // Fire-and-forget notifications (don't block on these)
@@ -258,7 +258,7 @@ contactEmail,
               icon: '◈',
               text: `You have been assigned to project: "${name}"`,
               link: 'projects'
-            }).catch(() => {});
+            }).catch(() => { });
           }
         });
       }
@@ -275,35 +275,35 @@ contactEmail,
       <style>{CSS}</style>
 
       {/* Header */}
-     <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
-  {onBack && (
-    <button onClick={onBack} className="mpc-btn mpc-btn-outline" style={{ padding: "8px 14px", flexShrink: 0 }}>
-      <i className="ti ti-arrow-left" />
-    </button>
-  )}
-  <div style={{ fontSize: 22, fontWeight: 900, color: P.textDark }}>{editProject ? 'Edit Project' : 'Create New Project'}</div>
-</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
+        {onBack && (
+          <button onClick={onBack} className="mpc-btn mpc-btn-outline" style={{ padding: "8px 14px", flexShrink: 0 }}>
+            <i className="ti ti-arrow-left" />
+          </button>
+        )}
+        <div style={{ fontSize: 22, fontWeight: 900, color: P.textDark }}>{editProject ? 'Edit Project' : 'Create New Project'}</div>
+      </div>
 
       <div className="mpc-create-layout">
         <div>
           {/* STEP BAR */}
           <div className="mpc-step-bar">
-            <div className={`mpc-step ${currentStep > 1 ? 'done' : 'active'}`} onClick={() => document.getElementById('sec1')?.scrollIntoView({behavior:'smooth'})} style={{cursor:'pointer'}}>
+            <div className={`mpc-step ${currentStep > 1 ? 'done' : 'active'}`} onClick={() => document.getElementById('sec1')?.scrollIntoView({ behavior: 'smooth' })} style={{ cursor: 'pointer' }}>
               <div className="mpc-step-num">{currentStep > 1 ? <i className="ti ti-check" /> : 1}</div> Basic Info
             </div>
             <div className={`mpc-step-line ${currentStep > 1 ? 'done' : ''}`} />
-            
-            <div className={`mpc-step ${currentStep > 2 ? 'done' : currentStep === 2 ? 'active' : ''}`} onClick={() => document.getElementById('sec2')?.scrollIntoView({behavior:'smooth'})} style={{cursor:'pointer'}}>
+
+            <div className={`mpc-step ${currentStep > 2 ? 'done' : currentStep === 2 ? 'active' : ''}`} onClick={() => document.getElementById('sec2')?.scrollIntoView({ behavior: 'smooth' })} style={{ cursor: 'pointer' }}>
               <div className="mpc-step-num">{currentStep > 2 ? <i className="ti ti-check" /> : 2}</div> Team & Dates
             </div>
             <div className={`mpc-step-line ${currentStep > 2 ? 'done' : ''}`} />
-            
-            <div className={`mpc-step ${currentStep > 3 ? 'done' : currentStep === 3 ? 'active' : ''}`} onClick={() => document.getElementById('sec3')?.scrollIntoView({behavior:'smooth'})} style={{cursor:'pointer'}}>
+
+            <div className={`mpc-step ${currentStep > 3 ? 'done' : currentStep === 3 ? 'active' : ''}`} onClick={() => document.getElementById('sec3')?.scrollIntoView({ behavior: 'smooth' })} style={{ cursor: 'pointer' }}>
               <div className="mpc-step-num">{currentStep > 3 ? <i className="ti ti-check" /> : 3}</div> Budget & Milestones
             </div>
             <div className={`mpc-step-line ${currentStep > 3 ? 'done' : ''}`} />
-            
-            <div className={`mpc-step ${currentStep === 4 ? 'active' : ''}`} onClick={() => document.getElementById('sec4')?.scrollIntoView({behavior:'smooth'})} style={{cursor:'pointer'}}>
+
+            <div className={`mpc-step ${currentStep === 4 ? 'active' : ''}`} onClick={() => document.getElementById('sec4')?.scrollIntoView({ behavior: 'smooth' })} style={{ cursor: 'pointer' }}>
               <div className="mpc-step-num">4</div> Launch
             </div>
           </div>
@@ -311,33 +311,33 @@ contactEmail,
           {/* SECTION 1: BASIC INFO */}
           <div className="mpc-section-card" id="sec1">
             <div className="mpc-section-heading"><i className="ti ti-file-description" /> Basic Information</div>
-            
+
             <div className="mpc-form-group">
               <label>Project Name *</label>
               <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. E-Commerce Platform Redesign" autoFocus />
             </div>
-            
+
             <div className="mpc-form-group">
               <label>Description</label>
               <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Describe the project scope, goals and deliverables..." />
             </div>
-            
+
             <div className="mpc-form-2col">
               <div className="mpc-form-group">
                 <label>Client *</label>
-               <select value={client} onChange={e => {
-  const selectedName = e.target.value;
-  setClient(selectedName);
-  const sel = clients.find(c => (c.clientName || c.name) === selectedName);
-  if (sel) {
-    setContactPersonName(sel.contactPersonName || '');
-    setContactPersonNo(sel.contactPersonNo || '');
-    setContactEmail(sel.email || '');
-  }
-}}>
-  <option value="">Select client...</option>
-  {clients.map(c => <option key={c._id || c.id} value={c.clientName || c.name}>{c.clientName || c.name}</option>)}
-</select>
+                <select value={client} onChange={e => {
+                  const selectedName = e.target.value;
+                  setClient(selectedName);
+                  const sel = clients.find(c => (c.clientName || c.name) === selectedName);
+                  if (sel) {
+                    setContactPersonName(sel.contactPersonName || '');
+                    setContactPersonNo(sel.contactPersonNo || '');
+                    setContactEmail(sel.email || '');
+                  }
+                }}>
+                  <option value="">Select client...</option>
+                  {clients.map(c => <option key={c._id || c.id} value={c.clientName || c.name}>{c.clientName || c.name}</option>)}
+                </select>
               </div>
               <div className="mpc-form-group">
                 <label>Category</label>
@@ -369,17 +369,7 @@ contactEmail,
             <div className="mpc-form-2col">
               <div className="mpc-form-group"><label>Start Date</label><input type="date" value={start} onChange={e => setStart(e.target.value)} /></div>
               <div className="mpc-form-group"><label>Deadline</label><input type="date" value={end} onChange={e => setEnd(e.target.value)} /></div>
-              <div className="mpc-form-group">
-  <label>Progress (%)</label>
-  <input 
-    type="number" 
-    min="0" 
-    max="100" 
-    value={progress} 
-    onChange={e => setProgress(Number(e.target.value))} 
-    placeholder="0" 
-  />
-</div>
+
             </div>
           </div>
 
@@ -429,9 +419,9 @@ contactEmail,
                   <input type="number" value={received} onChange={e => setReceived(e.target.value)} placeholder="0" />
                 </div>
                 <div className="mpc-form-group">
-  <label>Pending Amount</label>
-<input type="number" value={pending} readOnly style={{background:'#f0f4f8', cursor:'not-allowed'}} />
-</div>
+                  <label>Pending Amount</label>
+                  <input type="number" value={pending} readOnly style={{ background: '#f0f4f8', cursor: 'not-allowed' }} />
+                </div>
                 <div className="mpc-form-group">
                   <label>Spent Amount</label>
                   <input type="number" value={spent} onChange={e => setSpent(e.target.value)} placeholder="0" />
@@ -462,23 +452,23 @@ contactEmail,
             <div className="mpc-section-heading"><i className="ti ti-building" /> Client Portal Settings</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <label className="mpc-checkbox-label">
-                <input type="checkbox" checked={portalOpts.enablePortal} onChange={e => setPortalOpts({...portalOpts, enablePortal: e.target.checked})} />
+                <input type="checkbox" checked={portalOpts.enablePortal} onChange={e => setPortalOpts({ ...portalOpts, enablePortal: e.target.checked })} />
                 Enable client portal for this project
               </label>
               <label className="mpc-checkbox-label">
-                <input type="checkbox" checked={portalOpts.showProgress} onChange={e => setPortalOpts({...portalOpts, showProgress: e.target.checked})} disabled={!portalOpts.enablePortal} />
+                <input type="checkbox" checked={portalOpts.showProgress} onChange={e => setPortalOpts({ ...portalOpts, showProgress: e.target.checked })} disabled={!portalOpts.enablePortal} />
                 Show project progress to client
               </label>
               <label className="mpc-checkbox-label">
-                <input type="checkbox" checked={portalOpts.showMilestones} onChange={e => setPortalOpts({...portalOpts, showMilestones: e.target.checked})} disabled={!portalOpts.enablePortal} />
+                <input type="checkbox" checked={portalOpts.showMilestones} onChange={e => setPortalOpts({ ...portalOpts, showMilestones: e.target.checked })} disabled={!portalOpts.enablePortal} />
                 Show milestones to client
               </label>
               <label className="mpc-checkbox-label">
-                <input type="checkbox" checked={portalOpts.showTeam} onChange={e => setPortalOpts({...portalOpts, showTeam: e.target.checked})} disabled={!portalOpts.enablePortal} />
+                <input type="checkbox" checked={portalOpts.showTeam} onChange={e => setPortalOpts({ ...portalOpts, showTeam: e.target.checked })} disabled={!portalOpts.enablePortal} />
                 Show team members to client
               </label>
               <label className="mpc-checkbox-label">
-                <input type="checkbox" checked={portalOpts.allowMessages} onChange={e => setPortalOpts({...portalOpts, allowMessages: e.target.checked})} disabled={!portalOpts.enablePortal} />
+                <input type="checkbox" checked={portalOpts.allowMessages} onChange={e => setPortalOpts({ ...portalOpts, allowMessages: e.target.checked })} disabled={!portalOpts.enablePortal} />
                 Allow client to send messages
               </label>
             </div>
@@ -489,7 +479,7 @@ contactEmail,
         <div>
           <div className="mpc-preview-card">
             <h3><i className="ti ti-eye" /> Project Preview</h3>
-            
+
             <div className="mpc-pv-row"><span className="mpc-pv-label">Name</span><span className="mpc-pv-val">{name || '—'}</span></div>
             <div className="mpc-pv-row"><span className="mpc-pv-label">Client</span><span className="mpc-pv-val">{client || '—'}</span></div>
             <div className="mpc-pv-row"><span className="mpc-pv-label">Category</span><span className="mpc-pv-val">{category}</span></div>
@@ -515,7 +505,7 @@ contactEmail,
               </div>
             )}
             <div className="mpc-pv-row"><span className="mpc-pv-label">Client Portal</span><span className="mpc-pv-val">{portalOpts.enablePortal ? 'Enabled' : 'Disabled'}</span></div>
-            
+
             <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 12, marginTop: 8 }}>
               Checklist
             </div>
@@ -539,7 +529,7 @@ contactEmail,
           {onBack && <button className="mpc-btn mpc-btn-outline" onClick={onBack}>Cancel</button>}
           <button className="mpc-btn mpc-btn-primary" onClick={handleCreate} disabled={loading} style={{ opacity: loading ? 0.7 : 1 }}>
             {loading ? <i className="ti ti-loader" style={{ animation: 'spin 1s linear infinite' }} /> : <i className="ti ti-rocket" />}
-            {loading ? (editProject ? 'Updating...' : 'Launching...') : (editProject ? '✅ Update Project' : 'Create & Launch Project')}
+            {loading ? (editProject ? 'Updating...' : 'Launching...') : (editProject ? 'Success Update Project' : 'Create & Launch Project')}
           </button>
         </div>
       </div>

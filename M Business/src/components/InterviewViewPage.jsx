@@ -20,7 +20,7 @@ function Badge({ label = "pending" }) {
       padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700,
       textTransform: "capitalize", whiteSpace: "nowrap",
     }}>
-      {label?.toLowerCase() === "hired" ? "✅ Hired" : label?.toLowerCase() === "rejected" ? "❌ Rejected" : "⏳ Pending"}
+      {label?.toLowerCase() === "hired" ? "Success Hired" : label?.toLowerCase() === "rejected" ? "Error Rejected" : "Pending Pending"}
     </span>
   );
 }
@@ -44,7 +44,7 @@ function Modal({ title, onClose, children, wide }) {
           background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))",
         }}>
           <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "var(--app-text)" }}>{title}</h2>
-          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "var(--app-accent)", padding: "4px 8px" }}>✕</button>
+          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "var(--app-accent)", padding: "4px 8px" }}>Close</button>
         </div>
         <div style={{ overflowY: "auto", padding: "20px 22px", flex: 1 }}>{children}</div>
       </div>
@@ -73,7 +73,7 @@ function StatusPicker({ current = "pending", onChange }) {
           color: current?.toLowerCase() === s.toLowerCase() ? sc(s) : "var(--app-muted)",
           fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s",
         }}>
-          {s === "Pending" ? "⏳ Pending" : s === "Hired" ? "✅ Hired" : "❌ Rejected"}
+          {s === "Pending" ? "Pending Pending" : s === "Hired" ? "Success Hired" : "Error Rejected"}
         </button>
       ))}
     </div>
@@ -95,15 +95,15 @@ function ResumeModal({ candidate, onClose, onStatusChange }) {
   };
 
   return (
-    <Modal title={`📄 Resume — ${candidate.name}`} onClose={onClose} wide>
+    <Modal title={`Document Resume — ${candidate.name}`} onClose={onClose} wide>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 18 }}>
-        <InfoCell icon="👤" label="Name" value={candidate.name} />
-        <InfoCell icon="📧" label="Email" value={candidate.email} />
-        <InfoCell icon="📱" label="Mobile" value={candidate.mobile} />
-        <InfoCell icon="🎯" label="Role" value={candidate.role} />
-        <InfoCell icon="💼" label="Experience" value={candidate.experience === "Fresher" ? "🎓 Fresher" : `${candidate.years || "?"} yrs`} />
-        <InfoCell icon="📅" label="Applied" value={candidate.date ? new Date(candidate.date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—"} />
-        {candidate.interviewerName && <InfoCell icon="🧑‍💼" label="Interviewer" value={candidate.interviewerName} />}
+        <InfoCell icon="Profile" label="Name" value={candidate.name} />
+        <InfoCell icon="" label="Email" value={candidate.email} />
+        <InfoCell icon="" label="Mobile" value={candidate.mobile} />
+        <InfoCell icon="Target" label="Role" value={candidate.role} />
+        <InfoCell icon="Job" label="Experience" value={candidate.experience === "Fresher" ? "Education Fresher" : `${candidate.years || "?"} yrs`} />
+        <InfoCell icon="Date" label="Applied" value={candidate.date ? new Date(candidate.date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—"} />
+        {candidate.interviewerName && <InfoCell icon="‍Job" label="Interviewer" value={candidate.interviewerName} />}
       </div>
 
       <div style={{ marginBottom: 16 }}>
@@ -118,18 +118,18 @@ function ResumeModal({ candidate, onClose, onStatusChange }) {
             </div>
           ) : (
             <div style={{ background: "var(--app-bg)", borderRadius: 12, padding: 24, textAlign: "center", border: "1px solid var(--app-border)", marginBottom: 12 }}>
-              <div style={{ fontSize: 48, marginBottom: 8 }}>📄</div>
+              <div style={{ fontSize: 48, marginBottom: 8 }}>Document</div>
               <div style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 600 }}>{candidate.resumeName}</div>
               <div style={{ fontSize: 12, color: "var(--app-muted)", marginTop: 4 }}>Preview not available — download below</div>
             </div>
           )}
           <button onClick={downloadResume} style={btnStyle("var(--app-accent)")}>
-            ⬇️ Download Resume — {candidate.resumeName || "file"}
+             Download Resume — {candidate.resumeName || "file"}
           </button>
         </>
       ) : (
         <div style={{ textAlign: "center", padding: 30, color: "var(--app-muted)", background: "var(--app-bg)", borderRadius: 12, border: "1px solid var(--app-border)" }}>
-          <div style={{ fontSize: 40, marginBottom: 8 }}>📭</div>No resume uploaded
+          <div style={{ fontSize: 40, marginBottom: 8 }}></div>No resume uploaded
         </div>
       )}
     </Modal>
@@ -141,7 +141,7 @@ function ProfileModal({ candidate, onClose, onStatusChange, onViewResume }) {
   const fmt = (iso) => iso ? new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 
   return (
-    <Modal title="👤 Candidate Profile" onClose={onClose}>
+    <Modal title="Profile Candidate Profile" onClose={onClose}>
       <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", borderRadius: 14, border: "1px solid var(--app-border)", marginBottom: 18 }}>
         <div style={avatarStyle(56, 22)}>{(candidate.name || "?")[0].toUpperCase()}</div>
         <div style={{ flex: 1 }}>
@@ -152,14 +152,14 @@ function ProfileModal({ candidate, onClose, onStatusChange, onViewResume }) {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
-        <InfoCell icon="📧" label="Email" value={candidate.email} />
-        <InfoCell icon="📱" label="Mobile" value={candidate.mobile} />
-        <InfoCell icon="💼" label="Experience" value={candidate.experience === "Fresher" ? "🎓 Fresher" : `💼 ${candidate.years || "?"} years`} />
-        <InfoCell icon="🎯" label="Role" value={candidate.role} />
-        <InfoCell icon="📅" label="Applied" value={fmt(candidate.date || candidate.createdAt)} />
-        <InfoCell icon="📎" label="Resume" value={candidate.resumeName || "Not uploaded"} />
-        {candidate.interviewerName && <InfoCell icon="🧑‍💼" label="Interviewer" value={candidate.interviewerName} />}
-        {candidate.notes && <div style={{ gridColumn: "1/-1" }}><InfoCell icon="📝" label="Notes" value={candidate.notes} /></div>}
+        <InfoCell icon="" label="Email" value={candidate.email} />
+        <InfoCell icon="" label="Mobile" value={candidate.mobile} />
+        <InfoCell icon="Job" label="Experience" value={candidate.experience === "Fresher" ? "Education Fresher" : `Job ${candidate.years || "?"} years`} />
+        <InfoCell icon="Target" label="Role" value={candidate.role} />
+        <InfoCell icon="Date" label="Applied" value={fmt(candidate.date || candidate.createdAt)} />
+        <InfoCell icon="Attach" label="Resume" value={candidate.resumeName || "Not uploaded"} />
+        {candidate.interviewerName && <InfoCell icon="‍Job" label="Interviewer" value={candidate.interviewerName} />}
+        {candidate.notes && <div style={{ gridColumn: "1/-1" }}><InfoCell icon="Edit" label="Notes" value={candidate.notes} /></div>}
       </div>
 
       <div style={{ marginBottom: 14 }}>
@@ -167,13 +167,13 @@ function ProfileModal({ candidate, onClose, onStatusChange, onViewResume }) {
       </div>
 
       {(candidate.resumeData || candidate.resumeUrl) && (
-        <button onClick={onViewResume} style={btnStyle("var(--app-accent)")}>📄 </button>
+        <button onClick={onViewResume} style={btnStyle("var(--app-accent)")}>Document </button>
       )}
     </Modal>
   );
 }
 
-// ── Main Page ─────────────────────────────────────────────
+// ── Main Page ---------------------------------------------
 export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", companyName = "Your Business" }) {
   const STORAGE_KEY = `hr_candidates_${companyId}`;
   const [candidates, setCandidates] = useState([]);
@@ -205,7 +205,7 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
     persist(updated);
     const c = updated[idx]; const id = c._id || c.id;
     if (id) axios.patch(`${API_URL}/api/interviews/${id}/status`, { status: val }).catch(() => { });
-    showToast(`✅ Status → "${val}"`);
+    showToast(`Success Status  "${val}"`);
     if (viewResume && (viewResume._id || viewResume.id) === id) setViewResume(updated[idx]);
     if (viewProfile && (viewProfile._id || viewProfile.id) === id) setViewProfile(updated[idx]);
   };
@@ -215,12 +215,12 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
     const c = candidates[idx]; const id = c._id || c.id;
     if (id) axios.delete(`${API_URL}/api/interviews/${id}`).catch(() => { });
     persist(candidates.filter((_, i) => i !== idx));
-    showToast("  Delete️ Deleted");
+    showToast("Delete Deleted");
   };
 
   const copyLink = () => {
     navigator.clipboard.writeText(applyLink).then(() => {
-      setLinkCopied(true); showToast("📋 Link copied!");
+      setLinkCopied(true); showToast("Document Link copied!");
       setTimeout(() => setLinkCopied(false), 2200);
     });
   };
@@ -253,14 +253,14 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
 
       {/* Link Banner */}
       <div style={{ background: "linear-gradient(135deg,var(--app-text),#2d1057)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.22)" }}>
-        <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>🔗</div>
+        <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}></div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Candidate Application Link — share with applicants</div>
           <div style={{ fontSize: 12, color: "var(--app-muted)", fontFamily: "monospace", wordBreak: "break-all" }}>{applyLink}</div>
         </div>
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
           <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.5)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "var(--app-muted)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }}>
-            {linkCopied ? "✅ Copied!" : "📋 Copy Link"}
+            {linkCopied ? "Success Copied!" : "Document Copy Link"}
           </button>
           <button onClick={() => window.open(applyLink, "_blank")} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 9, padding: "9px 16px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
             View Preview Form
@@ -271,10 +271,10 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
         {[
-          { label: "Total", val: counts.total, icon: "🎯", c: "var(--app-accent)" },
-          { label: "Pending", val: counts.pending, icon: "⏳", c: "#F59E0B" },
-          { label: "Hired", val: counts.hired, icon: "✅", c: "#22C55E" },
-          { label: "Rejected", val: counts.rejected, icon: "❌", c: "#EF4444" },
+          { label: "Total", val: counts.total, icon: "Target", c: "var(--app-accent)" },
+          { label: "Pending", val: counts.pending, icon: "Pending", c: "#F59E0B" },
+          { label: "Hired", val: counts.hired, icon: "Success", c: "#22C55E" },
+          { label: "Rejected", val: counts.rejected, icon: "Error", c: "#EF4444" },
         ].map(({ label, val, icon, c }) => (
           <div key={label} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${c},${c}88)` }} />
@@ -292,7 +292,7 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
         {/* Filters */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
           <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
-            <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>🔍</span>
+            <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>Search</span>
             <input placeholder="Search name, role, email, mobile..." value={search} onChange={e => setSearch(e.target.value)}
               style={{ width: "100%", padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", color: "var(--app-text)", boxSizing: "border-box" }} />
           </div>
@@ -305,7 +305,7 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
               color: filter === f ? (f === "all" ? "var(--app-accent)" : sc(f)) : "var(--app-muted)",
               transition: "all 0.15s",
             }}>
-              {f === "all" ? "🎯 All" : f === "pending" ? "⏳ Pending" : f === "hired" ? "✅ Hired" : "❌ Rejected"}
+              {f === "all" ? "Target All" : f === "pending" ? "Pending Pending" : f === "hired" ? "Success Hired" : "Error Rejected"}
             </button>
           ))}
         </div>
@@ -314,7 +314,7 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
           <div style={{ textAlign: "center", padding: 50, color: "var(--app-muted)" }}>Loading candidates...</div>
         ) : displayed.length === 0 ? (
           <div style={{ textAlign: "center", padding: "50px 20px", color: "var(--app-muted)" }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>📭</div>
+            <div style={{ fontSize: 48, marginBottom: 12 }}></div>
             <div style={{ fontSize: 15, fontWeight: 700, color: "var(--app-text)", marginBottom: 6 }}>
               {candidates.length === 0 ? "No applications yet" : "No results found"}
             </div>
@@ -358,8 +358,8 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
 
                       <td style={{ padding: "12px 12px" }}>
                         {c.experience === "Fresher"
-                          ? <span style={expBadge("#22C55E")}>🎓 Fresher</span>
-                          : <span style={expBadge("var(--app-accent)")}>💼 {c.years || "?"}yrs</span>}
+                          ? <span style={expBadge("#22C55E")}>Education Fresher</span>
+                          : <span style={expBadge("var(--app-accent)")}>Job {c.years || "?"}yrs</span>}
                       </td>
 
                       <td style={{ padding: "12px 12px", fontWeight: 600, color: "var(--app-text)", fontSize: 12, maxWidth: 150, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -384,16 +384,16 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
                             border: `1.5px solid ${sc(status)}44`, borderRadius: 8, padding: "5px 10px",
                             color: sc(status), fontSize: 12, fontWeight: 700, cursor: "pointer", outline: "none", fontFamily: "inherit",
                           }}>
-                          <option value="pending">⏳ Pending</option>
-                          <option value="hired">✅ Hired</option>
-                          <option value="rejected">❌ Rejected</option>
+                          <option value="pending">Pending Pending</option>
+                          <option value="hired">Success Hired</option>
+                          <option value="rejected">Error Rejected</option>
                         </select>
                       </td>
 
                       <td style={{ padding: "12px 12px" }}>
                         {(c.resumeData || c.resumeUrl) ? (
                           <button onClick={() => setViewResume(c)} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 8, padding: "6px 14px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit" }}>
-                            📄
+                            Document
                           </button>
                         ) : <span style={{ fontSize: 11, color: "#ddd" }}>—</span>}
                       </td>
@@ -401,10 +401,10 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
                       <td style={{ padding: "12px 12px" }}>
                         <div style={{ display: "flex", gap: 6 }}>
                           <button onClick={() => setViewProfile(c)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>
-                            👤 Profile
+                            Profile Profile
                           </button>
                           <button onClick={() => deleteCandidate(idx)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>
-                            Delete
+                       Delete
                           </button>
                         </div>
                       </td>

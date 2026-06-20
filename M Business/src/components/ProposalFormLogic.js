@@ -382,9 +382,11 @@ export function extractProposalData() {
     val = Number(grandTotalStr.replace(/[^0-9.-]+/g, ""));
   } catch (err) { }
 
+  const clientName = document.getElementById('toComp')?.value || '';
   return {
     title: document.getElementById('propTitle')?.value || 'New Proposal',
-    client: document.getElementById('toComp')?.value || '',
+    client: clientName,
+    clientName: clientName,
     format: 'a4-proposal',
     value: val,
     html: document.getElementById('propDoc')?.outerHTML || ''
@@ -406,8 +408,14 @@ export function sendProposal() {
   selSt(document.querySelectorAll('.sc')[1], 'SENT');
   if (window._onSaveProposal) {
     const data = extractProposalData();
-    data.status = 'pending';
+    data.status = 'sent';
+    data.client = c;
+    data.sentAt = new Date().toISOString();
     window._onSaveProposal(data);
+  }
+  // Navigate back to Project Proposals list after sending
+  if (window._onBackToProposals) {
+    setTimeout(() => window._onBackToProposals(), 500);
   }
 }
 

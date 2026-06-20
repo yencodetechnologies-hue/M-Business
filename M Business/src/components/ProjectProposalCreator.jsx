@@ -977,17 +977,22 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   }, []);
   // ← empty deps — uses functional setters, no stale closure
 
-const openDoc = (d) => {
-  if (d.slides && d.slides.length > 0) {
-    // Canvas proposal — editor-ல் திற
-    setDoc({ ...d }); setPage(0); setView("editor");
-  } else {
-    // ProposalForm data — form-ல் திற
-    setDoc({ ...d }); setView("form");
-  }
-};
+  const openDoc = (d) => {
+    if (d.slides && d.slides.length > 0) {
+      // Canvas proposal — editor-ல் திற
+      setDoc({ ...d }); setPage(0); setView("editor");
+    } else {
+      // ProposalForm data — form-ல் திற
+      setDoc({ ...d }); setView("form");
+    }
+  };
   const createNew = (initialData = {}) => {
-    const nd = { ...makeInitialProposal(THEMES[0].name, companyName || ""), ...initialData, value: initialData.value ? Number(initialData.value) : 0 };
+    const nd = {
+      ...makeInitialProposal(THEMES[0].name, companyName || ""),
+      ...initialData,
+      value: initialData.value ? Number(initialData.value) : 0,
+      client: initialData.client || initialData.clientName || "",
+    };
     setProposals(prev => [nd, ...prev]);
     setDoc(nd);
     setPage(0);
@@ -995,18 +1000,38 @@ const openDoc = (d) => {
   };
   const openNewModal = () => { setView("form"); };
 
-  const saveDoc = (d = doc) => { const nd = { ...d, updated: new Date().toISOString() }; persist(nd); setDoc(nd); flash("💾 Saved!"); };
+  const saveDoc = (d = doc) => {
+    const nd = { ...d, updated: new Date().toISOString(), client: d.client || d.clientName || "" };
+    persist(nd);
+    setDoc(nd);
+    flash("💾 Saved!");
+  };
   const shareProposal = async (p = doc) => {
     const link = `${window.location.origin}/proposal-view?id=${p._id || p.id}`;
     const text = `Project Proposal: ${p.title}\nPrepared by ${companyName}\nView here: ${link}`;
+    // Mark proposal as "sent" so it appears in client dashboard
+    try {
+      if (p._id || p.id) {
+        const proposalId = p._id || p.id;
+        const updated = await axios.put(`${BASE_URL}/api/proposals/${proposalId}`, {
+          ...p,
+          status: "sent",
+          sentAt: new Date().toISOString(),
+          client: p.client || p.clientName || "",
+        });
+        setProposals(prev => prev.map(pr => (pr._id === proposalId || pr.id === proposalId) ? updated.data : pr));
+        if (doc && (doc._id === proposalId || doc.id === proposalId)) setDoc(updated.data);
+      }
+    } catch (err) {
+      console.error("Error marking proposal as sent:", err);
+    }
     if (navigator.share) {
       try { await navigator.share({ title: p.title, text, url: link }); } catch (err) { console.log(err); }
     } else {
       navigator.clipboard.writeText(text);
-      flash("📋 Link copied to clipboard!");
+      flash("📤 Proposal sent to client! Link copied to clipboard.");
     }
   };
-
   const shareWhatsApp = (p = doc) => {
     const link = `${window.location.origin}/proposal-view?id=${p._id || p.id}`;
     const text = encodeURIComponent(`Project Proposal: ${p.title}\nPrepared by ${companyName}\nView here: ${link}`);
@@ -1357,16 +1382,21 @@ const openDoc = (d) => {
   }
 
   // ══ FORM VIEW ══════════════════════════════════════════════════════════════
-if (view === "form") {
-  return <ProposalForm 
-    onBack={() => setView("list")} 
-    initialData={doc}
-    clients={clients}
-    onSave={(data) => {
-      createNew(data);
-    }} 
-  />;
-}
+  if (view === "form") {
+    // Register the back-to-list callback so ProposalFormLogic can call it after Send
+    window._onBackToProposals = () => setView("list");
+    return <ProposalForm
+      onBack={() => setView("list")}
+      initialData={doc}
+      clients={clients}
+      onSave={(data) => {
+        createNew(data);
+        if (data.status === 'sent') {
+          setTimeout(() => setView("list"), 500);
+        }
+      }}
+    />;
+  }
 
   // ══ LIST VIEW ══════════════════════════════════════════════════════════════
 
@@ -1725,662 +1755,6 @@ if (view === "form") {
   }
 
 
-
-  // ══ EDITOR - full Canva layout ═════════════════════════════════════════════
-  return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", flexDirection: "column", fontFamily: "'DM Sans',sans-serif", background: "#f0f0f0", overflow: "hidden" }} className={isViewMode ? "view-mode" : ""}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&display=swap');
-        ::-webkit-scrollbar{width:5px;height:5px;}
-        ::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px;}
-        .pgthumb{transition:all .15s;cursor:pointer;}
-        .pgthumb:hover{border-color:var(--app-accent)!important;}
-        .pgthumb.sel{border-color:var(--app-accent)!important;box-shadow:0 0 0 2px rgba(124,58,237,0.2);}
-        .sib:hover{background:#f0e9ff!important;color:var(--app-accent)!important;}
-        .topbtn:hover{background:#f1f5f9!important;}
-        .icobtn:hover{background:#e0d9f7!important;}
-        
-        @media print {
-          .no-print { display: none !important; }
-          .print-only { display: block !important; }
-          body, html { 
-            margin: 0 !important; 
-            padding: 0 !important; 
-            background: white !important;
-            height: auto !important;
-            overflow: visible !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          @page {
-            size: A4;
-            margin: 0;
-          }
-          /* Hide all dashboard UI ancestors and siblings */
-          .sidebar, .mob-topbar, .page-header, .header-actions { display: none !important; }
-          .main-content { padding: 0 !important; margin: 0 !important; overflow: visible !important; }
-          
-          .slide-print-container {
-            width: 210mm !important;
-            height: 297mm !important;
-            page-break-after: always !important;
-            page-break-inside: avoid !important;
-            overflow: hidden !important;
-            position: relative !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            box-shadow: none !important;
-            border: none !important;
-            background: white !important;
-          }
-          /* Scale the 900px slide content to fit exactly in 210mm (A4) */
-          .slide-print-container > div {
-            transform: scale(0.88) !important; 
-            transform-origin: top left !important;
-            width: 900px !important;
-          }
-          /* Fix for the last page empty issue */
-          .slide-print-container:last-child {
-            page-break-after: auto !important;
-          }
-          .canvas-container { padding: 0 !important; margin: 0 !important; }
-        }
-      `}</style>
-
-      <Confetti active={confetti} />
-
-      {/* TOAST */}
-      {toast && <div style={{ position: "fixed", top: 70, left: "50%", transform: "translateX(-50%)", background: toast.type === "err" ? "#fff1f2" : "#f0fdf4", color: toast.type === "err" ? "#9f1239" : "#14532d", border: `1px solid ${toast.type === "err" ? "#fda4af" : "#86efac"}`, padding: "10px 24px", borderRadius: 12, fontSize: 14, fontWeight: 700, zIndex: 100000, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", whiteSpace: "nowrap" }}>{toast.msg}</div>}
-
-      {/* REJECT MODAL */}
-      {rejectModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 100001, display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>
-          <div style={{ background: "var(--app-card)", borderRadius: 24, padding: 36, width: 440, boxShadow: "var(--app-shadow)", border: "1px solid var(--app-border)" }}>
-            <div style={{ fontSize: 22, fontWeight: 900, color: "var(--app-text)", marginBottom: 6 }}>❌ Reject Proposal</div>
-            <div style={{ fontSize: 13, color: "var(--app-muted)", marginBottom: 20 }}>Give feedback so the author can revise and resubmit.</div>
-            <textarea value={rejectReason} onChange={e => setRejectReason(e.target.value)} placeholder="e.g. Please revise the budget section and update timeline..."
-              style={{ width: "100%", height: 120, borderRadius: 12, border: "2px solid var(--app-border)", background: "var(--app-surface)", padding: "14px 18px", fontSize: 15, fontFamily: "inherit", outline: "none", boxSizing: "border-box", resize: "vertical", color: "var(--app-text)", transition: "border-color 0.2s", minHeight: 100 }} />
-            <div style={{ display: "flex", gap: 10, marginTop: 20, justifyContent: "flex-end" }}>
-              <button onClick={() => { setRejectModal(false); setRejectReason(""); }} style={{ background: "#f1f5f9", border: "none", borderRadius: 10, padding: "10px 22px", fontSize: 14, fontWeight: 600, cursor: "pointer", color: "#475569", fontFamily: "inherit" }}>Cancel</button>
-              <button onClick={() => { setStatus("rejected", { rejectNote: rejectReason || "Please review and resubmit." }); setRejectModal(false); setRejectReason(""); }} style={{ background: "linear-gradient(135deg,#9f1239,#ef4444)", color: "#fff", border: "none", borderRadius: 10, padding: "10px 22px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Confirm Reject</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ╔══ TOP BAR (Canva style) ══╗ */}
-      {!isViewMode && (
-        <div style={{ height: 56, background: "var(--app-card)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 16px", borderBottom: "1px solid var(--app-border)", flexShrink: 0, gap: 12, zIndex: 50 }} className="no-print">
-
-          {/* LEFT: logo + File/Resize/Editing */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-            <button onClick={() => { saveDoc(); setView("list"); }} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 22, padding: "6px", borderRadius: 8, transition: "background .15s" }} title="Home" className="topbtn">🏠</button>
-
-            {/* 🚀 QUICK ADD PROPOSAL BUTTON */}
-
-
-
-            <div style={{ position: "relative" }}>
-              <button className="topbtn" onClick={() => setShowResizeMenu(!showResizeMenu)} style={{ background: showResizeMenu ? "var(--app-surface)" : "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600, color: "var(--app-text)", padding: "6px 10px", borderRadius: 8 }}>Resize</button>
-              {showResizeMenu && (
-                <div style={{ position: "absolute", top: "100%", left: 0, marginTop: 4, background: "var(--app-card)", borderRadius: 8, boxShadow: "var(--app-shadow)", overflow: "hidden", zIndex: 1000, border: "1px solid var(--app-border)", width: 180 }}>
-                  <button onClick={() => changeFormat("a4-portrait")} style={{ width: "100%", padding: "10px 16px", textAlign: "left", background: "none", border: "none", fontSize: 13, fontWeight: 600, color: doc?.format === "a4-portrait" ? "var(--app-accent)" : "#374151", cursor: "pointer", display: "block", borderTop: "1px solid #f1f5f9" }} className="topbtn">📄 A4 Portrait</button>
-                  <button onClick={() => changeFormat("a4-landscape")} style={{ width: "100%", padding: "10px 16px", textAlign: "left", background: "none", border: "none", fontSize: 13, fontWeight: 600, color: doc?.format === "a4-landscape" ? "var(--app-accent)" : "#374151", cursor: "pointer", display: "block", borderTop: "1px solid #f1f5f9" }} className="topbtn">🖼️ A4 Landscape</button>
-                </div>
-              )}
-            </div>
-
-
-
-          </div>
-
-          {/* CENTER: editable title & client selector */}
-          <div style={{ flex: 1, display: "flex", justifyContent: "center", gap: 16, alignItems: "center" }}>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <input
-                value={doc.title}
-                onChange={e => setDoc({ ...doc, title: e.target.value })}
-                disabled={!canEdit}
-                placeholder="Enter Proposal Title..."
-                style={{
-                  background: "var(--app-surface)",
-                  border: "1.5px solid var(--app-border)",
-                  borderRadius: "6px",
-                  fontSize: 14,
-                  fontWeight: 700,
-                  color: "var(--app-text)",
-                  outline: "none",
-                  textAlign: "center",
-                  width: "300px",
-                  padding: "4px 10px",
-                  fontFamily: "inherit",
-                  transition: "all 0.2s"
-                }}
-                onFocus={e => e.target.style.borderColor = "var(--app-accent)"}
-                onBlur={e => e.target.style.borderColor = "var(--app-border)"}
-              />
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--app-border)", padding: "4px 12px", borderRadius: 8, border: "1px solid var(--app-accent)" }}>
-              <span style={{ fontSize: 11, fontWeight: 800, color: "var(--app-accent)" }}>FOR COMPANY NAME:</span>
-              <select
-                value={doc.client || ""}
-                onChange={e => { const nd = { ...doc, client: e.target.value }; setDoc(nd); persist(nd); }}
-                disabled={!canEdit}
-                style={{ background: "none", border: "none", fontSize: 12, fontWeight: 700, color: "var(--app-accent)", outline: "none", cursor: "pointer" }}
-              >
-                <option value="">-- Select Company Name --</option>
-                {clientsData.map(c => (
-                  <option key={c._id} value={c.name || c.clientName}>{c.name || c.clientName}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* RIGHT: status actions + share */}
-          <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
-
-            <div style={{ width: 1, height: 24, background: "#e5e7eb" }} />
-
-            {doc.status === "draft" || doc.status === "rejected" ? (
-              <button onClick={() => setStatus("pending")} style={{ background: "linear-gradient(135deg,#10b981,#059669)", color: "#fff", border: "none", padding: "8px 16px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
-                {doc.status === "rejected" ? "🔄 Resubmit Proposal" : "📤 Submit for Approval"}
-              </button>
-            ) : doc.status === "pending" ? (
-              <span style={{ fontSize: 13, fontWeight: 800, color: "#f59e0b", padding: "0 10px", display: "flex", alignItems: "center", gap: 6 }}>
-                ⏳ Waiting for company approval...
-              </span>
-            ) : (
-              <span style={{ fontSize: 13, fontWeight: 800, color: "#10b981", padding: "0 10px", display: "flex", alignItems: "center", gap: 6 }}>
-                ✅ Approved!
-              </span>
-            )}
-
-            <button onClick={() => printProposal(doc)} style={{ background: "var(--app-card)", color: "var(--app-text)", border: "1.5px solid var(--app-border)", padding: "8px 12px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}>🖨️</button>
-            <button onClick={() => shareProposal()} style={{ background: "var(--app-surface)", color: "var(--app-accent)", border: "1.5px solid var(--app-border)", padding: "8px 12px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}>🔗</button>
-            <button onClick={() => shareWhatsApp()} style={{ background: "#dcfce7", color: "#16a34a", border: "1.5px solid #bbf7d0", padding: "8px 12px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}>💬</button>
-
-
-          </div>
-        </div>
-      )}
-
-      {/* ╔══ BODY ══╗ */}
-      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
-
-        {/* ── ICON SIDEBAR (Canva left icon rail) ── */}
-        {!isViewMode && (
-          <div style={{ width: 72, background: "var(--app-bg)", borderRight: "1px solid #e5e7eb", display: "flex", flexDirection: "column", alignItems: "center", padding: "12px 0", gap: 4, flexShrink: 0 }} className="no-print">
-            {[
-
-              { id: "text", icon: "T", label: "Text" },
-              { id: "uploads", icon: "☁️", label: "Uploads" }
-            ].map(item => (
-              <button key={item.id} onClick={() => setLeftPanel(leftPanel === item.id ? "" : item.id)}
-                style={{ width: 64, height: 64, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2, background: leftPanel === item.id ? "rgba(124,58,237,0.15)" : "none", border: "none", borderRadius: 8, cursor: "pointer", transition: "all .15s", color: leftPanel === item.id ? "var(--app-accent)" : "#4b5563" }}>
-                <span style={{ fontSize: 24 }}>{item.icon}</span>
-                <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.3, opacity: leftPanel === item.id ? 1 : 0.5, textAlign: "center", color: "#6b7280" }}>
-                  {item.label}
-                </span>
-              </button>
-            ))}
-          </div>
-        )}
-        {/* ── LEFT CONTENT PANEL ── */}
-        {!isViewMode && leftPanel && (
-          <div style={{ width: 320, background: "var(--app-card)", borderRight: "1px solid var(--app-border)", display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden" }}>
-
-
-
-            {/* ELEMENTS */}
-            {leftPanel === "elements" && <>
-              <div style={{ padding: "16px", borderBottom: "1px solid #f1f5f9" }}>
-                <div style={{ fontSize: 18, fontWeight: 800, color: "#111827", marginBottom: 16 }}>Elements</div>
-                <div style={{ position: "relative" }}>
-
-                </div>
-              </div>
-
-              <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: 20 }}>
-
-                {/* Shapes */}
-                {/* <div>
-                  <div style={{fontSize: 14, fontWeight: 700, color: "#0f172a", marginBottom: 12}}>Shapes</div>
-                  <div style={{display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10}}>
-                    <div onClick={() => addElement({type:"shape", shape:"circle", width:100, height:100, color:"#94a3b8"})} style={{aspectRatio:"1", background:"#e2e8f0", borderRadius:"50%", cursor:"pointer", transition:"all .2s"}} className="sib"/>
-                    <div onClick={() => addElement({type:"shape", shape:"rectangle", width:120, height:100, color:"#94a3b8"})} style={{aspectRatio:"1", background:"#e2e8f0", borderRadius:4, cursor:"pointer", transition:"all .2s"}} className="sib"/>
-                    <div onClick={() => addElement({type:"shape", shape:"rounded-rectangle", width:120, height:100, borderRadius: 20, color:"#94a3b8"})} style={{aspectRatio:"1", background:"#e2e8f0", borderRadius:20, cursor:"pointer", transition:"all .2s"}} className="sib"/>
-                    <div onClick={() => addElement({type:"shape", shape:"square", width:100, height:100, color:"#94a3b8"})} style={{aspectRatio:"1", background:"#e2e8f0", borderRadius:0, cursor:"pointer", transition:"all .2s"}} className="sib"/>
-                  </div>
-                </div> */}
-
-                {/* Photos */}
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "#0f172a", marginBottom: 12 }}>Photos</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
-                    {[
-                      "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&q=80",
-                      "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&q=80",
-                      "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=400&q=80",
-                      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80"
-                    ].map((url, i) => (
-                      <img key={i} src={url} alt="" onClick={() => addElement({ type: "image", src: url, width: 250 })} style={{ width: "100%", borderRadius: 6, cursor: "pointer", transition: "transform .1s" }} className="pgthumb" />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Graphics */}
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "#0f172a", marginBottom: 12 }}>Graphics</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
-                    {["⭐", "❤️", "👍", "🔥", "🚀", "💡", "🎯", "📈"].map((emoji, i) => (
-                      <div key={i} onClick={() => addElement({ type: "icon", icon: emoji, fontSize: 80 })} style={{ fontSize: 30, textAlign: "center", cursor: "pointer", background: "#f1f5f9", borderRadius: 8, padding: 8, transition: "all .2s" }} className="sib">
-                        {emoji}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </>}
-
-            {/* TEXT */}
-            {leftPanel === "text" && <>
-
-              <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: 20 }}>
-
-                <button onClick={() => addElement({ type: "text", val: "New Text Box", fontSize: 18, fontWeight: 500 })} style={{ background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 8, padding: "14px", fontSize: 15, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 12px rgba(139,92,246,0.25)", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "all 0.2s" }} className="hb" onMouseDown={e => e.currentTarget.style.transform = "scale(0.98)"} onMouseUp={e => e.currentTarget.style.transform = "scale(1)"}>
-                  <span style={{ fontSize: 18 }}>T</span> Add a text box
-                </button>
-
-                {/* <div onClick={()=>flash("🪄 Magic Write: Generating AI content...")} style={{background:"linear-gradient(135deg,var(--app-accent),#ff6b6b)",borderRadius:12,padding:"16px",color:"#fff",cursor:"pointer",boxShadow:"0 4px 12px rgba(125,42,232,0.15)",position:"relative",overflow:"hidden"}} className="hb">
-                  <div style={{fontSize:14,fontWeight:700,display:"flex",alignItems:"center",gap:8,position:"relative",zIndex:1}}>🪄 Magic Write</div>
-                  <div style={{fontSize:11,opacity:0.9,marginTop:4,position:"relative",zIndex:1}}>Generate text with AI</div>
-                  <div style={{position:"absolute",right:-10,bottom:-10,fontSize:40,opacity:0.2,transform:"rotate(-15deg)"}}>✨</div>
-                </div> */}
-                {/* 
-                <div>
-                  <div style={{fontSize:11,color:"#6b7280",fontWeight:700,marginBottom:12,textTransform:"uppercase",letterSpacing:0.8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                    <span>Brand Kit</span>
-                    <button style={{background:"none",border:"none",color:"var(--app-accent)",fontSize:11,fontWeight:700,cursor:"pointer",padding:0}}>Edit 👑</button>
-                  </div>
-                  <button style={{width:"100%",background:"#fff",border:"1.5px dashed #d1d5db",borderRadius:8,padding:"12px",textAlign:"center",color:"#4b5563",fontSize:13,fontWeight:600,cursor:"pointer",transition:"all 0.15s"}} className="topbtn">
-                    Add your brand fonts
-                  </button>
-                </div> */}
-
-                <div>
-                  <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 700, marginBottom: 12, textTransform: "uppercase", letterSpacing: 0.8 }}>Default text styles</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    <button onClick={() => addElement({ type: "text", val: "Add a heading", fontSize: 32, fontWeight: 800 })} style={{ width: "100%", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, padding: "16px", textAlign: "left", cursor: "pointer", transition: "all 0.15s" }} className="hb">
-                      <div style={{ fontSize: 24, fontWeight: 800, color: "#111827" }}>Add a heading</div>
-                    </button>
-                    <button onClick={() => addElement({ type: "text", val: "Add a subheading", fontSize: 24, fontWeight: 700 })} style={{ width: "100%", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, padding: "14px", textAlign: "left", cursor: "pointer", transition: "all 0.15s" }} className="hb">
-                      <div style={{ fontSize: 18, fontWeight: 700, color: "#374151" }}>Add a subheading</div>
-                    </button>
-                    <button onClick={() => addElement({ type: "text", val: "Add a little bit of body text", fontSize: 16, fontWeight: 400 })} style={{ width: "100%", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, padding: "12px", textAlign: "left", cursor: "pointer", transition: "all 0.15s" }} className="hb">
-                      <div style={{ fontSize: 14, color: "#4b5563" }}>Add a little bit of body text</div>
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-
-                  </div>
-                </div>
-              </div>
-            </>}
-
-            {/* UPLOADS */}
-            {leftPanel === "uploads" && <>
-              <div style={{ padding: "16px", borderBottom: "1px solid #f1f5f9" }}>
-
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading}
-                  style={{ width: "100%", background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 8, padding: "14px", fontSize: 15, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 12px rgba(139,92,246,0.25)", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "all 0.2s" }}
-                >
-                  {uploading ? (
-                    <div style={{ width: 16, height: 16, border: "2px solid #fff", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
-                  ) : "☁️"}
-                  {uploading ? "Uploading..." : "Upload files"}
-                </button>
-                <input type="file" ref={fileInputRef} onChange={handleUpload} style={{ display: "none" }} accept="image/*" />
-                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-              </div>
-
-              <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
-                  {uploads.map(up => (
-                    <div key={up._id} onClick={() => addElement({ type: "image", src: up.url, width: 250 })}
-                      style={{ aspectRatio: "1", borderRadius: 6, overflow: "hidden", border: "1px solid #e2e8f0", cursor: "pointer", position: "relative" }} className="pgthumb">
-                      <img src={up.url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                      <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.05)", opacity: 0, transition: "opacity .2s" }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0} />
-                    </div>
-                  ))}
-                </div>
-                {uploads.length === 0 && !uploading && (
-                  <div style={{ textAlign: "center", padding: "40px 20px", color: "#94a3b8" }}>
-                    <div style={{ fontSize: 40, marginBottom: 12 }}>📥</div>
-                    <div style={{ fontSize: 13, fontWeight: 600 }}>No uploads yet</div>
-                    <p style={{ fontSize: 11 }}>Uploaded images will appear here</p>
-                  </div>
-                )}
-              </div>
-            </>}
-
-            {/* BRAND */}
-            {leftPanel === "brand" && <>
-              <div style={{ padding: "16px", borderBottom: "1px solid #f1f5f9" }}>
-                <div style={{ fontSize: 16, fontWeight: 700, color: "#0f172a", marginBottom: 16 }}>Brand Kit</div>
-                <button style={{ width: "100%", background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 8, padding: "12px", fontSize: 14, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 12px rgba(125,42,232,0.2)" }}>Set up your Brand Kit 👑</button>
-              </div>
-              <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: 24 }}>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a", marginBottom: 12 }}>Brand Colors</div>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    {["var(--app-accent)", "#10b981", "#f59e0b", "#ef4444", "#3b82f6"].map(c => <div key={c} style={{ width: 40, height: 40, borderRadius: "50%", background: c, cursor: "pointer", border: "2px solid transparent" }} onClick={() => addElement({ type: "shape", shape: "circle", width: 100, height: 100, color: c })} />)}
-                    <div style={{ width: 40, height: 40, borderRadius: "50%", background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "2px dashed #cbd5e1", color: "#64748b" }}>+</div>
-                  </div>
-                </div>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a", marginBottom: 12 }}>Brand Fonts</div>
-                  <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", padding: "16px", borderRadius: 8, textAlign: "center" }}>
-                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, fontFamily: "'DM Sans',sans-serif" }}>Heading Font</div>
-                    <div style={{ fontSize: 16, fontWeight: 500, color: "#475569" }}>Body Font</div>
-                  </div>
-                </div>
-              </div>
-            </>}
-
-            {/* TOOLS */}
-            {leftPanel === "tools" && <>
-              <div style={{ padding: "16px", borderBottom: "1px solid #f1f5f9" }}>
-                <div style={{ fontSize: 16, fontWeight: 700, color: "#0f172a", marginBottom: 16 }}>Magic Studio ✨</div>
-              </div>
-              <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: 16 }}>
-                {[
-                  { icon: "✂️", title: "Background Remover", desc: "Remove image backgrounds in 1 click" },
-
-                ].map(tool => (
-                  <div key={tool.title} onClick={() => flash(`Opening ${tool.title}...`)} style={{ display: "flex", gap: 12, padding: "16px", background: "linear-gradient(to right, #f8fafc, #fff)", border: "1px solid #e2e8f0", borderRadius: 12, cursor: "pointer", alignItems: "center" }} className="hb">
-                    <div style={{ fontSize: 24 }}>{tool.icon}</div>
-                    <div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: "#0f172a" }}>{tool.title}</div>
-                      <div style={{ fontSize: 11, color: "#64748b", marginTop: 2 }}>{tool.desc}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>}
-
-            {/* PROJECTS */}
-            {leftPanel === "projects" && <>
-              <div style={{ padding: "16px", borderBottom: "1px solid #f1f5f9" }}>
-                <div style={{ fontSize: 16, fontWeight: 700, color: "#0f172a", marginBottom: 16 }}>Projects</div>
-                <div style={{ position: "relative" }}>
-                  <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", fontSize: 14 }}>🔍</span>
-                  <input placeholder="Search your designs" style={{ width: "100%", boxSizing: "border-box", border: "1px solid #e2e8f0", borderRadius: 8, padding: "10px 14px 10px 36px", fontSize: 14, outline: "none", fontFamily: "inherit", background: "#f8fafc" }} />
-                </div>
-              </div>
-              <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                {proposals.map(p => (
-                  <div key={p._id || p.id} onClick={() => flash("Can't open another project while editing")} style={{ cursor: "pointer", borderRadius: 8, border: "1px solid #e2e8f0", overflow: "hidden", background: "#fff" }} className="pgthumb">
-                    <div style={{ height: 70, background: THEMES.find(t => t.name === p.theme)?.g || "#e2e8f0", display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: "#fff", fontSize: 20 }}>📄</span></div>
-                    <div style={{ padding: "8px", fontSize: 11, fontWeight: 600, color: "#1e293b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.title}</div>
-                  </div>
-                ))}
-              </div>
-            </>}
-
-            {/* APPS */}
-            {leftPanel === "apps" && <>
-              <div style={{ padding: "16px", borderBottom: "1px solid #f1f5f9" }}>
-                <div style={{ fontSize: 16, fontWeight: 700, color: "#0f172a", marginBottom: 16 }}>Apps & Integrations</div>
-                <div style={{ position: "relative" }}>
-                  <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", fontSize: 14 }}>🔍</span>
-                  <input placeholder="Search apps" style={{ width: "100%", boxSizing: "border-box", border: "1px solid #e2e8f0", borderRadius: 8, padding: "10px 14px 10px 36px", fontSize: 14, outline: "none", fontFamily: "inherit", background: "#f8fafc" }} />
-                </div>
-              </div>
-              <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                {[
-                  { icon: "📶", name: "QR Code" },
-                  { icon: "🤖", name: "DALL·E" },
-                  { icon: "📊", name: "Charts" },
-                  { icon: "📁", name: "Google Drive" },
-                  { icon: "▶️", name: "YouTube" },
-                  { icon: "🎤", name: "AI Voice" }
-                ].map(app => (
-                  <div key={app.name} onClick={() => flash(`${app.name} app connected!`)} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8, padding: "16px 8px", textAlign: "center", cursor: "pointer" }} className="sib">
-                    <div style={{ fontSize: 28, marginBottom: 8 }}>{app.icon}</div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: "#0f172a" }}>{app.name}</div>
-                  </div>
-                ))}
-              </div>
-            </>}
-          </div>
-        )}
-
-        {/* ── CENTER CANVAS ── */}
-        <div ref={canvasRef} onPointerDown={(e) => { if (e.target === e.currentTarget) setSelectedElementId(null); }}
-          style={{
-            flex: 1,
-            overflow: "auto",
-            background: isViewMode ? "var(--app-card)" : "var(--app-bg)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            padding: isViewMode ? "20px 0" : "48px 32px",
-            position: "relative",
-            gap: isViewMode ? 40 : 0
-          }}>
-
-          {isViewMode ? (
-            /* Vertical Scroll View for Client */
-            doc ? (
-              (doc.slides || []).map((s, idx) => {
-                const isP = doc.format === "a4-portrait" || (!doc.format && (s.type === "proposal" || s.type === "portrait"));
-                const isL = doc.format === "a4-landscape" || (!doc.format && s.type === "landscape");
-                const h = isP ? 1273 : isL ? 637 : 506;
-                const ar = isP ? "210/297" : isL ? "297/210" : "16/9";
-
-                return (
-                  <div key={s.id || idx} className="slide-print-container" style={{
-                    width: 900 * (zoom / 100 + 0.4),
-                    minWidth: 900 * 0.4,
-                    aspectRatio: ar,
-                    boxShadow: "0 12px 48px rgba(0,0,0,0.1)",
-                    borderRadius: 2,
-                    overflow: "hidden",
-                    flexShrink: 0,
-                    background: "#fff",
-                    transition: "width .2s ease-out",
-                    border: "1px solid #e5e7eb"
-                  }}>
-                    <div style={{
-                      transform: `scale(${zoom / 100 + 0.4})`,
-                      transformOrigin: "top left",
-                      width: 900,
-                      height: h
-                    }}>
-                      <Slide
-                        slide={s}
-                        theme={doc.theme}
-                        docFormat={doc.format}
-                        editing={false}
-                        onChange={() => { }}
-                        selectedId={null}
-                        onSelectElement={() => { }}
-                        onUpdateElement={() => { }}
-                        onDelete={() => { }}
-                        canvasRef={canvasRef}
-                        companyLogo={companyLogo}
-                        companyName={companyName}
-                        footerMessage={doc?.footerMessage}
-                      />
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, marginTop: 100 }}>
-                <div style={{ width: 40, height: 40, border: "4px solid #f3f4f6", borderTopColor: "var(--app-accent)", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
-                <div style={{ fontSize: 16, fontWeight: 600, color: "#64748b" }}>Loading proposal...</div>
-              </div>
-            )
-          ) : (
-            /* Single Slide Editor View */
-            doc ? (
-              <div style={{
-                width: 900 * (zoom / 100 + 0.4), minWidth: 900 * 0.4,
-                aspectRatio: doc.format === "a4-portrait" ? "210/297" : doc.format === "a4-landscape" ? "297/210" : doc.format === "ppt" ? "16/9" : (doc.slides?.[page]?.type === "proposal" ? "210/297" : doc.slides?.[page]?.type === "portrait" ? "210/297" : doc.slides?.[page]?.type === "landscape" ? "297/210" : "16/9"),
-                boxShadow: "0 12px 48px rgba(0,0,0,0.1)", borderRadius: 2, overflow: "hidden", flexShrink: 0, background: "#fff", transition: "width .2s ease-out"
-              }}>
-                <div style={{
-                  transform: `scale(${zoom / 100 + 0.4})`, transformOrigin: "top left", width: 900,
-                  height: doc.format === "a4-portrait" ? 1273 : doc.format === "a4-landscape" ? 637 : doc.format === "ppt" ? 506 : (doc.slides?.[page]?.type === "proposal" ? 1273 : doc.slides?.[page]?.type === "portrait" ? 1273 : doc.slides?.[page]?.type === "landscape" ? 637 : 506)
-                }}>
-                  {doc.slides && doc.slides[page] ? (
-                    <Slide
-                      slide={doc.slides[page]}
-                      theme={doc.theme}
-                      docFormat={doc.format}
-                      editing={canEdit}
-                      onChange={updateSlide}
-                      selectedId={selectedElementId}
-                      onSelectElement={setSelectedElementId}
-                      onUpdateElement={updateElement}
-                      onDelete={deleteElement}
-                      canvasRef={canvasRef}
-                      companyLogo={companyLogo}
-                      companyName={companyName}
-                      footerMessage={doc?.footerMessage}
-                    />
-                  ) : (
-                    <div style={{ width: 900, height: 506, display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc", color: "#64748b", fontSize: 14, fontWeight: 500 }}>
-                      Loading slide...
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, marginTop: 100 }}>
-                <div style={{ width: 40, height: 40, border: "4px solid #f3f4f6", borderTopColor: "var(--app-accent)", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
-                <div style={{ fontSize: 16, fontWeight: 600, color: "#64748b" }}>Loading editor...</div>
-              </div>
-            )
-          )}
-
-          {/* BOTTOM-RIGHT CONTROLS (Only show navigation in editor, or maybe a simpler version for view mode) */}
-          {!isViewMode ? (
-            <div style={{ position: "absolute", bottom: 24, right: 24, display: "flex", alignItems: "center", gap: 12, background: "#fff", padding: "8px 16px", borderRadius: 12, boxShadow: "0 4px 20px rgba(0,0,0,0.08)", zIndex: 100 }} className="no-print">
-              <div style={{ display: "flex", alignItems: "center", gap: 8, borderRight: "1px solid #e5e7eb", paddingRight: 12 }}>
-                <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0} style={{ background: "none", border: "none", cursor: page === 0 ? "not-allowed" : "pointer", color: page === 0 ? "#cbd5e1" : "#475569", fontSize: 12 }}>◀</button>
-                <span style={{ fontSize: 12, fontWeight: 700, color: "#1e293b", minWidth: 30, textAlign: "center" }}>{page + 1} / {doc.slides?.length || 0}</span>
-                <button onClick={() => setPage(Math.min((doc.slides?.length || 1) - 1, page + 1))} disabled={page === (doc.slides?.length || 1) - 1} style={{ background: "none", border: "none", cursor: page === (doc.slides?.length || 1) - 1 ? "not-allowed" : "pointer", color: page === (doc.slides?.length || 1) - 1 ? "#cbd5e1" : "#475569", fontSize: 12 }}>▶</button>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, width: 32 }}>{Math.round((zoom + 40))}%</span>
-                <input type="range" min={0} max={60} value={zoom} onChange={e => setZoom(+e.target.value)} style={{ width: 100, accentColor: "var(--app-accent)" }} />
-              </div>
-            </div>
-          ) : (
-            /* Simple Zoom for Client */
-            <div style={{ position: "fixed", bottom: 24, right: 24, display: "flex", alignItems: "center", gap: 12, background: "var(--app-card)", border: "1.5px solid var(--app-border)", padding: "8px 16px", borderRadius: 12, boxShadow: "var(--app-shadow)", zIndex: 100 }} className="no-print">
-              <span style={{ fontSize: 11, fontWeight: 700, width: 32 }}>{Math.round((zoom + 40))}%</span>
-              <input type="range" min={0} max={60} value={zoom} onChange={e => setZoom(+e.target.value)} style={{ width: 80, accentColor: "var(--app-accent)" }} />
-            </div>
-          )}
-
-{isViewMode && doc && (
-            <div style={{ position: "fixed", bottom: 30, right: 30, display: "flex", gap: 12, zIndex: 1000 }} className="no-print">
-              
-              {/* Client Signature Button */}
-              <button
-                onClick={async () => {
-                  if (doc.clientSignature) {
-                    flash('✅ Already signed by ' + doc.clientSignature);
-                    return;
-                  }
-                  const name = window.prompt('Enter your full name to sign this proposal:');
-                  if (!name || !name.trim()) return;
-                  if (!window.confirm(`Sign as "${name.trim()}"?`)) return;
-                  try {
-                    const res = await axios.put(`${BASE_URL}/api/proposals/${doc._id}/client-sign`, {
-                      clientSignature: name.trim(),
-                      clientName: name.trim()
-                    });
-                    setDoc(res.data);
-                    flash('✅ Proposal signed successfully!');
-                  } catch (err) {
-                    flash('❌ Error signing proposal', 'err');
-                  }
-                }}
-                style={{
-                  background: doc?.clientSignature ? '#10b981' : '#f59e0b',
-                  color: '#fff', border: 'none', borderRadius: '50%',
-                  width: 60, height: 60, fontSize: 24, cursor: 'pointer',
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  transition: 'transform 0.2s'
-                }}
-                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
-                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-                title={doc?.clientSignature ? 'Signed by ' + doc.clientSignature : 'Click to Sign'}
-              >
-                {doc?.clientSignature ? '✅' : '✍️'}
-              </button>
-
-              <button
-                onClick={() => printProposal(doc)}
-                style={{ background: "#10b981", color: "#fff", border: "none", borderRadius: "50%", width: 60, height: 60, fontSize: 24, cursor: "pointer", boxShadow: "0 10px 25px rgba(16,185,129,0.4)", display: "flex", alignItems: "center", justifyContent: "center", transition: "transform 0.2s" }}
-                onMouseEnter={e => e.currentTarget.style.transform = "scale(1.1)"}
-                onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
-                title="Print Proposal"
-              >
-                🖨️
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ╔══ BOTTOM PAGE STRIP (Canva style) ══╗ */}
-      {!isViewMode && doc && (
-        <div style={{ height: 100, background: "var(--app-card)", borderTop: "1px solid var(--app-border)", display: "flex", alignItems: "center", padding: "0 20px", gap: 16, overflowX: "auto", flexShrink: 0 }} className="no-print">
-          {doc.slides.map((s, i) => {
-            const isP = doc.format === "a4-portrait" || (!doc.format && (s.type === "proposal" || s.type === "portrait"));
-            const isL = doc.format === "a4-landscape" || (!doc.format && s.type === "landscape");
-            const h = isP ? 1273 : isL ? 637 : 506;
-            const stripWidth = isP ? 70 * (210 / 297) : isL ? 70 * (297 / 210) : 124;
-
-            return (
-              <div key={s.id} onClick={() => setPage(i)}
-                style={{ height: 70, width: stripWidth, flexShrink: 0, borderRadius: 6, overflow: "hidden", cursor: "pointer", border: `2px solid ${i === page ? "var(--app-accent)" : "#e2e8f0"}`, position: "relative", background: "#fff", transition: "all .2s", boxShadow: i === page ? "0 0 0 2px rgba(125,42,232,0.2)" : "none", transform: i === page ? "scale(1.05)" : "scale(1)" }}>
-                <div style={{ transform: `scale(${stripWidth / 900})`, transformOrigin: "top left", width: 900, height: h, pointerEvents: "none" }}>
-                  <Slide slide={s} theme={doc.theme} docFormat={doc.format} editing={false} onChange={() => { }} preview companyLogo={companyLogo} companyName={companyName} footerMessage={doc?.footerMessage} />
-                </div>
-                <div style={{ position: "absolute", bottom: 4, left: 6, fontSize: 10, fontWeight: 800, color: i === page ? "var(--app-accent)" : "#94a3b8", background: "rgba(255,255,255,0.8)", padding: "0 4px", borderRadius: 4 }}>{i + 1}</div>
-                {canEdit && doc.slides.length > 1 && (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); delSlide(i); }}
-                    style={{ position: "absolute", top: 2, right: 2, width: 18, height: 18, borderRadius: "50%", background: "#ef4444", border: "none", color: "#fff", fontSize: 10, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 }}
-                    title="Delete slide"
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
-            )
-          })}
-          <button onClick={() => { canEdit && addSlide("blank"); }} disabled={!canEdit}
-            style={{ height: 70, width: 40, flexShrink: 0, borderRadius: 6, border: "2px dashed #cbd5e1", background: "none", cursor: canEdit ? "pointer" : "not-allowed", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8", fontSize: 24, fontWeight: 300, transition: "all .15s" }}>
-            <span>+</span>
-          </button>
-        </div>
-      )}
-    </div>
-  );
 }
 
 

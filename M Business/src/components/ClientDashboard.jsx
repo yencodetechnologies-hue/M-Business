@@ -6,37 +6,37 @@ import ModernEmployeeProjectDetails from "./ModernEmployeeProjectDetails";
 
 // ── Teal Theme Colors ──────────────────────────────────────────
 const C = {
-  bg:       "#F3F8F9",
-  surface:  "#FFFFFF",
+  bg: "#F3F8F9",
+  surface: "#FFFFFF",
   surface2: "#F8FAFB",
-  border:   "#DFF0F2",
-  border2:  "#C5DDE0",
-  text:     "#0D2027",
-  text2:    "#4E6B75",
-  text3:    "#96B0B8",
-  teal:     "#00BCD4",
-  teal2:    "#00ACC1",
-  teal3:    "#006E7F",
-  tealLight:"#E0F7FA",
-  tealLighter:"#F0FDFE",
-  tealMid:  "rgba(0,188,212,.12)",
-  green:    "#1DB87A",
-  greenBg:  "#E3FAF0",
-  amber:    "#F59E0B",
-  amberBg:  "#FEF3C7",
-  red:      "#EF4444",
-  redBg:    "#FEF2F2",
-  purple:   "#7C3AED",
+  border: "#DFF0F2",
+  border2: "#C5DDE0",
+  text: "#0D2027",
+  text2: "#4E6B75",
+  text3: "#96B0B8",
+  teal: "#00BCD4",
+  teal2: "#00ACC1",
+  teal3: "#006E7F",
+  tealLight: "#E0F7FA",
+  tealLighter: "#F0FDFE",
+  tealMid: "rgba(0,188,212,.12)",
+  green: "#1DB87A",
+  greenBg: "#E3FAF0",
+  amber: "#F59E0B",
+  amberBg: "#FEF3C7",
+  red: "#EF4444",
+  redBg: "#FEF2F2",
+  purple: "#7C3AED",
   purpleBg: "#EDE9FE",
-  blue:     "#2563EB",
-  blueBg:   "#EFF4FF",
+  blue: "#2563EB",
+  blueBg: "#EFF4FF",
 };
 
 // Load Nunito Font + Tabler Icons
 function useAssets() {
   useEffect(() => {
     ["https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;500;600&display=swap",
-     "https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"
+      "https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"
     ].forEach(href => {
       if (!document.querySelector(`link[href="${href}"]`)) {
         const l = document.createElement("link");
@@ -56,6 +56,7 @@ export default function ClientDashboard({ user, setUser }) {
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [invoices, setInvoices] = useState([]);
+  const [proposals, setProposals] = useState([]);
   const [notifs, setNotifs] = useState([]);
   const [docs, setDocs] = useState([]);
   const [meetings, setMeetings] = useState([]);
@@ -109,7 +110,7 @@ export default function ClientDashboard({ user, setUser }) {
     }
     const fetchAll = async () => {
       try {
-        const [projRes, taskRes, invRes, notifRes, docRes, meetRes] = await Promise.all([
+        const [projRes, taskRes, invRes, notifRes, docRes, meetRes, propRes] = await Promise.all([
           axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}`, {
             headers: { 'x-company-id': user.companyId || "" }
           }),
@@ -121,7 +122,10 @@ export default function ClientDashboard({ user, setUser }) {
           }),
           axios.get(`${BASE_URL}/api/notifications/${user._id || user.id}`),
           axios.get(`${BASE_URL}/api/documents?companyId=${user.companyId || ""}&client=${encodeURIComponent(clientName)}&sendTo=client`).catch(() => ({ data: [] })),
-          axios.get(`${BASE_URL}/api/meetings?client=${encodeURIComponent(clientName)}`).catch(() => ({ data: [] }))
+          axios.get(`${BASE_URL}/api/meetings?client=${encodeURIComponent(clientName)}`).catch(() => ({ data: [] })),
+          axios.get(`${BASE_URL}/api/proposals/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}`, {
+            headers: { 'x-company-id': user.companyId || "" }
+          }).catch(() => ({ data: [] }))
         ]);
 
         setProjects(projRes.data || []);
@@ -130,6 +134,15 @@ export default function ClientDashboard({ user, setUser }) {
         setNotifs(notifRes.data || []);
         setDocs(docRes.data || []);
         setMeetings(Array.isArray(meetRes.data) ? meetRes.data : []);
+        const allProps = propRes.data || [];
+        const cn = (clientName || "").toLowerCase().trim();
+        const filtered = allProps.filter(p => {
+          const matchStatus = ["sent", "pending", "approved", "rejected"].includes(p.status);
+          const propClient = (p.client || p.clientName || "").toLowerCase().trim();
+          const matchClient = propClient === cn || propClient.includes(cn) || cn.includes(propClient);
+          return matchStatus && matchClient;
+        });
+        setProposals(filtered);
       } catch (err) {
         console.error("Failed to fetch client dashboard data", err);
       } finally {
@@ -154,7 +167,7 @@ export default function ClientDashboard({ user, setUser }) {
       ]);
       setProjects(projRes.data || []);
       setDocs(docRes.data || []);
-    } catch(e) { console.error(e); }
+    } catch (e) { console.error(e); }
     setRefreshing(false);
   };
 
@@ -180,7 +193,7 @@ export default function ClientDashboard({ user, setUser }) {
     }, 1500);
   };
 
- const submitFeedback = async (e) => {
+  const submitFeedback = async (e) => {
     e.preventDefault();
     try {
       await axios.post(`${BASE_URL}/api/clients/feedback`, {
@@ -305,43 +318,43 @@ export default function ClientDashboard({ user, setUser }) {
     raw: d
   }));
 
-const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
- .filter(f => {
-  if (!f.sentToClient || f.sentToClient === null || f.sentToClient === "") return false;
-  const sc = (f.sentToClient || "").toLowerCase().trim();
-  const cn = (clientName || "").toLowerCase().trim();
-  // "client" என்று generic ஆ save ஆனதும் show பண்ணு, அல்லது client name match ஆனாலும் show பண்ணு
-  return sc === "client" || sc === cn || sc.includes(cn) || cn.includes(sc);
-})
-  .map(f => {
-    const mime = (f.type || '').toLowerCase();
-    const fname = (f.name || '').toLowerCase();
-    let icon = 'ti-file', bg = C.blueBg, col = C.blue, fileType = 'Documents';
-    if (mime.includes('pdf') || fname.endsWith('.pdf')) {
-      icon = 'ti-file-type-pdf'; bg = C.redBg; col = C.red; fileType = 'Documents';
-    } else if (mime.includes('image') || /\.(jpg|jpeg|png|gif|webp|svg)$/.test(fname)) {
-      icon = 'ti-photo'; bg = C.purpleBg || '#f3e8ff'; col = C.purple || '#7c3aed'; fileType = 'Designs';
-    } else if (mime.includes('spreadsheet') || mime.includes('excel') || /\.(xlsx|xls|csv)$/.test(fname)) {
-      icon = 'ti-file-spreadsheet'; bg = C.greenBg; col = C.green; fileType = 'Reports';
-    } else if (mime.includes('word') || /\.(doc|docx)$/.test(fname)) {
-      icon = 'ti-file-text'; bg = C.blueBg; col = C.blue; fileType = 'Documents';
-    } else if (mime.includes('zip') || mime.includes('rar') || /\.(zip|rar|tar|gz)$/.test(fname)) {
-      icon = 'ti-file-zip'; bg = C.amberBg || '#fef3c7'; col = C.amber || '#d97706'; fileType = 'Documents';
-    } else if (mime.includes('video') || /\.(mp4|mov|avi|mkv)$/.test(fname)) {
-      icon = 'ti-video'; bg = C.purpleBg || '#f3e8ff'; col = C.purple || '#7c3aed'; fileType = 'Designs';
-    }
-    return {
-      name: f.name || f.heading || 'File',
-      meta: f.size ? `${Math.round(f.size / 1024)} KB` : (f.type || 'File'),
-      date: f.uploadedAt ? new Date(f.uploadedAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—',
-      type: fileType,
-      icon,
-      bg,
-      col,
-      url: f.url,
-      description: f.description || ''
-    };
-  })];
+  const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
+    .filter(f => {
+      if (!f.sentToClient || f.sentToClient === null || f.sentToClient === "") return false;
+      const sc = (f.sentToClient || "").toLowerCase().trim();
+      const cn = (clientName || "").toLowerCase().trim();
+      // "client" என்று generic ஆ save ஆனதும் show பண்ணு, அல்லது client name match ஆனாலும் show பண்ணு
+      return sc === "client" || sc === cn || sc.includes(cn) || cn.includes(sc);
+    })
+    .map(f => {
+      const mime = (f.type || '').toLowerCase();
+      const fname = (f.name || '').toLowerCase();
+      let icon = 'ti-file', bg = C.blueBg, col = C.blue, fileType = 'Documents';
+      if (mime.includes('pdf') || fname.endsWith('.pdf')) {
+        icon = 'ti-file-type-pdf'; bg = C.redBg; col = C.red; fileType = 'Documents';
+      } else if (mime.includes('image') || /\.(jpg|jpeg|png|gif|webp|svg)$/.test(fname)) {
+        icon = 'ti-photo'; bg = C.purpleBg || '#f3e8ff'; col = C.purple || '#7c3aed'; fileType = 'Designs';
+      } else if (mime.includes('spreadsheet') || mime.includes('excel') || /\.(xlsx|xls|csv)$/.test(fname)) {
+        icon = 'ti-file-spreadsheet'; bg = C.greenBg; col = C.green; fileType = 'Reports';
+      } else if (mime.includes('word') || /\.(doc|docx)$/.test(fname)) {
+        icon = 'ti-file-text'; bg = C.blueBg; col = C.blue; fileType = 'Documents';
+      } else if (mime.includes('zip') || mime.includes('rar') || /\.(zip|rar|tar|gz)$/.test(fname)) {
+        icon = 'ti-file-zip'; bg = C.amberBg || '#fef3c7'; col = C.amber || '#d97706'; fileType = 'Documents';
+      } else if (mime.includes('video') || /\.(mp4|mov|avi|mkv)$/.test(fname)) {
+        icon = 'ti-video'; bg = C.purpleBg || '#f3e8ff'; col = C.purple || '#7c3aed'; fileType = 'Designs';
+      }
+      return {
+        name: f.name || f.heading || 'File',
+        meta: f.size ? `${Math.round(f.size / 1024)} KB` : (f.type || 'File'),
+        date: f.uploadedAt ? new Date(f.uploadedAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—',
+        type: fileType,
+        icon,
+        bg,
+        col,
+        url: f.url,
+        description: f.description || ''
+      };
+    })];
   const filteredFiles = fileFilter === "All" ? allFiles : allFiles.filter(f => f.type === fileFilter);
 
   // Invoices variables
@@ -700,7 +713,7 @@ const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
   if (loading) {
     return (
       <div style={{ display: 'flex', height: '100vh', background: C.bg, alignItems: 'center', justifyContent: 'center', color: C.text, fontFamily: 'sans-serif' }}>
-  
+
       </div>
     );
   }
@@ -712,7 +725,7 @@ const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
         <style>{CSS}</style>
         {renderTopNav()}
         <div style={{ maxWidth: 900, margin: "24px auto", padding: "0 24px" }}>
-        
+
           <SettingsPage
             user={user}
             THEME={{
@@ -749,9 +762,16 @@ const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
           </div>
           <div className="tn-nav">
             <button className={`tn-item ${active === "dashboard" ? "active" : ""}`} onClick={() => setActive("dashboard")}>Overview</button>
-            <button className={`tn-item ${active === "projects" ? "active" : ""}`} onClick={() => setActive("projects")}><i className="ti ti-layout-kanban" style={{marginRight:4}}></i>My Projects</button>
+            <button className={`tn-item ${active === "projects" ? "active" : ""}`} onClick={() => setActive("projects")}><i className="ti ti-layout-kanban" style={{ marginRight: 4 }}></i>My Projects</button>
             <button className={`tn-item ${active === "timeline" ? "active" : ""}`} onClick={() => setActive("timeline")}>Timeline</button>
             <button className={`tn-item ${active === "files" ? "active" : ""}`} onClick={() => setActive("files")}>Files</button>
+            <button className={`tn-item ${active === "proposals" ? "active" : ""}`} onClick={() => setActive("proposals")}>
+              Proposals {proposals.filter(p => p.status === "sent" || p.status === "pending").length > 0 && (
+                <span style={{ background: "#00BCD4", color: "#fff", borderRadius: 20, fontSize: 10, fontWeight: 800, padding: "1px 6px", marginLeft: 4 }}>
+                  {proposals.filter(p => p.status === "sent" || p.status === "pending").length}
+                </span>
+              )}
+            </button>
             <button className={`tn-item ${active === "payments" ? "active" : ""}`} onClick={() => setActive("payments")}>Invoices</button>
             <button className={`tn-item ${active === "messages" ? "active" : ""}`} onClick={() => setActive("messages")}>Messages</button>
             <button className={`tn-item ${active === "calendar" ? "active" : ""}`} onClick={() => setActive("calendar")}>Schedule</button>
@@ -804,7 +824,7 @@ const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
                 <div className="hs-label">Complete</div>
               </div>
               <div className="hs-item">
-                <div className="hs-val">{activeProjDeadline ? Math.max(0, Math.ceil((new Date(activeProjDeadline) - Date.now()) / (1000*60*60*24))) : '—'}</div>
+                <div className="hs-val">{activeProjDeadline ? Math.max(0, Math.ceil((new Date(activeProjDeadline) - Date.now()) / (1000 * 60 * 60 * 24))) : '—'}</div>
                 <div className="hs-label">Days Left</div>
               </div>
               <div className="hs-item">
@@ -846,7 +866,7 @@ const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
     const stepNodes = milestones.length > 0 ? milestones.map((m, idx) => {
       const isDone = m.done === true;
       const isActive = !isDone && idx === milestones.findIndex(x => !x.done);
-      const dateLabel = m.date ? new Date(m.date).toLocaleDateString('en-IN', { day:'numeric', month:'short' }) : '';
+      const dateLabel = m.date ? new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '';
       const statusText = isDone ? `Done · ${dateLabel}` : isActive ? 'Active' : 'Pending';
       const statusColor = isDone ? C.green : isActive ? C.teal : C.text3;
       return (
@@ -868,7 +888,7 @@ const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
     // ── Gantt Chart ───────────────────────────────────────────────
     // Compute month range from project start→end
     const pStart = proj?.start ? new Date(proj.start) : new Date(today.getFullYear(), today.getMonth() - 1, 1);
-    const pEnd   = (proj?.end || proj?.deadline) ? new Date(proj.end || proj.deadline) : new Date(today.getFullYear(), today.getMonth() + 2, 0);
+    const pEnd = (proj?.end || proj?.deadline) ? new Date(proj.end || proj.deadline) : new Date(today.getFullYear(), today.getMonth() + 2, 0);
     // Build 6 month labels centered around today
     const ganttMonths = [];
     for (let i = -1; i <= 4; i++) {
@@ -983,23 +1003,23 @@ const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
         </div>
         <div className="files-grid">
           {filteredFiles.map((file, idx) => (
-<div key={idx} className="file-card" onClick={() => {
-  if (file.url) {
-    window.open(file.url, "_blank");
-  } else if (file.raw) {
-    setSelectedDoc(file.raw);
-  }
-}}>
-  {file.badge && <span className="fc-new-badge">{file.badge}</span>}
-  <div className="fc-download" onClick={(e) => {
-    e.stopPropagation();
-    if (file.url) {
-      const a = document.createElement("a");
-      a.href = file.url; a.download = file.name || "file";
-      a.target = "_blank";
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    }
-  }}><i className="ti ti-download"></i></div>
+            <div key={idx} className="file-card" onClick={() => {
+              if (file.url) {
+                window.open(file.url, "_blank");
+              } else if (file.raw) {
+                setSelectedDoc(file.raw);
+              }
+            }}>
+              {file.badge && <span className="fc-new-badge">{file.badge}</span>}
+              <div className="fc-download" onClick={(e) => {
+                e.stopPropagation();
+                if (file.url) {
+                  const a = document.createElement("a");
+                  a.href = file.url; a.download = file.name || "file";
+                  a.target = "_blank";
+                  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                }
+              }}><i className="ti ti-download"></i></div>
               <div className="fc-icon" style={{ background: file.bg, color: file.col }}><i className={`ti ${file.icon}`}></i></div>
               <div className="fc-name">{file.name}</div>
               {file.description && <div style={{ fontSize: 10, color: C.text3, marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.3 }}>{file.description}</div>}
@@ -1287,9 +1307,9 @@ const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
   // Render Contact Card helper
   function renderContactCard() {
     const proj = projects[0];
-const managerName = proj?.manager || proj?.contactPersonName || 'Project Manager';
-const managerPhone = proj?.contactPersonNo || proj?.managerPhone || '';
-const managerEmail = proj?.managerEmail || proj?.contactEmail || '';
+    const managerName = proj?.manager || proj?.contactPersonName || 'Project Manager';
+    const managerPhone = proj?.contactPersonNo || proj?.managerPhone || '';
+    const managerEmail = proj?.managerEmail || proj?.contactEmail || '';
     return (
       <div className="contact-card">
         <div className="cc-label">Your Account Manager</div>
@@ -1343,41 +1363,41 @@ const managerEmail = proj?.managerEmail || proj?.contactEmail || '';
                   <div className="sec-title-icon" style={{ background: C.blueBg, color: C.blue }}><i className="ti ti-files"></i></div>
                   Files & Documents
                 </div>
-                <div style={{display:"flex",gap:8}}>
-                  <div className="sec-action" onClick={handleRefresh} style={{opacity: refreshing ? 0.6 : 1}}>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <div className="sec-action" onClick={handleRefresh} style={{ opacity: refreshing ? 0.6 : 1 }}>
                     <i className={`ti ${refreshing ? "ti-loader-2" : "ti-refresh"}`} style={{ fontSize: 13, animation: refreshing ? "spin 1s linear infinite" : "none" }}></i>
                     {refreshing ? "Refreshing..." : "Refresh"}
                   </div>
-                <div className="sec-action" onClick={async () => {
-  const links = allFiles.map(f => f.url).filter(Boolean);
-  if (links.length === 0) return;
-  if (links.length === 1) {
-    const a = document.createElement("a");
-    a.href = links[0];
-    a.download = allFiles[0]?.name || "file";
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    return;
-  }
-  for (let i = 0; i < links.length; i++) {
-    try {
-      const res = await fetch(links[i]);
-      const blob = await res.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = blobUrl;
-      a.download = allFiles[i]?.name || `file_${i+1}`;
-      document.body.appendChild(a); a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-      await new Promise(r => setTimeout(r, 800));
-    } catch(e) {
-      window.open(links[i], "_blank");
-      await new Promise(r => setTimeout(r, 800));
-    }
-  }
-}}>
-                  <i className="ti ti-download" style={{ fontSize: 13 }}></i> Download All
-                </div>
+                  <div className="sec-action" onClick={async () => {
+                    const links = allFiles.map(f => f.url).filter(Boolean);
+                    if (links.length === 0) return;
+                    if (links.length === 1) {
+                      const a = document.createElement("a");
+                      a.href = links[0];
+                      a.download = allFiles[0]?.name || "file";
+                      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                      return;
+                    }
+                    for (let i = 0; i < links.length; i++) {
+                      try {
+                        const res = await fetch(links[i]);
+                        const blob = await res.blob();
+                        const blobUrl = URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.href = blobUrl;
+                        a.download = allFiles[i]?.name || `file_${i + 1}`;
+                        document.body.appendChild(a); a.click();
+                        document.body.removeChild(a);
+                        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+                        await new Promise(r => setTimeout(r, 800));
+                      } catch (e) {
+                        window.open(links[i], "_blank");
+                        await new Promise(r => setTimeout(r, 800));
+                      }
+                    }
+                  }}>
+                    <i className="ti ti-download" style={{ fontSize: 13 }}></i> Download All
+                  </div>
                 </div>
               </div>
               {renderFilesComponent()}
@@ -1438,40 +1458,105 @@ const managerEmail = proj?.managerEmail || proj?.contactEmail || '';
                 Files & Documents Checklist
               </div>
               <div className="sec-action" onClick={async () => {
-  const links = allFiles.map(f => f.url).filter(Boolean);
-  if (links.length === 0) return;
-  // Single file → direct download
-  if (links.length === 1) {
-    const a = document.createElement("a");
-    a.href = links[0];
-    a.download = allFiles[0]?.name || "file";
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    return;
-  }
-  // Multiple files → fetch as blob and download one by one
-  for (let i = 0; i < links.length; i++) {
-    try {
-      const res = await fetch(links[i]);
-      const blob = await res.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = blobUrl;
-      a.download = allFiles[i]?.name || `file_${i+1}`;
-      document.body.appendChild(a); a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-      await new Promise(r => setTimeout(r, 800));
-    } catch(e) {
-      // CORS issue-ஆ இருந்தா new tab-ல் open பண்ணு
-      window.open(links[i], "_blank");
-      await new Promise(r => setTimeout(r, 800));
-    }
-  }
-}}>
+                const links = allFiles.map(f => f.url).filter(Boolean);
+                if (links.length === 0) return;
+                // Single file → direct download
+                if (links.length === 1) {
+                  const a = document.createElement("a");
+                  a.href = links[0];
+                  a.download = allFiles[0]?.name || "file";
+                  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                  return;
+                }
+                // Multiple files → fetch as blob and download one by one
+                for (let i = 0; i < links.length; i++) {
+                  try {
+                    const res = await fetch(links[i]);
+                    const blob = await res.blob();
+                    const blobUrl = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = blobUrl;
+                    a.download = allFiles[i]?.name || `file_${i + 1}`;
+                    document.body.appendChild(a); a.click();
+                    document.body.removeChild(a);
+                    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+                    await new Promise(r => setTimeout(r, 800));
+                  } catch (e) {
+                    // CORS issue-ஆ இருந்தா new tab-ல் open பண்ணு
+                    window.open(links[i], "_blank");
+                    await new Promise(r => setTimeout(r, 800));
+                  }
+                }
+              }}>
                 <i className="ti ti-download" style={{ fontSize: 13 }}></i> Download All
               </div>
             </div>
             {renderFilesComponent()}
+          </div>
+        )}
+
+        {active === "proposals" && (
+          <div>
+            <div className="sec-header">
+              <div className="sec-title">
+                <div className="sec-title-icon" style={{ background: "#EDE9FE", color: "#7C3AED" }}><i className="ti ti-presentation"></i></div>
+                Project Proposals
+              </div>
+              <div style={{ fontSize: 12, color: C.text3, fontWeight: 600 }}>{proposals.length} proposal{proposals.length !== 1 ? "s" : ""} received</div>
+            </div>
+            {proposals.length === 0 ? (
+              <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 16, padding: "48px 24px", textAlign: "center" }}>
+                <div style={{ fontSize: 36, marginBottom: 12 }}>📋</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 6 }}>No Proposals Yet</div>
+                <div style={{ fontSize: 13, color: C.text3 }}>Project proposals sent to you will appear here.</div>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {proposals.map((prop, idx) => {
+                  const st = (prop.status || "sent").toLowerCase();
+                  const statusMap = {
+                    sent: { bg: "#EFF4FF", color: "#2563EB", label: "Sent" },
+                    pending: { bg: "#FEF3C7", color: "#B45309", label: "Under Review" },
+                    approved: { bg: "#DCFCE7", color: "#15803D", label: "Approved" },
+                    rejected: { bg: "#FEE2E2", color: "#DC2626", label: "Rejected" },
+                  };
+                  const badge = statusMap[st] || statusMap.sent;
+                  const sentDate = prop.sentAt || prop.submittedAt || prop.updatedAt;
+                  return (
+                    <div key={prop._id || idx} style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 14, padding: "18px 22px", display: "flex", alignItems: "center", gap: 18, boxShadow: "0 2px 10px rgba(0,0,0,.04)" }}>
+                      <div style={{ width: 44, height: 44, borderRadius: 12, background: "#EDE9FE", color: "#7C3AED", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                        <i className="ti ti-presentation"></i>
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{prop.title || "Untitled Proposal"}</div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                          {prop.value && (
+                            <span style={{ fontSize: 12, fontWeight: 700, color: C.teal }}>
+                              <i className="ti ti-currency-rupee" style={{ fontSize: 11 }}></i> {Number(prop.value).toLocaleString()}
+                            </span>
+                          )}
+                          {sentDate && (
+                            <span style={{ fontSize: 11, color: C.text3, fontWeight: 600 }}>
+                              <i className="ti ti-clock" style={{ fontSize: 11 }}></i> {new Date(sentDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                            </span>
+                          )}
+                          {prop.rejectNote && st === "rejected" && (
+                            <span style={{ fontSize: 11, color: "#DC2626", fontWeight: 600 }}>Note: {prop.rejectNote}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+                        <span style={{ background: badge.bg, color: badge.color, borderRadius: 20, padding: "4px 12px", fontSize: 11, fontWeight: 800 }}>{badge.label}</span>
+                        <a href={`${window.location.origin}/proposal-view?id=${prop._id}`} target="_blank" rel="noopener noreferrer"
+                          style={{ background: C.tealLight, color: C.teal, borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, textDecoration: "none", display: "flex", alignItems: "center", gap: 5 }}>
+                          <i className="ti ti-eye" style={{ fontSize: 13 }}></i> View
+                        </a>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 
@@ -1595,20 +1680,20 @@ const managerEmail = proj?.managerEmail || proj?.contactEmail || '';
           </div>
         )}
 
-  {active === "projects" && selectedClientProject && (
-  <ModernEmployeeProjectDetails 
-    project={{
-      ...selectedClientProject,
-      contactEmail: selectedClientProject.contactEmail || user?.email || "",
-      contactPersonName: selectedClientProject.contactPersonName || "",
-      contactPersonNo: selectedClientProject.contactPersonNo || user?.phone || "",
-    }} 
-    tasks={tasks} 
-    user={user} 
-    onBack={() => setSelectedClientProject(null)} 
-    onMessageTeam={() => setActive("messages")}
-  />
-)}
+        {active === "projects" && selectedClientProject && (
+          <ModernEmployeeProjectDetails
+            project={{
+              ...selectedClientProject,
+              contactEmail: selectedClientProject.contactEmail || user?.email || "",
+              contactPersonName: selectedClientProject.contactPersonName || "",
+              contactPersonNo: selectedClientProject.contactPersonNo || user?.phone || "",
+            }}
+            tasks={tasks}
+            user={user}
+            onBack={() => setSelectedClientProject(null)}
+            onMessageTeam={() => setActive("messages")}
+          />
+        )}
       </div>
 
       {/* MOBILE BOTTOM NAV */}
@@ -1655,7 +1740,7 @@ const managerEmail = proj?.managerEmail || proj?.contactEmail || '';
               </div>
 
               <div style={{ fontSize: 12, fontWeight: 800, color: C.text2, marginTop: 4 }}>Select Payment Method</div>
-              
+
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", border: "1.5px solid " + C.teal, borderRadius: 10, cursor: "pointer", background: C.tealLighter }}>
                   <i className="ti ti-brand-google-play" style={{ fontSize: 20, color: C.teal }}></i>

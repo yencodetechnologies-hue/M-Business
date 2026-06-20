@@ -27,10 +27,23 @@ router.get("/client/:name", async (req, res) => {
     const safeCompany = escapeRegExp(companyName);
 
     const conditions = [];
-    if (safeName) conditions.push({ client: { $regex: new RegExp(safeName, "i") } });
-    if (safeCompany) conditions.push({ client: { $regex: new RegExp(safeCompany, "i") } });
-
+    if (safeName) {
+      conditions.push({ client: { $regex: new RegExp(safeName, "i") } });
+      conditions.push({ clientName: { $regex: new RegExp(safeName, "i") } });
+    }
+    if (safeCompany) {
+      conditions.push({ client: { $regex: new RegExp(safeCompany, "i") } });
+      conditions.push({ clientName: { $regex: new RegExp(safeCompany, "i") } });
+    }
     let filter = conditions.length > 0 ? { $or: conditions } : {};
+
+    // Only return proposals that are visible to the client
+    filter = {
+      $and: [
+        filter,
+        { status: { $in: ["sent", "pending", "approved", "rejected"] } }
+      ]
+    };
 
     if (companyId) {
       filter = {
@@ -172,7 +185,12 @@ router.put("/:dbId", async (req, res) => {
     if (!existing) return res.status(404).json({ msg: "Proposal not found or unauthorized" });
 
     const updateData = { ...req.body };
-    if (existing.status === "approved" || existing.status === "rejected") {
+    // Only reset to pending if approved/rejected AND the incoming status is not explicitly set to sent/approved/rejected
+    const protectedStatuses = ["sent", "approved", "rejected", "won", "lost"];
+    if (
+      (existing.status === "approved" || existing.status === "rejected") &&
+      !protectedStatuses.includes(updateData.status)
+    ) {
       updateData.status = "pending";
     }
 

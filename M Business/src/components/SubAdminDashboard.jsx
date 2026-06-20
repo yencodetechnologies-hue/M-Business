@@ -6422,7 +6422,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   }, [active]);
 
   const [jumpProject, setJumpProject] = useState(null);
-
+  const [jumpInvoicePrefill, setJumpInvoicePrefill] = useState(null);
   useEffect(() => {
 
     if (active === "edit-project" && !jumpProject) {

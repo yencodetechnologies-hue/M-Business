@@ -931,7 +931,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           {!hideTopActions && (<>
             {onNewInvoice && (
               <button className="mpd-btn mpd-btn-primary" onClick={() => {
-                onNewInvoice(currProject);
+                setActiveTab('payments');
+                setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true }));
               }} style={{ gap: 6 }}>
                 <i className="ti ti-file-invoice"></i> New Invoice
               </button>
@@ -1618,9 +1619,53 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                 }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#00BCD4' }} title="View Invoice"><i className="ti ti-eye"></i></button>
                               </div>
                               {inv._source === 'global' ? (
-                                <button onClick={() => { const fullGlobal = projectInvoices.find(g => g.id === inv._globalId); if (onViewInvoice) onViewInvoice(fullGlobal || inv); }} title="Edit" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+                                <button onClick={async () => {
+                                  const fullGlobal = projectInvoices.find(g => g.id === inv._globalId);
+                                  const editData = fullGlobal?.inv || fullGlobal || inv;
+                                  if (onNewInvoice) {
+                                    onNewInvoice(currProject, {
+                                      editData: {
+                                        ...editData,
+                                        invoiceNo: editData.invoiceNo || inv.invoiceNo,
+                                        client: editData.client || editData.clientName || clientName,
+                                        project: editData.project || currProject.name,
+                                        date: editData.date || editData.issueDate || inv.issueDate,
+                                        dueDate: editData.dueDate || inv.dueDate,
+                                        status: editData.status || inv.status,
+                                        items: editData.items || editData.lineItems || [],
+                                        notes: editData.notes || '',
+                                        terms: editData.terms || '',
+                                      },
+                                      editIndex: i,
+                                      isEdit: true,
+                                      projectId: currProject._id,
+                                      client: editData.client || editData.clientName || clientName,
+                                      project: currProject.name,
+                                      globalInvoiceId: inv._globalId,
+                                    }, i);
+                                  }
+                                }} title="Edit" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
                               ) : (
-                                <button onClick={() => { if (onNewInvoice) { onNewInvoice(currProject, { ...inv }, i); } else { setPaymentModalsState({ showNewInvoice: true, showPayment: false, showAdvance: false, showAdditional: false, showMilestonePayment: false, showExpense: false, editData: { ...inv }, editIndex: i }); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }} title="Edit"><i className="ti ti-edit"></i></button>
+                                <button onClick={() => {
+                                  if (onNewInvoice) {
+                                    onNewInvoice(currProject, {
+                                      editData: {
+                                        ...inv,
+                                        client: inv.clientName || clientName,
+                                        project: currProject.name,
+                                      },
+                                      editIndex: i,
+                                      isEdit: true,
+                                      projectId: currProject._id,
+                                    }, i);
+                                  } else {
+                                    setPaymentModalsState({
+                                      showNewInvoice: true, showPayment: false, showAdvance: false,
+                                      showAdditional: false, showMilestonePayment: false, showExpense: false,
+                                      editData: { ...inv }, editIndex: i
+                                    });
+                                  }
+                                }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }} title="Edit"><i className="ti ti-edit"></i></button>
                               )}
                               {inv._source === 'global' ? (
                                 <button onClick={async () => { if (confirm('Delete this invoice?')) { await axios.delete(`${BASE_URL}/api/invoices/${inv._globalId}`); loadLatest(); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }} title="Delete"><i className="ti ti-trash"></i></button>

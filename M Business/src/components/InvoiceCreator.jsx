@@ -1547,16 +1547,17 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                       </td>
                       <td onClick={e => e.stopPropagation()}>
                         <div className="row-actions">
-                          <button className="row-btn" onClick={() => { loadEntry(entry); setStep("preview"); window.scrollTo(0, 0); }}><i className="ti ti-eye"></i></button>
+                          <button className="row-btn" title="View" onClick={() => { loadEntry(entry); setStep("preview"); window.scrollTo(0, 0); }}><i className="ti ti-eye"></i></button>
+                          <button className="row-btn" title="Edit" onClick={(e) => { e.stopPropagation(); loadEntry(entry); setStep("form"); window.scrollTo(0, 0); }}><i className="ti ti-edit"></i></button>
                           {(isPaid || isPartPaid) ? (
-                            <button className="row-btn" onClick={() => {
+                            <button className="row-btn" title="Receipt" onClick={() => {
                               setReceiptEntry({ ...entry, paymentData: { amountPaid: entry.amountPaid || entry.total, paymentMode: entry.paymentMode || "Other", paymentDate: entry.paymentDate || new Date().toISOString(), transactionId: entry.transactionId } });
                               setStep("receipt");
                             }}><i className="ti ti-download"></i></button>
                           ) : (
-                            <button className="row-btn" onClick={(e) => { e.stopPropagation(); shareInvoice({ id: entry.id, invoiceNo: entry.invoiceNo || entry.inv?.invoiceNo, total: entry.total }); }}><i className="ti ti-send"></i></button>
+                            <button className="row-btn" title="Send" onClick={(e) => { e.stopPropagation(); shareInvoice({ id: entry.id, invoiceNo: entry.invoiceNo || entry.inv?.invoiceNo, total: entry.total }); }}><i className="ti ti-send"></i></button>
                           )}
-                          <button className="row-btn danger" onClick={() => setDeleteTarget(entry)}><i className="ti ti-trash"></i></button>
+                          <button className="row-btn danger" title="Delete" onClick={() => setDeleteTarget(entry)}><i className="ti ti-trash"></i></button>
                         </div>
                       </td>
                     </tr>

@@ -522,6 +522,26 @@ export default function AdminDashboard({ user, setUser }) {
               user={user}
               clients={clients}
               onUpdate={() => { }}
+              onNewInvoice={(proj, prefill) => {
+                setJumpInvoicePrefill(prefill || { client: proj?.client || '', project: proj?.name || '' });
+                setActive("invoices");
+              }}
+              onViewInvoice={(inv) => {
+                setJumpInvoicePrefill({ editData: inv, client: inv?.client || inv?.clientName || '', project: inv?.project || jumpProject?.name || '' });
+                setActive("invoices");
+              }}
+            />
+          )}
+          {active === "invoices" && (
+            <InvoiceCreator
+              THEME={THEME}
+              clients={clients}
+              projects={projects}
+              newInvoicePrefill={jumpInvoicePrefill}
+              onBack={() => {
+                setJumpInvoicePrefill(null);
+                setActive(jumpProject ? "project-details" : "invoices");
+              }}
             />
           )}
           {active === "employees" && <EmployeesPage THEME={THEME} employees={employees} setEmployees={setEmployees} />}
@@ -529,7 +549,7 @@ export default function AdminDashboard({ user, setUser }) {
           {active === "projects" && <ProjectsPage THEME={THEME} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} fetchTasks={fetchTasks} />}
           {active === "quotations" && <QuotationCreatorModern THEME={THEME} clients={clients} projects={projects} />}
           {active === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "M Business"} />}
-          {active === "invoices" && <InvoiceCreator THEME={THEME} clients={clients} projects={projects} />}
+
           {active === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} />}
           {active === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} />}
           {active === "reports" && <ReportsPage THEME={THEME} clients={clients} projects={projects} employees={employees} managers={managers} />}

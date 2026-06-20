@@ -1320,7 +1320,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             {[
 
-              { icon: "ti-mail", label: "Email", val: activeClient.email, bg: "#E0F7FA", col: "#00BCD4" },
+              { icon: "ti-mail", label: "Email Address", val: activeClient.email, bg: "#E0F7FA", col: "#00BCD4" },
 
               { icon: "ti-user", label: "Contact Person Name", val: activeClient.contactPersonName || "—", bg: "#E0F7FA", col: "#00BCD4" },
 
@@ -1328,7 +1328,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               { icon: "ti-briefcase", label: "Category", val: activeClient.category || activeClient.industry || "—", bg: "#F3E8FF", col: "#7C5CFC" },
 
-              { icon: "ti-phone", label: "Phone", val: activeClient.phone || "—", bg: "#E0F7FA", col: "#00BCD4" },
+              { icon: "ti-phone", label: "Office Phone", val: activeClient.phone || "—", bg: "#E0F7FA", col: "#00BCD4" },
 
               { icon: "ti-building-bank", label: "Company Tax / GST", val: activeClient.gstNumber || "—", bg: "#EFF4FF", col: "#2563EB" },
 

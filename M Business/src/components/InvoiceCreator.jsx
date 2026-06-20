@@ -37,14 +37,14 @@ const CURRENCY_SYMBOLS = {
   TRY: "₺", RUB: "₽",
 };
 
-function getCurrencySymbol(code) {
-  return CURRENCY_SYMBOLS[code] || code || "₹";
+function getCurrencySymbol(code, customSymbol) {
+  return CURRENCY_SYMBOLS[code] || customSymbol || code || "₹";
 }
 
-function formatCurrency(val, currencyCode = "INR", compact = false, disableCompact = false) {
+function formatCurrency(val, currencyCode = "INR", compact = false, disableCompact = false, customSymbol = "") {
   const num = parseFloat(val) || 0;
   const absNum = Math.abs(num);
-  const symbol = getCurrencySymbol(currencyCode);
+  const symbol = getCurrencySymbol(currencyCode, customSymbol);
   const isINR = currencyCode === "INR";
 
   if (!disableCompact && ((compact && absNum >= 100000) || absNum >= 10000000)) {
@@ -608,6 +608,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     companyName: "YENCODE Technologies", companyEmail: "yencodetechnologies@gmail.com",
     companyPhone: "+91 89254 33533", companyAddress: "Chennai, Tamil Nadu, India – 600001",
     currency: "INR",
+    customCurrencySymbol: "",
     status: "pending",
     template: "Classic",
     footerMessage: "🙏 Thank you for considering us!",
@@ -1878,9 +1879,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                                 <td style={{ padding: "12px 11px", color: "#64748b", fontWeight: 700, fontSize: 12 }}>{String(globalItemOffset + idx + 1).padStart(2, "0")}</td>
                                 <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#0f1c2e" }}>{item.description || "—"}</td>
                                 <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
-                                <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, inv.currency)}</td>
+                                <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, inv.currency, false, false, inv.customCurrencySymbol)}</td>
                                 <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#6b7280" }}>{rateGst}% {isIncl ? "(Incl)" : ""}</td>
-                                <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
+                                <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency, false, false, inv.customCurrencySymbol)}</td>
                               </tr>
                             );
                           })}
@@ -1903,21 +1904,21 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                         <div className="inv-totals" style={{ width: "200px" }}>
                           <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
                             <span className="lbl" style={{ color: "#64748b" }}>Subtotal</span>
-                            <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(subtotal, inv.currency)}</span>
+                            <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(subtotal, inv.currency, false, false, inv.customCurrencySymbol)}</span>
                           </div>
                           <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
                             <span className="lbl" style={{ color: "#64748b" }}>GST / Tax</span>
-                            <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(gstAmt, inv.currency)}</span>
+                            <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(gstAmt, inv.currency, false, false, inv.customCurrencySymbol)}</span>
                           </div>
                           {amountPaid > 0 && (
                             <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
                               <span className="lbl" style={{ color: "#64748b" }}>Paid (Advance)</span>
-                              <span className="val" style={{ fontWeight: "700", color: "var(--green)" }}>-{formatCurrency(amountPaid, inv.currency)}</span>
+                              <span className="val" style={{ fontWeight: "700", color: "var(--green)" }}>-{formatCurrency(amountPaid, inv.currency, false, false, inv.customCurrencySymbol)}</span>
                             </div>
                           )}
                           <div className="inv-grand-row" style={{ display: "flex", justify: "space-between", padding: "6px 8px", background: "#0f1c2e", borderRadius: "6px", marginTop: "4px", color: "#fff" }}>
                             <span className="lbl" style={{ fontSize: "10px", fontWeight: "800" }}>Balance Due</span>
-                            <span className="val" style={{ fontSize: "12px", fontWeight: "900" }}>{formatCurrency(balanceDue, inv.currency)}</span>
+                            <span className="val" style={{ fontSize: "12px", fontWeight: "900" }}>{formatCurrency(balanceDue, inv.currency, false, false, inv.customCurrencySymbol)}</span>
                           </div>
                         </div>
                       </div>
@@ -2297,7 +2298,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                           </div>
                         </td>
                         <td className="inv-creator-item-total">
-                          {formatCurrency(lineTotal, inv.currency)}
+                          {formatCurrency(lineTotal, inv.currency, false, false, inv.customCurrencySymbol)}
                         </td>
                         <td>
                           <button className="inv-creator-del-row-btn" onClick={() => removeItem(item.id)} disabled={items.length === 1}><i className="ti ti-trash"></i></button>
@@ -2321,11 +2322,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                     <input className="inv-creator-form-input" type="number" value={inv.extraCharges || 0} onChange={(e) => upd("extraCharges", Number(e.target.value))} placeholder="0" />
                   </div>
                 </div>
-                <div className="inv-creator-total-row"><span className="inv-creator-total-label">Subtotal</span><span className="inv-creator-total-val">{formatCurrency(subtotal, inv.currency)}</span></div>
-                <div className="inv-creator-total-row discount"><span className="inv-creator-total-label">Discount</span><span className="inv-creator-total-val">- {formatCurrency((subtotal * (inv.discountPct || 0) / 100), inv.currency)}</span></div>
-                <div className="inv-creator-total-row tax"><span className="inv-creator-total-label">GST / Tax</span><span className="inv-creator-total-val">+ {formatCurrency(gstAmt, inv.currency)}</span></div>
-                <div className="inv-creator-total-row"><span className="inv-creator-total-label">Extra Charges</span><span className="inv-creator-total-val">+ {formatCurrency(inv.extraCharges || 0, inv.currency)}</span></div>
-                <div className="inv-creator-total-row grand"><span className="inv-creator-total-label">Total Amount</span><span className="inv-creator-total-val">{formatCurrency(total - (subtotal * (inv.discountPct || 0) / 100) + (inv.extraCharges || 0), inv.currency)}</span></div>
+                <div className="inv-creator-total-row"><span className="inv-creator-total-label">Subtotal</span><span className="inv-creator-total-val">{formatCurrency(subtotal, inv.currency, false, false, inv.customCurrencySymbol)}</span></div>
+                <div className="inv-creator-total-row discount"><span className="inv-creator-total-label">Discount</span><span className="inv-creator-total-val">- {formatCurrency((subtotal * (inv.discountPct || 0) / 100), inv.currency, false, false, inv.customCurrencySymbol)}</span></div>
+                <div className="inv-creator-total-row tax"><span className="inv-creator-total-label">GST / Tax</span><span className="inv-creator-total-val">+ {formatCurrency(gstAmt, inv.currency, false, false, inv.customCurrencySymbol)}</span></div>
+                <div className="inv-creator-total-row"><span className="inv-creator-total-label">Extra Charges</span><span className="inv-creator-total-val">+ {formatCurrency(inv.extraCharges || 0, inv.currency, false, false, inv.customCurrencySymbol)}</span></div>                <div className="inv-creator-total-row grand"><span className="inv-creator-total-label">Total Amount</span><span className="inv-creator-total-val">{formatCurrency(total - (subtotal * (inv.discountPct || 0) / 100) + (inv.extraCharges || 0), inv.currency, false, false, inv.customCurrencySymbol)}</span></div>
               </div>
             </div>
           </div>
@@ -2699,9 +2699,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                         <td style={{ padding: "6px 8px", fontSize: "10px", color: "#0f1c2e" }}>{idx + 1}</td>
                         <td style={{ padding: "6px 8px", fontSize: "10px", color: "#0f1c2e" }}>{item.description || "—"}</td>
                         <td style={{ padding: "6px 8px", fontSize: "10px", color: "#0f1c2e", textAlign: "right" }}>{item.quantity}</td>
-                        <td style={{ padding: "6px 8px", fontSize: "10px", color: "#0f1c2e", textAlign: "right" }}>{formatCurrency(item.rate, inv.currency)}</td>
+                        <td style={{ padding: "6px 8px", fontSize: "10px", color: "#0f1c2e", textAlign: "right" }}>{formatCurrency(item.rate, inv.currency, false, false, inv.customCurrencySymbol)}</td>
                         <td style={{ padding: "6px 8px", fontSize: "10px", textAlign: "right", color: "#64748b" }}>{rateGst}% {isIncl ? "Incl" : ""}</td>
-                        <td style={{ padding: "6px 8px", fontSize: "10px", color: "#0f1c2e", textAlign: "right", fontWeight: "700" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
+                        <td style={{ padding: "6px 8px", fontSize: "10px", color: "#0f1c2e", textAlign: "right", fontWeight: "700" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency, false, false, inv.customCurrencySymbol)}</td>
+
                       </tr>
                     );
                   })}
@@ -2722,21 +2723,22 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <div className="inv-totals" style={{ width: "200px" }}>
                   <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
                     <span className="lbl" style={{ color: "#64748b" }}>Subtotal</span>
-                    <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(subtotal, inv.currency)}</span>
-                  </div>
+                    <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(subtotal, inv.currency, false, false, inv.customCurrencySymbol)}</span>                  </div>
                   <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
                     <span className="lbl" style={{ color: "#64748b" }}>GST / Tax</span>
-                    <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(gstAmt, inv.currency)}</span>
+                    <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(gstAmt, inv.currency, false, false, inv.customCurrencySymbol)}</span>
                   </div>
                   {amountPaid > 0 && (
                     <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
                       <span className="lbl" style={{ color: "#64748b" }}>Paid (Advance)</span>
+                      <span className="val" style={{ fontWeight: "700", color: "var(--green)" }}>-{formatCurrency(amountPaid, inv.currency, false, false, inv.customCurrencySymbol)}</span>
                       <span className="val" style={{ fontWeight: "700", color: "var(--green)" }}>-{formatCurrency(amountPaid, inv.currency)}</span>
+
                     </div>
                   )}
                   <div className="inv-grand-row" style={{ display: "flex", justify: "space-between", padding: "6px 8px", background: "#0f1c2e", borderRadius: "6px", marginTop: "4px", color: "#fff" }}>
                     <span className="lbl" style={{ fontSize: "10px", fontWeight: "800" }}>Balance Due</span>
-                    <span className="val" style={{ fontSize: "12px", fontWeight: "900" }}>{formatCurrency(balanceDue, inv.currency)}</span>
+                    <span className="val" style={{ fontSize: "12px", fontWeight: "900" }}>{formatCurrency(balanceDue, inv.currency, false, false, inv.customCurrencySymbol)}</span>
                   </div>
                 </div>
               </div>

@@ -534,12 +534,15 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const doneTasks = projTasks.filter(t => t.status === 'done' || t.status === 'completed').length || 0;
   const inprogTasks = projTasks.filter(t => t.status === 'in_progress').length || 0;
   const openTasks = totalTasks - doneTasks - inprogTasks;
+
+  // Milestone progress — drives the Overall Progress bar (milestone-only, not task-only)
   const milestonesArr = currProject.milestones || [];
   const doneMilestones = milestonesArr.filter(m => m.done).length;
   const totalMilestones = milestonesArr.length;
   const progressPct = totalMilestones > 0
     ? Math.round((doneMilestones / totalMilestones) * 100)
     : (currProject.progress || 0);
+
   const parseAmt = (val) => {
     if (val === undefined || val === null) return 0;
     if (typeof val === 'number') return val;
@@ -558,7 +561,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const billed = billedGlobal + billedLocal;
   const received = (currProject.paymentsReceived || []).reduce((sum, p) => sum + parseAmt(p.amount), 0);
   const pending = Math.max(0, billed - received);
-  // Spent = dynamically summed from expenses array; fallback to stored spent value
   const spent = (currProject.expenses && currProject.expenses.length > 0)
     ? currProject.expenses.reduce((sum, exp) => sum + parseAmt(exp.amount), 0)
     : parseAmt(currProject.spent);
@@ -580,20 +582,49 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       const newStatus = isCurrentlyDone ? 'in_progress' : 'completed';
       await axios.put(`${BASE_URL}/api/tasks/${task._id}`, { status: newStatus });
 
-      // Recalculate progress and save to project DB
+      // Recalculate task counts and save to project DB
       const latestTasks = await axios.get(`${BASE_URL}/api/tasks`, {
         headers: { 'x-company-id': currProject?.companyId || '' }
       });
       const allTasks = Array.isArray(latestTasks.data) ? latestTasks.data : [];
-      const projTasks = allTasks.filter(t => t.project === currProject?.name && !t.isDeleted);
-      const totalT = projTasks.length;
-      const doneT = projTasks.filter(t => {
+      const _pidLatest = String(currProject._id);
+      const projTasksLatest = allTasks.filter(t => {
+        if (!t || t.isDeleted) return false;
+        const tPid = t.projectId ? (t.projectId._id ? String(t.projectId._id) : String(t.projectId)) : null;
+        return tPid === _pidLatest || t.project === currProject?.name;
+      });
+      const totalT = projTasksLatest.length;
+      const doneT = projTasksLatest.filter(t => {
         const s = t.status;
         return s === 'done' || s === 'completed' || (t._id === task._id ? !isCurrentlyDone : false);
       }).length;
+
+      // Auto-complete milestones whose tasks are all done — this is what drives Overall Progress.
+      // Completing an individual task never changes progressPct by itself; only flipping a
+      // milestone's `done` flag (when its LAST task is completed) moves the bar.
+      const existingMilestones = currProject.milestones || [];
+      const updatedMilestones = existingMilestones.map(m => {
+        const tasksForMilestone = projTasksLatest.filter(t => t.milestone === m.name && !t.isDeleted);
+
+        if (tasksForMilestone.length === 0) {
+          // No tasks under this milestone — leave its status untouched
+          return m;
+        }
+
+        const allDone = tasksForMilestone.every(t => {
+          const taskId = String(t._id);
+          // use the just-updated status for the task being toggled right now
+          const effectiveStatus = taskId === String(task._id) ? newStatus : t.status;
+          return effectiveStatus === 'done' || effectiveStatus === 'completed';
+        });
+
+        return { ...m, done: allDone };
+      });
+
       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
         completedTasks: doneT,
         tasks: totalT,
+        milestones: updatedMilestones, // persists auto-updated milestone completion
       });
 
       loadLatest();
@@ -603,6 +634,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       console.error("Failed to toggle task:", err);
     }
   };
+
 
   const getOrCreateGroupId = async () => {
     try {
@@ -1072,9 +1104,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 });
 
                 const isActive = !isDone && idx === firstNotDone;
-                const circleColor = isDone ? P.green : isActive ? '#E0F7FA' : '#fff';
-                const circleBorder = isDone ? P.green : isActive ? P.primary : P.border;
-                const textColor = isDone ? P.green : isActive ? P.primary : P.textLight;
+                const circleColor = isDone ? P.red : isActive ? '#E0F7FA' : '#fff';
+                const circleBorder = isDone ? P.red : isActive ? P.primary : P.border;
+                const textColor = isDone ? P.red : isActive ? P.primary : P.textLight;
                 const statusLabel = isDone ? 'Done' : isActive ? 'Active' : 'Pending';
                 return (
                   <div key={idx} draggable="true" onDragStart={(e) => { e.stopPropagation(); setDragMilestoneIdx(idx); }} onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDragOverMilestoneIdx(idx); }} onDrop={(e) => { e.preventDefault(); e.stopPropagation(); if (dragMilestoneIdx === null || dragMilestoneIdx === idx) { setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); return; } const ms = [...(currProject.milestones || [])]; const dragged = ms.splice(dragMilestoneIdx, 1)[0]; ms.splice(idx, 0, dragged); setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms }).then(loadLatest); }} onDragEnd={(e) => { e.stopPropagation(); setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1, position: 'relative', zIndex: 1, opacity: dragMilestoneIdx === idx ? 0.4 : 1, cursor: 'grab', outline: dragOverMilestoneIdx === idx && dragMilestoneIdx !== idx ? `2.5px dashed ${P.primary}` : 'none', borderRadius: 8, transition: 'opacity .2s' }}>

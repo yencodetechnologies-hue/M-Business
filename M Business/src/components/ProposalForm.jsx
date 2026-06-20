@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as logic from './ProposalFormLogic';
 
-export default function ProposalForm({ onBack, onSave,initialData  }) {
+export default function ProposalForm({ onBack, onSave, initialData }) {
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -12,8 +12,8 @@ export default function ProposalForm({ onBack, onSave,initialData  }) {
     // Expose ALL logic functions to window so dangerouslySetInnerHTML onclick attrs work natively
     Object.assign(window, logic);
     window._onSaveProposal = onSave;
-window._clientsData = window._clientsData || [];
-fetch('/api/clients').then(r => r.json()).then(d => { window._clientsData = d; }).catch(() => {});
+    window._clientsData = window._clientsData || [];
+    fetch('/api/clients').then(r => r.json()).then(d => { window._clientsData = d; }).catch(() => { });
     // Hook up back button
     // Hook up back button + all topbar buttons
     const hookUp = () => {
@@ -38,7 +38,7 @@ fetch('/api/clients').then(r => r.json()).then(d => { window._clientsData = d; }
           } else if (rawArgs.startsWith('this,')) {
             const rest = rawArgs.slice(5).replace(/['"]/g, '').trim();
             logic[fn](el, rest);
-} else {
+          } else {
             const args = rawArgs.split(',').map(a => a.trim().replace(/^['"]|['"]$/g, ''));
             logic[fn](...args);
           }
@@ -47,14 +47,14 @@ fetch('/api/clients').then(r => r.json()).then(d => { window._clientsData = d; }
 
       // Duplicate button (no onclick attr)
       const dupBtn = c.querySelector('.topbar-actions .btn-o:first-child');
-   if (dupBtn) dupBtn.onclick = () => {
-  if (window._onSaveProposal) {
-    const data = logic.extractProposalData();
-    data.title = data.title + ' (Copy)';
-    data.status = 'draft';
-    window._onSaveProposal(data);
-  }
-};
+      if (dupBtn) dupBtn.onclick = () => {
+        if (window._onSaveProposal) {
+          const data = logic.extractProposalData();
+          data.title = data.title + ' (Copy)';
+          data.status = 'draft';
+          window._onSaveProposal(data);
+        }
+      };
 
       // Cover upload — real file picker
       const coverZone = c.querySelector('#coverZone');
@@ -77,18 +77,18 @@ fetch('/api/clients').then(r => r.json()).then(d => { window._clientsData = d; }
     };
     setTimeout(hookUp, 300);
     // Existing data load
-if (initialData) {
-  setTimeout(() => {
-    const setVal = (id, val) => {
-      const el = document.getElementById(id);
-      if (el && val) el.value = val;
-    };
-    setVal('propTitle', initialData.title);
-    setVal('toComp', initialData.client);
-    if (logic.up) logic.up();
-    if (logic.calcTotal) logic.calcTotal();
-  }, 400);
-}
+    if (initialData) {
+      setTimeout(() => {
+        const setVal = (id, val) => {
+          const el = document.getElementById(id);
+          if (el && val) el.value = val;
+        };
+        setVal('propTitle', initialData.title);
+        setVal('toComp', initialData.client);
+        if (logic.up) logic.up();
+        if (logic.calcTotal) logic.calcTotal();
+      }, 400);
+    }
 
     const handleInput = () => {
       try {
@@ -933,16 +933,63 @@ YENCODE Technologies | yencodetechnologies@gmail.com | +91 89254 33533</textarea
         </div>
         <div class="form-row">
           <div class="fg"><label class="fl">Our Signature</label>
-            <div class="sig-box" onclick="signProposal(this)">
+            <div class="sig-box" id="ourSigBox" onclick="openSignatureModal()" style="height:70px">
               <i class="ti ti-signature" style="font-size:22px;color:var(--text3)"></i>
               <div style="font-size:11px;color:var(--text3);font-weight:600">Click to sign</div>
             </div>
           </div>
           <div class="fg"><label class="fl">Client Signature</label>
-            <div class="sig-box" style="border-color:var(--amber);background:var(--amber-bg)">
+            <div class="sig-box" style="border-color:var(--amber);background:var(--amber-bg);height:70px">
               <i class="ti ti-user-check" style="font-size:22px;color:var(--amber)"></i>
               <div style="font-size:11px;color:var(--amber);font-weight:600">Awaiting client</div>
             </div>
+          </div>
+        </div>
+
+        <!-- Signature Modal -->
+        <div id="sigModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
+          <div style="background:#fff;border-radius:16px;padding:24px;width:480px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,0.18);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+              <div style="font-size:13px;font-weight:800;color:#0f1c2e;letter-spacing:.5px;">AUTHORISED SIGNATURE</div>
+              <button id="sigModalClose" style="background:none;border:none;font-size:20px;cursor:pointer;color:#607D86;">✕</button>
+            </div>
+            <!-- Tabs -->
+            <div style="display:flex;border-bottom:2px solid #e5e7eb;margin-bottom:14px;">
+              <button id="sigTab-draw" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:var(--teal);border-bottom:2px solid var(--teal);cursor:pointer;margin-bottom:-2px;">✍️ Draw</button>
+              <button id="sigTab-type" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:#607D86;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-2px;">⌨️ Type</button>
+              <button id="sigTab-upload" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:#607D86;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-2px;">📁 Upload</button>
+            </div>
+            <!-- Draw Tab -->
+            <div id="sigContent-draw">
+              <div style="background:#F5FAFA;border:1.5px solid #E0EEF0;border-radius:10px;padding:10px;">
+                <canvas id="sigCanvas" width="420" height="160" style="border:1.5px dashed #C5DDE0;border-radius:8px;background:#fff;cursor:crosshair;width:100%;height:160px;display:block;touch-action:none;"></canvas>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:10px;">
+                <button id="sigClearBtn" style="padding:6px 14px;font-size:11px;background:#fff;border:1.5px solid #e5e7eb;border-radius:6px;cursor:pointer;font-weight:700;color:#374151;">Clear</button>
+                <button id="sigApplyDrawBtn" style="padding:6px 14px;font-size:11px;background:var(--teal);color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:800;">Apply Signature</button>
+              </div>
+            </div>
+            <!-- Type Tab -->
+            <div id="sigContent-type" style="display:none;">
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input id="typedSigInput" type="text" placeholder="Type your name..." style="flex:1;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:18px;font-family:'Dancing Script',cursive;font-weight:bold;color:#1a2e35;outline:none;" />
+                <button id="sigApplyTypeBtn" style="padding:10px 14px;background:var(--teal);border:none;border-radius:10px;color:#fff;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;">Apply Signature</button>
+              </div>
+              <div id="typedSigPreview" style="margin-top:10px;font-size:11px;color:#64748b;display:none;">
+                Preview: <span id="typedSigPreviewText" style="font-family:'Dancing Script',cursive;font-size:22px;color:#1a2e35;font-weight:bold;"></span>
+              </div>
+            </div>
+            <!-- Upload Tab -->
+            <div id="sigContent-upload" style="display:none;">
+              <div style="background:#F5FAFA;border:1.5px dashed #C5DDE0;border-radius:10px;padding:24px;text-align:center;cursor:pointer;position:relative;">
+                <input id="sigUploadInput" type="file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;" />
+                <i class="ti ti-upload" style="font-size:24px;color:#607D86;"></i>
+                <div style="font-size:12px;font-weight:700;color:#607D86;margin-top:4px;">Click to upload signature image</div>
+                <div style="font-size:10px;color:#A0B8BE;margin-top:2px;">PNG or JPG with transparent background preferred</div>
+              </div>
+            </div>
+          </div>
+        </div>
           </div>
         </div>
       </div>

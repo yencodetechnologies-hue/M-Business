@@ -13,6 +13,7 @@ const invoiceSchema = new mongoose.Schema({
   quotationId: { type: String },
   orderNo: String,
   date: String,
+  dueDate: { type: String, default: "" },
   dueDateType: { type: String, default: "30" },
   client: { type: String, required: true },
   project: String,

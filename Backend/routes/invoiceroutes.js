@@ -1,6 +1,6 @@
 // routes/invoiceRoutes.js  ← FLAT SCHEMA VERSION (matches your InvoiceModels.js)
 const express = require("express");
-const router  = express.Router();
+const router = express.Router();
 const Invoice = require("../models/InvoiceModels");
 const Income = require("../models/IncomeModel");
 
@@ -35,49 +35,49 @@ router.get("/", async (req, res) => {
 
       // Rebuild nested `inv` object that the frontend InvoiceCreator expects
       const inv = {
-        invoiceNo:      doc.invoiceNo      || "",
-        orderNo:        doc.orderNo        || "",
-        date:           doc.date           || "",
+        invoiceNo: doc.invoiceNo || "",
+        orderNo: doc.orderNo || "",
+        date: doc.date || "",
         dueDateType: doc.dueDateType || "30",
-        client:         doc.client         || "",
-        project:        doc.project        || "",
-        gstRate:        doc.gstRate        ?? 18,
-        notes:          doc.notes          || "",
-        terms:          doc.terms          || "",
-        companyName:    doc.companyName    || "",
-        companyEmail:   doc.companyEmail   || "",
-        companyPhone:   doc.companyPhone   || "",
+        client: doc.client || "",
+        project: doc.project || "",
+        gstRate: doc.gstRate ?? 18,
+        notes: doc.notes || "",
+        terms: doc.terms || "",
+        companyName: doc.companyName || "",
+        companyEmail: doc.companyEmail || "",
+        companyPhone: doc.companyPhone || "",
         companyAddress: doc.companyAddress || "",
-        amountPaid:     doc.amountPaid     || 0,
-        paymentMode:    doc.paymentMode    || "GPay",
-        transactionId:  doc.transactionId  || "",
-        currency:       doc.currency       || "₹",
-        upiId:          doc.upiId          || "",
-        bankName:       doc.bankName       || "",
-        accountName:    doc.accountName    || "",
-        accountNumber:  doc.accountNumber  || "",
-        ifscCode:       doc.ifscCode       || "",
-        footerMessage:  doc.footerMessage  || "",
-        signature:      doc.signature      || "",
-        signatureType:  doc.signatureType  || "text",
-        template:       doc.template       || "Classic",
+        amountPaid: doc.amountPaid || 0,
+        paymentMode: doc.paymentMode || "GPay",
+        transactionId: doc.transactionId || "",
+        currency: doc.currency || "₹",
+        upiId: doc.upiId || "",
+        bankName: doc.bankName || "",
+        accountName: doc.accountName || "",
+        accountNumber: doc.accountNumber || "",
+        ifscCode: doc.ifscCode || "",
+        footerMessage: doc.footerMessage || "",
+        signature: doc.signature || "",
+        signatureType: doc.signatureType || "text",
+        template: doc.template || "Classic",
         paymentHistory: history,
       };
 
       return {
-        id:        doc._id.toString(),
+        id: doc._id.toString(),
         invoiceNo: doc.invoiceNo || "—",
-        client:    doc.client    || "—",
-        project:   doc.project   || "",
-        date:      doc.date      || null,
-        dueDate:   doc.dueDate   || null,
-        status:    doc.status    || "draft",
+        client: doc.client || "—",
+        project: doc.project || "",
+        date: doc.date || null,
+        dueDate: doc.dueDate || null,
+        status: doc.status || "draft",
         total,
         amountPaid: doc.amountPaid || 0,
-        currency:   doc.currency   || "₹",
-        savedAt:   doc.createdAt || Date.now(),
+        currency: doc.currency || "₹",
+        savedAt: doc.createdAt || Date.now(),
         inv,
-        items:     doc.items || [],
+        items: doc.items || [],
         paymentHistory: history,
       };
     }));
@@ -94,11 +94,11 @@ router.get("/client/:clientName", async (req, res) => {
     const companyId = req.headers['x-company-id'] || req.companyId || "";
     const name = decodeURIComponent(req.params.clientName).trim();
     const companyName = req.query.company ? decodeURIComponent(req.query.company).trim() : "";
-    
+
     const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const safeName = escapeRegExp(name);
     const safeCompany = escapeRegExp(companyName);
-    
+
     const conditions = [];
     if (safeName) {
       conditions.push({ client: { $regex: new RegExp(safeName, "i") } });
@@ -106,7 +106,7 @@ router.get("/client/:clientName", async (req, res) => {
     if (safeCompany) {
       conditions.push({ client: { $regex: new RegExp(safeCompany, "i") } });
     }
-    
+
     let filter = conditions.length > 0 ? { $or: conditions } : {};
 
     // Isolation: Filter by companyId if provided
@@ -138,7 +138,7 @@ router.get("/client/:clientName", async (req, res) => {
           total += itemBase * (1 + rateGst / 100);
         }
       });
-      
+
       const history = await Income.find({ invoiceNo: doc.invoiceNo }).sort({ date: 1 }).lean();
 
       return {
@@ -189,50 +189,50 @@ router.get("/no/:invoiceNo", async (req, res) => {
     const history = await Income.find({ invoiceNo: doc.invoiceNo }).sort({ date: 1 }).lean();
 
     const inv = {
-      invoiceNo:      doc.invoiceNo      || "",
-      orderNo:        doc.orderNo        || "",
-      date:           doc.date           || "",
-      dueDate:        doc.dueDate        || "",
-      client:         doc.client         || "",
-      project:        doc.project        || "",
-      gstRate:        doc.gstRate        ?? 18,
-      notes:          doc.notes          || "",
-      terms:          doc.terms          || "",
-      companyName:    doc.companyName    || "",
-      companyEmail:   doc.companyEmail   || "",
-      companyPhone:   doc.companyPhone   || "",
+      invoiceNo: doc.invoiceNo || "",
+      orderNo: doc.orderNo || "",
+      date: doc.date || "",
+      dueDate: doc.dueDate || "",
+      client: doc.client || "",
+      project: doc.project || "",
+      gstRate: doc.gstRate ?? 18,
+      notes: doc.notes || "",
+      terms: doc.terms || "",
+      companyName: doc.companyName || "",
+      companyEmail: doc.companyEmail || "",
+      companyPhone: doc.companyPhone || "",
       companyAddress: doc.companyAddress || "",
-      amountPaid:     doc.amountPaid     || 0,
-      paymentMode:    doc.paymentMode    || "GPay",
-      transactionId:  doc.transactionId  || "",
-      currency:       doc.currency       || "₹",
-      upiId:          doc.upiId          || "",
-      bankName:       doc.bankName       || "",
-      accountName:    doc.accountName    || "",
-      accountNumber:  doc.accountNumber  || "",
-      ifscCode:       doc.ifscCode       || "",
-      footerMessage:  doc.footerMessage  || "",
-      signature:      doc.signature      || "",
-      signatureType:  doc.signatureType  || "text",
-      template:       doc.template       || "Classic",
+      amountPaid: doc.amountPaid || 0,
+      paymentMode: doc.paymentMode || "GPay",
+      transactionId: doc.transactionId || "",
+      currency: doc.currency || "₹",
+      upiId: doc.upiId || "",
+      bankName: doc.bankName || "",
+      accountName: doc.accountName || "",
+      accountNumber: doc.accountNumber || "",
+      ifscCode: doc.ifscCode || "",
+      footerMessage: doc.footerMessage || "",
+      signature: doc.signature || "",
+      signatureType: doc.signatureType || "text",
+      template: doc.template || "Classic",
       paymentHistory: history,
     };
 
     return res.json({
       success: true,
-      id:        doc._id.toString(),
+      id: doc._id.toString(),
       invoiceNo: doc.invoiceNo || "—",
-      client:    doc.client    || "—",
-      project:   doc.project   || "",
-      date:      doc.date      || null,
-      dueDate:   doc.dueDate   || null,
-      status:    doc.status    || "draft",
-      total:     doc.total     || 0,
+      client: doc.client || "—",
+      project: doc.project || "",
+      date: doc.date || null,
+      dueDate: doc.dueDate || null,
+      status: doc.status || "draft",
+      total: doc.total || 0,
       amountPaid: doc.amountPaid || 0,
-      currency:   doc.currency   || "₹",
-      savedAt:   doc.createdAt || Date.now(),
+      currency: doc.currency || "₹",
+      savedAt: doc.createdAt || Date.now(),
       inv,
-      items:     doc.items || [],
+      items: doc.items || [],
       paymentHistory: history,
     });
   } catch (err) {
@@ -286,46 +286,46 @@ router.post("/", async (req, res) => {
 
     // Flat payload — matches invoiceSchema exactly
     const flatData = {
-      invoiceNo:      inv.invoiceNo,
-      orderNo:        inv.orderNo        || "",
-      date:           inv.date           || "",
-      dueDate:        inv.dueDate        || "",
+      invoiceNo: inv.invoiceNo,
+      orderNo: inv.orderNo || "",
+      date: inv.date || "",
+      dueDate: inv.dueDate || "",
       dueDateType: inv.dueDateType || "30",
-      client:         inv.client,
-      project:        inv.project        || "",
-      gstRate:        inv.gstRate        ?? 18,
-      isGstIncluded:  inv.isGstIncluded  || false,
-      notes:          inv.notes          || "",
-      terms:          inv.terms          || "",
-      companyName:    inv.companyName    || "",
-      companyEmail:   inv.companyEmail   || "",
-      companyPhone:   inv.companyPhone   || "",
+      client: inv.client,
+      project: inv.project || "",
+      gstRate: inv.gstRate ?? 18,
+      isGstIncluded: inv.isGstIncluded || false,
+      notes: inv.notes || "",
+      terms: inv.terms || "",
+      companyName: inv.companyName || "",
+      companyEmail: inv.companyEmail || "",
+      companyPhone: inv.companyPhone || "",
       companyAddress: inv.companyAddress || "",
       items: items.map((i) => ({
         description: i.description || "",
-        quantity:    parseFloat(i.quantity) || 0,
-        rate:        parseFloat(i.rate)     || 0,
-        gstRate:     i.gstRate !== undefined ? parseFloat(i.gstRate) : (parseFloat(inv.gstRate) || 18),
+        quantity: parseFloat(i.quantity) || 0,
+        rate: parseFloat(i.rate) || 0,
+        gstRate: i.gstRate !== undefined ? parseFloat(i.gstRate) : (parseFloat(inv.gstRate) || 18),
         isGstIncluded: i.isGstIncluded !== undefined ? i.isGstIncluded : (inv.isGstIncluded || false),
       })),
       subtotal,
       gstAmt,
       total,
-   status: status || "draft",
-      amountPaid:     parseFloat(inv.amountPaid) || 0,
-      paymentMode:    inv.paymentMode            || "GPay",
-      transactionId:  inv.transactionId          || "",
-      paymentDate:    inv.paymentDate            || "",
-      currency:       inv.currency               || "₹",
-      upiId:          inv.upiId                  || "",
-      bankName:       inv.bankName               || "",
-      accountName:    inv.accountName            || "",
-      accountNumber:  inv.accountNumber          || "",
-      ifscCode:       inv.ifscCode               || "",
-      footerMessage:  inv.footerMessage          || "",
-      signature:      inv.signature              || "",
-      signatureType:  inv.signatureType          || "text",
-      template:       inv.template               || "Classic",
+      status: status || "draft",
+      amountPaid: parseFloat(inv.amountPaid) || 0,
+      paymentMode: inv.paymentMode || "GPay",
+      transactionId: inv.transactionId || "",
+      paymentDate: inv.paymentDate || "",
+      currency: inv.currency || "₹",
+      upiId: inv.upiId || "",
+      bankName: inv.bankName || "",
+      accountName: inv.accountName || "",
+      accountNumber: inv.accountNumber || "",
+      ifscCode: inv.ifscCode || "",
+      footerMessage: inv.footerMessage || "",
+      signature: inv.signature || "",
+      signatureType: inv.signatureType || "text",
+      template: inv.template || "Classic",
       companyId: req.companyId || "",
     };
 
@@ -337,12 +337,12 @@ router.post("/", async (req, res) => {
       // If updating, preserve existing status if not provided
       const updateData = { ...flatData };
       let newStatus = status || existing.status || "draft";
-      
+
       // Auto-transition from draft to part_paid if money is paid
       if (newStatus === "draft" && flatData.amountPaid > 0) {
         newStatus = flatData.amountPaid < total ? "part_paid" : "paid";
       }
-      
+
       updateData.status = newStatus;
       await Invoice.updateOne({ _id: existing._id }, { $set: updateData });
       savedInvoice = await Invoice.findById(existing._id).lean();
@@ -362,8 +362,8 @@ router.post("/", async (req, res) => {
       if (flatData.transactionId) query.transactionId = flatData.transactionId;
 
       const isPartial = flatData.amountPaid < flatData.total;
-      const incomeTitle = isPartial 
-        ? `Advance/Part Payment for Invoice ${flatData.invoiceNo}` 
+      const incomeTitle = isPartial
+        ? `Advance/Part Payment for Invoice ${flatData.invoiceNo}`
         : `Full Payment for Invoice ${flatData.invoiceNo}`;
       const incomeCategory = isPartial ? "Advance" : "Project Payment";
 
@@ -377,7 +377,7 @@ router.post("/", async (req, res) => {
           client: flatData.client,
           invoiceNo: flatData.invoiceNo,
           transactionId: flatData.transactionId,
-          date: flatData.paymentDate || flatData.date, 
+          date: flatData.paymentDate || flatData.date,
           status: "Received",
           currency: flatData.currency,
           companyId: flatData.companyId,
@@ -495,7 +495,7 @@ router.put("/:id", async (req, res) => {
 router.patch("/:id/status", async (req, res) => {
   try {
     const { status, amountPaid, paymentMode, paymentDate, transactionId } = req.body;
-    const allowed = ["draft", "sent", "paid", "unpaid", "overdue", "part_paid"]; 
+    const allowed = ["draft", "sent", "paid", "unpaid", "overdue", "part_paid"];
 
     if (!allowed.includes(status)) {
       return res.status(400).json({ success: false, msg: "Invalid status" });
@@ -531,7 +531,7 @@ router.patch("/:id/status", async (req, res) => {
     // Sync Income if status is Paid or Part Paid
     if ((status === "paid" || status === "part_paid") && amountPaid !== undefined && parseFloat(amountPaid) > 0) {
       const syncAmount = parseFloat(amountPaid);
-      
+
       // Always create a NEW Income record for each payment action to maintain history
       const newIncome = new Income({
         title: syncAmount < invoice.total ? `Part Payment for Invoice ${invoice.invoiceNo}` : `Full Payment for Invoice ${invoice.invoiceNo}`,

@@ -483,8 +483,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         amount: g.total || 0,
         taxType: 'inclusive',
         taxPercent: 0,
-        issueDate: g.date,
-        dueDate: g.dueDate,
+        issueDate: g.date || g.inv?.date || '',
+        dueDate: g.inv?.dueDate || g.dueDate || '',
         status: g.status,
         _source: 'global',
         _globalId: g.id,
@@ -930,10 +930,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         <div className="mpd-topbar-actions">
           {!hideTopActions && (<>
             {onNewInvoice && (
-              <button className="mpd-btn mpd-btn-primary" onClick={() => {
-                setActiveTab('payments');
-                setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true }));
-              }} style={{ gap: 6 }}>
+              <button className="mpd-btn mpd-btn-primary" onClick={() => onNewInvoice(currProject)} style={{ gap: 6 }}>
                 <i className="ti ti-file-invoice"></i> New Invoice
               </button>
             )}
@@ -978,11 +975,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             {budgetAmt > 0 && <div className="mpd-sub">Spent {currency}{spent.toLocaleString()} &nbsp;·&nbsp; <span className="mpd-g">Rem {currency}{remaining.toLocaleString()}</span></div>}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {onNewProposal && (
-              <button className="mpd-btn mpd-btn-outline" onClick={() => onNewProposal(currProject)}>
-                + New Proposal
-              </button>
-            )}
+
             {onNewQuotation && (
               <button className="mpd-btn mpd-btn-outline" onClick={() => onNewQuotation(currProject)}>
                 + New Quotation
@@ -1566,9 +1559,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               <div style={{ fontSize: 9, color: '#7B8FA1', fontWeight: 600 }}>{inv.taxType === 'inclusive' ? 'Incl. Tax' : 'Excl. Tax'}</div>
                             </div>
                             {/* Issue Date */}
-                            <div style={{ fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{inv.issueDate ? new Date(inv.issueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{(inv.issueDate || inv.date) ? new Date(inv.issueDate || inv.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
                             {/* Due Date */}
-                            <div style={{ fontSize: 12, fontWeight: (inv.status || '').toLowerCase() === 'overdue' ? 800 : 700, color: (inv.status || '').toLowerCase() === 'overdue' ? '#EF4444' : '#2D3E50' }}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
+                            <div style={{ fontSize: 12, fontWeight: (inv.status || '').toLowerCase() === 'overdue' ? 800 : 700, color: (inv.status || '').toLowerCase() === 'overdue' ? '#EF4444' : '#2D3E50' }}>{(inv.dueDate || inv.inv?.dueDate) ? new Date(inv.dueDate || inv.inv?.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
                             {/* Status */}
                             <div>
                               {(() => {

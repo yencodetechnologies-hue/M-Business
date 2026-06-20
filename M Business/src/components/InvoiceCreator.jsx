@@ -490,7 +490,31 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       if (newInvoicePrefill.editData) {
         // Edit mode — pre-fill existing invoice data
         const ed = newInvoicePrefill.editData;
-        setInv({ ...blank, ...ed, client: ed.client || newInvoicePrefill.client || '', project: ed.project || newInvoicePrefill.project || '' });
+        setInv({
+          ...blank,
+          ...ed,
+          client: ed.client || newInvoicePrefill.client || '',
+          project: ed.project || newInvoicePrefill.project || '',
+          date: ed.date || blank.date,
+          dueDate: ed.dueDate || blank.dueDate,
+          notes: ed.notes ?? blank.notes,
+          terms: ed.terms ?? blank.terms,
+          companyName: ed.companyName || blank.companyName,
+          companyEmail: ed.companyEmail || blank.companyEmail,
+          companyPhone: ed.companyPhone || blank.companyPhone,
+          companyAddress: ed.companyAddress || blank.companyAddress,
+          bankName: ed.bankName || blank.bankName,
+          accountNumber: ed.accountNumber || blank.accountNumber,
+          ifscCode: ed.ifscCode || blank.ifscCode,
+          upiId: ed.upiId || blank.upiId,
+          signature: ed.signature || '',
+          signatureType: ed.signatureType || 'text',
+          template: ed.template || 'Classic',
+          footerMessage: ed.footerMessage || blank.footerMessage,
+          amountPaid: ed.amountPaid ?? 0,
+          currency: ed.currency || 'INR',
+          gstRate: ed.gstRate ?? 18,
+        });
         const lineItems = ed.items || ed.lineItems;
         setItems(lineItems && lineItems.length > 0 ? lineItems.map((it, i) => ({ ...it, id: it.id || i + 1 })) : [{ id: 1, description: ed.description || '', quantity: 1, rate: ed.amount || '' }]);
         setEditingId(null);

@@ -341,19 +341,12 @@ export function addTeamMember() {
   updateTeamPreview();
 }
 
-export function fillClient() {
+export function clientSelected(el) {
   const clients = window._clientsData || [];
-  if (clients.length === 0) {
-    alert('No clients found. Please add clients first.');
-    return;
-  }
-  const names = clients.map((c, i) => `${i + 1}. ${c.name || c.clientName}`).join('\n');
-  const choice = prompt('Select client number:\n' + names);
-  if (!choice) return;
-  const idx = parseInt(choice) - 1;
-  const client = clients[idx];
+  const val = el.value;
+  if (!val) return;
+  const client = clients.find(c => (c.clientName || c.name) === val);
   if (!client) return;
-  getEl('toComp').value = client.name || client.clientName || '';
   getEl('toPerson').value = client.contactPerson || '';
   getEl('toEmail').value = client.email || '';
   getEl('toPhone').value = client.phone || '';
@@ -428,9 +421,135 @@ export function markWon() {
 }
 
 // Init
+// Init
 calcTotal();
 up();
 updateMilestonesPreview();
 updateTeamPreview();
 updateValuePreview();
 updateRisksPreview();
+
+export function openSignatureModal() {
+  const modal = document.getElementById('sigModal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+
+  const closeBtn = document.getElementById('sigModalClose');
+  if (closeBtn) closeBtn.onclick = () => { modal.style.display = 'none'; };
+
+  ['draw', 'type', 'upload'].forEach(tab => {
+    const btn = document.getElementById('sigTab-' + tab);
+    if (btn) btn.onclick = () => {
+      ['draw', 'type', 'upload'].forEach(t => {
+        const b = document.getElementById('sigTab-' + t);
+        const c = document.getElementById('sigContent-' + t);
+        if (b) { b.style.color = t === tab ? 'var(--teal)' : '#607D86'; b.style.borderBottom = t === tab ? '2px solid var(--teal)' : '2px solid transparent'; }
+        if (c) c.style.display = t === tab ? 'block' : 'none';
+      });
+    };
+  });
+
+  const clearBtn = document.getElementById('sigClearBtn');
+  if (clearBtn) clearBtn.onclick = () => {
+    const canvas = document.getElementById('sigCanvas');
+    if (canvas) canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  const applyDrawBtn = document.getElementById('sigApplyDrawBtn');
+  if (applyDrawBtn) applyDrawBtn.onclick = () => {
+    const canvas = document.getElementById('sigCanvas');
+    if (!canvas) return;
+    _applySignatureToBox(canvas.toDataURL(), 'image');
+    modal.style.display = 'none';
+  };
+
+  const applyTypeBtn = document.getElementById('sigApplyTypeBtn');
+  if (applyTypeBtn) applyTypeBtn.onclick = () => {
+    const val = document.getElementById('typedSigInput')?.value?.trim();
+    if (!val) return;
+    _applySignatureToBox(val, 'text');
+    modal.style.display = 'none';
+  };
+
+  const typedInput = document.getElementById('typedSigInput');
+  if (typedInput) typedInput.oninput = (e) => {
+    const preview = document.getElementById('typedSigPreview');
+    const previewText = document.getElementById('typedSigPreviewText');
+    if (preview && previewText) {
+      previewText.textContent = e.target.value;
+      preview.style.display = e.target.value ? 'block' : 'none';
+    }
+  };
+
+  const uploadInput = document.getElementById('sigUploadInput');
+  if (uploadInput) uploadInput.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = (ev) => { _applySignatureToBox(ev.target.result, 'image'); modal.style.display = 'none'; };
+    r.readAsDataURL(file);
+  };
+
+  setTimeout(() => {
+    const canvas = document.getElementById('sigCanvas');
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width || 420;
+    canvas.height = 160;
+    const ctx = canvas.getContext('2d');
+    ctx.strokeStyle = '#1a2e35'; ctx.lineWidth = 3.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    let isDrawing = false; let points = [];
+    function getPos(e) {
+      const r = canvas.getBoundingClientRect();
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: (cx - r.left) * (canvas.width / r.width), y: (cy - r.top) * (canvas.height / r.height) };
+    }
+    canvas.onmousedown = (e) => { points = [getPos(e)]; isDrawing = true; };
+    canvas.onmousemove = (e) => {
+      if (!isDrawing) return;
+      const pos = getPos(e); points.push(pos);
+      if (points.length > 2) {
+        const p1 = points[points.length - 3], p2 = points[points.length - 2], p3 = points[points.length - 1];
+        const mx = (p2.x + p3.x) / 2, my = (p2.y + p3.y) / 2, pmx = (p1.x + p2.x) / 2, pmy = (p1.y + p2.y) / 2;
+        ctx.beginPath(); ctx.moveTo(pmx, pmy); ctx.quadraticCurveTo(p2.x, p2.y, mx, my); ctx.stroke();
+      } else if (points.length === 2) {
+        ctx.beginPath(); ctx.moveTo(points[0].x, points[0].y); ctx.lineTo(points[1].x, points[1].y); ctx.stroke();
+      }
+    };
+    canvas.onmouseup = canvas.onmouseleave = () => { isDrawing = false; points = []; };
+    canvas.ontouchstart = (e) => { e.preventDefault(); points = [getPos(e)]; isDrawing = true; };
+    canvas.ontouchmove = (e) => {
+      if (!isDrawing) return; e.preventDefault();
+      const pos = getPos(e); points.push(pos);
+      if (points.length > 2) {
+        const p1 = points[points.length - 3], p2 = points[points.length - 2], p3 = points[points.length - 1];
+        const mx = (p2.x + p3.x) / 2, my = (p2.y + p3.y) / 2, pmx = (p1.x + p2.x) / 2, pmy = (p1.y + p2.y) / 2;
+        ctx.beginPath(); ctx.moveTo(pmx, pmy); ctx.quadraticCurveTo(p2.x, p2.y, mx, my); ctx.stroke();
+      }
+    };
+    canvas.ontouchend = () => { isDrawing = false; points = []; };
+  }, 50);
+}
+
+function _applySignatureToBox(value, type) {
+  const box = document.getElementById('ourSigBox');
+  const name = document.getElementById('pv-from')?.innerText || 'Signed';
+  if (box) {
+    if (type === 'image') {
+      box.innerHTML = `<img src="${value}" style="max-height:50px;max-width:100%;object-fit:contain;" /><div style="font-size:10px;color:var(--teal);font-weight:700;margin-top:2px;">${name} — Signed</div>`;
+    } else {
+      box.innerHTML = `<span style="font-family:'Dancing Script',cursive;font-size:22px;color:#1a2e35;font-weight:bold;">${value}</span><div style="font-size:10px;color:var(--teal);font-weight:700;margin-top:2px;">${name} — Signed</div>`;
+    }
+    box.style.borderColor = 'var(--teal)';
+    box.style.background = 'var(--teal-lighter)';
+  }
+  const pvSig = document.getElementById('pv-sig1');
+  if (pvSig) {
+    if (type === 'image') {
+      pvSig.innerHTML = `<img src="${value}" style="max-height:40px;max-width:120px;object-fit:contain;" /><div style="font-size:10px;color:var(--text3)">Signed Digitally</div>`;
+    } else {
+      pvSig.innerHTML = `<div style="color:var(--teal);font-family:'Dancing Script',cursive;font-size:24px;line-height:1;margin-bottom:5px;">${value}</div><div style="font-size:10px;color:var(--text3)">Signed Digitally</div>`;
+    }
+  }
+}

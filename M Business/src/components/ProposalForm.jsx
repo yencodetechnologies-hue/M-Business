@@ -11,9 +11,76 @@ export default function ProposalForm({ onBack, onSave, initialData }) {
 
     // Expose ALL logic functions to window so dangerouslySetInnerHTML onclick attrs work natively
     Object.assign(window, logic);
+    window.openSignatureModal = function () {
+      const modal = document.getElementById('sigModal');
+      if (!modal) return;
+      modal.style.display = 'flex';
+      const closeBtn = document.getElementById('sigModalClose');
+      if (closeBtn) closeBtn.onclick = () => { modal.style.display = 'none'; };
+      ['draw', 'type', 'upload'].forEach(tab => {
+        const btn = document.getElementById('sigTab-' + tab);
+        if (btn) btn.onclick = () => {
+          ['draw', 'type', 'upload'].forEach(t => {
+            const b = document.getElementById('sigTab-' + t);
+            const c = document.getElementById('sigContent-' + t);
+            if (b) { b.style.color = t === tab ? 'var(--teal)' : '#607D86'; b.style.borderBottom = t === tab ? '2px solid var(--teal)' : '2px solid transparent'; }
+            if (c) c.style.display = t === tab ? 'block' : 'none';
+          });
+        };
+      });
+      const clearBtn = document.getElementById('sigClearBtn');
+      if (clearBtn) clearBtn.onclick = () => { const cv = document.getElementById('sigCanvas'); if (cv) cv.getContext('2d').clearRect(0, 0, cv.width, cv.height); };
+      const applyDrawBtn = document.getElementById('sigApplyDrawBtn');
+      if (applyDrawBtn) applyDrawBtn.onclick = () => { const cv = document.getElementById('sigCanvas'); if (!cv) return; applyBox(cv.toDataURL(), 'image'); modal.style.display = 'none'; };
+      const applyTypeBtn = document.getElementById('sigApplyTypeBtn');
+      if (applyTypeBtn) applyTypeBtn.onclick = () => { const val = document.getElementById('typedSigInput')?.value?.trim(); if (!val) return; applyBox(val, 'text'); modal.style.display = 'none'; };
+      const typedInput = document.getElementById('typedSigInput');
+      if (typedInput) typedInput.oninput = (e) => { const p = document.getElementById('typedSigPreview'), pt = document.getElementById('typedSigPreviewText'); if (p && pt) { pt.textContent = e.target.value; p.style.display = e.target.value ? 'block' : 'none'; } };
+      const uploadInput = document.getElementById('sigUploadInput');
+      if (uploadInput) uploadInput.onchange = (e) => { const file = e.target.files[0]; if (!file) return; const r = new FileReader(); r.onload = (ev) => { applyBox(ev.target.result, 'image'); modal.style.display = 'none'; }; r.readAsDataURL(file); };
+      function applyBox(value, type) {
+        const box = document.getElementById('ourSigBox');
+        const name = document.getElementById('pv-from')?.innerText || 'Signed';
+        if (box) {
+          box.innerHTML = type === 'image' ? `<img src="${value}" style="max-height:50px;max-width:100%;object-fit:contain;"/><div style="font-size:10px;color:var(--teal);font-weight:700;margin-top:2px;">${name} — Signed</div>` : `<span style="font-family:'Dancing Script',cursive;font-size:22px;color:#1a2e35;font-weight:bold;">${value}</span><div style="font-size:10px;color:var(--teal);font-weight:700;margin-top:2px;">${name} — Signed</div>`;
+          box.style.borderColor = 'var(--teal)'; box.style.background = 'var(--teal-lighter)';
+        }
+        const pvSig = document.getElementById('pv-sig1');
+        if (pvSig) pvSig.innerHTML = type === 'image' ? `<img src="${value}" style="max-height:40px;max-width:120px;object-fit:contain;"/>` : `<div style="color:var(--teal);font-family:'Dancing Script',cursive;font-size:24px;">${value}</div>`;
+      }
+      setTimeout(() => {
+        const cv = document.getElementById('sigCanvas');
+        if (!cv) return;
+        const rect = cv.getBoundingClientRect();
+        cv.width = rect.width || 420; cv.height = 160;
+        const ctx = cv.getContext('2d');
+        ctx.strokeStyle = '#1a2e35'; ctx.lineWidth = 3.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        let drawing = false, pts = [];
+        function pos(e) { const r = cv.getBoundingClientRect(), cx = e.touches ? e.touches[0].clientX : e.clientX, cy = e.touches ? e.touches[0].clientY : e.clientY; return { x: (cx - r.left) * (cv.width / r.width), y: (cy - r.top) * (cv.height / r.height) }; }
+        cv.onmousedown = (e) => { pts = [pos(e)]; drawing = true; };
+        cv.onmousemove = (e) => { if (!drawing) return; const p = pos(e); pts.push(p); if (pts.length > 2) { const a = pts[pts.length - 3], b = pts[pts.length - 2], c = pts[pts.length - 1], mx = (b.x + c.x) / 2, my = (b.y + c.y) / 2, px = (a.x + b.x) / 2, py = (a.y + b.y) / 2; ctx.beginPath(); ctx.moveTo(px, py); ctx.quadraticCurveTo(b.x, b.y, mx, my); ctx.stroke(); } else if (pts.length === 2) { ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y); ctx.lineTo(pts[1].x, pts[1].y); ctx.stroke(); } };
+        cv.onmouseup = cv.onmouseleave = () => { drawing = false; pts = []; };
+        cv.ontouchstart = (e) => { e.preventDefault(); pts = [pos(e)]; drawing = true; };
+        cv.ontouchmove = (e) => { if (!drawing) return; e.preventDefault(); const p = pos(e); pts.push(p); if (pts.length > 2) { const a = pts[pts.length - 3], b = pts[pts.length - 2], c = pts[pts.length - 1], mx = (b.x + c.x) / 2, my = (b.y + c.y) / 2, px = (a.x + b.x) / 2, py = (a.y + b.y) / 2; ctx.beginPath(); ctx.moveTo(px, py); ctx.quadraticCurveTo(b.x, b.y, mx, my); ctx.stroke(); } };
+        cv.ontouchend = () => { drawing = false; pts = []; };
+      }, 50);
+    };
     window._onSaveProposal = onSave;
     window._clientsData = window._clientsData || [];
-    fetch('/api/clients').then(r => r.json()).then(d => { window._clientsData = d; }).catch(() => { });
+    fetch('/api/clients').then(r => r.json()).then(d => { 
+      window._clientsData = d; 
+      const sel = document.getElementById('toComp');
+      if (sel && sel.tagName === 'SELECT') {
+        sel.innerHTML = '<option value="">-- Select Client --</option>' + d.map(c => {
+          const name = c.clientName || c.name || '';
+          return `<option value="${name}">${name}</option>`;
+        }).join('');
+        // if there's initial data, select it
+        if (initialData && initialData.client) {
+          sel.value = initialData.client;
+        }
+      }
+    }).catch(() => { });
     // Hook up back button
     // Hook up back button + all topbar buttons
     const hookUp = () => {
@@ -76,6 +143,10 @@ export default function ProposalForm({ onBack, onSave, initialData }) {
       }
     };
     setTimeout(hookUp, 300);
+    setTimeout(() => {
+      const sigBox = document.getElementById('ourSigBox');
+      if (sigBox) sigBox.onclick = () => logic.openSignatureModal();
+    }, 400);
     // Existing data load
     if (initialData) {
       setTimeout(() => {
@@ -155,7 +226,9 @@ body{display:flex;min-height:100vh}
 .logout-btn:hover{background:rgba(255,255,255,.2)}
 
 /* ── MAIN ── */
-.main{flex:1;margin-left:210px;display:flex;flex-direction:column;min-width:0}
+.main{flex:1;margin-left:0;display:flex;flex-direction:column;min-width:0;width:100%}
+/* ── LAYOUT ── */
+.content{padding:20px 24px 40px;display:grid;grid-template-columns:1fr 420px;gap:18px;align-items:start}
 .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 8px rgba(0,188,212,.06);gap:10px}
 .topbar-left{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .back-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s;white-space:nowrap}
@@ -168,9 +241,6 @@ body{display:flex;min-height:100vh}
 .btn-t:hover{background:var(--teal2)}
 .btn-g{background:var(--green);box-shadow:0 3px 10px rgba(38,194,129,.2)}
 .btn-g:hover{background:#1da86e}
-
-/* ── LAYOUT ── */
-.content{padding:20px 24px 40px;display:grid;grid-template-columns:1fr 430px;gap:18px;align-items:start}
 
 /* ── SECTION PICKER ── */
 .section-picker{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px}
@@ -543,10 +613,10 @@ body{display:flex;min-height:100vh}
         <div style="height:1px;background:var(--border);margin:14px 0"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
           <div style="font-size:10px;font-weight:800;color:var(--amber);text-transform:uppercase;letter-spacing:.7px">Client Details</div>
-          <button onclick="fillClient()" style="display:flex;align-items:center;gap:4px;padding:4px 9px;background:var(--teal-lighter);border:1.5px solid var(--teal);border-radius:7px;font-size:10px;font-weight:700;color:var(--teal);cursor:pointer;font-family:var(--font)"><i class="ti ti-search" style="font-size:11px"></i>Select Client</button>
+          
         </div>
         <div class="form-row">
-          <div class="fg"><label class="fl">Client / Company</label><input class="fi" type="text" id="toComp" placeholder="e.g. STA Corporation" oninput="up()"></div>
+          <div class="fg"><label class="fl">Client / Company</label><select class="fi" id="toComp" onchange="clientSelected(this)"><option value="">-- Select Client --</option></select></div>
           <div class="fg"><label class="fl">Contact Person</label><input class="fi" type="text" id="toPerson" placeholder="Contact name" oninput="up()"></div>
         </div>
         <div class="form-row">
@@ -933,7 +1003,7 @@ YENCODE Technologies | yencodetechnologies@gmail.com | +91 89254 33533</textarea
         </div>
         <div class="form-row">
           <div class="fg"><label class="fl">Our Signature</label>
-            <div class="sig-box" id="ourSigBox" onclick="openSignatureModal()" style="height:70px">
+<div class="sig-box" id="ourSigBox" style="height:70px;cursor:pointer">
               <i class="ti ti-signature" style="font-size:22px;color:var(--text3)"></i>
               <div style="font-size:11px;color:var(--text3);font-weight:600">Click to sign</div>
             </div>

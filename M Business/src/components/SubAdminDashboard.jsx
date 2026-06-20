@@ -6420,19 +6420,23 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     localStorage.setItem("activeTab_subadmin", toSave);
 
   }, [active]);
-
+  const [modal, setModal] = useState(null);
   const [jumpProject, setJumpProject] = useState(null);
   const [jumpInvoicePrefill, setJumpInvoicePrefill] = useState(null);
+  const [pendingInvoiceNav, setPendingInvoiceNav] = useState(false);
+
   useEffect(() => {
-
-    if (active === "edit-project" && !jumpProject) {
-
-      setActive("projects");
-
+    if (pendingInvoiceNav && jumpInvoicePrefill) {
+      setActive("invoices");
+      setPendingInvoiceNav(false);
     }
+  }, [pendingInvoiceNav, jumpInvoicePrefill]);
 
+  useEffect(() => {
+    if (active === "edit-project" && !jumpProject) {
+      setActive("projects");
+    }
   }, [active, jumpProject]);
-
   const [_navPending, startNavTransition] = useTransition();
 
   const [fromEditProject, setFromEditProject] = useState(false);
@@ -6449,8 +6453,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [selectedProjectForTasks, setSelectedProjectForTasks] = useState(null);
 
   const [autoOpenTaskModal, setAutoOpenTaskModal] = useState(false);
-
-  const [modal, setModal] = useState(null);
 
   const [subscription, setSubscription] = useState(null);
 

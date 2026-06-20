@@ -454,18 +454,16 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   }, [autoOpenInvoice]);
 
   // Auto-fetch invoices for this project to calculate Billed/Received/Pending
-  // Auto-fetch invoices for this project to calculate Billed/Received/Pending
   useEffect(() => {
     if (!project) return;
-    const norm = (s) => (s || "").toString().trim().toLowerCase();
-    const pName = norm(project.name);
-    const cName = norm(project.client || project.clientName);
+    const pName = project.name || "";
+    const cName = project.client || project.clientName || "";
     axios.get(`${BASE_URL}/api/invoices`)
       .then(res => {
         const all = res.data?.invoices || res.data || [];
         const matched = (Array.isArray(all) ? all : []).filter(e => {
-          const eProj = norm(e.inv?.project || e.project);
-          const eClient = norm(e.inv?.clientName || e.inv?.client || e.client);
+          const eProj = e.inv?.project || e.project;
+          const eClient = e.inv?.clientName || e.inv?.client || e.client;
           return (eProj && eProj === pName) || (!eProj && eClient === cName);
         });
         setProjectInvoices(matched);
@@ -490,6 +488,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         status: g.status,
         _source: 'global',
         _globalId: g.id,
+        category: g.inv?.category || 'General',
+        projectName: g.inv?.project || g.project,
+        clientName: g.inv?.clientName || g.inv?.client || g.client
       }));
     return [...local, ...globalOnly];
   }, [currProject?.invoices, projectInvoices]);
@@ -976,7 +977,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             {budgetAmt > 0 && <div className="mpd-sub">Spent {currency}{spent.toLocaleString()} &nbsp;·&nbsp; <span className="mpd-g">Rem {currency}{remaining.toLocaleString()}</span></div>}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-
+            {onNewProposal && (
+              <button className="mpd-btn mpd-btn-outline" onClick={() => onNewProposal(currProject)}>
+                + New Proposal
+              </button>
+            )}
             {onNewQuotation && (
               <button className="mpd-btn mpd-btn-outline" onClick={() => onNewQuotation(currProject)}>
                 + New Quotation
@@ -1470,7 +1475,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>
                         <i className="ti ti-file-invoice" style={{ color: '#00BCD4', fontSize: 15 }}></i> Invoices
-                        <span style={{ background: '#E0F7FA', color: '#0097A7', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{mergedInvoices.length || 0}</span>
+                        <span style={{ background: '#E0F7FA', color: '#0097A7', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{(currProject.invoices || []).length || 0}</span>
                       </div>
                       <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                         {selectedPaymentItems.length > 0 && activePayTab === 'inv' && (
@@ -1508,14 +1513,14 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       </div>
                     </div>
                     {/* Table Header */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '40px 2fr 1fr 1fr 1fr 80px', gap: 8, padding: '8px 18px', background: '#FAFBFD', borderBottom: '1px solid #E8EDF2' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '40px 1.2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 100px', gap: 8, padding: '8px 18px', background: '#FAFBFD', borderBottom: '1px solid #E8EDF2' }}>
                       <div style={{ display: 'flex', alignItems: 'center' }}>
                         <input type="checkbox" checked={mergedInvoices.length > 0 && selectedPaymentItems.length === mergedInvoices.length} onChange={e => {
                           if (e.target.checked) setSelectedPaymentItems(mergedInvoices.map((_, idx) => idx));
                           else setSelectedPaymentItems([]);
                         }} style={{ cursor: 'pointer' }} />
                       </div>
-                      {['Invoice', 'Amount', 'Issue Date', 'Due Date', ''].map(h => (
+                      {['Invoice ID', 'Client', 'Project', 'Category', 'Amount', 'Issue Date', 'Due Date', 'Status', 'Actions'].map(h => (
                         <div key={h} style={{ fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px' }}>{h}</div>
                       ))}
                     </div>
@@ -1526,39 +1531,76 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         const invTaxAmt = inv.taxType === 'inclusive' ? 0 : Math.round((inv.amount || 0) * (inv.taxPercent || 0) / 100);
                         const totalInvoiceAmt = (inv.amount || 0) + invTaxAmt;
                         return (
-                          <div key={i} style={{ display: 'grid', gridTemplateColumns: '40px 2fr 1fr 1fr 1fr 80px', gap: 8, padding: '0 18px', alignItems: 'center', minHeight: 56, borderBottom: '1px solid #E8EDF2', borderLeft: `3px solid ${(inv.status || '').toLowerCase() === 'paid' ? '#22C55E' : (inv.status || '').toLowerCase() === 'overdue' ? '#EF4444' : '#F59E0B'}` }}>
+                          <div key={i} style={{ display: 'grid', gridTemplateColumns: '40px 1.2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 100px', gap: 8, padding: '0 18px', alignItems: 'center', minHeight: 56, borderBottom: '1px solid #E8EDF2', borderLeft: `3px solid ${(inv.status || '').toLowerCase() === 'paid' ? '#22C55E' : (inv.status || '').toLowerCase() === 'overdue' ? '#EF4444' : '#F59E0B'}` }}>
+                            {/* Checkbox */}
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                               <input type="checkbox" checked={selectedPaymentItems.includes(i)} onChange={e => {
                                 if (e.target.checked) setSelectedPaymentItems(prev => [...prev, i]);
                                 else setSelectedPaymentItems(prev => prev.filter(idx => idx !== i));
                               }} style={{ cursor: 'pointer' }} />
                             </div>
-                            <div>
-                              <div style={{ fontSize: 10, fontWeight: 700, color: '#7B8FA1' }}>{inv.invoiceNo || `INV-00${i + 1}`}</div>
-                              <div style={{ fontSize: 13, fontWeight: 800, color: '#0D1B2A', display: 'flex', alignItems: 'center', gap: 6 }}>
-                                {inv.description || 'Invoice'}
-
+                            {/* Invoice ID */}
+                            <div style={{ fontSize: 12, fontWeight: 800, color: '#00BCD4', cursor: 'pointer' }}>{inv.invoiceNo || `INV-00${i + 1}`}</div>
+                            {/* Client */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <div style={{ width: 26, height: 26, borderRadius: '50%', background: 'linear-gradient(135deg,#00BCD4,#006E7F)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 11, fontWeight: 800, flexShrink: 0 }}>
+                                {(clientName || '?')[0].toUpperCase()}
                               </div>
-                              <div style={{ fontSize: 11, color: '#7B8FA1', fontWeight: 600 }}>{clientName}</div>
+                              <span style={{ fontSize: 12, fontWeight: 700, color: '#0D1B2A' }}>{clientName || '—'}</span>
                             </div>
+                            {/* Project */}
+                            <div style={{ fontSize: 12, color: '#7B8FA1', fontWeight: 600 }}>{currProject?.name || '—'}</div>
+                            {/* Category */}
                             <div>
-                              <div style={{ fontSize: 14, fontWeight: 900, color: inv.status === 'paid' ? '#15803D' : '#0D1B2A' }}>{currency}{totalInvoiceAmt.toLocaleString()}</div>
+                              {(() => {
+                                const st = (inv.status || '').toLowerCase();
+                                if (st === 'paid' || st === 'part_paid') return <span style={{ background: '#E0F2FE', color: '#0369A1', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>Advance</span>;
+                                if (st === 'draft') return <span style={{ background: '#F1F5F9', color: '#64748B', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>Draft</span>;
+                                return <span style={{ background: '#EDE9FE', color: '#7C3AED', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>Milestone</span>;
+                              })()}
+                            </div>
+                            {/* Amount */}
+                            <div>
+                              <div style={{ fontSize: 14, fontWeight: 900, color: (inv.status || '').toLowerCase() === 'paid' ? '#15803D' : '#0D1B2A' }}>{currency}{totalInvoiceAmt.toLocaleString()}</div>
                               <div style={{ fontSize: 9, color: '#7B8FA1', fontWeight: 600 }}>{inv.taxType === 'inclusive' ? 'Incl. Tax' : 'Excl. Tax'}</div>
                             </div>
+                            {/* Issue Date */}
                             <div style={{ fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{inv.issueDate ? new Date(inv.issueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
+                            {/* Due Date */}
+                            <div style={{ fontSize: 12, fontWeight: (inv.status || '').toLowerCase() === 'overdue' ? 800 : 700, color: (inv.status || '').toLowerCase() === 'overdue' ? '#EF4444' : '#2D3E50' }}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
+                            {/* Status */}
                             <div>
                               {(() => {
                                 const st = (inv.status || 'pending').toLowerCase();
                                 const map = {
-                                  paid: { bg: '#DCFCE7', color: '#15803D', icon: '✓' },
-                                  pending: { bg: '#FEF3C7', color: '#B45309', icon: '⏳' },
-                                  overdue: { bg: '#FEE2E2', color: '#DC2626', icon: '⚠' },
-                                  sent: { bg: '#DBEAFE', color: '#1D4ED8', icon: '📨' },
-                                  draft: { bg: '#F1F5F9', color: '#64748B', icon: '📝' },
+                                  paid: { bg: '#DCFCE7', color: '#15803D' },
+                                  part_paid: { bg: '#D1FAE5', color: '#065F46' },
+                                  unpaid: { bg: '#FEF3C7', color: '#B45309' },
+                                  pending: { bg: '#FEF3C7', color: '#B45309' },
+                                  overdue: { bg: '#FEE2E2', color: '#DC2626' },
+                                  sent: { bg: '#DBEAFE', color: '#1D4ED8' },
+                                  draft: { bg: '#F1F5F9', color: '#64748B' },
                                 };
                                 const s = map[st] || map.pending;
-                                return <span style={{ background: s.bg, color: s.color, borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{s.icon} {inv.status || 'Pending'}</span>;
+                                return (
+                                  <select value={inv.status || 'pending'} onChange={async e => {
+                                    const newStatus = e.target.value;
+                                    if (inv._source === 'global') {
+                                      await axios.patch(`${BASE_URL}/api/invoices/${inv._globalId}/status`, { status: newStatus });
+                                    } else {
+                                      const updatedInvoices = (currProject.invoices || []).map((x, xi) => xi === i ? { ...x, status: newStatus } : x);
+                                      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { invoices: updatedInvoices });
+                                    }
+                                    loadLatest();
+                                  }} style={{ background: s.bg, color: s.color, border: 'none', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800, cursor: 'pointer', outline: 'none', fontFamily: 'inherit' }}>
+                                    <option value="draft">Draft</option>
+                                    <option value="sent">Sent</option>
+                                    <option value="part_paid">Part Paid</option>
+                                    <option value="paid">Paid</option>
+                                    <option value="unpaid">Unpaid</option>
+                                    <option value="overdue">Overdue</option>
+                                  </select>
+                                );
                               })()}
                             </div>
 
@@ -1574,37 +1616,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                     setPreviewInvoice(prev => prev?.invoiceNo === inv.invoiceNo ? null : { ...inv, projectName: currProject.name, clientName, currency });
                                   }
                                 }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#00BCD4' }} title="View Invoice"><i className="ti ti-eye"></i></button>
-                                {previewInvoice?.invoiceNo === inv.invoiceNo && !onViewInvoice && (
-                                  <div style={{ position: 'absolute', right: 0, top: 30, zIndex: 999, background: '#fff', border: '1px solid #E8EDF2', borderRadius: 10, boxShadow: '0 4px 20px rgba(0,0,0,0.12)', minWidth: 140, overflow: 'hidden' }}>
-                                    {[
-                                      { label: 'Pending', color: '#B45309', bg: '#FEF3C7', icon: '⏳' },
-                                      { label: 'Paid', color: '#15803D', bg: '#DCFCE7', icon: '✓' },
-                                      { label: 'Overdue', color: '#DC2626', bg: '#FEE2E2', icon: '⚠' },
-                                      { label: 'Sent', color: '#1D4ED8', bg: '#DBEAFE', icon: '📨' },
-                                    ].map(opt => (
-                                      <div key={opt.label} onClick={async () => {
-                                        if (inv._source === 'global') {
-                                          await axios.patch(`${BASE_URL}/api/invoices/${inv._globalId}/status`, { status: opt.label.toLowerCase() });
-                                        } else {
-                                          const updatedInvoices = (currProject.invoices || []).map((x, xi) => xi === i ? { ...x, status: opt.label } : x);
-                                          await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { invoices: updatedInvoices });
-                                        }
-                                        setPreviewInvoice(null);
-                                        loadLatest();
-                                      }} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', cursor: 'pointer', background: (inv.status || '').toLowerCase() === opt.label.toLowerCase() ? opt.bg : '#fff', borderBottom: '1px solid #F3F4F6' }}
-                                        onMouseEnter={e => e.currentTarget.style.background = opt.bg}
-                                        onMouseLeave={e => e.currentTarget.style.background = (inv.status || '').toLowerCase() === opt.label.toLowerCase() ? opt.bg : '#fff'}
-                                      >
-                                        <span>{opt.icon}</span>
-                                        <span style={{ fontSize: 13, fontWeight: 700, color: opt.color }}>{opt.label}</span>
-                                        {(inv.status || '').toLowerCase() === opt.label.toLowerCase() && <span style={{ marginLeft: 'auto', fontSize: 11, color: opt.color }}>✓</span>}
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
                               </div>
                               {inv._source === 'global' ? (
-                                <button onClick={() => { const fullGlobal = projectInvoices.find(g => g.id === inv._globalId); if (onViewInvoice) onViewInvoice(fullGlobal || inv); }} title="Edit (opens full invoice editor)" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+                                <button onClick={() => { const fullGlobal = projectInvoices.find(g => g.id === inv._globalId); if (onViewInvoice) onViewInvoice(fullGlobal || inv); }} title="Edit" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
                               ) : (
                                 <button onClick={() => { if (onNewInvoice) { onNewInvoice(currProject, { ...inv }, i); } else { setPaymentModalsState({ showNewInvoice: true, showPayment: false, showAdvance: false, showAdditional: false, showMilestonePayment: false, showExpense: false, editData: { ...inv }, editIndex: i }); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }} title="Edit"><i className="ti ti-edit"></i></button>
                               )}
@@ -1622,7 +1636,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         <i className="ti ti-file-invoice" style={{ fontSize: 32, display: 'block', marginBottom: 10, opacity: .3 }}></i>
                         No invoices yet for this project.
                         <div style={{ marginTop: 12 }}>
-                          <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true }))} style={{ padding: '8px 18px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                          <button onClick={() => { if (onNewInvoice) { onNewInvoice(currProject); } else { setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true })); } }} style={{ padding: '8px 18px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
                             <i className="ti ti-plus" style={{ marginRight: 6 }}></i>Create First Invoice
                           </button>
                         </div>
@@ -1711,12 +1725,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                           </span>
                                         )}
                                       </div>
-                                      {rec.heading && (
-                                        <div style={{ fontSize: 12, fontWeight: 700, color: '#1A2332', marginTop: 2 }}>{rec.heading}</div>
-                                      )}
-                                      <div style={{ fontSize: 11, fontWeight: 600, color: '#7B8FA1', marginTop: 2, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                        {rec.linkedInvoice || rec.description || rec.name || '—'}
-                                      </div>
+                                      <div style={{ fontSize: 12, fontWeight: 700, color: '#7B8FA1' }}>{rec.linkedInvoice || rec.description || rec.name || '—'}</div>
                                     </div>
                                   </>
                                 )}
@@ -2026,253 +2035,300 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         </div>
       )}
 
-      {/* Invoice Preview Modal - Full Template */}
+      {/* Invoice Preview Modal */}
       {previewInvoice && (() => {
         const inv = previewInvoice;
-        const clientInfo = clients?.find(c => (c.clientName || c.name) === (inv.clientName || clientName));
-        const lineItems = (inv.items && inv.items.length > 0) ? inv.items : [
-          { id: 1, description: inv.description || 'Service', quantity: 1, rate: inv.amount || 0, gstRate: inv.taxPercent || 0 }
-        ];
-        const taxRate = Number(inv.taxPercent === '' ? (inv.customTaxPercent || 0) : (inv.taxPercent ?? 0));
-        const isInclusive = inv.taxType === 'inclusive';
-        let subtotal = 0;
-        let totalTax = 0;
-        lineItems.forEach(item => {
-          const qty = Number(item.quantity) || 1;
-          const rate = Number(item.rate) || 0;
-          const lineTotal = qty * rate;
-          const itemTax = Number(item.gstRate !== undefined ? item.gstRate : taxRate);
-          subtotal += lineTotal;
-          if (isInclusive) { totalTax += lineTotal - lineTotal / (1 + itemTax / 100); }
-          else { totalTax += lineTotal * (itemTax / 100); }
-        });
-        const discAmt = subtotal * ((Number(inv.discountPct) || 0) / 100);
-        const afterDisc = subtotal - discAmt;
-        const extra = Number(inv.extraCharges) || 0;
-        const grandTotal = isInclusive ? afterDisc + extra : afterDisc + totalTax + extra;
-        const amountPaid = Number(inv.amountPaid) || 0;
-        const balanceDue = grandTotal - amountPaid;
-        const accentColor = '#00BCD4';
+        const taxAmt = inv.taxType === 'inclusive'
+          ? Math.round((inv.amount || 0) - (inv.amount || 0) / (1 + (inv.taxPercent || 0) / 100))
+          : Math.round((inv.amount || 0) * (inv.taxPercent || 0) / 100);
+        const subtotal = inv.taxType === 'inclusive'
+          ? Math.round((inv.amount || 0) / (1 + (inv.taxPercent || 0) / 100))
+          : (inv.amount || 0);
+        const total = inv.taxType === 'inclusive' ? (inv.amount || 0) : (inv.amount || 0) + taxAmt;
         const s = (inv.status || '').toLowerCase();
-        const statusLabel = s === 'paid' ? 'PAID' : s === 'part_paid' ? 'PART PAID' : s === 'overdue' ? 'OVERDUE' : s === 'sent' ? 'SENT' : s === 'draft' ? 'DRAFT' : 'PENDING';
-        const statusStyle = s === 'paid' ? { bg: '#d1fae5', color: '#059669', border: '#10b981' }
-          : s === 'part_paid' ? { bg: '#fef3c7', color: '#b45309', border: '#f59e0b' }
-            : s === 'overdue' ? { bg: '#fee2e2', color: '#dc2626', border: '#ef4444' }
-              : s === 'sent' ? { bg: '#dbeafe', color: '#1d4ed8', border: '#3b82f6' }
-                : { bg: '#f1f5f9', color: '#64748b', border: '#94a3b8' };
-        const fmtDate = (d) => { if (!d) return '—'; return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }); };
-        const fmtAmt = (n) => `₹${Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        const statusColor = s === 'paid' ? '#22C55E' : s === 'overdue' ? '#EF4444' : s === 'sent' ? '#3B82F6' : s === 'pending' ? '#F59E0B' : '#94A3B8';
+        const statusBg = s === 'paid' ? '#DCFCE7' : s === 'overdue' ? '#FEE2E2' : s === 'sent' ? '#DBEAFE' : s === 'pending' ? '#FEF3C7' : '#F1F5F9';
         return (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '20px 16px' }}>
-            <div style={{ width: '100%', maxWidth: 820 }}>
-              {/* Toolbar */}
-              <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 16, flexWrap: 'wrap' }}>
-                <button onClick={() => { setPreviewInvoice(null); setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo) })); }}
-                  style={{ padding: '9px 18px', background: '#fff', border: '1.5px solid #e5e7eb', borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: 'pointer', color: '#374151', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <i className="ti ti-edit" /> Edit
-                </button>
-                <button onClick={() => window.print()}
-                  style={{ padding: '9px 18px', background: accentColor, border: 'none', borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: 'pointer', color: '#fff', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <i className="ti ti-printer" /> Print / PDF
-                </button>
-                <button onClick={() => { if (confirm('Delete this invoice?')) { handleDeleteRecord('invoices', (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo)); setPreviewInvoice(null); } }}
-                  style={{ padding: '9px 18px', background: '#fee2e2', border: '1.5px solid #fecaca', borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: 'pointer', color: '#ef4444', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <i className="ti ti-trash" /> Delete
-                </button>
-                <button onClick={() => setPreviewInvoice(null)}
-                  style={{ padding: '9px 18px', background: '#1e293b', border: 'none', borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: 'pointer', color: '#fff' }}>
-                  ✕ Close
-                </button>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '30px 16px' }}>
+            <div style={{ background: '#fff', width: '100%', maxWidth: 640, borderRadius: 12, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'Arial,sans-serif', overflow: 'hidden' }}>
+              <div style={{ background: '#1A2332', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <i className="ti ti-file-invoice" style={{ color: '#00BCD4', fontSize: 18 }}></i>
+                  <span style={{ color: '#fff', fontWeight: 800, fontSize: 14 }}>Invoice Preview — {inv.invoiceNo}</span>
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button onClick={() => { setPreviewInvoice(null); setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo) })); }} style={{ padding: '6px 14px', background: '#fff', color: '#374151', border: '1px solid #E8EDF2', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>
+                    <i className="ti ti-edit"></i> Edit
+                  </button>
+                  <button onClick={() => { if (confirm('Delete this invoice?')) { handleDeleteRecord('invoices', (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo)); setPreviewInvoice(null); } }} style={{ padding: '6px 14px', background: '#FEE2E2', color: '#EF4444', border: '1px solid #FECACA', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>
+                    <i className="ti ti-trash"></i> Delete
+                  </button>
+                  <button onClick={() => window.print()} style={{ padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>
+                    <i className="ti ti-printer"></i> Print / PDF
+                  </button>
+                  <button onClick={() => setPreviewInvoice(null)} style={{ padding: '6px 14px', background: '#374151', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>✕ Close</button>
+                </div>
               </div>
-              {/* Invoice Paper */}
-              <div id="invoice-print-area" style={{ background: '#fff', borderRadius: 18, boxShadow: '0 24px 80px rgba(0,188,212,0.18)', fontFamily: "'Plus Jakarta Sans', Arial, sans-serif", overflow: 'hidden' }}>
-                {/* Header */}
-                <div style={{ background: '#f8fafc', padding: '28px 36px', borderBottom: '1px solid #e5e7eb', position: 'relative', overflow: 'hidden' }}>
-                  <div style={{ position: 'absolute', width: 240, height: 240, borderRadius: '50%', background: `radial-gradient(circle, ${accentColor}0d, transparent)`, top: -80, right: -40 }} />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 20, position: 'relative', zIndex: 1, flexWrap: 'wrap' }}>
-                    <div>
-                      {user?.logoUrl ? (
-                        <img src={user.logoUrl} alt="logo" style={{ height: 70, borderRadius: 10, marginBottom: 10, objectFit: 'contain' }} />
-                      ) : (
-                        <div style={{ height: 56, width: 56, background: `linear-gradient(135deg,${accentColor},#0097A7)`, borderRadius: 10, marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 900, color: '#fff' }}>
-                          {(user?.companyName || currProject?.client || 'Y')[0].toUpperCase()}
-                        </div>
-                      )}
-                      <div style={{ fontSize: 22, fontWeight: 900, color: '#0f1c2e', textTransform: 'uppercase', letterSpacing: 1 }}>{user?.companyName || inv.companyName || 'Your Company'}</div>
-                      {(user?.email || inv.companyEmail) && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 3 }}>{user?.email || inv.companyEmail}</div>}
-                      {(user?.phone || inv.companyPhone) && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{user?.phone || inv.companyPhone}</div>}
-                      {(user?.address || inv.companyAddress) && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{user?.address || inv.companyAddress}</div>}
+              <div id="invoice-print-area" style={{ padding: '36px 40px', background: '#fff' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
+                  <div>
+                    {user?.logoUrl ? (
+                      <img src={user.logoUrl} alt="Logo" style={{ height: 70, borderRadius: 12, marginBottom: 12, objectFit: 'contain' }} />
+                    ) : (
+                      <div style={{ width: 60, height: 60, borderRadius: 12, background: 'linear-gradient(135deg,#00BCD4,#0097A7)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+                        <span style={{ color: '#fff', fontWeight: 900, fontSize: 24 }}>{(user?.companyName || 'Y')[0].toUpperCase()}</span>
+                      </div>
+                    )}
+                    <div style={{ fontWeight: 900, fontSize: 20, color: '#0f1c2e', letterSpacing: '1px', textTransform: 'uppercase' }}>{user?.companyName || 'YOUR COMPANY'}</div>
+                    <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4, lineHeight: 1.7 }}>
+                      {user?.email}<br />{user?.phone}<br />{user?.address}
                     </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: 36, fontWeight: 900, color: `${accentColor}1a`, letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>INVOICE</div>
-                      <div style={{ fontSize: 16, fontWeight: 800, color: accentColor }}>{inv.invoiceNo}</div>
-                      <div style={{ marginTop: 14, display: 'flex', gap: 20, justifyContent: 'flex-end' }}>
-                        <div style={{ textAlign: 'right' }}>
-                          <div style={{ fontSize: 9, color: '#94a3b8', fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
-                          <div style={{ fontSize: 12, color: '#0f1c2e', fontWeight: 700 }}>{fmtDate(inv.issueDate || inv.date)}</div>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <div style={{ fontSize: 9, color: '#94a3b8', fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DUE DATE</div>
-                          <div style={{ fontSize: 12, color: '#ea580c', fontWeight: 700 }}>{fmtDate(inv.dueDate)}</div>
-                        </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: 32, fontWeight: 900, color: 'rgba(0,188,212,0.1)', letterSpacing: '-1px', marginBottom: 4 }}>INVOICE</div>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: '#00BCD4' }}>{inv.invoiceNo}</div>
+                    <div style={{ display: 'flex', gap: 20, marginTop: 14, justifyContent: 'flex-end' }}>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 3 }}>Date</div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: '#0f1c2e' }}>{inv.issueDate ? new Date(inv.issueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div>
                       </div>
-                      <div style={{ marginTop: 10, textAlign: 'right' }}>
-                        <span style={{ display: 'inline-block', padding: '4px 14px', border: `1.5px solid ${statusStyle.border}`, borderRadius: 20, color: statusStyle.color, fontSize: 11, fontWeight: 800, background: statusStyle.bg, letterSpacing: 1 }}>{statusLabel}</span>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 3 }}>Due Date</div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: '#ea580c' }}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div>
                       </div>
-                      {(inv.projectName || currProject?.name) && (
-                        <div style={{ marginTop: 16, textAlign: 'right' }}>
-                          <div style={{ fontSize: 9, color: '#94a3b8', fontWeight: 700, letterSpacing: 2, marginBottom: 4 }}>PROJECT</div>
-                          <div style={{ fontSize: 14, fontWeight: 800, color: '#0f1c2e' }}>{inv.projectName || currProject.name}</div>
-                        </div>
-                      )}
+                    </div>
+                    {inv.status && inv.status.toLowerCase() !== 'draft' && (
+                      <div style={{ marginTop: 12, textAlign: 'right' }}>
+                        <span style={{ display: 'inline-block', padding: '4px 14px', borderRadius: 20, background: statusBg, color: statusColor, fontSize: 11, fontWeight: 800, border: `1.5px solid ${statusColor}`, letterSpacing: 1 }}>
+                          {inv.status.charAt(0).toUpperCase() + inv.status.slice(1).toLowerCase()}
+                        </span>
+                      </div>
+                    )}
+                    <div style={{ marginTop: 24 }}>
+                      <div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '2px', textAlign: 'right', marginBottom: 6 }}>Project</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: '#0f1c2e', textAlign: 'right' }}>{inv.projectName || currProject.name}</div>
                     </div>
                   </div>
                 </div>
-                {/* Bill To */}
-                <div style={{ padding: '20px 36px', borderBottom: '2px solid #e5e7eb' }}>
-                  <div style={{ fontSize: 9, color: '#64748b', fontWeight: 700, letterSpacing: 2, marginBottom: 10, textTransform: 'uppercase' }}>Bill To</div>
-                  <div style={{ fontSize: 17, fontWeight: 800, color: '#0f1c2e' }}>{inv.clientName || clientName || '—'}</div>
-                  {clientInfo?.companyName && <div style={{ fontSize: 13, color: accentColor, fontWeight: 600, marginTop: 2 }}>{clientInfo.companyName}</div>}
-                  {clientInfo?.email && <div style={{ fontSize: 12, color: '#6b7280', marginTop: 5 }}>📧 {clientInfo.email}</div>}
-                  {clientInfo?.phone && <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>📱 {clientInfo.phone}</div>}
-                  {clientInfo?.gstNumber && <div style={{ fontSize: 12, color: accentColor, marginTop: 4, fontWeight: 600 }}>💎 GST: {clientInfo.gstNumber}</div>}
+                <div style={{ borderBottom: '2px solid #E8EDF2', paddingBottom: 20, marginBottom: 20 }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: 10 }}>Bill To</div>
+                  <div style={{ fontWeight: 800, fontSize: 17, color: '#0f1c2e' }}>{inv.clientName || clientName}</div>
+                  <div style={{ fontSize: 13, color: '#00BCD4', fontWeight: 600, marginTop: 2 }}>{inv.clientName || clientName}</div>
                 </div>
-                {/* Line Items */}
-                <div style={{ padding: '22px 36px' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                      <tr style={{ background: '#f8fafc' }}>
-                        {['#', 'Description', 'Qty', 'Unit Rate', 'Tax Rate', 'Amount'].map((h, i) => (
-                          <th key={i} style={{ padding: '9px 11px', fontSize: 9, fontWeight: 800, color: '#64748b', letterSpacing: 1.5, borderBottom: '2px solid #e5e7eb', textAlign: ['Amount', 'Unit Rate', 'Qty', 'Tax Rate'].includes(h) ? 'right' : 'left', textTransform: 'uppercase' }}>{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {lineItems.map((item, idx) => {
-                        const qty = Number(item.quantity) || 1;
-                        const rate = Number(item.rate) || 0;
-                        const itemTaxRate = Number(item.gstRate !== undefined ? item.gstRate : taxRate);
-                        const lineTotal = qty * rate;
-                        return (
-                          <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                            <td style={{ padding: '12px 11px', fontSize: 12, color: '#64748b', fontWeight: 700 }}>{String(idx + 1).padStart(2, '0')}</td>
-                            <td style={{ padding: '12px 11px', fontSize: 13, color: '#0f1c2e', fontWeight: 600 }}>{item.description || 'Service'}</td>
-                            <td style={{ padding: '12px 11px', fontSize: 13, color: '#374151', textAlign: 'right' }}>{qty}</td>
-                            <td style={{ padding: '12px 11px', fontSize: 13, color: '#374151', textAlign: 'right' }}>{fmtAmt(rate)}</td>
-                            <td style={{ padding: '12px 11px', fontSize: 13, color: '#6b7280', textAlign: 'right' }}>{itemTaxRate}%</td>
-                            <td style={{ padding: '12px 11px', fontSize: 14, color: '#0f1c2e', textAlign: 'right', fontWeight: 700 }}>{fmtAmt(lineTotal)}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-                {/* Totals */}
-                <div style={{ padding: '0 36px 28px', display: 'flex', justifyContent: 'flex-end' }}>
-                  <div style={{ minWidth: 260 }}>
-                    {[
-                      { label: 'Subtotal', value: fmtAmt(subtotal), color: '#374151' },
-                      discAmt > 0 && { label: 'Discount', value: `- ${fmtAmt(discAmt)}`, color: '#22c55e' },
-                      { label: 'GST / Tax', value: fmtAmt(totalTax), color: '#f59e0b' },
-                      extra > 0 && { label: 'Extra Charges', value: fmtAmt(extra), color: '#374151' },
-                      amountPaid > 0 && { label: 'Paid (Advance)', value: `- ${fmtAmt(amountPaid)}`, color: '#22c55e' },
-                    ].filter(Boolean).map((row, i) => (
-                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', fontSize: 13, borderBottom: '1px solid #f1f5f9' }}>
-                        <span style={{ color: '#64748b' }}>{row.label}</span>
-                        <span style={{ fontWeight: 700, color: row.color }}>{row.value}</span>
-                      </div>
-                    ))}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: '#0f1c2e', borderRadius: 8, marginTop: 8 }}>
-                      <span style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>Balance Due</span>
-                      <span style={{ fontSize: 15, fontWeight: 900, color: '#fff' }}>{fmtAmt(balanceDue)}</span>
+                <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 20 }}>
+                  <thead>
+                    <tr style={{ background: '#f8fafc' }}>
+                      {['#', 'Description', 'Qty', 'Unit Rate', 'Tax Rate', 'Amount'].map(h => (
+                        <th key={h} style={{ padding: '9px 11px', textAlign: h === 'Amount' || h === 'Unit Rate' || h === 'Qty' || h === 'Tax Rate' ? 'right' : 'left', fontSize: 9, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1.5, borderBottom: '2px solid #E8EDF2' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style={{ borderBottom: '1px solid #E8EDF2' }}>
+                      <td style={{ padding: '12px 11px', fontSize: 12, color: '#64748b', fontWeight: 700 }}>01</td>
+                      <td style={{ padding: '12px 11px', fontSize: 13, color: '#0f1c2e', fontWeight: 600 }}>{inv.description || 'Service'}</td>
+                      <td style={{ padding: '12px 11px', fontSize: 13, color: '#374151', textAlign: 'right' }}>1</td>
+                      <td style={{ padding: '12px 11px', fontSize: 13, color: '#374151', textAlign: 'right' }}>{currency}{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                      <td style={{ padding: '12px 11px', fontSize: 13, color: '#6b7280', textAlign: 'right' }}>{inv.taxPercent || 0}%</td>
+                      <td style={{ padding: '12px 11px', fontSize: 14, color: '#0f1c2e', textAlign: 'right', fontWeight: 700 }}>{currency}{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 24 }}>
+                  <div style={{ width: 200 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 10, borderBottom: '1px solid #E8EDF2' }}>
+                      <span style={{ color: '#64748b' }}>Subtotal</span><span style={{ fontWeight: 700 }}>{currency}{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 10, borderBottom: '1px solid #E8EDF2' }}>
+                      <span style={{ color: '#64748b' }}>GST / Tax</span><span style={{ fontWeight: 700 }}>{currency}{taxAmt.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 8px', background: '#0f1c2e', borderRadius: 6, marginTop: 4, color: '#fff' }}>
+                      <span style={{ fontSize: 10, fontWeight: 800 }}>Balance Due</span>
+                      <span style={{ fontSize: 12, fontWeight: 900 }}>{currency}{total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                     </div>
                   </div>
                 </div>
-                {/* Notes */}
                 {inv.notes && (
-                  <div style={{ padding: '14px 36px', borderTop: '1px solid #e5e7eb', background: '#f8fafc' }}>
-                    <div style={{ fontSize: 9, fontWeight: 700, color: accentColor, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>Notes</div>
-                    <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.6 }}>{inv.notes}</div>
+                  <div style={{ borderTop: '1px solid #E8EDF2', paddingTop: 14 }}>
+                    <div style={{ fontSize: 8, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 2 }}>Notes</div>
+                    <div style={{ fontSize: 8, color: '#64748b', lineHeight: 1.5 }}>{inv.notes}</div>
                   </div>
                 )}
-                {/* Footer */}
-                <div style={{ borderTop: '1px solid #e5e7eb', padding: '10px 36px', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{inv.invoiceNo}</div>
-                  <div style={{ position: 'relative' }}>
-                    {(() => {
-                      const st = (inv.status || '').toLowerCase();
-                      const cfg = st === 'paid' ? { label: 'Paid', bg: '#DCFCE7', color: '#15803D', icon: '✓' }
-                        : st === 'overdue' ? { label: 'Overdue', bg: '#FEE2E2', color: '#DC2626', icon: '⚠' }
-                          : st === 'sent' ? { label: 'Sent', bg: '#DBEAFE', color: '#1D4ED8', icon: '📨' }
-                            : { label: 'Pending', bg: '#FEF3C7', color: '#B45309', icon: '⏳' };
-                      return (
-                        <>
-                          <span onClick={() => setShowStatusDropdown(prev => !prev)}
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 14px', borderRadius: 20, background: cfg.bg, color: cfg.color, fontSize: 12, fontWeight: 800, border: `1.5px solid ${cfg.color}`, cursor: 'pointer', userSelect: 'none' }}>
-                            {cfg.icon} {cfg.label} <span style={{ fontSize: 10 }}>▼</span>
-                          </span>
-                          {showStatusDropdown && (
-                            <div style={{ position: 'absolute', bottom: 36, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: '#fff', border: '1px solid #E8EDF2', borderRadius: 10, boxShadow: '0 4px 20px rgba(0,0,0,0.15)', minWidth: 150, overflow: 'hidden' }}>
-                              {[
-                                { label: 'Pending', color: '#B45309', bg: '#FEF3C7', icon: '⏳' },
-                                { label: 'Paid', color: '#15803D', bg: '#DCFCE7', icon: '✓' },
-                                { label: 'Overdue', color: '#DC2626', bg: '#FEE2E2', icon: '⚠' },
-                                { label: 'Sent', color: '#1D4ED8', bg: '#DBEAFE', icon: '📨' },
-                              ].map(opt => (
-                                <div key={opt.label}
-                                  onClick={async () => {
-                                    const updatedInvoices = (currProject.invoices || []).map(x => x.invoiceNo === inv.invoiceNo ? { ...x, status: opt.label } : x);
-                                    await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { invoices: updatedInvoices });
-                                    setShowStatusDropdown(false);
-                                    setPreviewInvoice(prev => ({ ...prev, status: opt.label }));
-                                    loadLatest();
-                                  }}
-                                  style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', cursor: 'pointer', background: st === opt.label.toLowerCase() ? opt.bg : '#fff', borderBottom: '1px solid #F3F4F6' }}
-                                  onMouseEnter={e => e.currentTarget.style.background = opt.bg}
-                                  onMouseLeave={e => e.currentTarget.style.background = st === opt.label.toLowerCase() ? opt.bg : '#fff'}>
-                                  <span>{opt.icon}</span>
-                                  <span style={{ fontSize: 13, fontWeight: 700, color: opt.color }}>{opt.label}</span>
-                                  {st === opt.label.toLowerCase() && <span style={{ marginLeft: 'auto', fontSize: 11 }}>✓</span>}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </>
-                      );
-                    })()}
-                  </div>
-                  <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{currProject?.name}</div>
-                </div>
               </div>
+
+              {/* ── Footer Status Bar ── */}
+              {/* ── Footer Status Bar ── */}
+              <div style={{ borderTop: '1px solid #E8EDF2', padding: '10px 40px', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{inv.invoiceNo}</div>
+                <div style={{ position: 'relative' }}>
+                  {(() => {
+                    const st = (inv.status || '').toLowerCase();
+                    const cfg = st === 'paid'
+                      ? { label: 'Paid', bg: '#DCFCE7', color: '#15803D', icon: '✓' }
+                      : st === 'overdue'
+                        ? { label: 'Overdue', bg: '#FEE2E2', color: '#DC2626', icon: '⚠' }
+                        : st === 'sent'
+                          ? { label: 'Sent', bg: '#DBEAFE', color: '#1D4ED8', icon: '📨' }
+                          : { label: 'Pending', bg: '#FEF3C7', color: '#B45309', icon: '⏳' };
+                    return (
+                      <>
+                        <span
+                          onClick={() => setShowStatusDropdown(prev => !prev)}
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 14px', borderRadius: 20, background: cfg.bg, color: cfg.color, fontSize: 12, fontWeight: 800, border: `1.5px solid ${cfg.color}`, cursor: 'pointer', userSelect: 'none' }}
+                        >
+                          {cfg.icon} {cfg.label} <span style={{ fontSize: 10 }}>▼</span>
+                        </span>
+                        {showStatusDropdown && (
+                          <div style={{ position: 'absolute', bottom: 36, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: '#fff', border: '1px solid #E8EDF2', borderRadius: 10, boxShadow: '0 4px 20px rgba(0,0,0,0.15)', minWidth: 150, overflow: 'hidden' }}>
+                            {[
+                              { label: 'Pending', color: '#B45309', bg: '#FEF3C7', icon: '⏳' },
+                              { label: 'Paid', color: '#15803D', bg: '#DCFCE7', icon: '✓' },
+                              { label: 'Overdue', color: '#DC2626', bg: '#FEE2E2', icon: '⚠' },
+                              { label: 'Sent', color: '#1D4ED8', bg: '#DBEAFE', icon: '📨' },
+                            ].map(opt => (
+                              <div key={opt.label}
+                                onClick={async () => {
+                                  const updatedInvoices = (currProject.invoices || []).map(x =>
+                                    x.invoiceNo === inv.invoiceNo ? { ...x, status: opt.label } : x
+                                  );
+                                  await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { invoices: updatedInvoices });
+                                  setShowStatusDropdown(false);
+                                  setPreviewInvoice(prev => ({ ...prev, status: opt.label }));
+                                  loadLatest();
+                                }}
+                                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', cursor: 'pointer', background: st === opt.label.toLowerCase() ? opt.bg : '#fff', borderBottom: '1px solid #F3F4F6' }}
+                                onMouseEnter={e => e.currentTarget.style.background = opt.bg}
+                                onMouseLeave={e => e.currentTarget.style.background = st === opt.label.toLowerCase() ? opt.bg : '#fff'}
+                              >
+                                <span>{opt.icon}</span>
+                                <span style={{ fontSize: 13, fontWeight: 700, color: opt.color }}>{opt.label}</span>
+                                {st === opt.label.toLowerCase() && <span style={{ marginLeft: 'auto', fontSize: 11 }}>✓</span>}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
+                <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>Urban Cafe Billing Software</div>
+              </div>
+
             </div>
           </div>
         );
       })()}
 
+
       {/* Upload File Modal */}
       {showUploadModal && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 99998, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
           <div style={{ background: '#fff', borderRadius: P.radius, width: '100%', maxWidth: 480, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', overflow: 'hidden' }}>
+            {/* Header */}
             <div style={{ background: `linear-gradient(135deg,${P.primary},${P.primaryDark})`, padding: '16px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ color: '#fff', fontWeight: 800, fontSize: 15 }}>Upload File</span>
-              <button onClick={() => setShowUploadModal(false)} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', fontSize: 16 }}>✕</button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <i className="ti ti-upload" style={{ color: '#fff', fontSize: 18 }}></i>
+                <span style={{ color: '#fff', fontWeight: 800, fontSize: 15 }}>Upload File</span>
+              </div>
+              <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>✕</button>
             </div>
-            <div style={{ padding: '22px 24px' }}>
-              <div onClick={() => document.getElementById('modal-file-input').click()} style={{ border: `2px dashed ${P.border}`, borderRadius: 10, padding: '22px 16px', textAlign: 'center', cursor: 'pointer', marginBottom: 16 }}>
-                {uploadFileObj ? <div style={{ fontSize: 13, fontWeight: 700 }}>{uploadFileObj.name}</div> : <div style={{ fontSize: 13, color: P.textLight }}>Click to browse or drag & drop</div>}
+
+            {/* Body */}
+            <div style={{ padding: '22px 24px', maxHeight: '80vh', overflowY: 'auto' }}>
+
+              {/* Drop Zone */}
+              <div onClick={() => document.getElementById('modal-file-input').click()}
+                style={{ border: `2px dashed ${uploadFileObj ? P.primary : P.border}`, borderRadius: 10, padding: '22px 16px', textAlign: 'center', cursor: 'pointer', marginBottom: 16, background: uploadFileObj ? P.primaryLight : P.bg, transition: 'all .2s' }}>
+                <i className={`ti ${uploadFileObj ? 'ti-file-check' : 'ti-cloud-upload'}`} style={{ fontSize: 28, color: uploadFileObj ? P.green : P.textLight, display: 'block', marginBottom: 6 }}></i>
+                {uploadFileObj ? (
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>{uploadFileObj.name}</div>
+                    <div style={{ fontSize: 11, color: P.textLight, marginTop: 3 }}>{(uploadFileObj.size / 1024).toFixed(1)} KB · Click to change</div>
+                  </div>
+                ) : (
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Click to browse or drag & drop</div>
+                    <div style={{ fontSize: 11, color: P.textLight, marginTop: 3 }}>Images, PDFs, Docs supported</div>
+                  </div>
+                )}
               </div>
               <input id="modal-file-input" type="file" onChange={handleModalFileSelect} style={{ display: 'none' }} />
-              <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
-                <button onClick={() => setShowUploadModal(false)} style={{ flex: 1, padding: '10px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, cursor: 'pointer' }}>Cancel</button>
-                <button onClick={handleModalUpload} disabled={!uploadFileObj || uploadingModal} style={{ flex: 2, padding: '10px', borderRadius: 10, border: 'none', background: P.primary, color: '#fff', cursor: 'pointer', fontWeight: 800 }}>
+
+              {/* Heading */}
+              <div style={{ marginBottom: 12 }}>
+                <label style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', display: 'block', marginBottom: 5 }}>File Heading</label>
+                <input type="text" value={uploadHeading} onChange={e => setUploadHeading(e.target.value)} placeholder="e.g. Design Mockup v2"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+
+              {/* Description */}
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', display: 'block', marginBottom: 5 }}>Description</label>
+                <textarea value={uploadDescription} onChange={e => setUploadDescription(e.target.value)} placeholder="Brief description of this file..." rows={2}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }} />
+              </div>
+
+              {/* Share With label */}
+              <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 10 }}>Share With</div>
+
+              {/* Client Portal Toggle */}
+              <div style={{ border: `1.5px solid ${uploadSendToClient ? P.primary : P.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 10, background: uploadSendToClient ? P.primaryLight : '#fff', transition: 'all .15s' }}>
+                <div onClick={() => { const newVal = !uploadSendToClient; setUploadSendToClient(newVal); setUploadClientName(newVal ? (currProject.client || clientName || '') : ''); }} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                  <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${uploadSendToClient ? P.primary : P.border}`, background: uploadSendToClient ? P.primary : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    {uploadSendToClient && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>✓</span>}
+                  </div>
+                  <i className="ti ti-building" style={{ color: P.primary, fontSize: 16 }}></i>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Client Portal</span>
+                </div>
+                {uploadSendToClient && (
+                  <select value={uploadClientName} onChange={e => setUploadClientName(e.target.value)}
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.primary}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', background: '#fff', color: P.textDark, marginTop: 10 }}>
+                    <option value="">-- Select Client --</option>
+                    {currProject.client && <option value={currProject.client}>{currProject.client}</option>}
+                    {(clients || []).filter(c => (c.clientName || c.name) !== currProject.client).map(c => (
+                      <option key={c._id || c.clientName} value={c.clientName || c.name}>{c.clientName || c.name}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              {/* Employee Portal Toggle */}
+              <div style={{ border: `1.5px solid ${uploadSendToEmployee ? P.purple : P.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 20, background: uploadSendToEmployee ? P.purpleLight : '#fff', transition: 'all .15s' }}>
+                <div onClick={() => { setUploadSendToEmployee(!uploadSendToEmployee); setUploadEmployeeName(''); }} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                  <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${uploadSendToEmployee ? P.purple : P.border}`, background: uploadSendToEmployee ? P.purple : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    {uploadSendToEmployee && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>✓</span>}
+                  </div>
+                  <i className="ti ti-users" style={{ color: P.purple, fontSize: 16 }}></i>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Employee Portal</span>
+                </div>
+                {uploadSendToEmployee && (
+                  <select value={uploadEmployeeName} onChange={e => setUploadEmployeeName(e.target.value)}
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.purple}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', background: '#fff', color: P.textDark, marginTop: 10 }}>
+                    <option value="">-- Select Employee --</option>
+                    {(employees || []).map(emp => (
+                      <option key={emp._id} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName}{emp.role ? ` (${emp.role})` : ''}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              {/* Buttons */}
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }}
+                  style={{ flex: 1, padding: '10px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                  Cancel
+                </button>
+                <button onClick={handleModalUpload} disabled={!uploadFileObj || uploadingModal}
+                  style={{ flex: 2, padding: '10px', borderRadius: 10, border: 'none', background: (!uploadFileObj || uploadingModal) ? P.border : P.primary, color: (!uploadFileObj || uploadingModal) ? P.textLight : '#fff', fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 800, cursor: (!uploadFileObj || uploadingModal) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all .15s' }}>
+                  <i className="ti ti-upload" style={{ fontSize: 15 }}></i>
                   {uploadingModal ? 'Uploading...' : 'Upload & Share'}
                 </button>
               </div>
+
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 }

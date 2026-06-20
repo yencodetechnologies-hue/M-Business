@@ -4116,8 +4116,8 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
         <button className="create-btn" onClick={() => {
           if (setInvoicePrefill) setInvoicePrefill({ client: "", project: "", _t: Date.now() });
           if (setJumpInvoice) setJumpInvoice(null);
-        if (setPrevActiveBeforeInvoice) setPrevActiveBeforeInvoice(active);
-if (setActive) setActive("invoices");
+          if (setPrevActiveBeforeInvoice) setPrevActiveBeforeInvoice(active);
+          if (setActive) setActive("invoices");
         }}>
           <i className="ti ti-plus"></i> New Invoice
         </button>
@@ -4149,18 +4149,18 @@ if (setActive) setActive("invoices");
         onEdit={(p) => openEdit(p)}
 
         onDelete={(p) => setDeleteTarget(p)}
-onNewInvoice={(p, editInv, editIdx) => { 
-    if (!p) return;
-    if (setInvoicePrefill) setInvoicePrefill({ client: p.client || "", project: p.name || "", _t: Date.now(), ...(editInv ? { editData: editInv, editIndex: editIdx, projectId: p._id } : {}) });
-    if (setJumpInvoice) setJumpInvoice(true);
-    setPrevActiveBeforeInvoice(active);
-    if (setActive) setActive("invoices");
-}}
-onViewInvoice={(entry) => {
-  setJumpInvoice(entry);
-  setPrevActiveBeforeInvoice(active);
-  setActive("invoices");
-}}
+        onNewInvoice={(p, editInv, editIdx) => {
+          if (!p) return;
+          if (setInvoicePrefill) setInvoicePrefill({ client: p.client || "", project: p.name || "", _t: Date.now(), ...(editInv ? { editData: editInv, editIndex: editIdx, projectId: p._id } : {}) });
+          if (setJumpInvoice) setJumpInvoice(true);
+          setPrevActiveBeforeInvoice(active);
+          if (setActive) setActive("invoices");
+        }}
+        onViewInvoice={(entry) => {
+          setJumpInvoice(entry);
+          setPrevActiveBeforeInvoice(active);
+          setActive("invoices");
+        }}
       />
 
 
@@ -10542,17 +10542,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   setActive("proposals");
                 }}
 
-        onNewInvoice={(proj, editInv, editIdx) => {
-  setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now(), ...(editInv ? { editData: editInv, editIndex: editIdx, projectId: proj._id } : {}) });
-  setJumpInvoice(null);
-  setPrevActiveBeforeInvoice(active);
-  setActive("invoices");
-}}
-onViewInvoice={(entry) => {
-  setJumpInvoice(entry);
-  setPrevActiveBeforeInvoice(active);
-  setActive("invoices");
-}}
+                onNewInvoice={(proj, editInv, editIdx) => {
+                  setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now(), ...(editInv ? { editData: editInv, editIndex: editIdx, projectId: proj._id } : {}) });
+                  setJumpInvoice(null);
+                  setPrevActiveBeforeInvoice(active);
+                  setActive("invoices");
+                }}
+                onViewInvoice={(entry) => {
+                  setJumpInvoice(entry);
+                  setPrevActiveBeforeInvoice(active);
+                  setActive("invoices");
+                }}
                 onLogTime={async (hours) => {
 
                   try {
@@ -10731,7 +10731,7 @@ onViewInvoice={(entry) => {
 
 
 
-            {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => setActive("dashboard")} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill} onAddClient={() => {
+            {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => setActive(prevActiveBeforeInvoice || "dashboard")} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 

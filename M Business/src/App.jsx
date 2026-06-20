@@ -1,28 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-
-import AuthPage           from "./components/AuthPage";
-import Dashboard          from "./components/SubAdminDashboard";
-import AdminDashboard     from "./components/AdminDashboard";
-import ClientDashboard    from "./components/ClientDashboard";
-import EmployeeDashboard  from "./components/EmployeeDashboard";
-
-import InvoiceViewer      from "./components/InvoiceViewer";
-import QuotationViewer    from "./components/QuotationViewer";
-import ReceiptViewer      from "./components/ReceiptViewer";
-import TasksPage          from "./components/TaskPage";
-import CalendarPage       from "./components/CalendarPage";
-import { ExpensesPage }   from "./components/AccountsPage";
-import ReportsPage        from "./components/ReportsPage";
-import QuotationCreatorModern from "./components/QuotationCreatorModern";
-import QuotationCreator   from "./components/QuotationCreator";
-import ProjectProposalCreator from "./components/ProjectProposalCreator";
-import InterviewApplyForm from "./components/InterviewApplyForm";
-import EmployeeOnboarding from "./components/EmployeeOnboarding";
-import CanvasPage         from "./components/CanvasPage";
-import ModernProjectsPage from "./components/ModernProjectsPage";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+// Lazy load all heavy components
+const AuthPage = lazy(() => import("./components/AuthPage"));
+const Dashboard = lazy(() => import("./components/SubAdminDashboard"));
+const AdminDashboard = lazy(() => import("./components/AdminDashboard"));
+const ClientDashboard = lazy(() => import("./components/ClientDashboard"));
+const EmployeeDashboard = lazy(() => import("./components/EmployeeDashboard"));
+const InvoiceViewer = lazy(() => import("./components/InvoiceViewer"));
+const QuotationViewer = lazy(() => import("./components/QuotationViewer"));
+const ReceiptViewer = lazy(() => import("./components/ReceiptViewer"));
+const TasksPage = lazy(() => import("./components/TaskPage"));
+const CalendarPage = lazy(() => import("./components/CalendarPage"));
+const ExpensesPage = lazy(() => import("./components/AccountsPage").then(m => ({ default: m.ExpensesPage })));
+const ReportsPage = lazy(() => import("./components/ReportsPage"));
+const QuotationCreatorModern = lazy(() => import("./components/QuotationCreatorModern"));
+const QuotationCreator = lazy(() => import("./components/QuotationCreator"));
+const ProjectProposalCreator = lazy(() => import("./components/ProjectProposalCreator"));
+const InterviewApplyForm = lazy(() => import("./components/InterviewApplyForm"));
+const EmployeeOnboarding = lazy(() => import("./components/EmployeeOnboarding"));
+const CanvasPage = lazy(() => import("./components/CanvasPage"));
+const ModernProjectsPage = lazy(() => import("./components/ModernProjectsPage"));
 
 export default function App() {
   const [user, setUser] = useState(() => {
@@ -50,7 +50,7 @@ export default function App() {
         role: (userData.role || "").toLowerCase().trim(),
       };
       localStorage.setItem("user", JSON.stringify(normalized));
-      
+
       // Save to accounts list for multi-account support
       try {
         let accs = JSON.parse(localStorage.getItem("accounts") || "[]");
@@ -58,7 +58,7 @@ export default function App() {
         if (idx !== -1) accs[idx] = normalized;
         else accs.push(normalized);
         localStorage.setItem("accounts", JSON.stringify(accs));
-      } catch (e) {}
+      } catch (e) { }
 
       setUser(normalized);
     } else {
@@ -72,65 +72,67 @@ export default function App() {
 
   // ── Role-based root page ────────────────────────────────────────────────────
   const role = (user?.role || "").toLowerCase().trim();
-const getRootPage = () => {
-  console.log("🎯 getRootPage called, role:", JSON.stringify(role));
-  
-  if (!user) return <AuthPage setUser={handleSetUser} />;
+  const getRootPage = () => {
+    console.log("🎯 getRootPage called, role:", JSON.stringify(role));
 
-  console.log("👤 User exists, role:", role);
+    if (!user) return <AuthPage setUser={handleSetUser} />;
 
-  if (role === "employee") {
-    console.log("✅ Routing to EmployeeDashboard");
-    return <EmployeeDashboard user={user} setUser={handleSetUser} />;
-  }
+    console.log("👤 User exists, role:", role);
 
-  if (role === "admin") {
-    console.log("👑 Routing to AdminDashboard");
-    return <AdminDashboard user={user} setUser={handleSetUser} />;
-  }
+    if (role === "employee") {
+      console.log("✅ Routing to EmployeeDashboard");
+      return <EmployeeDashboard user={user} setUser={handleSetUser} />;
+    }
 
-  if (role === "subadmin") {
-    console.log("🛡️ Routing to Main Dashboard (Subadmin logic)");
+    if (role === "admin") {
+      console.log("👑 Routing to AdminDashboard");
+      return <AdminDashboard user={user} setUser={handleSetUser} />;
+    }
+
+    if (role === "subadmin") {
+      console.log("🛡️ Routing to Main Dashboard (Subadmin logic)");
+      return <Dashboard user={user} setUser={handleSetUser} />;
+    }
+
+    if (role === "client")
+      return <ClientDashboard user={user} setUser={handleSetUser} />;
+
     return <Dashboard user={user} setUser={handleSetUser} />;
-  }
-
-  if (role === "client")
-    return <ClientDashboard user={user} setUser={handleSetUser} />;
-
-  return <Dashboard user={user} setUser={handleSetUser} />;
-};
+  };
   return (
     <Router>
       <ToastContainer position="top-right" autoClose={3000} />
-      <Routes>
-        <Route path="/" element={getRootPage()} />
-        <Route path="/add-account" element={<AuthPage setUser={(u) => { handleSetUser(u); window.location.href="/"; }} initialTab="register" />} />
+      <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontSize: '18px' }}>Loading...</div>}>
+        <Routes>
+          <Route path="/" element={getRootPage()} />
+          <Route path="/add-account" element={<AuthPage setUser={(u) => { handleSetUser(u); window.location.href = "/"; }} initialTab="register" />} />
 
-        <Route
-          path="/employeedashboard"
-          element={
-            user && role === "employee"
-              ? <EmployeeDashboard user={user} setUser={handleSetUser} />
-              : <Navigate to="/" replace />
-          }
-        />
+          <Route
+            path="/employeedashboard"
+            element={
+              user && role === "employee"
+                ? <EmployeeDashboard user={user} setUser={handleSetUser} />
+                : <Navigate to="/" replace />
+            }
+          />
 
-        <Route path="/tasks"             element={<TasksPage />} />
-        <Route path="/canvas"            element={<CanvasPage />} />
-        <Route path="/invoice-view"      element={<InvoiceViewer />} />
-        <Route path="/quotation-view"    element={<QuotationViewer />} />
-        <Route path="/receipt-view"      element={<ReceiptViewer />} />
-        <Route path="/calendar"          element={<CalendarPage />} />
-        <Route path="/expenses"          element={<ExpensesPage />} />
-        <Route path="/reports"           element={<ReportsPage />} />
-        <Route path="/quotation-creator" element={<QuotationCreatorModern />} />
-        <Route path="/project-proposal" element={<ProjectProposalCreator />} />
-        <Route path="/interview-apply/:companySlug" element={<InterviewApplyForm />} />
-        <Route path="/employee-onboarding" element={<EmployeeOnboarding />} />
-        <Route path="/modern-projects"   element={user ? <ModernProjectsPage user={user} /> : <Navigate to="/" replace />} />
+          <Route path="/tasks" element={<TasksPage />} />
+          <Route path="/canvas" element={<CanvasPage />} />
+          <Route path="/invoice-view" element={<InvoiceViewer />} />
+          <Route path="/quotation-view" element={<QuotationViewer />} />
+          <Route path="/receipt-view" element={<ReceiptViewer />} />
+          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/expenses" element={<ExpensesPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/quotation-creator" element={<QuotationCreatorModern />} />
+          <Route path="/project-proposal" element={<ProjectProposalCreator />} />
+          <Route path="/interview-apply/:companySlug" element={<InterviewApplyForm />} />
+          <Route path="/employee-onboarding" element={<EmployeeOnboarding />} />
+          <Route path="/modern-projects" element={user ? <ModernProjectsPage user={user} /> : <Navigate to="/" replace />} />
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
     </Router>
   );
 }

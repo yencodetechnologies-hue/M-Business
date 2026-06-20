@@ -1369,11 +1369,11 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
               Projects
 
             </span>
-
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-
+              <button onClick={() => onCreateProject && onCreateProject(activeClient)} style={{ background: "#00BCD4", border: "none", borderRadius: 7, padding: "4px 10px", fontSize: 11, color: "#fff", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
+                <i className="ti ti-plus" style={{ fontSize: 11 }} /> Add Project
+              </button>
               <span onClick={() => setActiveTab("projects")} style={{ fontSize: 11, color: "#00BCD4", fontWeight: 700, cursor: "pointer" }}>View all</span>
-
             </div>
 
 

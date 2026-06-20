@@ -1620,54 +1620,101 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               </div>
                               {inv._source === 'global' ? (
                                 <button onClick={async () => {
-                                  const fullGlobal = projectInvoices.find(g => g.id === inv._globalId);
-                                  const editData = fullGlobal?.inv || fullGlobal || inv;
-                                  if (onNewInvoice) {
-                                    onNewInvoice(currProject, {
-                                      editData: {
-                                        ...editData,
+                                  try {
+                                    const res = await axios.get(`${BASE_URL}/api/invoices`);
+                                    const all = res.data?.invoices || res.data || [];
+                                    const fullGlobal = all.find(g => g.id === inv._globalId || g._id === inv._globalId);
+                                    const rawInv = fullGlobal?.inv || {};
+                                    const editData = {
+                                      ...rawInv,
+                                      invoiceNo: rawInv.invoiceNo || fullGlobal?.invoiceNo || inv.invoiceNo,
+                                      client: rawInv.client || fullGlobal?.client || clientName,
+                                      project: rawInv.project || currProject.name,
+                                      date: rawInv.date || fullGlobal?.date || inv.issueDate,
+                                      dueDate: rawInv.dueDate || fullGlobal?.dueDate || inv.dueDate,
+                                      status: rawInv.status || fullGlobal?.status || inv.status,
+                                      items: rawInv.items?.length ? rawInv.items : [{ id: 1, description: rawInv.notes || inv.description || '', quantity: 1, rate: fullGlobal?.total || inv.amount || '' }],
+                                      notes: rawInv.notes || '',
+                                      terms: rawInv.terms || '',
+                                      companyName: rawInv.companyName || '',
+                                      companyEmail: rawInv.companyEmail || '',
+                                      companyPhone: rawInv.companyPhone || '',
+                                      companyAddress: rawInv.companyAddress || '',
+                                      bankName: rawInv.bankName || '',
+                                      accountNumber: rawInv.accountNumber || '',
+                                      ifscCode: rawInv.ifscCode || '',
+                                      upiId: rawInv.upiId || '',
+                                      currency: rawInv.currency || 'INR',
+                                      gstRate: rawInv.gstRate || 18,
+                                      amountPaid: rawInv.amountPaid || 0,
+                                      signature: rawInv.signature || '',
+                                      signatureType: rawInv.signatureType || 'text',
+                                      template: rawInv.template || 'Classic',
+                                      footerMessage: rawInv.footerMessage || '',
+                                    };
+                                    if (onNewInvoice) {
+                                      onNewInvoice(currProject, {
+                                        editData: editData,
                                         invoiceNo: editData.invoiceNo || inv.invoiceNo,
                                         client: editData.client || editData.clientName || clientName,
                                         project: editData.project || currProject.name,
                                         date: editData.date || editData.issueDate || inv.issueDate,
                                         dueDate: editData.dueDate || inv.dueDate,
                                         status: editData.status || inv.status,
-                                        items: editData.items || editData.lineItems || [],
-                                        notes: editData.notes || '',
-                                        terms: editData.terms || '',
-                                      },
-                                      editIndex: i,
-                                      isEdit: true,
-                                      projectId: currProject._id,
-                                      client: editData.client || editData.clientName || clientName,
-                                      project: currProject.name,
-                                      globalInvoiceId: inv._globalId,
-                                    }, i);
+                                        items: editData.items || editData.lineItems || [{ id: 1, description: editData.description || inv.description || '', quantity: 1, rate: editData.amount || inv.amount || '' }],
+                                        notes: editData.notes || inv.notes || '',
+                                        terms: editData.terms || inv.terms || '',
+                                        companyName: editData.companyName || '',
+                                        companyEmail: editData.companyEmail || '',
+                                        companyPhone: editData.companyPhone || '',
+                                        companyAddress: editData.companyAddress || '',
+                                        bankName: editData.bankName || '',
+                                        accountNumber: editData.accountNumber || '',
+                                        ifscCode: editData.ifscCode || '',
+                                        upiId: editData.upiId || '',
+                                        currency: editData.currency || inv.currency || 'INR',
+                                        gstRate: editData.gstRate || 18,
+                                        amountPaid: editData.amountPaid || 0,
+                                        signature: editData.signature || '',
+                                        signatureType: editData.signatureType || 'text',
+                                        template: editData.template || 'Classic',
+                                        footerMessage: editData.footerMessage || '',
+                                        editIndex: i,
+                                        isEdit: true,
+                                        projectId: currProject._id,
+                                        globalInvoiceId: inv._globalId,
+                                      });
+                                    }
+                                  } catch (err) {
+                                    console.error('Failed to fetch invoice for edit:', err);
                                   }
                                 }} title="Edit" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+
                               ) : (
                                 <button onClick={() => {
+                                  const payload = {
+                                    editData: { ...inv, client: inv.clientName || clientName, project: currProject.name },
+                                    editIndex: i,
+                                    isEdit: true,
+                                    projectId: currProject._id,
+                                  };
                                   if (onNewInvoice) {
-                                    onNewInvoice(currProject, {
-                                      editData: {
-                                        ...inv,
-                                        client: inv.clientName || clientName,
-                                        project: currProject.name,
-                                      },
-                                      editIndex: i,
-                                      isEdit: true,
-                                      projectId: currProject._id,
-                                    }, i);
+                                    onNewInvoice(currProject, payload);
                                   } else {
-                                    setPaymentModalsState({
-                                      showNewInvoice: true, showPayment: false, showAdvance: false,
-                                      showAdditional: false, showMilestonePayment: false, showExpense: false,
-                                      editData: { ...inv }, editIndex: i
-                                    });
+                                    setPaymentModalsState(prev => ({
+                                      ...prev,
+                                      showNewInvoice: true,
+                                      showPayment: false,
+                                      showAdvance: false,
+                                      showMilestonePayment: false,
+                                      showAdditional: false,
+                                      showExpense: false,
+                                      editData: { ...inv },
+                                      editIndex: i,
+                                    }));
                                   }
                                 }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }} title="Edit"><i className="ti ti-edit"></i></button>
-                              )}
-                              {inv._source === 'global' ? (
+                              )}                           {inv._source === 'global' ? (
                                 <button onClick={async () => { if (confirm('Delete this invoice?')) { await axios.delete(`${BASE_URL}/api/invoices/${inv._globalId}`); loadLatest(); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }} title="Delete"><i className="ti ti-trash"></i></button>
                               ) : (
                                 <button onClick={() => handleDeleteRecord('invoices', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }} title="Delete"><i className="ti ti-trash"></i></button>
@@ -1926,125 +1973,131 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       </div>
 
       {/* Add Task Modal */}
-      {showAddTaskModal && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 99995, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ background: '#fff', borderRadius: P.radius, width: 440, padding: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.15)', boxSizing: 'border-box', maxHeight: '90vh', overflowY: 'auto' }}>
-            <h3 style={{ margin: '0 0 16px', fontSize: 18, color: P.textDark }}>{editingTask ? 'Edit Task' : 'Add New Task'}</h3>
-            <form onSubmit={handleCreateTask}>
-              <div style={{ marginBottom: 12 }}>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Task Name</label>
-                <input type="text" value={newTaskTitle} onChange={e => setNewTaskTitle(e.target.value)} placeholder="Enter task title" required style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }} />
-              </div>
-              <div style={{ marginBottom: 12 }}>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Description</label>
-                <textarea value={newTaskDesc} onChange={e => setNewTaskDesc(e.target.value)} placeholder="Enter details..." style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', resize: 'vertical', minHeight: 60, boxSizing: 'border-box' }} />
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Priority</label>
-                  <select value={newTaskPriority} onChange={e => setNewTaskPriority(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
+      {
+        showAddTaskModal && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99995, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ background: '#fff', borderRadius: P.radius, width: 440, padding: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.15)', boxSizing: 'border-box', maxHeight: '90vh', overflowY: 'auto' }}>
+              <h3 style={{ margin: '0 0 16px', fontSize: 18, color: P.textDark }}>{editingTask ? 'Edit Task' : 'Add New Task'}</h3>
+              <form onSubmit={handleCreateTask}>
+                <div style={{ marginBottom: 12 }}>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Task Name</label>
+                  <input type="text" value={newTaskTitle} onChange={e => setNewTaskTitle(e.target.value)} placeholder="Enter task title" required style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+                <div style={{ marginBottom: 12 }}>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Description</label>
+                  <textarea value={newTaskDesc} onChange={e => setNewTaskDesc(e.target.value)} placeholder="Enter details..." style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', resize: 'vertical', minHeight: 60, boxSizing: 'border-box' }} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Priority</label>
+                    <select value={newTaskPriority} onChange={e => setNewTaskPriority(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Due Date</label>
+                    <input type="date" value={newTaskDue} onChange={e => setNewTaskDue(e.target.value)} style={{ width: '100%', padding: '9px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }} />
+                  </div>
+                </div>
+                <div style={{ marginBottom: 12 }}>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Link to Milestone (Optional)</label>
+                  <select value={newTaskMilestone} onChange={e => setNewTaskMilestone(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
+                    <option value="">-- No Milestone --</option>
+                    {(currProject.milestones || []).map((m, i) => (
+                      <option key={i} value={m.name}>{m.name}</option>
+                    ))}
                   </select>
                 </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Due Date</label>
-                  <input type="date" value={newTaskDue} onChange={e => setNewTaskDue(e.target.value)} style={{ width: '100%', padding: '9px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }} />
-                </div>
-              </div>
-              <div style={{ marginBottom: 12 }}>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Link to Milestone (Optional)</label>
-                <select value={newTaskMilestone} onChange={e => setNewTaskMilestone(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
-                  <option value="">-- No Milestone --</option>
-                  {(currProject.milestones || []).map((m, i) => (
-                    <option key={i} value={m.name}>{m.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div style={{ marginBottom: 16 }}>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Assign To</label>
-                <div style={{ border: `1.5px solid ${P.border}`, borderRadius: 8, maxHeight: 150, overflowY: 'auto', padding: '4px 0' }}>
-                  {(employees || []).map(emp => {
-                    const name = emp.name || emp.employeeName || 'Unassigned';
-                    const selected = Array.isArray(newTaskAssignTo) ? newTaskAssignTo.includes(name) : false;
-                    return (
-                      <div key={emp._id} onClick={() => {
-                        if (name === 'Unassigned') { setNewTaskAssignTo([]); return; }
-                        const cur = Array.isArray(newTaskAssignTo) ? newTaskAssignTo.filter(n => n !== 'Unassigned') : [];
-                        setNewTaskAssignTo(selected ? cur.filter(n => n !== name) : [...cur, name]);
-                      }} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 12px', cursor: 'pointer', background: selected ? P.primaryLight : 'transparent' }}>
-                        <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${selected ? P.primary : P.border}`, background: selected ? P.primary : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          {selected && <span style={{ color: '#fff', fontSize: 10, fontWeight: 900, lineHeight: 1 }}>✓</span>}
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Assign To</label>
+                  <div style={{ border: `1.5px solid ${P.border}`, borderRadius: 8, maxHeight: 150, overflowY: 'auto', padding: '4px 0' }}>
+                    {(employees || []).map(emp => {
+                      const name = emp.name || emp.employeeName || 'Unassigned';
+                      const selected = Array.isArray(newTaskAssignTo) ? newTaskAssignTo.includes(name) : false;
+                      return (
+                        <div key={emp._id} onClick={() => {
+                          if (name === 'Unassigned') { setNewTaskAssignTo([]); return; }
+                          const cur = Array.isArray(newTaskAssignTo) ? newTaskAssignTo.filter(n => n !== 'Unassigned') : [];
+                          setNewTaskAssignTo(selected ? cur.filter(n => n !== name) : [...cur, name]);
+                        }} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 12px', cursor: 'pointer', background: selected ? P.primaryLight : 'transparent' }}>
+                          <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${selected ? P.primary : P.border}`, background: selected ? P.primary : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            {selected && <span style={{ color: '#fff', fontSize: 10, fontWeight: 900, lineHeight: 1 }}>✓</span>}
+                          </div>
+                          <span style={{ fontSize: 13, color: P.textDark, fontWeight: selected ? 700 : 500 }}>{name}</span>
                         </div>
-                        <span style={{ fontSize: 13, color: P.textDark, fontWeight: selected ? 700 : 500 }}>{name}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-                {Array.isArray(newTaskAssignTo) && newTaskAssignTo.length > 0 && (
-                  <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                    {newTaskAssignTo.map(n => (
-                      <span key={n} style={{ background: P.primaryLight, color: P.primary, padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{n} ×</span>
-                    ))}
+                      );
+                    })}
                   </div>
-                )}
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-                <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddTaskModal(false)}>Cancel</button>
-                <button type="submit" className="mpd-btn mpd-btn-primary" disabled={addingTask}>{addingTask ? 'Adding...' : editingTask ? 'Update Task' : 'Add Task'}</button>
-              </div>
-            </form>
+                  {Array.isArray(newTaskAssignTo) && newTaskAssignTo.length > 0 && (
+                    <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                      {newTaskAssignTo.map(n => (
+                        <span key={n} style={{ background: P.primaryLight, color: P.primary, padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{n} ×</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                  <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddTaskModal(false)}>Cancel</button>
+                  <button type="submit" className="mpd-btn mpd-btn-primary" disabled={addingTask}>{addingTask ? 'Adding...' : editingTask ? 'Update Task' : 'Add Task'}</button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* Add Member Modal */}
-      {showAddMemberModal && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 99996, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ background: '#fff', borderRadius: P.radius, width: 380, padding: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
-            <h3 style={{ margin: '0 0 16px', fontSize: 16, color: P.textDark }}>Add Team Member</h3>
-            <select value={selectedNewMember} onChange={e => setSelectedNewMember(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none', marginBottom: 16 }}>
-              <option value="">-- Select Employee --</option>
-              {(employees || []).filter(emp => !assigned.includes(emp.name || emp.employeeName)).map(emp => (
-                <option key={emp._id} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName} ({emp.role || 'Employee'})</option>
-              ))}
-            </select>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-              <button className="mpd-btn mpd-btn-outline" onClick={() => { setShowAddMemberModal(false); setSelectedNewMember(''); }}>Cancel</button>
-              <button className="mpd-btn mpd-btn-primary" disabled={!selectedNewMember} onClick={async () => {
-                if (!selectedNewMember) return;
-                const updated = [...(currProject.assignedTo || []), selectedNewMember];
-                await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated });
-                setShowAddMemberModal(false);
-                setSelectedNewMember('');
-                loadLatest();
-              }}>Add</button>
+      {
+        showAddMemberModal && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99996, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ background: '#fff', borderRadius: P.radius, width: 380, padding: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
+              <h3 style={{ margin: '0 0 16px', fontSize: 16, color: P.textDark }}>Add Team Member</h3>
+              <select value={selectedNewMember} onChange={e => setSelectedNewMember(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none', marginBottom: 16 }}>
+                <option value="">-- Select Employee --</option>
+                {(employees || []).filter(emp => !assigned.includes(emp.name || emp.employeeName)).map(emp => (
+                  <option key={emp._id} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName} ({emp.role || 'Employee'})</option>
+                ))}
+              </select>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                <button className="mpd-btn mpd-btn-outline" onClick={() => { setShowAddMemberModal(false); setSelectedNewMember(''); }}>Cancel</button>
+                <button className="mpd-btn mpd-btn-primary" disabled={!selectedNewMember} onClick={async () => {
+                  if (!selectedNewMember) return;
+                  const updated = [...(currProject.assignedTo || []), selectedNewMember];
+                  await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated });
+                  setShowAddMemberModal(false);
+                  setSelectedNewMember('');
+                  loadLatest();
+                }}>Add</button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* Portal Live Preview Overlay */}
-      {showPortalPreview && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: '#fff', overflowY: 'auto', padding: 20 }}>
-          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: `1px solid ${P.border}`, paddingBottom: 12 }}>
-              <h2 style={{ margin: 0, fontSize: 20, color: P.textDark }}>Client Portal Live Preview</h2>
-              <button className="mpd-btn mpd-btn-danger" onClick={() => { setShowPortalPreview(false); onBack(); }}>
-                <i className="ti ti-arrow-right"></i> {hideTopActions ? 'Next' : 'Exit Preview'}
-              </button>
+      {
+        showPortalPreview && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: '#fff', overflowY: 'auto', padding: 20 }}>
+            <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: `1px solid ${P.border}`, paddingBottom: 12 }}>
+                <h2 style={{ margin: 0, fontSize: 20, color: P.textDark }}>Client Portal Live Preview</h2>
+                <button className="mpd-btn mpd-btn-danger" onClick={() => { setShowPortalPreview(false); onBack(); }}>
+                  <i className="ti ti-arrow-right"></i> {hideTopActions ? 'Next' : 'Exit Preview'}
+                </button>
+              </div>
+              <ModernEmployeeProjectDetails
+                project={currProject}
+                tasks={currTasks}
+                user={{ role: 'client', name: currProject.client }}
+                onBack={() => setShowPortalPreview(false)}
+                onMessageTeam={() => { setShowPortalPreview(false); if (onMessageTeam) onMessageTeam(); }}
+              />
             </div>
-            <ModernEmployeeProjectDetails
-              project={currProject}
-              tasks={currTasks}
-              user={{ role: 'client', name: currProject.client }}
-              onBack={() => setShowPortalPreview(false)}
-              onMessageTeam={() => { setShowPortalPreview(false); if (onMessageTeam) onMessageTeam(); }}
-            />
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* Payment Modals */}
       <ProjectPaymentModals
@@ -2055,325 +2108,331 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       />
 
       {/* Send to Client Popup */}
-      {showSendPopup && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-          <div style={{ background: '#fff', width: '100%', maxWidth: 400, borderRadius: 16, boxShadow: '0 20px 40px rgba(0,0,0,0.2)', overflow: 'hidden' }}>
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid #E8EDF2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ fontSize: 16, fontWeight: 900, color: '#0D1B2A' }}>Send to Client Portal</div>
-              <button onClick={() => setShowSendPopup(false)} style={{ background: 'none', border: 'none', fontSize: 20, color: '#7B8FA1', cursor: 'pointer' }}>✕</button>
-            </div>
-            <div style={{ padding: 24 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 8 }}>Select Client</div>
-              <select value={targetPortalClient} onChange={e => setTargetPortalClient(e.target.value)} style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #E8EDF2', fontSize: 13, color: '#1A2332', outline: 'none', background: '#FAFBFD' }}>
-                <option value="">-- Select Client --</option>
-                <option value={currProject.client}>{currProject.client || 'Project Client'}</option>
-                {clients && clients.filter(c => (c.clientName || c.name) !== currProject.client).map(c => (
-                  <option key={c._id || c.clientName || c.name} value={c.clientName || c.name}>{c.clientName || c.name}</option>
-                ))}
-              </select>
-              <div style={{ marginTop: 24, display: 'flex', gap: 10 }}>
-                <button onClick={() => setShowSendPopup(false)} style={{ flex: 1, padding: '10px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>Cancel</button>
-                <button onClick={() => handleSendSelectedToPortal(targetPortalClient)} disabled={!targetPortalClient} style={{ flex: 1, padding: '10px', background: '#22C55E', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: !targetPortalClient ? 'not-allowed' : 'pointer', opacity: !targetPortalClient ? 0.5 : 1 }}>Send ({selectedPaymentItems.length})</button>
+      {
+        showSendPopup && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+            <div style={{ background: '#fff', width: '100%', maxWidth: 400, borderRadius: 16, boxShadow: '0 20px 40px rgba(0,0,0,0.2)', overflow: 'hidden' }}>
+              <div style={{ padding: '20px 24px', borderBottom: '1px solid #E8EDF2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ fontSize: 16, fontWeight: 900, color: '#0D1B2A' }}>Send to Client Portal</div>
+                <button onClick={() => setShowSendPopup(false)} style={{ background: 'none', border: 'none', fontSize: 20, color: '#7B8FA1', cursor: 'pointer' }}>✕</button>
+              </div>
+              <div style={{ padding: 24 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 8 }}>Select Client</div>
+                <select value={targetPortalClient} onChange={e => setTargetPortalClient(e.target.value)} style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #E8EDF2', fontSize: 13, color: '#1A2332', outline: 'none', background: '#FAFBFD' }}>
+                  <option value="">-- Select Client --</option>
+                  <option value={currProject.client}>{currProject.client || 'Project Client'}</option>
+                  {clients && clients.filter(c => (c.clientName || c.name) !== currProject.client).map(c => (
+                    <option key={c._id || c.clientName || c.name} value={c.clientName || c.name}>{c.clientName || c.name}</option>
+                  ))}
+                </select>
+                <div style={{ marginTop: 24, display: 'flex', gap: 10 }}>
+                  <button onClick={() => setShowSendPopup(false)} style={{ flex: 1, padding: '10px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>Cancel</button>
+                  <button onClick={() => handleSendSelectedToPortal(targetPortalClient)} disabled={!targetPortalClient} style={{ flex: 1, padding: '10px', background: '#22C55E', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: !targetPortalClient ? 'not-allowed' : 'pointer', opacity: !targetPortalClient ? 0.5 : 1 }}>Send ({selectedPaymentItems.length})</button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* Invoice Preview Modal */}
-      {previewInvoice && (() => {
-        const inv = previewInvoice;
-        const taxAmt = inv.taxType === 'inclusive'
-          ? Math.round((inv.amount || 0) - (inv.amount || 0) / (1 + (inv.taxPercent || 0) / 100))
-          : Math.round((inv.amount || 0) * (inv.taxPercent || 0) / 100);
-        const subtotal = inv.taxType === 'inclusive'
-          ? Math.round((inv.amount || 0) / (1 + (inv.taxPercent || 0) / 100))
-          : (inv.amount || 0);
-        const total = inv.taxType === 'inclusive' ? (inv.amount || 0) : (inv.amount || 0) + taxAmt;
-        const s = (inv.status || '').toLowerCase();
-        const statusColor = s === 'paid' ? '#22C55E' : s === 'overdue' ? '#EF4444' : s === 'sent' ? '#3B82F6' : s === 'pending' ? '#F59E0B' : '#94A3B8';
-        const statusBg = s === 'paid' ? '#DCFCE7' : s === 'overdue' ? '#FEE2E2' : s === 'sent' ? '#DBEAFE' : s === 'pending' ? '#FEF3C7' : '#F1F5F9';
-        return (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '30px 16px' }}>
-            <div style={{ background: '#fff', width: '100%', maxWidth: 640, borderRadius: 12, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'Arial,sans-serif', overflow: 'hidden' }}>
-              <div style={{ background: '#1A2332', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <i className="ti ti-file-invoice" style={{ color: '#00BCD4', fontSize: 18 }}></i>
-                  <span style={{ color: '#fff', fontWeight: 800, fontSize: 14 }}>Invoice Preview — {inv.invoiceNo}</span>
-                </div>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={() => { setPreviewInvoice(null); setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo) })); }} style={{ padding: '6px 14px', background: '#fff', color: '#374151', border: '1px solid #E8EDF2', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>
-                    <i className="ti ti-edit"></i> Edit
-                  </button>
-                  <button onClick={() => { if (confirm('Delete this invoice?')) { handleDeleteRecord('invoices', (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo)); setPreviewInvoice(null); } }} style={{ padding: '6px 14px', background: '#FEE2E2', color: '#EF4444', border: '1px solid #FECACA', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>
-                    <i className="ti ti-trash"></i> Delete
-                  </button>
-                  <button onClick={() => window.print()} style={{ padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>
-                    <i className="ti ti-printer"></i> Print / PDF
-                  </button>
-                  <button onClick={() => setPreviewInvoice(null)} style={{ padding: '6px 14px', background: '#374151', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>✕ Close</button>
-                </div>
-              </div>
-              <div id="invoice-print-area" style={{ padding: '36px 40px', background: '#fff' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
-                  <div>
-                    {user?.logoUrl ? (
-                      <img src={user.logoUrl} alt="Logo" style={{ height: 70, borderRadius: 12, marginBottom: 12, objectFit: 'contain' }} />
-                    ) : (
-                      <div style={{ width: 60, height: 60, borderRadius: 12, background: 'linear-gradient(135deg,#00BCD4,#0097A7)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
-                        <span style={{ color: '#fff', fontWeight: 900, fontSize: 24 }}>{(user?.companyName || 'Y')[0].toUpperCase()}</span>
-                      </div>
-                    )}
-                    <div style={{ fontWeight: 900, fontSize: 20, color: '#0f1c2e', letterSpacing: '1px', textTransform: 'uppercase' }}>{user?.companyName || 'YOUR COMPANY'}</div>
-                    <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4, lineHeight: 1.7 }}>
-                      {user?.email}<br />{user?.phone}<br />{user?.address}
-                    </div>
+      {
+        previewInvoice && (() => {
+          const inv = previewInvoice;
+          const taxAmt = inv.taxType === 'inclusive'
+            ? Math.round((inv.amount || 0) - (inv.amount || 0) / (1 + (inv.taxPercent || 0) / 100))
+            : Math.round((inv.amount || 0) * (inv.taxPercent || 0) / 100);
+          const subtotal = inv.taxType === 'inclusive'
+            ? Math.round((inv.amount || 0) / (1 + (inv.taxPercent || 0) / 100))
+            : (inv.amount || 0);
+          const total = inv.taxType === 'inclusive' ? (inv.amount || 0) : (inv.amount || 0) + taxAmt;
+          const s = (inv.status || '').toLowerCase();
+          const statusColor = s === 'paid' ? '#22C55E' : s === 'overdue' ? '#EF4444' : s === 'sent' ? '#3B82F6' : s === 'pending' ? '#F59E0B' : '#94A3B8';
+          const statusBg = s === 'paid' ? '#DCFCE7' : s === 'overdue' ? '#FEE2E2' : s === 'sent' ? '#DBEAFE' : s === 'pending' ? '#FEF3C7' : '#F1F5F9';
+          return (
+            <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '30px 16px' }}>
+              <div style={{ background: '#fff', width: '100%', maxWidth: 640, borderRadius: 12, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'Arial,sans-serif', overflow: 'hidden' }}>
+                <div style={{ background: '#1A2332', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <i className="ti ti-file-invoice" style={{ color: '#00BCD4', fontSize: 18 }}></i>
+                    <span style={{ color: '#fff', fontWeight: 800, fontSize: 14 }}>Invoice Preview — {inv.invoiceNo}</span>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: 32, fontWeight: 900, color: 'rgba(0,188,212,0.1)', letterSpacing: '-1px', marginBottom: 4 }}>INVOICE</div>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: '#00BCD4' }}>{inv.invoiceNo}</div>
-                    <div style={{ display: 'flex', gap: 20, marginTop: 14, justifyContent: 'flex-end' }}>
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 3 }}>Date</div>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: '#0f1c2e' }}>{inv.issueDate ? new Date(inv.issueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div>
-                      </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 3 }}>Due Date</div>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: '#ea580c' }}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div>
-                      </div>
-                    </div>
-                    {inv.status && inv.status.toLowerCase() !== 'draft' && (
-                      <div style={{ marginTop: 12, textAlign: 'right' }}>
-                        <span style={{ display: 'inline-block', padding: '4px 14px', borderRadius: 20, background: statusBg, color: statusColor, fontSize: 11, fontWeight: 800, border: `1.5px solid ${statusColor}`, letterSpacing: 1 }}>
-                          {inv.status.charAt(0).toUpperCase() + inv.status.slice(1).toLowerCase()}
-                        </span>
-                      </div>
-                    )}
-                    <div style={{ marginTop: 24 }}>
-                      <div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '2px', textAlign: 'right', marginBottom: 6 }}>Project</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: '#0f1c2e', textAlign: 'right' }}>{inv.projectName || currProject.name}</div>
-                    </div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button onClick={() => { setPreviewInvoice(null); setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo) })); }} style={{ padding: '6px 14px', background: '#fff', color: '#374151', border: '1px solid #E8EDF2', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>
+                      <i className="ti ti-edit"></i> Edit
+                    </button>
+                    <button onClick={() => { if (confirm('Delete this invoice?')) { handleDeleteRecord('invoices', (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo)); setPreviewInvoice(null); } }} style={{ padding: '6px 14px', background: '#FEE2E2', color: '#EF4444', border: '1px solid #FECACA', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>
+                      <i className="ti ti-trash"></i> Delete
+                    </button>
+                    <button onClick={() => window.print()} style={{ padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>
+                      <i className="ti ti-printer"></i> Print / PDF
+                    </button>
+                    <button onClick={() => setPreviewInvoice(null)} style={{ padding: '6px 14px', background: '#374151', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>✕ Close</button>
                   </div>
                 </div>
-                <div style={{ borderBottom: '2px solid #E8EDF2', paddingBottom: 20, marginBottom: 20 }}>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: 10 }}>Bill To</div>
-                  <div style={{ fontWeight: 800, fontSize: 17, color: '#0f1c2e' }}>{inv.clientName || clientName}</div>
-                  <div style={{ fontSize: 13, color: '#00BCD4', fontWeight: 600, marginTop: 2 }}>{inv.clientName || clientName}</div>
-                </div>
-                <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 20 }}>
-                  <thead>
-                    <tr style={{ background: '#f8fafc' }}>
-                      {['#', 'Description', 'Qty', 'Unit Rate', 'Tax Rate', 'Amount'].map(h => (
-                        <th key={h} style={{ padding: '9px 11px', textAlign: h === 'Amount' || h === 'Unit Rate' || h === 'Qty' || h === 'Tax Rate' ? 'right' : 'left', fontSize: 9, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1.5, borderBottom: '2px solid #E8EDF2' }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr style={{ borderBottom: '1px solid #E8EDF2' }}>
-                      <td style={{ padding: '12px 11px', fontSize: 12, color: '#64748b', fontWeight: 700 }}>01</td>
-                      <td style={{ padding: '12px 11px', fontSize: 13, color: '#0f1c2e', fontWeight: 600 }}>{inv.description || 'Service'}</td>
-                      <td style={{ padding: '12px 11px', fontSize: 13, color: '#374151', textAlign: 'right' }}>1</td>
-                      <td style={{ padding: '12px 11px', fontSize: 13, color: '#374151', textAlign: 'right' }}>{currency}{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                      <td style={{ padding: '12px 11px', fontSize: 13, color: '#6b7280', textAlign: 'right' }}>{inv.taxPercent || 0}%</td>
-                      <td style={{ padding: '12px 11px', fontSize: 14, color: '#0f1c2e', textAlign: 'right', fontWeight: 700 }}>{currency}{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 24 }}>
-                  <div style={{ width: 200 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 10, borderBottom: '1px solid #E8EDF2' }}>
-                      <span style={{ color: '#64748b' }}>Subtotal</span><span style={{ fontWeight: 700 }}>{currency}{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                <div id="invoice-print-area" style={{ padding: '36px 40px', background: '#fff' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
+                    <div>
+                      {user?.logoUrl ? (
+                        <img src={user.logoUrl} alt="Logo" style={{ height: 70, borderRadius: 12, marginBottom: 12, objectFit: 'contain' }} />
+                      ) : (
+                        <div style={{ width: 60, height: 60, borderRadius: 12, background: 'linear-gradient(135deg,#00BCD4,#0097A7)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+                          <span style={{ color: '#fff', fontWeight: 900, fontSize: 24 }}>{(user?.companyName || 'Y')[0].toUpperCase()}</span>
+                        </div>
+                      )}
+                      <div style={{ fontWeight: 900, fontSize: 20, color: '#0f1c2e', letterSpacing: '1px', textTransform: 'uppercase' }}>{user?.companyName || 'YOUR COMPANY'}</div>
+                      <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4, lineHeight: 1.7 }}>
+                        {user?.email}<br />{user?.phone}<br />{user?.address}
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 10, borderBottom: '1px solid #E8EDF2' }}>
-                      <span style={{ color: '#64748b' }}>GST / Tax</span><span style={{ fontWeight: 700 }}>{currency}{taxAmt.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 8px', background: '#0f1c2e', borderRadius: 6, marginTop: 4, color: '#fff' }}>
-                      <span style={{ fontSize: 10, fontWeight: 800 }}>Balance Due</span>
-                      <span style={{ fontSize: 12, fontWeight: 900 }}>{currency}{total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: 32, fontWeight: 900, color: 'rgba(0,188,212,0.1)', letterSpacing: '-1px', marginBottom: 4 }}>INVOICE</div>
+                      <div style={{ fontSize: 16, fontWeight: 800, color: '#00BCD4' }}>{inv.invoiceNo}</div>
+                      <div style={{ display: 'flex', gap: 20, marginTop: 14, justifyContent: 'flex-end' }}>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 3 }}>Date</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: '#0f1c2e' }}>{inv.issueDate ? new Date(inv.issueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 3 }}>Due Date</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: '#ea580c' }}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div>
+                        </div>
+                      </div>
+                      {inv.status && inv.status.toLowerCase() !== 'draft' && (
+                        <div style={{ marginTop: 12, textAlign: 'right' }}>
+                          <span style={{ display: 'inline-block', padding: '4px 14px', borderRadius: 20, background: statusBg, color: statusColor, fontSize: 11, fontWeight: 800, border: `1.5px solid ${statusColor}`, letterSpacing: 1 }}>
+                            {inv.status.charAt(0).toUpperCase() + inv.status.slice(1).toLowerCase()}
+                          </span>
+                        </div>
+                      )}
+                      <div style={{ marginTop: 24 }}>
+                        <div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '2px', textAlign: 'right', marginBottom: 6 }}>Project</div>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: '#0f1c2e', textAlign: 'right' }}>{inv.projectName || currProject.name}</div>
+                      </div>
                     </div>
                   </div>
-                </div>
-                {inv.notes && (
-                  <div style={{ borderTop: '1px solid #E8EDF2', paddingTop: 14 }}>
-                    <div style={{ fontSize: 8, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 2 }}>Notes</div>
-                    <div style={{ fontSize: 8, color: '#64748b', lineHeight: 1.5 }}>{inv.notes}</div>
+                  <div style={{ borderBottom: '2px solid #E8EDF2', paddingBottom: 20, marginBottom: 20 }}>
+                    <div style={{ fontSize: 9, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: 10 }}>Bill To</div>
+                    <div style={{ fontWeight: 800, fontSize: 17, color: '#0f1c2e' }}>{inv.clientName || clientName}</div>
+                    <div style={{ fontSize: 13, color: '#00BCD4', fontWeight: 600, marginTop: 2 }}>{inv.clientName || clientName}</div>
                   </div>
-                )}
-              </div>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 20 }}>
+                    <thead>
+                      <tr style={{ background: '#f8fafc' }}>
+                        {['#', 'Description', 'Qty', 'Unit Rate', 'Tax Rate', 'Amount'].map(h => (
+                          <th key={h} style={{ padding: '9px 11px', textAlign: h === 'Amount' || h === 'Unit Rate' || h === 'Qty' || h === 'Tax Rate' ? 'right' : 'left', fontSize: 9, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1.5, borderBottom: '2px solid #E8EDF2' }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{ borderBottom: '1px solid #E8EDF2' }}>
+                        <td style={{ padding: '12px 11px', fontSize: 12, color: '#64748b', fontWeight: 700 }}>01</td>
+                        <td style={{ padding: '12px 11px', fontSize: 13, color: '#0f1c2e', fontWeight: 600 }}>{inv.description || 'Service'}</td>
+                        <td style={{ padding: '12px 11px', fontSize: 13, color: '#374151', textAlign: 'right' }}>1</td>
+                        <td style={{ padding: '12px 11px', fontSize: 13, color: '#374151', textAlign: 'right' }}>{currency}{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                        <td style={{ padding: '12px 11px', fontSize: 13, color: '#6b7280', textAlign: 'right' }}>{inv.taxPercent || 0}%</td>
+                        <td style={{ padding: '12px 11px', fontSize: 14, color: '#0f1c2e', textAlign: 'right', fontWeight: 700 }}>{currency}{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 24 }}>
+                    <div style={{ width: 200 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 10, borderBottom: '1px solid #E8EDF2' }}>
+                        <span style={{ color: '#64748b' }}>Subtotal</span><span style={{ fontWeight: 700 }}>{currency}{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 10, borderBottom: '1px solid #E8EDF2' }}>
+                        <span style={{ color: '#64748b' }}>GST / Tax</span><span style={{ fontWeight: 700 }}>{currency}{taxAmt.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 8px', background: '#0f1c2e', borderRadius: 6, marginTop: 4, color: '#fff' }}>
+                        <span style={{ fontSize: 10, fontWeight: 800 }}>Balance Due</span>
+                        <span style={{ fontSize: 12, fontWeight: 900 }}>{currency}{total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                      </div>
+                    </div>
+                  </div>
+                  {inv.notes && (
+                    <div style={{ borderTop: '1px solid #E8EDF2', paddingTop: 14 }}>
+                      <div style={{ fontSize: 8, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 2 }}>Notes</div>
+                      <div style={{ fontSize: 8, color: '#64748b', lineHeight: 1.5 }}>{inv.notes}</div>
+                    </div>
+                  )}
+                </div>
 
-              {/* ── Footer Status Bar ── */}
-              {/* ── Footer Status Bar ── */}
-              <div style={{ borderTop: '1px solid #E8EDF2', padding: '10px 40px', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{inv.invoiceNo}</div>
-                <div style={{ position: 'relative' }}>
-                  {(() => {
-                    const st = (inv.status || '').toLowerCase();
-                    const cfg = st === 'paid'
-                      ? { label: 'Paid', bg: '#DCFCE7', color: '#15803D', icon: '✓' }
-                      : st === 'overdue'
-                        ? { label: 'Overdue', bg: '#FEE2E2', color: '#DC2626', icon: '⚠' }
-                        : st === 'sent'
-                          ? { label: 'Sent', bg: '#DBEAFE', color: '#1D4ED8', icon: '📨' }
-                          : { label: 'Pending', bg: '#FEF3C7', color: '#B45309', icon: '⏳' };
-                    return (
-                      <>
-                        <span
-                          onClick={() => setShowStatusDropdown(prev => !prev)}
-                          style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 14px', borderRadius: 20, background: cfg.bg, color: cfg.color, fontSize: 12, fontWeight: 800, border: `1.5px solid ${cfg.color}`, cursor: 'pointer', userSelect: 'none' }}
-                        >
-                          {cfg.icon} {cfg.label} <span style={{ fontSize: 10 }}>▼</span>
-                        </span>
-                        {showStatusDropdown && (
-                          <div style={{ position: 'absolute', bottom: 36, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: '#fff', border: '1px solid #E8EDF2', borderRadius: 10, boxShadow: '0 4px 20px rgba(0,0,0,0.15)', minWidth: 150, overflow: 'hidden' }}>
-                            {[
-                              { label: 'Pending', color: '#B45309', bg: '#FEF3C7', icon: '⏳' },
-                              { label: 'Paid', color: '#15803D', bg: '#DCFCE7', icon: '✓' },
-                              { label: 'Overdue', color: '#DC2626', bg: '#FEE2E2', icon: '⚠' },
-                              { label: 'Sent', color: '#1D4ED8', bg: '#DBEAFE', icon: '📨' },
-                            ].map(opt => (
-                              <div key={opt.label}
-                                onClick={async () => {
-                                  const updatedInvoices = (currProject.invoices || []).map(x =>
-                                    x.invoiceNo === inv.invoiceNo ? { ...x, status: opt.label } : x
-                                  );
-                                  await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { invoices: updatedInvoices });
-                                  setShowStatusDropdown(false);
-                                  setPreviewInvoice(prev => ({ ...prev, status: opt.label }));
-                                  loadLatest();
-                                }}
-                                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', cursor: 'pointer', background: st === opt.label.toLowerCase() ? opt.bg : '#fff', borderBottom: '1px solid #F3F4F6' }}
-                                onMouseEnter={e => e.currentTarget.style.background = opt.bg}
-                                onMouseLeave={e => e.currentTarget.style.background = st === opt.label.toLowerCase() ? opt.bg : '#fff'}
-                              >
-                                <span>{opt.icon}</span>
-                                <span style={{ fontSize: 13, fontWeight: 700, color: opt.color }}>{opt.label}</span>
-                                {st === opt.label.toLowerCase() && <span style={{ marginLeft: 'auto', fontSize: 11 }}>✓</span>}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </>
-                    );
-                  })()}
+                {/* ── Footer Status Bar ── */}
+                {/* ── Footer Status Bar ── */}
+                <div style={{ borderTop: '1px solid #E8EDF2', padding: '10px 40px', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{inv.invoiceNo}</div>
+                  <div style={{ position: 'relative' }}>
+                    {(() => {
+                      const st = (inv.status || '').toLowerCase();
+                      const cfg = st === 'paid'
+                        ? { label: 'Paid', bg: '#DCFCE7', color: '#15803D', icon: '✓' }
+                        : st === 'overdue'
+                          ? { label: 'Overdue', bg: '#FEE2E2', color: '#DC2626', icon: '⚠' }
+                          : st === 'sent'
+                            ? { label: 'Sent', bg: '#DBEAFE', color: '#1D4ED8', icon: '📨' }
+                            : { label: 'Pending', bg: '#FEF3C7', color: '#B45309', icon: '⏳' };
+                      return (
+                        <>
+                          <span
+                            onClick={() => setShowStatusDropdown(prev => !prev)}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 14px', borderRadius: 20, background: cfg.bg, color: cfg.color, fontSize: 12, fontWeight: 800, border: `1.5px solid ${cfg.color}`, cursor: 'pointer', userSelect: 'none' }}
+                          >
+                            {cfg.icon} {cfg.label} <span style={{ fontSize: 10 }}>▼</span>
+                          </span>
+                          {showStatusDropdown && (
+                            <div style={{ position: 'absolute', bottom: 36, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: '#fff', border: '1px solid #E8EDF2', borderRadius: 10, boxShadow: '0 4px 20px rgba(0,0,0,0.15)', minWidth: 150, overflow: 'hidden' }}>
+                              {[
+                                { label: 'Pending', color: '#B45309', bg: '#FEF3C7', icon: '⏳' },
+                                { label: 'Paid', color: '#15803D', bg: '#DCFCE7', icon: '✓' },
+                                { label: 'Overdue', color: '#DC2626', bg: '#FEE2E2', icon: '⚠' },
+                                { label: 'Sent', color: '#1D4ED8', bg: '#DBEAFE', icon: '📨' },
+                              ].map(opt => (
+                                <div key={opt.label}
+                                  onClick={async () => {
+                                    const updatedInvoices = (currProject.invoices || []).map(x =>
+                                      x.invoiceNo === inv.invoiceNo ? { ...x, status: opt.label } : x
+                                    );
+                                    await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { invoices: updatedInvoices });
+                                    setShowStatusDropdown(false);
+                                    setPreviewInvoice(prev => ({ ...prev, status: opt.label }));
+                                    loadLatest();
+                                  }}
+                                  style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', cursor: 'pointer', background: st === opt.label.toLowerCase() ? opt.bg : '#fff', borderBottom: '1px solid #F3F4F6' }}
+                                  onMouseEnter={e => e.currentTarget.style.background = opt.bg}
+                                  onMouseLeave={e => e.currentTarget.style.background = st === opt.label.toLowerCase() ? opt.bg : '#fff'}
+                                >
+                                  <span>{opt.icon}</span>
+                                  <span style={{ fontSize: 13, fontWeight: 700, color: opt.color }}>{opt.label}</span>
+                                  {st === opt.label.toLowerCase() && <span style={{ marginLeft: 'auto', fontSize: 11 }}>✓</span>}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>Urban Cafe Billing Software</div>
                 </div>
-                <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>Urban Cafe Billing Software</div>
-              </div>
 
+              </div>
             </div>
-          </div>
-        );
-      })()}
+          );
+        })()
+      }
 
 
       {/* Upload File Modal */}
-      {showUploadModal && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 99998, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-          <div style={{ background: '#fff', borderRadius: P.radius, width: '100%', maxWidth: 480, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', overflow: 'hidden' }}>
-            {/* Header */}
-            <div style={{ background: `linear-gradient(135deg,${P.primary},${P.primaryDark})`, padding: '16px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <i className="ti ti-upload" style={{ color: '#fff', fontSize: 18 }}></i>
-                <span style={{ color: '#fff', fontWeight: 800, fontSize: 15 }}>Upload File</span>
-              </div>
-              <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>✕</button>
-            </div>
-
-            {/* Body */}
-            <div style={{ padding: '22px 24px', maxHeight: '80vh', overflowY: 'auto' }}>
-
-              {/* Drop Zone */}
-              <div onClick={() => document.getElementById('modal-file-input').click()}
-                style={{ border: `2px dashed ${uploadFileObj ? P.primary : P.border}`, borderRadius: 10, padding: '22px 16px', textAlign: 'center', cursor: 'pointer', marginBottom: 16, background: uploadFileObj ? P.primaryLight : P.bg, transition: 'all .2s' }}>
-                <i className={`ti ${uploadFileObj ? 'ti-file-check' : 'ti-cloud-upload'}`} style={{ fontSize: 28, color: uploadFileObj ? P.green : P.textLight, display: 'block', marginBottom: 6 }}></i>
-                {uploadFileObj ? (
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>{uploadFileObj.name}</div>
-                    <div style={{ fontSize: 11, color: P.textLight, marginTop: 3 }}>{(uploadFileObj.size / 1024).toFixed(1)} KB · Click to change</div>
-                  </div>
-                ) : (
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Click to browse or drag & drop</div>
-                    <div style={{ fontSize: 11, color: P.textLight, marginTop: 3 }}>Images, PDFs, Docs supported</div>
-                  </div>
-                )}
-              </div>
-              <input id="modal-file-input" type="file" onChange={handleModalFileSelect} style={{ display: 'none' }} />
-
-              {/* Heading */}
-              <div style={{ marginBottom: 12 }}>
-                <label style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', display: 'block', marginBottom: 5 }}>File Heading</label>
-                <input type="text" value={uploadHeading} onChange={e => setUploadHeading(e.target.value)} placeholder="e.g. Design Mockup v2"
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', boxSizing: 'border-box' }} />
-              </div>
-
-              {/* Description */}
-              <div style={{ marginBottom: 16 }}>
-                <label style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', display: 'block', marginBottom: 5 }}>Description</label>
-                <textarea value={uploadDescription} onChange={e => setUploadDescription(e.target.value)} placeholder="Brief description of this file..." rows={2}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }} />
-              </div>
-
-              {/* Share With label */}
-              <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 10 }}>Share With</div>
-
-              {/* Client Portal Toggle */}
-              <div style={{ border: `1.5px solid ${uploadSendToClient ? P.primary : P.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 10, background: uploadSendToClient ? P.primaryLight : '#fff', transition: 'all .15s' }}>
-                <div onClick={() => { const newVal = !uploadSendToClient; setUploadSendToClient(newVal); setUploadClientName(newVal ? (currProject.client || clientName || '') : ''); }} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-                  <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${uploadSendToClient ? P.primary : P.border}`, background: uploadSendToClient ? P.primary : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    {uploadSendToClient && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>✓</span>}
-                  </div>
-                  <i className="ti ti-building" style={{ color: P.primary, fontSize: 16 }}></i>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Client Portal</span>
+      {
+        showUploadModal && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99998, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+            <div style={{ background: '#fff', borderRadius: P.radius, width: '100%', maxWidth: 480, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', overflow: 'hidden' }}>
+              {/* Header */}
+              <div style={{ background: `linear-gradient(135deg,${P.primary},${P.primaryDark})`, padding: '16px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <i className="ti ti-upload" style={{ color: '#fff', fontSize: 18 }}></i>
+                  <span style={{ color: '#fff', fontWeight: 800, fontSize: 15 }}>Upload File</span>
                 </div>
-                {uploadSendToClient && (
-                  <select value={uploadClientName} onChange={e => setUploadClientName(e.target.value)}
-                    style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.primary}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', background: '#fff', color: P.textDark, marginTop: 10 }}>
-                    <option value="">-- Select Client --</option>
-                    {currProject.client && <option value={currProject.client}>{currProject.client}</option>}
-                    {(clients || []).filter(c => (c.clientName || c.name) !== currProject.client).map(c => (
-                      <option key={c._id || c.clientName} value={c.clientName || c.name}>{c.clientName || c.name}</option>
-                    ))}
-                  </select>
-                )}
+                <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>✕</button>
               </div>
 
-              {/* Employee Portal Toggle */}
-              <div style={{ border: `1.5px solid ${uploadSendToEmployee ? P.purple : P.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 20, background: uploadSendToEmployee ? P.purpleLight : '#fff', transition: 'all .15s' }}>
-                <div onClick={() => { setUploadSendToEmployee(!uploadSendToEmployee); setUploadEmployeeName(''); }} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-                  <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${uploadSendToEmployee ? P.purple : P.border}`, background: uploadSendToEmployee ? P.purple : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    {uploadSendToEmployee && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>✓</span>}
-                  </div>
-                  <i className="ti ti-users" style={{ color: P.purple, fontSize: 16 }}></i>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Employee Portal</span>
+              {/* Body */}
+              <div style={{ padding: '22px 24px', maxHeight: '80vh', overflowY: 'auto' }}>
+
+                {/* Drop Zone */}
+                <div onClick={() => document.getElementById('modal-file-input').click()}
+                  style={{ border: `2px dashed ${uploadFileObj ? P.primary : P.border}`, borderRadius: 10, padding: '22px 16px', textAlign: 'center', cursor: 'pointer', marginBottom: 16, background: uploadFileObj ? P.primaryLight : P.bg, transition: 'all .2s' }}>
+                  <i className={`ti ${uploadFileObj ? 'ti-file-check' : 'ti-cloud-upload'}`} style={{ fontSize: 28, color: uploadFileObj ? P.green : P.textLight, display: 'block', marginBottom: 6 }}></i>
+                  {uploadFileObj ? (
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>{uploadFileObj.name}</div>
+                      <div style={{ fontSize: 11, color: P.textLight, marginTop: 3 }}>{(uploadFileObj.size / 1024).toFixed(1)} KB · Click to change</div>
+                    </div>
+                  ) : (
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Click to browse or drag & drop</div>
+                      <div style={{ fontSize: 11, color: P.textLight, marginTop: 3 }}>Images, PDFs, Docs supported</div>
+                    </div>
+                  )}
                 </div>
-                {uploadSendToEmployee && (
-                  <select value={uploadEmployeeName} onChange={e => setUploadEmployeeName(e.target.value)}
-                    style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.purple}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', background: '#fff', color: P.textDark, marginTop: 10 }}>
-                    <option value="">-- Select Employee --</option>
-                    {(employees || []).map(emp => (
-                      <option key={emp._id} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName}{emp.role ? ` (${emp.role})` : ''}</option>
-                    ))}
-                  </select>
-                )}
-              </div>
+                <input id="modal-file-input" type="file" onChange={handleModalFileSelect} style={{ display: 'none' }} />
 
-              {/* Buttons */}
-              <div style={{ display: 'flex', gap: 10 }}>
-                <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }}
-                  style={{ flex: 1, padding: '10px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-                  Cancel
-                </button>
-                <button onClick={handleModalUpload} disabled={!uploadFileObj || uploadingModal}
-                  style={{ flex: 2, padding: '10px', borderRadius: 10, border: 'none', background: (!uploadFileObj || uploadingModal) ? P.border : P.primary, color: (!uploadFileObj || uploadingModal) ? P.textLight : '#fff', fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 800, cursor: (!uploadFileObj || uploadingModal) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all .15s' }}>
-                  <i className="ti ti-upload" style={{ fontSize: 15 }}></i>
-                  {uploadingModal ? 'Uploading...' : 'Upload & Share'}
-                </button>
-              </div>
+                {/* Heading */}
+                <div style={{ marginBottom: 12 }}>
+                  <label style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', display: 'block', marginBottom: 5 }}>File Heading</label>
+                  <input type="text" value={uploadHeading} onChange={e => setUploadHeading(e.target.value)} placeholder="e.g. Design Mockup v2"
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', boxSizing: 'border-box' }} />
+                </div>
 
+                {/* Description */}
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', display: 'block', marginBottom: 5 }}>Description</label>
+                  <textarea value={uploadDescription} onChange={e => setUploadDescription(e.target.value)} placeholder="Brief description of this file..." rows={2}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }} />
+                </div>
+
+                {/* Share With label */}
+                <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 10 }}>Share With</div>
+
+                {/* Client Portal Toggle */}
+                <div style={{ border: `1.5px solid ${uploadSendToClient ? P.primary : P.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 10, background: uploadSendToClient ? P.primaryLight : '#fff', transition: 'all .15s' }}>
+                  <div onClick={() => { const newVal = !uploadSendToClient; setUploadSendToClient(newVal); setUploadClientName(newVal ? (currProject.client || clientName || '') : ''); }} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                    <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${uploadSendToClient ? P.primary : P.border}`, background: uploadSendToClient ? P.primary : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      {uploadSendToClient && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>✓</span>}
+                    </div>
+                    <i className="ti ti-building" style={{ color: P.primary, fontSize: 16 }}></i>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Client Portal</span>
+                  </div>
+                  {uploadSendToClient && (
+                    <select value={uploadClientName} onChange={e => setUploadClientName(e.target.value)}
+                      style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.primary}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', background: '#fff', color: P.textDark, marginTop: 10 }}>
+                      <option value="">-- Select Client --</option>
+                      {currProject.client && <option value={currProject.client}>{currProject.client}</option>}
+                      {(clients || []).filter(c => (c.clientName || c.name) !== currProject.client).map(c => (
+                        <option key={c._id || c.clientName} value={c.clientName || c.name}>{c.clientName || c.name}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+
+                {/* Employee Portal Toggle */}
+                <div style={{ border: `1.5px solid ${uploadSendToEmployee ? P.purple : P.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 20, background: uploadSendToEmployee ? P.purpleLight : '#fff', transition: 'all .15s' }}>
+                  <div onClick={() => { setUploadSendToEmployee(!uploadSendToEmployee); setUploadEmployeeName(''); }} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                    <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${uploadSendToEmployee ? P.purple : P.border}`, background: uploadSendToEmployee ? P.purple : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      {uploadSendToEmployee && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>✓</span>}
+                    </div>
+                    <i className="ti ti-users" style={{ color: P.purple, fontSize: 16 }}></i>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Employee Portal</span>
+                  </div>
+                  {uploadSendToEmployee && (
+                    <select value={uploadEmployeeName} onChange={e => setUploadEmployeeName(e.target.value)}
+                      style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.purple}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', background: '#fff', color: P.textDark, marginTop: 10 }}>
+                      <option value="">-- Select Employee --</option>
+                      {(employees || []).map(emp => (
+                        <option key={emp._id} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName}{emp.role ? ` (${emp.role})` : ''}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+
+                {/* Buttons */}
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }}
+                    style={{ flex: 1, padding: '10px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                    Cancel
+                  </button>
+                  <button onClick={handleModalUpload} disabled={!uploadFileObj || uploadingModal}
+                    style={{ flex: 2, padding: '10px', borderRadius: 10, border: 'none', background: (!uploadFileObj || uploadingModal) ? P.border : P.primary, color: (!uploadFileObj || uploadingModal) ? P.textLight : '#fff', fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 800, cursor: (!uploadFileObj || uploadingModal) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all .15s' }}>
+                    <i className="ti ti-upload" style={{ fontSize: 15 }}></i>
+                    {uploadingModal ? 'Uploading...' : 'Upload & Share'}
+                  </button>
+                </div>
+
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 }

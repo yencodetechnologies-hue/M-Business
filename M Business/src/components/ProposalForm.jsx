@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as logic from './ProposalFormLogic';
 
-export default function ProposalForm({ onBack, onSave, initialData }) {
+export default function ProposalForm({ onBack, onSave, initialData, clients }) {
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -66,21 +66,20 @@ export default function ProposalForm({ onBack, onSave, initialData }) {
       }, 50);
     };
     window._onSaveProposal = onSave;
-    window._clientsData = window._clientsData || [];
-    fetch('/api/clients').then(r => r.json()).then(d => { 
-      window._clientsData = d; 
-      const sel = document.getElementById('toComp');
-      if (sel && sel.tagName === 'SELECT') {
-        sel.innerHTML = '<option value="">-- Select Client --</option>' + d.map(c => {
-          const name = c.clientName || c.name || '';
-          return `<option value="${name}">${name}</option>`;
-        }).join('');
-        // if there's initial data, select it
-        if (initialData && initialData.client) {
-          sel.value = initialData.client;
-        }
+    
+    const clientsList = clients || window._clientsData || [];
+    window._clientsData = clientsList;
+    const sel = document.getElementById('toComp');
+    if (sel && sel.tagName === 'SELECT') {
+      sel.innerHTML = '<option value="">-- Select Client --</option>' + clientsList.map(c => {
+        const name = c.clientName || c.name || '';
+        return `<option value="${name}">${name}</option>`;
+      }).join('');
+      // if there's initial data, select it
+      if (initialData && initialData.client) {
+        sel.value = initialData.client;
       }
-    }).catch(() => { });
+    }
     // Hook up back button
     // Hook up back button + all topbar buttons
     const hookUp = () => {

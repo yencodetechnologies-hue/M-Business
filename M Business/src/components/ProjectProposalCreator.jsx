@@ -1361,6 +1361,7 @@ if (view === "form") {
   return <ProposalForm 
     onBack={() => setView("list")} 
     initialData={doc}
+    clients={clients}
     onSave={(data) => {
       createNew(data);
     }} 

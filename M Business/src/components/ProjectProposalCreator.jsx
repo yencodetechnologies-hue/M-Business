@@ -1328,13 +1328,8 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   // ← empty deps — uses functional setters, no stale closure
 
   const openDoc = (d) => {
-    if (d.slides && d.slides.length > 0) {
-      // Canvas proposal — editor-ல் திற
-      setDoc({ ...d }); setPage(0); setView("editor");
-    } else {
-      // ProposalForm data — form-ல் திற
-      setDoc({ ...d }); setView("form");
-    }
+    // Always open the viewer when clicking a proposal card
+    setViewingProposal(d);
   };
   const createNew = async (initialData = {}) => {
     const nd = {

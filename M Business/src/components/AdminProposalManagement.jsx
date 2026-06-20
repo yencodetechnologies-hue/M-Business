@@ -1148,70 +1148,144 @@ export default function AdminProposalManagement() {
         <Mdl
           title="Proposal Details"
           onClose={() => setSelectedProposal(null)}
-          maxWidth={600}
+          maxWidth={860}
         >
-          <div style={{ marginBottom: 16 }}>
-            <div style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              marginBottom: 12
-            }}>
-              <div>
-                <h4 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: 700, color: T.text }}>
-                  {selectedProposal.title || "Untitled Proposal"}
-                </h4>
-                <p style={{ margin: 0, fontSize: 13, color: "var(--app-accent)" }}>
-                  Company Name: {selectedProposal.client || "No company name"}
-                </p>
-                <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: "#6b7280" }}>Assigned To:</span>
-                  <div style={{ flex: 1, maxWidth: 200 }}>
-                    <EmployeeDropdown
-                      employees={employees}
-                      value={selectedProposal.assignedEmployee || ""}
-                      onChange={(val) => handleUpdateEmployee(selectedProposal._id, val)}
-                    />
-                  </div>
+          {/* Header info row */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
+            <div>
+              <h4 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: 700, color: T.text }}>
+                {selectedProposal.title || "Untitled Proposal"}
+              </h4>
+              <p style={{ margin: 0, fontSize: 13, color: "var(--app-accent)" }}>
+                Company: {selectedProposal.client || "No company name"}
+              </p>
+              <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#6b7280" }}>Assigned To:</span>
+                <div style={{ flex: 1, maxWidth: 200 }}>
+                  <EmployeeDropdown
+                    employees={employees}
+                    value={selectedProposal.assignedEmployee || ""}
+                    onChange={(val) => handleUpdateEmployee(selectedProposal._id, val)}
+                  />
                 </div>
               </div>
-              <Badge status={selectedProposal.status || "draft"} />
             </div>
-
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: 12,
-              fontSize: 12,
-              color: "#6b7280"
-            }}>
-              <div>
-                <strong>Slides:</strong> {selectedProposal.slides?.length || 0}
-              </div>
-              <div>
-                <strong>Created:</strong> {new Date(selectedProposal.created).toLocaleDateString()}
-              </div>
-              <div>
-                <strong>Updated:</strong> {new Date(selectedProposal.updated).toLocaleDateString()}
-              </div>
-              <div>
-                <strong>Theme:</strong> {selectedProposal.theme || "Violet"}
-              </div>
-            </div>
+            <Badge status={selectedProposal.status || "draft"} />
           </div>
 
+          {/* Rejection reason */}
           {selectedProposal.status === "rejected" && selectedProposal.rejectNote && (
-            <div style={{
-              padding: "12px",
-              background: "#fff1f2",
-              border: "1px solid #fecdd3",
-              borderRadius: 8,
-              marginBottom: 16
-            }}>
+            <div style={{ padding: "10px 14px", background: "#fff1f2", border: "1px solid #fecdd3", borderRadius: 8, marginBottom: 14 }}>
               <strong style={{ color: "#9f1239" }}>Rejection Reason:</strong>
-              <p style={{ margin: "4px 0 0", fontSize: 13, color: "#9f1239" }}>
-                {selectedProposal.rejectNote}
+              <p style={{ margin: "4px 0 0", fontSize: 13, color: "#9f1239" }}>{selectedProposal.rejectNote}</p>
+            </div>
+          )}
+
+          {/* ── Slides Preview ── */}
+          {selectedProposal.slides && selectedProposal.slides.length > 0 ? (
+            <div style={{ marginBottom: 16 }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: "#6b7280", marginBottom: 10 }}>
+                SLIDES PREVIEW ({selectedProposal.slides.length} slides)
               </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12, maxHeight: 480, overflowY: "auto", paddingRight: 4 }}>
+                {selectedProposal.slides.map((slide, idx) => {
+                  const t = THEMES.find(x => x.name === selectedProposal.theme) || THEMES[0];
+                  return (
+                    <div key={idx} style={{
+                      border: "1.5px solid var(--app-border)",
+                      borderRadius: 12,
+                      overflow: "hidden",
+                      background: "#fff"
+                    }}>
+                      {/* Slide header bar */}
+                      <div style={{
+                        background: t.g,
+                        padding: "8px 14px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8
+                      }}>
+                        <span style={{
+                          background: "rgba(255,255,255,0.25)",
+                          color: "#fff",
+                          borderRadius: "50%",
+                          width: 22,
+                          height: 22,
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: 11,
+                          fontWeight: 800
+                        }}>{idx + 1}</span>
+                        <span style={{ color: "#fff", fontSize: 12, fontWeight: 700, textTransform: "capitalize" }}>
+                          {slide.type || "slide"}
+                        </span>
+                      </div>
+
+                      {/* Slide body */}
+                      <div style={{ padding: "14px 18px" }}>
+                        {slide.type === "cover" && (
+                          <>
+                            <p style={{ margin: "0 0 4px", fontWeight: 800, fontSize: 15, color: "#0f172a" }}>{slide.title}</p>
+                            <p style={{ margin: 0, fontSize: 12, color: "#64748b" }}>{slide.subtitle}</p>
+                          </>
+                        )}
+                        {(slide.type === "overview" || slide.type === "closing" || slide.type === "content") && (
+                          <>
+                            {slide.heading && <p style={{ margin: "0 0 6px", fontWeight: 700, fontSize: 14, color: "#0f172a" }}>{slide.heading}</p>}
+                            {slide.body && <p style={{ margin: 0, fontSize: 12, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{slide.body}</p>}
+                          </>
+                        )}
+                        {slide.type === "objectives" && (
+                          <>
+                            {slide.heading && <p style={{ margin: "0 0 8px", fontWeight: 700, fontSize: 14, color: "#0f172a" }}>{slide.heading}</p>}
+                            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                              {(slide.items || []).map((item, i) => (
+                                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                                  <span style={{
+                                    background: t.g,
+                                    color: "#fff",
+                                    borderRadius: "50%",
+                                    width: 20,
+                                    height: 20,
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    fontSize: 10,
+                                    fontWeight: 800,
+                                    flexShrink: 0
+                                  }}>{i + 1}</span>
+                                  <span style={{ fontSize: 12, color: "#1e293b", paddingTop: 2 }}>{item}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                        {/* Fallback for any other slide type */}
+                        {!["cover", "overview", "closing", "content", "objectives"].includes(slide.type) && (
+                          <>
+                            {slide.heading && <p style={{ margin: "0 0 6px", fontWeight: 700, fontSize: 14, color: "#0f172a" }}>{slide.heading}</p>}
+                            {slide.body && <p style={{ margin: 0, fontSize: 12, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{slide.body}</p>}
+                            {slide.title && <p style={{ margin: "0 0 4px", fontWeight: 800, fontSize: 14, color: "#0f172a" }}>{slide.title}</p>}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <div style={{
+              padding: "24px",
+              textAlign: "center",
+              color: "#94a3b8",
+              background: "var(--app-bg)",
+              borderRadius: 10,
+              marginBottom: 16,
+              fontSize: 13
+            }}>
+              No slides content to preview.
             </div>
           )}
 

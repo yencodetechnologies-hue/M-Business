@@ -16,26 +16,37 @@ router.get("/", async (req, res) => {
 });
 
 // GET proposals for a specific client
+// GET proposals for a specific client
 router.get("/client/:name", async (req, res) => {
   try {
     const companyId = req.headers['x-company-id'] || req.companyId || "";
     const name = decodeURIComponent(req.params.name).trim();
     const companyName = req.query.company ? decodeURIComponent(req.query.company).trim() : "";
+    const clientId = req.query.clientId ? String(req.query.clientId).trim() : "";
 
-    const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const safeName = escapeRegExp(name);
-    const safeCompany = escapeRegExp(companyName);
+    let filter;
 
-    const conditions = [];
-    if (safeName) {
-      conditions.push({ client: { $regex: new RegExp(safeName, "i") } });
-      conditions.push({ clientName: { $regex: new RegExp(safeName, "i") } });
+    if (clientId) {
+      // Strict, unambiguous match — only proposals explicitly sent to THIS client account.
+      filter = { clientId };
+    } else {
+      // Legacy fallback (older proposals saved before clientId existed) — exact name match only,
+      // no partial/substring matching, so similarly-named clients can't see each other's proposals.
+      const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const safeName = escapeRegExp(name);
+      const safeCompany = escapeRegExp(companyName);
+
+      const conditions = [];
+      if (safeName) {
+        conditions.push({ client: { $regex: new RegExp(`^${safeName}$`, "i") } });
+        conditions.push({ clientName: { $regex: new RegExp(`^${safeName}$`, "i") } });
+      }
+      if (safeCompany) {
+        conditions.push({ client: { $regex: new RegExp(`^${safeCompany}$`, "i") } });
+        conditions.push({ clientName: { $regex: new RegExp(`^${safeCompany}$`, "i") } });
+      }
+      filter = conditions.length > 0 ? { $or: conditions } : { _id: null };
     }
-    if (safeCompany) {
-      conditions.push({ client: { $regex: new RegExp(safeCompany, "i") } });
-      conditions.push({ clientName: { $regex: new RegExp(safeCompany, "i") } });
-    }
-    let filter = conditions.length > 0 ? { $or: conditions } : {};
 
     // Only return proposals that are visible to the client
     filter = {
@@ -221,12 +232,19 @@ router.delete("/:dbId", async (req, res) => {
 // CORRECT
 router.put('/:id/client-sign', async (req, res) => {
   try {
-    const { clientSignature, clientName } = req.body;
+    const { clientSignature, clientName, sigMode } = req.body;
     const proposal = await Proposal.findByIdAndUpdate(
       req.params.id,
-      { clientSignature, clientName, clientSignedAt: new Date() },
+      {
+        clientSignature,
+        clientName,
+        clientSignedAt: new Date(),
+        sigMode: sigMode || "draw",
+        status: "approved",
+      },
       { new: true }
     );
+    if (!proposal) return res.status(404).json({ error: "Proposal not found" });
     res.json(proposal);
   } catch (err) {
     res.status(500).json({ error: err.message });

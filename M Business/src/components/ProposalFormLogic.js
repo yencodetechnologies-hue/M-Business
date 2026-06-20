@@ -344,9 +344,12 @@ export function addTeamMember() {
 export function clientSelected(el) {
   const clients = window._clientsData || [];
   const val = el.value;
-  if (!val) return;
+  if (!val) { window._selectedClientId = ''; return; }
   const client = clients.find(c => (c.clientName || c.name) === val);
-  if (!client) return;
+  if (!client) { window._selectedClientId = ''; return; }
+  // Remember exactly which client account this proposal is for, so it can
+  // only ever show up on that one client's dashboard.
+  window._selectedClientId = client._id || client.id || '';
   getEl('toPerson').value = client.contactPerson || '';
   getEl('toEmail').value = client.email || '';
   getEl('toPhone').value = client.phone || '';
@@ -387,6 +390,7 @@ export function extractProposalData() {
     title: document.getElementById('propTitle')?.value || 'New Proposal',
     client: clientName,
     clientName: clientName,
+    clientId: window._selectedClientId || '',
     format: 'a4-proposal',
     value: val,
     html: document.getElementById('propDoc')?.outerHTML || ''

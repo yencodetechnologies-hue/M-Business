@@ -4,14 +4,14 @@ import { BASE_URL } from "../config";
 
 // ─── THEMES ───────────────────────────────────────────────────────────────────
 const THEMES = [
-  { name:"Violet",  p:"var(--app-accent)", g:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", l:"var(--app-border)", t:"var(--app-accent)" },
-  { name:"Cobalt",  p:"#1d4ed8", g:"linear-gradient(135deg,#1e40af,#3b82f6)", l:"#dbeafe", t:"#1e3a8a" },
-  { name:"Emerald", p:"#059669", g:"linear-gradient(135deg,#065f46,#10b981)", l:"#d1fae5", t:"#064e3b" },
-  { name:"Rose",    p:"#e11d48", g:"linear-gradient(135deg,#9f1239,#f43f5e)", l:"#ffe4e6", t:"#881337" },
-  { name:"Amber",   p:"#d97706", g:"linear-gradient(135deg,#92400e,#fbbf24)", l:"#fef3c7", t:"#78350f" },
-  { name:"Slate",   p:"#334155", g:"linear-gradient(135deg,#0f172a,#475569)", l:"#f1f5f9", t:"#0f172a" },
-  { name:"Teal",    p:"#0d9488", g:"linear-gradient(135deg,#134e4a,#2dd4bf)", l:"#ccfbf1", t:"#134e4a" },
-  { name:"Fuchsia", p:"var(--app-accent)", g:"linear-gradient(135deg,#701a75,#e879f9)", l:"var(--app-border)", t:"#4a044e" },
+  { name: "Violet", p: "var(--app-accent)", g: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", l: "var(--app-border)", t: "var(--app-accent)" },
+  { name: "Cobalt", p: "#1d4ed8", g: "linear-gradient(135deg,#1e40af,#3b82f6)", l: "#dbeafe", t: "#1e3a8a" },
+  { name: "Emerald", p: "#059669", g: "linear-gradient(135deg,#065f46,#10b981)", l: "#d1fae5", t: "#064e3b" },
+  { name: "Rose", p: "#e11d48", g: "linear-gradient(135deg,#9f1239,#f43f5e)", l: "#ffe4e6", t: "#881337" },
+  { name: "Amber", p: "#d97706", g: "linear-gradient(135deg,#92400e,#fbbf24)", l: "#fef3c7", t: "#78350f" },
+  { name: "Slate", p: "#334155", g: "linear-gradient(135deg,#0f172a,#475569)", l: "#f1f5f9", t: "#0f172a" },
+  { name: "Teal", p: "#0d9488", g: "linear-gradient(135deg,#134e4a,#2dd4bf)", l: "#ccfbf1", t: "#134e4a" },
+  { name: "Fuchsia", p: "var(--app-accent)", g: "linear-gradient(135deg,#701a75,#e879f9)", l: "var(--app-border)", t: "#4a044e" },
 ];
 
 const P = {
@@ -73,7 +73,7 @@ function CanvasElement({ element, isSelected, onSelect, onUpdate, onDelete, canv
       const scale = 900 / rect.width;
       let nx = (e.clientX - rect.left) * scale - dragStart.x;
       let ny = (e.clientY - rect.top) * scale - dragStart.y;
-      
+
       // Canvas boundary clamp
       nx = Math.max(0, Math.min(900 - (element.width || 100), nx));
       ny = Math.max(0, Math.min(506 - (element.height || 40), ny));
@@ -356,10 +356,11 @@ function CanvasSizeControls({ currentSize, onSizeChange }) {
 }
 
 // ─── MAIN COMPONENT ──────────────────────────────────────────────────────────────
-export default function CanvasProposalEditor({ proposalId, onSave, onClose }) {
+export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPreviewMode = false, proposalData: propDataProp = null }) {
   const [canvasSize, setCanvasSize] = useState({ width: A4_WIDTH, height: A4_HEIGHT });
   const [elements, setElements] = useState([]);
   const [selectedElement, setSelectedElement] = useState(null);
+  const [isPreview, setIsPreview] = useState(isPreviewMode);
   const [isAddingText, setIsAddingText] = useState(false);
   const [isAddingShape, setIsAddingShape] = useState(false);
   const [isAddingHeading, setIsAddingHeading] = useState(false);
@@ -377,15 +378,20 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose }) {
   const [selectedClient, setSelectedClient] = useState("");
   const [proposalTitle, setProposalTitle] = useState("");
   const canvasRef = useRef();
-
   useEffect(() => {
     fetchClients();
-    if (proposalId) {
+    if (propDataProp) {
+      // Data passed directly (view mode from dashboard)
+      setProposalData(propDataProp);
+      if (propDataProp.canvasElements) setElements(propDataProp.canvasElements);
+      if (propDataProp.canvasSize) setCanvasSize(propDataProp.canvasSize);
+      setLoading(false);
+    } else if (proposalId) {
       loadProposal();
     } else {
       setLoading(false);
     }
-  }, [proposalId]);
+  }, [proposalId, propDataProp]);
 
   const fetchClients = async () => {
     try {
@@ -401,12 +407,12 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose }) {
     try {
       const response = await axios.get(`${BASE_URL}/api/proposals/${proposalId}`);
       setProposalData(response.data);
-      
+
       // Load existing canvas elements if any
       if (response.data.canvasElements) {
         setElements(response.data.canvasElements);
       }
-      
+
       // Load canvas size if set
       if (response.data.canvasSize) {
         setCanvasSize(response.data.canvasSize);
@@ -421,13 +427,13 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose }) {
   const handleCanvasClick = (e) => {
     if (e.target === canvasRef.current) {
       setSelectedElement(null);
-      
+
       // Add element based on selected mode
       if (isAddingText || isAddingHeading || isAddingShape || isAddingLine || isAddingRectangle || isAddingCircle) {
         const rect = canvasRef.current.getBoundingClientRect();
         const x = Math.max(0, Math.min(e.clientX - rect.left - 50, canvasSize.width - 100));
         const y = Math.max(0, Math.min(e.clientY - rect.top - 25, canvasSize.height - 50));
-        
+
         let newElement = {
           id: Date.now(),
           x,
@@ -467,7 +473,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose }) {
           newElement.shape = "rectangle";
           newElement.borderRadius = 8;
         }
-        
+
         setElements(prev => [...prev, newElement]);
         setIsAddingText(false);
         setIsAddingHeading(false);
@@ -481,7 +487,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose }) {
   };
 
   const handleElementUpdate = (elementId, updates) => {
-    setElements(prev => prev.map(el => 
+    setElements(prev => prev.map(el =>
       el.id === elementId ? { ...el, ...updates } : el
     ));
   };
@@ -531,7 +537,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose }) {
       } else {
         // Create new proposal
         const newProposal = {
-          id: `PROP-${new Date().getFullYear()}-${String(Math.floor(Math.random()*9000)+1000)}`,
+          id: `PROP-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
           title: proposalTitle.trim(),
           client: selectedClient,
           status: "draft",
@@ -578,15 +584,52 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose }) {
       {/* Header */}
       <div style={{
         background: '#fff', borderRadius: 12, padding: 16, marginBottom: 20,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+        boxShadow: '0 2px 8px rgba(0,0,0,0.08)', display: 'flex',
+        justifyContent: 'space-between', alignItems: 'center', gap: 12
       }}>
-        <div>
-          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: P.text }}>
-            {proposalId ? `Edit Proposal: ${proposalData?.title || 'Untitled'}` : 'Create New Proposal'}
-          </h2>
-          
-          {/* Client and Title inputs for new proposals */}
-          {!proposalId && (
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: P.text }}>
+              {isPreview
+                ? (proposalData?.title || propDataProp?.title || 'Proposal Preview')
+                : (proposalId ? `Edit: ${proposalData?.title || 'Untitled'}` : 'Create New Proposal')}
+            </h2>
+            {isPreview && (proposalData || propDataProp) && (
+              <span style={{
+                fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20,
+                background: (() => {
+                  const s = (proposalData?.status || propDataProp?.status || 'draft').toLowerCase();
+                  return s === 'approved' ? '#f0fdf4' : s === 'sent' ? '#EFF4FF' : s === 'rejected' ? '#fff1f2' : '#f8fafc';
+                })(),
+                color: (() => {
+                  const s = (proposalData?.status || propDataProp?.status || 'draft').toLowerCase();
+                  return s === 'approved' ? '#15803D' : s === 'sent' ? '#2563EB' : s === 'rejected' ? '#9f1239' : '#475569';
+                })(),
+              }}>
+                {(proposalData?.status || propDataProp?.status || 'draft').toUpperCase()}
+              </span>
+            )}
+            {isPreview && (proposalData?.clientSignature || propDataProp?.clientSignature) && (
+              <span style={{
+                fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20,
+                background: '#f0fdf4', color: '#15803D',
+              }}>
+                ✓ Client Signed
+              </span>
+            )}
+          </div>
+
+          {isPreview && (
+            <div style={{ fontSize: 12, color: P.muted, marginTop: 4 }}>
+              Client: {proposalData?.client || propDataProp?.client || '—'} ·{' '}
+              {proposalData?.sentAt || propDataProp?.sentAt
+                ? new Date(proposalData?.sentAt || propDataProp?.sentAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+                : ''}
+            </div>
+          )}
+
+          {/* Client and Title inputs — only for new proposals */}
+          {!proposalId && !isPreview && (
             <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
               <div style={{ flex: 1 }}>
                 <label style={{ fontSize: 11, color: P.muted, fontWeight: 600, marginBottom: 4 }}>CLIENT</label>
@@ -594,14 +637,9 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose }) {
                   value={selectedClient}
                   onChange={e => setSelectedClient(e.target.value)}
                   style={{
-                    width: '100%',
-                    padding: '6px 8px',
-                    border: `1px solid ${P.border}`,
-                    borderRadius: 6,
-                    fontSize: 12,
-                    background: '#fff',
-                    outline: 'none',
-                    color: P.text
+                    width: '100%', padding: '6px 8px',
+                    border: `1px solid ${P.border}`, borderRadius: 6,
+                    fontSize: 12, background: '#fff', outline: 'none', color: P.text
                   }}
                 >
                   <option value="">Select Client</option>
@@ -620,47 +658,79 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose }) {
                   onChange={e => setProposalTitle(e.target.value)}
                   placeholder="Enter proposal title..."
                   style={{
-                    width: '100%',
-                    padding: '6px 8px',
-                    border: `1px solid ${P.border}`,
-                    borderRadius: 6,
-                    fontSize: 12,
-                    background: '#fff',
-                    outline: 'none',
-                    color: P.text
+                    width: '100%', padding: '6px 8px',
+                    border: `1px solid ${P.border}`, borderRadius: 6,
+                    fontSize: 12, background: '#fff', outline: 'none', color: P.text
                   }}
                 />
               </div>
             </div>
           )}
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
+
+        <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+          {/* Back / Cancel */}
           <button
             onClick={onClose}
             style={{
-              background: '#f3f4f6', color: '#6b7280', border: 'none', borderRadius: 8,
-              padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer'
+              background: '#f3f4f6', color: '#6b7280', border: 'none',
+              borderRadius: 8, padding: '8px 16px', fontSize: 13,
+              fontWeight: 600, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 6
             }}
           >
-            Cancel
+            ← {isPreview ? 'Back' : 'Cancel'}
           </button>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            style={{
-              background: P.accent, color: '#fff', border: 'none', borderRadius: 8,
-              padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer',
-              opacity: saving ? 0.7 : 1
-            }}
-          >
-            {saving ? 'Saving...' : 'Save Proposal'}
-          </button>
+
+          {/* Toggle Preview/Edit — only for non-preview mode editors */}
+          {!isPreviewMode && (
+            <button
+              onClick={() => setIsPreview(v => !v)}
+              style={{
+                background: isPreview ? '#f3f4f6' : P.accent,
+                color: isPreview ? '#6b7280' : '#fff',
+                border: 'none', borderRadius: 8, padding: '8px 16px',
+                fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              }}
+            >
+              {isPreview ? '✏️ Edit' : '👁 Preview'}
+            </button>
+          )}
+
+          {/* Print — always shown in preview */}
+          {isPreview && (
+            <button
+              onClick={() => window.print()}
+              style={{
+                background: '#f3f4f6', color: '#374151', border: 'none',
+                borderRadius: 8, padding: '8px 16px', fontSize: 13,
+                fontWeight: 600, cursor: 'pointer',
+              }}
+            >
+              🖨️ Print
+            </button>
+          )}
+
+          {/* Save — only in edit mode */}
+          {!isPreview && (
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              style={{
+                background: P.accent, color: '#fff', border: 'none',
+                borderRadius: 8, padding: '8px 16px', fontSize: 13,
+                fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer',
+                opacity: saving ? 0.7 : 1
+              }}
+            >
+              {saving ? 'Saving...' : 'Save Proposal'}
+            </button>
+          )}
         </div>
       </div>
-
       <div style={{ display: 'flex', gap: 20 }}>
-        {/* Sidebar */}
-        <div style={{ width: 260, flexShrink: 0 }}>
+        {/* Sidebar — hidden in preview mode */}
+        <div style={{ width: isPreview ? 0 : 260, flexShrink: 0, overflow: 'hidden', transition: 'width 0.3s ease' }}>
           <CanvasSizeControls
             currentSize={canvasSize}
             onSizeChange={(w, h) => setCanvasSize({ width: w, height: h })}
@@ -673,7 +743,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose }) {
             boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
           }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: P.text, marginBottom: 12 }}>Add Elements</div>
-            
+
             {/* Color and Font Controls */}
             <div style={{ marginBottom: 12 }}>
               <div style={{ fontSize: 11, color: P.muted, marginBottom: 6, fontWeight: 600, letterSpacing: 0.3 }}>STYLING</div>
@@ -914,16 +984,135 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose }) {
             }}
           >
             {elements.map(element => (
-              <CanvasElement
-                key={element.id}
-                element={element}
-                isSelected={selectedElement === element.id}
-                onSelect={setSelectedElement}
-                onUpdate={(updates) => handleElementUpdate(element.id, updates)}
-                onDelete={handleElementDelete}
-                canvasRef={canvasRef}
-              />
+              isPreview ? (
+                /* Read-only render in preview mode */
+                <div
+                  key={element.id}
+                  style={{
+                    position: 'absolute',
+                    left: element.x,
+                    top: element.y,
+                    width: element.width || 'auto',
+                    height: element.height || 'auto',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  {element.type === 'text' && (
+                    <div style={{
+                      fontSize: element.fontSize || 16,
+                      fontWeight: element.fontWeight || 400,
+                      color: element.color || '#000',
+                      fontFamily: element.fontFamily || "'Plus Jakarta Sans', sans-serif",
+                      padding: 4,
+                    }}>{element.text}</div>
+                  )}
+                  {element.type === 'heading' && (
+                    <h1 style={{
+                      fontSize: element.fontSize || 24,
+                      fontWeight: element.fontWeight || 700,
+                      color: element.color || P.text,
+                      fontFamily: element.fontFamily || "'Plus Jakarta Sans', sans-serif",
+                      margin: 0, padding: 4,
+                    }}>{element.text}</h1>
+                  )}
+                  {element.type === 'shape' && (
+                    <div style={{
+                      width: element.width || 100,
+                      height: element.height || 100,
+                      background: element.color || P.accent,
+                      borderRadius: element.borderRadius !== undefined
+                        ? element.borderRadius + 'px'
+                        : (element.shape === 'circle' ? '50%' : '8px'),
+                    }} />
+                  )}
+                  {element.type === 'image' && (
+                    <img src={element.src} alt="" style={{
+                      width: element.width || 200,
+                      height: element.height || 'auto',
+                      borderRadius: 8, display: 'block',
+                    }} />
+                  )}
+                  {element.type === 'line' && (
+                    <svg style={{ width: element.width || 200, height: element.height || 2 }}>
+                      <line x1="0" y1="0" x2={element.width || 200} y2="0"
+                        stroke={element.color || P.accent}
+                        strokeWidth={element.height || 2} />
+                    </svg>
+                  )}
+                </div>
+              ) : (
+                <CanvasElement
+                  key={element.id}
+                  element={element}
+                  isSelected={selectedElement === element.id}
+                  onSelect={setSelectedElement}
+                  onUpdate={(updates) => handleElementUpdate(element.id, updates)}
+                  onDelete={handleElementDelete}
+                  canvasRef={canvasRef}
+                />
+              )
             ))}
+
+            {/* Signature section in preview mode */}
+            {isPreview && (
+              <div style={{
+                position: 'absolute',
+                bottom: 60,
+                left: 60,
+                right: 60,
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 40,
+              }}>
+                {/* Subadmin signature */}
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+                    <span style={{ fontSize: 22, fontWeight: 900, color: '#00BCD4' }}>YT</span>
+                  </div>
+                  <div style={{ height: 1, background: '#00BCD4', marginBottom: 6 }}></div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#0D2027' }}>YENCODE Technologies</div>
+                  <div style={{ fontSize: 10, color: '#96B0B8' }}>Authorised Signatory</div>
+                </div>
+
+                {/* Client signature */}
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{
+                    height: 50,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    marginBottom: 8,
+                    border: (proposalData?.clientSignature || propDataProp?.clientSignature) ? 'none' : '1.5px dashed #fcd34d',
+                    borderRadius: 8,
+                  }}>
+                    {(proposalData?.clientSignature || propDataProp?.clientSignature) ? (
+                      (proposalData?.clientSignature || propDataProp?.clientSignature).startsWith('data:image') ? (
+                        <img
+                          src={proposalData?.clientSignature || propDataProp?.clientSignature}
+                          style={{ maxHeight: 46, maxWidth: '100%', objectFit: 'contain' }}
+                          alt="client sig"
+                        />
+                      ) : (
+                        <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 24, color: '#0D2027' }}>
+                          {proposalData?.clientSignature || propDataProp?.clientSignature}
+                        </span>
+                      )
+                    ) : (
+                      <span style={{ fontSize: 11, color: '#d97706', fontWeight: 600 }}>⏳ Awaiting Signature</span>
+                    )}
+                  </div>
+                  <div style={{
+                    height: 1,
+                    background: (proposalData?.clientSignature || propDataProp?.clientSignature) ? '#15803D' : '#fcd34d',
+                    marginBottom: 6
+                  }}></div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#0D2027' }}>
+                    {proposalData?.clientName || propDataProp?.clientName || proposalData?.client || propDataProp?.client || 'Client'}
+                  </div>
+                  <div style={{ fontSize: 10, color: (proposalData?.clientSignature || propDataProp?.clientSignature) ? '#15803D' : '#d97706', fontWeight: 700 }}>
+                    {(proposalData?.clientSignature || propDataProp?.clientSignature) ? '✓ Signed Digitally' : 'Awaiting Client Signature'}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div style={{ textAlign: 'center', marginTop: 10, fontSize: 12, color: P.muted }}>

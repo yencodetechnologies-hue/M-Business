@@ -66,19 +66,25 @@ export default function ProposalForm({ onBack, onSave, initialData, clients }) {
       }, 50);
     };
     window._onSaveProposal = onSave;
-    
+
+    window._onSaveProposal = onSave;
+
     const clientsList = clients || window._clientsData || [];
     window._clientsData = clientsList;
     const sel = document.getElementById('toComp');
     if (sel && sel.tagName === 'SELECT') {
       sel.innerHTML = '<option value="">-- Select Client --</option>' + clientsList.map(c => {
         const name = c.clientName || c.name || '';
-        return `<option value="${name}">${name}</option>`;
+        const cid = c._id || c.id || '';
+        return `<option value="${name}" data-client-id="${cid}">${name}</option>`;
       }).join('');
       // if there's initial data, select it
       if (initialData && initialData.client) {
         sel.value = initialData.client;
       }
+      // Keep track of the selected client's unique ID (used to isolate the
+      // proposal to that exact client account, not just a matching name).
+      window._selectedClientId = (initialData && initialData.clientId) || '';
     }
     // Hook up back button
     // Hook up back button + all topbar buttons

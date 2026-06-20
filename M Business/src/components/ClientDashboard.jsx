@@ -46,7 +46,275 @@ function useAssets() {
     });
   }, []);
 }
+function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned }) {
+  const [sigMode, setSigMode] = React.useState("draw");
+  const [sigText, setSigText] = React.useState("");
+  const [saving, setSaving] = React.useState(false);
+  const [saved, setSaved] = React.useState(!!proposal.clientSignature);
+  const canvasRef = React.useRef(null);
+  const drawing = React.useRef(false);
+  const points = React.useRef([]);
 
+  React.useEffect(() => {
+    if (sigMode !== "draw") return;
+    const cv = canvasRef.current;
+    if (!cv) return;
+    const rect = cv.getBoundingClientRect();
+    cv.width = rect.width || 500;
+    cv.height = 150;
+    const ctx = cv.getContext("2d");
+    ctx.strokeStyle = "#1a2e35";
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    function getPos(e) {
+      const r = cv.getBoundingClientRect();
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: (cx - r.left) * (cv.width / r.width), y: (cy - r.top) * (cv.height / r.height) };
+    }
+    cv.onmousedown = (e) => { points.current = [getPos(e)]; drawing.current = true; };
+    cv.onmousemove = (e) => {
+      if (!drawing.current) return;
+      const p = getPos(e); points.current.push(p);
+      const pts = points.current;
+      if (pts.length > 2) {
+        const a = pts[pts.length - 3], b = pts[pts.length - 2], c = pts[pts.length - 1];
+        const mx = (b.x + c.x) / 2, my = (b.y + c.y) / 2;
+        const px = (a.x + b.x) / 2, py = (a.y + b.y) / 2;
+        ctx.beginPath(); ctx.moveTo(px, py); ctx.quadraticCurveTo(b.x, b.y, mx, my); ctx.stroke();
+      }
+    };
+    cv.onmouseup = cv.onmouseleave = () => { drawing.current = false; points.current = []; };
+    cv.ontouchstart = (e) => { e.preventDefault(); points.current = [getPos(e)]; drawing.current = true; };
+    cv.ontouchmove = (e) => {
+      e.preventDefault();
+      if (!drawing.current) return;
+      const p = getPos(e); points.current.push(p);
+      const pts = points.current;
+      if (pts.length > 2) {
+        const a = pts[pts.length - 3], b = pts[pts.length - 2], c = pts[pts.length - 1];
+        const mx = (b.x + c.x) / 2, my = (b.y + c.y) / 2;
+        const px = (a.x + b.x) / 2, py = (a.y + b.y) / 2;
+        ctx.beginPath(); ctx.moveTo(px, py); ctx.quadraticCurveTo(b.x, b.y, mx, my); ctx.stroke();
+      }
+    };
+    cv.ontouchend = () => { drawing.current = false; points.current = []; };
+  }, [sigMode]);
+
+  const clearCanvas = () => {
+    const cv = canvasRef.current;
+    if (!cv) return;
+    cv.getContext("2d").clearRect(0, 0, cv.width, cv.height);
+  };
+
+  const saveSignature = async () => {
+    let sigData = "";
+    if (sigMode === "draw") {
+      const cv = canvasRef.current;
+      if (!cv) return;
+      sigData = cv.toDataURL();
+    } else {
+      if (!sigText.trim()) return alert("Please type your name to sign.");
+      sigData = sigText.trim();
+    }
+    setSaving(true);
+    try {
+      const res = await axios.put(`${BASE_URL}/api/proposals/${proposal._id}/client-sign`, {
+        clientSignature: sigData,
+        clientName: clientName,
+        sigMode: sigMode,
+      });
+      setSaved(true);
+      if (onSigned) onSigned(res.data);
+      alert("✅ Signature saved! The proposal has been signed successfully.");
+    } catch (err) {
+      console.error("Signature save error:", err);
+      alert("❌ Failed to save signature. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const prop = proposal;
+  const st = (prop.status || "sent").toLowerCase();
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.6)", display: "flex", flexDirection: "column" }}>
+      {/* Top bar */}
+      <div style={{ background: "#fff", borderBottom: "1px solid #e0eef0", padding: "12px 24px", display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
+        <button onClick={onClose} style={{ background: "#f0fdfe", border: "1.5px solid #e0eef0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#00BCD4", display: "flex", alignItems: "center", gap: 6 }}>
+          <i className="ti ti-arrow-left"></i> Back
+        </button>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: "#0D2027" }}>{prop.title || "Proposal"}</div>
+          <div style={{ fontSize: 11, color: "#96B0B8" }}>
+            {prop.client || prop.clientName} · {prop.sentAt ? new Date(prop.sentAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : ""}
+          </div>
+        </div>
+        <span style={{ background: st === "approved" ? "#DCFCE7" : st === "rejected" ? "#FEE2E2" : "#EFF4FF", color: st === "approved" ? "#15803D" : st === "rejected" ? "#DC2626" : "#2563EB", borderRadius: 20, padding: "4px 14px", fontSize: 11, fontWeight: 800 }}>
+          {st.charAt(0).toUpperCase() + st.slice(1)}
+        </span>
+        <button onClick={() => window.print()} style={{ background: "#f0fdfe", border: "1.5px solid #e0eef0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#00BCD4" }}>
+          <i className="ti ti-printer"></i> Print
+        </button>
+      </div>
+
+      {/* Body */}
+      <div style={{ flex: 1, overflowY: "auto", background: "#f5fafa", padding: "24px" }}>
+        <div style={{ maxWidth: 900, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
+
+          {/* Proposal HTML content */}
+          {prop.html ? (
+            <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", padding: "32px 40px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}
+              dangerouslySetInnerHTML={{ __html: prop.html }} />
+          ) : prop.slides && prop.slides.length > 0 ? (
+            <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", padding: "32px 40px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+              {/* Slide-based proposal summary */}
+              <div style={{ textAlign: "center", marginBottom: 28 }}>
+                <div style={{ fontSize: 28, fontWeight: 900, color: "#0D2027", marginBottom: 6 }}>{prop.title}</div>
+                <div style={{ fontSize: 14, color: "#607D86" }}>Prepared for {prop.client || prop.clientName}</div>
+                <div style={{ fontSize: 13, color: "#96B0B8", marginTop: 4 }}>
+                  {prop.sentAt ? new Date(prop.sentAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) : ""}
+                </div>
+              </div>
+              <div style={{ borderTop: "2px solid #00BCD4", marginBottom: 24 }}></div>
+              {prop.slides.map((slide, si) => (
+                <div key={si} style={{ marginBottom: 20, padding: "16px 20px", background: "#f5fafa", borderRadius: 10, border: "1px solid #e0eef0" }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: "#00BCD4", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>{slide.type}</div>
+                  {slide.heading && <div style={{ fontSize: 16, fontWeight: 700, color: "#0D2027", marginBottom: 4 }}>{slide.heading}</div>}
+                  {slide.title && <div style={{ fontSize: 16, fontWeight: 700, color: "#0D2027", marginBottom: 4 }}>{slide.title}</div>}
+                  {slide.body && <div style={{ fontSize: 13, color: "#4E6B75", lineHeight: 1.7 }}>{slide.body}</div>}
+                  {slide.subtitle && <div style={{ fontSize: 13, color: "#4E6B75" }}>{slide.subtitle}</div>}
+                  {slide.items && slide.items.map((item, ii) => (
+                    <div key={ii} style={{ fontSize: 13, color: "#4E6B75", padding: "4px 0", borderBottom: "1px solid #e0eef0" }}>✓ {item}</div>
+                  ))}
+                  {slide.rows && slide.rows.map((row, ri) => (
+                    <div key={ri} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "4px 0", borderBottom: "1px solid #e0eef0" }}>
+                      <span>{row.item}</span><span style={{ fontWeight: 700 }}>{row.cost}</span>
+                    </div>
+                  ))}
+                  {slide.total && <div style={{ fontSize: 14, fontWeight: 800, color: "#00BCD4", marginTop: 8 }}>Total: {slide.total}</div>}
+                  {slide.phases && slide.phases.map((ph, pi) => (
+                    <div key={pi} style={{ fontSize: 13, color: "#4E6B75", padding: "3px 0" }}>Phase {pi + 1}: {ph.label} — {ph.dur}</div>
+                  ))}
+                  {slide.members && slide.members.map((m, mi) => (
+                    <div key={mi} style={{ fontSize: 13, color: "#4E6B75", padding: "3px 0" }}>{m.name} — {m.role}</div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", padding: 40, textAlign: "center", color: "#96B0B8" }}>
+              No proposal content available.
+            </div>
+          )}
+
+          {/* Already signed display */}
+          {prop.clientSignature && (
+            <div style={{ background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: 14, padding: "20px 28px" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "#15803D", marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
+                <i className="ti ti-circle-check" style={{ fontSize: 18 }}></i> Signed by Client
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+                <div style={{ textAlign: "center", padding: 16, background: "#fff", borderRadius: 10, border: "1px solid #86efac" }}>
+                  <div style={{ height: 60, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
+                    {prop.clientSignature.startsWith("data:image") ? (
+                      <img src={prop.clientSignature} style={{ maxHeight: 55, maxWidth: "100%", objectFit: "contain" }} alt="client sig" />
+                    ) : (
+                      <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 28, color: "#0D2027" }}>{prop.clientSignature}</span>
+                    )}
+                  </div>
+                  <div style={{ height: 1, background: "#15803D", marginBottom: 6 }}></div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#0D2027" }}>{prop.clientName || "Client"}</div>
+                  <div style={{ fontSize: 10, color: "#96B0B8" }}>Signed Digitally</div>
+                </div>
+                <div style={{ textAlign: "center", padding: 16, background: "#fff", borderRadius: 10, border: "1px solid #e0eef0" }}>
+                  <div style={{ height: 60, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
+                    <span style={{ fontSize: 32, color: "#00BCD4" }}>YT</span>
+                  </div>
+                  <div style={{ height: 1, background: "#00BCD4", marginBottom: 6 }}></div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#0D2027" }}>YENCODE Technologies</div>
+                  <div style={{ fontSize: 10, color: "#96B0B8" }}>Authorised Signatory</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Signature box — show only if not yet signed */}
+          {!prop.clientSignature && !saved && (
+            <div style={{ background: "#fff", borderRadius: 14, border: "2px solid #00BCD4", padding: "24px 28px", boxShadow: "0 4px 20px rgba(0,188,212,0.1)" }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: "#0D2027", marginBottom: 4 }}>
+                <i className="ti ti-writing" style={{ color: "#00BCD4", marginRight: 8 }}></i>
+                Awaiting Client Signature
+              </div>
+              <div style={{ fontSize: 12, color: "#96B0B8", marginBottom: 18 }}>
+                Please sign below to accept this proposal. Your signature confirms agreement to the terms outlined.
+              </div>
+
+              {/* Tabs */}
+              <div style={{ display: "flex", gap: 4, background: "#f5fafa", borderRadius: 10, padding: 4, marginBottom: 16, width: "fit-content" }}>
+                {["draw", "type"].map(mode => (
+                  <button key={mode} onClick={() => setSigMode(mode)} style={{ padding: "6px 16px", borderRadius: 8, border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer", background: sigMode === mode ? "#00BCD4" : "transparent", color: sigMode === mode ? "#fff" : "#607D86" }}>
+                    {mode === "draw" ? "✍️ Draw" : "⌨️ Type"}
+                  </button>
+                ))}
+              </div>
+
+              {sigMode === "draw" ? (
+                <div>
+                  <div style={{ background: "#f5fafa", border: "1.5px dashed #c5dde0", borderRadius: 10, overflow: "hidden", marginBottom: 12 }}>
+                    <canvas ref={canvasRef} style={{ width: "100%", height: 150, cursor: "crosshair", display: "block", touchAction: "none" }} />
+                  </div>
+                  <button onClick={clearCanvas} style={{ background: "none", border: "1px solid #e0eef0", borderRadius: 7, padding: "5px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: "#607D86", marginBottom: 12 }}>
+                    Clear
+                  </button>
+                </div>
+              ) : (
+                <div style={{ marginBottom: 16 }}>
+                  <input
+                    value={sigText}
+                    onChange={e => setSigText(e.target.value)}
+                    placeholder="Type your full name to sign..."
+                    style={{ width: "100%", padding: "12px 16px", border: "1.5px solid #e0eef0", borderRadius: 10, fontSize: 22, fontFamily: "'Dancing Script', cursive", color: "#0D2027", outline: "none", boxSizing: "border-box" }}
+                  />
+                  {sigText && (
+                    <div style={{ marginTop: 8, fontSize: 11, color: "#96B0B8" }}>
+                      Preview: <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 22, color: "#0D2027" }}>{sigText}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Sign button */}
+              <button
+                onClick={saveSignature}
+                disabled={saving}
+                style={{ width: "100%", padding: "13px", background: saving ? "#96B0B8" : "#00BCD4", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 800, cursor: saving ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: "0 4px 14px rgba(0,188,212,0.3)" }}>
+                <i className="ti ti-writing" style={{ fontSize: 16 }}></i>
+                {saving ? "Saving Signature..." : "Sign & Accept Proposal"}
+              </button>
+
+              <div style={{ textAlign: "center", fontSize: 11, color: "#96B0B8", marginTop: 10 }}>
+                By signing, you agree to the terms and conditions outlined in this proposal.
+              </div>
+            </div>
+          )}
+
+          {/* Success state after signing */}
+          {!prop.clientSignature && saved && (
+            <div style={{ background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: 14, padding: "20px 28px", textAlign: "center" }}>
+              <i className="ti ti-circle-check" style={{ fontSize: 36, color: "#15803D" }}></i>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "#15803D", marginTop: 8 }}>Proposal Signed Successfully!</div>
+              <div style={{ fontSize: 12, color: "#607D86", marginTop: 4 }}>Your signature has been saved and the subadmin has been notified.</div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 export default function ClientDashboard({ user, setUser }) {
   useAssets();
   const [active, setActive] = useState(() => localStorage.getItem("activeTab_client") || "dashboard");
@@ -95,6 +363,13 @@ export default function ClientDashboard({ user, setUser }) {
 
   // Payment Checkout Modal
   const [payModalOpen, setPayModalOpen] = useState(false);
+  const [viewingProposal, setViewingProposal] = useState(null);
+  const [clientSigMode, setClientSigMode] = useState("draw"); // draw | type
+  const [clientSigText, setClientSigText] = useState("");
+  const [clientSigSaving, setClientSigSaving] = useState(false);
+  const clientCanvasRef = React.useRef(null);
+  const clientDrawingRef = React.useRef(false);
+  const clientPointsRef = React.useRef([]);
   const [paymentInvoice, setPaymentInvoice] = useState(null);
   const [paymentProcessing, setPaymentProcessing] = useState(false);
 
@@ -123,7 +398,7 @@ export default function ClientDashboard({ user, setUser }) {
           axios.get(`${BASE_URL}/api/notifications/${user._id || user.id}`),
           axios.get(`${BASE_URL}/api/documents?companyId=${user.companyId || ""}&client=${encodeURIComponent(clientName)}&sendTo=client`).catch(() => ({ data: [] })),
           axios.get(`${BASE_URL}/api/meetings?client=${encodeURIComponent(clientName)}`).catch(() => ({ data: [] })),
-          axios.get(`${BASE_URL}/api/proposals/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}`, {
+          axios.get(`${BASE_URL}/api/proposals/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}&clientId=${encodeURIComponent(user._id || user.id || "")}`, {
             headers: { 'x-company-id': user.companyId || "" }
           }).catch(() => ({ data: [] }))
         ]);
@@ -135,12 +410,17 @@ export default function ClientDashboard({ user, setUser }) {
         setDocs(docRes.data || []);
         setMeetings(Array.isArray(meetRes.data) ? meetRes.data : []);
         const allProps = propRes.data || [];
+        const myClientId = String(user._id || user.id || "");
         const cn = (clientName || "").toLowerCase().trim();
         const filtered = allProps.filter(p => {
           const matchStatus = ["sent", "pending", "approved", "rejected"].includes(p.status);
+          if (!matchStatus) return false;
+          // Strict match: a proposal addressed to a specific client account
+          // should only ever be visible to that exact client.
+          if (p.clientId) return String(p.clientId) === myClientId;
+          // Legacy proposals saved before clientId existed — exact name match only.
           const propClient = (p.client || p.clientName || "").toLowerCase().trim();
-          const matchClient = propClient === cn || propClient.includes(cn) || cn.includes(propClient);
-          return matchStatus && matchClient;
+          return propClient === cn;
         });
         setProposals(filtered);
       } catch (err) {
@@ -1543,14 +1823,20 @@ export default function ClientDashboard({ user, setUser }) {
                           {prop.rejectNote && st === "rejected" && (
                             <span style={{ fontSize: 11, color: "#DC2626", fontWeight: 600 }}>Note: {prop.rejectNote}</span>
                           )}
+                          {prop.clientSignature && (
+                            <span style={{ fontSize: 11, color: C.green, fontWeight: 700 }}>
+                              <i className="ti ti-writing" style={{ fontSize: 11 }}></i> Signed by client
+                            </span>
+                          )}
                         </div>
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
                         <span style={{ background: badge.bg, color: badge.color, borderRadius: 20, padding: "4px 12px", fontSize: 11, fontWeight: 800 }}>{badge.label}</span>
-                        <a href={`${window.location.origin}/proposal-view?id=${prop._id}`} target="_blank" rel="noopener noreferrer"
-                          style={{ background: C.tealLight, color: C.teal, borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, textDecoration: "none", display: "flex", alignItems: "center", gap: 5 }}>
+                        <button
+                          onClick={() => setViewingProposal(prop)}
+                          style={{ background: C.tealLight, color: C.teal, borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
                           <i className="ti ti-eye" style={{ fontSize: 13 }}></i> View
-                        </a>
+                        </button>
                       </div>
                     </div>
                   );
@@ -1721,7 +2007,19 @@ export default function ClientDashboard({ user, setUser }) {
           </button>
         </div>
       </div>
-
+      {/* PROPOSAL VIEWER MODAL */}
+      {viewingProposal && (
+        <ProposalViewerModal
+          proposal={viewingProposal}
+          clientName={clientName}
+          BASE_URL={BASE_URL}
+          onClose={() => setViewingProposal(null)}
+          onSigned={(updated) => {
+            setProposals(prev => prev.map(p => (p._id === updated._id ? updated : p)));
+            setViewingProposal(updated);
+          }}
+        />
+      )}
       {/* PAYMENT MODAL (CHECKOUT DIALOG OVERLAY) */}
       {payModalOpen && paymentInvoice && (
         <div className="modal-overlay" onClick={() => setPayModalOpen(false)}>

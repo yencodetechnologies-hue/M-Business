@@ -6,6 +6,7 @@ const ProposalSchema = new mongoose.Schema(
     title: { type: String, required: true },
     client: { type: String, default: "" },
     clientName: { type: String, default: "" },
+    clientId: { type: String, default: "", index: true },
     status: {
       type: String,
       enum: ["draft", "pending", "sent", "approved", "rejected", "negotiation", "won", "lost"],
@@ -23,7 +24,8 @@ const ProposalSchema = new mongoose.Schema(
     assignedEmployee: { type: String, default: "" },
     value: { type: Number, default: 0 },
     clientSignature: { type: String, default: "" },
-    clientSignedAt: { type: Date }
+    clientSignedAt: { type: Date },
+    sigMode: { type: String, default: "draw" }
   },
   { timestamps: true }
 );

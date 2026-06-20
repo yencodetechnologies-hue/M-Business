@@ -3,7 +3,7 @@ import axios from "axios";
 import { BASE_URL } from "../config";
 import ProposalForm from "./ProposalForm";
 import CanvasProposalEditor from "./CanvasProposalEditor";
-import { PROPOSAL_PREVIEW_CSS } from "./proposalPreviewStyles";
+import { PROPOSAL_PREVIEW_CSS } from "./ProposalPreviewStyles";
 import { printProposal, shareProposalAsPDF } from "./proposalPrintUtils";
 // ─── UTILS ────────────────────────────────────────────────────────────────────
 const uid = () => `${Date.now()}_${Math.random().toString(36).slice(2)}`;

@@ -3,9 +3,9 @@ import axios from "axios";
 import { BASE_URL } from "../config";
 import SettingsPage from "./SettingsPage";
 import ModernEmployeeProjectDetails from "./ModernEmployeeProjectDetails";
-import { PROPOSAL_PREVIEW_CSS } from "./proposalPreviewStyles";
+import { PROPOSAL_PREVIEW_CSS } from "./ProposalPreviewStyles";
 import { printProposal, shareProposalAsPDF } from "./proposalPrintUtils";
-// ── Teal Theme Colors ──────────────────────────────────────────
+// ── Teal Theme Colors ────────────────────      ──────────────────────
 const C = {
   bg: "#F3F8F9",
   surface: "#FFFFFF",

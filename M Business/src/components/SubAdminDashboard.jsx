@@ -5655,7 +5655,9 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
 
           ) : (
 
-            <span className="logo-mark" onClick={onLogoUploadClick} style={{ cursor: "pointer" }}>{companyName || "MBusiness"}</span>
+            <span className="logo-mark" onClick={onLogoUploadClick} style={{ cursor: "pointer" }}>
+              {(companyName && /^[\x20-\x7E\u00C0-\u024F]+$/.test(companyName)) ? companyName : "M Business"}
+            </span>
 
           )}
 
@@ -5669,7 +5671,9 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
 
         <div className="profile-area">
 
-          <div className="profile-avatar">{initials || "P"}</div>
+          <div className="profile-avatar">
+            {(initials && /^[A-Z]{1,2}$/.test(initials)) ? initials : "MB"}
+          </div>
 
           <div>
 

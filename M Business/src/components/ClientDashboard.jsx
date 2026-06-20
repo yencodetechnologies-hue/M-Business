@@ -3,7 +3,8 @@ import axios from "axios";
 import { BASE_URL } from "../config";
 import SettingsPage from "./SettingsPage";
 import ModernEmployeeProjectDetails from "./ModernEmployeeProjectDetails";
-
+import { PROPOSAL_PREVIEW_CSS } from "./proposalPreviewStyles";
+import { printProposal, shareProposalAsPDF } from "./proposalPrintUtils";
 // ── Teal Theme Colors ──────────────────────────────────────────
 const C = {
   bg: "#F3F8F9",
@@ -156,8 +157,11 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
         <span style={{ background: st === "approved" ? "#DCFCE7" : st === "rejected" ? "#FEE2E2" : "#EFF4FF", color: st === "approved" ? "#15803D" : st === "rejected" ? "#DC2626" : "#2563EB", borderRadius: 20, padding: "4px 14px", fontSize: 11, fontWeight: 800 }}>
           {st.charAt(0).toUpperCase() + st.slice(1)}
         </span>
-        <button onClick={() => window.print()} style={{ background: "#f0fdfe", border: "1.5px solid #e0eef0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#00BCD4" }}>
-          <i className="ti ti-printer"></i> Print
+        <button onClick={() => printProposal(proposal)} style={{ background: "#f0fdfe", border: "1.5px solid #e0eef0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#00BCD4", display: "flex", alignItems: "center", gap: 6 }}>
+          <i className="ti ti-printer"></i> Print / PDF
+        </button>
+        <button onClick={() => shareProposalAsPDF(proposal, "YENCODE Technologies", null)} style={{ background: "#00BCD4", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#fff", display: "flex", alignItems: "center", gap: 6 }}>
+          <i className="ti ti-share"></i> Share PDF
         </button>
       </div>
 
@@ -167,8 +171,11 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
 
           {/* Proposal HTML content */}
           {prop.html ? (
-            <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", padding: "32px 40px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}
-              dangerouslySetInnerHTML={{ __html: prop.html }} />
+            <>
+              <style>{PROPOSAL_PREVIEW_CSS}</style>
+              <div className="prop-doc" style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", maxHeight: "none", overflow: "visible" }}
+                dangerouslySetInnerHTML={{ __html: prop.html }} />
+            </>
           ) : prop.slides && prop.slides.length > 0 ? (
             <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", padding: "32px 40px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
               {/* Slide-based proposal summary */}
@@ -211,36 +218,44 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
             </div>
           )}
 
-          {/* Already signed display */}
-          {prop.clientSignature && (
-            <div style={{ background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: 14, padding: "20px 28px" }}>
-              <div style={{ fontSize: 13, fontWeight: 800, color: "#15803D", marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
-                <i className="ti ti-circle-check" style={{ fontSize: 18 }}></i> Signed by Client
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-                <div style={{ textAlign: "center", padding: 16, background: "#fff", borderRadius: 10, border: "1px solid #86efac" }}>
-                  <div style={{ height: 60, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
+          {/* ── Client Signature display (always shown at bottom) ── */}
+          <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", padding: "24px 28px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)" }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: "#607D86", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
+              Client Sign-off
+            </div>
+            {prop.clientSignature ? (
+              <div style={{ background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: 12, padding: "20px 24px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+                  <i className="ti ti-circle-check" style={{ fontSize: 18, color: "#15803D" }}></i>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: "#15803D" }}>You have accepted this proposal</span>
+                  {prop.clientSignedAt && (
+                    <span style={{ marginLeft: "auto", fontSize: 11, color: "#96B0B8", fontWeight: 600 }}>
+                      {new Date(prop.clientSignedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                    </span>
+                  )}
+                </div>
+                <div style={{ background: "#fff", borderRadius: 10, border: "1px solid #86efac", padding: "16px 20px", textAlign: "center", maxWidth: 320, margin: "0 auto" }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "#96B0B8", textTransform: "uppercase", letterSpacing: .6, marginBottom: 12 }}>Your Signature</div>
+                  <div style={{ height: 64, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
                     {prop.clientSignature.startsWith("data:image") ? (
-                      <img src={prop.clientSignature} style={{ maxHeight: 55, maxWidth: "100%", objectFit: "contain" }} alt="client sig" />
+                      <img src={prop.clientSignature} style={{ maxHeight: 60, maxWidth: "100%", objectFit: "contain" }} alt="your signature" />
                     ) : (
-                      <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 28, color: "#0D2027" }}>{prop.clientSignature}</span>
+                      <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 28, color: "#0D2027" }}>
+                        {prop.clientSignature}
+                      </span>
                     )}
                   </div>
-                  <div style={{ height: 1, background: "#15803D", marginBottom: 6 }}></div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "#0D2027" }}>{prop.clientName || "Client"}</div>
-                  <div style={{ fontSize: 10, color: "#96B0B8" }}>Signed Digitally</div>
-                </div>
-                <div style={{ textAlign: "center", padding: 16, background: "#fff", borderRadius: 10, border: "1px solid #e0eef0" }}>
-                  <div style={{ height: 60, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
-                    <span style={{ fontSize: 32, color: "#00BCD4" }}>YT</span>
-                  </div>
-                  <div style={{ height: 1, background: "#00BCD4", marginBottom: 6 }}></div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "#0D2027" }}>YENCODE Technologies</div>
-                  <div style={{ fontSize: 10, color: "#96B0B8" }}>Authorised Signatory</div>
+                  <div style={{ height: 1, background: "#15803D", marginBottom: 8 }} />
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#0D2027" }}>{prop.clientName || clientName}</div>
+                  <div style={{ fontSize: 10, color: "#15803D", fontWeight: 700, marginTop: 3 }}>✓ Digitally Signed & Accepted</div>
                 </div>
               </div>
-            </div>
-          )}
+            ) : (
+              <div style={{ fontSize: 12, color: "#96B0B8", marginBottom: 16 }}>
+                Please sign below to formally accept this proposal.
+              </div>
+            )}
+          </div>
 
           {/* Signature box — show only if not yet signed */}
           {!prop.clientSignature && !saved && (
@@ -1832,11 +1847,23 @@ export default function ClientDashboard({ user, setUser }) {
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
                         <span style={{ background: badge.bg, color: badge.color, borderRadius: 20, padding: "4px 12px", fontSize: 11, fontWeight: 800 }}>{badge.label}</span>
-                        <button
-                          onClick={() => setViewingProposal(prop)}
-                          style={{ background: C.tealLight, color: C.teal, borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
-                          <i className="ti ti-eye" style={{ fontSize: 13 }}></i> View
-                        </button>
+                        <div style={{ display: "flex", gap: 8 }}>
+                          <button
+                            onClick={() => setViewingProposal(prop)}
+                            style={{ background: C.tealLight, color: C.teal, borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+                            <i className="ti ti-eye" style={{ fontSize: 13 }}></i> View
+                          </button>
+                          <button
+                            onClick={() => printProposal(prop)}
+                            style={{ background: C.surface2, color: C.text2, borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 700, border: "1.5px solid " + C.border, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+                            <i className="ti ti-printer" style={{ fontSize: 13 }}></i> PDF
+                          </button>
+                          <button
+                            onClick={() => shareProposalAsPDF(prop, "YENCODE Technologies", null)}
+                            style={{ background: C.surface2, color: C.text2, borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 700, border: "1.5px solid " + C.border, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+                            <i className="ti ti-share" style={{ fontSize: 13 }}></i> Share
+                          </button>
+                        </div>
                       </div>
                     </div>
                   );

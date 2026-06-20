@@ -3,7 +3,8 @@ import axios from "axios";
 import { BASE_URL } from "../config";
 import ProposalForm from "./ProposalForm";
 import CanvasProposalEditor from "./CanvasProposalEditor";
-
+import { PROPOSAL_PREVIEW_CSS } from "./proposalPreviewStyles";
+import { printProposal, shareProposalAsPDF } from "./proposalPrintUtils";
 // ─── UTILS ────────────────────────────────────────────────────────────────────
 const uid = () => `${Date.now()}_${Math.random().toString(36).slice(2)}`;
 const pid = () => `PROP-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
@@ -880,13 +881,17 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
 
 
             prop.html ? (
-              <div style={{
-                background: "#fff", borderRadius: 14,
-                border: "1.5px solid #e0eef0", padding: "36px 44px",
-                boxShadow: "0 2px 14px rgba(0,0,0,0.06)"
-              }}
-                dangerouslySetInnerHTML={{ __html: prop.html }}
-              />
+              <>
+                <style>{PROPOSAL_PREVIEW_CSS}</style>
+                <div className="prop-doc" style={{
+                  background: "#fff", borderRadius: 14,
+                  border: "1.5px solid #e0eef0",
+                  boxShadow: "0 2px 14px rgba(0,0,0,0.06)",
+                  maxHeight: "none", overflow: "visible"
+                }}
+                  dangerouslySetInnerHTML={{ __html: prop.html }}
+                />
+              </>
             ) : prop.slides && prop.slides.length > 0 ? (
               <div style={{
                 background: "#fff", borderRadius: 14,
@@ -1039,75 +1044,73 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
               </div>
             )}
 
-          {/* ── Signature Section ── */}
+
+          {/* ── Client Signature Section ── */}
           <div style={{
             background: "#fff", borderRadius: 14,
             border: "1.5px solid #e0eef0", padding: "24px 28px",
             boxShadow: "0 2px 10px rgba(0,0,0,0.04)"
           }}>
-            <div style={{ fontSize: 13, fontWeight: 800, color: "#607D86", marginBottom: 16, textTransform: "uppercase", letterSpacing: 0.5 }}>
-              Sign-off
+            <div style={{ fontSize: 13, fontWeight: 800, color: "#607D86", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
+              Client Sign-off
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-              {/* Subadmin side */}
-              <div style={{
-                padding: "18px 20px", background: "#f5fafa",
-                borderRadius: 10, border: "1px solid #e0eef0", textAlign: "center"
-              }}>
-                <div style={{ height: 56, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
-                  <span style={{ fontSize: 28, fontWeight: 900, color: "#00BCD4" }}>YT</span>
-                </div>
-                <div style={{ height: 1, background: "#00BCD4", marginBottom: 8 }}></div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "#0D2027" }}>YENCODE Technologies</div>
-                <div style={{ fontSize: 10, color: "#96B0B8", marginTop: 2 }}>Authorised Signatory</div>
-              </div>
+            <div style={{ fontSize: 11, color: "#96B0B8", marginBottom: 18 }}>
+              {prop.clientSignature
+                ? "The client has digitally signed and accepted this proposal."
+                : "Awaiting client's electronic signature to confirm acceptance."}
+            </div>
 
-              {/* Client side */}
-              <div style={{
-                padding: "18px 20px",
-                background: prop.clientSignature ? "#f0fdf4" : "#fffbeb",
-                borderRadius: 10,
-                border: prop.clientSignature ? "1.5px solid #86efac" : "1.5px dashed #fcd34d",
-                textAlign: "center"
-              }}>
-                {prop.clientSignature ? (
-                  <>
-                    <div style={{ height: 56, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
+            {prop.clientSignature ? (
+              /* ── Signed state ── */
+              <div style={{ background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: 12, padding: "20px 24px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+                  <i className="ti ti-circle-check" style={{ fontSize: 18, color: "#15803D" }}></i>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: "#15803D" }}>Proposal Accepted by Client</span>
+                  {prop.clientSignedAt && (
+                    <span style={{ marginLeft: "auto", fontSize: 11, color: "#96B0B8", fontWeight: 600 }}>
+                      {new Date(prop.clientSignedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                    </span>
+                  )}
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+                  <div style={{ background: "#fff", borderRadius: 10, border: "1px solid #86efac", padding: "16px 20px", textAlign: "center" }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "#96B0B8", textTransform: "uppercase", letterSpacing: .6, marginBottom: 12 }}>Client Signature</div>
+                    <div style={{ height: 64, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
                       {prop.clientSignature.startsWith("data:image") ? (
-                        <img src={prop.clientSignature} style={{ maxHeight: 52, maxWidth: "100%", objectFit: "contain" }} alt="client signature" />
+                        <img src={prop.clientSignature} style={{ maxHeight: 60, maxWidth: "100%", objectFit: "contain" }} alt="client signature" />
                       ) : (
-                        <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 26, color: "#0D2027" }}>
+                        <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 28, color: "#0D2027" }}>
                           {prop.clientSignature}
                         </span>
                       )}
                     </div>
-                    <div style={{ height: 1, background: "#15803D", marginBottom: 8 }}></div>
+                    <div style={{ height: 1, background: "#15803D", marginBottom: 8 }} />
                     <div style={{ fontSize: 12, fontWeight: 700, color: "#0D2027" }}>{prop.clientName || prop.client || "Client"}</div>
-                    <div style={{ fontSize: 10, color: "#15803D", marginTop: 2, fontWeight: 700 }}>
-                      ✓ Signed Digitally
-                      {prop.clientSignedAt && (
-                        <span style={{ color: "#96B0B8", fontWeight: 400 }}>
-                          {" · "}{new Date(prop.clientSignedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                        </span>
-                      )}
+                    <div style={{ fontSize: 10, color: "#15803D", fontWeight: 700, marginTop: 3 }}>✓ Digitally Signed</div>
+                  </div>
+                  <div style={{ background: "#fff", borderRadius: 10, border: "1px solid #e0eef0", padding: "16px 20px", textAlign: "center" }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "#96B0B8", textTransform: "uppercase", letterSpacing: .6, marginBottom: 12 }}>Authorised Signatory</div>
+                    <div style={{ height: 64, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
+                      <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg,#006E7F,#00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, color: "#fff" }}>✓</div>
                     </div>
-                  </>
-                ) : (
-                  <>
-                    <div style={{ height: 56, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
-                      <i className="ti ti-writing" style={{ fontSize: 28, color: "#d97706" }}></i>
-                    </div>
-                    <div style={{ height: 1, background: "#fcd34d", marginBottom: 8 }}></div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#92400e" }}>
-                      {prop.client || prop.clientName || "Client"}
-                    </div>
-                    <div style={{ fontSize: 10, color: "#d97706", marginTop: 2, fontWeight: 700 }}>
-                      ⏳ Awaiting Client Signature
-                    </div>
-                  </>
-                )}
+                    <div style={{ height: 1, background: "#00BCD4", marginBottom: 8 }} />
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#0D2027" }}>Company Representative</div>
+                    <div style={{ fontSize: 10, color: "#96B0B8", marginTop: 3 }}>Authorised Signatory</div>
+                  </div>
+                </div>
               </div>
-            </div>
+            ) : (
+              /* ── Awaiting state ── */
+              <div style={{ background: "#fffbeb", border: "1.5px dashed #fcd34d", borderRadius: 12, padding: "24px", textAlign: "center" }}>
+                <i className="ti ti-writing" style={{ fontSize: 32, color: "#d97706", marginBottom: 10, display: "block" }}></i>
+                <div style={{ fontSize: 13, fontWeight: 800, color: "#92400e", marginBottom: 6 }}>
+                  {prop.client || prop.clientName || "Client"} hasn't signed yet
+                </div>
+                <div style={{ fontSize: 11, color: "#B45309" }}>
+                  The client will see a signature pad when they view this proposal in their dashboard.
+                </div>
+              </div>
+            )}
           </div>
 
         </div>
@@ -1360,30 +1363,25 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     flash("💾 Saved!");
   };
   const shareProposal = async (p = doc) => {
-    const link = `${window.location.origin}/proposal-view?id=${p._id || p.id}`;
-    const text = `Project Proposal: ${p.title}\nPrepared by ${companyName}\nView here: ${link}`;
-    // Mark proposal as "sent" so it appears in client dashboard
-    try {
-      if (p._id || p.id) {
-        const proposalId = p._id || p.id;
-        const updated = await axios.put(`${BASE_URL}/api/proposals/${proposalId}`, {
-          ...p,
-          status: "sent",
-          sentAt: new Date().toISOString(),
-          client: p.client || p.clientName || "",
-        });
-        setProposals(prev => prev.map(pr => (pr._id === proposalId || pr.id === proposalId) ? updated.data : pr));
-        if (doc && (doc._id === proposalId || doc.id === proposalId)) setDoc(updated.data);
+    await shareProposalAsPDF(p, companyName, async (proposal) => {
+      try {
+        if (proposal._id || proposal.id) {
+          const proposalId = proposal._id || proposal.id;
+          const updated = await axios.put(`${BASE_URL}/api/proposals/${proposalId}`, {
+            ...proposal,
+            status: "sent",
+            sentAt: new Date().toISOString(),
+            client: proposal.client || proposal.clientName || "",
+          });
+          setProposals(prev => prev.map(pr =>
+            (pr._id === proposalId || pr.id === proposalId) ? updated.data : pr
+          ));
+          if (doc && (doc._id === proposalId || doc.id === proposalId)) setDoc(updated.data);
+        }
+      } catch (err) {
+        console.error("Error marking proposal as sent:", err);
       }
-    } catch (err) {
-      console.error("Error marking proposal as sent:", err);
-    }
-    if (navigator.share) {
-      try { await navigator.share({ title: p.title, text, url: link }); } catch (err) { console.log(err); }
-    } else {
-      navigator.clipboard.writeText(text);
-      flash("📤 Proposal sent to client! Link copied to clipboard.");
-    }
+    });
   };
   const shareWhatsApp = (p = doc) => {
     const link = `${window.location.origin}/proposal-view?id=${p._id || p.id}`;
@@ -1672,6 +1670,8 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
           </div>
         `;
       }).join("");
+    } else if (proposal.html) {
+      proposalHTML = `<div class="prop-doc" style="max-height:none;overflow:visible">${proposal.html}</div>`;
     } else {
       proposalHTML = `<div style="padding: 56px; text-align: center; color: #666;">This proposal has no content yet.</div>`;
     }
@@ -1694,6 +1694,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
               body { margin: 0; -webkit-print-color-adjust: exact; }
               div { page-break-inside: avoid; }
             }
+            ${PROPOSAL_PREVIEW_CSS}
           </style>
         </head>
         <body>
@@ -1913,7 +1914,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
             {/* LEFT – PROPOSALS */}
             <div>
               {loading ? (
-                <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--text3,#A0B8BE)", fontSize: 14 }}>Loading proposals…</div>
+                <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--text3,#A0B8BE)", fontSize: 14 }}></div>
               ) : filtered.length === 0 ? (
                 <div className="add-card" onClick={openNewModal}>
                   <div style={{ width: 52, height: 52, borderRadius: 14, background: "var(--teal,#00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, color: "#fff", boxShadow: "0 4px 12px rgba(0,188,212,.3)", flexShrink: 0 }}><i className="ti ti-plus"></i></div>

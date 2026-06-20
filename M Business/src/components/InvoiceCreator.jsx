@@ -28,26 +28,39 @@ function numberToWords(num) {
 function generateInvoiceNo() {
   return `INV-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
 }
-function formatCurrency(val, symbol = "INR", compact = false, disableCompact = false) {
+// REPLACE WITH:
+const CURRENCY_SYMBOLS = {
+  INR: "₹", USD: "$", EUR: "€", GBP: "£", AED: "د.إ", SAR: "﷼", SGD: "S$",
+  AUD: "A$", CAD: "C$", JPY: "¥", QAR: "﷼", KWD: "د.ك", OMR: "﷼", BHD: "BD",
+  CHF: "CHF", NZD: "NZ$", MYR: "RM", THB: "฿", IDR: "Rp", PKR: "₨", BDT: "৳",
+  LKR: "₨", NPR: "₨", MXN: "MX$", BRL: "R$", ZAR: "R", NGN: "₦", EGP: "E£",
+  TRY: "₺", RUB: "₽",
+};
+
+function getCurrencySymbol(code) {
+  return CURRENCY_SYMBOLS[code] || code || "₹";
+}
+
+function formatCurrency(val, currencyCode = "INR", compact = false, disableCompact = false) {
   const num = parseFloat(val) || 0;
   const absNum = Math.abs(num);
+  const symbol = getCurrencySymbol(currencyCode);
+  const isINR = currencyCode === "INR";
 
   if (!disableCompact && ((compact && absNum >= 100000) || absNum >= 10000000)) {
     try {
-      const isINR = symbol === "INR";
       const formatter = new Intl.NumberFormat(isINR ? 'en-IN' : 'en-US', {
         notation: 'compact',
         compactDisplay: 'short',
         maximumFractionDigits: 2
       });
-      return symbol + (" ") + formatter.format(num);
+      return symbol + " " + formatter.format(num);
     } catch (e) {
       // Fallback
     }
   }
 
-  const isINR = symbol === "INR";
-  return symbol + (" ") + num.toLocaleString(isINR ? "en-IN" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return symbol + " " + num.toLocaleString(isINR ? "en-IN" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 function formatDate(d) {
   if (!d) return "—";
@@ -2347,22 +2360,89 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 </div>
                 <div className="inv-creator-form-group">
                   <label className="inv-creator-form-label">Currency</label>
-                  <select className="inv-creator-form-select" value={inv.currency || 'INR'} onChange={e => upd('currency', e.target.value)}>
-                    <option value="INR">INR - Indian Rupee</option>
-                    <option value="USD">USD - US Dollar</option>
-                    <option value="EUR">EUR - Euro</option>
-                    <option value="GBP">GBP - British Pound</option>
-                    <option value="AED">AED - UAE Dirham</option>
-                    <option value="SAR">SAR - Saudi Riyal</option>
-                    <option value="SGD">SGD - Singapore Dollar</option>
-                    <option value="AUD">AUD - Australian Dollar</option>
-                    <option value="CAD">CAD - Canadian Dollar</option>
-                    <option value="JPY">JPY - Japanese Yen</option>
-                    <option value="QAR">QAR - Qatari Riyal</option>
-                    <option value="KWD">KWD - Kuwaiti Dinar</option>
-                    <option value="OMR">OMR - Omani Rial</option>
-                    <option value="BHD">BHD - Bahraini Dinar</option>
-                  </select>
+                  {(() => {
+                    const presetCurrencies = ["INR", "USD", "EUR", "GBP", "AED", "SAR", "SGD", "AUD", "CAD", "JPY", "QAR", "KWD", "OMR", "BHD", "CHF", "NZD", "MYR", "THB", "IDR", "PKR", "BDT", "LKR", "NPR", "MXN", "BRL", "ZAR", "NGN", "EGP", "TRY", "RUB"];
+                    const isCustom = !presetCurrencies.includes(inv.currency || 'INR');
+                    return (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                        <select
+                          className="inv-creator-form-select"
+                          value={isCustom ? "__custom__" : (inv.currency || 'INR')}
+                          onChange={e => {
+                            if (e.target.value !== "__custom__") upd('currency', e.target.value);
+                            else upd('currency', '');
+                          }}
+                        >
+                          <option value="INR">INR - Indian Rupee</option>
+                          <option value="USD">USD - US Dollar</option>
+                          <option value="EUR">EUR - Euro</option>
+                          <option value="GBP">GBP - British Pound</option>
+                          <option value="AED">AED - UAE Dirham</option>
+                          <option value="SAR">SAR - Saudi Riyal</option>
+                          <option value="SGD">SGD - Singapore Dollar</option>
+                          <option value="AUD">AUD - Australian Dollar</option>
+                          <option value="CAD">CAD - Canadian Dollar</option>
+                          <option value="JPY">JPY - Japanese Yen</option>
+                          <option value="QAR">QAR - Qatari Riyal</option>
+                          <option value="KWD">KWD - Kuwaiti Dinar</option>
+                          <option value="OMR">OMR - Omani Rial</option>
+                          <option value="BHD">BHD - Bahraini Dinar</option>
+                          <option value="CHF">CHF - Swiss Franc</option>
+                          <option value="NZD">NZD - New Zealand Dollar</option>
+                          <option value="MYR">MYR - Malaysian Ringgit</option>
+                          <option value="THB">THB - Thai Baht</option>
+                          <option value="IDR">IDR - Indonesian Rupiah</option>
+                          <option value="PKR">PKR - Pakistani Rupee</option>
+                          <option value="BDT">BDT - Bangladeshi Taka</option>
+                          <option value="LKR">LKR - Sri Lankan Rupee</option>
+                          <option value="NPR">NPR - Nepalese Rupee</option>
+                          <option value="MXN">MXN - Mexican Peso</option>
+                          <option value="BRL">BRL - Brazilian Real</option>
+                          <option value="ZAR">ZAR - South African Rand</option>
+                          <option value="NGN">NGN - Nigerian Naira</option>
+                          <option value="EGP">EGP - Egyptian Pound</option>
+                          <option value="TRY">TRY - Turkish Lira</option>
+                          <option value="RUB">RUB - Russian Ruble</option>
+                          <option value="__custom__">✏️ Type Custom Currency Code...</option>
+                        </select>
+                        {isCustom || inv.currency === '' ? (
+                          <div style={{ display: "flex", gap: 8 }}>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontSize: 10, color: "#607D86", fontWeight: 700, marginBottom: 4 }}>Currency Code</div>
+                              <input
+                                className="inv-creator-form-input"
+                                type="text"
+                                maxLength={10}
+                                placeholder="e.g. XOF, VND..."
+                                value={inv.currency || ''}
+                                onChange={e => upd('currency', e.target.value.toUpperCase())}
+                                style={{ fontWeight: 800, letterSpacing: 1, textTransform: "uppercase" }}
+                                autoFocus
+                              />
+                            </div>
+                            <div style={{ width: 90 }}>
+                              <div style={{ fontSize: 10, color: "#607D86", fontWeight: 700, marginBottom: 4 }}>Symbol</div>
+                              <input
+                                className="inv-creator-form-input"
+                                type="text"
+                                maxLength={5}
+                                placeholder="e.g. ₫, ₣"
+                                value={inv.customCurrencySymbol || ''}
+                                onChange={e => upd('customCurrencySymbol', e.target.value)}
+                                style={{ fontWeight: 800, fontSize: 16, textAlign: "center" }}
+                              />
+                            </div>
+                          </div>
+                        ) : null}
+                        {inv.currency && inv.currency !== '' && (
+                          <div style={{ fontSize: 10, color: "#64748b", fontWeight: 600, display: "flex", gap: 12 }}>
+                            <span>Code: <span style={{ color: "var(--teal)", fontWeight: 800 }}>{inv.currency}</span></span>
+                            <span>Symbol: <span style={{ color: "var(--teal)", fontWeight: 800 }}>{getCurrencySymbol(inv.currency) !== inv.currency ? getCurrencySymbol(inv.currency) : (inv.customCurrencySymbol || inv.currency)}</span></span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
               <div className="inv-creator-form-row">

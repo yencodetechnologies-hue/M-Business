@@ -1614,9 +1614,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 return (
                   <div key={pageIndex} className="invoice-paper print-container" style={{ position: "relative", maxWidth: 794, margin: "0 auto", background: "#fff", borderRadius: 18, boxShadow: "0 24px 80px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)", display: "flex", flexDirection: "column", minHeight: 1122, width: "100%" }}>
                     {/* Header */}
-                    {isFirstPage && (<div className="avoid-break" style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0, borderBottom: "1px solid var(--app-border)" }}>
+                    {isFirstPage && (<div className="avoid-break" style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "visible", flexShrink: 0, borderBottom: "1px solid var(--app-border)" }}>
                       <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: `radial-gradient(circle, ${currentT.primaryColor}0d, transparent)`, top: -80, right: -40, pointerEvents: "none" }} />
-                      <div className="inv-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 1, gap: 20 }}>
+                      <div className="inv-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", gap: 20 }}>
                         <div>
                           {effectiveLogo ? (
                             <img src={effectiveLogo} alt="logo" style={{ height: 85, maxWidth: "100%", borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />

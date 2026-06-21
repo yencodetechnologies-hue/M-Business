@@ -13,12 +13,12 @@ const EMPTY = { name: "", project: "", client: "", date: "", start: "", end: "",
 
 export default function CalendarPage({ projects = [], tasks = [], clients = [], companyId, onUpdateProject, onUpdateTask, config, user, THEME }) {
   const finalTheme = THEME || { accent: "var(--app-accent)", muted: "var(--app-muted)", card: "var(--app-card)", bg: "var(--app-bg)", border: "var(--app-border)", text: "var(--app-text)" };
-  
+
   // Update TC to use dynamic theme accent if available
-  const TYPE_COLORS = { 
-    ...TC, 
-    Meeting: finalTheme.accent || TC.Meeting, 
-    Call: finalTheme.accent || TC.Call, 
+  const TYPE_COLORS = {
+    ...TC,
+    Meeting: finalTheme.accent || TC.Meeting,
+    Call: finalTheme.accent || TC.Call,
     Handover: finalTheme.accent || TC.Handover,
     Other: finalTheme.muted || TC.Other
   };
@@ -173,7 +173,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
         for (const name of targetNames) {
           const targetClient = (clients || []).find(c => (c.name || c.clientName || "").toLowerCase() === name.toLowerCase());
           const targetEmp = (projects || []).flatMap(p => p.team || []).find(e => (typeof e === 'string' ? e : e.name || "").toLowerCase() === name.toLowerCase());
-          
+
           const userId = targetClient?._id || targetClient?.id || targetEmp?._id || targetEmp?.id;
           if (userId) {
             axios.post(`${BASE_URL}/api/notifications`, {
@@ -182,7 +182,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
               icon: 'Date',
               text: `New event scheduled: "${savedEvent.name || savedEvent.title || 'Meeting'}" on ${savedEvent.date}`,
               link: 'calendar'
-            }).catch(() => {});
+            }).catch(() => { });
           }
         }
       }
@@ -548,7 +548,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
               </h3>
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 <div style={{ position: "relative" }}>
-                  <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>Search</span>
+
                   <input placeholder="Search…" value={search}
                     onChange={e => { setSearch(e.target.value); setSelectedDate(null); }}
                     style={{ ...inp(false), paddingLeft: 30, width: 150, padding: "7px 10px 7px 30px" }} />
@@ -655,7 +655,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                           {ev.client && <span style={{ color: finalTheme.muted, fontSize: 11 }}>Profile {ev.client}</span>}
                           {(ev.start || ev.end) && (
                             <span style={{ color: finalTheme.muted, fontSize: 11 }}>
-                               {ev.start || "--"} – {ev.end || "--"}
+                              {ev.start || "--"} – {ev.end || "--"}
                             </span>
                           )}
                         </div>
@@ -689,7 +689,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                                   borderRadius: 7, padding: "5px 12px", fontSize: 11,
                                   color: "#ef4444", cursor: "pointer", fontWeight: 700
                                 }}>
-                             Delete
+                                  Delete
                                 </button>
                               )}
                             </>

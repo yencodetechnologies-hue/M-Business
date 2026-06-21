@@ -783,7 +783,7 @@ function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel = "Del
 
 
 
-// â”€â”€ Action Buttons (View / Edit / Delete) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Action Buttons (View / Edit / Delete) ────────────────────
 
 function ActionBtns({ onView, onEdit, onDelete, onShare }) {
 
@@ -835,7 +835,7 @@ function InfoRow({ icon, label, value }) {
 
 function LimitReachedModal({ type, limit, onClose, onUpgrade }) {
 
-  const icons = { client: "Team", employee: "ðŸ‘¨â€💼", manager: "ðŸ§‘â€💼" };
+  const icons = { client: "Team", employee: "👨‍💼", manager: "🧑‍💼" };
 
   const labels = { client: "Clients", employee: "Employees", manager: "Managers" };
 
@@ -934,7 +934,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 
             {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No clients found</div>
 
-              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-border)" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-border)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>âœ“</span>}</div>); })}
+              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-border)" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-border)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
 
           </div>
 
@@ -1460,7 +1460,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                       } catch (err) {
 
-                        showToast("âŒ Delete failed!");
+                        showToast("❌ Delete failed!");
 
                       }
 
@@ -1510,7 +1510,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
         <div key={i} style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 12, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14 }}>
 
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>ðŸ“</div>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>📁</div>
 
           <div style={{ flex: 1 }}>
 
@@ -1554,7 +1554,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               } catch (err) {
 
-                showToast("âŒ Delete failed!");
+                showToast("❌ Delete failed!");
 
               }
 
@@ -1662,7 +1662,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
         reader.onerror = () => {
 
-          showToast("âŒ Failed to read file!");
+          showToast("❌ Failed to read file!");
 
           setDocUploading(false);
 
@@ -1672,7 +1672,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
       } catch (err) {
 
-        showToast("âŒ Upload failed!");
+        showToast("❌ Upload failed!");
 
         setDocUploading(false);
 
@@ -1904,7 +1904,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
 
-      {/* â”€â”€ CLIENT LIST â”€â”€ */}
+      {/* ── CLIENT LIST ── */}
 
       <div style={{ width: 300, minWidth: 300, background: "#fff", borderRight: "1.5px solid #E0EEF0", display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
@@ -1914,7 +1914,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             <i className="ti ti-search" style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#A0B8BE", fontSize: 14 }} />
 
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search clientsâ€¦" style={{ width: "100%", padding: "8px 12px 8px 32px", background: "#F5FAFA", border: "1.5px solid #E0EEF0", borderRadius: 9, fontSize: 12, color: "#1A2E35", fontFamily: "inherit", outline: "none" }} onFocus={e => e.target.style.borderColor = "#00BCD4"} onBlur={e => e.target.style.borderColor = "#E0EEF0"} />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search clients…" style={{ width: "100%", padding: "8px 12px 8px 32px", background: "#F5FAFA", border: "1.5px solid #E0EEF0", borderRadius: 9, fontSize: 12, color: "#1A2E35", fontFamily: "inherit", outline: "none" }} onFocus={e => e.target.style.borderColor = "#00BCD4"} onBlur={e => e.target.style.borderColor = "#E0EEF0"} />
 
           </div>
 
@@ -1974,7 +1974,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
 
-      {/* â”€â”€ DETAIL PANEL â”€â”€ */}
+      {/* ── DETAIL PANEL ── */}
 
       {activeClient ? (
 
@@ -2552,7 +2552,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
               console.error("Failed to deactivate employee:", err);
 
-              showToast("âŒ Failed to deactivate employee");
+              showToast("❌ Failed to deactivate employee");
 
             }
 
@@ -2578,7 +2578,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
               console.error("Failed to update role:", err);
 
-              showToast("âŒ Failed to update role");
+              showToast("❌ Failed to update role");
 
             }
 
@@ -2630,7 +2630,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
             <div style={{ marginTop: 14 }}>
 
-              <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>ðŸ¦ BANK DETAILS</div>
+              <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
 
               <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
 
@@ -2650,7 +2650,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
               <button onClick={() => setEditEmp(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
 
-              <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Savingâ€¦" : "Save Changes "}</button>
+              <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes "}</button>
 
             </div>
 
@@ -2996,7 +2996,7 @@ ${onboardingLink}`;
 
           <div style={{ marginTop: 14 }}>
 
-            <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>ðŸ¦ BANK DETAILS</div>
+            <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
 
             <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
 
@@ -3016,7 +3016,7 @@ ${onboardingLink}`;
 
             <button onClick={() => setEditEmp(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
 
-            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Savingâ€¦" : "Save Changes "}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes "}</button>
 
           </div>
 
@@ -3172,7 +3172,7 @@ function ManagersPage({ managers, setManagers }) {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
 
-        {[{ t: "Total Managers", v: managers.length, i: "ðŸ§‘â€💼", c: "#f59e0b" }, { t: "Active", v: managers.filter(m => m.status === "Active").length, i: "Yes", c: "#22C55E" }, { t: "Inactive", v: managers.filter(m => m.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
+        {[{ t: "Total Managers", v: managers.length, i: "🧑‍💼", c: "#f59e0b" }, { t: "Active", v: managers.filter(m => m.status === "Active").length, i: "Yes", c: "#22C55E" }, { t: "Inactive", v: managers.filter(m => m.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
 
           <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
 
@@ -3286,9 +3286,9 @@ function ManagersPage({ managers, setManagers }) {
 
           <InfoRow icon="📱" label="Phone" value={viewMgr.phone} />
 
-          <InfoRow icon="ðŸ¢" label="Department" value={viewMgr.department} />
+          <InfoRow icon="🏢" label="Department" value={viewMgr.department} />
 
-          <InfoRow icon="ðŸ“" label="Address" value={viewMgr.address} />
+          <InfoRow icon="📍" label="Address" value={viewMgr.address} />
 
           <InfoRow icon="📅" label="Joined" value={viewMgr.createdAt ? new Date(viewMgr.createdAt).toLocaleDateString() : "—"} />
 
@@ -3334,7 +3334,7 @@ function ManagersPage({ managers, setManagers }) {
 
             <button onClick={() => setEditMgr(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
 
-            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Savingâ€¦" : "Save Changes "}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes "}</button>
 
           </div>
 
@@ -3564,7 +3564,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
 
-        {[{ t: "Total Subadmins", v: subadmins.length, i: "ðŸ›¡ï¸", c: "#3b82f6" }, { t: "Active", v: subadmins.filter(s => (s.status || "Active") === "Active").length, i: "Yes", c: "#22C55E" }, { t: "Inactive", v: subadmins.filter(s => s.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
+        {[{ t: "Total Subadmins", v: subadmins.length, i: "🛡️", c: "#3b82f6" }, { t: "Active", v: subadmins.filter(s => (s.status || "Active") === "Active").length, i: "Yes", c: "#22C55E" }, { t: "Inactive", v: subadmins.filter(s => s.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
 
           <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
 
@@ -3684,7 +3684,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 12, marginBottom: 20 }}>
 
-              <InfoRow icon="ðŸ¢" label="Company" value={viewSub.companyName || viewSub.company || "—"} />
+              <InfoRow icon="🏢" label="Company" value={viewSub.companyName || viewSub.company || "—"} />
 
               <InfoRow icon="💼" label="Company Type" value={viewSub.companyType || "IT"} />
 
@@ -3698,11 +3698,11 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
               <div style={{ gridColumn: "span 2", height: 1, background: "#bfdbfe", margin: "10px 0" }} />
 
-              <InfoRow icon="ðŸ¢" label="Client Limit" value={viewSub.clientLimit || "Not set (Default 10)"} />
+              <InfoRow icon="🏢" label="Client Limit" value={viewSub.clientLimit || "Not set (Default 10)"} />
 
-              <InfoRow icon="ðŸ‘¨â€💼" label="Employee Limit" value={viewSub.employeeLimit || "Not set (Default 20)"} />
+              <InfoRow icon="👨‍💼" label="Employee Limit" value={viewSub.employeeLimit || "Not set (Default 20)"} />
 
-              <InfoRow icon="ðŸ§‘â€💼" label="Manager Limit" value={viewSub.managerLimit || "Not set (Default 5)"} />
+              <InfoRow icon="🧑‍💼" label="Manager Limit" value={viewSub.managerLimit || "Not set (Default 5)"} />
 
             </div>
 
@@ -3788,7 +3788,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
                 <h4 style={{ fontSize: 14, fontWeight: 700, color: T.text, margin: "0 0 12px 0", display: "flex", alignItems: "center", gap: 8 }}>
 
-                  <span>ðŸ‘¨â€💼</span> Employees ({relatedEmployees.length})
+                  <span>👨‍💼</span> Employees ({relatedEmployees.length})
 
                 </h4>
 
@@ -3834,7 +3834,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
                 <h4 style={{ fontSize: 14, fontWeight: 700, color: T.text, margin: "0 0 12px 0", display: "flex", alignItems: "center", gap: 8 }}>
 
-                  <span>ðŸ§‘â€💼</span> Managers ({relatedManagers.length})
+                  <span>🧑‍💼</span> Managers ({relatedManagers.length})
 
                 </h4>
 
@@ -3912,7 +3912,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
             <button onClick={() => setEditSub(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
 
-            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#3b82f6,#60a5fa)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Savingâ€¦" : "Save Changes "}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#3b82f6,#60a5fa)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes "}</button>
 
           </div>
 
@@ -4103,7 +4103,7 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
 
 
-      {/* â”€â”€ Page header â”€â”€ */}
+      {/* ── Page header ── */}
 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
 
@@ -4499,7 +4499,7 @@ function SearchDropdown({ label, items, displayKey, value, onChange, error, plac
 
             {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No results</div>
 
-              : filtered.map((item, i) => { const name = item[displayKey] || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-border)" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-border)" : "transparent"}><div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div><span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</span>{isSel && <span style={{ marginLeft: "auto", color: "var(--app-accent)" }}>âœ“</span>}</div>); })}
+              : filtered.map((item, i) => { const name = item[displayKey] || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-border)" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-border)" : "transparent"}><div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div><span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</span>{isSel && <span style={{ marginLeft: "auto", color: "var(--app-accent)" }}>✓</span>}</div>); })}
 
           </div>
 
@@ -4569,13 +4569,13 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
 
 
-  const tsStats = [{ t: "Total", v: trackList.length, i: "ðŸ“", c: "var(--app-accent)" }, { t: "In Progress", v: trackList.filter(p => p.status === "In Progress").length, i: "⚡", c: "var(--app-muted)" }, { t: "Completed", v: trackList.filter(p => p.status === "Completed").length, i: "Yes", c: "#22C55E" }, { t: "Pending", v: trackList.filter(p => p.status === "Pending").length, i: "ðŸ•", c: "#F59E0B" }, { t: "On Hold", v: trackList.filter(p => p.status === "On Hold").length, i: "â¸ï¸", c: "var(--app-accent)" }];
+  const tsStats = [{ t: "Total", v: trackList.length, i: "📁", c: "var(--app-accent)" }, { t: "In Progress", v: trackList.filter(p => p.status === "In Progress").length, i: "⚡", c: "var(--app-muted)" }, { t: "Completed", v: trackList.filter(p => p.status === "Completed").length, i: "Yes", c: "#22C55E" }, { t: "Pending", v: trackList.filter(p => p.status === "Pending").length, i: "🕚", c: "#F59E0B" }, { t: "On Hold", v: trackList.filter(p => p.status === "On Hold").length, i: "⏸️", c: "var(--app-accent)" }];
 
   const openAdd = () => { setTsForm(EMPTY); setTsErr({}); setTsEditId(null); setTsModal("add"); };
 
   const openEdit = (p) => { setTsForm({ projectId: p.projectId || p.id || "", name: p.name || "", client: p.client || "", manager: p.manager || "", employee: p.employee || "", deadline: p.deadline || "", status: p.status || "In Progress", progress: p.progress || p.pct || 0, notes: p.notes || p.note || "" }); setTsErr({}); setTsEditId(p._id || p.id); setTsModal("edit"); };
 
-  const saveTs = async () => { const errs = {}; if (!tsForm.name.trim()) errs.name = "Project name required"; if (!tsForm.client.trim()) errs.client = "Company name required"; if (!tsForm.deadline) errs.deadline = "Deadline required"; const pv = Number(tsForm.progress); if (isNaN(pv) || pv < 0 || pv > 100) errs.progress = "0â€“100 only"; if (Object.keys(errs).length) { setTsErr(errs); return; } try { setTsSaving(true); const payload = { ...tsForm, progress: Number(tsForm.progress) }; if (tsModal === "add") { if (!payload.projectId) { const maxId = Math.max(...trackList.map(p => { const match = (p.projectId || p.id || "").match(/PRJ(\d+)/); return match ? parseInt(match[1]) : 0; }), 0); payload.projectId = `PRJ${String(maxId + 1).padStart(3, "0")}`; } const res = await axios.post(BASE_URL + "/api/project-status", payload); setTrackList(prev => [res.data, ...prev]); } else { const res = await axios.put(`${BASE_URL}/api/project-status/${tsEditId}`, payload); setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? res.data : p)); } showToast(tsModal === "add" ? "Yes Project added!" : "Yes Project updated!"); setTsModal(null); } catch { if (tsModal === "add") { const local = { ...tsForm, _id: Date.now().toString(), projectId: tsForm.projectId || `PRJ${String(trackList.length + 1).padStart(3, "0")}`, progress: Number(tsForm.progress) }; setTrackList(prev => [local, ...prev]); } else { setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? { ...p, ...tsForm, progress: Number(tsForm.progress) } : p)); } showToast("Yes Saved locally!"); setTsModal(null); } finally { setTsSaving(false); } };
+  const saveTs = async () => { const errs = {}; if (!tsForm.name.trim()) errs.name = "Project name required"; if (!tsForm.client.trim()) errs.client = "Company name required"; if (!tsForm.deadline) errs.deadline = "Deadline required"; const pv = Number(tsForm.progress); if (isNaN(pv) || pv < 0 || pv > 100) errs.progress = "0–100 only"; if (Object.keys(errs).length) { setTsErr(errs); return; } try { setTsSaving(true); const payload = { ...tsForm, progress: Number(tsForm.progress) }; if (tsModal === "add") { if (!payload.projectId) { const maxId = Math.max(...trackList.map(p => { const match = (p.projectId || p.id || "").match(/PRJ(\d+)/); return match ? parseInt(match[1]) : 0; }), 0); payload.projectId = `PRJ${String(maxId + 1).padStart(3, "0")}`; } const res = await axios.post(BASE_URL + "/api/project-status", payload); setTrackList(prev => [res.data, ...prev]); } else { const res = await axios.put(`${BASE_URL}/api/project-status/${tsEditId}`, payload); setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? res.data : p)); } showToast(tsModal === "add" ? "Yes Project added!" : "Yes Project updated!"); setTsModal(null); } catch { if (tsModal === "add") { const local = { ...tsForm, _id: Date.now().toString(), projectId: tsForm.projectId || `PRJ${String(trackList.length + 1).padStart(3, "0")}`, progress: Number(tsForm.progress) }; setTrackList(prev => [local, ...prev]); } else { setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? { ...p, ...tsForm, progress: Number(tsForm.progress) } : p)); } showToast("Yes Saved locally!"); setTsModal(null); } finally { setTsSaving(false); } };
 
   const deleteTs = async (id) => { if (!window.confirm("Delete?")) return; try { await axios.delete(`${BASE_URL}/api/project-status/${id}`); } catch { } setTrackList(prev => prev.filter(p => (p._id || p.id) !== id)); showToast(" Deleteï¸ Deleted!"); };
 
@@ -4597,7 +4597,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
 
-          <div style={{ position: "relative" }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>Search</span><input placeholder="Searchâ€¦" value={tsSearch} onChange={e => setTsSearch(e.target.value)} style={{ padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", width: 240, color: T.text }} /></div>
+          <div style={{ position: "relative" }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>Search</span><input placeholder="Search…" value={tsSearch} onChange={e => setTsSearch(e.target.value)} style={{ padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", width: 240, color: T.text }} /></div>
 
           {["All", "In Progress", "Pending", "Completed", "On Hold"].map(f => (<button key={f} onClick={() => setTsFilter(f)} style={{ padding: "7px 13px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: tsFilter === f ? "var(--app-accent)" : "var(--app-border)", background: tsFilter === f ? "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)" : "#fff", color: tsFilter === f ? "var(--app-accent)" : "var(--app-muted)" }}>{f}</button>))}
 
@@ -4657,7 +4657,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
                         } catch {
 
-                          showToast("âŒ Update failed");
+                          showToast("❌ Update failed");
 
                         }
 
@@ -4699,7 +4699,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
                   <td style={{ padding: "11px 12px", minWidth: 130 }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ flex: 1, background: "var(--app-border)", borderRadius: 6, height: 7 }}><div style={{ width: `${p.progress || p.pct || 0}%`, background: p.progress === 100 || p.pct === 100 ? "linear-gradient(90deg,#22C55E,#4ade80)" : "linear-gradient(90deg,var(--app-accent),var(--app-accent))", borderRadius: 6, height: "100%" }} /></div><span style={{ fontSize: 12, fontWeight: 700, color: sc(p.status), width: 32, textAlign: "right" }}>{p.progress || p.pct || 0}%</span></div></td>
 
-                  <td style={{ padding: "11px 12px", maxWidth: 180 }}><span style={{ fontSize: 12, color: "var(--app-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block" }} title={p.notes || p.note}>{(p.notes || p.note) ? `ðŸ“ ${p.notes || p.note}` : "—"}</span></td>
+                  <td style={{ padding: "11px 12px", maxWidth: 180 }}><span style={{ fontSize: 12, color: "var(--app-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block" }} title={p.notes || p.note}>{(p.notes || p.note) ? `📝 ${p.notes || p.note}` : "—"}</span></td>
 
                   <td style={{ padding: "11px 12px" }}>
 
@@ -4757,11 +4757,11 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
           <Fld label="Status" value={tsForm.status} onChange={v => setTsForm({ ...tsForm, status: v })} options={["Active", "On Hold", "Completed", "Overdue"]} allowCustom={true} />
 
-          <Fld label="Progress (0â€“100)" value={String(tsForm.progress)} type="number" onChange={v => { setTsForm({ ...tsForm, progress: v }); setTsErr(p => ({ ...p, progress: "" })); }} error={tsErr.progress} placeholder="e.g. 65" />
+          <Fld label="Progress (0–100)" value={String(tsForm.progress)} type="number" onChange={v => { setTsForm({ ...tsForm, progress: v }); setTsErr(p => ({ ...p, progress: "" })); }} error={tsErr.progress} placeholder="e.g. 65" />
 
         </div>
 
-        <Fld label="Notes" value={tsForm.notes} onChange={v => setTsForm({ ...tsForm, notes: v })} placeholder="Brief updateâ€¦" />
+        <Fld label="Notes" value={tsForm.notes} onChange={v => setTsForm({ ...tsForm, notes: v })} placeholder="Brief update…" />
 
         <div style={{ background: "var(--app-bg)", borderRadius: 12, padding: "12px 16px", border: "1px solid var(--app-border)", marginBottom: 14 }}>
 
@@ -4775,7 +4775,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
           <button onClick={() => setTsModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
 
-          <button onClick={saveTs} disabled={tsSaving} style={{ ...B2("var(--app-accent)"), opacity: tsSaving ? 0.7 : 1 }}>{tsSaving ? "Savingâ€¦" : tsModal === "add" ? "Save Project " : "Next "}</button>
+          <button onClick={saveTs} disabled={tsSaving} style={{ ...B2("var(--app-accent)"), opacity: tsSaving ? 0.7 : 1 }}>{tsSaving ? "Saving…" : tsModal === "add" ? "Save Project " : "Next "}</button>
 
         </div>
 
@@ -4905,7 +4905,7 @@ function InterviewPage({ companyId, companyName }) {
 
       console.error("Copy failed:", err);
 
-      showToast("âŒ Copy failed. Please copy manually.");
+      showToast("❌ Copy failed. Please copy manually.");
 
     }
 
@@ -4961,7 +4961,7 @@ function InterviewPage({ companyId, companyName }) {
 
       <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
 
-        {[{ t: "Total", v: counts.total, i: "🎯", c: "var(--app-accent)" }, { t: "Pending", v: counts.pending, i: "â³", c: "#F59E0B" }, { t: "Hired", v: counts.hired, i: "Yes", c: "#22C55E" }, { t: "Rejected", v: counts.rejected, i: "âŒ", c: "#EF4444" }].map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${c},${c}88)` }} /><div style={{ width: 36, height: 36, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 26, fontWeight: 800, color: c }}>{v}</div></div>))}
+        {[{ t: "Total", v: counts.total, i: "🎯", c: "var(--app-accent)" }, { t: "Pending", v: counts.pending, i: "⏳", c: "#F59E0B" }, { t: "Hired", v: counts.hired, i: "Yes", c: "#22C55E" }, { t: "Rejected", v: counts.rejected, i: "❌", c: "#EF4444" }].map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${c},${c}88)` }} /><div style={{ width: 36, height: 36, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 26, fontWeight: 800, color: c }}>{v}</div></div>))}
 
       </div>
 
@@ -4973,7 +4973,7 @@ function InterviewPage({ companyId, companyName }) {
 
           <div style={{ position: "relative", flex: 1, minWidth: 200 }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>Search</span><input placeholder="Search name, role, email, mobile..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", color: "var(--app-sidebar)", boxSizing: "border-box" }} /></div>
 
-          {["all", "pending", "hired", "rejected"].map(f => (<button key={f} onClick={() => setFilter(f)} style={{ padding: "7px 14px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-border)", background: filter === f ? `${f === "all" ? "var(--app-accent)" : sC(f)}15` : "#fff", color: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-muted)", transition: "all 0.15s" }}>{f === "all" ? "🎯 All" : f === "pending" ? "â³ Pending" : f === "hired" ? "Yes Hired" : "âŒ Rejected"}</button>))}
+          {["all", "pending", "hired", "rejected"].map(f => (<button key={f} onClick={() => setFilter(f)} style={{ padding: "7px 14px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-border)", background: filter === f ? `${f === "all" ? "var(--app-accent)" : sC(f)}15` : "#fff", color: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-muted)", transition: "all 0.15s" }}>{f === "all" ? "🎯 All" : f === "pending" ? "⏳ Pending" : f === "hired" ? "Yes Hired" : "❌ Rejected"}</button>))}
 
         </div>
 
@@ -5009,7 +5009,7 @@ function InterviewPage({ companyId, companyName }) {
 
                       <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-muted)", fontFamily: "monospace", whiteSpace: "nowrap" }}>{fmt(c.date || c.createdAt)}</td>
 
-                      <td style={{ padding: "12px 12px" }}><select value={status} onChange={e => updateStatus(idx, e.target.value)} style={{ background: status === "hired" ? "rgba(34,197,94,0.1)" : status === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(245,158,11,0.1)", border: `1.5px solid ${sC(status)}44`, borderRadius: 8, padding: "5px 10px", color: sC(status), fontSize: 12, fontWeight: 700, cursor: "pointer", outline: "none", fontFamily: "inherit" }}><option value="pending">â³ Pending</option><option value="hired">Yes Hired</option><option value="rejected">âŒ Rejected</option></select></td>
+                      <td style={{ padding: "12px 12px" }}><select value={status} onChange={e => updateStatus(idx, e.target.value)} style={{ background: status === "hired" ? "rgba(34,197,94,0.1)" : status === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(245,158,11,0.1)", border: `1.5px solid ${sC(status)}44`, borderRadius: 8, padding: "5px 10px", color: sC(status), fontSize: 12, fontWeight: 700, cursor: "pointer", outline: "none", fontFamily: "inherit" }}><option value="pending">⏳ Pending</option><option value="hired">Yes Hired</option><option value="rejected">❌ Rejected</option></select></td>
 
                       <td style={{ padding: "12px 12px" }}>{finalResumeUrl ? <button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap" }}>📄</button> : <span style={{ fontSize: 11, color: "#ddd" }}>—</span>}</td>
 
@@ -5067,7 +5067,7 @@ function InterviewPage({ companyId, companyName }) {
 
                 <span style={{ background: `${sC(viewModal.status || "Pending")}18`, color: sC(viewModal.status || "Pending"), border: `1px solid ${sC(viewModal.status || "Pending")}33`, padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
 
-                  {viewModal.status?.toLowerCase() === "hired" ? "Yes Hired" : viewModal.status?.toLowerCase() === "rejected" ? "âŒ Rejected" : "â³ Pending"}
+                  {viewModal.status?.toLowerCase() === "hired" ? "Yes Hired" : viewModal.status?.toLowerCase() === "rejected" ? "❌ Rejected" : "⏳ Pending"}
 
                 </span>
 
@@ -5165,7 +5165,7 @@ function InterviewPage({ companyId, companyName }) {
 
                 <div style={{ padding: 12, background: "var(--app-bg)", borderRadius: 10, border: "1px solid var(--app-border)" }}>
 
-                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>ðŸ‘¨â€💼 Interviewer</div>
+                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>👨‍💼 Interviewer</div>
 
                   <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)" }}>{viewModal.interviewerName || "—"}</div>
 
@@ -5291,7 +5291,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
             <div style={{ fontSize: 11, fontWeight: 800, color: "var(--app-muted)", marginBottom: 12, letterSpacing: 1 }}>PERSONAL DETAILS</div>
 
-            {[{ icon: "👤", label: "Full Name", value: displayName }, { icon: "📧", label: "Email", value: user?.email || "—" }, { icon: "📱", label: "Phone", value: user?.phone || "—" }, { icon: "ðŸŽ­", label: "Role", value: user?.role || "user" }].map(({ icon, label, value }) => (
+            {[{ icon: "👤", label: "Full Name", value: displayName }, { icon: "📧", label: "Email", value: user?.email || "—" }, { icon: "📱", label: "Phone", value: user?.phone || "—" }, { icon: "🎬", label: "Role", value: user?.role || "user" }].map(({ icon, label, value }) => (
 
               <div key={label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "var(--app-bg)", borderRadius: 9, border: "1px solid var(--app-border)", marginBottom: 7 }}>
 
@@ -5313,7 +5313,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
             <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "#fdf4ff", borderRadius: 9, border: "1px solid #fae8ff", marginBottom: 16 }}>
 
-              <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(168,85,247,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>ðŸ¢</div>
+              <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(168,85,247,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>🏢</div>
 
               <div style={{ flex: 1 }}>
 
@@ -5503,7 +5503,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
             <button onClick={onClose} style={{ flex: 1, padding: "10px", background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 9, fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)", cursor: "pointer", fontFamily: "inherit" }}>Close</button>
 
-            <button onClick={onLogout} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>ðŸšª Logout</button>
+            <button onClick={onLogout} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>🚪 Logout</button>
 
           </div>
 
@@ -5825,7 +5825,7 @@ const DEFAULT_PLANS = [
 
   {
 
-    title: "Starter", price: 999, icon: "ðŸŒ±",
+    title: "Starter", price: 999, icon: "🌱",
 
     features: ["5 Projects", "10 Invoices", "Single business manage", "Managers: 1", "Clients: 3", "Employees: 10", "Email Support"]
 
@@ -5877,7 +5877,7 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
 
       <div style={{ textAlign: "center", marginBottom: 44, position: "relative", zIndex: 1 }}>
 
-        <div style={{ display: "inline-block", padding: "6px 16px", background: `${THEME.accent}12`, borderRadius: 100, color: THEME.accent, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 14 }}>ðŸ’Ž Choose Plan</div>
+        <div style={{ display: "inline-block", padding: "6px 16px", background: `${THEME.accent}12`, borderRadius: 100, color: THEME.accent, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 14 }}>💎 Choose Plan</div>
 
         <h1 style={{ fontSize: 34, fontWeight: 900, color: "#1e1b4b", margin: "0 0 10px", letterSpacing: "-1px", lineHeight: 1 }}>Choose your Plan</h1>
 
@@ -5891,7 +5891,7 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
 
         <div style={{ textAlign: "center", padding: "60px 20px", position: "relative", zIndex: 1 }}>
 
-          <div style={{ fontSize: 54, marginBottom: 20, opacity: 0.5 }}>ðŸ“¦</div>
+          <div style={{ fontSize: 54, marginBottom: 20, opacity: 0.5 }}>📦</div>
 
           <h2 style={{ fontSize: 22, fontWeight: 800, color: "#94a3b8", marginBottom: 8 }}>No Packages Available</h2>
 
@@ -6017,7 +6017,7 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
 
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
 
-                      <div style={{ width: 18, height: 18, borderRadius: "50%", background: `${THEME.accent}12`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: THEME.accent, fontWeight: 900, flexShrink: 0 }}>âœ“</div>
+                      <div style={{ width: 18, height: 18, borderRadius: "50%", background: `${THEME.accent}12`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: THEME.accent, fontWeight: 900, flexShrink: 0 }}>✓</div>
 
                       <span style={{ fontSize: 13, color: "#475569", fontWeight: 600 }}>{f}</span>
 
@@ -6193,7 +6193,7 @@ function VendorsPage({ vendors, setVendors }) {
 
     } catch (err) {
 
-      showToast("âŒ Update failed!");
+      showToast("❌ Update failed!");
 
     } finally { setSaving(false); }
 
@@ -6215,7 +6215,7 @@ function VendorsPage({ vendors, setVendors }) {
 
     } catch {
 
-      showToast("âŒ Delete failed!");
+      showToast("❌ Delete failed!");
 
     }
 
@@ -6321,17 +6321,17 @@ function VendorsPage({ vendors, setVendors }) {
 
           </div>
 
-          <InfoRow icon="ðŸ’°" label="Total Amount" value={formatCurrency(viewVendor.amountTaxGst, viewVendor.currency)} />
+          <InfoRow icon="💰" label="Total Amount" value={formatCurrency(viewVendor.amountTaxGst, viewVendor.currency)} />
 
-          <InfoRow icon="ðŸ’¸" label="Paid Amount" value={formatCurrency(viewVendor.paidAmount, viewVendor.currency)} />
+          <InfoRow icon="💸" label="Paid Amount" value={formatCurrency(viewVendor.paidAmount, viewVendor.currency)} />
 
-          <InfoRow icon="âš–ï¸" label="Balance Due" value={formatCurrency((viewVendor.amountTaxGst || 0) - (viewVendor.paidAmount || 0), viewVendor.currency)} />
+          <InfoRow icon="⚖️" label="Balance Due" value={formatCurrency((viewVendor.amountTaxGst || 0) - (viewVendor.paidAmount || 0), viewVendor.currency)} />
 
-          <InfoRow icon="ðŸ’³" label="Mode of Payment" value={viewVendor.modeOfPayment} />
+          <InfoRow icon="💳" label="Mode of Payment" value={viewVendor.modeOfPayment} />
 
           <InfoRow icon="📅" label="Date of Purchase" value={viewVendor.dateOfPurchase ? new Date(viewVendor.dateOfPurchase).toLocaleDateString() : "—"} />
 
-          <InfoRow icon="ðŸ“" label="Description" value={viewVendor.productDescription} />
+          <InfoRow icon="📝" label="Description" value={viewVendor.productDescription} />
 
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
 
@@ -6375,7 +6375,7 @@ function VendorsPage({ vendors, setVendors }) {
 
             <button onClick={() => setEditVendor(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
 
-            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Savingâ€¦" : "Save Changes "}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes "}</button>
 
           </div>
 
@@ -6494,7 +6494,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  // â† à®‡à®¤à¯ à®®à®Ÿà¯à®Ÿà¯à®®à¯ à®‡à®°à¯à®•à¯à®•à®£à¯à®®à¯ (KEEP THIS)
+  // ← à®‡à®¤à¯ à®®à®Ÿà¯à®Ÿà¯à®®à¯ à®‡à®°à¯à®•à¯à®•à®£à¯à®®à¯ (KEEP THIS)
 
   const [appTheme, setAppTheme] = useState(() => localStorage.getItem("appTheme") || "teal");
 
@@ -6928,9 +6928,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const [packages, setPackages] = useState([]);
 
-  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "ðŸ“¦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "", assignedSubadmins: [] });
+  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "", assignedSubadmins: [] });
 
-  const [editPkgForm, setEditPkgForm] = useState({ title: "", description: "", icon: "ðŸ“¦", type: "paid", price: "", noOfDays: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", status: "Active", assignedSubadmins: [] });
+  const [editPkgForm, setEditPkgForm] = useState({ title: "", description: "", icon: "📦", type: "paid", price: "", noOfDays: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", status: "Active", assignedSubadmins: [] });
 
   const [pkgError, setPkgError] = useState({});
 
@@ -7170,7 +7170,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  // â”€â”€ Listen for SEND_DOCUMENT from template designer iframe â”€â”€
+  // ── Listen for SEND_DOCUMENT from template designer iframe ──
 
   useEffect(() => {
 
@@ -7736,7 +7736,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       description: pkg.description || "",
 
-      icon: pkg.icon || "ðŸ“¦",
+      icon: pkg.icon || "📦",
 
       type: pkg.type || "paid",
 
@@ -7942,7 +7942,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
         } else {
 
-          alert("âŒ No Active Subscription: You do not have an active subscription package. Please contact your administrator to assign a package.");
+          alert("❌ No Active Subscription: You do not have an active subscription package. Please contact your administrator to assign a package.");
 
           return;
 
@@ -8116,7 +8116,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
         } else {
 
-          alert("âŒ No Active Subscription: You do not have an active subscription package. Please contact your administrator to assign a package.");
+          alert("❌ No Active Subscription: You do not have an active subscription package. Please contact your administrator to assign a package.");
 
           return;
 
@@ -8334,7 +8334,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
         } else {
 
-          alert("âŒ No Active Subscription: You do not have an active subscription package. Please contact your administrator to assign a package.");
+          alert("❌ No Active Subscription: You do not have an active subscription package. Please contact your administrator to assign a package.");
 
           return;
 
@@ -8462,7 +8462,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
         description: npkg.description,
 
-        icon: npkg.icon || "ðŸ“¦",
+        icon: npkg.icon || "📦",
 
         type: npkg.type || "paid",
 
@@ -8506,7 +8506,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       setPackages(prev => [...prev, res.data]);
 
-      setNpkg({ title: "", description: "", icon: "ðŸ“¦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", employeeLimit: "", type: "paid", price: "", noOfDays: "", assignedSubadmins: [] });
+      setNpkg({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", employeeLimit: "", type: "paid", price: "", noOfDays: "", assignedSubadmins: [] });
 
       setPkgError({});
 
@@ -8518,7 +8518,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       console.error("Add package error:", err);
 
-      toast.error("âŒ Failed to add package: " + (err.response?.data?.msg || err.message));
+      toast.error("❌ Failed to add package: " + (err.response?.data?.msg || err.message));
 
     } finally { setPkgSaveLoading(false); }
 
@@ -8590,7 +8590,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       console.error('Add vendor error:', err);
 
-      toast.error("âŒ Failed to add vendor: " + (err.response?.data?.message || err.message));
+      toast.error("❌ Failed to add vendor: " + (err.response?.data?.message || err.message));
 
     } finally { setVendorSaveLoading(false); }
 
@@ -8600,7 +8600,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  // â”€â”€ Subscription gate: subadmins must subscribe before accessing dashboard â”€â”€
+  // ── Subscription gate: subadmins must subscribe before accessing dashboard ──
 
   const roleLower = (user?.role || "").toLowerCase().trim();
 
@@ -9152,7 +9152,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {/* â”€â”€ Dashboard â”€â”€ */}
+            {/* ── Dashboard ── */}
 
             {validActive === "dashboard" && (
 
@@ -9178,7 +9178,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                       <div style={{ fontSize: 13, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 14 }}>
 
-                        ðŸŽ¨ Choose Theme
+                         Choose Theme
 
                       </div>
 
@@ -9250,7 +9250,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                             >
 
-                              <span style={{ fontSize: 16 }}>ðŸŽ¨</span>
+                              <span style={{ fontSize: 16 }}></span>
 
                             </div>
 
@@ -9368,7 +9368,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     }}>
 
-                    ðŸŽ¨
+                    
 
                   </button>
 
@@ -10414,7 +10414,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {/* â”€â”€ Pages using new components â”€â”€ */}
+            {/* ── Pages using new components ── */}
 
             {validActive === "create-project" && (
 
@@ -11021,7 +11021,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     </div>
 
-                    <span style={{ fontSize: 12 }}>âœ“</span>
+                    <span style={{ fontSize: 12 }}>✓</span>
 
                   </div>
 
@@ -11287,7 +11287,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   >
 
-                    <span style={{ fontSize: 14 }}>ðŸšª</span> Logout            </button>
+                    <span style={{ fontSize: 14 }}>🚪</span> Logout            </button>
 
                 </div>
 
@@ -11377,7 +11377,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {/* â”€â”€ Add Client Modal â”€â”€ */}
+            {/* ── Add Client Modal ── */}
 
             {limitModal && <LimitReachedModal type={limitModal.type} limit={limitModal.limit} onClose={() => setLimitModal(null)} onUpgrade={() => { setLimitModal(null); setForceUpgradeTab(true); setActive("mysubscriptions"); }} />}
 
@@ -11387,7 +11387,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <div style={{ textAlign: "center", padding: "5px 0" }}>
 
-                  <div style={{ width: 54, height: 54, background: "linear-gradient(135deg,#dcfce7,#bbf7d0)", color: "#16a34a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 14px", boxShadow: "0 6px 15px rgba(22,163,74,0.12)" }}>âœ“</div>
+                  <div style={{ width: 54, height: 54, background: "linear-gradient(135deg,#dcfce7,#bbf7d0)", color: "#16a34a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 14px", boxShadow: "0 6px 15px rgba(22,163,74,0.12)" }}>✓</div>
 
                   <h3 style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 8 }}>Registration Successful!</h3>
 
@@ -11589,7 +11589,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                           <div style={{ textAlign: "center" }}>
 
-                            <div style={{ fontSize: 40, marginBottom: 8 }}>ðŸ¢</div>
+                            <div style={{ fontSize: 40, marginBottom: 8 }}>🏢</div>
 
                             <div style={{ fontSize: 10, fontWeight: 800, color: "var(--app-muted)", textTransform: "uppercase", letterSpacing: 1 }}>Upload Logo</div>
 
@@ -11619,7 +11619,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   </div>
 
-                  {/* â”€â”€ CLIENT TYPE â”€â”€ */}
+                  {/* ── CLIENT TYPE ── */}
 
                   <div style={{ marginBottom: 16 }}>
 
@@ -11627,7 +11627,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
 
-                      {[{ val: 'b2b', icon: 'ðŸ¢', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: '👤', label: 'B2C', sub: 'Individual person' }, { val: 'freelancer', icon: '💼', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
+                      {[{ val: 'b2b', icon: '🏢', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: '👤', label: 'B2C', sub: 'Individual person' }, { val: 'freelancer', icon: '💼', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
 
                         <div key={t.val} onClick={() => setNc(p => ({ ...p, clientType: t.val }))}
 
@@ -11649,11 +11649,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-                  {/* â”€â”€ BASIC INFO â”€â”€ */}
+                  {/* ── BASIC INFO ── */}
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>ðŸ¢ Basic Info</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>🏢 Basic Info</div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
 
@@ -11677,7 +11677,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-                  {/* â”€â”€ PRIMARY CONTACT â”€â”€ */}
+                  {/* ── PRIMARY CONTACT ── */}
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
@@ -11703,11 +11703,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-                  {/* â”€â”€ ADDRESS â”€â”€ */}
+                  {/* ── ADDRESS ── */}
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>ðŸ“ Address</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>📍 Address</div>
 
                     <div style={{ marginBottom: 12 }}><Fld label="Street / Building Address" value={nc.address} onChange={v => setNc({ ...nc, address: v })} /></div>
 
@@ -11727,11 +11727,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-                  {/* â”€â”€ ONLINE PRESENCE â”€â”€ */}
+                  {/* ── ONLINE PRESENCE ── */}
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>ðŸŒ Online Presence</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>🌐 Online Presence</div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
 
@@ -11745,11 +11745,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-                  {/* â”€â”€ BILLING & TERMS â”€â”€ */}
+                  {/* ── BILLING & TERMS ── */}
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>ðŸ’³ Billing & Terms</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>💳 Billing & Terms</div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
 
@@ -11767,7 +11767,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-                  {/* â”€â”€ PORTAL ACCESS â”€â”€ */}
+                  {/* ── PORTAL ACCESS ── */}
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
@@ -11791,11 +11791,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-                  {/* â”€â”€ INTERNAL NOTES â”€â”€ */}
+                  {/* ── INTERNAL NOTES ── */}
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>ðŸ“ Internal Notes</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>📝 Internal Notes</div>
 
                     <textarea value={nc.notes} onChange={e => setNc({ ...nc, notes: e.target.value })}
 
@@ -11823,7 +11823,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {/* â”€â”€ Add Employee Modal â”€â”€ */}
+            {/* ── Add Employee Modal ── */}
 
             {modal === "employee" && <Mdl title="Add New Employee" onClose={() => setModal(null)}>
 
@@ -11857,7 +11857,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
               <div style={{ marginTop: 14 }}>
 
-                <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>ðŸ¦ BANK DETAILS</div>
+                <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
 
                 <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
 
@@ -11915,7 +11915,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {/* â”€â”€ Add Project Modal â”€â”€ */}
+            {/* ── Add Project Modal ── */}
 
             {modal === "project" && <Mdl title="Create New Project" onClose={() => setModal(null)}>
 
@@ -12225,7 +12225,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {/* â”€â”€ Add Manager Modal â”€â”€ */}
+            {/* ── Add Manager Modal ── */}
 
             {modal === "manager" && <Mdl title="Add New Manager" onClose={() => setModal(null)}>
 
@@ -12275,7 +12275,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {/* â”€â”€ Add Subadmin Modal â”€â”€ */}
+            {/* ── Add Subadmin Modal ── */}
 
             {modal === "subadmin" && <Mdl title="Add New Subadmin" onClose={() => setModal(null)}>
 
@@ -12329,7 +12329,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {/* â”€â”€ Add Package Modal â”€â”€ */}
+            {/* ── Add Package Modal ── */}
 
             {modal === "package_add" && <Mdl title="Add New Package" onClose={() => setModal(null)} maxWidth={700}>
 
@@ -12337,7 +12337,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <Fld label="Package Title *" value={npkg.title} onChange={v => { setNpkg({ ...npkg, title: v }); setPkgError(p => ({ ...p, title: "" })); }} error={pkgError.title} />
 
-                <Fld label="Icon (Emoji)" value={npkg.icon} onChange={v => setNpkg({ ...npkg, icon: v })} placeholder="e.g. ðŸ“¦" />
+                <Fld label="Icon (Emoji)" value={npkg.icon} onChange={v => setNpkg({ ...npkg, icon: v })} placeholder="e.g. 📦" />
 
 
 
@@ -12407,7 +12407,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     >
 
-                      {npkg.businessLimit === mode ? "âœ“ " : ""}{mode}
+                      {npkg.businessLimit === mode ? "✓ " : ""}{mode}
 
                     </button>
 
@@ -12543,7 +12543,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {/* â”€â”€ View Package Modal â”€â”€ */}
+            {/* ── View Package Modal ── */}
 
             {viewPackage && (
 
@@ -12555,7 +12555,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     <div style={{ width: 56, height: 56, borderRadius: "50%", background: "var(--app-accent-gradient)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>
 
-                      {viewPackage.icon || "ðŸ“¦"}
+                      {viewPackage.icon || "📦"}
 
                     </div>
 
@@ -12575,13 +12575,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <InfoRow icon="📅" label="Duration" value={`${viewPackage.no_of_days || viewPackage.noOfDays || 30} days`} />
 
-                  <InfoRow icon="ðŸ’°" label="Price" value={viewPackage.type === "free" ? "Free" : `Rs.${viewPackage.price || 0}`} />
+                  <InfoRow icon="💰" label="Price" value={viewPackage.type === "free" ? "Free" : `Rs.${viewPackage.price || 0}`} />
 
-                  <InfoRow icon="ðŸ—“ï¸" label="Plan Duration" value={viewPackage.planDuration || "Monthly"} />
+                  <InfoRow icon="" label="Plan Duration" value={viewPackage.planDuration || "Monthly"} />
 
-                  <InfoRow icon="ðŸ¢" label="Business" value={viewPackage.businessLimit || ""} />
+                  <InfoRow icon="🏢" label="Business" value={viewPackage.businessLimit || ""} />
 
-                  <InfoRow icon="ðŸ‘¨â€💼" label="Manager" value={viewPackage.managerLimit || ""} />
+                  <InfoRow icon="👨‍💼" label="Manager" value={viewPackage.managerLimit || ""} />
 
                   <InfoRow icon="Team" label="Clients (Company Name)" value={viewPackage.clientLimit || ""} />
 
@@ -12603,7 +12603,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                           <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: T.text }}>
 
-                            <span style={{ color: "#22c55e" }}>âœ“</span> {f}
+                            <span style={{ color: "#22c55e" }}>✓</span> {f}
 
                           </div>
 
@@ -12629,7 +12629,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {/* â”€â”€ Edit Package Modal â”€â”€ */}
+            {/* ── Edit Package Modal ── */}
 
             {editPackage && (
 
@@ -12693,7 +12693,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                       >
 
-                        {editPkgForm.businessLimit === mode ? "âœ“ " : ""}{mode}
+                        {editPkgForm.businessLimit === mode ? "✓ " : ""}{mode}
 
                       </button>
 
@@ -12833,7 +12833,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 18 }}>
 
-                    <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>ðŸ’°</div>
+                    <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>💰</div>
 
                     <div>
 

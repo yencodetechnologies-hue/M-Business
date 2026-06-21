@@ -165,7 +165,7 @@ export function EmployeeProfilePanel({ empName, user, notify, onDocStatusChange,
     }
   }, [forceOpen]);
 
-  // Panel close ஆகும்போது parent-க்கு notify பண்ணணும்
+  // Notify parent when panel is closed
   const handleClose = () => {
     setOpen(false);
     if (onCloseExternal) onCloseExternal();

@@ -389,8 +389,8 @@ export default function ClientDashboard({ user, setUser }) {
   const [paymentProcessing, setPaymentProcessing] = useState(false);
 
   const clientName = user?.clientName || user?.name || "Client";
-  // client company - user object-ல் இல்லன்னா clientName-ஐ fallback ஆ use பண்ணு
-  // Backend-ல் project.client = "Urban Cafe" type company name save ஆகும்
+  // Fallback to clientName if client company is not in user object
+  // In the backend, a company name of type "Urban Cafe" will be saved in project.client
   const clientCompany = user?.companyName || user?.company || user?.clientCompany || user?.organization || "";
 
   useEffect(() => {
@@ -445,7 +445,7 @@ export default function ClientDashboard({ user, setUser }) {
       }
     };
     fetchAll();
-    // Every 30s auto-refresh — new files உடனே show ஆகும்
+    // Auto-refresh every 30s — new files will show immediately
     const interval = setInterval(fetchAll, 30000);
     return () => clearInterval(interval);
   }, [user, clientName]);
@@ -618,7 +618,7 @@ export default function ClientDashboard({ user, setUser }) {
       if (!f.sentToClient || f.sentToClient === null || f.sentToClient === "") return false;
       const sc = (f.sentToClient || "").toLowerCase().trim();
       const cn = (clientName || "").toLowerCase().trim();
-      // "client" என்று generic ஆ save ஆனதும் show பண்ணு, அல்லது client name match ஆனாலும் show பண்ணு
+      // Show when saved generically as "client", or if client name matches
       return sc === "client" || sc === cn || sc.includes(cn) || cn.includes(sc);
     })
     .map(f => {
@@ -1588,7 +1588,7 @@ export default function ClientDashboard({ user, setUser }) {
           <div className="rating-row">
             {[1, 2, 3, 4, 5].map((star) => (
               <span key={star} className={`star ${feedbackRating >= star ? "active" : ""}`} onClick={() => setFeedbackRating(star)}>
-                
+
               </span>
             ))}
           </div>
@@ -1777,7 +1777,7 @@ export default function ClientDashboard({ user, setUser }) {
                     setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
                     await new Promise(r => setTimeout(r, 800));
                   } catch (e) {
-                    // CORS issue-ஆ இருந்தா new tab-ல் open பண்ணு
+                    // Open in a new tab if there is a CORS issue
                     window.open(links[i], "_blank");
                     await new Promise(r => setTimeout(r, 800));
                   }

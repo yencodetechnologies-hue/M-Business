@@ -146,7 +146,7 @@ export default function AdminDashboard({ user, setUser }) {
     shadowMd: "0 4px 16px rgba(0,0,0,0.35)",
     shadowLg: "0 12px 32px rgba(0,0,0,0.4)",
   } : {
-    // உங்கள் existing light T object இங்கே
+    // Your existing light theme object here
     bg: "#f5f3ff",
     surface: "#ffffff",
     sidebar: "#ffffff",

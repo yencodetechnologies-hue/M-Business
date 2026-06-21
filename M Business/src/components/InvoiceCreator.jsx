@@ -113,141 +113,6 @@ function Toast({ msg }) {
   if (!msg) return null;
   return (
     <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "var(--app-card)", border: "2px solid #22c55e", borderRadius: 16, padding: "14px 24px", fontSize: 14, fontWeight: 800, color: "#22c55e", boxShadow: "var(--app-shadow)", display: "flex", alignItems: "center", gap: 10, animation: "fadeInUp 0.3s ease-out" }}>
-      <style>{`@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        /* Isolated Invoice Creator Styles */
-        .inv-creator-form-side { display: flex; flex-direction: column; gap: 16px; }
-        .inv-creator-card { background: #FFFFFF; border: 1.5px solid #E0EEF0; border-radius: 14px; overflow: hidden; margin-bottom: 12px; }
-        .inv-creator-card-header { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid #E0EEF0; }
-        .inv-creator-card-title { font-size: 15px; font-weight: 800; color: #1A2E35; }
-        .inv-creator-card-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
-        .inv-creator-card-body { padding: 18px; }
-
-        .inv-creator-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-        .inv-creator-form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px; }
-        .inv-creator-form-group { margin-bottom: 14px; }
-        .inv-creator-form-group:last-child { margin-bottom: 0; }
-        .inv-creator-form-label { font-size: 13px; font-weight: 800; color: #607D86; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; display: block; }
-        .inv-creator-form-input { width: 100%; padding: 12px 14px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 15px; font-weight: 700; color: #1A2E35; font-family: inherit; outline: none; transition: all .15s; }
-        .inv-creator-form-input:focus { border-color: #00BCD4 !important; background: #FFFFFF; box-shadow: 0 0 0 3px rgba(0,188,212,.08); }
-        .inv-creator-form-input::placeholder { color: #A0B8BE; }
-        .inv-creator-form-input:read-only { background: #F8FAFB; color: #A0B8BE; cursor: not-allowed; }
-        .inv-creator-form-select { width: 100%; padding: 12px 14px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 15px; font-weight: 700; color: #1A2E35; font-family: inherit; outline: none; cursor: pointer; appearance: none; -webkit-appearance: none; transition: all .15s; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A0B8BE' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
-        .inv-creator-form-select:focus { border-color: #00BCD4 !important; box-shadow: 0 0 0 3px rgba(0,188,212,.08); }
-        .inv-creator-form-textarea { width: 100%; padding: 12px 14px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 15px; font-weight: 700; color: #1A2E35; font-family: inherit; outline: none; resize: vertical; min-height: 72px; transition: all .15s; }
-        .inv-creator-form-textarea:focus { border-color: #00BCD4 !important; box-shadow: 0 0 0 3px rgba(0,188,212,.08); }
-        .inv-creator-form-textarea::placeholder { color: #A0B8BE; }
-
-        .inv-creator-template-row { display: flex; gap: 8px; margin-bottom: 14px; }
-        .inv-creator-template-opt { flex: 1; padding: 10px; border: 1.5px solid #E0EEF0; border-radius: 10px; cursor: pointer; text-align: center; transition: all .15s; }
-        .inv-creator-template-opt:hover { border-color: #00BCD4; }
-        .inv-creator-template-opt.selected { border-color: #00BCD4; background: #F0FDFE; }
-        .inv-creator-template-opt-icon { font-size: 20px; margin-bottom: 4px; }
-        .inv-creator-template-opt-name { font-size: 10px; font-weight: 700; color: #607D86; }
-        .inv-creator-template-opt.selected .inv-creator-template-opt-name { color: #00BCD4; }
-
-        .inv-creator-items-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
-        .inv-creator-items-table thead tr th { font-size: 10px; font-weight: 700; color: #A0B8BE; text-transform: uppercase; letter-spacing: .6px; padding: 8px 10px; text-align: left; background: #F8FAFB; border-bottom: 1px solid #E0EEF0; }
-        .inv-creator-items-table tbody tr td { padding: 6px 6px; border-bottom: 1px solid #E0EEF0; vertical-align: middle; }
-        .inv-creator-items-table tbody tr:last-child td { border-bottom: none; }
-        .inv-creator-item-input { width: 100%; padding: 8px 10px; background: #F5FAFA; border: 1.5px solid transparent; border-radius: 8px; font-size: 12px; color: #1A2E35; font-family: inherit; outline: none; transition: all .15s; }
-        .inv-creator-item-input:focus { border-color: #00BCD4 !important; background: #FFFFFF; box-shadow: 0 0 0 2px rgba(0,188,212,.08); }
-        .inv-creator-item-input.desc { min-width: 160px; }
-        .inv-creator-item-input.num { width: 70px; text-align: right; }
-        .inv-creator-item-total { font-size: 13px; font-weight: 700; color: #1A2E35; padding: 0 10px; min-width: 80px; text-align: right; }
-        .inv-creator-del-row-btn { width: 26px; height: 26px; border-radius: 7px; background: none; border: 1.5px solid #E0EEF0; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: #A0B8BE; transition: all .15s; flex-shrink: 0; }
-        .inv-creator-del-row-btn:hover { border-color: #F05C5C; color: #F05C5C; background: #FEF2F2; }
-        .inv-creator-add-item-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: #F0FDFE; border: 1.5px dashed #00BCD4; border-radius: 9px; font-size: 12px; font-weight: 700; color: #00BCD4; cursor: pointer; transition: all .15s; font-family: inherit; width: 100%; justify-content: center; }
-        .inv-creator-add-item-btn:hover { background: #E0F7FA; }
-
-        .inv-creator-totals-section { border-top: 1px solid #E0EEF0; padding-top: 14px; margin-top: 4px; }
-        .inv-creator-total-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; }
-        .inv-creator-total-label { color: #607D86; font-weight: 600; }
-        .inv-creator-total-val { font-weight: 700; color: #1A2E35; }
-        .inv-creator-total-row.discount .inv-creator-total-val { color: #26C281; }
-        .inv-creator-total-row.tax .inv-creator-total-val { color: #F5A623; }
-        .inv-creator-total-row.grand { padding: 10px 14px; background: linear-gradient(135deg, #F0FDFE, #E0F7FA); border-radius: 10px; border: 1.5px solid #E0F7FA; margin-top: 6px; }
-        .inv-creator-total-row.grand .inv-creator-total-label { font-size: 14px; font-weight: 800; color: #1A2E35; }
-        .inv-creator-total-row.grand .inv-creator-total-val { font-size: 18px; font-weight: 900; color: #00BCD4; }
-
-        .inv-creator-payment-terms-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
-        .inv-creator-pt-opt { padding: 8px 6px; border: 1.5px solid #E0EEF0; border-radius: 9px; cursor: pointer; text-align: center; transition: all .15s; font-family: inherit; }
-        .inv-creator-pt-opt:hover { border-color: #00BCD4; }
-        .inv-creator-pt-opt.selected { border-color: #00BCD4; background: #F0FDFE; color: #00BCD4; }
-        .inv-creator-pt-opt-days { font-size: 14px; font-weight: 800; color: #1A2E35; }
-        .inv-creator-pt-opt.selected .inv-creator-pt-opt-days { color: #00BCD4; }
-        .inv-creator-pt-opt-label { font-size: 9px; color: #A0B8BE; font-weight: 600; }
-        .inv-creator-pt-opt.selected .inv-creator-pt-opt-label { color: #00BCD4; }
-
-        .inv-creator-sig-pad { border: 2px dashed #C5DDE0; border-radius: 10px; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: all .15s; background: #F5FAFA; }
-        .inv-creator-sig-pad:hover { border-color: #00BCD4; background: #F0FDFE; }
-
-        /* Isolated Invoice Creator Styles */
-        .inv-creator-form-side { display: flex; flex-direction: column; gap: 16px; }
-        .inv-creator-card { background: #FFFFFF; border: 1.5px solid #E0EEF0; border-radius: 14px; overflow: hidden; margin-bottom: 12px; }
-        .inv-creator-card-header { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid #E0EEF0; }
-        .inv-creator-card-title { font-size: 15px; font-weight: 800; color: #1A2E35; }
-        .inv-creator-card-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
-        .inv-creator-card-body { padding: 18px; }
-
-        .inv-creator-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-        .inv-creator-form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px; }
-        .inv-creator-form-group { margin-bottom: 14px; }
-        .inv-creator-form-group:last-child { margin-bottom: 0; }
-        .inv-creator-form-label { font-size: 13px; font-weight: 800; color: #607D86; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; display: block; }
-        .inv-creator-form-input { width: 100%; padding: 12px 14px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 15px; font-weight: 700; color: #1A2E35; font-family: inherit; outline: none; transition: all .15s; }
-        .inv-creator-form-input:focus { border-color: #00BCD4 !important; background: #FFFFFF; box-shadow: 0 0 0 3px rgba(0,188,212,.08); }
-        .inv-creator-form-input::placeholder { color: #A0B8BE; }
-        .inv-creator-form-input:read-only { background: #F8FAFB; color: #A0B8BE; cursor: not-allowed; }
-        .inv-creator-form-select { width: 100%; padding: 12px 14px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 15px; font-weight: 700; color: #1A2E35; font-family: inherit; outline: none; cursor: pointer; appearance: none; -webkit-appearance: none; transition: all .15s; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A0B8BE' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
-        .inv-creator-form-select:focus { border-color: #00BCD4 !important; box-shadow: 0 0 0 3px rgba(0,188,212,.08); }
-        .inv-creator-form-textarea { width: 100%; padding: 12px 14px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 15px; font-weight: 700; color: #1A2E35; font-family: inherit; outline: none; resize: vertical; min-height: 72px; transition: all .15s; }
-        .inv-creator-form-textarea:focus { border-color: #00BCD4 !important; box-shadow: 0 0 0 3px rgba(0,188,212,.08); }
-        .inv-creator-form-textarea::placeholder { color: #A0B8BE; }
-
-        .inv-creator-template-row { display: flex; gap: 8px; margin-bottom: 14px; }
-        .inv-creator-template-opt { flex: 1; padding: 10px; border: 1.5px solid #E0EEF0; border-radius: 10px; cursor: pointer; text-align: center; transition: all .15s; }
-        .inv-creator-template-opt:hover { border-color: #00BCD4; }
-        .inv-creator-template-opt.selected { border-color: #00BCD4; background: #F0FDFE; }
-        .inv-creator-template-opt-icon { font-size: 20px; margin-bottom: 4px; }
-        .inv-creator-template-opt-name { font-size: 10px; font-weight: 700; color: #607D86; }
-        .inv-creator-template-opt.selected .inv-creator-template-opt-name { color: #00BCD4; }
-
-        .inv-creator-items-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
-        .inv-creator-items-table thead tr th { font-size: 10px; font-weight: 700; color: #A0B8BE; text-transform: uppercase; letter-spacing: .6px; padding: 8px 10px; text-align: left; background: #F8FAFB; border-bottom: 1px solid #E0EEF0; }
-        .inv-creator-items-table tbody tr td { padding: 6px 6px; border-bottom: 1px solid #E0EEF0; vertical-align: middle; }
-        .inv-creator-items-table tbody tr:last-child td { border-bottom: none; }
-        .inv-creator-item-input { width: 100%; padding: 8px 10px; background: #F5FAFA; border: 1.5px solid transparent; border-radius: 8px; font-size: 12px; color: #1A2E35; font-family: inherit; outline: none; transition: all .15s; }
-        .inv-creator-item-input:focus { border-color: #00BCD4 !important; background: #FFFFFF; box-shadow: 0 0 0 2px rgba(0,188,212,.08); }
-        .inv-creator-item-input.desc { min-width: 160px; }
-        .inv-creator-item-input.num { width: 70px; text-align: right; }
-        .inv-creator-item-total { font-size: 13px; font-weight: 700; color: #1A2E35; padding: 0 10px; min-width: 80px; text-align: right; }
-        .inv-creator-del-row-btn { width: 26px; height: 26px; border-radius: 7px; background: none; border: 1.5px solid #E0EEF0; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: #A0B8BE; transition: all .15s; flex-shrink: 0; }
-        .inv-creator-del-row-btn:hover { border-color: #F05C5C; color: #F05C5C; background: #FEF2F2; }
-        .inv-creator-add-item-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: #F0FDFE; border: 1.5px dashed #00BCD4; border-radius: 9px; font-size: 12px; font-weight: 700; color: #00BCD4; cursor: pointer; transition: all .15s; font-family: inherit; width: 100%; justify-content: center; }
-        .inv-creator-add-item-btn:hover { background: #E0F7FA; }
-
-        .inv-creator-totals-section { border-top: 1px solid #E0EEF0; padding-top: 14px; margin-top: 4px; }
-        .inv-creator-total-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; }
-        .inv-creator-total-label { color: #607D86; font-weight: 600; }
-        .inv-creator-total-val { font-weight: 700; color: #1A2E35; }
-        .inv-creator-total-row.discount .inv-creator-total-val { color: #26C281; }
-        .inv-creator-total-row.tax .inv-creator-total-val { color: #F5A623; }
-        .inv-creator-total-row.grand { padding: 10px 14px; background: linear-gradient(135deg, #F0FDFE, #E0F7FA); border-radius: 10px; border: 1.5px solid #E0F7FA; margin-top: 6px; }
-        .inv-creator-total-row.grand .inv-creator-total-label { font-size: 14px; font-weight: 800; color: #1A2E35; }
-        .inv-creator-total-row.grand .inv-creator-total-val { font-size: 18px; font-weight: 900; color: #00BCD4; }
-
-        .inv-creator-payment-terms-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
-        .inv-creator-pt-opt { padding: 8px 6px; border: 1.5px solid #E0EEF0; border-radius: 9px; cursor: pointer; text-align: center; transition: all .15s; font-family: inherit; }
-        .inv-creator-pt-opt:hover { border-color: #00BCD4; }
-        .inv-creator-pt-opt.selected { border-color: #00BCD4; background: #F0FDFE; color: #00BCD4; }
-        .inv-creator-pt-opt-days { font-size: 14px; font-weight: 800; color: #1A2E35; }
-        .inv-creator-pt-opt.selected .inv-creator-pt-opt-days { color: #00BCD4; }
-        .inv-creator-pt-opt-label { font-size: 9px; color: #A0B8BE; font-weight: 600; }
-        .inv-creator-pt-opt.selected .inv-creator-pt-opt-label { color: #00BCD4; }
-
-        .inv-creator-sig-pad { border: 2px dashed #C5DDE0; border-radius: 10px; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: all .15s; background: #F5FAFA; }
-        .inv-creator-sig-pad:hover { border-color: #00BCD4; background: #F0FDFE; }
-`}</style>
       <span>Special</span>
       {msg}
     </div>
@@ -791,8 +656,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   };
 
   // ── Load entry into form (EDIT) -----------------------------
-  const loadEntry = (entry) => {
-    // entry.inv இருந்தா use பண்ணு, இல்லன்னா entry itself-ஐ inv-ஆ treat பண்ணு
+  const loadEntry = (entry, targetStep = "form") => {
+    // Use entry.inv if it exists, otherwise treat entry itself as the invoice
     const invData = entry.inv || entry;
     setInv({
       ...blank,
@@ -811,7 +676,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     setEditingId(entry._id || entry.id || null);
     setErrors({});
     setDraftSaved(false);
-    setStep("form");
+    setStep(targetStep);
   };
 
   // ── Clear ---------------------------------------------------
@@ -1126,13 +991,6 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
     return (
       <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "var(--app-bg)", minHeight: "100vh", padding: "40px 20px" }}>
-        <style>{`
-          @media print {
-            .no-print { display: none !important; }
-            body { background: #fff !important; }
-            .receipt-paper { box-shadow: none !important; border: 1px solid #eee !important; margin: 0 !important; width: 100% !important; }
-          }
-        `}</style>
 
         <div className="no-print" style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 30 }}>
           <button onClick={() => jumpInvoice ? onBack() : (setEditingReceipt(false), setStep("list"))} style={{ padding: "12px 24px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>{jumpInvoice ? " Back to Dashboard" : " Back to List"}</button>
@@ -1266,19 +1124,6 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
     return (
       <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", maxWidth: "100%", padding: "20px" }}>
-        <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');
-          * { box-sizing: border-box; }
-          .inv-row:hover { background: var(--app-bg) !important; }
-          .inv-row { transition: background 0.15s; cursor: pointer; }
-          .inv-action-btn { transition: all 0.15s; }
-          .inv-action-btn:hover { opacity: 0.85; transform: translateY(-1px); }
-          @media (max-width: 700px) {
-            .inv-th { display: none !important; }
-            .inv-col-hide { display: none !important; }
-            .inv-grid { grid-template-columns: 1fr 1fr !important; }
-          }
-        `}</style>
 
         <Toast msg={toast} />
         {deleteTarget && <ConfirmModal invoiceNo={deleteTarget.invoiceNo} onConfirm={() => handleDelete(deleteTarget)} onCancel={() => setDeleteTarget(null)} />}
@@ -1543,7 +1388,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                   const isPending = !isPaid && !isPartPaid && !isDraft;
 
                   return (
-                    <tr key={entry.id || idx} onClick={() => { loadEntry(entry); setStep("preview"); }}>
+                    <tr key={entry.id || idx} onClick={() => { loadEntry(entry, "preview"); window.scrollTo(0, 0); }}>
                       <td onClick={e => e.stopPropagation()}><input type="checkbox" className="cb" /></td>
                       <td className="inv-id" style={{ color: "var(--teal)", fontWeight: 800 }}>{entry.invoiceNo || "—"}</td>
                       <td>
@@ -1585,8 +1430,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                       </td>
                       <td onClick={e => e.stopPropagation()}>
                         <div className="row-actions">
-                          <button className="row-btn" title="View" onClick={() => { loadEntry(entry); setStep("preview"); window.scrollTo(0, 0); }}><i className="ti ti-eye"></i></button>
-                          <button className="row-btn" title="Edit" onClick={(e) => { e.stopPropagation(); loadEntry(entry); setStep("form"); window.scrollTo(0, 0); }}><i className="ti ti-edit"></i></button>
+                          <button className="row-btn" title="View" onClick={(e) => { e.stopPropagation(); loadEntry(entry, "preview"); window.scrollTo(0, 0); }}><i className="ti ti-eye"></i></button>
+                          <button className="row-btn" title="Edit" onClick={(e) => { e.stopPropagation(); loadEntry(entry, "form"); window.scrollTo(0, 0); }}><i className="ti ti-edit"></i></button>
                           {(isPaid || isPartPaid) ? (
                             <button className="row-btn" title="Receipt" onClick={() => {
                               setReceiptEntry({ ...entry, paymentData: { amountPaid: entry.amountPaid || entry.total, paymentMode: entry.paymentMode || "Other", paymentDate: entry.paymentDate || new Date().toISOString(), transactionId: entry.transactionId } });
@@ -1730,36 +1575,6 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   if (step === "preview") {
     return (
       <div className="print-wrapper" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "var(--app-bg)", minHeight: "100vh", padding: "20px 12px" }}>
-        <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
-          * { box-sizing: border-box; }
-          .invoice-paper { position: relative; max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25); display: flex; flex-direction: column; min-height: 1122px; }
-          @media print {
-            @page { size: A4 portrait; margin: 0; }
-            html, body { margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; background: white !important; }
-            .no-print, .no-print * { display: none !important; }
-            .print-wrapper { background: white !important; padding: 0 !important; min-height: 0 !important; display: block !important; }
-            .invoice-paper { 
-              position: relative !important; top: auto !important; left: auto !important; 
-              width: 100% !important; max-width: 100% !important; margin: 0 !important; 
-              border-radius: 0 !important; box-shadow: none !important; 
-              overflow: visible !important; min-height: 0 !important; height: auto !important;
-              page-break-after: always; break-after: page;
-            }
-            .invoice-paper:last-child {
-              page-break-after: auto; break-after: auto;
-            }
-            .inv-table-wrap { overflow-x: visible !important; overflow: visible !important; }
-            .flex-spacer { display: none !important; }
-            body > div { height: auto !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; }
-          }
-          .avoid-break { page-break-inside: avoid; break-inside: avoid; }
-          @media (max-width:600px) {
-            .inv-hgrid { flex-direction:column!important;gap:16px!important; }
-            .inv-hright { text-align:left!important; }
-            .inv-btgrid { grid-template-columns:1fr!important; }
-          }
-        `}</style>
 
         {deleteTarget && <ConfirmModal invoiceNo={deleteTarget.invoiceNo} onConfirm={() => handleDelete(deleteTarget)} onCancel={() => setDeleteTarget(null)} />}
 
@@ -2036,17 +1851,6 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const hasErrors = Object.keys(errors).length > 0;
   return (
     <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", flex: 1 }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
-        * { box-sizing: border-box; }
-        input:focus, select:focus, textarea:focus { border-color: var(--app-accent) !important; box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
-        @keyframes shake { 0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)} }
-        .shake { animation: shake 0.35s ease; }
-        @media (max-width:600px) { .f2col { grid-template-columns: 1fr !important; } .f3col { grid-template-columns: 1fr 1fr !important; } }
-        /* Hide Arrows in Number Inputs */
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
-      `}</style>
 
       <Toast msg={toast} />
 
@@ -2135,7 +1939,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               <div className="inv-creator-form-row">
                 <div className="inv-creator-form-group">
                   <label className="inv-creator-form-label">Due Date</label>
-                  {/* Line 2234 - existing label கு கீழே, terms grid-க்கு பதிலா இதை போடு */}
+                  {/* Put this under the existing label, instead of the terms grid */}
                   <div style={{ display: 'flex', gap: 10 }}>
                     <select className="inv-creator-form-select"
                       value={inv.dueDateType || '30'}
@@ -2844,5 +2648,6 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     </div>
   );
 }
+
 
 

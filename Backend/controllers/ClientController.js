@@ -13,10 +13,11 @@ exports.addClient = async (req, res) => {
       contactPersonNo,
       status,
       address,
-      password,  
+      password,
       gstNumber,
       logoUrl,
       clientType,
+      category,
       clientSource,
       onboardedOn,
       designation,
@@ -53,12 +54,13 @@ exports.addClient = async (req, res) => {
       contactPersonNo,
       status: status || "Active",
       address,
-      password: hashedPassword,  
-      role: "client",           
+      password: hashedPassword,
+      role: "client",
       gstNumber: gstNumber || "",
       logoUrl: logoUrl || "",
       companyId: req.companyId || "",
       clientType: clientType || "b2b",
+      category: category || "",
       clientSource: clientSource || "",
       onboardedOn: onboardedOn || "",
       designation: designation || "",
@@ -88,7 +90,7 @@ exports.addClient = async (req, res) => {
       <p><strong>Status:</strong> ${status || 'Active'}</p>
       <p>You can now access your dashboard and start using our services.</p>
     `;
-    
+
     await sendQuickEmail(email, "Welcome - Account Created Successfully", welcomeMessage);
 
     res.status(201).json({

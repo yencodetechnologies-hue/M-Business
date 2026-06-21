@@ -201,7 +201,7 @@ router.put("/:id", async (req, res) => {
       });
     }
 
-    // assignedTo array-ஆ வந்தா சரியா save ஆகணும்
+    // Save properly if assignedTo is passed as an array
     const updateData = { ...req.body };
     if (updateData.assignedTo && !Array.isArray(updateData.assignedTo)) {
       updateData.assignedTo = [updateData.assignedTo];

@@ -69,7 +69,7 @@ router.post("/", async (req, res) => {
     res.status(201).json(doc);
 
   } catch(e) {
-    console.error("❌ POST error:", e.message); // ← exact error காணும்
+    console.error("❌ POST error:", e.message); // exact error trace
     res.status(500).json({ msg: e.message });
   }
 });

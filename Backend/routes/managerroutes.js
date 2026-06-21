@@ -22,7 +22,7 @@ router.post("/add", checkResourceLimit('manager'), addManager);
 router.put("/:id", async (req, res) => {
   try {
     const updateData = { ...req.body };
-    // password field-ஐ route-ல் update பண்ண வேண்டாம்னா remove பண்ணு
+    // Remove password field if it should not be updated in route
     if (!updateData.password || updateData.password.trim() === "") {
       delete updateData.password;
     }

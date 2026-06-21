@@ -347,7 +347,7 @@ exports.autoAssignTask = async (req, res) => {
   taskId,
   { 
     $addToSet: { assignedTo: randomUser._id },
-    assignTo: randomUser.name,  // ← இது வேணும்!
+    assignTo: randomUser.name,  // This is required
     autoAssign: true
   },
   { returnDocument: 'after' }

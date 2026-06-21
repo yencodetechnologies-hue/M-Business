@@ -16,7 +16,7 @@ router.get("/profile/:email", async (req, res) => {
 router.get("/:clientName", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.clientName);
-    // Task model-ல client field இருந்தா இப்படி:
+    // If client field is present in Task model, do this:
     const tasks = await Task.find({ 
       assignedTo: { $regex: new RegExp(name, "i") }
     }).sort({ createdAt: -1 });

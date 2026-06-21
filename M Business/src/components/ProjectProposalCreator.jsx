@@ -1121,9 +1121,18 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
 
 // ─── MAIN APP -----------------------------------------------------------------
 export default function CanvaProposal({ clients = [], openNew = false, onOpenNewDone, companyLogo, companyName }) {
-  const [view, setView] = useState(new URLSearchParams(window.location.search).get("edit") || new URLSearchParams(window.location.search).get("view") ? "editor" : "list");    // list | editor
+  // Always start at "list" view; fetchProposals() will switch to "editor" once the
+  // correct doc has been loaded from the API (fixes the blank-editor flash when
+  // navigating via ?edit= or ?view= URL params before data is ready).
+  const [view, setView] = useState("list");    // list | editor
   const [proposals, setProposals] = useState([]);
   const [doc, setDoc] = useState(null);
+  // True when we arrived via ?edit= or ?view= URL param and are waiting for the
+  // proposal data to load — prevents the list from flickering before the editor opens.
+  const [isUrlNavigation] = useState(
+    () => !!(new URLSearchParams(window.location.search).get("edit") ||
+             new URLSearchParams(window.location.search).get("view"))
+  );
 
   const iframeRef = useRef(null);
 
@@ -1261,25 +1270,36 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
       console.log(`Document Found ${res.data.length} proposals in backend`);
 
       const list = res.data || [];
+      setProposals(list);
+
       if (list.length > 0) {
-        setProposals(list);
         console.log("Proposals loaded successfully");
 
-        // Auto-open based on URL
+        // Auto-open based on URL — must set doc BEFORE switching view so the
+        // editor never renders with a null doc (that was the root cause of the
+        // blank / incorrect page bug on first click).
         const params = new URLSearchParams(window.location.search);
         const editId = params.get("edit");
         const viewId = params.get("view");
 
         if (editId) {
           const found = list.find(p => p.id === editId || p._id === editId);
-          if (found) { setDoc(found); setPage(0); setView("editor"); }
+          if (found) {
+            setDoc(found);
+            setPage(0);
+            // Clear the ?edit param so a future refresh doesn't re-open the editor
+            window.history.replaceState({}, document.title, window.location.pathname);
+            setView("editor");
+          }
         } else if (viewId) {
           const found = list.find(p => p.id === viewId || p._id === viewId);
           if (found) {
             setDoc(found);
             setPage(0);
-            setView("editor");
             setIsViewMode(true);
+            // Clear the ?view param so a future refresh doesn't re-open view mode
+            window.history.replaceState({}, document.title, window.location.pathname);
+            setView("editor");
           }
         }
 
@@ -1750,6 +1770,27 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
   // ══ LIST VIEW --------------------------------------------------------------
 
+  // While loading, show a full-screen spinner so the list never flickers into view.
+  if (loading) {
+    return (
+      <div style={{
+        position: "fixed", inset: 0, display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center",
+        background: "var(--bg, #F5FAFA)", zIndex: 9999, gap: 18
+      }}>
+        <div style={{
+          width: 52, height: 52, borderRadius: "50%",
+          border: "4px solid var(--app-border, #E0EEF0)",
+          borderTopColor: "var(--app-accent, #00BCD4)",
+          animation: "spin 0.7s linear infinite"
+        }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-muted, #96B0B8)" }}>
+          {isUrlNavigation ? "Opening proposal…" : "Loading proposals…"}
+        </div>
+      </div>
+    );
+  }
 
   if (view === "list") {
     const total = proposals.length;

@@ -1501,8 +1501,8 @@ function ProjectCell({ task, projects, onField }) {
         cursor: "pointer"
       }}
       onClick={(e) => {
-        e.stopPropagation(); //  இது முக்கியம்
-        setOpen(v => !v);   //  open ஆகும்போது மட்டும்
+        e.stopPropagation(); // This is important
+        setOpen(v => !v);   // Only when opening
       }}
       onMouseEnter={e => e.currentTarget.style.background = P.light}
       onMouseLeave={e => e.currentTarget.style.background = "transparent"}
@@ -1521,7 +1521,7 @@ function ProjectCell({ task, projects, onField }) {
 
       </div>
 
-      {/* Success open true ஆனா மட்டும் show */}
+      {/* Show only if open is true */}
       {open && (
         <ProjectPicker
           anchor={ref}
@@ -1529,7 +1529,7 @@ function ProjectCell({ task, projects, onField }) {
           currentProjectId={task.projectId}
           onSelect={pid => {
             onField(task._id || task.id, "projectId", pid);
-            setOpen(false); //  select பண்ணிட்டா close
+            setOpen(false); // Close when selected
           }}
           onClose={() => setOpen(false)}
         />
@@ -1988,7 +1988,7 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
                 ))}
                 <div style={{ width: COL_W.dots, flexShrink: 0 }} />
 
-                {/* Success + Add Column button — HEADER ROW-ல */}
+                {/* Add Column button — in header row */}
                 <div
                   onClick={onAddCol}
                   style={{

@@ -1742,7 +1742,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const fetchSubscription = async () => {
     try {
       setSubLoading(true);
-      // resolveSubadminId() - இது correct ID return பண்றதா?
+      // Does resolveSubadminId() return the correct ID?
       const id = user?._id || user?.id;
       if (!id) return;
 

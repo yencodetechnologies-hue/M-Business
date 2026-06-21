@@ -1,4 +1,4 @@
-// உங்கள் backend terminal-ல் இந்த script run பண்ணுங்க
+// Run this script in your backend terminal
 // node updateProjects.js
 
 const mongoose = require("mongoose");
@@ -8,7 +8,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => {
   console.log("✅ Connected");
 
   const result = await mongoose.connection.collection("projects").updateMany(
-    {}, // எல்லா projects-க்கும்
+    {}, // For all projects
     { $set: { assignedTo: "A Irin Amal Felshiya" } }
   );
 

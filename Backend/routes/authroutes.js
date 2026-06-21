@@ -2,10 +2,10 @@
 const express  = require("express");
 const router   = express.Router();
 const bcrypt   = require("bcryptjs");
-const User     = require("../models/UserModels");   // உங்கள் existing ✅
-const Client   = require("../models/ClientModel");  // உங்கள் existing ✅
-const Manager  = require("../models/ManagerModel"); // உங்கள் existing ✅
-const Employee = require("../models/EmployeeModel");// ← இது மட்டும் புதுசு add
+const User     = require("../models/UserModels");   // Your existing
+const Client   = require("../models/ClientModel");  // Your existing
+const Manager  = require("../models/ManagerModel"); // Your existing
+const Employee = require("../models/EmployeeModel");// Added new Employee model
 const Subscription = require("../models/SubscriptionModel");
 const { sendOTPEmail, sendTrialWelcome } = require("../config/email");
 
@@ -285,7 +285,7 @@ router.post("/verify-otp", async (req, res) => {
   }
 });
 
-// ── POST /api/auth/save-logo (உங்கள் existing — touch பண்ணல) ───────────────
+// ── POST /api/auth/save-logo (Your existing — untouched) ───────────────
 router.post("/save-logo", async (req, res) => {
   try {
     const { userId, logoUrl } = req.body;
@@ -332,7 +332,7 @@ router.get("/profile/:id", async (req, res) => {
   }
 });
 
-// ── GET /api/auth/debug-clients (உங்கள் existing — touch பண்ணல) ─────────────
+// ── GET /api/auth/debug-clients (Your existing — untouched) ─────────────
 router.get("/debug-clients", async (req, res) => {
   try {
     const clients = await Client.find({});

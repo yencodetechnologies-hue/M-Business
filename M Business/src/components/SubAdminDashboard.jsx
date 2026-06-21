@@ -9367,9 +9367,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       transition: "all 0.2s"
 
                     }}>
-
-                    
-
+                      🎨
                   </button>
 
                 </div>

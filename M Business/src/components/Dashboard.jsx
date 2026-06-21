@@ -105,6 +105,26 @@ function Mdl({ title, onClose, children, maxWidth = 820 }) {
 }
 
 function Fld({ label, value, onChange, options, type = "text", error, placeholder, disabled, allowCustom }) {
+  const [isCustomMode, setIsCustomMode] = useState(() => {
+    if (!allowCustom) return false;
+    if (!value) return false;
+    const lowerOptions = (options || []).map(o => String(o).toLowerCase());
+    return !lowerOptions.includes(String(value).toLowerCase());
+  });
+
+  useEffect(() => {
+    if (allowCustom) {
+      if (!value) {
+        setIsCustomMode(false);
+      } else {
+        const lowerOptions = (options || []).map(o => String(o).toLowerCase());
+        if (!lowerOptions.includes(String(value).toLowerCase())) {
+          setIsCustomMode(true);
+        }
+      }
+    }
+  }, [value, options, allowCustom]);
+
   const s = { width: "100%", border: `1.5px solid ${error ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: disabled ? "var(--app-border)" : "var(--app-bg)", boxSizing: "border-box", outline: "none", fontFamily: "inherit", opacity: disabled ? 0.7 : 1 };
   const sCustom = { flex: 1.2, border: `1.5px solid ${error ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "#fff", boxSizing: "border-box", outline: "none", fontFamily: "inherit" };
   return (
@@ -112,15 +132,11 @@ function Fld({ label, value, onChange, options, type = "text", error, placeholde
       <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>{label.toUpperCase()}</label>
       {options ? (
         allowCustom ? (() => {
-          const lowerOptions = (options || []).map(o => String(o).toLowerCase());
-          const lowerVal = String(value || "").toLowerCase();
-          const matchIdx = lowerOptions.indexOf(lowerVal);
-          const hasMatch = matchIdx !== -1;
-          const selectValue = hasMatch ? options[matchIdx] : "Custom";
+          const selectValue = isCustomMode ? "Custom" : (value || "");
           return (
             <div style={{ display: "flex", gap: 10 }}>
-              <select value={selectValue} onChange={e => { const v = e.target.value; if (v === "Custom") onChange(""); else onChange(v); }} style={{ ...s, flex: 1 }} disabled={disabled}>{options.map(o => <option key={o} value={o}>{o}</option>)}<option value="Custom">Custom Status...</option></select>
-              {!hasMatch && <input type="text" placeholder={`Type custom ${label.toLowerCase()}...`} value={value || ""} onChange={e => onChange(e.target.value)} style={sCustom} disabled={disabled} />}
+              <select value={selectValue} onChange={e => { const v = e.target.value; if (v === "Custom") { setIsCustomMode(true); onChange(""); } else { setIsCustomMode(false); onChange(v); } }} style={{ ...s, flex: 1 }} disabled={disabled}>{options.map(o => <option key={o} value={o}>{o || "Select option..."}</option>)}<option value="Custom">Custom...</option></select>
+              {isCustomMode && <input type="text" placeholder={`Type custom ${label.toLowerCase()}...`} value={value || ""} onChange={e => onChange(e.target.value)} style={sCustom} disabled={disabled} autoFocus />}
             </div>
           );
         })() : (() => {
@@ -242,7 +258,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
   const filtered = clients.filter(c => (c.clientName || c.name || "").toLowerCase().includes(search.toLowerCase()) || (c.companyName || c.company || "").toLowerCase().includes(search.toLowerCase()));
   const selected = clients.find(c => (c.clientName || c.name) === value);
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative", zIndex: open ? 1000 : 1 }}>
       <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
         {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "var(--app-muted)" }}>({selected.companyName})</span>}</div>) : "-- Select Client --"}
         <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>

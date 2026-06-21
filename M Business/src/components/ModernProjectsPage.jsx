@@ -75,6 +75,7 @@ export default function ModernProjectsPage({ user }) {
   // ── Invoice ---------------------------------------------------
   const [showInvoiceCreator, setShowInvoiceCreator] = useState(false);
   const [invoicePrefill, setInvoicePrefill] = useState(null);
+  const [jumpInvoice, setJumpInvoice] = useState(null);
   const [prevActiveBeforeInvoice, setPrevActiveBeforeInvoice] = useState("dashboard");
   // ── UI state --------------------------------------------------
   const [selectedProject, setSelectedProject] = useState(() => {
@@ -363,8 +364,24 @@ export default function ModernProjectsPage({ user }) {
               onEdit={() => openEdit(selectedProject)}
               onDelete={() => setDeleteTarget(selectedProject)}
               onLogTime={(e) => openLogTime(selectedProject, e)}
-              onNewInvoice={(proj, editInv, editIdx) => {
-                setInvoicePrefill({ client: proj.client || '', project: proj.name || '', _t: Date.now(), ...(editInv ? { editData: editInv, editIndex: editIdx, projectId: proj._id } : {}) });
+              onNewInvoice={(proj, editPayload) => {
+                if (editPayload && editPayload.editData) {
+                  // Edit invoice — payload already contains editData, editIndex, projectId etc.
+                  setInvoicePrefill({
+                    client: proj.client || '',
+                    project: proj.name || '',
+                    _t: Date.now(),
+                    ...editPayload,
+                  });
+                } else {
+                  // New invoice
+                  setInvoicePrefill({ client: proj.client || '', project: proj.name || '', _t: Date.now() });
+                }
+                setJumpInvoice(null);
+                setShowInvoiceCreator(true);
+              }}
+              onViewInvoice={(inv) => {
+                setJumpInvoice(inv);
                 setShowInvoiceCreator(true);
               }} />
           </div>
@@ -382,8 +399,9 @@ export default function ModernProjectsPage({ user }) {
               clients={clients}
               projects={projects}
               newInvoicePrefill={invoicePrefill}
+              jumpInvoice={jumpInvoice}
               onSaveLocalInvoice={handleSaveLocalProjectInvoice}
-              onBack={() => setShowInvoiceCreator(false)}
+              onBack={() => { setShowInvoiceCreator(false); setJumpInvoice(null); }}
             />
           </div>
         )}

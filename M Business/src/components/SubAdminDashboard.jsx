@@ -555,6 +555,25 @@ function Mdl({ title, onClose, children, maxWidth = 820, zIndex = 1000 }) {
 
 
 function Fld({ label, value, onChange, options, type = "text", error, placeholder, disabled, allowCustom }) {
+  const [isCustomMode, setIsCustomMode] = useState(() => {
+    if (!allowCustom) return false;
+    if (!value) return false;
+    const lowerOptions = (options || []).map(o => String(o).toLowerCase());
+    return !lowerOptions.includes(String(value).toLowerCase());
+  });
+
+  useEffect(() => {
+    if (allowCustom) {
+      if (!value) {
+        setIsCustomMode(false);
+      } else {
+        const lowerOptions = (options || []).map(o => String(o).toLowerCase());
+        if (!lowerOptions.includes(String(value).toLowerCase())) {
+          setIsCustomMode(true);
+        }
+      }
+    }
+  }, [value, options, allowCustom]);
 
   const s = { width: "100%", border: `1.5px solid ${error ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: disabled ? "#f3f0ff" : "var(--app-bg)", boxSizing: "border-box", outline: "none", fontFamily: "inherit", opacity: disabled ? 0.7 : 1 };
 
@@ -570,23 +589,15 @@ function Fld({ label, value, onChange, options, type = "text", error, placeholde
 
         allowCustom ? (() => {
 
-          const lowerOptions = (options || []).map(o => String(o).toLowerCase());
-
-          const lowerVal = String(value || "").toLowerCase();
-
-          const matchIdx = lowerOptions.indexOf(lowerVal);
-
-          const hasMatch = matchIdx !== -1;
-
-          const selectValue = hasMatch ? options[matchIdx] : "Custom";
+          const selectValue = isCustomMode ? "Custom" : (value || "");
 
           return (
 
             <div style={{ display: "flex", gap: 10 }}>
 
-              <select value={selectValue} onChange={e => { const v = e.target.value; if (v === "Custom") onChange(""); else onChange(v); }} style={{ ...s, flex: 1 }} disabled={disabled}>{options.map(o => <option key={o} value={o}>{o}</option>)}<option value="Custom">Custom Status...</option></select>
+              <select value={selectValue} onChange={e => { const v = e.target.value; if (v === "Custom") { setIsCustomMode(true); onChange(""); } else { setIsCustomMode(false); onChange(v); } }} style={{ ...s, flex: 1 }} disabled={disabled}>{options.map(o => <option key={o} value={o}>{o || "Select option..."}</option>)}<option value="Custom">Custom...</option></select>
 
-              {!hasMatch && <input type="text" placeholder={`Type custom ${label.toLowerCase()}...`} value={value || ""} onChange={e => onChange(e.target.value)} style={sCustom} disabled={disabled} />}
+              {isCustomMode && <input type="text" placeholder={`Type custom ${label.toLowerCase()}...`} value={value || ""} onChange={e => onChange(e.target.value)} style={sCustom} disabled={disabled} autoFocus />}
 
             </div>
 
@@ -824,7 +835,7 @@ function InfoRow({ icon, label, value }) {
 
 function LimitReachedModal({ type, limit, onClose, onUpgrade }) {
 
-  const icons = { client: "Team", employee: "ðŸ‘¨â€ðŸ’¼", manager: "ðŸ§‘â€ðŸ’¼" };
+  const icons = { client: "Team", employee: "ðŸ‘¨â€💼", manager: "ðŸ§‘â€💼" };
 
   const labels = { client: "Clients", employee: "Employees", manager: "Managers" };
 
@@ -902,8 +913,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 
   return (
 
-    <div style={{ position: "relative" }}>
-
+    <div style={{ position: "relative", zIndex: open ? 1000 : 1 }}>
       <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
 
         {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "var(--app-muted)" }}>({selected.companyName})</span>}</div>) : "-- Select Client --"}
@@ -1710,7 +1720,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
           <div style={{ textAlign: "center", padding: 40, color: "#A0B8BE", fontSize: 12 }}>
 
-            <div style={{ fontSize: 32, marginBottom: 8 }}>ðŸ“‚</div>
+            <div style={{ fontSize: 32, marginBottom: 8 }}>📂</div>
 
             No documents uploaded yet
 
@@ -1730,7 +1740,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               }}>
 
-                <div style={{ fontSize: 22, marginBottom: 8 }}>ðŸ“„</div>
+                <div style={{ fontSize: 22, marginBottom: 8 }}>📄</div>
 
                 <div style={{ fontSize: 11, fontWeight: 700, color: "#1A2E35" }}>
 
@@ -1828,7 +1838,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
           <div style={{ display: "flex", gap: 8 }}>
 
-            <button onClick={() => { navigator.clipboard.writeText(portalUrl); showToast("ðŸ“‹ Portal link copied!"); }} style={{ flex: 1, padding: 8, background: "rgba(255,255,255,.15)", border: "1.5px solid rgba(255,255,255,.25)", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}><i className="ti ti-copy" style={{ fontSize: 13 }} />Copy Link</button>
+            <button onClick={() => { navigator.clipboard.writeText(portalUrl); showToast("📋 Portal link copied!"); }} style={{ flex: 1, padding: 8, background: "rgba(255,255,255,.15)", border: "1.5px solid rgba(255,255,255,.25)", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}><i className="ti ti-copy" style={{ fontSize: 13 }} />Copy Link</button>
 
             <button onClick={() => window.open(portalUrl, "_blank")} style={{ flex: 1, padding: 8, background: "rgba(255,255,255,.15)", border: "1.5px solid rgba(255,255,255,.25)", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}><i className="ti ti-external-link" style={{ fontSize: 13 }} />Open Portal</button>
 
@@ -2536,7 +2546,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
               setEmployees(prev => prev.map(e => e._id === viewEmp._id ? { ...e, status: "Inactive" } : e));
 
-              showToast("ðŸ‘¤ Employee deactivated!");
+              showToast("👤 Employee deactivated!");
 
             } catch (err) {
 
@@ -2562,7 +2572,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
               setEmployees(prev => prev.map(e => e._id === viewEmp._id ? { ...e, role: newRole } : e));
 
-              showToast("ðŸ’¼ Role updated successfully!");
+              showToast("💼 Role updated successfully!");
 
             } catch (err) {
 
@@ -2712,7 +2722,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
 
-          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "Copied!" : "ðŸ“‹ Copy Link"}</button>
+          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "Copied!" : "📋 Copy Link"}</button>
 
           <button onClick={() => {
 
@@ -2730,7 +2740,7 @@ ${onboardingLink}`;
 
           }} style={{ background: "#25D366", border: "none", borderRadius: 9, padding: "9px 16px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}>
 
-            <span>ðŸ’¬</span> WhatsApp
+            <span>💬</span> WhatsApp
 
           </button>
 
@@ -3162,7 +3172,7 @@ function ManagersPage({ managers, setManagers }) {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
 
-        {[{ t: "Total Managers", v: managers.length, i: "ðŸ§‘â€ðŸ’¼", c: "#f59e0b" }, { t: "Active", v: managers.filter(m => m.status === "Active").length, i: "Yes", c: "#22C55E" }, { t: "Inactive", v: managers.filter(m => m.status === "Inactive").length, i: "â›”", c: "#EF4444" }].map(({ t, v, i, c }) => (
+        {[{ t: "Total Managers", v: managers.length, i: "ðŸ§‘â€💼", c: "#f59e0b" }, { t: "Active", v: managers.filter(m => m.status === "Active").length, i: "Yes", c: "#22C55E" }, { t: "Inactive", v: managers.filter(m => m.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
 
           <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
 
@@ -3272,15 +3282,15 @@ function ManagersPage({ managers, setManagers }) {
 
           </div>
 
-          <InfoRow icon="ðŸ“§" label="Email" value={viewMgr.email} />
+          <InfoRow icon="📧" label="Email" value={viewMgr.email} />
 
-          <InfoRow icon="ðŸ“±" label="Phone" value={viewMgr.phone} />
+          <InfoRow icon="📱" label="Phone" value={viewMgr.phone} />
 
           <InfoRow icon="ðŸ¢" label="Department" value={viewMgr.department} />
 
           <InfoRow icon="ðŸ“" label="Address" value={viewMgr.address} />
 
-          <InfoRow icon="ðŸ“…" label="Joined" value={viewMgr.createdAt ? new Date(viewMgr.createdAt).toLocaleDateString() : "—"} />
+          <InfoRow icon="📅" label="Joined" value={viewMgr.createdAt ? new Date(viewMgr.createdAt).toLocaleDateString() : "—"} />
 
 
 
@@ -3554,7 +3564,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
 
-        {[{ t: "Total Subadmins", v: subadmins.length, i: "ðŸ›¡ï¸", c: "#3b82f6" }, { t: "Active", v: subadmins.filter(s => (s.status || "Active") === "Active").length, i: "Yes", c: "#22C55E" }, { t: "Inactive", v: subadmins.filter(s => s.status === "Inactive").length, i: "â›”", c: "#EF4444" }].map(({ t, v, i, c }) => (
+        {[{ t: "Total Subadmins", v: subadmins.length, i: "ðŸ›¡ï¸", c: "#3b82f6" }, { t: "Active", v: subadmins.filter(s => (s.status || "Active") === "Active").length, i: "Yes", c: "#22C55E" }, { t: "Inactive", v: subadmins.filter(s => s.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
 
           <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
 
@@ -3676,23 +3686,23 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
               <InfoRow icon="ðŸ¢" label="Company" value={viewSub.companyName || viewSub.company || "—"} />
 
-              <InfoRow icon="ðŸ’¼" label="Company Type" value={viewSub.companyType || "IT"} />
+              <InfoRow icon="💼" label="Company Type" value={viewSub.companyType || "IT"} />
 
               <InfoRow icon="Team" label="Employees" value={viewSub.employeeCount || "0-10"} />
 
-              <InfoRow icon="ðŸ“§" label="Email" value={viewSub.email} />
+              <InfoRow icon="📧" label="Email" value={viewSub.email} />
 
-              <InfoRow icon="ðŸ“±" label="Phone" value={viewSub.phone} />
+              <InfoRow icon="📱" label="Phone" value={viewSub.phone} />
 
-              <InfoRow icon="ðŸ“…" label="Joined" value={viewSub.createdAt ? new Date(viewSub.createdAt).toLocaleDateString() : "—"} />
+              <InfoRow icon="📅" label="Joined" value={viewSub.createdAt ? new Date(viewSub.createdAt).toLocaleDateString() : "—"} />
 
               <div style={{ gridColumn: "span 2", height: 1, background: "#bfdbfe", margin: "10px 0" }} />
 
               <InfoRow icon="ðŸ¢" label="Client Limit" value={viewSub.clientLimit || "Not set (Default 10)"} />
 
-              <InfoRow icon="ðŸ‘¨â€ðŸ’¼" label="Employee Limit" value={viewSub.employeeLimit || "Not set (Default 20)"} />
+              <InfoRow icon="ðŸ‘¨â€💼" label="Employee Limit" value={viewSub.employeeLimit || "Not set (Default 20)"} />
 
-              <InfoRow icon="ðŸ§‘â€ðŸ’¼" label="Manager Limit" value={viewSub.managerLimit || "Not set (Default 5)"} />
+              <InfoRow icon="ðŸ§‘â€💼" label="Manager Limit" value={viewSub.managerLimit || "Not set (Default 5)"} />
 
             </div>
 
@@ -3738,7 +3748,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
                 <h4 style={{ fontSize: 14, fontWeight: 700, color: T.text, margin: "0 0 12px 0", display: "flex", alignItems: "center", gap: 8 }}>
 
-                  <span>ðŸ“‹</span> Quotations ({relatedQuotations.length})
+                  <span>📋</span> Quotations ({relatedQuotations.length})
 
                 </h4>
 
@@ -3778,7 +3788,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
                 <h4 style={{ fontSize: 14, fontWeight: 700, color: T.text, margin: "0 0 12px 0", display: "flex", alignItems: "center", gap: 8 }}>
 
-                  <span>ðŸ‘¨â€ðŸ’¼</span> Employees ({relatedEmployees.length})
+                  <span>ðŸ‘¨â€💼</span> Employees ({relatedEmployees.length})
 
                 </h4>
 
@@ -3824,7 +3834,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
                 <h4 style={{ fontSize: 14, fontWeight: 700, color: T.text, margin: "0 0 12px 0", display: "flex", alignItems: "center", gap: 8 }}>
 
-                  <span>ðŸ§‘â€ðŸ’¼</span> Managers ({relatedManagers.length})
+                  <span>ðŸ§‘â€💼</span> Managers ({relatedManagers.length})
 
                 </h4>
 
@@ -4319,7 +4329,7 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
               <button onClick={(e) => { e.stopPropagation(); setViewProj(null); openEdit(viewProj); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>Edit</button>
 
-              <button onClick={(e) => { e.stopPropagation(); setViewProj(null); setAssignModal(viewProj); setAssignTo(Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : [])); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>ðŸ‘¤ Assign</button>
+              <button onClick={(e) => { e.stopPropagation(); setViewProj(null); setAssignModal(viewProj); setAssignTo(Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : [])); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>👤 Assign</button>
 
               <button onClick={(e) => { e.stopPropagation(); setViewProj(null); setDeleteTarget(viewProj); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,#ef4444,#dc2626)", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}> Delete</button>
 
@@ -4559,7 +4569,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
 
 
-  const tsStats = [{ t: "Total", v: trackList.length, i: "ðŸ“", c: "var(--app-accent)" }, { t: "In Progress", v: trackList.filter(p => p.status === "In Progress").length, i: "âš¡", c: "var(--app-muted)" }, { t: "Completed", v: trackList.filter(p => p.status === "Completed").length, i: "Yes", c: "#22C55E" }, { t: "Pending", v: trackList.filter(p => p.status === "Pending").length, i: "ðŸ•", c: "#F59E0B" }, { t: "On Hold", v: trackList.filter(p => p.status === "On Hold").length, i: "â¸ï¸", c: "var(--app-accent)" }];
+  const tsStats = [{ t: "Total", v: trackList.length, i: "ðŸ“", c: "var(--app-accent)" }, { t: "In Progress", v: trackList.filter(p => p.status === "In Progress").length, i: "⚡", c: "var(--app-muted)" }, { t: "Completed", v: trackList.filter(p => p.status === "Completed").length, i: "Yes", c: "#22C55E" }, { t: "Pending", v: trackList.filter(p => p.status === "Pending").length, i: "ðŸ•", c: "#F59E0B" }, { t: "On Hold", v: trackList.filter(p => p.status === "On Hold").length, i: "â¸ï¸", c: "var(--app-accent)" }];
 
   const openAdd = () => { setTsForm(EMPTY); setTsErr({}); setTsEditId(null); setTsModal("add"); };
 
@@ -4701,7 +4711,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
                         e.stopPropagation();
 
-                        const text = `ðŸ“Š *Project Status Update*\n\nProject: ${p.name}\nStatus: ${p.status}\nProgress: ${p.progress || p.pct || 0}%\nDeadline: ${p.deadline || "—"}\nNotes: ${p.notes || p.note || "No notes"}`;
+                        const text = `📊 *Project Status Update*\n\nProject: ${p.name}\nStatus: ${p.status}\nProgress: ${p.progress || p.pct || 0}%\nDeadline: ${p.deadline || "—"}\nNotes: ${p.notes || p.note || "No notes"}`;
 
                         const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
 
@@ -4941,7 +4951,7 @@ function InterviewPage({ companyId, companyName }) {
 
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
 
-          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "Copied!" : "ðŸ“‹ Copy Link"}</button>
+          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "Copied!" : "📋 Copy Link"}</button>
 
           <button onClick={() => window.open(appLink, "_blank")} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 9, padding: "9px 16px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>View Preview Form</button>
 
@@ -4951,7 +4961,7 @@ function InterviewPage({ companyId, companyName }) {
 
       <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
 
-        {[{ t: "Total", v: counts.total, i: "ðŸŽ¯", c: "var(--app-accent)" }, { t: "Pending", v: counts.pending, i: "â³", c: "#F59E0B" }, { t: "Hired", v: counts.hired, i: "Yes", c: "#22C55E" }, { t: "Rejected", v: counts.rejected, i: "âŒ", c: "#EF4444" }].map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${c},${c}88)` }} /><div style={{ width: 36, height: 36, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 26, fontWeight: 800, color: c }}>{v}</div></div>))}
+        {[{ t: "Total", v: counts.total, i: "🎯", c: "var(--app-accent)" }, { t: "Pending", v: counts.pending, i: "â³", c: "#F59E0B" }, { t: "Hired", v: counts.hired, i: "Yes", c: "#22C55E" }, { t: "Rejected", v: counts.rejected, i: "âŒ", c: "#EF4444" }].map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${c},${c}88)` }} /><div style={{ width: 36, height: 36, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 26, fontWeight: 800, color: c }}>{v}</div></div>))}
 
       </div>
 
@@ -4963,11 +4973,11 @@ function InterviewPage({ companyId, companyName }) {
 
           <div style={{ position: "relative", flex: 1, minWidth: 200 }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>Search</span><input placeholder="Search name, role, email, mobile..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", color: "var(--app-sidebar)", boxSizing: "border-box" }} /></div>
 
-          {["all", "pending", "hired", "rejected"].map(f => (<button key={f} onClick={() => setFilter(f)} style={{ padding: "7px 14px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-border)", background: filter === f ? `${f === "all" ? "var(--app-accent)" : sC(f)}15` : "#fff", color: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-muted)", transition: "all 0.15s" }}>{f === "all" ? "ðŸŽ¯ All" : f === "pending" ? "â³ Pending" : f === "hired" ? "Yes Hired" : "âŒ Rejected"}</button>))}
+          {["all", "pending", "hired", "rejected"].map(f => (<button key={f} onClick={() => setFilter(f)} style={{ padding: "7px 14px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-border)", background: filter === f ? `${f === "all" ? "var(--app-accent)" : sC(f)}15` : "#fff", color: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-muted)", transition: "all 0.15s" }}>{f === "all" ? "🎯 All" : f === "pending" ? "â³ Pending" : f === "hired" ? "Yes Hired" : "âŒ Rejected"}</button>))}
 
         </div>
 
-        {loading ? (<div style={{ textAlign: "center", padding: 50, color: "var(--app-muted)" }}>Loading candidates...</div>) : displayed.length === 0 ? (<div style={{ textAlign: "center", padding: "50px 20px", color: "var(--app-muted)" }}><div style={{ fontSize: 48, marginBottom: 12 }}>ðŸ“­</div><div style={{ fontSize: 15, fontWeight: 700, color: "var(--app-sidebar)", marginBottom: 6 }}>{candidates.length === 0 ? "No applications yet" : "No results found"}</div></div>) : (
+        {loading ? (<div style={{ textAlign: "center", padding: 50, color: "var(--app-muted)" }}>Loading candidates...</div>) : displayed.length === 0 ? (<div style={{ textAlign: "center", padding: "50px 20px", color: "var(--app-muted)" }}><div style={{ fontSize: 48, marginBottom: 12 }}>📬</div><div style={{ fontSize: 15, fontWeight: 700, color: "var(--app-sidebar)", marginBottom: 6 }}>{candidates.length === 0 ? "No applications yet" : "No results found"}</div></div>) : (
 
           <div style={{ overflowX: "auto" }}>
 
@@ -4991,7 +5001,7 @@ function InterviewPage({ companyId, companyName }) {
 
                       <td style={{ padding: "12px 12px" }}><div style={{ fontSize: 12, color: "var(--app-muted)" }}>{c.email || "—"}</div><div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{c.mobile || ""}</div></td>
 
-                      <td style={{ padding: "12px 12px" }}>{(c.experience || "").toLowerCase() === "fresher" ? <span style={{ background: "rgba(34,197,94,0.12)", color: "#22C55E", border: "1px solid rgba(34,197,94,0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>ðŸŽ“ Fresher</span> : <span style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.12)", color: "var(--app-accent)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>ðŸ’¼ {c.years || "?"}yrs</span>}</td>
+                      <td style={{ padding: "12px 12px" }}>{(c.experience || "").toLowerCase() === "fresher" ? <span style={{ background: "rgba(34,197,94,0.12)", color: "#22C55E", border: "1px solid rgba(34,197,94,0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>🎓 Fresher</span> : <span style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.12)", color: "var(--app-accent)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>💼 {c.years || "?"}yrs</span>}</td>
 
                       <td style={{ padding: "12px 12px", fontWeight: 600, color: "var(--app-sidebar)", fontSize: 12 }}>{c.role || "—"}</td>
 
@@ -5001,9 +5011,9 @@ function InterviewPage({ companyId, companyName }) {
 
                       <td style={{ padding: "12px 12px" }}><select value={status} onChange={e => updateStatus(idx, e.target.value)} style={{ background: status === "hired" ? "rgba(34,197,94,0.1)" : status === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(245,158,11,0.1)", border: `1.5px solid ${sC(status)}44`, borderRadius: 8, padding: "5px 10px", color: sC(status), fontSize: 12, fontWeight: 700, cursor: "pointer", outline: "none", fontFamily: "inherit" }}><option value="pending">â³ Pending</option><option value="hired">Yes Hired</option><option value="rejected">âŒ Rejected</option></select></td>
 
-                      <td style={{ padding: "12px 12px" }}>{finalResumeUrl ? <button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap" }}>ðŸ“„</button> : <span style={{ fontSize: 11, color: "#ddd" }}>—</span>}</td>
+                      <td style={{ padding: "12px 12px" }}>{finalResumeUrl ? <button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap" }}>📄</button> : <span style={{ fontSize: 11, color: "#ddd" }}>—</span>}</td>
 
-                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", gap: 5 }}><button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>ðŸ‘¤</button><button onClick={() => deleteCandidate(idx)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}> Delete</button></div></td>
+                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", gap: 5 }}><button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>👤</button><button onClick={() => deleteCandidate(idx)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}> Delete</button></div></td>
 
                     </tr>
 
@@ -5031,7 +5041,7 @@ function InterviewPage({ companyId, companyName }) {
 
             <div style={{ padding: "16px 22px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink: 0 }}>
 
-              <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "var(--app-sidebar)" }}>ðŸ‘¤ Candidate Profile</h2>
+              <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "var(--app-sidebar)" }}>👤 Candidate Profile</h2>
 
               <button onClick={() => setViewModal(null)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "var(--app-muted)", padding: "4px 8px" }}>Close</button>
 
@@ -5069,7 +5079,7 @@ function InterviewPage({ companyId, companyName }) {
 
                 <div style={{ marginBottom: 20 }}>
 
-                  <h3 style={{ margin: "0 0 12px", fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>ðŸ“„ Resume</h3>
+                  <h3 style={{ margin: "0 0 12px", fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>📄 Resume</h3>
 
                   <div style={{ border: "1.5px solid var(--app-border)", borderRadius: 12, overflow: "hidden", background: "var(--app-bg)" }}>
 
@@ -5089,7 +5099,7 @@ function InterviewPage({ companyId, companyName }) {
 
                         errorDiv.style.cssText = 'padding: 50px; text-align: center; color: #ef4444; font-size: 14px; background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 12px; margin: 20px;';
 
-                        errorDiv.innerHTML = 'ðŸ“„ Resume file not found<br><span style="font-size: 12px; color: #991b1b;">The resume file may have been deleted or moved</span>';
+                        errorDiv.innerHTML = '📄 Resume file not found<br><span style="font-size: 12px; color: #991b1b;">The resume file may have been deleted or moved</span>';
 
                         e.target.parentNode.appendChild(errorDiv);
 
@@ -5119,7 +5129,7 @@ function InterviewPage({ companyId, companyName }) {
 
                 <div style={{ padding: 12, background: "var(--app-bg)", borderRadius: 10, border: "1px solid var(--app-border)" }}>
 
-                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>ðŸ“§ Email</div>
+                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>📧 Email</div>
 
                   <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)" }}>{viewModal.email || "—"}</div>
 
@@ -5127,7 +5137,7 @@ function InterviewPage({ companyId, companyName }) {
 
                 <div style={{ padding: 12, background: "var(--app-bg)", borderRadius: 10, border: "1px solid var(--app-border)" }}>
 
-                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>ðŸ“± Mobile</div>
+                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>📱 Mobile</div>
 
                   <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)" }}>{viewModal.mobile || "—"}</div>
 
@@ -5135,11 +5145,11 @@ function InterviewPage({ companyId, companyName }) {
 
                 <div style={{ padding: 12, background: "var(--app-bg)", borderRadius: 10, border: "1px solid var(--app-border)" }}>
 
-                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>ðŸ’¼ Experience</div>
+                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>💼 Experience</div>
 
                   <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)" }}>
 
-                    {(viewModal.experience || "").toLowerCase() === "fresher" ? "ðŸŽ“ Fresher" : `ðŸ’¼ ${viewModal.years || "?"} years`}
+                    {(viewModal.experience || "").toLowerCase() === "fresher" ? "🎓 Fresher" : `💼 ${viewModal.years || "?"} years`}
 
                   </div>
 
@@ -5147,7 +5157,7 @@ function InterviewPage({ companyId, companyName }) {
 
                 <div style={{ padding: 12, background: "var(--app-bg)", borderRadius: 10, border: "1px solid var(--app-border)" }}>
 
-                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>ðŸ“… Applied Date</div>
+                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>📅 Applied Date</div>
 
                   <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)" }}>{fmt(viewModal.date || viewModal.createdAt)}</div>
 
@@ -5155,7 +5165,7 @@ function InterviewPage({ companyId, companyName }) {
 
                 <div style={{ padding: 12, background: "var(--app-bg)", borderRadius: 10, border: "1px solid var(--app-border)" }}>
 
-                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>ðŸ‘¨â€ðŸ’¼ Interviewer</div>
+                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>ðŸ‘¨â€💼 Interviewer</div>
 
                   <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)" }}>{viewModal.interviewerName || "—"}</div>
 
@@ -5253,7 +5263,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
             >
 
-              ðŸ“·
+              📷
 
             </button>
 
@@ -5281,7 +5291,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
             <div style={{ fontSize: 11, fontWeight: 800, color: "var(--app-muted)", marginBottom: 12, letterSpacing: 1 }}>PERSONAL DETAILS</div>
 
-            {[{ icon: "ðŸ‘¤", label: "Full Name", value: displayName }, { icon: "ðŸ“§", label: "Email", value: user?.email || "—" }, { icon: "ðŸ“±", label: "Phone", value: user?.phone || "—" }, { icon: "ðŸŽ­", label: "Role", value: user?.role || "user" }].map(({ icon, label, value }) => (
+            {[{ icon: "👤", label: "Full Name", value: displayName }, { icon: "📧", label: "Email", value: user?.email || "—" }, { icon: "📱", label: "Phone", value: user?.phone || "—" }, { icon: "ðŸŽ­", label: "Role", value: user?.role || "user" }].map(({ icon, label, value }) => (
 
               <div key={label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "var(--app-bg)", borderRadius: 9, border: "1px solid var(--app-border)", marginBottom: 7 }}>
 
@@ -6319,7 +6329,7 @@ function VendorsPage({ vendors, setVendors }) {
 
           <InfoRow icon="ðŸ’³" label="Mode of Payment" value={viewVendor.modeOfPayment} />
 
-          <InfoRow icon="ðŸ“…" label="Date of Purchase" value={viewVendor.dateOfPurchase ? new Date(viewVendor.dateOfPurchase).toLocaleDateString() : "—"} />
+          <InfoRow icon="📅" label="Date of Purchase" value={viewVendor.dateOfPurchase ? new Date(viewVendor.dateOfPurchase).toLocaleDateString() : "—"} />
 
           <InfoRow icon="ðŸ“" label="Description" value={viewVendor.productDescription} />
 
@@ -9212,7 +9222,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                         <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>
 
-                          ðŸŽ¯ Custom Color
+                          🎯 Custom Color
 
                         </div>
 
@@ -10552,11 +10562,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now(), ...(editInv ? { editData: editInv, editIndex: editIdx, projectId: proj._id } : {}) });
                   setJumpInvoice(null);
                   setPrevActiveBeforeInvoice(active);
+                  setSidebarOverride(active);
                   setActive("invoices");
                 }}
                 onViewInvoice={(entry) => {
                   setJumpInvoice(entry);
                   setPrevActiveBeforeInvoice(active);
+                  setSidebarOverride(active);
                   setActive("invoices");
                 }}
                 onLogTime={async (hours) => {
@@ -10737,7 +10749,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => setActive(prevActiveBeforeInvoice || "dashboard")} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill} onAddClient={() => {
+            {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={sidebarOverride ? () => { setSidebarOverride(null); setActive(prevActiveBeforeInvoice || "dashboard"); } : undefined} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 
@@ -11151,7 +11163,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   >
 
-                    <span style={{ fontSize: 14 }}>ðŸ‘¤</span> Profile
+                    <span style={{ fontSize: 14 }}>👤</span> Profile
 
                   </button>
 
@@ -11421,7 +11433,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                         navigator.clipboard.writeText(text);
 
-                        toast.success("ðŸ“‹ Credentials copied!");
+                        toast.success("📋 Credentials copied!");
 
                       }}
 
@@ -11429,7 +11441,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     >
 
-                      ðŸ“‹ Copy Login Details
+                      📋 Copy Login Details
 
                     </button>
 
@@ -11451,7 +11463,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     >
 
-                      <span style={{ fontSize: 16 }}>ðŸ’¬</span> Share via WhatsApp
+                      <span style={{ fontSize: 16 }}>💬</span> Share via WhatsApp
 
                     </button>
 
@@ -11601,7 +11613,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                         border: "3px solid #fff"
 
-                      }}>ðŸ“·</div>
+                      }}>📷</div>
 
                     </div>
 
@@ -11615,7 +11627,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
 
-                      {[{ val: 'b2b', icon: 'ðŸ¢', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: 'ðŸ‘¤', label: 'B2C', sub: 'Individual person' }, { val: 'freelancer', icon: 'ðŸ’¼', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
+                      {[{ val: 'b2b', icon: 'ðŸ¢', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: '👤', label: 'B2C', sub: 'Individual person' }, { val: 'freelancer', icon: '💼', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
 
                         <div key={t.val} onClick={() => setNc(p => ({ ...p, clientType: t.val }))}
 
@@ -11669,7 +11681,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>ðŸ“‹ Primary Contact</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>📋 Primary Contact</div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
 
@@ -11889,7 +11901,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 }} style={{ background: "#dcfce7", border: "1.5px solid #bbf7d0", color: "#16a34a", borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 700, fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}>
 
-                  <span>ðŸ’¬</span> Share Link
+                  <span>💬</span> Share Link
 
                 </button>
 
@@ -12559,9 +12571,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-                  <InfoRow icon="ðŸ“„" label="Description" value={viewPackage.description} />
+                  <InfoRow icon="📄" label="Description" value={viewPackage.description} />
 
-                  <InfoRow icon="ðŸ“…" label="Duration" value={`${viewPackage.no_of_days || viewPackage.noOfDays || 30} days`} />
+                  <InfoRow icon="📅" label="Duration" value={`${viewPackage.no_of_days || viewPackage.noOfDays || 30} days`} />
 
                   <InfoRow icon="ðŸ’°" label="Price" value={viewPackage.type === "free" ? "Free" : `Rs.${viewPackage.price || 0}`} />
 
@@ -12569,13 +12581,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <InfoRow icon="ðŸ¢" label="Business" value={viewPackage.businessLimit || ""} />
 
-                  <InfoRow icon="ðŸ‘¨â€ðŸ’¼" label="Manager" value={viewPackage.managerLimit || ""} />
+                  <InfoRow icon="ðŸ‘¨â€💼" label="Manager" value={viewPackage.managerLimit || ""} />
 
                   <InfoRow icon="Team" label="Clients (Company Name)" value={viewPackage.clientLimit || ""} />
 
-                  <InfoRow icon="ðŸ‘¤" label="Employee" value={viewPackage.employeeLimit || ""} />
+                  <InfoRow icon="👤" label="Employee" value={viewPackage.employeeLimit || ""} />
 
-                  <InfoRow icon="ðŸ“Š" label="Status" value={viewPackage.status || "Active"} />
+                  <InfoRow icon="📊" label="Status" value={viewPackage.status || "Active"} />
 
 
 
@@ -12871,7 +12883,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 24 }}>
 
-                    <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>ðŸŽ¯</div>
+                    <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>🎯</div>
 
                     <div>
 

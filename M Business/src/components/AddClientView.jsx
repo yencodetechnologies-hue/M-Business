@@ -7,6 +7,9 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
   const isEdit = !!editData;
   const today = new Date().toISOString().split('T')[0];
 
+  const [customCats, setCustomCats] = useState([]);
+  const [customSources, setCustomSources] = useState([]);
+
   const [formData, setFormData] = useState({
     clientType: editData?.clientType || 'b2b',
     name: editData?.clientName || editData?.name || '',
@@ -248,14 +251,15 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                   <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Category / industry</label>
                   {customInputMode.category ? (
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <input name="category" value={formData.category} onChange={handleChange} placeholder="Type custom category..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus />
-                      <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, category: false })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</button>
+                      <input name="category" value={formData.category} onChange={handleChange} placeholder="Type custom category..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.category) { setCustomCats(prev => Array.from(new Set([...prev, formData.category]))); } setCustomInputMode(prev => ({ ...prev, category: false })); } }} />
+                      <button type="button" onClick={() => { if (formData.category) { setCustomCats(prev => Array.from(new Set([...prev, formData.category]))); } setCustomInputMode(prev => ({ ...prev, category: false })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</button>
                     </div>
                   ) : (
                     <select name="category" value={formData.category} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
                       <option value="">Select a category</option>
-                      <option>Web Development</option><option>Mobile App Development</option><option>UI/UX Design</option><option>Digital Marketing</option><option>IT Consulting</option><option>E-commerce</option><option>Healthcare</option><option>Education</option><option>Finance</option><option>Real Estate</option><option>Manufacturing</option><option>Retail</option><option>Logistics</option><option>Media & Entertainment</option>
-                      {formData.category && !['Web Development', 'Mobile App Development', 'UI/UX Design', 'Digital Marketing', 'IT Consulting', 'E-commerce', 'Healthcare', 'Education', 'Finance', 'Real Estate', 'Manufacturing', 'Retail', 'Logistics', 'Media & Entertainment'].includes(formData.category) && (
+                      <option value="Web Development">Web Development</option><option value="Mobile App Development">Mobile App Development</option><option value="UI/UX Design">UI/UX Design</option><option value="Digital Marketing">Digital Marketing</option><option value="IT Consulting">IT Consulting</option><option value="E-commerce">E-commerce</option><option value="Healthcare">Healthcare</option><option value="Education">Education</option><option value="Finance">Finance</option><option value="Real Estate">Real Estate</option><option value="Manufacturing">Manufacturing</option><option value="Retail">Retail</option><option value="Logistics">Logistics</option><option value="Media & Entertainment">Media & Entertainment</option>
+                      {customCats.map(c => <option key={c} value={c}>{c}</option>)}
+                      {formData.category && !['Web Development', 'Mobile App Development', 'UI/UX Design', 'Digital Marketing', 'IT Consulting', 'E-commerce', 'Healthcare', 'Education', 'Finance', 'Real Estate', 'Manufacturing', 'Retail', 'Logistics', 'Media & Entertainment'].includes(formData.category) && !customCats.includes(formData.category) && (
                         <option value={formData.category}>{formData.category}</option>
                       )}
                       <option value="__custom__">+ Custom</option>
@@ -271,13 +275,18 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                   <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Client source</label>
                   {customInputMode.source ? (
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <input name="source" value={formData.source} onChange={handleChange} placeholder="Type custom source..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus />
-                      <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, source: false })); setFormData(prev => ({ ...prev, source: '' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Close</button>
+                      <input name="source" value={formData.source} onChange={handleChange} placeholder="Type custom source..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.source) { setCustomSources(prev => Array.from(new Set([...prev, formData.source]))); } setCustomInputMode(prev => ({ ...prev, source: false })); } }} />
+                      <button type="button" onClick={() => { if (formData.source) { setCustomSources(prev => Array.from(new Set([...prev, formData.source]))); } setCustomInputMode(prev => ({ ...prev, source: false })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</button>
                     </div>
                   ) : (
                     <select name="source" value={formData.source} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
                       <option value="">How did they find you?</option>
-                      <option>Referral</option><option>Website / Organic</option><option>Social Media</option><option>Cold Outreach</option><option>LinkedIn</option><option>Event / Conference</option><option>Google Ads</option><option>Word of Mouth</option><option value="__custom__">Custom</option>
+                      <option value="Referral">Referral</option><option value="Website / Organic">Website / Organic</option><option value="Social Media">Social Media</option><option value="Cold Outreach">Cold Outreach</option><option value="LinkedIn">LinkedIn</option><option value="Event / Conference">Event / Conference</option><option value="Google Ads">Google Ads</option><option value="Word of Mouth">Word of Mouth</option>
+                      {customSources.map(s => <option key={s} value={s}>{s}</option>)}
+                      {formData.source && !['Referral', 'Website / Organic', 'Social Media', 'Cold Outreach', 'LinkedIn', 'Event / Conference', 'Google Ads', 'Word of Mouth'].includes(formData.source) && !customSources.includes(formData.source) && (
+                        <option value={formData.source}>{formData.source}</option>
+                      )}
+                      <option value="__custom__">+ Custom</option>
                     </select>
                   )}
                 </div>

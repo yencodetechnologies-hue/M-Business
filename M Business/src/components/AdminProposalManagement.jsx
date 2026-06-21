@@ -217,7 +217,7 @@ function CompanyDropdown({ clients, value, onChange, error }) {
   const selected = clients.find(c => (c.clientName || c.name) === value);
 
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative", zIndex: open ? 1000 : 1 }}>
       <div onClick={() => setOpen(!open)} style={{
         width: "100%",
         border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`,
@@ -386,7 +386,7 @@ function EmployeeDropdown({ employees, value, onChange, error }) {
   );
 
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative", zIndex: open ? 1000 : 1 }}>
       <div onClick={() => setOpen(!open)} style={{
         width: "100%",
         border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`,

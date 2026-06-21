@@ -164,7 +164,7 @@ function CompanyDropdown({ clients, value, onChange, error, onAddCompany }) {
   const filtered = clients.filter(c => (c.clientName || c.name || "").toLowerCase().includes(search.toLowerCase()) || (c.companyName || c.company || "").toLowerCase().includes(search.toLowerCase()));
   const selected = clients.find(c => (c.clientName || c.name) === value);
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative", zIndex: open ? 1000 : 1 }}>
       <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "#64748b", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
         {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "#64748b" }}>({selected.companyName})</span>}</div>) : "-- Select Company Name --"}
         <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "#64748b", transition: "0.2s" }}>▼</span>
@@ -189,7 +189,7 @@ function ProjectDropdown({ projects, value, onChange, onAddProject, disabled }) 
   const [open, setOpen] = useState(false);
   const filtered = projects.filter(p => (p.name || "").toLowerCase().includes(search.toLowerCase()));
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative", zIndex: open ? 1000 : 1 }}>
       <div onClick={() => { if (!disabled) setOpen(!open) }} style={{ width: "100%", border: `1.5px solid ${open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "#64748b", background: "var(--app-bg)", cursor: disabled ? "not-allowed" : "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42, opacity: disabled ? 0.5 : 1 }}>
         {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span></div>) : "-- Select Project --"}
         <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "#64748b", transition: "0.2s" }}>▼</span>
@@ -335,7 +335,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || "";
 
-  const [step, setStep] = useState("list"); // "list" | "form" | "preview"
+  const [step, setStep] = useState(jumpInvoice ? "preview" : newInvoicePrefill ? "form" : "list"); // "list" | "form" | "preview"
   const [internalNav, setInternalNav] = useState(false);
 
   useEffect(() => {

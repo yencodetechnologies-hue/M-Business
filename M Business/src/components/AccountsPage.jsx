@@ -149,7 +149,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient, THEME })
   const filtered = clients.filter(c => (c.clientName || c.name || "").toLowerCase().includes(search.toLowerCase()) || (c.companyName || c.company || "").toLowerCase().includes(search.toLowerCase()));
   const selected = clients.find(c => (c.clientName || c.name) === value);
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative", zIndex: open ? 1000 : 1 }}>
       <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? THEME.accent : "var(--app-border)"}`, borderRadius: 12, padding: "12px 36px 12px 14px", fontSize: 14, color: value ? "var(--app-text)" : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 46, fontWeight: 600 }}>
         {value ? (
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

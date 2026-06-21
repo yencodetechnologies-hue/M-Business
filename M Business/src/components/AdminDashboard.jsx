@@ -1424,7 +1424,7 @@ function SubadminDropdown({ value, options, onChange, darkMode }) {
   const selected = options.find(o => o._id === effectiveValue);
 
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative", zIndex: open ? 1000 : 1 }}>
       <div
         onClick={() => setOpen(!open)}
         style={{

@@ -506,7 +506,7 @@ function Search({ value, onChange, placeholder }) {
 
     <div style={{ position: "relative", marginBottom: 16 }}>
 
-      <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>Search</span>
+      <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "var(--app-muted)", fontSize: 16 }}></i>
 
       <input type="text" placeholder={placeholder || "Search..."} value={value} onChange={e => onChange(e.target.value)}
 

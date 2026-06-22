@@ -615,14 +615,65 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
     }
   };
 
-  // ── Initiate PayU Payment (Bypassed to Mock Gateway for Testing) ------
+  // ── Initiate PayU Payment ---------------------------------------------
   const startPayUPayment = async (plan) => {
     if (plan.isTrial) { startTrial(plan); return; }
     if (!plan.price) { window.open(`mailto:billing@${(user?.companyName || "business").toLowerCase().replace(/\s+/g, "")}.com`); return; }
 
-    // Bypass real PayU and use the Mock Gateway for seamless testing
-    setMockGatewayPlan(plan);
-    setShowPlanPicker(false);
+    // Prevent duplicate API calls from rapid clicking
+    if (payuInFlight.current || payLoading) return;
+    payuInFlight.current = true;
+    setPayLoading(plan.name);
+    try {
+      // Get PayU parameters from backend
+      const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, {
+        userId,
+        userEmail,
+        userName,
+        plan
+      });
+
+      if (res.data.success) {
+        // Create an invisible form and submit it to PayU
+        const payuData = res.data;
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = payuData.env === "prod" ? "https://secure.payu.in/_payment" : "https://test.payu.in/_payment";
+        form.style.display = "none";
+
+        const fields = {
+          key: payuData.key,
+          txnid: payuData.txnid,
+          amount: payuData.amount,
+          productinfo: payuData.productinfo,
+          firstname: payuData.firstname,
+          email: payuData.email,
+          phone: payuData.phone,
+          udf1: payuData.udf1 || "",
+          hash: payuData.hash,
+          surl: payuData.surl,
+          furl: payuData.furl
+        };
+
+        for (const [key, value] of Object.entries(fields)) {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = key;
+          input.value = value;
+          form.appendChild(input);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+      } else {
+        throw new Error(res.data.error || "Failed to initialize PayU payment");
+      }
+    } catch (err) {
+      console.error("PayU init error:", err);
+      showToast("Error Could not initialize payment. Please try again.");
+      setPayLoading(null);
+      payuInFlight.current = false; // Release the guard on error
+    }
   };
 
   // ── Complete mock payment  activate subscription -------------------------

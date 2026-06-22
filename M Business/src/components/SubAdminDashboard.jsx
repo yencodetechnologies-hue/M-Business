@@ -11175,7 +11175,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                       >
 
-                        <span style={{ fontSize: 14 }}>âž•</span> Add account
+                        <span style={{ fontSize: 14 }}>➕</span> Add Account
 
                       </button>
 

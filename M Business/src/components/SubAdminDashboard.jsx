@@ -757,7 +757,7 @@ function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel = "Del
 
         <div style={{ width: 52, height: 52, borderRadius: "50%", background: danger ? "rgba(var(--red-rgb),0.1)" : "rgba(var(--app-accent-rgb),0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, margin: "0 auto 14px" }}>
 
-          {danger ? "Deleteï¸" : "Yes"}
+          {danger ? "Delete" : "Yes"}
 
         </div>
 
@@ -2498,7 +2498,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
       }
 
-      showToast("Delete Deleted locally!");
+      showToast("Delete Deleted locally!");
 
     }
 
@@ -4041,7 +4041,7 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
     setDeleteTarget(null);
 
-    showToast(" Deleteï¸ Project deleted!");
+    showToast(" Delete Project deleted!");
 
   };
 
@@ -4577,7 +4577,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
   const saveTs = async () => { const errs = {}; if (!tsForm.name.trim()) errs.name = "Project name required"; if (!tsForm.client.trim()) errs.client = "Company name required"; if (!tsForm.deadline) errs.deadline = "Deadline required"; const pv = Number(tsForm.progress); if (isNaN(pv) || pv < 0 || pv > 100) errs.progress = "0–100 only"; if (Object.keys(errs).length) { setTsErr(errs); return; } try { setTsSaving(true); const payload = { ...tsForm, progress: Number(tsForm.progress) }; if (tsModal === "add") { if (!payload.projectId) { const maxId = Math.max(...trackList.map(p => { const match = (p.projectId || p.id || "").match(/PRJ(\d+)/); return match ? parseInt(match[1]) : 0; }), 0); payload.projectId = `PRJ${String(maxId + 1).padStart(3, "0")}`; } const res = await axios.post(BASE_URL + "/api/project-status", payload); setTrackList(prev => [res.data, ...prev]); } else { const res = await axios.put(`${BASE_URL}/api/project-status/${tsEditId}`, payload); setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? res.data : p)); } showToast(tsModal === "add" ? "Yes Project added!" : "Yes Project updated!"); setTsModal(null); } catch { if (tsModal === "add") { const local = { ...tsForm, _id: Date.now().toString(), projectId: tsForm.projectId || `PRJ${String(trackList.length + 1).padStart(3, "0")}`, progress: Number(tsForm.progress) }; setTrackList(prev => [local, ...prev]); } else { setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? { ...p, ...tsForm, progress: Number(tsForm.progress) } : p)); } showToast("Yes Saved locally!"); setTsModal(null); } finally { setTsSaving(false); } };
 
-  const deleteTs = async (id) => { if (!window.confirm("Delete?")) return; try { await axios.delete(`${BASE_URL}/api/project-status/${id}`); } catch { } setTrackList(prev => prev.filter(p => (p._id || p.id) !== id)); showToast(" Deleteï¸ Deleted!"); };
+  const deleteTs = async (id) => { if (!window.confirm("Delete?")) return; try { await axios.delete(`${BASE_URL}/api/project-status/${id}`); } catch { } setTrackList(prev => prev.filter(p => (p._id || p.id) !== id)); showToast(" Delete Deleted!"); };
 
   const B2 = (color) => ({ background: "var(--app-accent-gradient)", color: "#ffffff", border: "none", borderRadius: 12, padding: "12px 22px", fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 6px 20px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)", transition: "all 0.25s cubic-bezier(0.4,0,0.2,1)" });
 
@@ -4911,7 +4911,7 @@ function InterviewPage({ companyId, companyName }) {
 
   };
 
-  const deleteCandidate = (idx) => { if (!window.confirm("Delete this candidate?")) return; const c = candidates[idx]; const id = c._id || c.id; if (id) axios.delete(`${API_URL}/api/interviews/${id}`).catch(() => { }); persist(candidates.filter((_, i) => i !== idx)); showToast(" Deleteï¸ Deleted"); setViewModal(null); };
+  const deleteCandidate = (idx) => { if (!window.confirm("Delete this candidate?")) return; const c = candidates[idx]; const id = c._id || c.id; if (id) axios.delete(`${API_URL}/api/interviews/${id}`).catch(() => { }); persist(candidates.filter((_, i) => i !== idx)); showToast(" Delete Deleted"); setViewModal(null); };
 
   const fmt = (iso) => iso ? new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 
@@ -6211,7 +6211,7 @@ function VendorsPage({ vendors, setVendors }) {
 
       setDeleteTarget(null);
 
-      showToast(" Deleteï¸ Vendor deleted!");
+      showToast("Delete Vendor deleted!");
 
     } catch {
 

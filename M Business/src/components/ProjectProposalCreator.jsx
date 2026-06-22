@@ -1131,7 +1131,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   // proposal data to load — prevents the list from flickering before the editor opens.
   const [isUrlNavigation] = useState(
     () => !!(new URLSearchParams(window.location.search).get("edit") ||
-             new URLSearchParams(window.location.search).get("view"))
+      new URLSearchParams(window.location.search).get("view"))
   );
 
   const iframeRef = useRef(null);
@@ -1182,6 +1182,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   const [propSearch, setPropSearch] = useState("");
   const [newForm, setNewForm] = useState({ title: "", client: "", value: "" });
   const [viewingProposal, setViewingProposal] = useState(null);
+  const [openMenuId, setOpenMenuId] = useState(null);
 
   // Role-based security: Force View Mode for clients
   useEffect(() => {
@@ -1970,7 +1971,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                     const value = p.value || 0;
                     const slides = p.slides?.length || 0;
                     return (
-                      <div key={p.id || p._id} className="proposal-card" onClick={() => openDoc(p)}>
+                      <div key={p.id || p._id} className="proposal-card" onClick={() => { setOpenMenuId(null); openDoc(p); }}>
                         {/* Header */}
                         <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 20px", borderBottom: "1px solid var(--border,#E0EEF0)" }}>
                           <div style={{ width: 48, height: 48, borderRadius: 13, background: grad, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 800, color: "#fff", flexShrink: 0 }}>{initials}</div>
@@ -1982,9 +1983,17 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                               <span style={{ fontSize: 11, color: "var(--text2,#607D86)", fontWeight: 600 }}>{p.client || "No client assigned"}</span>
                             </div>
                           </div>
-                          <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0, position: "relative" }}>
                             <span className={`badge-pill badge-${badge.cls}`}>{badge.label}</span>
-                            <button onClick={e => { e.stopPropagation(); }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3,#A0B8BE)", fontSize: 17, padding: 4 }}><i className="ti ti-dots-vertical"></i></button>
+                            <button onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === (p.id || p._id) ? null : (p.id || p._id)); }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3,#A0B8BE)", fontSize: 17, padding: 4 }}><i className="ti ti-dots-vertical"></i></button>
+                            {openMenuId === (p.id || p._id) && (
+                              <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 28, right: 0, background: "#fff", border: "1.5px solid #e0eef0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 999, minWidth: 160, overflow: "hidden" }}>
+                                <div onClick={e => { setOpenMenuId(null); setViewingProposal(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-eye" style={{ color: "#00BCD4" }}></i> View</div>
+                                <div onClick={e => { setOpenMenuId(null); shareProposal(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-share" style={{ color: "#7C5CFC" }}></i> Share</div>
+                                <div onClick={e => { setOpenMenuId(null); printProposal(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-download" style={{ color: "#2563EB" }}></i> PDF</div>
+                                <div onClick={e => { setOpenMenuId(null); deleteProposal(p.id, p._id, e); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }} onMouseEnter={e => e.currentTarget.style.background = "#fff1f2"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-trash" style={{ color: "#EF4444" }}></i> Delete</div>
+                              </div>
+                            )}
                           </div>
                         </div>
 
@@ -2041,7 +2050,6 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                             <button className="pf-btn" onClick={e => { e.stopPropagation(); setViewingProposal(p); }}><i className="ti ti-eye" style={{ fontSize: 12 }}></i> View</button>
                             <button className="pf-btn" onClick={e => { e.stopPropagation(); shareProposal(p); }}><i className="ti ti-share" style={{ fontSize: 12 }}></i> Share</button>
                             <button className="pf-btn" onClick={e => { e.stopPropagation(); printProposal(p); }}><i className="ti ti-download" style={{ fontSize: 12 }}></i> PDF</button>
-                            <button className="pf-btn danger" onClick={e => deleteProposal(p.id, p._id, e)}><i className="ti ti-trash" style={{ fontSize: 12 }}></i></button>
                           </div>
                         </div>
                       </div>

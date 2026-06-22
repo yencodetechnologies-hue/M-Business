@@ -53,9 +53,9 @@ exports.processRefund = async (req, res) => {
 
 exports.getPaymentStats = async (req, res) => {
   try {
-    const total   = await PaymentHistory.countDocuments();
+    const total = await PaymentHistory.countDocuments();
     const success = await PaymentHistory.countDocuments({ status: 'success' });
-    const failed  = await PaymentHistory.countDocuments({ status: 'failed' });
+    const failed = await PaymentHistory.countDocuments({ status: 'failed' });
     res.json({ total, success, failed });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -89,6 +89,12 @@ exports.initPayU = async (req, res) => {
     const firstname = userName || '';
     const email = userEmail || '';
     const phone = '';
+    // Cancel any existing pending subscriptions for this user before creating a new one
+    await Subscription.updateMany(
+      { userId, status: "pending" },
+      { status: "cancelled", updatedAt: new Date() }
+    );
+
     // Create a pending subscription first
     const pendingSub = new Subscription({
       userId,

@@ -50,7 +50,7 @@ exports.addClient = async (req, res) => {
     if (isBlacklisted) {
       console.log(`Blocked re-registration for deleted client email: ${normalizedEmail}`);
       return res.status(403).json({
-        message: "This email address belongs to a previously deleted client account and cannot be reused."
+        message: "This email address is unavailable and cannot be used to create a new client account."
       });
     }
 

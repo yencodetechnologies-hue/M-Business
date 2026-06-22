@@ -122,7 +122,7 @@ export default function ProposalForm({ onBack, onSave, initialData, clients }) {
       if (dupBtn) dupBtn.onclick = () => {
         if (window._onSaveProposal) {
           const data = logic.extractProposalData();
-          data.title = data.title + ' (Copy)';
+          data.title = data.title + ' ()';
           data.status = 'draft';
           window._onSaveProposal(data);
         }

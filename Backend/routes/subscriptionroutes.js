@@ -12,7 +12,7 @@ router.get("/current/:id", async (req, res) => {
     const { id } = req.params;
     const subscription = await Subscription.findOne({
       $or: [{ userId: id }, { companyId: id }],
-      status: { $in: ["active", "pending", "expired", "trial"] }
+      status: { $in: ["active", "expired", "trial"] }
     }).sort({ createdAt: -1 });
 
     if (!subscription) return res.json({ hasSubscription: false, message: "No subscription found" });
@@ -141,7 +141,7 @@ router.post("/start-trial", async (req, res) => {
     await trialPayment.save();
 
     // Update user mySubscriptions
-    await User.findByIdAndUpdate(userId, { 
+    await User.findByIdAndUpdate(userId, {
       mySubscriptions: true,
       clientLimit: subscription.clientLimit,
       employeeLimit: subscription.employeeLimit,
@@ -176,7 +176,7 @@ router.post("/create", async (req, res) => {
     await subscription.save();
 
     // Update user limits to match the new subscription
-    await User.findByIdAndUpdate(data.userId, { 
+    await User.findByIdAndUpdate(data.userId, {
       mySubscriptions: true,
       clientLimit: subscription.clientLimit,
       employeeLimit: subscription.employeeLimit,
@@ -476,11 +476,11 @@ router.get("/quotations/:userId", async (req, res) => {
 // ─── Assign package to subadmin ───────────────────────────────────────────────
 router.post("/assign-to-subadmin", async (req, res) => {
   try {
-    const { 
-      subadminId, subadminEmail, subadminName, 
-      packageId, packageTitle, planPrice, billingCycle, 
+    const {
+      subadminId, subadminEmail, subadminName,
+      packageId, packageTitle, planPrice, billingCycle,
       durationDays, features, notes,
-      clientLimit, employeeLimit, managerLimit, businessLimit 
+      clientLimit, employeeLimit, managerLimit, businessLimit
     } = req.body;
 
     const assignedPackage = packageId ? await Package.findById(packageId) : null;
@@ -496,9 +496,9 @@ router.post("/assign-to-subadmin", async (req, res) => {
       return val;
     };
 
-    const resolvedClientLimit   = normalizeLimit(clientLimit,   assignedPackage?.clientLimit,   "Clients");
+    const resolvedClientLimit = normalizeLimit(clientLimit, assignedPackage?.clientLimit, "Clients");
     const resolvedEmployeeLimit = normalizeLimit(employeeLimit, assignedPackage?.employeeLimit, "Employees");
-    const resolvedManagerLimit  = normalizeLimit(managerLimit,  assignedPackage?.managerLimit,  "Managers");
+    const resolvedManagerLimit = normalizeLimit(managerLimit, assignedPackage?.managerLimit, "Managers");
     const resolvedBusinessLimit = normalizeLimit(businessLimit, assignedPackage?.businessLimit, "Business");
 
     console.log("[ASSIGN] Normalized limits:", {
@@ -547,13 +547,13 @@ router.post("/assign-to-subadmin", async (req, res) => {
       managerLimit: sub.managerLimit,
     });
 
-    await User.findByIdAndUpdate(subadminId, { 
+    await User.findByIdAndUpdate(subadminId, {
       mySubscriptions: true,
       clientLimit: sub.clientLimit,
       employeeLimit: sub.employeeLimit,
       managerLimit: sub.managerLimit,
       businessLimit: sub.businessLimit
-    }).catch(() => {});
+    }).catch(() => { });
 
     res.status(201).json({ success: true, subscription: sub });
   } catch (err) {

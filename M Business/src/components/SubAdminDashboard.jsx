@@ -1429,7 +1429,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                       e.stopPropagation();
 
-                      if (!window.confirm(`"${p.name}" delete à®ªà®£à¯à®£à®µà®¾?`)) return;
+                      if (!window.confirm(`Are you sure you want to delete "${p.name}"? This cannot be undone.`)) return;
 
                       try {
 
@@ -1523,7 +1523,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               e.stopPropagation();
 
-              if (!window.confirm(`"${p.name}" delete à®ªà®£à¯à®£à®µà®¾?`)) return;
+              if (!window.confirm(`Are you sure you want to delete "${p.name}"? This cannot be undone.`)) return;
 
               try {
 
@@ -9381,7 +9381,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     padding: "16px 20px",
 
-                    marginBottom: 18,
+                    marginBottom: 32,
 
                     display: "flex",
 

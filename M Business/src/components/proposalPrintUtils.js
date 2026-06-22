@@ -2,51 +2,51 @@
 import { PROPOSAL_PREVIEW_CSS } from "./ProposalPreviewStyles";
 
 const THEMES = [
-    { name: "Violet", p: "var(--app-accent)", g: "linear-gradient(135deg,var(--app-accent),var(--app-accent))" },
-    { name: "Cobalt", p: "#1d4ed8", g: "linear-gradient(135deg,#1e40af,#3b82f6)" },
-    { name: "Emerald", p: "#059669", g: "linear-gradient(135deg,#065f46,#10b981)" },
-    { name: "Rose", p: "#e11d48", g: "linear-gradient(135deg,#9f1239,#f43f5e)" },
-    { name: "Amber", p: "#d97706", g: "linear-gradient(135deg,#92400e,#fbbf24)" },
-    { name: "Slate", p: "#334155", g: "linear-gradient(135deg,#0f172a,#475569)" },
-    { name: "Teal", p: "#0d9488", g: "linear-gradient(135deg,#134e4a,#2dd4bf)" },
-    { name: "Fuchsia", p: "var(--app-accent)", g: "linear-gradient(135deg,#701a75,#e879f9)" },
+  { name: "Violet", p: "var(--app-accent)", g: "linear-gradient(135deg,var(--app-accent),var(--app-accent))" },
+  { name: "Cobalt", p: "#1d4ed8", g: "linear-gradient(135deg,#1e40af,#3b82f6)" },
+  { name: "Emerald", p: "#059669", g: "linear-gradient(135deg,#065f46,#10b981)" },
+  { name: "Rose", p: "#e11d48", g: "linear-gradient(135deg,#9f1239,#f43f5e)" },
+  { name: "Amber", p: "#d97706", g: "linear-gradient(135deg,#92400e,#fbbf24)" },
+  { name: "Slate", p: "#334155", g: "linear-gradient(135deg,#0f172a,#475569)" },
+  { name: "Teal", p: "#0d9488", g: "linear-gradient(135deg,#134e4a,#2dd4bf)" },
+  { name: "Fuchsia", p: "var(--app-accent)", g: "linear-gradient(135deg,#701a75,#e879f9)" },
 ];
 
 function getElementsHTML(elements) {
-    if (!elements || elements.length === 0) return "";
-    return `<div style="position:absolute;inset:0;pointer-events:none;z-index:20;">
+  if (!elements || elements.length === 0) return "";
+  return `<div style="position:absolute;inset:0;pointer-events:none;z-index:20;">
     ${elements.map(el => {
-        const w = el.w || el.width || "auto";
-        const h = el.h || el.height || "auto";
-        let content = "";
-        if (el.type === "text") {
-            content = `<div style="font-size:${el.fontSize}px;font-weight:${el.fontWeight};color:${el.color || "#000"};white-space:pre-wrap;width:${w}px;">${el.val || ""}</div>`;
-        } else if (el.type === "shape") {
-            const br = el.borderRadius !== undefined ? el.borderRadius + "px" : (el.shape === "circle" ? "50%" : "8px");
-            content = `<div style="width:${w === "auto" ? 100 : w}px;height:${h === "auto" ? 100 : h}px;background:${el.color || "#00BCD4"};border-radius:${br};"></div>`;
-        } else if (el.type === "image") {
-            content = `<img src="${el.src}" style="width:${w === "auto" ? 200 : w}px;height:${h};object-fit:contain;" />`;
-        } else if (el.type === "icon") {
-            content = `<div style="font-size:${el.fontSize || 40}px;">${el.icon}</div>`;
-        }
-        return `<div style="position:absolute;left:${el.x}px;top:${el.y}px;width:${w}px;height:${h}px;">${content}</div>`;
-    }).join("")}
+    const w = el.w || el.width || "auto";
+    const h = el.h || el.height || "auto";
+    let content = "";
+    if (el.type === "text") {
+      content = `<div style="font-size:${el.fontSize}px;font-weight:${el.fontWeight};color:${el.color || "#000"};white-space:pre-wrap;width:${w}px;">${el.val || ""}</div>`;
+    } else if (el.type === "shape") {
+      const br = el.borderRadius !== undefined ? el.borderRadius + "px" : (el.shape === "circle" ? "50%" : "8px");
+      content = `<div style="width:${w === "auto" ? 100 : w}px;height:${h === "auto" ? 100 : h}px;background:${el.color || "#00BCD4"};border-radius:${br};"></div>`;
+    } else if (el.type === "image") {
+      content = `<img src="${el.src}" style="width:${w === "auto" ? 200 : w}px;height:${h};object-fit:contain;" />`;
+    } else if (el.type === "icon") {
+      content = `<div style="font-size:${el.fontSize || 40}px;">${el.icon}</div>`;
+    }
+    return `<div style="position:absolute;left:${el.x}px;top:${el.y}px;width:${w}px;height:${h}px;">${content}</div>`;
+  }).join("")}
   </div>`;
 }
 
 export function buildProposalHTML(proposal) {
-    const t = THEMES.find(x => x.name === proposal.theme) || THEMES[0];
-    let body = "";
+  const t = THEMES.find(x => x.name === proposal.theme) || THEMES[0];
+  let body = "";
 
-    if (proposal.html) {
-        body = `<style>${PROPOSAL_PREVIEW_CSS}</style>
+  if (proposal.html) {
+    body = `<style>${PROPOSAL_PREVIEW_CSS}</style>
              <div class="prop-doc" style="max-height:none;overflow:visible;">${proposal.html}</div>`;
-    } else if (proposal.slides && proposal.slides.length > 0) {
-        body = proposal.slides.map(slide => {
-            const elHTML = getElementsHTML(slide.elements);
+  } else if (proposal.slides && proposal.slides.length > 0) {
+    body = proposal.slides.map(slide => {
+      const elHTML = getElementsHTML(slide.elements);
 
-            if (slide.type === "cover") {
-                return `<div style="page-break-after:always;width:210mm;min-height:297mm;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;">
+      if (slide.type === "cover") {
+        return `<div style="page-break-after:always;width:210mm;min-height:297mm;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;">
           <img src="${slide.coverImage || ""}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;" />
           <div style="position:absolute;inset:0;background:linear-gradient(150deg,${t.p}dd 0%,rgba(0,0,0,0.85) 60%,rgba(0,0,0,0.5) 100%);z-index:-1;"></div>
           <div style="position:relative;padding:48px 56px;">
@@ -55,20 +55,20 @@ export function buildProposalHTML(proposal) {
           </div>
           ${elHTML}
         </div>`;
-            }
+      }
 
-            if (slide.type === "overview" || slide.type === "closing") {
-                return `<div style="page-break-after:always;width:210mm;min-height:297mm;padding:56px;display:flex;flex-direction:column;justify-content:center;position:relative;background:#fff;">
+      if (slide.type === "overview" || slide.type === "closing") {
+        return `<div style="page-break-after:always;width:210mm;min-height:297mm;padding:56px;display:flex;flex-direction:column;justify-content:center;position:relative;background:#fff;">
           <div style="width:56px;height:6px;background:${t.g};border-radius:3px;margin-bottom:20px;"></div>
           <h1 style="font-size:36px;font-weight:800;color:#0f172a;margin-bottom:24px;">${slide.heading || ""}</h1>
           <p style="font-size:15px;color:#4b5563;line-height:1.9;white-space:pre-wrap;">${slide.body || ""}</p>
           ${slide.cta ? `<div style="margin-top:32px;display:inline-block;background:${t.g};color:#fff;border-radius:14px;padding:15px 36px;font-size:16px;font-weight:700;">${slide.cta}</div>` : ""}
           ${elHTML}
         </div>`;
-            }
+      }
 
-            if (slide.type === "objectives") {
-                return `<div style="page-break-after:always;width:210mm;min-height:297mm;padding:56px;background:#fff;position:relative;">
+      if (slide.type === "objectives") {
+        return `<div style="page-break-after:always;width:210mm;min-height:297mm;padding:56px;background:#fff;position:relative;">
           <div style="width:56px;height:6px;background:${t.g};border-radius:3px;margin-bottom:20px;"></div>
           <h1 style="font-size:36px;font-weight:800;color:#0f172a;margin-bottom:24px;">${slide.heading || ""}</h1>
           ${(slide.items || []).map((item, i) => `
@@ -78,10 +78,10 @@ export function buildProposalHTML(proposal) {
             </div>`).join("")}
           ${elHTML}
         </div>`;
-            }
+      }
 
-            if (slide.type === "timeline") {
-                return `<div style="page-break-after:always;width:210mm;min-height:297mm;padding:56px;background:#fff;position:relative;">
+      if (slide.type === "timeline") {
+        return `<div style="page-break-after:always;width:210mm;min-height:297mm;padding:56px;background:#fff;position:relative;">
           <div style="width:56px;height:6px;background:${t.g};border-radius:3px;margin-bottom:20px;"></div>
           <h1 style="font-size:36px;font-weight:800;color:#0f172a;margin-bottom:24px;">${slide.heading || ""}</h1>
           <div style="display:flex;gap:16px;flex-wrap:wrap;">
@@ -94,10 +94,10 @@ export function buildProposalHTML(proposal) {
           </div>
           ${elHTML}
         </div>`;
-            }
+      }
 
-            if (slide.type === "budget") {
-                return `<div style="page-break-after:always;width:210mm;min-height:297mm;padding:56px;background:#fff;position:relative;">
+      if (slide.type === "budget") {
+        return `<div style="page-break-after:always;width:210mm;min-height:297mm;padding:56px;background:#fff;position:relative;">
           <div style="width:56px;height:6px;background:${t.g};border-radius:3px;margin-bottom:20px;"></div>
           <h1 style="font-size:36px;font-weight:800;color:#0f172a;margin-bottom:24px;">${slide.heading || ""}</h1>
           <table style="width:100%;border-collapse:collapse;">
@@ -118,10 +118,10 @@ export function buildProposalHTML(proposal) {
           </div>
           ${elHTML}
         </div>`;
-            }
+      }
 
-            if (slide.type === "team") {
-                return `<div style="page-break-after:always;width:210mm;min-height:297mm;padding:56px;background:#fff;position:relative;">
+      if (slide.type === "team") {
+        return `<div style="page-break-after:always;width:210mm;min-height:297mm;padding:56px;background:#fff;position:relative;">
           <div style="width:56px;height:6px;background:${t.g};border-radius:3px;margin-bottom:20px;"></div>
           <h1 style="font-size:36px;font-weight:800;color:#0f172a;margin-bottom:24px;">${slide.heading || ""}</h1>
           <div style="display:flex;gap:18px;flex-wrap:wrap;">
@@ -134,16 +134,19 @@ export function buildProposalHTML(proposal) {
           </div>
           ${elHTML}
         </div>`;
-            }
+      }
 
-            if (slide.type === "blank_first_page" || slide.type === "proposal" || slide.type === "portrait") {
-                return `<div style="page-break-after:always;min-height:297mm;padding:40px 60px;background:#fff;position:relative;">
-          ${elHTML}
+      if (slide.type === "blank_first_page" || slide.type === "proposal" || slide.type === "portrait") {
+        const hasContent = elHTML.trim().length > 0;
+        const hasHtml = proposal.html && proposal.html.trim().length > 0;
+        return `<div style="page-break-after:always;min-height:297mm;padding:40px 60px;background:#fff;position:relative;font-size:14px;line-height:1.6;color:#000;">
+          ${hasHtml ? `<div class="prop-doc" style="max-height:none;overflow:visible;">${proposal.html}</div>` : ''}
+          ${hasContent ? elHTML : (!hasHtml ? `<div style="padding:40px;text-align:center;color:#aaa;font-size:13px;">Canvas slide — open in editor to add content.</div>` : '')}
         </div>`;
-            }
+      }
 
-            if (slide.type === "proposal_page2") {
-                return `<div style="page-break-after:always;min-height:297mm;padding:40px 60px;background:#fff;font-size:14px;line-height:1.5;color:#000;position:relative;">
+      if (slide.type === "proposal_page2") {
+        return `<div style="page-break-after:always;min-height:297mm;padding:40px 60px;background:#fff;font-size:14px;line-height:1.5;color:#000;position:relative;">
           <div style="margin-bottom:20px;">
             <div style="font-weight:bold;text-decoration:underline;margin-bottom:8px;">3.0 SITE VISITS:</div>
             ${(slide.siteVisits || []).map(i => `<div style="margin-left:20px;margin-bottom:4px;">• ${i}</div>`).join("")}
@@ -167,22 +170,22 @@ export function buildProposalHTML(proposal) {
           </div>
           ${elHTML}
         </div>`;
-            }
+      }
 
-            // Default slide
-            return `<div style="page-break-after:always;min-height:297mm;padding:56px;background:#fff;position:relative;">
+      // Default slide
+      return `<div style="page-break-after:always;min-height:297mm;padding:56px;background:#fff;position:relative;">
         ${slide.heading ? `<div style="width:56px;height:6px;background:${t.g};border-radius:3px;margin-bottom:20px;"></div>
         <h1 style="font-size:36px;font-weight:800;color:#0f172a;margin-bottom:24px;">${slide.heading}</h1>` : ""}
         <p style="font-size:15px;color:#4b5563;line-height:1.9;white-space:pre-wrap;">${slide.body || ""}</p>
         ${elHTML}
       </div>`;
-        }).join("");
-    } else {
-        body = `<div style="padding:56px;text-align:center;color:#666;">This proposal has no content.</div>`;
-    }
+    }).join("");
+  } else {
+    body = `<div style="padding:56px;text-align:center;color:#666;">This proposal has no content.</div>`;
+  }
 
-    // ── Signature section (always appended) ----------------------
-    const sigSection = `
+  // ── Signature section (always appended) ----------------------
+  const sigSection = `
   <div style="page-break-before:auto;padding:40px 56px;background:#fff;font-family:'Segoe UI',sans-serif;">
     <div style="border-top:2px solid #00BCD4;padding-top:28px;">
       <div style="font-size:11px;font-weight:700;color:#96B0B8;text-transform:uppercase;letter-spacing:1px;margin-bottom:20px;">Sign-off & Acceptance</div>
@@ -205,8 +208,8 @@ export function buildProposalHTML(proposal) {
           ${proposal.clientSignature ? `
             <div style="height:60px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
               ${proposal.clientSignature.startsWith("data:image")
-                ? `<img src="${proposal.clientSignature}" style="max-height:56px;max-width:100%;object-fit:contain;" />`
-                : `<span style="font-family:'Georgia',serif;font-size:28px;color:#0D2027;font-style:italic;">${proposal.clientSignature}</span>`}
+        ? `<img src="${proposal.clientSignature}" style="max-height:56px;max-width:100%;object-fit:contain;" />`
+        : `<span style="font-family:'Georgia',serif;font-size:28px;color:#0D2027;font-style:italic;">${proposal.clientSignature}</span>`}
             </div>
             <div style="height:1px;background:#15803D;margin-bottom:8px;"></div>
             <div style="font-size:12px;font-weight:700;color:#0D2027;">${proposal.clientName || proposal.client || "Client"}</div>
@@ -224,9 +227,9 @@ export function buildProposalHTML(proposal) {
     </div>
   </div>`;
 
-    body += sigSection;
+  body += sigSection;
 
-    return `<!DOCTYPE html>
+  return `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8" />
@@ -244,43 +247,49 @@ export function buildProposalHTML(proposal) {
 }
 
 export function printProposal(proposal) {
-    const html = buildProposalHTML(proposal);
-    const win = window.open("", "_blank");
-    if (!win) { alert("Please allow popups to print."); return; }
-    win.document.write(html + `<script>window.onload=()=>{setTimeout(()=>{window.print();window.onafterprint=()=>window.close();},500);}<\/script>`);
-    win.document.close();
+  const html = buildProposalHTML(proposal);
+  const win = window.open("", "_blank");
+  if (!win) { alert("Please allow popups to print."); return; }
+  win.document.write(html + `<script>
+      window.onload = () => {
+        setTimeout(() => {
+          window.print();
+        }, 800);
+      };
+    <\/script>`);
+  win.document.close();
 }
 
 export async function shareProposalAsPDF(proposal, companyName, onStatusUpdate) {
-    // Mark as sent first
-    if (onStatusUpdate) await onStatusUpdate(proposal);
+  // Mark as sent first
+  if (onStatusUpdate) await onStatusUpdate(proposal);
 
-    const html = buildProposalHTML(proposal);
-    const blob = new Blob([html], { type: "text/html" });
-    const fileName = `${(proposal.title || "Proposal").replace(/\s+/g, "_")}.html`;
+  const html = buildProposalHTML(proposal);
+  const blob = new Blob([html], { type: "text/html" });
+  const fileName = `${(proposal.title || "Proposal").replace(/\s+/g, "_")}.html`;
 
-    // Try Web Share API with file
-    if (navigator.canShare) {
-        const file = new File([blob], fileName, { type: "text/html" });
-        if (navigator.canShare({ files: [file] })) {
-            try {
-                await navigator.share({ title: proposal.title, files: [file] });
-                return;
-            } catch (e) { /* fall through */ }
-        }
+  // Try Web Share API with file
+  if (navigator.canShare) {
+    const file = new File([blob], fileName, { type: "text/html" });
+    if (navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ title: proposal.title, files: [file] });
+        return;
+      } catch (e) { /* fall through */ }
     }
+  }
 
-    // Fallback: open in new tab so user can print-to-PDF / share link
-    const url = URL.createObjectURL(blob);
-    const link = `${window.location.origin}/proposal-view?id=${proposal._id || proposal.id}`;
-    const shareText = `${proposal.title}\nPrepared by ${companyName || "Us"}\nView: ${link}`;
+  // Fallback: open in new tab so user can print-to-PDF / share link
+  const url = URL.createObjectURL(blob);
+  const link = `${window.location.origin}/proposal-view?id=${proposal._id || proposal.id}`;
+  const shareText = `${proposal.title}\nPrepared by ${companyName || "Us"}\nView: ${link}`;
 
-    if (navigator.share) {
-        try { await navigator.share({ title: proposal.title, text: shareText, url: link }); return; } catch (e) { /* fall through */ }
-    }
+  if (navigator.share) {
+    try { await navigator.share({ title: proposal.title, text: shareText, url: link }); return; } catch (e) { /* fall through */ }
+  }
 
-    // Last resort: open the rendered HTML in a new tab
-    window.open(url, "_blank");
-    navigator.clipboard.writeText(shareText).catch(() => { });
-    alert("Export Proposal opened in a new tab — you can print it as PDF or share the link:\n\n" + link);
+  // Last resort: open the rendered HTML in a new tab
+  window.open(url, "_blank");
+  navigator.clipboard.writeText(shareText).catch(() => { });
+  alert("Export Proposal opened in a new tab — you can print it as PDF or share the link:\n\n" + link);
 }

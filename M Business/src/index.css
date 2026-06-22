@@ -5370,7 +5370,7 @@ tbody tr:last-child td {
   display: flex;
   height: calc(100vh - 80px);
   overflow: hidden;
-  margin: -22px -28px -32px;
+  margin: 16px -28px -32px;
   background: var(--bg)
 }
 

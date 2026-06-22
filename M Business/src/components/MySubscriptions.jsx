@@ -169,7 +169,7 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
                 {/* Action Button */}
                 <button
                   className="pp-btn"
-                  disabled={isCurrent || !!payLoading}
+                  disabled={(isCurrent && subscription?.status === "active") || !!payLoading}
                   onClick={() => plan.isTrial ? onStartTrial() : onSelectPlan(plan)}
                   style={{
                     width: "100%", padding: "14px", borderRadius: 12, fontSize: 15, fontWeight: 800,
@@ -192,7 +192,7 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
                     boxShadow: isPopular && !isCurrent ? "0 6px 18px rgba(0,137,123,0.3)" : "none"
                   }}
                 >
-                  {isProcessing ? "Processing..." : isCurrent ? "Yes Current Plan" : plan.btnLabel || "Get Started"}
+                  {isProcessing ? "Processing..." : (isCurrent && subscription?.status === "active") ? "✓ Current Plan" : (isCurrent && subscription?.status !== "active") ? "Renew Plan" : plan.btnLabel || "Get Started"}
                 </button>
               </div>
             );
@@ -434,8 +434,10 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
         setPaymentSuccessData({ name: planName || "Subscription" });
         showToast("Celebration Payment Successful! Your plan is active.");
 
-      } else if (paymentStatus === "failed") {
-        showToast("Error Payment failed. Please try again.");
+      } else if (paymentStatus === "failed" || paymentStatus === "cancelled") {
+        showToast("Error Payment was not completed. Please try again.");
+        await fetchData();
+        setShowPlanPicker(true);
       }
     };
 
@@ -1167,7 +1169,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
               </div>
               <div style={{ padding: "20px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-                  <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--teal-lighter)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>Company</div>
+                  <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--teal-lighter)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🏢</div>
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text)" }}>{subscription.providerCompany || user?.companyName || "M Business"}</div>
                     <div style={{ fontSize: 11, color: "var(--text3)", fontWeight: 600 }}>Service Provider</div>

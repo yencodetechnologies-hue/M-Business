@@ -379,6 +379,7 @@ export default function ClientDashboard({ user, setUser }) {
   // Payment Checkout Modal
   const [payModalOpen, setPayModalOpen] = useState(false);
   const [viewingProposal, setViewingProposal] = useState(null);
+  const [openMenuId, setOpenMenuId] = useState(null);
   const [clientSigMode, setClientSigMode] = useState("draw"); // draw | type
   const [clientSigText, setClientSigText] = useState("");
   const [clientSigSaving, setClientSigSaving] = useState(false);

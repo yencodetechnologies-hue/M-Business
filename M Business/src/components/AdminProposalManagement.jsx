@@ -152,6 +152,136 @@ const printProposal = (proposal) => {
   printWindow.document.close();
 };
 
+const viewProposal = (proposal) => {
+  if (!proposal) return;
+
+  const getElementsHTML = (elements) => {
+    if (!elements || elements.length === 0) return '';
+    return `
+      <div style="position:absolute; inset:0; pointer-events:none; z-index:20;">
+        ${elements.map(el => {
+      let content = '';
+      const val = el.val || el.text || '';
+      if (el.type === "text" || el.type === "heading") {
+        const fs = el.fontSize || (el.type === "heading" ? 24 : 16);
+        const fw = el.fontWeight || (el.type === "heading" ? 700 : 400);
+        content = `<div style="font-size:${fs}px; font-weight:${fw}; color:${el.color || '#000'}; white-space:pre-wrap; width:${el.width || el.w}px;">${val}</div>`;
+      } else if (el.type === "shape") {
+        const br = el.borderRadius !== undefined ? (typeof el.borderRadius === 'number' ? el.borderRadius + 'px' : el.borderRadius) : (el.shape === 'circle' ? '50%' : '4px');
+        content = `<div style="width:${el.width || el.w || 60}px; height:${el.height || el.h || 60}px; background:${el.color || '#00BCD4'}; border-radius:${br};"></div>`;
+      } else if (el.type === "image") {
+        content = `<img src="${el.src}" style="width:${el.width || el.w || 200}px; height:${el.height || el.h || 'auto'}; object-fit:contain; pointer-events:none;" />`;
+      } else if (el.type === "icon") {
+        content = `<div style="font-size:${el.fontSize || 40}px; display:flex; align-items:center; justify-content:center;">${el.icon}</div>`;
+      }
+      return `<div style="position:absolute; left:${el.x}px; top:${el.y}px; width:${el.width || el.w || 'auto'}px; height:${el.height || el.h || 'auto'}px;">${content}</div>`;
+    }).join('')}
+      </div>
+    `;
+  };
+
+  let proposalHTML = "";
+
+  if (proposal.format === "canvas" && proposal.canvasElements) {
+    proposalHTML = `
+      <div style="page-break-after: always; min-height: 100vh; position: relative; background: #fff; overflow: hidden;">
+        ${getElementsHTML(proposal.canvasElements)}
+      </div>
+    `;
+  } else if (proposal.slides && proposal.slides.length > 0) {
+    proposalHTML = proposal.slides.map(slide => {
+      const t = THEMES.find(x => x.name === proposal.theme) || THEMES[0];
+      const elementsHTML = getElementsHTML(slide.elements);
+
+      if (slide.type === "cover") {
+        return `
+          <div style="page-break-after: always; min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; position: relative; background: linear-gradient(150deg,${t.p}dd 0%,rgba(0,0,0,0.85) 60%,rgba(0,0,0,0.5) 100%); color: white; padding: 48px 56px; overflow: hidden;">
+            <div style="position: absolute; inset: 0; background: url('${slide.coverImage || ''}') center/cover; z-index: -2;"></div>
+            <div style="position: absolute; inset: 0; background: linear-gradient(150deg,${t.p}dd 0%,rgba(0,0,0,0.85) 60%,rgba(0,0,0,0.5) 100%); z-index: -1;"></div>
+            <h1 style="font-size: 48px; font-weight: 900; margin-bottom: 16px; line-height: 1.05;">${slide.title}</h1>
+            <p style="font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 28px;">${slide.subtitle}</p>
+            ${elementsHTML}
+          </div>
+        `;
+      }
+
+      if (slide.type === "overview" || slide.type === "closing") {
+        return `
+          <div style="page-break-after: always; min-height: 100vh; padding: 56px; display: flex; flex-direction: column; justify-content: center; position: relative; background: #fff; overflow: hidden;">
+            ${slide.heading ? `
+              <div style="width: 56px; height: 6px; background: ${t.g}; border-radius: 3px; margin-bottom: 20px;"></div>
+              <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px; letter-spacing: -0.5px; line-height: 1.1;">${slide.heading}</h1>
+            ` : ''}
+            <p style="font-size: 15px; color: #4b5563; line-height: 1.9; max-width: 620px; white-space: pre-wrap;">${slide.body}</p>
+            ${elementsHTML}
+          </div>
+        `;
+      }
+
+      if (slide.type === "objectives") {
+        return `
+          <div style="page-break-after: always; min-height: 100vh; padding: 56px; position: relative; background: #fff; overflow: hidden;">
+            ${slide.heading ? `
+              <div style="width: 56px; height: 6px; background: ${t.g}; border-radius: 3px; margin-bottom: 20px;"></div>
+              <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px;">${slide.heading}</h1>
+            ` : ''}
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              ${(slide.items || []).map((item, i) => `
+                <div style="display: flex; gap: 18px; align-items: flex-start; padding: 16px 22px; background: ${t.l}; border-radius: 14px; border: 1px solid ${t.p}20;">
+                  <div style="width: 36px; height: 36px; border-radius: 50%; background: ${t.g}; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; flex-shrink: 0;">${i + 1}</div>
+                  <div style="flex: 1; font-size: 14px; color: #1e293b; font-weight: 600; padding-top: 6px;">${item}</div>
+                </div>
+              `).join('')}
+            </div>
+            ${elementsHTML}
+          </div>
+        `;
+      }
+
+      return `
+        <div style="page-break-after: always; min-height: 100vh; padding: 56px; display: flex; flex-direction: column; justify-content: center; position: relative; background: #fff; overflow: hidden;">
+          ${slide.heading ? `<h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px;">${slide.heading}</h1>` : ''}
+          <p style="font-size: 15px; color: #4b5563; line-height: 1.9; white-space: pre-wrap;">${slide.body || ''}</p>
+          ${elementsHTML}
+        </div>
+      `;
+    }).join("");
+  } else {
+    proposalHTML = `<div style="padding: 56px; text-align: center; color: #666;">This proposal has no content yet.</div>`;
+  }
+
+  const viewWindow = window.open('', '_blank');
+  if (!viewWindow) { alert("Please allow popups to view."); return; }
+  viewWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>${proposal.title || 'Proposal'} — View</title>
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { background: #f1f5f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+          .page-wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px; display: flex; flex-direction: column; gap: 32px; }
+          .slide-page { background: #fff; box-shadow: 0 4px 24px rgba(0,0,0,0.10); border-radius: 12px; overflow: hidden; }
+          .top-bar { position: sticky; top: 0; z-index: 100; background: #1e293b; color: #fff; padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; }
+          .top-bar h2 { font-size: 16px; font-weight: 700; margin: 0; }
+          .print-btn { background: #00BCD4; color: #fff; border: none; border-radius: 8px; padding: 8px 20px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+          @media print { .top-bar { display: none; } body { background: white; } .slide-page { box-shadow: none; border-radius: 0; } @page { size: A4; margin: 0; } }
+        </style>
+      </head>
+      <body>
+        <div class="top-bar">
+          <h2>📄 ${proposal.title || 'Proposal'}</h2>
+          <button class="print-btn" onclick="window.print()">🖨️ Print / Save PDF</button>
+        </div>
+        <div class="page-wrap">
+          ${proposalHTML.replace(/<div style="page-break-after: always;/g, '<div class="slide-page" style="page-break-after: always;')}
+        </div>
+      </body>
+    </html>
+  `);
+  viewWindow.document.close();
+};
+
 
 
 const STATUS = {

@@ -1166,7 +1166,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
     setDeleteTarget(null);
 
-    showToast("Delete Client deleted!");
+    showToast("Delete Client deleted!");
 
   };
 
@@ -2710,7 +2710,12 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
       <div style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.2)", marginBottom: 6 }}>
 
-        <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}></div>
+        <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+          </svg>
+        </div>
 
         <div style={{ flex: 1, minWidth: 0 }}>
 
@@ -11590,13 +11595,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           />
 
                         ) : (
-
                           <div style={{ textAlign: "center" }}>
-
-                            <div style={{ fontSize: 40, marginBottom: 8 }}>🏢</div>
-
+                            <i className="ti ti-building" style={{ fontSize: 40, color: "#00BCD4", display: "block", marginBottom: 8 }}></i>
                             <div style={{ fontSize: 10, fontWeight: 800, color: "var(--app-muted)", textTransform: "uppercase", letterSpacing: 1 }}>Upload Logo</div>
-
                           </div>
 
                         )}

@@ -280,13 +280,7 @@ function CompanyDropdown({ clients, value, onChange, error }) {
         }}>
           <div style={{ padding: "10px 10px 6px" }}>
             <div style={{ position: "relative" }}>
-              <span style={{
-                position: "absolute",
-                left: 10,
-                top: "50%",
-                transform: "translateY(-50%)",
-                fontSize: 12
-              }}>Search</span>
+
               <input
                 autoFocus
                 placeholder="Search company name..."
@@ -1389,7 +1383,7 @@ export default function AdminProposalManagement() {
               fontSize: 22,
               margin: "0 auto 14px"
             }}>
-         Delete
+              Delete
             </div>
             <h3 style={{
               textAlign: "center",
@@ -1398,7 +1392,7 @@ export default function AdminProposalManagement() {
               fontWeight: 800,
               color: T.text
             }}>
-         Delete Proposal
+              Delete Proposal
             </h3>
             <p style={{
               textAlign: "center",
@@ -1441,7 +1435,7 @@ export default function AdminProposalManagement() {
                   fontFamily: "inherit"
                 }}
               >
-           Delete
+                Delete
               </button>
             </div>
           </div>

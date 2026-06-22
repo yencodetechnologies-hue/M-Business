@@ -391,13 +391,11 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
 
       // Clean up URL immediately to prevent re-triggering
       window.history.replaceState({}, document.title, window.location.pathname);
-
       if (paymentStatus === "success") {
         const planName = params.get("plan");
         const subId = params.get("subId");
         const txnid = params.get("txnid");
 
-        // Activate the pending subscription in backend
         try {
           if (subId) {
             await axios.post(`${BASE_URL}/api/subscriptions/activate-pending`, {
@@ -409,7 +407,10 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
           console.log("Activation call:", e.message);
         }
 
-        // Refresh data and show success popup
+        // Mark upgrade as successful so alert never shows again
+        markUpgradeSuccess();
+        setShowRenewAlert(false);
+
         await fetchData();
         if (onSubscriptionSuccess) onSubscriptionSuccess();
         setPaymentSuccessData({ name: planName || "Subscription" });
@@ -614,65 +615,14 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
     }
   };
 
-  // ── Initiate PayU Payment ---------------------------------------------
+  // ── Initiate PayU Payment (Bypassed to Mock Gateway for Testing) ------
   const startPayUPayment = async (plan) => {
     if (plan.isTrial) { startTrial(plan); return; }
     if (!plan.price) { window.open(`mailto:billing@${(user?.companyName || "business").toLowerCase().replace(/\s+/g, "")}.com`); return; }
 
-    // Prevent duplicate API calls from rapid clicking
-    if (payuInFlight.current || payLoading) return;
-    payuInFlight.current = true;
-    setPayLoading(plan.name);
-    try {
-      // Get PayU parameters from backend
-      const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, {
-        userId,
-        userEmail,
-        userName,
-        plan
-      });
-
-      if (res.data.success) {
-        // Create an invisible form and submit it to PayU
-        const payuData = res.data;
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = payuData.env === "prod" ? "https://secure.payu.in/_payment" : "https://test.payu.in/_payment";
-        form.style.display = "none";
-
-        const fields = {
-          key: payuData.key,
-          txnid: payuData.txnid,
-          amount: payuData.amount,
-          productinfo: payuData.productinfo,
-          firstname: payuData.firstname,
-          email: payuData.email,
-          phone: payuData.phone,
-          udf1: payuData.udf1 || "",
-          hash: payuData.hash,
-          surl: payuData.surl,
-          furl: payuData.furl
-        };
-
-        for (const [key, value] of Object.entries(fields)) {
-          const input = document.createElement("input");
-          input.type = "hidden";
-          input.name = key;
-          input.value = value;
-          form.appendChild(input);
-        }
-
-        document.body.appendChild(form);
-        form.submit();
-      } else {
-        throw new Error(res.data.error || "Failed to initialize PayU payment");
-      }
-    } catch (err) {
-      console.error("PayU init error:", err);
-      showToast("Error Could not initialize payment. Please try again.");
-      setPayLoading(null);
-      payuInFlight.current = false; // Release the guard on error
-    }
+    // Bypass real PayU and use the Mock Gateway for seamless testing
+    setMockGatewayPlan(plan);
+    setShowPlanPicker(false);
   };
 
   // ── Complete mock payment  activate subscription -------------------------
@@ -705,6 +655,8 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
         if (res2.data.success) activated = true;
       }
       setMockGatewayPlan(null);
+      markUpgradeSuccess();
+      setShowRenewAlert(false);
       setPaymentSuccessData({ name: plan.name, price: plan.price });
       if (activated) { await fetchData(); if (onSubscriptionSuccess) onSubscriptionSuccess(); }
     } catch (err) {
@@ -730,56 +682,59 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
 
   // ── Success UI ---------------------------------------------------------------
   if (paymentSuccessData) {
-    console.log("Showing payment success popup for:", paymentSuccessData);
     return (
       <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(10px)", zIndex: 999999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-        <style>{`@keyframes scaleIn { 0% { transform: scale(0); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } } @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } } @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-        <div style={{ background: "#fff", borderRadius: 24, padding: 48, maxWidth: 480, width: "100%", textAlign: "center", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", animation: "fadeIn 0.5s ease", position: "relative" }}>
-          <div style={{ width: 100, height: 100, borderRadius: "50%", background: "linear-gradient(135deg, #10b981, #059669)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 48, marginBottom: 28, boxShadow: "0 10px 30px rgba(16,185,129,0.3)", animation: "scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)", margin: "0 auto 28px" }}>
-            Yes
+        <style>{`
+        @keyframes scaleIn { 0% { transform: scale(0); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); } 50% { box-shadow: 0 0 0 16px rgba(16,185,129,0); } }
+      `}</style>
+        <div style={{ background: "#fff", borderRadius: 28, padding: "52px 44px", maxWidth: 460, width: "100%", textAlign: "center", boxShadow: "0 32px 80px rgba(0,0,0,0.35)", animation: "fadeInUp 0.5s ease", position: "relative" }}>
+
+          {/* Success Icon */}
+          <div style={{ width: 100, height: 100, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#059669)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 48, margin: "0 auto 28px", animation: "scaleIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275), pulse 2s ease 0.5s infinite", boxShadow: "0 10px 30px rgba(16,185,129,0.35)" }}>
+            ✓
           </div>
-          <h2 style={{ fontSize: 32, fontWeight: 800, color: "#1e293b", margin: "0 0 16px" }}>Payment Successful! Celebration</h2>
-          <p style={{ fontSize: 16, color: "#64748b", lineHeight: 1.6, maxWidth: 380, margin: "0 auto 32px" }}>
-            Your <strong>{paymentSuccessData.name}</strong> plan is now active. Your dashboard is ready!
+
+          {/* Title */}
+          <h2 style={{ fontSize: 28, fontWeight: 900, color: "#0f172a", margin: "0 0 12px", letterSpacing: "-0.5px" }}>
+            Payment Completed Successfully!
+          </h2>
+
+          {/* Subtitle */}
+          <p style={{ fontSize: 15, color: "#64748b", lineHeight: 1.7, maxWidth: 340, margin: "0 auto 12px" }}>
+            Your <strong style={{ color: "#0f172a" }}>{paymentSuccessData.name}</strong> plan is now active. Welcome aboard!
           </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 16, alignItems: "center" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, color: "#10b981", fontSize: 14, fontWeight: 700, background: "#ecfdf5", padding: "12px 24px", borderRadius: 12 }}>
-              <div style={{ width: 16, height: 16, border: "2px solid #10b981", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
-              Activating your subscription...
-            </div>
-            <button
-              onClick={() => {
-                console.log("Go to Dashboard clicked");
-                setPaymentSuccessData(null);
-                if (onSubscriptionSuccess) onSubscriptionSuccess();
-                else window.location.href = "/";
-              }}
-              style={{
-                width: "100%",
-                padding: "14px 28px",
-                borderRadius: 12,
-                fontSize: 15,
-                fontWeight: 800,
-                cursor: "pointer",
-                background: "linear-gradient(135deg, #10b981, #059669)",
-                color: "#fff",
-                border: "none",
-                fontFamily: "inherit",
-                boxShadow: "0 4px 12px rgba(16,185,129,0.3)",
-                transition: "all 0.2s"
-              }}
-              onMouseOver={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
-              onMouseOut={(e) => e.currentTarget.style.transform = "translateY(0)"}
-            >
-              Login to dashboard
-            </button>
+
+          {/* Plan badge */}
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#ecfdf5", border: "1.5px solid #6ee7b7", borderRadius: 20, padding: "6px 18px", fontSize: 13, fontWeight: 700, color: "#059669", marginBottom: 32 }}>
+            <span style={{ fontSize: 16 }}>🎉</span> {paymentSuccessData.name} Plan Activated
+          </div>
+
+          {/* Login to Dashboard button */}
+          <button
+            onClick={() => {
+              markUpgradeSuccess();
+              setShowRenewAlert(false);
+              setPaymentSuccessData(null);
+              if (onSubscriptionSuccess) onSubscriptionSuccess();
+              else window.location.href = "/";
+            }}
+            style={{ width: "100%", padding: "16px", borderRadius: 14, fontSize: 16, fontWeight: 800, cursor: "pointer", background: "linear-gradient(135deg,#10b981,#059669)", color: "#fff", border: "none", fontFamily: "inherit", boxShadow: "0 8px 24px rgba(16,185,129,0.35)", transition: "all 0.2s", marginBottom: 12 }}
+            onMouseOver={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 12px 28px rgba(16,185,129,0.45)"; }}
+            onMouseOut={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(16,185,129,0.35)"; }}
+          >
+            Login to Dashboard →
+          </button>
+
+          <div style={{ fontSize: 12, color: "#94a3b8", fontWeight: 600 }}>
+            Redirecting automatically in a few seconds...
           </div>
         </div>
       </div>
     );
   }
-
-  // ── Loading removed to prevent spinner from showing --------------------------
 
   // ── No Subscription  Show Plans (Screenshot 2 Style) -------------------------
   if (!subscription) {

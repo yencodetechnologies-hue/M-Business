@@ -398,7 +398,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                     style={{
                       marginLeft: 6, cursor: "pointer", color: finalTheme.accent,
                       textDecoration: "underline"
-                    }}>Close Clear</span>
+                    }}>CloseClear</span>
                 </div>
               )}
             </div>

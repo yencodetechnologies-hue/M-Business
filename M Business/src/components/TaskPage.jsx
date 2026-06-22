@@ -740,16 +740,16 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
       setSaveError("");
       const res = await axios.post(`${BASE_URL}/api/employees/add`, newEmp);
       const added = res.data.employee;
-      
+
       // Update local dropdown state
       setLocalEmployees(prev => [added, ...prev]);
-      
+
       // Select the newly added employee
       handleSelect(added.name);
-      
-      // Close modal
+
+      // Closemodal
       setShowAddModal(false);
-      
+
       // Reset state
       setNewEmp({ name: "", email: "", password: "", phone: "", role: "employee", department: "", salary: "" });
     } catch (err) {
@@ -882,8 +882,8 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
           }} onClick={e => e.stopPropagation()}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
               <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#1e293b" }}>Add New Employee</h3>
-              <button 
-                onClick={() => setShowAddModal(false)} 
+              <button
+                onClick={() => setShowAddModal(false)}
                 style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: "#64748b" }}
               >Close</button>
             </div>
@@ -897,41 +897,41 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Full Name *</label>
-                <input 
-                  type="text" 
-                  value={newEmp.name} 
+                <input
+                  type="text"
+                  value={newEmp.name}
                   onChange={e => setNewEmp({ ...newEmp, name: e.target.value })}
-                  placeholder="Enter name" 
+                  placeholder="Enter name"
                   style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }}
                 />
               </div>
 
               <div>
                 <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Email Address *</label>
-                <input 
-                  type="email" 
-                  value={newEmp.email} 
+                <input
+                  type="email"
+                  value={newEmp.email}
                   onChange={e => setNewEmp({ ...newEmp, email: e.target.value })}
-                  placeholder="Enter email" 
+                  placeholder="Enter email"
                   style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }}
                 />
               </div>
 
               <div>
                 <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Password *</label>
-                <input 
-                  type="password" 
-                  value={newEmp.password} 
+                <input
+                  type="password"
+                  value={newEmp.password}
                   onChange={e => setNewEmp({ ...newEmp, password: e.target.value })}
-                  placeholder="Min 4 characters" 
+                  placeholder="Min 4 characters"
                   style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }}
                 />
               </div>
 
               <div>
                 <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Role</label>
-                <select 
-                  value={newEmp.role} 
+                <select
+                  value={newEmp.role}
                   onChange={e => setNewEmp({ ...newEmp, role: e.target.value })}
                   style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box", background: "#fff", color: "#1e293b", fontWeight: 500 }}
                 >
@@ -944,21 +944,21 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
               <div style={{ display: "flex", gap: 10 }}>
                 <div style={{ flex: 1 }}>
                   <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Phone</label>
-                  <input 
-                    type="text" 
-                    value={newEmp.phone} 
+                  <input
+                    type="text"
+                    value={newEmp.phone}
                     onChange={e => setNewEmp({ ...newEmp, phone: e.target.value })}
-                    placeholder="Optional" 
+                    placeholder="Optional"
                     style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }}
                   />
                 </div>
                 <div style={{ flex: 1 }}>
                   <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Department</label>
-                  <input 
-                    type="text" 
-                    value={newEmp.department} 
+                  <input
+                    type="text"
+                    value={newEmp.department}
                     onChange={e => setNewEmp({ ...newEmp, department: e.target.value })}
-                    placeholder="Optional" 
+                    placeholder="Optional"
                     style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }}
                   />
                 </div>
@@ -966,7 +966,7 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
             </div>
 
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 20 }}>
-              <button 
+              <button
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -976,7 +976,7 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
               >
                 Cancel
               </button>
-              <button 
+              <button
                 type="button"
                 onClick={handleCreateEmployee}
                 disabled={saving}
@@ -1067,7 +1067,7 @@ function ImportModal({ onClose, onImportTasks }) {
           <div><div style={{ fontSize: 16, fontWeight: 800, color: "#323338" }}>Import tasks</div><div style={{ fontSize: 12, color: "#676879", marginTop: 2 }}>Upload CSV or Excel file</div></div>
           <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#676879" }}>×</button>
         </div>
-        <div  style={{ flex: 1, overflowY: "auto", padding: "18px 22px" }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: "18px 22px" }}>
           {!file ? (
             <div onDragOver={e => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }} onClick={() => fileRef.current?.click()}
               style={{ border: `2px dashed ${dragOver ? "var(--app-accent)" : "#d0d4e4"}`, borderRadius: 12, padding: "36px 24px", textAlign: "center", cursor: "pointer", background: dragOver ? "#e8f4fd" : "#fafbfc" }}>
@@ -1133,7 +1133,7 @@ function SidekickPanel({ onClose, groups }) {
           </div>
         </div>
       </div>
-      <div  style={{ flex: 1, overflowY: "auto", padding: 14 }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: 14 }}>
         <div style={{ background: P.light, border: `1.5px solid ${P.border}`, borderRadius: 12, padding: "12px 13px", marginBottom: 12 }}>
           <div style={{ fontSize: 10, color: P.muted, fontWeight: 700, letterSpacing: .8, textTransform: "uppercase", marginBottom: 6 }}>Tip Insight</div>
           <div style={{ fontSize: 12, color: P.text, lineHeight: 1.65 }}>
@@ -1209,7 +1209,7 @@ function IntegrateModal({ onClose, showToast }) {
     <div style={{ position: "fixed", inset: 0, background: "rgba(30,10,60,0.45)", zIndex: 8000, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div style={{ background: "#fff", borderRadius: 16, width: 520, maxHeight: "80vh", boxShadow: "0 24px 80px rgba(124,58,237,0.25)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <div style={{ background: `linear-gradient(135deg,${P.dark},${P.mid})`, padding: "18px 20px" }}><div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}><div style={{ fontSize: 17, fontWeight: 800, color: "#fff" }}> Integrations</div><button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", color: "#fff", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button></div></div>
-        <div  style={{ flex: 1, overflowY: "auto", padding: "4px 20px 16px" }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: "4px 20px 16px" }}>
           {integrations.map(({ icon, name, desc, badge }) => (
             <div key={name} style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 0", borderBottom: `1px solid ${P.border}` }}>
               <div style={{ width: 42, height: 42, borderRadius: 10, background: P.light, border: `1.5px solid ${P.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>{icon}</div>
@@ -1249,7 +1249,7 @@ function AutomateModal({ onClose }) {
     <div style={{ position: "fixed", inset: 0, background: "rgba(30,10,60,0.45)", zIndex: 8000, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div style={{ background: "#fff", borderRadius: 16, width: 520, maxHeight: "80vh", boxShadow: "0 24px 80px rgba(124,58,237,0.25)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <div style={{ background: `linear-gradient(135deg,${P.dark},${P.mid})`, padding: "18px 20px" }}><div style={{ display: "flex", justifyContent: "space-between" }}><div style={{ fontSize: 17, fontWeight: 800, color: "#fff" }}>Automations</div><button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", color: "#fff", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button></div></div>
-        <div  style={{ flex: 1, overflowY: "auto", padding: "8px 20px 16px" }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: "8px 20px 16px" }}>
           {automations.map(({ icon, title, desc }) => (
             <div key={title} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: `1px solid ${P.border}` }}>
               <div style={{ width: 38, height: 38, borderRadius: 9, background: P.light, border: `1.5px solid ${P.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{icon}</div>
@@ -1529,7 +1529,7 @@ function ProjectCell({ task, projects, onField }) {
           currentProjectId={task.projectId}
           onSelect={pid => {
             onField(task._id || task.id, "projectId", pid);
-            setOpen(false); // Close when selected
+            setOpen(false); // Closewhen selected
           }}
           onClose={() => setOpen(false)}
         />
@@ -1562,9 +1562,9 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
       {/* task name */}
       <div style={{ width: COL_W.task, flexShrink: 0, position: "sticky", left: 0, zIndex: 10, background: bg, boxShadow: hovered ? "2px 0 8px rgba(0,0,0,0.07)" : "2px 0 4px rgba(0,0,0,0.04)", display: "flex", alignItems: "center", gap: 4, padding: "0 6px 0 0", transition: "background .1s" }}>
         <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: groupColor, flexShrink: 0 }} />
-        <input 
-          key={task.title} 
-          defaultValue={task.title} 
+        <input
+          key={task.title}
+          defaultValue={task.title}
           onFocus={e => {
             if (e.target.value === "New task") {
               e.target.value = "";
@@ -1573,28 +1573,28 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
             e.target.style.boxShadow = "0 0 0 2px " + P.accent + "33";
             e.target.style.borderRadius = "4px";
           }}
-          onBlur={e => { 
-            const v = e.target.value.trim(); 
-            if (v && v !== task.title) onField(id, "title", v); 
+          onBlur={e => {
+            const v = e.target.value.trim();
+            if (v && v !== task.title) onField(id, "title", v);
             else if (!v && task.title === "New task") {
               e.target.value = "New task";
             }
-          }} 
-          style={{ 
-            background: "transparent", 
-            border: "none", 
-            outline: "none", 
-            fontSize: 14, 
+          }}
+          style={{
+            background: "transparent",
+            border: "none",
+            outline: "none",
+            fontSize: 14,
             color: "#1e1b4b", // Darker indigo/black for maximum visibility
-            fontFamily: "inherit", 
-            width: "100%", 
-            padding: "12px 8px", 
-            textDecoration: task.checked ? "line-through" : "none", 
-            opacity: task.checked ? .5 : 1, 
-            fontWeight: 700, 
-            cursor: "pointer" 
-          }} 
-          onBlurCapture={e => { e.target.style.background = "transparent"; e.target.style.boxShadow = "none"; }} 
+            fontFamily: "inherit",
+            width: "100%",
+            padding: "12px 8px",
+            textDecoration: task.checked ? "line-through" : "none",
+            opacity: task.checked ? .5 : 1,
+            fontWeight: 700,
+            cursor: "pointer"
+          }}
+          onBlurCapture={e => { e.target.style.background = "transparent"; e.target.style.boxShadow = "none"; }}
         />
       </div>
       {/* person */}
@@ -1859,7 +1859,7 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
             e.currentTarget.style.opacity = hovered ? "1" : "0.6";
           }}
         >
-     Delete
+          Delete
         </button>
         <div ref={dotsRef} onClick={e => { e.stopPropagation(); setDotsOpen(v => !v); }} style={{ width: 26, height: 26, borderRadius: 5, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, color: P.muted, letterSpacing: 1, userSelect: "none" }} onMouseEnter={e => e.currentTarget.style.background = P.border} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>···</div>
         {dotsOpen && (<DD anchor={dotsRef} onClose={() => setDotsOpen(false)} w={180}>
@@ -2349,7 +2349,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
     try {
       await axios.put(`${API}/tasks/${id}`, { [field]: value });
       onUpdate?.();
-      
+
       // Notify if assigned
       if (field === "assignTo" && value && value !== "Unassigned") {
         const emp = (employees || []).find(e => (e.name || e.employeeName || "").toLowerCase() === value.toLowerCase());
@@ -2360,7 +2360,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
             icon: 'Edit',
             text: `Task assigned to you: "${(selected?.title || 'New Task')}"`,
             link: 'tasks'
-          }).catch(() => {});
+          }).catch(() => { });
         }
       }
     } catch { showToast("Failed to save", "error"); }
@@ -2388,17 +2388,17 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
     try {
       const id = task._id || task.id;
       const r = await axios.post(`${API}/tasks/${id}/auto-assign`);
-const assignedName = r.data.assignedTo?.[0]?.name || 
-                     (typeof r.data.assignTo === 'string' && 
-                      !r.data.assignTo.match(/^[a-f0-9]{24}$/i) 
-                      ? r.data.assignTo : null) || 
-                     randomUser?.name;
-      
+      const assignedName = r.data.assignedTo?.[0]?.name ||
+        (typeof r.data.assignTo === 'string' &&
+          !r.data.assignTo.match(/^[a-f0-9]{24}$/i)
+          ? r.data.assignTo : null) ||
+        randomUser?.name;
+
       setGroups(p => p.map(g => ({
         ...g,
         tasks: (g.tasks || []).map(t => (t._id || t.id) === id ? { ...t, assignTo: assignedName } : t)
       })));
-      
+
       // Notify assigned employee
       if (assignedName && assignedName !== "Unassigned") {
         const emp = (employees || []).find(e => (e.name || e.employeeName || "").toLowerCase() === assignedName.toLowerCase());
@@ -2409,7 +2409,7 @@ const assignedName = r.data.assignedTo?.[0]?.name ||
             icon: 'Edit',
             text: `Task auto-assigned to you: "${task.title || 'New Task'}"`,
             link: 'tasks'
-          }).catch(() => {});
+          }).catch(() => { });
         }
       }
 
@@ -2463,9 +2463,9 @@ const assignedName = r.data.assignedTo?.[0]?.name ||
     tasks: sortFn((g.tasks || []).filter(t => {
       const tProjId = t.projectId?._id || t.projectId || t.project || t.projectName || t.project_id;
       const hasProject = tProjId && String(tProjId).trim() !== "" && tProjId !== "null" && tProjId !== "undefined";
-      
+
       // If a project is selected, only show tasks for that project
-      
+
       // If a project is selected, show ONLY that project's tasks
       if (selectedProjectId) {
         if (String(tProjId) !== String(selectedProjectId)) return false;
@@ -2491,7 +2491,7 @@ const assignedName = r.data.assignedTo?.[0]?.name ||
   });
 
   let displayGroups;
-  if (groupBy === "default") { 
+  if (groupBy === "default") {
     if (selectedProjectId || selectedProjectName) {
       // Merge all tasks into one single display group when viewing a specific project
       const allTasks = filteredGroups.flatMap(g => g.tasks);
@@ -2501,11 +2501,11 @@ const assignedName = r.data.assignedTo?.[0]?.name ||
         label: "Tasks",
         color: P.accent,
         open: true,
-        isVirtual: true, 
+        isVirtual: true,
         tasks: allTasks
       }];
     } else {
-      displayGroups = filteredGroups.map(g => ({ ...g, isVirtual: false })); 
+      displayGroups = filteredGroups.map(g => ({ ...g, isVirtual: false }));
     }
   }
   else { const all = filteredGroups.flatMap(g => g.tasks || []); if (groupBy === "status") { displayGroups = STATUS_LIST.map(s => ({ _id: "v" + s, label: s, color: STATUS_CFG[s].bg, open: true, isVirtual: true, tasks: all.filter(t => t.status === s) })).filter(g => g.tasks.length > 0); } else { const today = new Date(); today.setHours(0, 0, 0, 0); const nw = new Date(today); nw.setDate(nw.getDate() + 7); displayGroups = [{ _id: "vov", label: "Overdue", color: "#e2445c", open: true, isVirtual: true, tasks: all.filter(t => { const d = new Date(t.date); return !isNaN(d) && d < today && t.status !== "Done"; }) }, { _id: "vto", label: "Today", color: "#fdab3d", open: true, isVirtual: true, tasks: all.filter(t => { const d = new Date(t.date); d.setHours(0, 0, 0, 0); return !isNaN(d) && d.getTime() === today.getTime(); }) }, { _id: "vwk", label: "This Week", color: P.accent, open: true, isVirtual: true, tasks: all.filter(t => { const d = new Date(t.date); return !isNaN(d) && d > today && d < nw; }) }, { _id: "vla", label: "Later", color: P.mid, open: true, isVirtual: true, tasks: all.filter(t => { const d = new Date(t.date); return !isNaN(d) && d >= nw; }) }, { _id: "vnd", label: "No date", color: "#c4b5fd", open: true, isVirtual: true, tasks: all.filter(t => !t.date || isNaN(new Date(t.date))) }].filter(g => g.tasks.length > 0); } }
@@ -2544,11 +2544,11 @@ const assignedName = r.data.assignedTo?.[0]?.name ||
               {selectedProjectName ? `Project: ${selectedProjectName}` : "Task Dashboard"}
             </span>
             {selectedProjectName && (
-              <button 
+              <button
                 onClick={onClearProjectFilter}
                 style={{ background: "#fef2f2", border: "1px solid #fee2e2", color: "#ef4444", borderRadius: 8, padding: "4px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}
               >
-                Close Exit Project View
+                CloseExit Project View
               </button>
             )}
 

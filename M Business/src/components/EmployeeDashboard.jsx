@@ -250,7 +250,7 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems })
           <button onClick={onLogout} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "11px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: T.radiusSm, color: "#fca5a5", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.18s" }}
             onMouseEnter={e => { e.currentTarget.style.background = "rgba(239,68,68,0.18)"; }}
             onMouseLeave={e => { e.currentTarget.style.background = "rgba(239,68,68,0.1)"; }}>
-             Logout
+            Logout
           </button>
         </div>
       </div>
@@ -370,14 +370,14 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
 
   if (selectedDoc) {
     return (
-      <div style={{ display:"flex", flexDirection:"column", height:"100%" }}>
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
-          <button onClick={() => setSelectedDoc(null)} style={{ background:T.surface, border:`1px solid ${T.border}`, color:T.text, padding:"8px 16px", borderRadius:8, cursor:"pointer", display:"flex", alignItems:"center", gap:8 }}>
+      <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+          <button onClick={() => setSelectedDoc(null)} style={{ background: T.surface, border: `1px solid ${T.border}`, color: T.text, padding: "8px 16px", borderRadius: 8, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
             <i className="ti ti-arrow-left"></i> Back to Documents
           </button>
-          <div style={{ fontSize:16, fontWeight:700, color:T.text }}>{selectedDoc.docType.toUpperCase()} Document</div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: T.text }}>{selectedDoc.docType.toUpperCase()} Document</div>
         </div>
-        <div style={{ flex:1, background:"#f3f4f6", borderRadius:12, padding:"20px", overflowY:"auto" }}>
+        <div style={{ flex: 1, background: "#f3f4f6", borderRadius: 12, padding: "20px", overflowY: "auto" }}>
           <style>{`
             .emp-doc-view .lh-wrap { max-width: 760px; margin: 0 auto; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; border: 1px solid #eaeaea; font-family: 'Nunito', sans-serif; overflow: hidden; }
             .emp-doc-view .lb-editor { min-height: 0 !important; }
@@ -399,8 +399,8 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
   );
 
   return (
-    <div style={{ display:"flex", flexDirection:"column", gap:16, padding:24 }}>
-      <div style={{ fontSize:22, fontWeight:800, color:T.text }}>My Documents</div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 16, padding: 24 }}>
+      <div style={{ fontSize: 22, fontWeight: 800, color: T.text }}>My Documents</div>
 
       {pendingRequests.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -461,30 +461,30 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
         </div>
       )}
 
-      <div style={{ display:"grid", gap:12 }}>
+      <div style={{ display: "grid", gap: 12 }}>
         {loading ? (
-          <div style={{ color:T.textMuted, padding: 20 }}>Loading documents...</div>
+          <div style={{ color: T.textMuted, padding: 20 }}>Loading documents...</div>
         ) : docs.length === 0 ? (
-          <div style={{ background:T.surface, border:`1px solid ${T.border}`, padding:40, borderRadius:16, textAlign:"center" }}>
-            <div style={{ fontSize:40, marginBottom:16 }}></div>
-            <div style={{ fontSize:16, fontWeight:700, color:T.text, marginBottom:8 }}>No Documents</div>
-            <div style={{ color:T.textMuted, fontSize:14 }}>You haven't received any documents or letters yet.</div>
+          <div style={{ background: T.surface, border: `1px solid ${T.border}`, padding: 40, borderRadius: 16, textAlign: "center" }}>
+            <div style={{ fontSize: 40, marginBottom: 16 }}></div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 8 }}>No Documents</div>
+            <div style={{ color: T.textMuted, fontSize: 14 }}>You haven't received any documents or letters yet.</div>
           </div>
         ) : (
           docs.map(doc => (
-          <div key={doc._id || doc.id} onClick={() => setSelectedDoc(doc)} style={{ background:T.surface, border:`1px solid ${T.border}`, padding:20, borderRadius:12, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center", transition:"all 0.2s" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-              <div style={{ width:40, height:40, borderRadius:10, background:T.accentLight, display:"flex", alignItems:"center", justifyContent:"center", color:T.accent }}>
-                <i className="ti ti-file-text" style={{ fontSize:20 }}></i>
+            <div key={doc._id || doc.id} onClick={() => setSelectedDoc(doc)} style={{ background: T.surface, border: `1px solid ${T.border}`, padding: 20, borderRadius: 12, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", transition: "all 0.2s" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 10, background: T.accentLight, display: "flex", alignItems: "center", justifyContent: "center", color: T.accent }}>
+                  <i className="ti ti-file-text" style={{ fontSize: 20 }}></i>
+                </div>
+                <div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: T.text, textTransform: "capitalize" }}>{doc.docType} received</div>
+                  <div style={{ fontSize: 12, color: T.textMuted }}>Sent on {new Date(doc.dateSent).toLocaleString()}</div>
+                </div>
               </div>
-              <div>
-                <div style={{ fontSize:15, fontWeight:700, color:T.text, textTransform:"capitalize" }}>{doc.docType} received</div>
-                <div style={{ fontSize:12, color:T.textMuted }}>Sent on {new Date(doc.dateSent).toLocaleString()}</div>
-              </div>
+              <i className="ti ti-chevron-right" style={{ color: T.textMuted }}></i>
             </div>
-            <i className="ti ti-chevron-right" style={{ color:T.textMuted }}></i>
-          </div>
-        )))}
+          )))}
       </div>
     </div>
   );
@@ -646,26 +646,26 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
   const joinDate = user?.dateJoined || user?.joinDate || "";
   const employment = user?.employmentType || user?.employment || "Full-Time";
   const presentDays = attendance.filter(a => a.status === "present").length;
-  const absentDays  = attendance.filter(a => a.status === "absent").length;
-  const leaveDays   = attendance.filter(a => a.status === "leave").length;
-  const wfhDays     = attendance.filter(a => a.status === "wfh").length;
+  const absentDays = attendance.filter(a => a.status === "absent").length;
+  const leaveDays = attendance.filter(a => a.status === "leave").length;
+  const wfhDays = attendance.filter(a => a.status === "wfh").length;
   const totalMarked = presentDays + absentDays + leaveDays;
-  const attRate     = totalMarked > 0 ? Math.round((presentDays / totalMarked) * 100) : 0;
-  const leaveUsed   = leaveDays;
-  const leaveTotal  = 18;
-  const pendingTasks = tasks.filter(t => !["done","completed"].includes((t.status||"").toLowerCase())).length;
-  const activeProj   = projects.filter(p => !["done","completed"].includes((p.status||"").toLowerCase())).length;
-  const leaveHistory = attendance.filter(a => a.status === "leave" || a.status === "absent").slice(0,3);
-  const initials = name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0,2);
+  const attRate = totalMarked > 0 ? Math.round((presentDays / totalMarked) * 100) : 0;
+  const leaveUsed = leaveDays;
+  const leaveTotal = 18;
+  const pendingTasks = tasks.filter(t => !["done", "completed"].includes((t.status || "").toLowerCase())).length;
+  const activeProj = projects.filter(p => !["done", "completed"].includes((p.status || "").toLowerCase())).length;
+  const leaveHistory = attendance.filter(a => a.status === "leave" || a.status === "absent").slice(0, 3);
+  const initials = name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
 
   const TC = { teal: "#00BCD4", bg: "#f0f4f8", card: "#fff", border: "#e5eaf0", text: "#0f1c2e", textMid: "#4a5568", textSoft: "#94a3b8", green: "#16a34a", amber: "#d97706", red: "#dc2626", blue: "#2563eb" };
 
   const docItems = [
-    { name:"Offer Letter",  meta:"Jan 2024 · PDF", icon:"Document", color:"#6366F1" },
-    { name:"Aadhaar Card",  meta:"ID Proof · PDF",  icon:"ID Card", color:"#0ea5e9" },
-    { name:"Contract",      meta:"Signed · PDF",     icon:"Document",color:"#f59e0b" },
-    { name:"Degree Cert",   meta:"Education · PDF",  icon:"Education", color:"#8b5cf6" },
-    { name:"Resume",        meta:"Latest · PDF",     icon:"Edit", color:"#ef4444" },
+    { name: "Offer Letter", meta: "Jan 2024 · PDF", icon: "Document", color: "#6366F1" },
+    { name: "Aadhaar Card", meta: "ID Proof · PDF", icon: "ID Card", color: "#0ea5e9" },
+    { name: "Contract", meta: "Signed · PDF", icon: "Document", color: "#f59e0b" },
+    { name: "Degree Cert", meta: "Education · PDF", icon: "Education", color: "#8b5cf6" },
+    { name: "Resume", meta: "Latest · PDF", icon: "Edit", color: "#ef4444" },
   ];
 
   const cardStyle = { background: TC.card, borderRadius: 16, border: `1px solid ${TC.border}`, overflow: "hidden" };
@@ -678,78 +678,78 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
       {/* Back */}
-     
+
 
       {/* Hero */}
-      <div style={{ background:"linear-gradient(135deg,#0f9baa,#00BCD4,#26c6da)", borderRadius:18, padding:"24px 28px", display:"flex", alignItems:"center", gap:18, color:"#fff", position:"relative", overflow:"hidden" }}>
-        <div style={{ width:56, height:56, borderRadius:16, background:"rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, fontWeight:900, border:"2px solid rgba(255,255,255,0.3)", flexShrink:0 }}>{initials}</div>
-        <div style={{ flex:1 }}>
-          <div style={{ fontSize:12, opacity:0.7, fontWeight:600 }}>My Profile</div>
-          <div style={{ fontSize:22, fontWeight:900, marginTop:2 }}>{name} </div>
-          <div style={{ fontSize:12, opacity:0.7, marginTop:4 }}>{role}{dept ? ` · ${dept} Department` : ""}</div>
+      <div style={{ background: "linear-gradient(135deg,#0f9baa,#00BCD4,#26c6da)", borderRadius: 18, padding: "24px 28px", display: "flex", alignItems: "center", gap: 18, color: "#fff", position: "relative", overflow: "hidden" }}>
+        <div style={{ width: 56, height: 56, borderRadius: 16, background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 900, border: "2px solid rgba(255,255,255,0.3)", flexShrink: 0 }}>{initials}</div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 12, opacity: 0.7, fontWeight: 600 }}>My Profile</div>
+          <div style={{ fontSize: 22, fontWeight: 900, marginTop: 2 }}>{name} </div>
+          <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>{role}{dept ? ` · ${dept} Department` : ""}</div>
         </div>
-        <div style={{ textAlign:"right" }}>
-          <div style={{ fontSize:14, fontWeight:800 }}>{empId}</div>
-          <div style={{ fontSize:10, opacity:0.6 }}>Employee ID</div>
-          <div style={{ marginTop:8, background:"rgba(255,255,255,0.2)", borderRadius:20, padding:"4px 14px", fontSize:11, fontWeight:700, display:"inline-flex", alignItems:"center", gap:5 }}>
-            <span style={{ width:6, height:6, borderRadius:"50%", background:"#fff" }} /> Active Employee
+        <div style={{ textAlign: "right" }}>
+          <div style={{ fontSize: 14, fontWeight: 800 }}>{empId}</div>
+          <div style={{ fontSize: 10, opacity: 0.6 }}>Employee ID</div>
+          <div style={{ marginTop: 8, background: "rgba(255,255,255,0.2)", borderRadius: 20, padding: "4px 14px", fontSize: 11, fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 5 }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }} /> Active Employee
           </div>
         </div>
       </div>
 
       {/* Quick Stats */}
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
         {[
-          { icon:"Date", val:presentDays, lbl:"Days Present", bg:"#e0f7fa", ic:TC.teal },
-          { icon:"Job", val:activeProj, lbl:"Active Projects", bg:"#dcfce7", ic:TC.green },
-          { icon:"Checked", val:pendingTasks, lbl:"Tasks Pending", bg:"#fef3c7", ic:TC.amber },
-          { icon:"", val:leaveTotal-leaveUsed, lbl:"Leave Days Left", bg:"#dbeafe", ic:TC.blue },
-        ].map((s,i) => (
-          <div key={i} style={{ ...cardStyle, padding:"16px 18px", display:"flex", alignItems:"center", gap:12 }}>
-            <div style={{ width:40, height:40, borderRadius:10, background:s.bg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18 }}>{s.icon}</div>
-            <div><div style={{ fontSize:20, fontWeight:900, color:TC.text }}>{s.val}</div><div style={{ fontSize:11, color:TC.textSoft, fontWeight:600 }}>{s.lbl}</div></div>
+          { icon: "Date", val: presentDays, lbl: "Days Present", bg: "#e0f7fa", ic: TC.teal },
+          { icon: "Job", val: activeProj, lbl: "Active Projects", bg: "#dcfce7", ic: TC.green },
+          { icon: "Checked", val: pendingTasks, lbl: "Tasks Pending", bg: "#fef3c7", ic: TC.amber },
+          { icon: "", val: leaveTotal - leaveUsed, lbl: "Leave Days Left", bg: "#dbeafe", ic: TC.blue },
+        ].map((s, i) => (
+          <div key={i} style={{ ...cardStyle, padding: "16px 18px", display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 10, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{s.icon}</div>
+            <div><div style={{ fontSize: 20, fontWeight: 900, color: TC.text }}>{s.val}</div><div style={{ fontSize: 11, color: TC.textSoft, fontWeight: 600 }}>{s.lbl}</div></div>
           </div>
         ))}
       </div>
 
       {/* Profile + Attendance */}
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
         <div style={cardStyle}>
           <div style={headStyle}><div style={titleStyle}>Profile My Profile</div></div>
           <div style={bodyStyle}>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
-              {[["Full Name",name],["Employee ID",empId,true],["Role",role],["Department",dept||"—"],["Email",email||"—"],["Phone",phone||"—"],["Date Joined",joinDate||"—"],["Employment",employment]].map(([l,v,teal],i)=>(
-                <div key={i}><div style={lblStyle}>{l}</div><div style={{ ...valStyle, ...(teal?{color:TC.teal}:{}) }}>{v}</div></div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+              {[["Full Name", name], ["Employee ID", empId, true], ["Role", role], ["Department", dept || "—"], ["Email", email || "—"], ["Phone", phone || "—"], ["Date Joined", joinDate || "—"], ["Employment", employment]].map(([l, v, teal], i) => (
+                <div key={i}><div style={lblStyle}>{l}</div><div style={{ ...valStyle, ...(teal ? { color: TC.teal } : {}) }}>{v}</div></div>
               ))}
             </div>
           </div>
         </div>
 
         <div style={cardStyle}>
-          <div style={headStyle}><div style={titleStyle}>Metrics Attendance & Leave</div><span style={{ fontSize:11, color:TC.textSoft, fontWeight:700 }}>This Month</span></div>
+          <div style={headStyle}><div style={titleStyle}>Metrics Attendance & Leave</div><span style={{ fontSize: 11, color: TC.textSoft, fontWeight: 700 }}>This Month</span></div>
           <div style={bodyStyle}>
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8, marginBottom:16 }}>
-              {[[presentDays,"Present",TC.green],[absentDays,"Absent",TC.red],[leaveDays,"On Leave",TC.amber],[wfhDays,"WFH",TC.blue]].map(([v,l,c],i)=>(
-                <div key={i} style={{ textAlign:"center", padding:"10px 0", borderRadius:10, border:`1px solid ${TC.border}` }}>
-                  <div style={{ fontSize:18, fontWeight:900, color:c }}>{v}</div>
-                  <div style={{ fontSize:10, color:TC.textSoft, fontWeight:600, marginTop:2 }}>{l}</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8, marginBottom: 16 }}>
+              {[[presentDays, "Present", TC.green], [absentDays, "Absent", TC.red], [leaveDays, "On Leave", TC.amber], [wfhDays, "WFH", TC.blue]].map(([v, l, c], i) => (
+                <div key={i} style={{ textAlign: "center", padding: "10px 0", borderRadius: 10, border: `1px solid ${TC.border}` }}>
+                  <div style={{ fontSize: 18, fontWeight: 900, color: c }}>{v}</div>
+                  <div style={{ fontSize: 10, color: TC.textSoft, fontWeight: 600, marginTop: 2 }}>{l}</div>
                 </div>
               ))}
             </div>
-            {[["Attendance Rate",attRate+"%",attRate,TC.green],["Leave Used",`${leaveUsed} / ${leaveTotal} days`,Math.round((leaveUsed/leaveTotal)*100),TC.amber]].map(([l,r,pct,c],i)=>(
-              <div key={i} style={{ marginBottom:10 }}>
-                <div style={{ display:"flex", justifyContent:"space-between", fontSize:11, fontWeight:700, color:TC.textMid, marginBottom:4 }}><span>{l}</span><span>{r}</span></div>
-                <div style={{ height:5, borderRadius:99, background:"#e5eaf0" }}><div style={{ height:"100%", borderRadius:99, background:c, width:`${pct}%`, transition:"width 0.5s" }} /></div>
+            {[["Attendance Rate", attRate + "%", attRate, TC.green], ["Leave Used", `${leaveUsed} / ${leaveTotal} days`, Math.round((leaveUsed / leaveTotal) * 100), TC.amber]].map(([l, r, pct, c], i) => (
+              <div key={i} style={{ marginBottom: 10 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 700, color: TC.textMid, marginBottom: 4 }}><span>{l}</span><span>{r}</span></div>
+                <div style={{ height: 5, borderRadius: 99, background: "#e5eaf0" }}><div style={{ height: "100%", borderRadius: 99, background: c, width: `${pct}%`, transition: "width 0.5s" }} /></div>
               </div>
             ))}
-            <div style={{ marginTop:14 }}>
-              <div style={{ fontSize:11, fontWeight:900, color:TC.text, marginBottom:8 }}>Document My Leave History</div>
-              <table style={{ width:"100%", fontSize:11, borderCollapse:"collapse" }}>
-                <thead><tr style={{ borderBottom:`1px solid ${TC.border}` }}>{["TYPE","DATES","STATUS"].map(h=><th key={h} style={{ padding:"6px 0", textAlign:"left", color:TC.textSoft, fontWeight:700, fontSize:10 }}>{h}</th>)}</tr></thead>
+            <div style={{ marginTop: 14 }}>
+              <div style={{ fontSize: 11, fontWeight: 900, color: TC.text, marginBottom: 8 }}>Document My Leave History</div>
+              <table style={{ width: "100%", fontSize: 11, borderCollapse: "collapse" }}>
+                <thead><tr style={{ borderBottom: `1px solid ${TC.border}` }}>{["TYPE", "DATES", "STATUS"].map(h => <th key={h} style={{ padding: "6px 0", textAlign: "left", color: TC.textSoft, fontWeight: 700, fontSize: 10 }}>{h}</th>)}</tr></thead>
                 <tbody>
-                  {leaveHistory.length===0
-                    ? <tr><td colSpan={3} style={{ textAlign:"center", color:TC.textSoft, padding:12 }}>No leave history</td></tr>
-                    : leaveHistory.map((a,i)=><tr key={i} style={{ borderBottom:`1px solid ${TC.border}` }}><td style={{ padding:"6px 0" }}>{a.leaveType||"Leave"}</td><td>{a.date}</td><td><span style={{ background:TC.amber+"20", color:TC.amber, padding:"2px 8px", borderRadius:12, fontSize:10, fontWeight:700 }}>{a.leaveStatus||"Pending"}</span></td></tr>)}
+                  {leaveHistory.length === 0
+                    ? <tr><td colSpan={3} style={{ textAlign: "center", color: TC.textSoft, padding: 12 }}>No leave history</td></tr>
+                    : leaveHistory.map((a, i) => <tr key={i} style={{ borderBottom: `1px solid ${TC.border}` }}><td style={{ padding: "6px 0" }}>{a.leaveType || "Leave"}</td><td>{a.date}</td><td><span style={{ background: TC.amber + "20", color: TC.amber, padding: "2px 8px", borderRadius: 12, fontSize: 10, fontWeight: 700 }}>{a.leaveStatus || "Pending"}</span></td></tr>)}
                 </tbody>
               </table>
             </div>
@@ -758,69 +758,69 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
       </div>
 
       {/* Projects + Tasks + Documents */}
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
         {/* Projects */}
         <div style={cardStyle}>
-          <div style={headStyle}><div style={titleStyle}>Job My Projects</div><span style={{ fontSize:12, fontWeight:800, color:TC.teal }}>{activeProj} active</span></div>
-          <div style={{ padding:"8px 18px" }}>
-            {projects.slice(0,4).map((p,i)=>{
+          <div style={headStyle}><div style={titleStyle}>Job My Projects</div><span style={{ fontSize: 12, fontWeight: 800, color: TC.teal }}>{activeProj} active</span></div>
+          <div style={{ padding: "8px 18px" }}>
+            {projects.slice(0, 4).map((p, i) => {
               const pTasks = tasks.filter(t => {
                 const tProjId = t.projectId && typeof t.projectId === 'object' ? t.projectId._id : t.projectId;
                 const tProjName = t.projectId && typeof t.projectId === 'object' ? t.projectId.name : t.project;
                 return (tProjId && (tProjId === p._id || tProjId === p.id)) || (tProjName && tProjName === p.name);
               });
-              const s=(p.status||"").toLowerCase();
-              const pct=s==="done"||s==="completed"?100:pTasks.length>0?Math.round((pTasks.filter(t=>["done","completed"].includes((t.status||"").toLowerCase())).length/pTasks.length)*100):s==="in progress"?50:(p.progress||0);
-              return(
-                <div key={p._id||i} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 0", borderBottom:i<Math.min(projects.length,4)-1?`1px solid ${TC.border}`:"none" }}>
-                  <div style={{ width:32, height:32, borderRadius:8, background:TC.teal+"15", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, color:TC.teal }}>Web</div>
-                  <div style={{ flex:1 }}><div style={{ fontSize:12, fontWeight:700, color:TC.text }}>{p.name}</div><div style={{ fontSize:10, color:TC.textSoft }}>{role}</div></div>
-                  <div style={{ textAlign:"right" }}>
-                    <div style={{ fontSize:12, fontWeight:800, color:TC.teal }}>{pct}%</div>
-                    <div style={{ fontSize:10, color:TC.textSoft }}>{p.status||"Pending"}</div>
-                    <div style={{ width:50, height:3, borderRadius:99, background:"#e5eaf0", marginTop:3 }}><div style={{ height:"100%", borderRadius:99, background:TC.teal, width:`${pct}%` }}/></div>
+              const s = (p.status || "").toLowerCase();
+              const pct = s === "done" || s === "completed" ? 100 : pTasks.length > 0 ? Math.round((pTasks.filter(t => ["done", "completed"].includes((t.status || "").toLowerCase())).length / pTasks.length) * 100) : s === "in progress" ? 50 : (p.progress || 0);
+              return (
+                <div key={p._id || i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 0", borderBottom: i < Math.min(projects.length, 4) - 1 ? `1px solid ${TC.border}` : "none" }}>
+                  <div style={{ width: 32, height: 32, borderRadius: 8, background: TC.teal + "15", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: TC.teal }}>Web</div>
+                  <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 700, color: TC.text }}>{p.name}</div><div style={{ fontSize: 10, color: TC.textSoft }}>{role}</div></div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: 12, fontWeight: 800, color: TC.teal }}>{pct}%</div>
+                    <div style={{ fontSize: 10, color: TC.textSoft }}>{p.status || "Pending"}</div>
+                    <div style={{ width: 50, height: 3, borderRadius: 99, background: "#e5eaf0", marginTop: 3 }}><div style={{ height: "100%", borderRadius: 99, background: TC.teal, width: `${pct}%` }} /></div>
                   </div>
                 </div>
               );
             })}
-            {projects.length===0&&<div style={{ padding:"20px 0", textAlign:"center", color:TC.textSoft, fontSize:12 }}>No projects assigned</div>}
+            {projects.length === 0 && <div style={{ padding: "20px 0", textAlign: "center", color: TC.textSoft, fontSize: 12 }}>No projects assigned</div>}
           </div>
         </div>
 
         {/* Tasks */}
         <div style={cardStyle}>
-          <div style={headStyle}><div style={titleStyle}>Checked My Tasks</div><span style={{ fontSize:11, color:TC.textSoft, fontWeight:700 }}>{pendingTasks} pending</span></div>
-          <div style={{ borderBottom:`1px solid ${TC.border}`, display:"flex" }}>
-            {["All","Pending","Done"].map((tab,i)=><button key={tab} style={{ flex:1, padding:"8px 0", background:"none", border:"none", borderBottom:i===0?`2px solid ${TC.teal}`:"2px solid transparent", fontSize:11, fontWeight:i===0?800:600, color:i===0?TC.teal:TC.textSoft, cursor:"pointer", fontFamily:"inherit" }}>{tab}</button>)}
+          <div style={headStyle}><div style={titleStyle}>Checked My Tasks</div><span style={{ fontSize: 11, color: TC.textSoft, fontWeight: 700 }}>{pendingTasks} pending</span></div>
+          <div style={{ borderBottom: `1px solid ${TC.border}`, display: "flex" }}>
+            {["All", "Pending", "Done"].map((tab, i) => <button key={tab} style={{ flex: 1, padding: "8px 0", background: "none", border: "none", borderBottom: i === 0 ? `2px solid ${TC.teal}` : "2px solid transparent", fontSize: 11, fontWeight: i === 0 ? 800 : 600, color: i === 0 ? TC.teal : TC.textSoft, cursor: "pointer", fontFamily: "inherit" }}>{tab}</button>)}
           </div>
-          <div style={{ padding:"8px 18px" }}>
-            {tasks.slice(0,5).map((t,i,arr)=>{
-              const isDone=["done","completed"].includes((t.status||"").toLowerCase());
-              const pri=(t.priority||"low").toLowerCase();
-              const priColor=pri==="high"?"#dc2626":pri==="medium"||pri==="mid"?"#d97706":"#16a34a";
-              return(
-                <div key={t._id||i} style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 0", borderBottom:i<arr.length-1?`1px solid ${TC.border}`:"none" }}>
-                  <div style={{ width:16, height:16, borderRadius:4, border:`1.5px solid ${isDone?TC.green:TC.border}`, background:isDone?TC.green:"transparent", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{isDone&&<span style={{ color:"#fff", fontSize:9 }}>Yes</span>}</div>
-                  <div style={{ flex:1 }}><div style={{ fontSize:12, fontWeight:600, color:isDone?TC.textSoft:TC.text, textDecoration:isDone?"line-through":"none" }}>{t.title}</div><div style={{ fontSize:10, color:TC.textSoft }}>{t.date||t.dueDate?`Due: ${t.date||t.dueDate}`:""}</div></div>
-                  <span style={{ background:priColor+"15", color:priColor, padding:"2px 8px", borderRadius:10, fontSize:10, fontWeight:700 }}>{pri.charAt(0).toUpperCase()+pri.slice(1)}</span>
+          <div style={{ padding: "8px 18px" }}>
+            {tasks.slice(0, 5).map((t, i, arr) => {
+              const isDone = ["done", "completed"].includes((t.status || "").toLowerCase());
+              const pri = (t.priority || "low").toLowerCase();
+              const priColor = pri === "high" ? "#dc2626" : pri === "medium" || pri === "mid" ? "#d97706" : "#16a34a";
+              return (
+                <div key={t._id || i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0", borderBottom: i < arr.length - 1 ? `1px solid ${TC.border}` : "none" }}>
+                  <div style={{ width: 16, height: 16, borderRadius: 4, border: `1.5px solid ${isDone ? TC.green : TC.border}`, background: isDone ? TC.green : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{isDone && <span style={{ color: "#fff", fontSize: 9 }}>Yes</span>}</div>
+                  <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 600, color: isDone ? TC.textSoft : TC.text, textDecoration: isDone ? "line-through" : "none" }}>{t.title}</div><div style={{ fontSize: 10, color: TC.textSoft }}>{t.date || t.dueDate ? `Due: ${t.date || t.dueDate}` : ""}</div></div>
+                  <span style={{ background: priColor + "15", color: priColor, padding: "2px 8px", borderRadius: 10, fontSize: 10, fontWeight: 700 }}>{pri.charAt(0).toUpperCase() + pri.slice(1)}</span>
                 </div>
               );
             })}
-            {tasks.length===0&&<div style={{ padding:"20px 0", textAlign:"center", color:TC.textSoft, fontSize:12 }}>No tasks assigned</div>}
+            {tasks.length === 0 && <div style={{ padding: "20px 0", textAlign: "center", color: TC.textSoft, fontSize: 12 }}>No tasks assigned</div>}
           </div>
         </div>
 
         {/* Documents */}
         <div style={cardStyle}>
-          <div style={headStyle}><div style={titleStyle}>Folder My Documents</div><span style={{ fontSize:11, color:TC.textSoft, fontWeight:700 }}>5 files</span></div>
+          <div style={headStyle}><div style={titleStyle}>Folder My Documents</div><span style={{ fontSize: 11, color: TC.textSoft, fontWeight: 700 }}>5 files</span></div>
           <div style={bodyStyle}>
-            {docItems.map((d,i)=>(
-              <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 0", borderBottom:i<docItems.length-1?`1px solid ${TC.border}`:"none" }}>
-                <span style={{ fontSize:16 }}>{d.icon}</span>
-                <div style={{ flex:1 }}><div style={{ fontSize:12, fontWeight:700, color:TC.text }}>{d.name}</div><div style={{ fontSize:10, color:TC.textSoft }}>{d.meta}</div></div>
-                <div style={{ display:"flex", gap:4 }}>
-                  <button style={{ background:"#f0f4f8", border:`1px solid ${TC.border}`, borderRadius:6, padding:"4px 8px", cursor:"pointer", fontSize:10, fontWeight:700, color:TC.textMid, fontFamily:"inherit" }}>View View</button>
-                  <button style={{ background:TC.teal, border:"none", borderRadius:6, padding:"4px 8px", cursor:"pointer", color:"#fff", fontSize:10, fontFamily:"inherit" }}></button>
+            {docItems.map((d, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: i < docItems.length - 1 ? `1px solid ${TC.border}` : "none" }}>
+                <span style={{ fontSize: 16 }}>{d.icon}</span>
+                <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 700, color: TC.text }}>{d.name}</div><div style={{ fontSize: 10, color: TC.textSoft }}>{d.meta}</div></div>
+                <div style={{ display: "flex", gap: 4 }}>
+                  <button style={{ background: "#f0f4f8", border: `1px solid ${TC.border}`, borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontSize: 10, fontWeight: 700, color: TC.textMid, fontFamily: "inherit" }}>View View</button>
+                  <button style={{ background: TC.teal, border: "none", borderRadius: 6, padding: "4px 8px", cursor: "pointer", color: "#fff", fontSize: 10, fontFamily: "inherit" }}></button>
                 </div>
               </div>
             ))}
@@ -1384,7 +1384,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
                     <button onClick={() => setShowAdvFilter(v => !v)} style={{ padding: "7px 11px", borderRadius: T.radiusSm, fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: `1px solid ${showAdvFilter ? T.accent : T.border}`, background: showAdvFilter ? T.accentLight : T.surface, color: showAdvFilter ? T.text : T.textMuted, whiteSpace: "nowrap" }}>
                       Settings {showAdvFilter ? "Hide" : "Date Range"}
                     </button>
-                    {hasActiveFilter && <button onClick={resetAllFilters} style={{ padding: "7px 11px", borderRadius: T.radiusSm, fontSize: 11, fontWeight: 700, cursor: "pointer", border: `1px solid ${T.dangerBorder}`, background: T.dangerBg, color: T.danger, fontFamily: "inherit", whiteSpace: "nowrap" }}>Close Reset</button>}
+                    {hasActiveFilter && <button onClick={resetAllFilters} style={{ padding: "7px 11px", borderRadius: T.radiusSm, fontSize: 11, fontWeight: 700, cursor: "pointer", border: `1px solid ${T.dangerBorder}`, background: T.dangerBg, color: T.danger, fontFamily: "inherit", whiteSpace: "nowrap" }}>CloseReset</button>}
                   </div>
                   {showAdvFilter && (
                     <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 10, flexWrap: "wrap" }}>

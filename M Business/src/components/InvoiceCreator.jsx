@@ -2315,7 +2315,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <label className="inv-creator-form-label">Authorised Signature</label>
                 {inv.signature ? (
                   <div style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 12, padding: "14px 18px", display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
-                    <button type="button" onClick={() => { upd("signature", ""); setTypedSig(""); }} style={{ position: "absolute", top: 10, right: 10, border: "none", background: "none", color: "#ef4444", fontSize: 12, cursor: "pointer", fontWeight: "800" }}>Close Clear Signature</button>
+                    <button type="button" onClick={() => { upd("signature", ""); setTypedSig(""); }} style={{ position: "absolute", top: 10, right: 10, border: "none", background: "none", color: "#ef4444", fontSize: 12, cursor: "pointer", fontWeight: "800" }}>CloseClear Signature</button>
                     <div style={{ minHeight: 60, display: "flex", alignItems: "center", justifyContent: "center", width: "100%", marginTop: 12 }}>
                       {inv.signatureType === "image" ? (
                         <img src={inv.signature} alt="Signature Preview" style={{ maxHeight: 50, maxWidth: "100%", objectFit: "contain" }} />

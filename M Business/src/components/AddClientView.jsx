@@ -182,6 +182,8 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
 
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       <div style={{ background: '#F4F6F8', width: '100%', maxWidth: 800, maxHeight: '90vh', overflowY: 'auto', borderRadius: 16, fontFamily: "'Nunito', sans-serif", color: '#1A2332', display: 'flex', flexDirection: 'column', position: 'relative', boxShadow: '0 10px 40px rgba(0,0,0,0.2)' }}>
 
         {/* Header */}
@@ -195,14 +197,14 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           {/* Logo Section */}
           <div id="logo" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: 'linear-gradient(90deg, #E0F7FA 0%, #ffffff 100%)' }}>
-              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>Image</div>
+              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📷</div>
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Client Logo</div><div style={{ fontSize: 12, color: '#94A3B0' }}>Upload a company logo or avatar</div></div>
               <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 20, background: '#F4F6F8', color: '#94A3B0', border: '1px solid #E0E6EA' }}>Optional</span>
             </div>
             <div style={{ padding: 20 }}>
               <div onClick={() => fileInputRef.current.click()} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: 24, border: '2px dashed #E0E6EA', borderRadius: 12, background: '#F4F6F8', cursor: 'pointer' }}>
                 <div style={{ width: 72, height: 72, borderRadius: 14, background: '#fff', border: '1.5px solid #E0E6EA', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                  {formData.logoUrl ? <img src={formData.logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 28, color: '#94A3B0' }}>Company</span>}
+                  {formData.logoUrl ? <img src={formData.logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 28, color: '#94A3B0' }}>📷</span>}
                 </div>
                 <button type="button" style={{ background: '#00BCD4', color: 'white', padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer' }}> Choose logo</button>
                 <span style={{ fontSize: 12, color: '#94A3B0' }}>PNG, JPG or SVG · Max 2MB · Recommended 200×200px</span>
@@ -214,9 +216,8 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           {/* Basic Info */}
           <div id="basic" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: 'linear-gradient(90deg, #E0F7FA 0%, #ffffff 100%)' }}>
-              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>Company</div>
-              <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Basic Info</div><div style={{ fontSize: 12, color: '#94A3B0' }}>Core client identity and classification</div></div>
-              <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 20, background: '#E0F7FA', color: '#0097A7' }}>Core</span>
+              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🏢</div>
+
             </div>
             <div style={{ padding: 20 }}>
               <div style={{ marginBottom: 20 }}>
@@ -299,7 +300,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                   <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</label>
                   <div style={{ display: 'flex', gap: 8, height: 42 }}>
                     <button onClick={() => setFormData({ ...formData, status: 'Active' })} style={{ flex: 1, height: '100%', borderRadius: 8, border: `1.5px solid ${formData.status === 'Active' ? '#26A69A' : '#E0E6EA'}`, background: formData.status === 'Active' ? '#E0F2F1' : '#F4F6F8', color: formData.status === 'Active' ? '#26A69A' : '#94A3B0', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer' }}>Yes Active</button>
-                    <button onClick={() => setFormData({ ...formData, status: 'Inactive' })} style={{ flex: 1, height: '100%', borderRadius: 8, border: `1.5px solid ${formData.status === 'Inactive' ? '#EF9A9A' : '#E0E6EA'}`, background: formData.status === 'Inactive' ? '#FFEBEE' : '#F4F6F8', color: formData.status === 'Inactive' ? '#EF5350' : '#94A3B0', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer' }}>Close Inactive</button>
+                    <button onClick={() => setFormData({ ...formData, status: 'Inactive' })} style={{ flex: 1, height: '100%', borderRadius: 8, border: `1.5px solid ${formData.status === 'Inactive' ? '#EF9A9A' : '#E0E6EA'}`, background: formData.status === 'Inactive' ? '#FFEBEE' : '#F4F6F8', color: formData.status === 'Inactive' ? '#EF5350' : '#94A3B0', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer' }}>CloseInactive</button>
                   </div>
                 </div>
               </div>
@@ -309,7 +310,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           {/* Primary Contact */}
           <div id="contact" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: 'linear-gradient(90deg, #E0F7FA 0%, #ffffff 100%)' }}>
-              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>Call</div>
+              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📞</div>
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Primary Contact</div><div style={{ fontSize: 12, color: '#94A3B0' }}>Main point of contact at this client</div></div>
               <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 20, background: '#E0F7FA', color: '#0097A7' }}>Core</span>
             </div>
@@ -326,7 +327,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           {/* Address */}
           <div id="address" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: 'linear-gradient(90deg, #E0F7FA 0%, #ffffff 100%)' }}>
-              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>Location</div>
+              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📍</div>
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Address</div><div style={{ fontSize: 12, color: '#94A3B0' }}>Billing and office location</div></div>
             </div>
             <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -353,7 +354,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           {/* Online Presence */}
           <div id="online" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: 'linear-gradient(90deg, #E0F7FA 0%, #ffffff 100%)' }}>
-              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}><i className="ti ti-world"></i></div>
+              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🌐</div>
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Online Presence</div></div>
             </div>
             <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -365,7 +366,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           {/* Billing & Terms */}
           <div id="billing" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: 'linear-gradient(90deg, #E0F7FA 0%, #ffffff 100%)' }}>
-              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}></div>
+              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>💳</div>
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Billing & Terms</div></div>
             </div>
             <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -403,7 +404,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           {/* Portal Access */}
           <div id="portal" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: 'linear-gradient(90deg, #E0F7FA 0%, #ffffff 100%)' }}>
-              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>Secure</div>
+              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🔒</div>
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Portal Access</div></div>
             </div>
             <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -428,7 +429,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           {/* Internal Notes */}
           <div id="notes" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: 'linear-gradient(90deg, #E0F7FA 0%, #ffffff 100%)' }}>
-              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>Edit</div>
+              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📝</div>
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Internal Notes</div></div>
             </div>
             <div style={{ padding: 20 }}>
@@ -443,8 +444,13 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
             <div style={{ fontSize: 13, color: '#94A3B0', display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ color: '#00BCD4' }}>Security</span> All data is saved securely.</div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={onBack} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 22px', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer', background: '#F4F6F8', color: '#5A6A7A', border: '1.5px solid #E0E6EA' }}>Cancel</button>
-              <button onClick={submitForm} disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 22px', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer', background: '#00BCD4', color: 'white', border: '1.5px solid #00BCD4' }}>
-                {saving ? (isEdit ? '' : '') : (isEdit ? 'Update Client' : 'Add Client')}
+              <button onClick={submitForm} disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 22px', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', background: saving ? '#80DEEA' : '#00BCD4', color: 'white', border: '1.5px solid #00BCD4', opacity: saving ? 0.8 : 1, transition: 'all 0.2s' }}>
+                {saving ? (
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.4)', borderTopColor: '#fff', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.8s linear infinite' }}></span>
+                    {isEdit ? 'Updating...' : 'Saving...'}
+                  </span>
+                ) : (isEdit ? '✅ Update Client' : '➕ Add Client')}
               </button>
             </div>
           </div>

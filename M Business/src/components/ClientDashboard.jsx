@@ -969,7 +969,7 @@ export default function ClientDashboard({ user, setUser }) {
     .cp-root .modal-card { background: var(--surface); border-radius: var(--radius); border: 1.5px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.15); width: 100%; max-width: 420px; overflow: hidden; animation: popUp 0.3s ease; }
     .cp-root .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .cp-root .modal-title { font-size: 15px; font-weight: 800; color: var(--text); }
-    .cp-root .modal-close { background: none; border: none; font-size: 20px; color: var(--text3); cursor: pointer; }
+    .cp-root .modal-Close{ background: none; border: none; font-size: 20px; color: var(--text3); cursor: pointer; }
     .cp-root .modal-close:hover { color: var(--text); }
     .cp-root .modal-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
 

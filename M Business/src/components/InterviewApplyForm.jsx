@@ -46,7 +46,7 @@ function RoleDropdown({ role, setRole, error, setErrors }) {
     setTimeout(() => searchRef.current?.focus(), 50);
   };
 
-  // Close on outside click
+  // Closeon outside click
   useEffect(() => {
     if (!open) return;
     const handler = (e) => {
@@ -353,7 +353,7 @@ export default function InterviewApplyForm() {
             setErrors={setErrors}
           />
 
-       
+
 
           {/* Resume Upload */}
           <div className="fade-up d7">
@@ -420,7 +420,7 @@ export default function InterviewApplyForm() {
           <button
             type="button" onClick={handleSubmit} disabled={loading}
             style={{
-              width: "70%",margin: "0 auto",   padding: "14px", borderRadius: 14, border: "none",
+              width: "70%", margin: "0 auto", padding: "14px", borderRadius: 14, border: "none",
               background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))",
               color: "#fff", fontSize: 15, fontWeight: 800,
               fontFamily: "'Syne',sans-serif", letterSpacing: 0.3,

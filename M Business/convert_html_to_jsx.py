@@ -7,7 +7,7 @@ def html_to_jsx(html_content):
     # Convert for to htmlFor
     jsx = jsx.replace('for="', 'htmlFor="')
     
-    # Close self-closing tags
+    # Closeself-closing tags
     self_closing_tags = ['input', 'img', 'br', 'hr']
     for tag in self_closing_tags:
         jsx = re.sub(r'(<' + tag + r'[^>]*?[^/])>', r'\1 />', jsx)

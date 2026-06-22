@@ -21,7 +21,7 @@ lines.forEach((line, idx) => {
     console.log(`Line ${idx + 1}: +${openMatches.length} -> ${openDivs} (${line.trim().substring(0, 40)})`);
   }
 
-  // count close </div> tags
+  // count Close</div> tags
   const closeMatches = line.match(/<\/div>/g);
   if (closeMatches) {
     openDivs -= closeMatches.length;

@@ -139,7 +139,7 @@ function Mdl({ title, onClose, children, maxWidth = 820 }) {
       <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(147,51,234,0.25)" }}>
         <div style={{ padding: "16px 22px", borderBottom: "1px solid #ede9fe", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,#f5f3ff,#faf5ff)", flexShrink: 0 }}>
           <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: T.text }}>{title}</h2>
-          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#7c3aed", padding: "4px 8px" }}>✕</button>
+          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#7c3aed", padding: "4px 8px" }}>Close</button>
         </div>
         <div style={{ overflowY: "auto", padding: "20px 22px", flex: 1 }}>{children}</div>
       </div>
@@ -1794,7 +1794,7 @@ function InterviewPage({ companyId, companyName }) {
           <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 820, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(147,51,234,0.25)" }}>
             <div style={{ padding: "16px 22px", borderBottom: "1px solid #ede9fe", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,#f5f3ff,#faf5ff)", flexShrink: 0 }}>
               <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#1e0a3c" }}>👤 Candidate Profile</h2>
-              <button onClick={() => setViewModal(null)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#7c3aed", padding: "4px 8px" }}>✕</button>
+              <button onClick={() => setViewModal(null)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#7c3aed", padding: "4px 8px" }}>Close</button>
             </div>
             <div style={{ overflowY: "auto", padding: "20px 22px", flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,#f5f3ff,#faf5ff)", borderRadius: 14, border: "1px solid #ede9fe", marginBottom: 18 }}>
@@ -1892,7 +1892,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
     <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.6)", backdropFilter: "blur(10px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
       <div style={{ background: "#fff", borderRadius: 22, width: "100%", maxWidth: 650, maxHeight: "90vh", boxShadow: "0 32px 80px rgba(147,51,234,0.3)", display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={e => e.stopPropagation()}>
         <div style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7,#c084fc)", padding: "28px 28px 22px", textAlign: "center", flexShrink: 0, position: "relative" }}>
-          <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.2)", border: "none", width: 30, height: 30, borderRadius: 8, color: "#fff", fontSize: 16, cursor: "pointer" }}>✕</button>
+          <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.2)", border: "none", width: 30, height: 30, borderRadius: 8, color: "#fff", fontSize: 16, cursor: "pointer" }}>Close</button>
           <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 8, margin: "0 auto 12px", position: "relative", width: "fit-content" }}>
             <div style={{ width: 72, height: 72, borderRadius: 16, background: "rgba(255,255,255,0.22)", border: "3px solid rgba(255,255,255,0.45)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
               {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ fontSize: 24, fontWeight: 800, color: "#fff" }}>{initials}</span>}
@@ -2112,7 +2112,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
               {roleDisplay && <div style={{ fontSize: 8, color: "rgba(255,255,255,0.45)", letterSpacing: 1.2, textTransform: "uppercase", fontWeight: 700, marginTop: -1 }}>{roleDisplay}</div>}
             </div>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "none", color: "#fff", width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s" }} className="sidebar-close">✕</button>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "none", color: "#fff", width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s" }} className="sidebar-close">Close</button>
         </div>
         <nav style={{ flex: 1, minHeight: 0, padding: "10px 8px", overflowY: "auto", position: "relative", zIndex: 1 }}>
           {items.map(n => {
@@ -2634,7 +2634,7 @@ useEffect(() => {
     window.location.reload();
   };
 
-  // Close dropdown on outside click
+  // Closedropdown on outside click
   useEffect(() => {
     if (!profileDropdownOpen) return;
     const onDown = (e) => {
@@ -2956,7 +2956,7 @@ const handleEditPackage = (pkg) => {
       setClientSuccessData({ email: nc.email, password: nc.password, name: nc.name });
       setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", logoUrl: "" });
       setNcError({});
-      // Don't close modal yet - show success screen
+      // Don't Closemodal yet - show success screen
     } catch (err) {
       setNcError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" });
     } finally {
@@ -3762,7 +3762,7 @@ const handleEditPackage = (pkg) => {
               fontSize: 14,
             }}
           >
-            ✕
+            Close
           </button>
           <AuthPage setUser={handleAuthSetUser} initialTab={accountAuthTab} />
         </div>

@@ -2,28 +2,28 @@ import React, { useState, useMemo } from 'react';
 
 // ── Colour palette (matches M Business design system) ----------
 const P = {
-  primary:       '#00BCD4',
-  primaryDark:   '#0097A7',
-  primaryLight:  '#E0F7FA',
-  primaryMid:    '#B2EBF2',
-  textDark:      '#1A2332',
-  textMid:       '#4A5568',
-  textLight:     '#718096',
-  bg:            '#F0F4F8',
-  white:         '#FFFFFF',
-  border:        '#E2E8F0',
-  green:         '#26C281',
-  greenLight:    '#D1FAE5',
-  orange:        '#F59E0B',
-  orangeLight:   '#FEF3C7',
-  red:           '#FF6B6B',
-  redLight:      '#FEE2E2',
-  purple:        '#8B5CF6',
-  purpleLight:   '#EDE9FE',
+  primary: '#00BCD4',
+  primaryDark: '#0097A7',
+  primaryLight: '#E0F7FA',
+  primaryMid: '#B2EBF2',
+  textDark: '#1A2332',
+  textMid: '#4A5568',
+  textLight: '#718096',
+  bg: '#F0F4F8',
+  white: '#FFFFFF',
+  border: '#E2E8F0',
+  green: '#26C281',
+  greenLight: '#D1FAE5',
+  orange: '#F59E0B',
+  orangeLight: '#FEF3C7',
+  red: '#FF6B6B',
+  redLight: '#FEE2E2',
+  purple: '#8B5CF6',
+  purpleLight: '#EDE9FE',
 };
 
 // Avatar colour palette
-const AV_COLORS = ['#00BCD4','#8B5CF6','#F59E0B','#26C281','#EC4899','#3B82F6','#EF4444','#10B981'];
+const AV_COLORS = ['#00BCD4', '#8B5CF6', '#F59E0B', '#26C281', '#EC4899', '#3B82F6', '#EF4444', '#10B981'];
 
 function getAvColor(name, idx) {
   if (!name) return AV_COLORS[idx % AV_COLORS.length];
@@ -40,18 +40,18 @@ function getInitials2(name) {
 // Normalise backend status  display label + badge class
 function normaliseStatus(raw) {
   const s = (raw || '').toLowerCase().replace(/[\s_-]/g, '');
-  if (['active','inprogress','inreview','started'].includes(s)) return { label: 'Active',    cls: 'active' };
-  if (['onhold','hold','paused','suspended'].includes(s))        return { label: 'On Hold',  cls: 'hold' };
-  if (['completed','done','delivered','closed'].includes(s))     return { label: 'Completed',cls: 'completed' };
-  if (['overdue','late'].includes(s))                            return { label: 'Overdue',  cls: 'overdue' };
+  if (['active', 'inprogress', 'inreview', 'started'].includes(s)) return { label: 'Active', cls: 'active' };
+  if (['onhold', 'hold', 'paused', 'suspended'].includes(s)) return { label: 'On Hold', cls: 'hold' };
+  if (['completed', 'done', 'delivered', 'closed'].includes(s)) return { label: 'Completed', cls: 'completed' };
+  if (['overdue', 'late'].includes(s)) return { label: 'Overdue', cls: 'overdue' };
   return { label: raw || 'Pending', cls: 'hold' };
 }
 
 // Progress bar colour
 function progColor(statusCls) {
   if (statusCls === 'completed') return `linear-gradient(90deg,${P.green},#059669)`;
-  if (statusCls === 'overdue')   return `linear-gradient(90deg,${P.red},#DC2626)`;
-  if (statusCls === 'hold')      return `linear-gradient(90deg,${P.purple},#7C3AED)`;
+  if (statusCls === 'overdue') return `linear-gradient(90deg,${P.red},#DC2626)`;
+  if (statusCls === 'hold') return `linear-gradient(90deg,${P.purple},#7C3AED)`;
   return `linear-gradient(90deg,${P.primary},${P.primaryDark})`;
 }
 
@@ -61,7 +61,7 @@ function deadlineColor(dateStr, statusCls) {
   if (!dateStr) return P.textMid;
   const d = new Date(dateStr);
   const diff = (d - Date.now()) / (1000 * 60 * 60 * 24);
-  if (diff < 0)  return P.red;
+  if (diff < 0) return P.red;
   if (diff < 14) return P.orange;
   return P.textDark;
 }
@@ -201,17 +201,17 @@ export default function ModernProjectsView({
   onNewInvoice,
   searchQuery = '',
 }) {
-  const [search, setSearch]       = useState(searchQuery);
+  const [search, setSearch] = useState(searchQuery);
   const [statusFilter, setStatus] = useState('all');
-  const [sortBy, setSort]         = useState('newest');
-  const [view, setView]           = useState('grid');
-  const [openMenu, setOpenMenu]   = useState(null);
-  const [page, setPage]           = useState(1);
+  const [sortBy, setSort] = useState('newest');
+  const [view, setView] = useState('grid');
+  const [openMenu, setOpenMenu] = useState(null);
+  const [page, setPage] = useState(1);
   const perPage = 12;
 
-  // Close menu on outside click
+  // Closemenu on outside click
   React.useEffect(() => {
-    const close = () => setOpenMenu(null);
+    const Close = () => setOpenMenu(null);
     document.addEventListener('mousedown', close);
     return () => document.removeEventListener('mousedown', close);
   }, []);
@@ -233,10 +233,10 @@ export default function ModernProjectsView({
     let active = 0, hold = 0, completed = 0, overdue = 0;
     projects.forEach(p => {
       const { cls } = normaliseStatus(p.status);
-      if (cls === 'active')    active++;
+      if (cls === 'active') active++;
       else if (cls === 'hold') hold++;
       else if (cls === 'completed') completed++;
-      else if (cls === 'overdue')   overdue++;
+      else if (cls === 'overdue') overdue++;
     });
     return { all, active, hold, completed, overdue };
   }, [projects]);
@@ -245,7 +245,7 @@ export default function ModernProjectsView({
   const displayed = useMemo(() => {
     let list = projects.filter(p => {
       const q = search.toLowerCase();
-      const nameMatch   = (p.name   || '').toLowerCase().includes(q);
+      const nameMatch = (p.name || '').toLowerCase().includes(q);
       const clientMatch = (p.client || '').toLowerCase().includes(q);
       if (!nameMatch && !clientMatch) return false;
       if (statusFilter === 'all') return true;
@@ -269,11 +269,11 @@ export default function ModernProjectsView({
   const paginated = displayed.slice((page - 1) * perPage, page * perPage);
 
   const KPI_ITEMS = [
-    { key: 'all',       label: 'All Projects', count: counts.all,       icon: 'ti-layout-kanban',   iconBg: P.primaryLight, iconColor: P.primary },
-    { key: 'active',    label: 'Active',        count: counts.active,    icon: 'ti-player-play',     iconBg: P.greenLight,   iconColor: P.green },
-    { key: 'hold',      label: 'On Hold',       count: counts.hold,      icon: 'ti-player-pause',    iconBg: P.orangeLight,  iconColor: P.orange },
-    { key: 'completed', label: 'Completed',     count: counts.completed, icon: 'ti-circle-check',    iconBg: '#DBEAFE',      iconColor: '#2563EB' },
-    { key: 'overdue',   label: 'Overdue',       count: counts.overdue,   icon: 'ti-alert-triangle',  iconBg: P.redLight,     iconColor: P.red },
+    { key: 'all', label: 'All Projects', count: counts.all, icon: 'ti-layout-kanban', iconBg: P.primaryLight, iconColor: P.primary },
+    { key: 'active', label: 'Active', count: counts.active, icon: 'ti-player-play', iconBg: P.greenLight, iconColor: P.green },
+    { key: 'hold', label: 'On Hold', count: counts.hold, icon: 'ti-player-pause', iconBg: P.orangeLight, iconColor: P.orange },
+    { key: 'completed', label: 'Completed', count: counts.completed, icon: 'ti-circle-check', iconBg: '#DBEAFE', iconColor: '#2563EB' },
+    { key: 'overdue', label: 'Overdue', count: counts.overdue, icon: 'ti-alert-triangle', iconBg: P.redLight, iconColor: P.red },
   ];
 
   return (
@@ -350,17 +350,17 @@ export default function ModernProjectsView({
       {/* ── Project Cards ── */}
       {displayed.length === 0 ? (
         <div className="mpv-empty">
-         
+
         </div>
       ) : (
         <div className={`mpv-grid${view === 'list' ? ' list' : ''}`}>
           {paginated.map(p => {
             const { label: statusLabel, cls: statusCls } = normaliseStatus(p.status);
-            const pct      = Math.min(100, Math.max(0, p.progress || 0));
+            const pct = Math.min(100, Math.max(0, p.progress || 0));
             const deadline = p.end || p.deadline;
-            const dlColor  = deadlineColor(deadline, statusCls);
-            const team     = Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []);
-            const prio     = (p.priority || 'medium').toLowerCase();
+            const dlColor = deadlineColor(deadline, statusCls);
+            const team = Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []);
+            const prio = (p.priority || 'medium').toLowerCase();
             const prioLabel = prio.charAt(0).toUpperCase() + prio.slice(1);
             const isMenuOpen = openMenu === (p._id || p.id);
 
@@ -388,7 +388,7 @@ export default function ModernProjectsView({
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span className={`mpv-prio ${prio}`}>{prioLabel}</span>
-{(onEdit || onDelete || onAssign || onNewInvoice) && (
+                      {(onEdit || onDelete || onAssign || onNewInvoice) && (
                         <div style={{ position: 'relative' }} onClick={e => e.stopPropagation()}>
                           <button
                             className="mpv-more-btn"
@@ -413,7 +413,7 @@ export default function ModernProjectsView({
                                   <i className="ti ti-checklist" /> View Tasks
                                 </div>
                               )}
-                        {onNewInvoice && (
+                              {onNewInvoice && (
                                 <div className="mpv-menu-item" onClick={() => { setOpenMenu(null); onNewInvoice(p); }}>
                                   <i className="ti ti-file-invoice" /> New Invoice
                                 </div>

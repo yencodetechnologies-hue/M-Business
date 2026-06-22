@@ -63,7 +63,7 @@ send_modal_html = """
 old_body_end = '</body>\n</html>'
 text = text.replace(old_body_end, send_modal_html + '\n</body>\n</html>')
 
-# 6. Add modal open/close JS functions before </script>
+# 6. Add modal open/CloseJS functions before </script>
 old_end_script = "applyHash();\nwindow.addEventListener('DOMContentLoaded', applyHash);\nwindow.addEventListener('hashchange', applyHash);"
 
 new_end_script = """// ── SEND MODAL ──
@@ -82,7 +82,7 @@ function openSendModal() {
 function closeSendModal() {
   document.getElementById('sendModal').style.display = 'none';
 }
-// Close modal on backdrop click
+// Closemodal on backdrop click
 document.getElementById('sendModal').addEventListener('click', function(e) {
   if (e.target === this) closeSendModal();
 });
@@ -93,7 +93,7 @@ window.addEventListener('hashchange', applyHash);"""
 
 text = text.replace(old_end_script, new_end_script)
 
-# 7. Fix sendDoc to also close modal and show better toast
+# 7. Fix sendDoc to also Closemodal and show better toast
 old_send_func = """function sendDoc() {
   const hash = window.location.hash.substring(1) || 'inv';
   const data = {
@@ -138,7 +138,7 @@ new_send_func = """function sendDoc() {
     data.amount = grandEl ? parseFloat(grandEl.textContent.replace(/[^0-9.-]+/g,"")) : 0;
   }
   
-  // Close modal
+  // Closemodal
   closeSendModal();
   
   // Show toast

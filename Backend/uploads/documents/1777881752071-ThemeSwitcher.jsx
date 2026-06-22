@@ -3,13 +3,13 @@ import { useState, useEffect, useRef } from "react";
 // ── 8 preset themes ──────────────────────────────────────────
 const THEMES = [
   { id: "purple", label: "Purple", a: "#9333ea", b: "#7c3aed" },
-  { id: "ocean",  label: "Ocean",  a: "#0284c7", b: "#0369a1" },
+  { id: "ocean", label: "Ocean", a: "#0284c7", b: "#0369a1" },
   { id: "forest", label: "Forest", a: "#16a34a", b: "#15803d" },
   { id: "sunset", label: "Sunset", a: "#ea580c", b: "#c2410c" },
-  { id: "rose",   label: "Rose",   a: "#e11d48", b: "#be123c" },
-  { id: "slate",  label: "Slate",  a: "#475569", b: "#334155" },
-  { id: "mint",   label: "Mint",   a: "#0d9488", b: "#0f766e" },
-  { id: "candy",  label: "Candy",  a: "#c026d3", b: "#a21caf" },
+  { id: "rose", label: "Rose", a: "#e11d48", b: "#be123c" },
+  { id: "slate", label: "Slate", a: "#475569", b: "#334155" },
+  { id: "mint", label: "Mint", a: "#0d9488", b: "#0f766e" },
+  { id: "candy", label: "Candy", a: "#c026d3", b: "#a21caf" },
 ];
 
 function hexToRgb(hex) {
@@ -55,7 +55,7 @@ export default function ThemeSwitcher() {
     }
   }, []);
 
-  // Close panel on outside click
+  // Closepanel on outside click
   useEffect(() => {
     const handler = (e) => {
       if (panelRef.current && !panelRef.current.contains(e.target)) setOpen(false);
@@ -99,9 +99,9 @@ export default function ThemeSwitcher() {
 
   const handleThemeClick = (themeId) => {
     const root = document.documentElement;
-    ["--app-accent","--app-accent2","--app-sidebar","--app-primary",
-     "--app-bg","--app-card","--app-text","--app-muted","--app-border",
-     "--app-accent-gradient"].forEach(v => root.style.removeProperty(v));
+    ["--app-accent", "--app-accent2", "--app-sidebar", "--app-primary",
+      "--app-bg", "--app-card", "--app-text", "--app-muted", "--app-border",
+      "--app-accent-gradient"].forEach(v => root.style.removeProperty(v));
     applyTheme(themeId);
   };
 

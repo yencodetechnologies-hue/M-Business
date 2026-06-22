@@ -7,9 +7,9 @@ let lines = html.split('\n');
 // - line 1644: </div>
 // - line 1645: </div>
 
-lines[1391] = '<!-- REMOVED EXTRA CLOSE FOR CTRL-INV -->';
-lines[1643] = '<!-- REMOVED EXTRA CLOSE 2 -->';
-lines[1644] = '<!-- REMOVED EXTRA CLOSE 3 -->';
+lines[1391] = '<!-- REMOVED EXTRA CloseFOR CTRL-INV -->';
+lines[1643] = '<!-- REMOVED EXTRA Close2 -->';
+lines[1644] = '<!-- REMOVED EXTRA Close3 -->';
 
 const content = lines.join('\n');
 let open = 0;
@@ -19,7 +19,7 @@ lines.forEach((line, i) => {
   const closes = (line.match(/<\/div>/g) || []).length;
   open += opens - closes;
   if (open < 0) {
-    errors.push(`Line ${i+1}: negative depth (${open}) | ${line.trim()}`);
+    errors.push(`Line ${i + 1}: negative depth (${open}) | ${line.trim()}`);
     open = 0;
   }
 });

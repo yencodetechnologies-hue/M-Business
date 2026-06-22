@@ -87,7 +87,7 @@ const getStatusColor = (s) => ({ active: T.success, completed: T.success, paid: 
 function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onStartTrial, PLANS }) {
   const currentPlan = subscription?.planName;
   return (
-    <div style={{ position:"fixed", inset:0, zIndex:99990, background:"linear-gradient(135deg,#e0f7fa 0%,#e8f5e9 50%,#e3f2fd 100%)", overflowY:"auto", display:"flex", flexDirection:"column" }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 99990, background: "linear-gradient(135deg,#e0f7fa 0%,#e8f5e9 50%,#e3f2fd 100%)", overflowY: "auto", display: "flex", flexDirection: "column" }}>
       <style>{`
         @keyframes ppFadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
         .pp-card { transition: transform 0.22s, box-shadow 0.22s; cursor:default; }
@@ -96,22 +96,22 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
         .pp-btn:hover:not(:disabled) { filter: brightness(0.93); transform: translateY(-1px); }
       `}</style>
 
-      {/* Close button */}
-      <button onClick={onClose} style={{ position:"fixed", top:18, right:22, zIndex:100000, background:"rgba(0,150,136,0.12)", border:"none", color:"#00796b", width:38, height:38, borderRadius:"50%", fontSize:20, cursor:"pointer", fontFamily:"inherit", fontWeight:700 }}>Close</button>
+      {/* Closebutton */}
+      <button onClick={onClose} style={{ position: "fixed", top: 18, right: 22, zIndex: 100000, background: "rgba(0,150,136,0.12)", border: "none", color: "#00796b", width: 38, height: 38, borderRadius: "50%", fontSize: 20, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Close</button>
 
-      <div style={{ maxWidth:1060, width:"100%", margin:"0 auto", padding:"48px 20px 60px", animation:"ppFadeUp 0.38s ease" }}>
+      <div style={{ maxWidth: 1060, width: "100%", margin: "0 auto", padding: "48px 20px 60px", animation: "ppFadeUp 0.38s ease" }}>
 
         {/* Header */}
-        <div style={{ textAlign:"center", marginBottom:44 }}>
-          <h2 style={{ fontSize:36, fontWeight:900, color:"#00897b", margin:"0 0 10px", letterSpacing:"-0.5px" }}>Choose Your Plan</h2>
-          <p style={{ color:"#00796b", fontSize:15, margin:"0 0 6px", fontWeight:500 }}>Select the best plan for your business growth</p>
-          <div style={{ fontSize:12, color:"#80cbc4", fontWeight:700, letterSpacing:0.5 }}>
+        <div style={{ textAlign: "center", marginBottom: 44 }}>
+          <h2 style={{ fontSize: 36, fontWeight: 900, color: "#00897b", margin: "0 0 10px", letterSpacing: "-0.5px" }}>Choose Your Plan</h2>
+          <p style={{ color: "#00796b", fontSize: 15, margin: "0 0 6px", fontWeight: 500 }}>Select the best plan for your business growth</p>
+          <div style={{ fontSize: 12, color: "#80cbc4", fontWeight: 700, letterSpacing: 0.5 }}>
             {subscription ? `Current Plan: ${currentPlan}` : "Management Suite - subadmin"}
           </div>
         </div>
 
         {/* Plan Cards Grid */}
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(270px,1fr))", gap:28, alignItems:"stretch" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(270px,1fr))", gap: 28, alignItems: "stretch" }}>
           {PLANS.map((plan) => {
             const isCurrent = plan.name === currentPlan;
             const isProcessing = payLoading === plan.name;
@@ -119,49 +119,49 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
 
             return (
               <div key={plan.name} className="pp-card" style={{
-                background:"#fff",
-                borderRadius:20,
-                padding:"36px 26px 28px",
+                background: "#fff",
+                borderRadius: 20,
+                padding: "36px 26px 28px",
                 border: isPopular ? "2.5px solid #00897b" : isCurrent ? "2.5px solid #26a69a" : "1.5px solid #e0f2f1",
                 boxShadow: isPopular ? "0 16px 48px rgba(0,137,123,0.16)" : "0 6px 24px rgba(0,0,0,0.05)",
-                position:"relative",
-                display:"flex",
-                flexDirection:"column",
+                position: "relative",
+                display: "flex",
+                flexDirection: "column",
                 transform: isPopular ? "scale(1.035)" : "scale(1)"
               }}>
                 {/* MOST POPULAR badge */}
                 {isPopular && (
-                  <div style={{ position:"absolute", top:-1, right:-1, background:"#00897b", color:"#fff", padding:"7px 18px", borderRadius:"0 18px 0 14px", fontSize:11, fontWeight:900, textTransform:"uppercase", letterSpacing:1 }}>
+                  <div style={{ position: "absolute", top: -1, right: -1, background: "#00897b", color: "#fff", padding: "7px 18px", borderRadius: "0 18px 0 14px", fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1 }}>
                     Most Popular
                   </div>
                 )}
                 {/* CURRENT PLAN badge */}
                 {isCurrent && (
-                  <div style={{ position:"absolute", top:-1, right:-1, background:"#26a69a", color:"#fff", padding:"7px 18px", borderRadius:"0 18px 0 14px", fontSize:11, fontWeight:900, textTransform:"uppercase", letterSpacing:1 }}>
+                  <div style={{ position: "absolute", top: -1, right: -1, background: "#26a69a", color: "#fff", padding: "7px 18px", borderRadius: "0 18px 0 14px", fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1 }}>
                     Current Plan
                   </div>
                 )}
 
                 {/* Icon */}
-                <div style={{ fontSize:38, marginBottom:16 }}>{plan.icon}</div>
+                <div style={{ fontSize: 38, marginBottom: 16 }}>{plan.icon}</div>
 
                 {/* Name */}
-                <h3 style={{ fontSize:24, fontWeight:900, color: isPopular ? "#00897b" : "#1e293b", margin:"0 0 16px" }}>{plan.name}</h3>
+                <h3 style={{ fontSize: 24, fontWeight: 900, color: isPopular ? "#00897b" : "#1e293b", margin: "0 0 16px" }}>{plan.name}</h3>
 
                 {/* Price */}
-                <div style={{ display:"flex", alignItems:"baseline", gap:3, marginBottom:20 }}>
-                  <span style={{ fontSize:40, fontWeight:900, color:"#1e293b", letterSpacing:"-1px" }}>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 3, marginBottom: 20 }}>
+                  <span style={{ fontSize: 40, fontWeight: 900, color: "#1e293b", letterSpacing: "-1px" }}>
                     {plan.price === 0 ? "₹0" : plan.price === null ? "Custom" : `₹${plan.price.toLocaleString("en-IN")}`}
                   </span>
-                  {plan.price !== null && <span style={{ fontSize:14, color:"#94a3b8", fontWeight:600 }}> / month</span>}
+                  {plan.price !== null && <span style={{ fontSize: 14, color: "#94a3b8", fontWeight: 600 }}> / month</span>}
                 </div>
 
                 {/* Features */}
-                <div style={{ flex:1, display:"flex", flexDirection:"column", gap:11, marginBottom:28 }}>
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 11, marginBottom: 28 }}>
                   {plan.features.map((f, i) => (
-                    <div key={i} style={{ display:"flex", alignItems:"center", gap:9 }}>
-                      <span style={{ color:"#00897b", fontSize:15, flexShrink:0, fontWeight:700 }}>Yes</span>
-                      <span style={{ fontSize:13.5, color:"#475569", fontWeight:500 }}>{f}</span>
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 9 }}>
+                      <span style={{ color: "#00897b", fontSize: 15, flexShrink: 0, fontWeight: 700 }}>Yes</span>
+                      <span style={{ fontSize: 13.5, color: "#475569", fontWeight: 500 }}>{f}</span>
                     </div>
                   ))}
                 </div>
@@ -172,23 +172,23 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
                   disabled={isCurrent || !!payLoading}
                   onClick={() => plan.isTrial ? onStartTrial() : onSelectPlan(plan)}
                   style={{
-                    width:"100%", padding:"14px", borderRadius:12, fontSize:15, fontWeight:800,
-                    fontFamily:"inherit", border:"none",
+                    width: "100%", padding: "14px", borderRadius: 12, fontSize: 15, fontWeight: 800,
+                    fontFamily: "inherit", border: "none",
                     cursor: isCurrent || payLoading ? "not-allowed" : "pointer",
                     background: isCurrent
                       ? "#e0f2f1"
                       : isPopular
-                      ? "#00897b"
-                      : plan.isTrial
-                      ? "#e0f2f1"
-                      : "#e0f2f1",
+                        ? "#00897b"
+                        : plan.isTrial
+                          ? "#e0f2f1"
+                          : "#e0f2f1",
                     color: isCurrent
                       ? "#26a69a"
                       : isPopular
-                      ? "#fff"
-                      : plan.isTrial
-                      ? "#00897b"
-                      : "#00897b",
+                        ? "#fff"
+                        : plan.isTrial
+                          ? "#00897b"
+                          : "#00897b",
                     boxShadow: isPopular && !isCurrent ? "0 6px 18px rgba(0,137,123,0.3)" : "none"
                   }}
                 >
@@ -199,7 +199,7 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
           })}
         </div>
 
-        <div style={{ textAlign:"center", marginTop:32, color:"#80cbc4", fontSize:13, fontWeight:600 }}>
+        <div style={{ textAlign: "center", marginTop: 32, color: "#80cbc4", fontSize: 13, fontWeight: 600 }}>
           Secure Secure payment · Cancel anytime · 24/7 support
         </div>
       </div>
@@ -219,16 +219,16 @@ function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, on
   const loading = !!payLoading;
 
   const fmtCard = (v) => v.replace(/\D/g, "").slice(0, 16).replace(/(.{4})/g, "$1 ").trim();
-  const fmtExp  = (v) => v.replace(/\D/g, "").slice(0, 4).replace(/^(\d{2})(\d)/, "$1/$2");
+  const fmtExp = (v) => v.replace(/\D/g, "").slice(0, 4).replace(/^(\d{2})(\d)/, "$1/$2");
 
   const canPay = method === "card"
-    ? cardNum.replace(/\s/g,"").length === 16 && cardName && expiry.length === 5 && cvv.length >= 3
+    ? cardNum.replace(/\s/g, "").length === 16 && cardName && expiry.length === 5 && cvv.length >= 3
     : method === "upi"
-    ? /^[\w.\-]+@[\w]+$/.test(upi)
-    : true;
+      ? /^[\w.\-]+@[\w]+$/.test(upi)
+      : true;
 
   return (
-    <div style={{ position:"fixed", inset:0, zIndex:999998, background:"rgba(10,10,30,0.75)", backdropFilter:"blur(8px)", display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 999998, background: "rgba(10,10,30,0.75)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
       <style>{`
         @keyframes slideUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
         @keyframes pgSpin { to { transform:rotate(360deg); } }
@@ -239,59 +239,59 @@ function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, on
         .pg-method:hover { border-color:#a5b4fc; }
       `}</style>
 
-      <div style={{ background:"#fff", borderRadius:24, width:"100%", maxWidth:480, boxShadow:"0 30px 60px rgba(0,0,0,0.3)", animation:"slideUp 0.35s ease", overflow:"hidden" }}>
+      <div style={{ background: "#fff", borderRadius: 24, width: "100%", maxWidth: 480, boxShadow: "0 30px 60px rgba(0,0,0,0.3)", animation: "slideUp 0.35s ease", overflow: "hidden" }}>
         {/* Header */}
-        <div style={{ background:"linear-gradient(135deg,#6366f1,#4f46e5)", padding:"24px 28px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+        <div style={{ background: "linear-gradient(135deg,#6366f1,#4f46e5)", padding: "24px 28px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
-            <div style={{ color:"rgba(255,255,255,0.8)", fontSize:12, fontWeight:700, letterSpacing:1, textTransform:"uppercase", marginBottom:4 }}>Secure Payment</div>
-            <div style={{ color:"#fff", fontSize:22, fontWeight:900 }}>₹{plan.price?.toLocaleString("en-IN")}<span style={{ fontSize:13, fontWeight:600, opacity:0.8 }}>/month</span></div>
-            <div style={{ color:"rgba(255,255,255,0.85)", fontSize:13, marginTop:2 }}>{plan.icon} {plan.name} Plan</div>
+            <div style={{ color: "rgba(255,255,255,0.8)", fontSize: 12, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Secure Payment</div>
+            <div style={{ color: "#fff", fontSize: 22, fontWeight: 900 }}>₹{plan.price?.toLocaleString("en-IN")}<span style={{ fontSize: 13, fontWeight: 600, opacity: 0.8 }}>/month</span></div>
+            <div style={{ color: "rgba(255,255,255,0.85)", fontSize: 13, marginTop: 2 }}>{plan.icon} {plan.name} Plan</div>
           </div>
-          <button onClick={onClose} style={{ background:"rgba(255,255,255,0.2)", border:"none", color:"#fff", width:36, height:36, borderRadius:"50%", fontSize:18, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>Close</button>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.2)", border: "none", color: "#fff", width: 36, height: 36, borderRadius: "50%", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }}>Close</button>
         </div>
 
-        <div style={{ padding:"24px 28px" }}>
+        <div style={{ padding: "24px 28px" }}>
           {/* Payment methods */}
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8, marginBottom:24 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 24 }}>
             {[
-              { id:"card", icon:"", label:"Card" },
-              { id:"upi",  icon:"", label:"UPI" },
-              { id:"netbanking", icon:"Bank", label:"Net Banking" }
+              { id: "card", icon: "", label: "Card" },
+              { id: "upi", icon: "", label: "UPI" },
+              { id: "netbanking", icon: "Bank", label: "Net Banking" }
             ].map(m => (
-              <div key={m.id} className={`pg-method${method===m.id?" active":""}`} onClick={() => setMethod(m.id)}
-                style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 12px", border:`2px solid ${method===m.id?"#6366f1":"#e2e8f0"}`, borderRadius:12, cursor:"pointer", background:method===m.id?"#f5f3ff":"#fafafa", color:method===m.id?"#6366f1":"#64748b", fontWeight:700, fontSize:12, transition:"all 0.2s" }}>
-                <span style={{ fontSize:18 }}>{m.icon}</span> {m.label}
+              <div key={m.id} className={`pg-method${method === m.id ? " active" : ""}`} onClick={() => setMethod(m.id)}
+                style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", border: `2px solid ${method === m.id ? "#6366f1" : "#e2e8f0"}`, borderRadius: 12, cursor: "pointer", background: method === m.id ? "#f5f3ff" : "#fafafa", color: method === m.id ? "#6366f1" : "#64748b", fontWeight: 700, fontSize: 12, transition: "all 0.2s" }}>
+                <span style={{ fontSize: 18 }}>{m.icon}</span> {m.label}
               </div>
             ))}
           </div>
 
           {/* Card Fields */}
           {method === "card" && (
-            <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div>
-                <div style={{ fontSize:12, fontWeight:700, color:"#475569", marginBottom:6, textTransform:"uppercase", letterSpacing:0.5 }}>Card Number</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#475569", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>Card Number</div>
                 <input className="pg-input" placeholder="1234 5678 9012 3456" value={cardNum}
                   onChange={e => setCardNum(fmtCard(e.target.value))}
-                  style={{ width:"100%", padding:"12px 14px", border:"1.5px solid #e2e8f0", borderRadius:10, fontSize:15, fontFamily:"inherit", outline:"none", background:"#fafafa", letterSpacing:2 }} />
+                  style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 15, fontFamily: "inherit", outline: "none", background: "#fafafa", letterSpacing: 2 }} />
               </div>
               <div>
-                <div style={{ fontSize:12, fontWeight:700, color:"#475569", marginBottom:6, textTransform:"uppercase", letterSpacing:0.5 }}>Cardholder Name</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#475569", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>Cardholder Name</div>
                 <input className="pg-input" placeholder="Name on card" value={cardName}
                   onChange={e => setCardName(e.target.value)}
-                  style={{ width:"100%", padding:"12px 14px", border:"1.5px solid #e2e8f0", borderRadius:10, fontSize:14, fontFamily:"inherit", outline:"none", background:"#fafafa" }} />
+                  style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 14, fontFamily: "inherit", outline: "none", background: "#fafafa" }} />
               </div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
-                  <div style={{ fontSize:12, fontWeight:700, color:"#475569", marginBottom:6, textTransform:"uppercase", letterSpacing:0.5 }}>Expiry</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#475569", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>Expiry</div>
                   <input className="pg-input" placeholder="MM/YY" value={expiry}
                     onChange={e => setExpiry(fmtExp(e.target.value))}
-                    style={{ width:"100%", padding:"12px 14px", border:"1.5px solid #e2e8f0", borderRadius:10, fontSize:14, fontFamily:"inherit", outline:"none", background:"#fafafa" }} />
+                    style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 14, fontFamily: "inherit", outline: "none", background: "#fafafa" }} />
                 </div>
                 <div>
-                  <div style={{ fontSize:12, fontWeight:700, color:"#475569", marginBottom:6, textTransform:"uppercase", letterSpacing:0.5 }}>CVV</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#475569", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>CVV</div>
                   <input className="pg-input" placeholder="•••" type="password" maxLength={4} value={cvv}
-                    onChange={e => setCvv(e.target.value.replace(/\D/g,"").slice(0,4))}
-                    style={{ width:"100%", padding:"12px 14px", border:"1.5px solid #e2e8f0", borderRadius:10, fontSize:14, fontFamily:"inherit", outline:"none", background:"#fafafa" }} />
+                    onChange={e => setCvv(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                    style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 14, fontFamily: "inherit", outline: "none", background: "#fafafa" }} />
                 </div>
               </div>
             </div>
@@ -300,21 +300,21 @@ function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, on
           {/* UPI */}
           {method === "upi" && (
             <div>
-              <div style={{ fontSize:12, fontWeight:700, color:"#475569", marginBottom:6, textTransform:"uppercase", letterSpacing:0.5 }}>UPI ID</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#475569", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>UPI ID</div>
               <input placeholder="yourname@upi" value={upi} onChange={e => setUpi(e.target.value)}
-                style={{ width:"100%", padding:"12px 14px", border:"1.5px solid #e2e8f0", borderRadius:10, fontSize:14, fontFamily:"inherit", outline:"none", background:"#fafafa" }} />
-              <div style={{ marginTop:8, fontSize:12, color:"#94a3b8" }}>e.g. 9876543210@paytm, name@ybl</div>
+                style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 14, fontFamily: "inherit", outline: "none", background: "#fafafa" }} />
+              <div style={{ marginTop: 8, fontSize: 12, color: "#94a3b8" }}>e.g. 9876543210@paytm, name@ybl</div>
             </div>
           )}
 
           {/* Net Banking */}
           {method === "netbanking" && (
             <div>
-              <div style={{ fontSize:12, fontWeight:700, color:"#475569", marginBottom:8, textTransform:"uppercase", letterSpacing:0.5 }}>Select Bank</div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-                {[{id:"sbi",label:"State Bank of India"},{id:"hdfc",label:"HDFC Bank"},{id:"icici",label:"ICICI Bank"},{id:"axis",label:"Axis Bank"},{id:"kotak",label:"Kotak Bank"},{id:"other",label:"Other Bank"}].map(b => (
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#475569", marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>Select Bank</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                {[{ id: "sbi", label: "State Bank of India" }, { id: "hdfc", label: "HDFC Bank" }, { id: "icici", label: "ICICI Bank" }, { id: "axis", label: "Axis Bank" }, { id: "kotak", label: "Kotak Bank" }, { id: "other", label: "Other Bank" }].map(b => (
                   <div key={b.id} onClick={() => setBank(b.id)}
-                    style={{ padding:"10px 14px", border:`2px solid ${bank===b.id?"#6366f1":"#e2e8f0"}`, borderRadius:10, cursor:"pointer", fontSize:12, fontWeight:700, color:bank===b.id?"#6366f1":"#475569", background:bank===b.id?"#f5f3ff":"#fafafa", transition:"all 0.15s" }}>
+                    style={{ padding: "10px 14px", border: `2px solid ${bank === b.id ? "#6366f1" : "#e2e8f0"}`, borderRadius: 10, cursor: "pointer", fontSize: 12, fontWeight: 700, color: bank === b.id ? "#6366f1" : "#475569", background: bank === b.id ? "#f5f3ff" : "#fafafa", transition: "all 0.15s" }}>
                     {b.label}
                   </div>
                 ))}
@@ -323,25 +323,25 @@ function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, on
           )}
 
           {/* Summary */}
-          <div style={{ marginTop:20, background:"#f8fafc", borderRadius:12, padding:"14px 16px", display:"flex", justifyContent:"space-between", alignItems:"center", border:"1px solid #e2e8f0" }}>
-            <div style={{ fontSize:13, color:"#64748b", fontWeight:600 }}>Total to pay</div>
-            <div style={{ fontSize:20, fontWeight:900, color:"#1e293b" }}>₹{plan.price?.toLocaleString("en-IN")}</div>
+          <div style={{ marginTop: 20, background: "#f8fafc", borderRadius: 12, padding: "14px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", border: "1px solid #e2e8f0" }}>
+            <div style={{ fontSize: 13, color: "#64748b", fontWeight: 600 }}>Total to pay</div>
+            <div style={{ fontSize: 20, fontWeight: 900, color: "#1e293b" }}>₹{plan.price?.toLocaleString("en-IN")}</div>
           </div>
 
           {/* Pay Button */}
           <button
             onClick={onPay}
             disabled={!canPay || loading}
-            style={{ marginTop:16, width:"100%", padding:"15px", background: canPay && !loading ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "#e2e8f0", color: canPay && !loading ? "#fff" : "#94a3b8", border:"none", borderRadius:12, fontSize:16, fontWeight:800, cursor: canPay && !loading ? "pointer" : "not-allowed", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"center", gap:10, transition:"all 0.2s", boxShadow: canPay && !loading ? "0 8px 20px rgba(99,102,241,0.35)" : "none" }}
+            style={{ marginTop: 16, width: "100%", padding: "15px", background: canPay && !loading ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "#e2e8f0", color: canPay && !loading ? "#fff" : "#94a3b8", border: "none", borderRadius: 12, fontSize: 16, fontWeight: 800, cursor: canPay && !loading ? "pointer" : "not-allowed", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, transition: "all 0.2s", boxShadow: canPay && !loading ? "0 8px 20px rgba(99,102,241,0.35)" : "none" }}
           >
             {loading
-              ? <><div style={{ width:18, height:18, border:"2.5px solid #fff", borderTopColor:"transparent", borderRadius:"50%", animation:"pgSpin 0.8s linear infinite" }} /> Processing...</>
+              ? <><div style={{ width: 18, height: 18, border: "2.5px solid #fff", borderTopColor: "transparent", borderRadius: "50%", animation: "pgSpin 0.8s linear infinite" }} /> Processing...</>
               : <>Secure Pay ₹{plan.price?.toLocaleString("en-IN")} Now</>
             }
           </button>
 
           {/* Security badges */}
-          <div style={{ marginTop:16, display:"flex", justifyContent:"center", gap:20, color:"#94a3b8", fontSize:11, fontWeight:600 }}>
+          <div style={{ marginTop: 16, display: "flex", justifyContent: "center", gap: 20, color: "#94a3b8", fontSize: 11, fontWeight: 600 }}>
             <span>Secure 256-bit SSL</span>
             <span>Security PCI DSS</span>
             <span>Success RBI Compliant</span>
@@ -355,24 +355,24 @@ function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, on
 // ─── MAIN COMPONENT -----------------------------------------------------------
 export default function MySubscriptions({ user, onSubscriptionSuccess, initialTab = "overview", preloadedSubscription = null, onTabChange, packagesList = [] }) {
   const sortedPackages = [...(packagesList || [])].sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0));
-  const PLANS = sortedPackages.length > 0 
+  const PLANS = sortedPackages.length > 0
     ? sortedPackages.map((pkg, index) => {
-        const isFree = pkg.type === "free" || pkg.price === 0 || pkg.price === "0";
-        return {
-          name: pkg.title || pkg.name || "Custom Plan",
-          price: isFree ? 0 : parseFloat(pkg.price) || 0,
-          icon: pkg.icon || (index === 0 ? "Special" : index === sortedPackages.length - 1 ? "Launch" : "Start"),
-          color: "var(--app-accent)",
-          popular: (pkg.title || "").toLowerCase().includes("pro") || index === Math.floor(sortedPackages.length / 2),
-          duration: pkg.no_of_days ? `${pkg.no_of_days} days` : "30 days",
-          isTrial: isFree,
-          features: Array.isArray(pkg.features) ? pkg.features : (pkg.features || "").split("\n").filter(Boolean),
-          clientLimit: `${pkg.clientLimit} Clients`,
-          employeeLimit: `${pkg.employeeLimit} Employees`,
-          managerLimit: `${pkg.managerLimit} Managers`,
-          btnLabel: isFree ? "Start Free Trial" : undefined
-        };
-      })
+      const isFree = pkg.type === "free" || pkg.price === 0 || pkg.price === "0";
+      return {
+        name: pkg.title || pkg.name || "Custom Plan",
+        price: isFree ? 0 : parseFloat(pkg.price) || 0,
+        icon: pkg.icon || (index === 0 ? "Special" : index === sortedPackages.length - 1 ? "Launch" : "Start"),
+        color: "var(--app-accent)",
+        popular: (pkg.title || "").toLowerCase().includes("pro") || index === Math.floor(sortedPackages.length / 2),
+        duration: pkg.no_of_days ? `${pkg.no_of_days} days` : "30 days",
+        isTrial: isFree,
+        features: Array.isArray(pkg.features) ? pkg.features : (pkg.features || "").split("\n").filter(Boolean),
+        clientLimit: `${pkg.clientLimit} Clients`,
+        employeeLimit: `${pkg.employeeLimit} Employees`,
+        managerLimit: `${pkg.managerLimit} Managers`,
+        btnLabel: isFree ? "Start Free Trial" : undefined
+      };
+    })
     : DEFAULT_PLANS;
   const [subscription, setSubscription] = useState(preloadedSubscription);
   const [payments, setPayments] = useState([]);
@@ -383,7 +383,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
   const [activeTab, setActiveTab] = useState(initialTab);
   const [viewPayment, setViewPayment] = useState(null);
   const [viewInvoice, setViewInvoice] = useState(null);
-  
+
   useEffect(() => {
     setActiveTab(initialTab);
     if (initialTab === "upgrade") setShowPlanPicker(true);
@@ -609,14 +609,14 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
   const startTrial = async (targetPkg = null) => {
     try {
       setPayLoading("Trial");
-const payload = {
-  amount: plan.amount, // numeric, no trailing .00
-  productinfo: plan.name,
-  firstname: user.firstName,
-  email: user.email,
-  phone: user.phone || ''
-};
-const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
+      const payload = {
+        amount: plan.amount, // numeric, no trailing .00
+        productinfo: plan.name,
+        firstname: user.firstName,
+        email: user.email,
+        phone: user.phone || ''
+      };
+      const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
       if (res.data.success) {
         showToast(`Celebration 30-day free trial started${targetPkg ? ` with ${targetPkg.title}` : ""}!`);
         await fetchData();
@@ -635,7 +635,7 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
   const startPayUPayment = async (plan) => {
     if (plan.isTrial) { startTrial(plan); return; }
     if (!plan.price) { window.open(`mailto:billing@${(user?.companyName || "business").toLowerCase().replace(/\s+/g, "")}.com`); return; }
-    
+
     // Prevent duplicate API calls from rapid clicking
     if (payuInFlight.current || payLoading) return;
     payuInFlight.current = true;
@@ -764,23 +764,23 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
               <div style={{ width: 16, height: 16, border: "2px solid #10b981", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
               Activating your subscription...
             </div>
-            <button 
+            <button
               onClick={() => {
                 console.log("Go to Dashboard clicked");
                 setPaymentSuccessData(null);
                 if (onSubscriptionSuccess) onSubscriptionSuccess();
                 else window.location.href = "/";
               }}
-              style={{ 
-                width: "100%", 
-                padding: "14px 28px", 
-                borderRadius: 12, 
-                fontSize: 15, 
-                fontWeight: 800, 
-                cursor: "pointer", 
-                background: "linear-gradient(135deg, #10b981, #059669)", 
-                color: "#fff", 
-                border: "none", 
+              style={{
+                width: "100%",
+                padding: "14px 28px",
+                borderRadius: 12,
+                fontSize: 15,
+                fontWeight: 800,
+                cursor: "pointer",
+                background: "linear-gradient(135deg, #10b981, #059669)",
+                color: "#fff",
+                border: "none",
                 fontFamily: "inherit",
                 boxShadow: "0 4px 12px rgba(16,185,129,0.3)",
                 transition: "all 0.2s"
@@ -790,7 +790,7 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
             >
               Login to dashboard
             </button>
-            </div>
+          </div>
         </div>
       </div>
     );
@@ -856,7 +856,7 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
 
                 <div style={{ fontSize: 36, marginBottom: 20, textAlign: "left" }}>{plan.icon}</div>
                 <h3 style={{ fontSize: 24, fontWeight: 800, color: T.text, margin: "0 0 6px" }}>{plan.name}</h3>
-                
+
                 <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 24 }}>
                   <span style={{ fontSize: 42, fontWeight: 900, color: T.text, letterSpacing: "-1px" }}>
                     {plan.price === null ? "Contact us" : `₹${plan.price.toLocaleString("en-IN")}`}
@@ -947,7 +947,7 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
       <style>{`
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
-      
+
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "var(--text)", color: "#fff", borderRadius: 12, padding: "14px 22px", fontSize: 14, fontWeight: 700, boxShadow: "0 8px 32px rgba(0,0,0,0.25)" }}>{toast}</div>}
 
       {!subscription ? (
@@ -970,8 +970,8 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
                   </div>
                 ))}
               </div>
-              <button 
-                className={"plan-btn " + (plan.popular ? "popular-btn" : "upgrade-btn")} 
+              <button
+                className={"plan-btn " + (plan.popular ? "popular-btn" : "upgrade-btn")}
                 onClick={() => startPayUPayment(plan)}
                 disabled={!!payLoading}
               >
@@ -983,98 +983,98 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
       ) : (
         <>
           <div style={{ background: "var(--teal)", borderRadius: 20, padding: "32px 40px", color: "#fff", display: "flex", justifyContent: "space-between", position: "relative", overflow: "hidden", marginBottom: 10 }}>
-  <div style={{ zIndex: 1, maxWidth: "60%" }}>
-    <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.2)", padding: "6px 12px", borderRadius: 20, fontSize: 11, fontWeight: 800, letterSpacing: 0.5, marginBottom: 16 }}>
-      <i className="ti ti-link"></i> CURRENT PLAN
-    </div>
-    <h1 style={{ fontSize: 28, fontWeight: 800, margin: "0 0 12px" }}>{subscription.planName} Plan</h1>
-    <p style={{ fontSize: 14, color: "rgba(255,255,255,0.9)", margin: "0 0 24px", lineHeight: 1.6 }}>
-      You're on the {subscription.planName} plan with access to core business features. Upgrade to Pro or Business for more companies, employees, and advanced analytics.
-    </p>
-    
-    <div style={{ display: "flex", gap: 32 }}>
-      <div>
-        <div style={{ fontSize: 20, fontWeight: 800 }}>{subscription.clientCount || 0} <span style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>/ {subscription.clientLimit || "∞"}</span></div>
-        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.5, marginTop: 4, color: "rgba(255,255,255,0.8)" }}>COMPANIES</div>
-      </div>
-      <div>
-        <div style={{ fontSize: 20, fontWeight: 800 }}>{subscription.employeeCount || 0} <span style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>/ {subscription.employeeLimit || "∞"}</span></div>
-        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.5, marginTop: 4, color: "rgba(255,255,255,0.8)" }}>EMPLOYEES</div>
-      </div>
-      <div>
-        <div style={{ fontSize: 20, fontWeight: 800 }}>{subscription.projectCount || 0}</div>
-        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.5, marginTop: 4, color: "rgba(255,255,255,0.8)" }}>PROJECTS</div>
-      </div>
-      <div>
-        <div style={{ fontSize: 20, fontWeight: 800 }}>{subscription.invoiceCount || 0}</div>
-        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.5, marginTop: 4, color: "rgba(255,255,255,0.8)" }}>INVOICES</div>
-      </div>
-    </div>
-  </div>
-  
-  <div style={{ zIndex: 1, textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", justifyContent: "center" }}>
-    <div style={{ fontSize: 42, fontWeight: 900, marginBottom: 4, letterSpacing: "-1px" }}>₹{subscription.planPrice?.toLocaleString("en-IN") || "0"}</div>
-    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.8)", fontWeight: 600, marginBottom: 24 }}>per {subscription.billingCycle || "month"}</div>
-    <button onClick={() => setShowPlanPicker(true)} style={{ background: "#fff", color: "var(--teal)", border: "none", padding: "12px 24px", borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, transition: "all 0.2s" }}>
-      <i className="ti ti-arrow-up"></i> Upgrade Now
-    </button>
-    {daysLeft !== null && (
-      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.8)", fontWeight: 600, marginTop: 12 }}>
-        Renews {formatDate(subscription.endDate)}
-      </div>
-    )}
-  </div>
+            <div style={{ zIndex: 1, maxWidth: "60%" }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.2)", padding: "6px 12px", borderRadius: 20, fontSize: 11, fontWeight: 800, letterSpacing: 0.5, marginBottom: 16 }}>
+                <i className="ti ti-link"></i> CURRENT PLAN
+              </div>
+              <h1 style={{ fontSize: 28, fontWeight: 800, margin: "0 0 12px" }}>{subscription.planName} Plan</h1>
+              <p style={{ fontSize: 14, color: "rgba(255,255,255,0.9)", margin: "0 0 24px", lineHeight: 1.6 }}>
+                You're on the {subscription.planName} plan with access to core business features. Upgrade to Pro or Business for more companies, employees, and advanced analytics.
+              </p>
 
-  <div style={{ position: "absolute", right: "-5%", top: "-20%", width: 400, height: 400, borderRadius: "50%", background: "rgba(255,255,255,0.1)", zIndex: 0 }} />
-  <div style={{ position: "absolute", right: "15%", bottom: "-40%", width: 250, height: 250, borderRadius: "50%", background: "rgba(255,255,255,0.05)", zIndex: 0 }} />
-</div>
+              <div style={{ display: "flex", gap: 32 }}>
+                <div>
+                  <div style={{ fontSize: 20, fontWeight: 800 }}>{subscription.clientCount || 0} <span style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>/ {subscription.clientLimit || "∞"}</span></div>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.5, marginTop: 4, color: "rgba(255,255,255,0.8)" }}>COMPANIES</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 20, fontWeight: 800 }}>{subscription.employeeCount || 0} <span style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>/ {subscription.employeeLimit || "∞"}</span></div>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.5, marginTop: 4, color: "rgba(255,255,255,0.8)" }}>EMPLOYEES</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 20, fontWeight: 800 }}>{subscription.projectCount || 0}</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.5, marginTop: 4, color: "rgba(255,255,255,0.8)" }}>PROJECTS</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 20, fontWeight: 800 }}>{subscription.invoiceCount || 0}</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.5, marginTop: 4, color: "rgba(255,255,255,0.8)" }}>INVOICES</div>
+                </div>
+              </div>
+            </div>
 
-<h3 style={{ fontSize: 16, fontWeight: 800, color: "var(--text)", margin: "10px 0 0" }}>Plan Usage</h3>
+            <div style={{ zIndex: 1, textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", justifyContent: "center" }}>
+              <div style={{ fontSize: 42, fontWeight: 900, marginBottom: 4, letterSpacing: "-1px" }}>₹{subscription.planPrice?.toLocaleString("en-IN") || "0"}</div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.8)", fontWeight: 600, marginBottom: 24 }}>per {subscription.billingCycle || "month"}</div>
+              <button onClick={() => setShowPlanPicker(true)} style={{ background: "#fff", color: "var(--teal)", border: "none", padding: "12px 24px", borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, transition: "all 0.2s" }}>
+                <i className="ti ti-arrow-up"></i> Upgrade Now
+              </button>
+              {daysLeft !== null && (
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.8)", fontWeight: 600, marginTop: 12 }}>
+                  Renews {formatDate(subscription.endDate)}
+                </div>
+              )}
+            </div>
 
-<div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
-  {[
-    { icon: "ti-building", label: "COMPANY NAMES", count: subscription.clientCount || 0, limit: subscription.clientLimit || 5, color: "var(--red)" },
-    { icon: "ti-users", label: "EMPLOYEES", count: subscription.employeeCount || 0, limit: subscription.employeeLimit || 20, color: "var(--green)" },
-    { icon: "ti-user-star", label: "MANAGERS", count: subscription.managerCount || 0, limit: subscription.managerLimit || 1, color: "var(--amber)" },
-    { icon: "ti-briefcase", label: "PROJECTS", count: subscription.projectCount || 0, limit: 10, color: "var(--teal)" },
-    { icon: "ti-file-invoice", label: "INVOICES", count: subscription.invoiceCount || 0, limit: 10, color: "var(--blue)" },
-    { icon: "ti-database", label: "STORAGE", count: "2.2", limit: 10, unit: "GB", color: "var(--purple)" },
-  ].map((stat, i) => {
-    const numCount = typeof stat.count === 'string' ? parseFloat(stat.count) : stat.count;
-    const pct = stat.limit === "Unlimited" ? 0 : Math.min(100, Math.round((numCount / stat.limit) * 100));
-    const isOver = pct >= 100;
-    const remaining = stat.limit === "Unlimited" ? "Unlimited" : Math.max(0, stat.limit - numCount);
-    
-    return (
-      <div key={i} style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1.5px solid var(--border)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: `${stat.color}15`, color: stat.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
-            <i className={`ti ${stat.icon}`}></i>
+            <div style={{ position: "absolute", right: "-5%", top: "-20%", width: 400, height: 400, borderRadius: "50%", background: "rgba(255,255,255,0.1)", zIndex: 0 }} />
+            <div style={{ position: "absolute", right: "15%", bottom: "-40%", width: 250, height: 250, borderRadius: "50%", background: "rgba(255,255,255,0.05)", zIndex: 0 }} />
           </div>
-          <div style={{ fontSize: 13, fontWeight: 800, color: stat.color }}>{pct}%</div>
-        </div>
-        
-        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", letterSpacing: 0.5, marginBottom: 4 }}>{stat.label}</div>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 16 }}>
-          <div style={{ fontSize: 24, fontWeight: 800, color: "var(--text)" }}>{stat.count} {stat.unit || ""}</div>
-          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text3)" }}>/ {stat.limit} {stat.unit ? "limit" : "limit"}</div>
-        </div>
-        
-        <div style={{ height: 6, background: "var(--bg)", borderRadius: 3, overflow: "hidden", marginBottom: 10 }}>
-          <div style={{ height: "100%", background: isOver ? "var(--red)" : stat.color, width: `${pct}%`, borderRadius: 3 }} />
-        </div>
-        
-        <div style={{ fontSize: 11, fontWeight: 600, color: isOver ? "var(--red)" : stat.color }}>
-          {isOver ? (
-            <span style={{ display: "flex", alignItems: "center", gap: 4 }}><i className="ti ti-alert-circle"></i> Over limit — upgrade plan</span>
-          ) : (
-            <span>{remaining} {stat.unit ? "GB" : "slots"} remaining</span>
-          )}
-        </div>
-      </div>
-    );
-  })}
-</div>
+
+          <h3 style={{ fontSize: 16, fontWeight: 800, color: "var(--text)", margin: "10px 0 0" }}>Plan Usage</h3>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+            {[
+              { icon: "ti-building", label: "COMPANY NAMES", count: subscription.clientCount || 0, limit: subscription.clientLimit || 5, color: "var(--red)" },
+              { icon: "ti-users", label: "EMPLOYEES", count: subscription.employeeCount || 0, limit: subscription.employeeLimit || 20, color: "var(--green)" },
+              { icon: "ti-user-star", label: "MANAGERS", count: subscription.managerCount || 0, limit: subscription.managerLimit || 1, color: "var(--amber)" },
+              { icon: "ti-briefcase", label: "PROJECTS", count: subscription.projectCount || 0, limit: 10, color: "var(--teal)" },
+              { icon: "ti-file-invoice", label: "INVOICES", count: subscription.invoiceCount || 0, limit: 10, color: "var(--blue)" },
+              { icon: "ti-database", label: "STORAGE", count: "2.2", limit: 10, unit: "GB", color: "var(--purple)" },
+            ].map((stat, i) => {
+              const numCount = typeof stat.count === 'string' ? parseFloat(stat.count) : stat.count;
+              const pct = stat.limit === "Unlimited" ? 0 : Math.min(100, Math.round((numCount / stat.limit) * 100));
+              const isOver = pct >= 100;
+              const remaining = stat.limit === "Unlimited" ? "Unlimited" : Math.max(0, stat.limit - numCount);
+
+              return (
+                <div key={i} style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1.5px solid var(--border)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 10, background: `${stat.color}15`, color: stat.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
+                      <i className={`ti ${stat.icon}`}></i>
+                    </div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: stat.color }}>{pct}%</div>
+                  </div>
+
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", letterSpacing: 0.5, marginBottom: 4 }}>{stat.label}</div>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 16 }}>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: "var(--text)" }}>{stat.count} {stat.unit || ""}</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text3)" }}>/ {stat.limit} {stat.unit ? "limit" : "limit"}</div>
+                  </div>
+
+                  <div style={{ height: 6, background: "var(--bg)", borderRadius: 3, overflow: "hidden", marginBottom: 10 }}>
+                    <div style={{ height: "100%", background: isOver ? "var(--red)" : stat.color, width: `${pct}%`, borderRadius: 3 }} />
+                  </div>
+
+                  <div style={{ fontSize: 11, fontWeight: 600, color: isOver ? "var(--red)" : stat.color }}>
+                    {isOver ? (
+                      <span style={{ display: "flex", alignItems: "center", gap: 4 }}><i className="ti ti-alert-circle"></i> Over limit — upgrade plan</span>
+                    ) : (
+                      <span>{remaining} {stat.unit ? "GB" : "slots"} remaining</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
           {activeTab === "upgrade" && (
             <div className="plans-grid" style={{ marginTop: 10 }}>
               {PLANS.map(plan => {
@@ -1098,8 +1098,8 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
                         </div>
                       ))}
                     </div>
-                    <button 
-                      className={"plan-btn " + (isCurrent ? "current-btn" : plan.popular ? "popular-btn" : "upgrade-btn")} 
+                    <button
+                      className={"plan-btn " + (isCurrent ? "current-btn" : plan.popular ? "popular-btn" : "upgrade-btn")}
                       onClick={() => !isCurrent && startPayUPayment(plan)}
                       disabled={!!payLoading || isCurrent}
                     >
@@ -1119,7 +1119,7 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
                   {activeTab === "payments" ? "Hide all" : "View all"} <span></span>
                 </button>
               </div>
-              
+
               {payments.length === 0 ? (
                 <div style={{ textAlign: "center", padding: 40, color: "var(--text3)", fontSize: 13, fontWeight: 600 }}>No payment history found</div>
               ) : (
@@ -1146,7 +1146,7 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
                             </span>
                           </td>
                           <td>
-                            <button 
+                            <button
                               onClick={() => p.invoiceNo ? setViewInvoice(p) : setViewPayment(p)}
                               style={{ background: "none", border: "none", color: "var(--teal)", fontWeight: 700, cursor: "pointer", fontSize: 12, textDecoration: "underline", fontFamily: "var(--font)" }}
                             >
@@ -1173,7 +1173,7 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
                     <div style={{ fontSize: 11, color: "var(--text3)", fontWeight: 600 }}>Service Provider</div>
                   </div>
                 </div>
-                
+
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 10, borderBottom: "1px solid var(--border)" }}>
                     <span style={{ fontSize: 11, color: "var(--text2)", fontWeight: 600 }}>Email</span>
@@ -1202,7 +1202,7 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
               Payment Details
               <button onClick={() => setViewPayment(null)} style={{ background: "var(--surface2)", border: "none", color: "var(--text2)", width: 28, height: 28, borderRadius: "50%", cursor: "pointer" }}>Close</button>
             </div>
-            
+
             <div style={{ textAlign: "center", padding: 20, background: "var(--bg)", borderRadius: 14, marginBottom: 20, border: `1px solid var(--border)` }}>
               <div style={{ fontSize: 36, marginBottom: 8 }}>{viewPayment.status === "completed" || viewPayment.status === "paid" ? "Success" : "Pending"}</div>
               <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>{formatCurrency(viewPayment.amount, viewPayment.currency)}</div>
@@ -1229,7 +1229,7 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
               </div>
               <div style={{ fontSize: 15, fontWeight: 600, color: "#64748b", marginBottom: 8 }}>Invoice paid</div>
               <div style={{ fontSize: 48, fontWeight: 800, color: "#1e293b", marginBottom: 12 }}>{formatCurrency(viewInvoice.amount, viewInvoice.currency)}</div>
-              
+
               <div style={{ width: "100%", textAlign: "left", display: "flex", flexDirection: "column", gap: 16, marginBottom: 40, marginTop: 20 }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ color: "#94a3b8", fontSize: 14 }}>Invoice number</span>

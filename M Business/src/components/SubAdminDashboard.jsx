@@ -538,7 +538,7 @@ function Mdl({ title, onClose, children, maxWidth = 820, zIndex = 1000 }) {
 
           <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: T.text }}>{title}</h2>
 
-          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-muted)", padding: "4px 8px" }}>Close</button>
+          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-muted)", padding: "4px 8px" }}>✕</button>
 
         </div>
 
@@ -1115,45 +1115,26 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
   const saveEdit = async () => {
-
     const errs = {};
-
     if (!editForm.companyName.trim()) errs.companyName = "Company name required";
-
     if (!editForm.email.trim()) errs.email = "Email required";
-
     if (Object.keys(errs).length) { setEditErr(errs); return; }
 
-
-
     try {
-
       setSaving(true);
-
       const res = await axios.put(`${BASE_URL}/api/clients/${editClient._id}`, editForm);
-
-      setClients(prev => prev.map(c => c._id === editClient._id ? { ...c, ...editForm, ...res.data.client } : c));
-
-      setEditClient(null);
-
-      showToast("Yes Client updated successfully!");
-
+      const updated = { ...editClient, ...editForm, ...(res.data?.client || {}) };
+      setClients(prev => prev.map(c => c._id === editClient._id ? updated : c));
+      showToast("✅ Client updated successfully!");
     } catch (err) {
-
       console.error(err);
-
-      setClients(prev => prev.map(c => c._id === editClient._id ? { ...c, ...editForm } : c));
-
-      setEditClient(null);
-
-      showToast("Yes Client updated locally!");
-
+      const updated = { ...editClient, ...editForm };
+      setClients(prev => prev.map(c => c._id === editClient._id ? updated : c));
+      showToast("✅ Client updated locally!");
     } finally {
-
       setSaving(false);
-
+      setEditClient(null);
     }
-
   };
 
   const doDelete = async () => {
@@ -6787,7 +6768,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  // Close dropdown on outside click
+  // Closedropdown on outside click
 
   useEffect(() => {
 
@@ -8057,7 +8038,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       if (returnToModal) { setModal(returnToModal); setReturnToModal(null); }
 
-      // Don't close modal yet if no return - show success screen (this depends on existing logic)
+      // Don't Closemodal yet if no return - show success screen (this depends on existing logic)
 
     } catch (err) {
 
@@ -11595,9 +11576,50 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           />
 
                         ) : (
-                          <div style={{ textAlign: "center" }}>
-                            <i className="ti ti-building" style={{ fontSize: 40, color: "#00BCD4", display: "block", marginBottom: 8 }}></i>
-                            <div style={{ fontSize: 10, fontWeight: 800, color: "var(--app-muted)", textTransform: "uppercase", letterSpacing: 1 }}>Upload Logo</div>
+                          <div style={{
+                            padding: nc.logoUrl ? 4 : 24,
+                            borderRadius: 20,
+                            background: "#fff",
+                            border: "2.5px dashed var(--app-border)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            minWidth: 100,
+                            minHeight: 100,
+                            overflow: "hidden",
+                            boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
+                            transition: "all 0.3s ease"
+                          }}>
+                            {nc.logoUrl ? (
+                              <img
+                                src={nc.logoUrl}
+                                alt="Logo"
+                                style={{
+                                  width: "auto",
+                                  height: "auto",
+                                  maxWidth: "240px",
+                                  maxHeight: "120px",
+                                  objectFit: "contain",
+                                  display: "block",
+                                  borderRadius: 12
+                                }}
+                              />
+                            ) : (
+                              <div style={{ textAlign: "center" }}>
+                                <div style={{
+                                  width: 60,
+                                  height: 60,
+                                  borderRadius: 14,
+                                  background: "#00BCD4",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  margin: "0 auto 10px"
+                                }}>
+                                  📷
+                                </div>
+                                <div style={{ fontSize: 10, fontWeight: 800, color: "#607D86", textTransform: "uppercase", letterSpacing: 1 }}>Upload Logo</div>
+                              </div>)}
                           </div>
 
                         )}
@@ -11658,7 +11680,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>🏢 Basic Info</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: '#00BCD4', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-building" style={{ color: '#fff', fontSize: 16 }}></i></span> Basic Info</div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
 
@@ -11686,7 +11708,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>📋 Primary Contact</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: '#00BCD4', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-phone-call" style={{ color: '#fff', fontSize: 16 }}></i></span> Primary Contact</div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
 
@@ -11712,7 +11734,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>📍 Address</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: '#00BCD4', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-map-pin" style={{ color: '#fff', fontSize: 16 }}></i></span> Address</div>
 
                     <div style={{ marginBottom: 12 }}><Fld label="Street / Building Address" value={nc.address} onChange={v => setNc({ ...nc, address: v })} /></div>
 
@@ -11733,18 +11755,18 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   {/* ── ONLINE PRESENCE ── */}
 
+                  {/* ── ONLINE PRESENCE ── */}
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>🌐 Online Presence</div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
-
-                      <Fld label="Website URL" value={nc.website} onChange={v => setNc({ ...nc, website: v })} />
-
-                      <Fld label="LinkedIn Profile" value={nc.linkedin} onChange={v => setNc({ ...nc, linkedin: v })} />
-
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ background: '#00BCD4', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <i className="ti ti-link" style={{ color: '#fff', fontSize: 16 }}></i>
+                      </span>
+                      Online Presence
                     </div>
-
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+                      <Fld label="Website URL" value={nc.website} onChange={v => setNc({ ...nc, website: v })} />
+                      <Fld label="LinkedIn Profile" value={nc.linkedin} onChange={v => setNc({ ...nc, linkedin: v })} />
+                    </div>
                   </div>
 
 
@@ -11753,7 +11775,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>💳 Billing & Terms</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: '#00BCD4', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-credit-card" style={{ color: '#fff', fontSize: 16 }}></i></span> Billing & Terms</div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
 
@@ -11799,7 +11821,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>📝 Internal Notes</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: '#00BCD4', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-notes" style={{ color: '#fff', fontSize: 16 }}></i></span> Internal Notes</div>
 
                     <textarea value={nc.notes} onChange={e => setNc({ ...nc, notes: e.target.value })}
 

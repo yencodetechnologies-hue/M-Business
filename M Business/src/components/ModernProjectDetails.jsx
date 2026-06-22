@@ -1291,7 +1291,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         <div style={{ textAlign: 'left' }}>
                           {currProject.updates.slice(activityPage * 10, activityPage * 10 + 10).map((upd, idx) => (
                             <div key={idx} style={{ padding: '8px 0', borderBottom: `1px solid ${P.bg}`, fontSize: 12.5, color: P.textMid }}>
-                               Update posted: <strong>{upd.text}</strong> by {upd.author} on {new Date(upd.date).toLocaleDateString()}
+                              Update posted: <strong>{upd.text}</strong> by {upd.author} on {new Date(upd.date).toLocaleDateString()}
                             </div>
                           ))}
                         </div>
@@ -2192,7 +2192,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     <button onClick={() => window.print()} style={{ padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>
                       <i className="ti ti-printer"></i> Print / PDF
                     </button>
-                    <button onClick={() => setPreviewInvoice(null)} style={{ padding: '6px 14px', background: '#374151', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>Close Close</button>
+                    <button onClick={() => setPreviewInvoice(null)} style={{ padding: '6px 14px', background: '#374151', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>CloseClose</button>
                   </div>
                 </div>
                 <div id="invoice-print-area" style={{ padding: '36px 40px', background: '#fff' }}>

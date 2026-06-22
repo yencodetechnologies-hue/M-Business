@@ -336,7 +336,7 @@ body{display:flex}
                   <span>Click to upload logo</span>
                   <small>PNG, SVG, JPG · transparent PNG recommended</small>
                 </div>
-                <button class="logo-rm" onclick="removeLogo(event)">✕</button>
+                <button class="logo-rm" onclick="removeLogo(event)">Close</button>
               </div>
               <input type="file" id="logoFile" accept="image/*" style="display:none" onchange="handleLogo(this)">
             </div>

@@ -39,7 +39,7 @@ function ProgressRing({ pct, color }) {
 
 function DocCard({ doc, empName, onUploaded, notify }) {
   const [uploading, setUploading] = useState(false);
-const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(0);
   const [preview, setPreview] = useState(null);
   const [existing, setExisting] = useState(null);
   const [loading, setLoading] = useState(true);

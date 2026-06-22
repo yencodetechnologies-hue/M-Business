@@ -60,7 +60,7 @@ new_block = '''      {/* Invoice Preview Modal - Full Template */}
                 </button>
                 <button onClick={() => setPreviewInvoice(null)}
                   style={{ padding: '9px 18px', background: '#1e293b', border: 'none', borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: 'pointer', color: '#fff' }}>
-                  ✕ Close
+                  Close Close
                 </button>
               </div>
               {/* Invoice Paper */}

@@ -10414,10 +10414,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 employees={employees}
 
+                prefillClient={jumpProject?._prefillClient ? clients.find(c => (c.clientName || c.name) === jumpProject._prefillClient) : null}
+
                 onBack={() => {
                   const returnTo = sidebarOverride || "projects";
 
                   setSidebarOverride(null);
+
+                  setJumpProject(null);
 
                   setActive(returnTo);
                 }}

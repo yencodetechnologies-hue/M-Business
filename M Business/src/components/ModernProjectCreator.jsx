@@ -103,13 +103,13 @@ function getAvatarColor(name) {
   return colors[name.charCodeAt(0) % colors.length];
 }
 
-export default function ModernProjectCreator({ onBack, clients = [], employees = [], onSuccess, editProject }) {
+export default function ModernProjectCreator({ onBack, clients = [], employees = [], onSuccess, editProject, prefillClient }) {
   const [loading, setLoading] = useState(false);
 
   // Form State
   const [name, setName] = useState(editProject?.name || '');
   const [description, setDescription] = useState(editProject?.description || editProject?.purpose || '');
-  const [client, setClient] = useState(editProject?.client || '');
+  const [client, setClient] = useState(editProject?.client || prefillClient?.clientName || prefillClient?.name || '');
   const [category, setCategory] = useState(editProject?.category || 'Web Development');
   const [priority, setPriority] = useState(editProject?.priority || 'medium');
   const [status, setStatus] = useState(editProject?.status || 'Active');
@@ -126,9 +126,12 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   });
   const [budget, setBudget] = useState(editProject?.budget || '');
   const [currency, setCurrency] = useState(editProject?.currency || '₹');
-  const [contactPersonName, setContactPersonName] = useState(editProject?.contactPersonName || '');
-  const [contactPersonNo, setContactPersonNo] = useState(editProject?.contactPersonNo || '');
-  const [contactEmail, setContactEmail] = useState(editProject?.contactEmail || editProject?.clientEmail || '');
+  const [contactPersonName, setContactPersonName] = useState(editProject?.contactPersonName || prefillClient?.contactPersonName || '');
+  const [contactPersonNo, setContactPersonNo] = useState(editProject?.contactPersonNo || prefillClient?.contactPersonNo || prefillClient?.phone || '');
+  const [contactEmail, setContactEmail] = useState(editProject?.contactEmail || editProject?.clientEmail || prefillClient?.email || '');
+  const [companyName, setCompanyName] = useState(editProject?.companyName || prefillClient?.companyName || prefillClient?.company || '');
+  const [clientPhone, setClientPhone] = useState(editProject?.phone || prefillClient?.phone || '');
+  const [clientAddress, setClientAddress] = useState(editProject?.address || prefillClient?.address || '');
   const [billed, setBilled] = useState(editProject?.billed || '');
   const [received, setReceived] = useState(editProject?.received || '');
   const [pending, setPending] = useState(editProject?.pending || '');
@@ -333,10 +336,9 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                     setContactPersonName(sel.contactPersonName || '');
                     setContactPersonNo(sel.contactPersonNo || sel.phone || '');
                     setContactEmail(sel.email || '');
-                    // Auto-fill additional client fields
-                    if (typeof setCompanyName === 'function') setCompanyName(sel.companyName || sel.company || '');
-                    if (typeof setClientPhone === 'function') setClientPhone(sel.phone || '');
-                    if (typeof setClientAddress === 'function') setClientAddress(sel.address || '');
+                    setCompanyName(sel.companyName || sel.company || '');
+                    setClientPhone(sel.phone || '');
+                    setClientAddress(sel.address || '');
                   }
                 }}>
                   <option value="">Select client...</option>

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Client = require("../models/ClientModel");
+const DeletedClient = require("../models/DeletedClientModel");
 const { addClient } = require("../controllers/ClientController");
 const Project = require("../models/ProjectModel");
 const Feedback = require("../models/FeedbackModel");
@@ -73,9 +74,25 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
-    await Client.findByIdAndDelete(req.params.id);
+    // Fetch client before deleting so we can blacklist their credentials
+    const client = await Client.findById(req.params.id);
+    if (client) {
+      // Add to permanent blacklist (upsert to avoid duplicate-key errors)
+      await DeletedClient.findOneAndUpdate(
+        { email: client.email.toLowerCase().trim() },
+        {
+          email: client.email.toLowerCase().trim(),
+          clientName: client.clientName || "",
+          companyId: client.companyId || "",
+          deletedAt: new Date()
+        },
+        { upsert: true, new: true }
+      );
+      await client.deleteOne();
+    }
     res.json({ msg: "Client deleted" });
   } catch (err) {
+    console.error("Delete client error:", err);
     res.status(500).json({ msg: "Server error" });
   }
 });

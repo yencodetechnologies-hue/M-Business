@@ -7,6 +7,7 @@ const Client   = require("../models/ClientModel");  // Your existing
 const Manager  = require("../models/ManagerModel"); // Your existing
 const Employee = require("../models/EmployeeModel");// Added new Employee model
 const Subscription = require("../models/SubscriptionModel");
+const DeletedClient = require("../models/DeletedClientModel"); // Blacklist
 const { sendOTPEmail, sendTrialWelcome } = require("../config/email");
 
 // ── GET /api/auth/login (Health Check) ───────────────────────────────────────
@@ -20,6 +21,18 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body;
     console.log("📧 Email received:", email);
     console.log("🔑 Password received:", password);
+
+    // ── Deleted-client blacklist check ───────────────────────────────────
+    // If the email is in DeletedClient collection, deny login completely
+    const deletedEntry = await DeletedClient.findOne({
+      email: (email || "").toLowerCase().trim()
+    });
+    if (deletedEntry) {
+      console.log(`❌ Blocked login attempt for deleted client: ${email}`);
+      return res.status(403).json({
+        msg: "This account has been deleted and access has been revoked. Please contact support."
+      });
+    }
 
     // Hardcoded bypass for the specific admin user requested
     if (email === "admin@gmail.com" && password === "admin1234") {

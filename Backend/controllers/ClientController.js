@@ -1,4 +1,5 @@
 const Client = require("../models/ClientModel");
+const DeletedClient = require("../models/DeletedClientModel");
 const bcrypt = require("bcryptjs");
 const { sendQuickEmail } = require("../config/email");
 
@@ -41,6 +42,16 @@ exports.addClient = async (req, res) => {
     if (!clientName || !email) {
       console.log("Validation failed: Missing clientName or email");
       return res.status(400).json({ message: "Name and Email are required" });
+    }
+
+    // ── Blacklist check ───────────────────────────────────────────────
+    const normalizedEmail = email.toLowerCase().trim();
+    const isBlacklisted = await DeletedClient.findOne({ email: normalizedEmail });
+    if (isBlacklisted) {
+      console.log(`Blocked re-registration for deleted client email: ${normalizedEmail}`);
+      return res.status(403).json({
+        message: "This email address belongs to a previously deleted client account and cannot be reused."
+      });
     }
 
     const hashedPassword = password ? await bcrypt.hash(password, 10) : "";

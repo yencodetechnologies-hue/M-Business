@@ -10,11 +10,7 @@ const Task = require("../models/TaskModels");
 const Quotation = require("../models/QuotationModel");
 const Proposal = require("../models/ProposalModel");
 const Document = require("../models/DocumentModel");
-const Invoice = require("../models/InvoiceModels");
-const Task = require("../models/TaskModels");
-const Quotation = require("../models/QuotationModel");
-const Proposal = require("../models/ProposalModel");
-const Document = require("../models/DocumentModel");
+
 router.get("/projects/:name", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.name);
@@ -60,16 +56,12 @@ router.post("/add", checkResourceLimit('client'), addClient);
 router.put("/:id", async (req, res) => {
   try {
     const updateData = { ...req.body };
-
-    // Hash password if provided
     if (updateData.password && updateData.password.trim() !== "") {
       const bcrypt = require("bcryptjs");
       updateData.password = await bcrypt.hash(updateData.password, 10);
     } else {
-      // Don't update password if it's empty or blank
       delete updateData.password;
     }
-
     const client = await Client.findByIdAndUpdate(
       req.params.id,
       { $set: updateData },
@@ -95,7 +87,6 @@ router.delete("/:id", async (req, res) => {
       const nameRegex = clientName ? new RegExp(`^\\s*${escapeRegExp(clientName)}\\s*$`, "i") : null;
       const companyRegex = companyName ? new RegExp(`^\\s*${escapeRegExp(companyName)}\\s*$`, "i") : null;
 
-      // Build name-match conditions
       const nameConditions = [];
       if (nameRegex) nameConditions.push({ client: { $regex: nameRegex } });
       if (companyRegex) nameConditions.push({ client: { $regex: companyRegex } });
@@ -103,14 +94,14 @@ router.delete("/:id", async (req, res) => {
         ? { companyId, $or: nameConditions }
         : { companyId, client: clientName };
 
-      // 1. Find all projects for this client then delete their tasks
+      // 1. Find projects then delete their tasks
       const clientProjects = await Project.find(nameFilter).select("_id").lean();
       const projectIds = clientProjects.map(p => p._id);
       if (projectIds.length > 0) {
         await Task.deleteMany({ projectId: { $in: projectIds } });
       }
 
-      // 2. Delete the projects themselves
+      // 2. Delete projects
       await Project.deleteMany(nameFilter);
 
       // 3. Delete invoices
@@ -179,4 +170,5 @@ router.post("/feedback", async (req, res) => {
     res.status(500).json({ msg: err.message });
   }
 });
+
 module.exports = router;

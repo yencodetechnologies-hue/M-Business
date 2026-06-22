@@ -2153,7 +2153,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
         <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}>
 
-          <div style={{ width: 56, height: 56, borderRadius: 14, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#00BCD4" }}>Team</div>
+          <div style={{ width: 56, height: 56, borderRadius: 14, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#00BCD4" }}></div>
 
           <div style={{ fontSize: 15, fontWeight: 800, color: "#1A2E35" }}>Select a Client</div>
 

@@ -84,7 +84,7 @@ exports.addClient = async (req, res) => {
 
     await newClient.save();
 
-    // Send welcome email
+    // Send welcome email in background
     const welcomeMessage = `
       <h3>Welcome to the Platform, ${clientName}!</h3>
       <p>Your account has been successfully created.</p>
@@ -94,7 +94,8 @@ exports.addClient = async (req, res) => {
       <p>You can now access your dashboard and start using our services.</p>
     `;
 
-    await sendQuickEmail(email, "Welcome - Account Created Successfully", welcomeMessage);
+    sendQuickEmail(email, "Welcome - Account Created Successfully", welcomeMessage)
+      .catch(err => console.error("Failed to send welcome email:", err));
 
     res.status(201).json({
       message: "Client Added Successfully",

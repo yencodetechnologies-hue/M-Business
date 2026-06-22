@@ -218,13 +218,20 @@ function CanvasSignature({ onSave }) {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Set logical size to match physical display layout to remove blur
+    // Get display size
     const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width || 340;
-    canvas.height = rect.height || 150;
+    const dpr = window.devicePixelRatio || 1;
 
+    // Set actual size in memory (scaled for retina/high-DPI displays)
+    canvas.width = (rect.width || 340) * dpr;
+    canvas.height = (rect.height || 150) * dpr;
+
+    // Normalize coordinate system to use CSS pixels
     const ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+
     ctx.strokeStyle = "#1a2e35";
+    ctx.fillStyle = "#1a2e35";
     ctx.lineWidth = 3.5;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -244,9 +251,13 @@ function CanvasSignature({ onSave }) {
       clientY = e.clientY;
     }
 
+    // Adjust scale based on CSS width vs internal resolution (in CSS pixels)
+    const scaleX = (canvas.width / (window.devicePixelRatio || 1)) / rect.width;
+    const scaleY = (canvas.height / (window.devicePixelRatio || 1)) / rect.height;
+
     return {
-      x: (clientX - rect.left) * (canvas.width / rect.width),
-      y: (clientY - rect.top) * (canvas.height / rect.height)
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY
     };
   };
 
@@ -255,6 +266,14 @@ function CanvasSignature({ onSave }) {
     const pos = getPos(e);
     pointsRef.current = [pos];
     setIsDrawing(true);
+
+    // Draw a single dot immediately to support taps/clicks without dragging
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
   };
 
   const draw = (e) => {

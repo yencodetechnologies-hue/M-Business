@@ -97,7 +97,7 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
       `}</style>
 
       {/* Closebutton */}
-      <button onClick={onClose} style={{ position: "fixed", top: 18, right: 22, zIndex: 100000, background: "rgba(0,150,136,0.12)", border: "none", color: "#00796b", width: 38, height: 38, borderRadius: "50%", fontSize: 20, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Close</button>
+      <button onClick={onClose} style={{ position: "fixed", top: 18, right: 22, zIndex: 100000, background: "rgba(0,150,136,0.12)", border: "none", color: "#00796b", width: 38, height: 38, borderRadius: "50%", fontSize: 20, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>✕</button>
 
       <div style={{ maxWidth: 1060, width: "100%", margin: "0 auto", padding: "48px 20px 60px", animation: "ppFadeUp 0.38s ease" }}>
 
@@ -354,26 +354,7 @@ function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, on
 
 // ─── MAIN COMPONENT -----------------------------------------------------------
 export default function MySubscriptions({ user, onSubscriptionSuccess, initialTab = "overview", preloadedSubscription = null, onTabChange, packagesList = [] }) {
-  const sortedPackages = [...(packagesList || [])].sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0));
-  const PLANS = sortedPackages.length > 0
-    ? sortedPackages.map((pkg, index) => {
-      const isFree = pkg.type === "free" || pkg.price === 0 || pkg.price === "0";
-      return {
-        name: pkg.title || pkg.name || "Custom Plan",
-        price: isFree ? 0 : parseFloat(pkg.price) || 0,
-        icon: pkg.icon || (index === 0 ? "Special" : index === sortedPackages.length - 1 ? "Launch" : "Start"),
-        color: "var(--app-accent)",
-        popular: (pkg.title || "").toLowerCase().includes("pro") || index === Math.floor(sortedPackages.length / 2),
-        duration: pkg.no_of_days ? `${pkg.no_of_days} days` : "30 days",
-        isTrial: isFree,
-        features: Array.isArray(pkg.features) ? pkg.features : (pkg.features || "").split("\n").filter(Boolean),
-        clientLimit: `${pkg.clientLimit} Clients`,
-        employeeLimit: `${pkg.employeeLimit} Employees`,
-        managerLimit: `${pkg.managerLimit} Managers`,
-        btnLabel: isFree ? "Start Free Trial" : undefined
-      };
-    })
-    : DEFAULT_PLANS;
+  const PLANS = DEFAULT_PLANS;
   const [subscription, setSubscription] = useState(preloadedSubscription);
   const [payments, setPayments] = useState([]);
   const [invoices, setInvoices] = useState([]);

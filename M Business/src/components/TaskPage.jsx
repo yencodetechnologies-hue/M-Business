@@ -1065,7 +1065,7 @@ function ImportModal({ onClose, onImportTasks }) {
       <div style={{ background: "#fff", borderRadius: 16, width: 560, maxHeight: "85vh", boxShadow: "0 24px 80px rgba(0,0,0,0.18)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid #eef0f4", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div><div style={{ fontSize: 16, fontWeight: 800, color: "#323338" }}>Import tasks</div><div style={{ fontSize: 12, color: "#676879", marginTop: 2 }}>Upload CSV or Excel file</div></div>
-          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#676879" }}>×</button>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#676879" }}>✕</button>
         </div>
         <div style={{ flex: 1, overflowY: "auto", padding: "18px 22px" }}>
           {!file ? (
@@ -1110,7 +1110,7 @@ function SidekickPanel({ onClose, groups }) {
             <div style={{ width: 32, height: 32, borderRadius: 9, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17 }}>Special</div>
             <div><div style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>Board Sidekick</div><div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }}>Live insights</div></div>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 7, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff", fontSize: 16 }}>×</button>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 7, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff", fontSize: 16 }}>✕</button>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           <div style={{ position: "relative", flexShrink: 0 }}>
@@ -1177,7 +1177,7 @@ function ShareModal({ onClose }) {
       <div style={{ background: "#fff", borderRadius: 16, width: 520, boxShadow: "0 24px 80px rgba(0,0,0,0.18)", overflow: "hidden" }}>
         <div style={{ padding: "20px 24px 16px", borderBottom: "1px solid #eef0f4", display: "flex", justifyContent: "space-between" }}>
           <span style={{ fontSize: 17, fontWeight: 800, color: "#323338" }}>Share board</span>
-          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#676879" }}>×</button>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#676879" }}>✕</button>
         </div>
         <div style={{ padding: "16px 24px 24px" }}>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -1208,7 +1208,7 @@ function IntegrateModal({ onClose, showToast }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(30,10,60,0.45)", zIndex: 8000, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div style={{ background: "#fff", borderRadius: 16, width: 520, maxHeight: "80vh", boxShadow: "0 24px 80px rgba(124,58,237,0.25)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <div style={{ background: `linear-gradient(135deg,${P.dark},${P.mid})`, padding: "18px 20px" }}><div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}><div style={{ fontSize: 17, fontWeight: 800, color: "#fff" }}> Integrations</div><button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", color: "#fff", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button></div></div>
+        <div style={{ background: `linear-gradient(135deg,${P.dark},${P.mid})`, padding: "18px 20px" }}><div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}><div style={{ fontSize: 17, fontWeight: 800, color: "#fff" }}> Integrations</div><button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", color: "#fff", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button></div></div>
         <div style={{ flex: 1, overflowY: "auto", padding: "4px 20px 16px" }}>
           {integrations.map(({ icon, name, desc, badge }) => (
             <div key={name} style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 0", borderBottom: `1px solid ${P.border}` }}>
@@ -1248,7 +1248,7 @@ function AutomateModal({ onClose }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(30,10,60,0.45)", zIndex: 8000, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div style={{ background: "#fff", borderRadius: 16, width: 520, maxHeight: "80vh", boxShadow: "0 24px 80px rgba(124,58,237,0.25)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <div style={{ background: `linear-gradient(135deg,${P.dark},${P.mid})`, padding: "18px 20px" }}><div style={{ display: "flex", justifyContent: "space-between" }}><div style={{ fontSize: 17, fontWeight: 800, color: "#fff" }}>Automations</div><button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", color: "#fff", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button></div></div>
+        <div style={{ background: `linear-gradient(135deg,${P.dark},${P.mid})`, padding: "18px 20px" }}><div style={{ display: "flex", justifyContent: "space-between" }}><div style={{ fontSize: 17, fontWeight: 800, color: "#fff" }}>Automations</div><button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", color: "#fff", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button></div></div>
         <div style={{ flex: 1, overflowY: "auto", padding: "8px 20px 16px" }}>
           {automations.map(({ icon, title, desc }) => (
             <div key={title} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: `1px solid ${P.border}` }}>
@@ -1396,7 +1396,7 @@ function AddColumnModal({ onAdd, onClose }) {
     <div style={{ position: "fixed", inset: 0, background: "rgba(30,10,60,0.4)", zIndex: 8000, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div style={{ background: "#fff", borderRadius: 16, width: 480, boxShadow: "0 24px 80px rgba(124,58,237,0.25)", overflow: "hidden" }}>
         <div style={{ background: `linear-gradient(135deg,${P.dark},${P.mid})`, padding: "16px 20px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between" }}><div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>Add Column</div><button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 7, width: 28, height: 28, cursor: "pointer", color: "#fff", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button></div>
+          <div style={{ display: "flex", justifyContent: "space-between" }}><div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>Add Column</div><button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 7, width: 28, height: 28, cursor: "pointer", color: "#fff", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button></div>
           <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.15)", borderRadius: 8, padding: "7px 11px" }}><span style={{ fontSize: 13, color: "rgba(255,255,255,0.6)" }}>Search</span><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search column types…" style={{ border: "none", outline: "none", background: "transparent", fontSize: 13, color: "#fff", fontFamily: "inherit", flex: 1 }} /></div>
         </div>
         <div style={{ padding: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, maxHeight: 380, overflowY: "auto" }}>
@@ -1884,7 +1884,7 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
 //       <div style={{ padding: "14px 18px 0", borderBottom: `1px solid ${P.border}`, flexShrink: 0 }}>
 //         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
 //           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-//             <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: P.muted, fontSize: 18, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>×</button>
+//             <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: P.muted, fontSize: 18, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>✕</button>
 //             <div style={{ fontSize: 17, fontWeight: 700, color: P.text }}>{task.title}</div>
 //           </div>
 //         </div>
@@ -2107,7 +2107,7 @@ function DetailPanel({ task, onClose, onField, projects }) {
       <div style={{ background: P.light, borderBottom: `1.5px solid ${P.border}`, padding: "14px 16px", flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10 }}>
           <div style={{ flex: 1, marginRight: 8 }}><div style={{ fontSize: 15, fontWeight: 700, color: P.text, lineHeight: 1.4, marginBottom: 8 }}>{task.title}</div><div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}><div style={{ background: sc.bg, color: sc.fg, borderRadius: 4, padding: "3px 10px", fontSize: 11, fontWeight: 700 }}>{task.status}</div>{task.date && <span style={{ fontSize: 11, color: P.muted }}>Date {fmt(task.date)}</span>}</div></div>
-          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: P.muted, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>×</button>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: P.muted, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>✕</button>
         </div>
       </div>
       <div style={{ flex: 1, overflow: "auto", padding: 16, display: "flex", flexDirection: "column", gap: 13 }}>
@@ -2122,7 +2122,7 @@ function DetailPanel({ task, onClose, onField, projects }) {
             <div style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--app-bg)", border: "1px solid #ddd6fe", borderRadius: 8, padding: "6px 12px", width: "fit-content" }}>
               <div style={{ width: 24, height: 24, borderRadius: "50%", background: getAvatarColor(task.assignTo), display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700 }}>{task.assignTo.slice(0, 2).toUpperCase()}</div>
               <span style={{ fontSize: 13, fontWeight: 600, color: "var(--app-accent)" }}>{task.assignTo}</span>
-              <button onClick={() => onField(id, "assignTo", "Unassigned")} style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 16, padding: "0 4px", fontWeight: 700 }}>×</button>
+              <button onClick={() => onField(id, "assignTo", "Unassigned")} style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 16, padding: "0 4px", fontWeight: 700 }}>✕</button>
             </div>
           ) : (
             <div style={{ fontSize: 13, color: P.muted, fontStyle: "italic", background: "#f8fafc", padding: "8px 12px", borderRadius: 8, border: "1.5px dashed #e2e8f0" }}>Unassigned</div>

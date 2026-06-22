@@ -1786,7 +1786,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                           {inv.notes && (
                             <div>
                               <div className="inv-notes-title" style={{ fontSize: "10px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Notes</div>
-                              <div className="inv-notes-text" style={{ fontSize: "10px", color: "#64748b", lineHeight: "1.5" }}>{inv.notes}</div>
+                              <div className="inv-notes-text" style={{ fontSize: "10px", color: "#64748b", lineHeight: "1.5" }}>{inv.terms}</div>
                             </div>
                           )}
                           {inv.terms && (
@@ -2167,15 +2167,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             <div className="inv-creator-card-body">
 
               <div className="inv-creator-form-row">
-                <div className="inv-creator-form-group">
-                  <label className="inv-creator-form-label">Status</label>
-                  <select className="inv-creator-form-select" value={inv.status || "pending"} onChange={(e) => upd("status", e.target.value)}>
-                    <option value="pending">Pending Pending</option>
-                    <option value="paid">Yes Paid</option>
-                    <option value="overdue">Warning Overdue</option>
-                    <option value="sent"> Sent</option>
-                  </select>
-                </div>
+
                 <div className="inv-creator-form-group">
                   <label className="inv-creator-form-label">Payment Method</label>
                   <select className="inv-creator-form-select" value={inv.paymentMode} onChange={(e) => upd("paymentMode", e.target.value)}>
@@ -2304,12 +2296,12 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             </div>
             <div className="inv-creator-card-body">
               <div className="inv-creator-form-group">
-                <label className="inv-creator-form-label">Invoice Notes</label>
-                <textarea className="inv-creator-form-textarea" value={inv.notes} onChange={(e) => upd("notes", e.target.value)} placeholder="Thank you for your business!" />
+                <label className="inv-creator-form-label" style={{ fontSize: 15 }}>Invoice Notes</label>
+                <textarea className="inv-creator-form-textarea" value={inv.notes} onChange={(e) => upd("notes", e.target.value)} placeholder="Thank you for your business!" style={{ fontSize: 15 }} />
               </div>
               <div className="inv-creator-form-group">
-                <label className="inv-creator-form-label">Terms & Conditions</label>
-                <textarea className="inv-creator-form-textarea" value={inv.terms} onChange={(e) => upd("terms", e.target.value)} placeholder="Terms and conditions..." />
+                <label className="inv-creator-form-label" style={{ fontSize: 15 }}>Terms & Conditions</label>
+                <textarea className="inv-creator-form-textarea" value={inv.terms} onChange={(e) => upd("terms", e.target.value)} placeholder="Terms and conditions..." style={{ fontSize: 15 }} />
               </div>
               <div className="inv-creator-form-group">
                 <label className="inv-creator-form-label">Authorised Signature</label>
@@ -2590,18 +2582,19 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               )}
 
               {/* FOOTER */}
+              {/* FOOTER */}
               <div className="inv-footer" style={{ marginTop: "16px", paddingTop: "10px", borderTop: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
                 <div className="inv-notes" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
                   {inv.notes && (
                     <div>
-                      <div className="inv-notes-title" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Notes</div>
-                      <div className="inv-notes-text" style={{ fontSize: "8px", color: "#64748b", lineHeight: "1.5" }}>{inv.notes}</div>
+                      <div className="inv-notes-title" style={{ fontSize: "11px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Notes</div>
+                      <div className="inv-notes-text" style={{ fontSize: "11px", color: "#64748b", lineHeight: "1.5" }}>{inv.terms}</div>
                     </div>
                   )}
                   {inv.terms && (
                     <div>
-                      <div className="inv-notes-title" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Terms & Conditions</div>
-                      <div className="inv-notes-text" style={{ fontSize: "8px", color: "#64748b", lineHeight: "1.5" }}>{inv.terms}</div>
+                      <div className="inv-notes-title" style={{ fontSize: "11px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Terms & Conditions</div>
+                      <div className="inv-notes-text" style={{ fontSize: "11px", color: "#64748b", lineHeight: "1.5" }}>{inv.terms}</div>
                     </div>
                   )}
                 </div>

@@ -1181,7 +1181,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
                         onClick={(e) => { e.stopPropagation(); setEditForm({ ...editForm, assignedTo: editForm.assignedTo.filter(n => n !== name) }); }}
                         style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
                       >
-                        ×
+                        ✕
                       </button>
                     </div>
                   ))}
@@ -1237,7 +1237,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
                         onClick={(e) => { e.stopPropagation(); setAssignTo(assignTo.filter(n => n !== name)); }}
                         style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
                       >
-                        ×
+                        ✕
                       </button>
                     </div>
                   ))}
@@ -2169,7 +2169,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const file = e.target.files[0]; if (file) { const r = new FileReader(); r.onloadend = () => setNc(p => ({ ...p, logoUrl: r.result })); r.readAsDataURL(file); } }} />
                   </label>
                 </div>
-                <div style={{ fontSize: 12, color: '#94A3B0' }}>PNG, JPG · Max 2MB<br />Recommended 200×200px</div>
+                <div style={{ fontSize: 12, color: '#94A3B0' }}>PNG, JPG · Max 2MB<br />Recommended 200✕200px</div>
               </div>
             </div>
 
@@ -2396,7 +2396,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       onClick={(e) => { e.stopPropagation(); setNp(prev => ({ ...prev, assignedTo: prev.assignedTo.filter(n => n !== name) })); }}
                       style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
                     >
-                      ×
+                      ✕
                     </button>
                   </div>
                 ))}

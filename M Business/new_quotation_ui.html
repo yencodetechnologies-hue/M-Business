@@ -1083,7 +1083,7 @@ function updateScopeTags(){
   tags.forEach(t=>{
     const span=document.createElement('span');
     span.className='quo-scope-tag';
-    span.textContent=t.textContent.replace('×','').trim();
+    span.textContent=t.textContent.replace('✕','').trim();
     pTags.appendChild(span);
   });
 }

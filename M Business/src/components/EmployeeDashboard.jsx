@@ -1665,6 +1665,13 @@ export default function EmployeeDashboard({ user, setUser }) {
   const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
   const [subLoading, setSubLoading] = useState(true);
+
+  const [alertDismissedToday, setAlertDismissedToday] = useState(() => {
+    try {
+      const stored = localStorage.getItem("subAlertDismissedDate");
+      return stored === new Date().toDateString();
+    } catch { return false; }
+  });
   const [subscriptionNotification, setSubscriptionNotification] = useState(null);
   const [notifications, setNotifications] = useState(() => {
     try { const u = JSON.parse(localStorage.getItem("user")); const n = u?.name || ""; const s = localStorage.getItem(`notifications_${n}`); return s ? JSON.parse(s) : []; } catch { return []; }

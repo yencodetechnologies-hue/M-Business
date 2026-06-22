@@ -1463,7 +1463,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
                         onClick={(e) => { e.stopPropagation(); setEditForm({ ...editForm, assignedTo: editForm.assignedTo.filter(n => n !== name) }); }}
                         style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
                       >
-                        ×
+                        ✕
                       </button>
                     </div>
                   ))}
@@ -1519,7 +1519,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
                         onClick={(e) => { e.stopPropagation(); setAssignTo(assignTo.filter(n => n !== name)); }}
                         style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
                       >
-                        ×
+                        ✕
                       </button>
                     </div>
                   ))}
@@ -2695,6 +2695,13 @@ useEffect(() => {
   const [vendors, setVendors] = useState([]);
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [subLoading, setSubLoading] = useState(true);
+
+  const [alertDismissedToday, setAlertDismissedToday] = useState(() => {
+    try {
+      const stored = localStorage.getItem("subAlertDismissedDate");
+      return stored === new Date().toDateString();
+    } catch { return false; }
+  });
 
   const [nv, setNv] = useState({ vendorName: "", vendorProduct: "", amountTaxGst: "", date: "", paidAmount: "", productDescription: "", dateOfPurchase: "", modeOfPayment: "Cash" });
   const [nvError, setNvError] = useState({});
@@ -4001,7 +4008,7 @@ const handleEditPackage = (pkg) => {
                       onClick={(e) => { e.stopPropagation(); setNp(prev => ({ ...prev, assignedTo: prev.assignedTo.filter(n => n !== name) })); }}
                       style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
                     >
-                      ×
+                      ✕
                     </button>
                   </div>
                 ))}

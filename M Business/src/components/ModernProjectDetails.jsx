@@ -2058,7 +2058,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   {Array.isArray(newTaskAssignTo) && newTaskAssignTo.length > 0 && (
                     <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                       {newTaskAssignTo.map(n => (
-                        <span key={n} style={{ background: P.primaryLight, color: P.primary, padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{n} ×</span>
+                        <span key={n} style={{ background: P.primaryLight, color: P.primary, padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{n} ✕</span>
                       ))}
                     </div>
                   )}

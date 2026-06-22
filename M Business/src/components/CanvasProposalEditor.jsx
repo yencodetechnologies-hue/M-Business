@@ -134,7 +134,7 @@ function CanvasElement({ element, isSelected, onSelect, onUpdate, onDelete, canv
             zIndex: 20,
           }}
         >
-          ×
+          ✕
         </button>
       )}
 
@@ -310,7 +310,7 @@ function CanvasSizeControls({ currentSize, onSizeChange }) {
             >
               <span>{preset.name}</span>
               <span style={{ fontSize: 10, color: active ? P.muted : '#c4b5fd' }}>
-                {preset.width}×{preset.height}
+                {preset.width}✕{preset.height}
               </span>
             </button>
           );
@@ -327,7 +327,7 @@ function CanvasSizeControls({ currentSize, onSizeChange }) {
           placeholder="W"
           style={{ width: 68, padding: '6px 8px', border: `1px solid ${P.border}`, borderRadius: 6, fontSize: 12, outline: 'none', color: P.text }}
         />
-        <span style={{ color: P.muted, flexShrink: 0 }}>×</span>
+        <span style={{ color: P.muted, flexShrink: 0 }}>✕</span>
         <input
           type="number"
           value={customHeight}
@@ -348,7 +348,7 @@ function CanvasSizeControls({ currentSize, onSizeChange }) {
       </div>
 
       <div style={{ fontSize: 11, color: P.muted, marginTop: 10 }}>
-        {currentSize.width} × {currentSize.height}px &middot;{' '}
+        {currentSize.width} ✕ {currentSize.height}px &middot;{' '}
         {currentSize.width > currentSize.height ? 'Landscape' : currentSize.width < currentSize.height ? 'Portrait' : 'Square'}
       </div>
     </div>
@@ -679,7 +679,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
               display: 'flex', alignItems: 'center', gap: 6
             }}
           >
-             {isPreview ? 'Back' : 'Cancel'}
+            {isPreview ? 'Back' : 'Cancel'}
           </button>
 
           {/* Toggle Preview/Edit — only for non-preview mode editors */}
@@ -861,7 +861,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                   fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 }}
               >
-                 Add Line
+                Add Line
               </button>
 
               <button
@@ -881,7 +881,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                   fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 }}
               >
-                 Add Rectangle
+                Add Rectangle
               </button>
 
               <button
@@ -901,7 +901,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                   fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 }}
               >
-                 Add Circle
+                Add Circle
               </button>
 
               <label style={{
@@ -958,7 +958,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                   >
                     <span>{element.type === 'text' ? 'Edit' : element.type === 'heading' ? 'News' : element.type === 'shape' ? '' : 'Image'} {element.type}</span>
                     <span style={{ fontSize: 10, color: P.muted }}>
-                      {Math.round(element.width || 0)}×{Math.round(element.height || 0)}
+                      {Math.round(element.width || 0)}✕{Math.round(element.height || 0)}
                     </span>
                   </div>
                 ))}
@@ -1116,7 +1116,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
           </div>
 
           <div style={{ textAlign: 'center', marginTop: 10, fontSize: 12, color: P.muted }}>
-            {canvasSize.width} × {canvasSize.height}px &middot;{' '}
+            {canvasSize.width} ✕ {canvasSize.height}px &middot;{' '}
             {canvasSize.width > canvasSize.height ? 'Landscape' : canvasSize.width < canvasSize.height ? 'Portrait' : 'Square'}
           </div>
         </div>

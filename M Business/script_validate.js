@@ -264,7 +264,7 @@ function renderQuo() {
   // Tags from the scope tag section
   const tagEls = document.querySelectorAll('#quoScopeTags span');
   let tagsHtml = '';
-  tagEls.forEach(t => { tagsHtml += `<span style="padding:2px 9px;background:${h2r(color, .15)};border-radius:20px;font-size:10px;font-weight:700;color:${color};margin-right:4px">${t.textContent.replace(' ×', '')}</span>`; });
+  tagEls.forEach(t => { tagsHtml += `<span style="padding:2px 9px;background:${h2r(color, .15)};border-radius:20px;font-size:10px;font-weight:700;color:${color};margin-right:4px">${t.textContent.replace(' ✕', '')}</span>`; });
 
   let hdrHtml = '';
   if (quoLayout === 'classic') {
@@ -432,7 +432,7 @@ function addTag() {
   const c = document.getElementById('quoScopeTags');
   const s = document.createElement('span');
   s.style.cssText = `padding:3px 10px;background:var(--teal-light);border-radius:20px;font-size:11px;font-weight:700;color:var(--teal);cursor:pointer`;
-  s.textContent = val + ' ×';
+  s.textContent = val + ' ✕';
   s.onclick = function () { this.remove(); render(); };
   c.appendChild(s);
   inp.value = '';

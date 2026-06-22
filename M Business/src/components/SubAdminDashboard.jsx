@@ -952,11 +952,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 
 
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-// CLIENTS PAGE
-
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function ClientsPage({ clients, setClients, projects = [], setProjects, onAddClient, onViewProject, triggerCrop, onCreateProject, user, activeClientIdForReturn, onActiveClientIdRestored, newClientId, onNewClientShown }) {
 
@@ -1034,25 +1030,6 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   }, [activeClientIdForReturn]);
 
   // Select newly added client immediately after add
-  useEffect(() => {
-    if (newClientId) {
-      setActiveClientId(newClientId);
-      setActiveTab("overview");
-      setSearch("");
-      if (onNewClientShown) onNewClientShown();
-    }
-  }, [newClientId]);
-
-  // Restore the exact client that was active before navigating to create/edit project
-  useEffect(() => {
-    if (activeClientIdForReturn) {
-      setActiveClientId(activeClientIdForReturn);
-      setActiveTab("overview");
-      if (onActiveClientIdRestored) onActiveClientIdRestored();
-    }
-  }, [activeClientIdForReturn]);
-
-  // When a new client is added, immediately select it
   useEffect(() => {
     if (newClientId) {
       setActiveClientId(newClientId);
@@ -6978,6 +6955,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [paymentHistory, setPaymentHistory] = useState([]);
 
   const [subLoading, setSubLoading] = useState(true);
+
+  const [alertDismissedToday, setAlertDismissedToday] = useState(() => {
+    try {
+      const stored = localStorage.getItem("subAlertDismissedDate");
+      return stored === new Date().toDateString();
+    } catch { return false; }
+  });
 
 
 

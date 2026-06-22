@@ -95,7 +95,7 @@ const Chip = ({ children, onRemove }) => (
   }}>
     {children}
     {onRemove && (
-      <button onClick={onRemove} style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 16, padding: "0 4px" }}>×</button>
+      <button onClick={onRemove} style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 16, padding: "0 4px" }}>✕</button>
     )}
   </div>
 );
@@ -136,7 +136,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
- const mainScrollRef = useRef(null);  
+  const mainScrollRef = useRef(null);
   // Profile state
   const [profile, setProfile] = useState({ name: "", email: "", phone: "", companyName: "" });
   const [profileSaving, setProfileSaving] = useState(false);
@@ -174,7 +174,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
         footerNote: 'Thank you for your business! Please make payment within the due date.',
         signatory: ''
       };
-    } catch { return { companyName:'',gstNo:'',email:'',phone:'',address:'',website:'',bankName:'',accountNo:'',ifscCode:'',upiId:'',accountType:'Current Account',paymentTerms:'',footerNote:'',signatory:'' }; }
+    } catch { return { companyName: '', gstNo: '', email: '', phone: '', address: '', website: '', bankName: '', accountNo: '', ifscCode: '', upiId: '', accountType: 'Current Account', paymentTerms: '', footerNote: '', signatory: '' }; }
   });
   const [docsSaving, setDocsSaving] = useState(false);
   const [prevType, setPrevType] = useState('inv');
@@ -189,7 +189,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
 
   // Invoice Creation state (embedded in settings)
   const [invState, setInvState] = useState({
-    invNum: `INV-${new Date().getFullYear()}-${Math.floor(Math.random()*9000)+1000}`,
+    invNum: `INV-${new Date().getFullYear()}-${Math.floor(Math.random() * 9000) + 1000}`,
     invDate: new Date().toISOString().split('T')[0],
     dueDateType: '15',
     dueDate: '',
@@ -200,17 +200,17 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
     shipping: 0
   });
   const [invItems, setInvItems] = useState([{ desc: 'Item description', qty: 1, price: 0, tax: 18 }]);
-  
+
   const calcInvTotals = () => {
     let subtotal = 0;
     let taxTotal = 0;
     invItems.forEach(item => {
-      const itemTotal = (parseFloat(item.qty)||0) * (parseFloat(item.price)||0);
+      const itemTotal = (parseFloat(item.qty) || 0) * (parseFloat(item.price) || 0);
       subtotal += itemTotal;
-      taxTotal += itemTotal * ((parseFloat(item.tax)||0)/100);
+      taxTotal += itemTotal * ((parseFloat(item.tax) || 0) / 100);
     });
-    const discountAmt = subtotal * ((parseFloat(invState.discount)||0)/100);
-    const totalAmt = subtotal - discountAmt + taxTotal + (parseFloat(invState.shipping)||0);
+    const discountAmt = subtotal * ((parseFloat(invState.discount) || 0) / 100);
+    const totalAmt = subtotal - discountAmt + taxTotal + (parseFloat(invState.shipping) || 0);
     return { subtotal, discountAmt, taxTotal, totalAmt };
   };
   const invTotals = calcInvTotals();
@@ -220,7 +220,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
     if (user) {
       // Load bank details
       const savedBank = localStorage.getItem("bankDetails");
-      if (savedBank) { try { setBank(JSON.parse(savedBank)); } catch(e) {} }
+      if (savedBank) { try { setBank(JSON.parse(savedBank)); } catch (e) { } }
 
       setProfile({
         name: user?.companyName || user?.name || "",
@@ -352,7 +352,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
       localStorage.setItem("bankDetails", JSON.stringify(bank));
       setTimeout(() => setBankSaving(false), 800);
       showToast("Bank details saved!");
-    } catch(e) { setBankSaving(false); showToast("Failed to save"); }
+    } catch (e) { setBankSaving(false); showToast("Failed to save"); }
   };
 
   // Sidebar navigation items
@@ -391,7 +391,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
         }}>{toast}</div>
       )}
 
-<div className="content" ref={mainScrollRef} style={{ padding: "22px 28px 32px" }}>
+      <div className="content" ref={mainScrollRef} style={{ padding: "22px 28px 32px" }}>
         <div className="page-header" style={{ marginBottom: 22 }}>
           <div>
             <div className="page-title" style={{ fontSize: 20, fontWeight: 800 }}>Settings</div>
@@ -404,11 +404,11 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
           <div className="settings-nav">
             {navItems.map((item, idx) => (
               <React.Fragment key={item.id}>
-                <div 
+                <div
                   className={`sn-item ${activeTab === item.id ? "active" : ""}`}
                   onClick={() => setActiveTab(item.id)}
                 >
-                  <span style={{ fontSize: 16 }}>{item.icon}</span> 
+                  <span style={{ fontSize: 16 }}>{item.icon}</span>
                   {item.label}
                 </div>
                 {idx === 0 && <hr className="sn-divider" />}
@@ -441,7 +441,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                         <input type="file" accept="image/*" onChange={handleAvatarUpload} style={{ display: "none" }} />
                         <i className="ti ti-upload"></i> Upload new photo
                       </label>
-                      {avatarUrl && <div className="avatar-remove" onClick={() => { setAvatarUrl(""); if(onLogoChange) onLogoChange(""); }}>Remove photo</div>}
+                      {avatarUrl && <div className="avatar-remove" onClick={() => { setAvatarUrl(""); if (onLogoChange) onLogoChange(""); }}>Remove photo</div>}
                       <div className="avatar-note">Recommended size: 256x256px. Max 2MB.</div>
                     </div>
                   </div>
@@ -460,7 +460,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                     <label className="form-label">Phone Number</label>
                     <input className="form-input" type="tel" value={profile.phone} onChange={e => setProfile(p => ({ ...p, phone: e.target.value }))} placeholder="Contact number" />
                   </div>
-                  
+
                   <div className="section-save">
                     <button className="sec-save-btn" onClick={saveProfile} disabled={profileSaving}>
                       {profileSaving ? "Saving..." : <><i className="ti ti-device-floppy"></i> Save Changes</>}
@@ -484,8 +484,8 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                     <label className="form-label">App Theme</label>
                     <div className="color-picker-row">
                       {themes && Object.entries(themes).map(([key, t]) => (
-                        <div 
-                          key={key} 
+                        <div
+                          key={key}
                           className={`color-swatch ${appTheme === key ? "selected" : ""}`}
                           style={{ background: t.dot }}
                           onClick={() => setAppTheme(key)}
@@ -502,78 +502,78 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
             {activeTab === "documents" && (
               <div className="settings-section">
                 {/* Alert */}
-                <div style={{display:'flex',alignItems:'flex-start',gap:10,padding:'11px 14px',borderRadius:8,marginBottom:16,fontSize:12,background:'#DBEAFE',color:'#1e40af'}}>
-                  <i className="ti ti-info-circle" style={{fontSize:15,marginTop:1,flexShrink:0}}></i>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '11px 14px', borderRadius: 8, marginBottom: 16, fontSize: 12, background: '#DBEAFE', color: '#1e40af' }}>
+                  <i className="ti ti-info-circle" style={{ fontSize: 15, marginTop: 1, flexShrink: 0 }}></i>
                   <span>Everything configured here appears automatically on <strong>all 6 billing document types</strong> shared to the client portal — Invoice, Advance, Additional, Milestone, Payment receipt, and Expense report.</span>
                 </div>
 
                 {/* Document Header */}
-                <div style={{background:'#fff',border:'1px solid #E2E8F0',borderRadius:12,marginBottom:14,overflow:'hidden'}}>
-                  <div style={{padding:'14px 18px',borderBottom:'1px solid #F1F5F9',display:'flex',alignItems:'center',gap:10}}>
-                    <div style={{width:32,height:32,borderRadius:8,background:'#E0F7FA',display:'flex',alignItems:'center',justifyContent:'center'}}><i className="ti ti-layout-navbar" style={{color:'#00BCD4'}}></i></div>
-                    <div><div style={{fontSize:14,fontWeight:700}}>Document header</div><div style={{fontSize:11,color:'#6b7a8d'}}>Top section of every document sent to clients</div></div>
+                <div style={{ background: '#fff', border: '1px solid #E2E8F0', borderRadius: 12, marginBottom: 14, overflow: 'hidden' }}>
+                  <div style={{ padding: '14px 18px', borderBottom: '1px solid #F1F5F9', display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 8, background: '#E0F7FA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-layout-navbar" style={{ color: '#00BCD4' }}></i></div>
+                    <div><div style={{ fontSize: 14, fontWeight: 700 }}>Document header</div><div style={{ fontSize: 11, color: '#6b7a8d' }}>Top section of every document sent to clients</div></div>
 
                   </div>
-                  <div style={{padding:20}}>
+                  <div style={{ padding: 20 }}>
                     {/* Logo upload */}
-                    <div style={{marginBottom:14}}>
-                      <label style={{fontSize:11,fontWeight:700,color:'#6b7a8d',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:6,display:'block'}}>Company logo</label>
-                      <div style={{border:'2px dashed #E2E8F0',borderRadius:10,padding:14,display:'flex',alignItems:'center',gap:14,background:'#F8FAFC',cursor:'pointer'}} onClick={() => document.getElementById('docs-logo-upload').click()}>
-                        <div style={{width:52,height:52,borderRadius:10,background:'linear-gradient(135deg,#00BCD4,#0097A7)',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:20,color:'white',flexShrink:0,overflow:'hidden'}}>
-                          {avatarUrl ? <img src={avatarUrl} alt="Logo" style={{width:'100%',height:'100%',objectFit:'contain'}} /> : (docs.companyName||user?.companyName||'M')[0]?.toUpperCase()}
+                    <div style={{ marginBottom: 14 }}>
+                      <label style={{ fontSize: 11, fontWeight: 700, color: '#6b7a8d', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 6, display: 'block' }}>Company logo</label>
+                      <div style={{ border: '2px dashed #E2E8F0', borderRadius: 10, padding: 14, display: 'flex', alignItems: 'center', gap: 14, background: '#F8FAFC', cursor: 'pointer' }} onClick={() => document.getElementById('docs-logo-upload').click()}>
+                        <div style={{ width: 52, height: 52, borderRadius: 10, background: 'linear-gradient(135deg,#00BCD4,#0097A7)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 20, color: 'white', flexShrink: 0, overflow: 'hidden' }}>
+                          {avatarUrl ? <img src={avatarUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : (docs.companyName || user?.companyName || 'M')[0]?.toUpperCase()}
                         </div>
                         <div>
-                          <p style={{fontWeight:700,color:'#1a2332',marginBottom:3,fontSize:13}}>Upload company logo</p>
-                          <p style={{fontSize:11,color:'#6b7a8d'}}>PNG or SVG · Max 2MB · Recommended 200×200px</p>
-                          <input id="docs-logo-upload" type="file" accept="image/*" style={{display:'none'}} onChange={handleAvatarUpload} />
-                          <button className="btn" style={{marginTop:6,padding:'4px 12px',fontSize:12,background:'#F8FAFC',border:'1px solid #E2E8F0',borderRadius:6,cursor:'pointer',fontWeight:700}} type="button" onClick={e=>{e.stopPropagation();document.getElementById('docs-logo-upload').click();}}>Change logo</button>
+                          <p style={{ fontWeight: 700, color: '#1a2332', marginBottom: 3, fontSize: 13 }}>Upload company logo</p>
+                          <p style={{ fontSize: 11, color: '#6b7a8d' }}>PNG or SVG · Max 2MB · Recommended 200✕200px</p>
+                          <input id="docs-logo-upload" type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarUpload} />
+                          <button className="btn" style={{ marginTop: 6, padding: '4px 12px', fontSize: 12, background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 6, cursor: 'pointer', fontWeight: 700 }} type="button" onClick={e => { e.stopPropagation(); document.getElementById('docs-logo-upload').click(); }}>Change logo</button>
                         </div>
                       </div>
                     </div>
-                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
-                      <div className="form-group"><label className="form-label">Company name *</label><input className="form-input" value={docs.companyName} onChange={e=>setDocs(d=>({...d,companyName:e.target.value}))} placeholder="e.g. YENCODE Technologies" /></div>
-                      <div className="form-group"><label className="form-label">GST / Tax number</label><input className="form-input" value={docs.gstNo} onChange={e=>setDocs(d=>({...d,gstNo:e.target.value}))} placeholder="e.g. 33AABCU9603R1ZV" /></div>
-                      <div className="form-group"><label className="form-label">Email address</label><input className="form-input" type="email" value={docs.email} onChange={e=>setDocs(d=>({...d,email:e.target.value}))} placeholder="company@email.com" /></div>
-                      <div className="form-group"><label className="form-label">Phone number</label><input className="form-input" value={docs.phone} onChange={e=>setDocs(d=>({...d,phone:e.target.value}))} placeholder="+91 XXXXX XXXXX" /></div>
-                      <div className="form-group" style={{gridColumn:'span 2'}}><label className="form-label">Address</label><input className="form-input" value={docs.address} onChange={e=>setDocs(d=>({...d,address:e.target.value}))} placeholder="City, State, Country — PIN" /></div>
-                      <div className="form-group"><label className="form-label">Website (optional)</label><input className="form-input" value={docs.website} onChange={e=>setDocs(d=>({...d,website:e.target.value}))} placeholder="https://yoursite.com" /></div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                      <div className="form-group"><label className="form-label">Company name *</label><input className="form-input" value={docs.companyName} onChange={e => setDocs(d => ({ ...d, companyName: e.target.value }))} placeholder="e.g. YENCODE Technologies" /></div>
+                      <div className="form-group"><label className="form-label">GST / Tax number</label><input className="form-input" value={docs.gstNo} onChange={e => setDocs(d => ({ ...d, gstNo: e.target.value }))} placeholder="e.g. 33AABCU9603R1ZV" /></div>
+                      <div className="form-group"><label className="form-label">Email address</label><input className="form-input" type="email" value={docs.email} onChange={e => setDocs(d => ({ ...d, email: e.target.value }))} placeholder="company@email.com" /></div>
+                      <div className="form-group"><label className="form-label">Phone number</label><input className="form-input" value={docs.phone} onChange={e => setDocs(d => ({ ...d, phone: e.target.value }))} placeholder="+91 XXXXX XXXXX" /></div>
+                      <div className="form-group" style={{ gridColumn: 'span 2' }}><label className="form-label">Address</label><input className="form-input" value={docs.address} onChange={e => setDocs(d => ({ ...d, address: e.target.value }))} placeholder="City, State, Country — PIN" /></div>
+                      <div className="form-group"><label className="form-label">Website (optional)</label><input className="form-input" value={docs.website} onChange={e => setDocs(d => ({ ...d, website: e.target.value }))} placeholder="https://yoursite.com" /></div>
                     </div>
                   </div>
                 </div>
 
-             
+
 
                 {/* Document Footer */}
-                <div style={{background:'#fff',border:'1px solid #E2E8F0',borderRadius:12,marginBottom:14,overflow:'hidden'}}>
-                  <div style={{padding:'14px 18px',borderBottom:'1px solid #F1F5F9',display:'flex',alignItems:'center',gap:10}}>
-                    <div style={{width:32,height:32,borderRadius:8,background:'#1a2332',display:'flex',alignItems:'center',justifyContent:'center'}}><i className="ti ti-layout-bottombar" style={{color:'white'}}></i></div>
-                    <div><div style={{fontSize:14,fontWeight:700}}>Document footer</div><div style={{fontSize:11,color:'#6b7a8d'}}>Bank details, terms & signatory at the bottom of every document</div></div>
-                    <span style={{marginLeft:'auto',display:'inline-flex',alignItems:'center',gap:4,fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:20,background:'#E0F7FA',color:'#0097A7'}}><i className="ti ti-lock" style={{fontSize:9}}></i> Auto-applied to all types</span>
+                <div style={{ background: '#fff', border: '1px solid #E2E8F0', borderRadius: 12, marginBottom: 14, overflow: 'hidden' }}>
+                  <div style={{ padding: '14px 18px', borderBottom: '1px solid #F1F5F9', display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 8, background: '#1a2332', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-layout-bottombar" style={{ color: 'white' }}></i></div>
+                    <div><div style={{ fontSize: 14, fontWeight: 700 }}>Document footer</div><div style={{ fontSize: 11, color: '#6b7a8d' }}>Bank details, terms & signatory at the bottom of every document</div></div>
+                    <span style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: '#E0F7FA', color: '#0097A7' }}><i className="ti ti-lock" style={{ fontSize: 9 }}></i> Auto-applied to all types</span>
                   </div>
-                  <div style={{padding:20}}>
-                    <div style={{fontSize:12,fontWeight:700,color:'#6b7a8d',textTransform:'uppercase',letterSpacing:'.06em',marginBottom:10,display:'flex',alignItems:'center',gap:8}}>Bank &amp; payment details<span style={{flex:1,height:1,background:'#E2E8F0',marginLeft:8}}></span></div>
-                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:14,marginBottom:16}}>
-                      <div className="form-group"><label className="form-label">Bank name</label><input className="form-input" value={docs.bankName} onChange={e=>setDocs(d=>({...d,bankName:e.target.value}))} placeholder="e.g. HDFC Bank" /></div>
-                      <div className="form-group"><label className="form-label">Account number</label><input className="form-input" value={docs.accountNo} onChange={e=>setDocs(d=>({...d,accountNo:e.target.value}))} placeholder="e.g. 5020123456789" /></div>
-                      <div className="form-group"><label className="form-label">IFSC code</label><input className="form-input" value={docs.ifscCode} onChange={e=>setDocs(d=>({...d,ifscCode:e.target.value}))} placeholder="e.g. HDFC0001234" /></div>
-                      <div className="form-group"><label className="form-label">UPI ID</label><input className="form-input" value={docs.upiId} onChange={e=>setDocs(d=>({...d,upiId:e.target.value}))} placeholder="e.g. company@okaxis" /></div>
-                      <div className="form-group"><label className="form-label">Account type</label><select className="form-input" value={docs.accountType} onChange={e=>setDocs(d=>({...d,accountType:e.target.value}))}><option>Current Account</option><option>Savings Account</option></select></div>
+                  <div style={{ padding: 20 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7a8d', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>Bank &amp; payment details<span style={{ flex: 1, height: 1, background: '#E2E8F0', marginLeft: 8 }}></span></div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, marginBottom: 16 }}>
+                      <div className="form-group"><label className="form-label">Bank name</label><input className="form-input" value={docs.bankName} onChange={e => setDocs(d => ({ ...d, bankName: e.target.value }))} placeholder="e.g. HDFC Bank" /></div>
+                      <div className="form-group"><label className="form-label">Account number</label><input className="form-input" value={docs.accountNo} onChange={e => setDocs(d => ({ ...d, accountNo: e.target.value }))} placeholder="e.g. 5020123456789" /></div>
+                      <div className="form-group"><label className="form-label">IFSC code</label><input className="form-input" value={docs.ifscCode} onChange={e => setDocs(d => ({ ...d, ifscCode: e.target.value }))} placeholder="e.g. HDFC0001234" /></div>
+                      <div className="form-group"><label className="form-label">UPI ID</label><input className="form-input" value={docs.upiId} onChange={e => setDocs(d => ({ ...d, upiId: e.target.value }))} placeholder="e.g. company@okaxis" /></div>
+                      <div className="form-group"><label className="form-label">Account type</label><select className="form-input" value={docs.accountType} onChange={e => setDocs(d => ({ ...d, accountType: e.target.value }))}><option>Current Account</option><option>Savings Account</option></select></div>
                     </div>
-                    <div style={{fontSize:12,fontWeight:700,color:'#6b7a8d',textTransform:'uppercase',letterSpacing:'.06em',marginBottom:10,display:'flex',alignItems:'center',gap:8}}>Default document text<span style={{flex:1,height:1,background:'#E2E8F0',marginLeft:8}}></span></div>
-                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
-                      <div className="form-group"><label className="form-label">Payment terms</label><textarea className="form-input" style={{resize:'vertical',minHeight:80}} value={docs.paymentTerms} onChange={e=>setDocs(d=>({...d,paymentTerms:e.target.value}))} placeholder="Terms & conditions..." /></div>
-                      <div className="form-group"><label className="form-label">Thank-you / footer note</label><textarea className="form-input" style={{resize:'vertical',minHeight:80}} value={docs.footerNote} onChange={e=>setDocs(d=>({...d,footerNote:e.target.value}))} placeholder="Thank you note..." /></div>
-                      <div className="form-group" style={{gridColumn:'span 2'}}><label className="form-label">Authorised signatory</label><input className="form-input" value={docs.signatory} onChange={e=>setDocs(d=>({...d,signatory:e.target.value}))} placeholder="e.g. Prabhu · Managing Director" /></div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7a8d', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>Default document text<span style={{ flex: 1, height: 1, background: '#E2E8F0', marginLeft: 8 }}></span></div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                      <div className="form-group"><label className="form-label">Payment terms</label><textarea className="form-input" style={{ resize: 'vertical', minHeight: 80 }} value={docs.paymentTerms} onChange={e => setDocs(d => ({ ...d, paymentTerms: e.target.value }))} placeholder="Terms & conditions..." /></div>
+                      <div className="form-group"><label className="form-label">Thank-you / footer note</label><textarea className="form-input" style={{ resize: 'vertical', minHeight: 80 }} value={docs.footerNote} onChange={e => setDocs(d => ({ ...d, footerNote: e.target.value }))} placeholder="Thank you note..." /></div>
+                      <div className="form-group" style={{ gridColumn: 'span 2' }}><label className="form-label">Authorised signatory</label><input className="form-input" value={docs.signatory} onChange={e => setDocs(d => ({ ...d, signatory: e.target.value }))} placeholder="e.g. Prabhu · Managing Director" /></div>
                     </div>
                   </div>
                 </div>
 
                 {/* Live Preview */}
-                <div style={{background:'#fff',border:'1px solid #E2E8F0',borderRadius:12,marginBottom:14,overflow:'hidden'}}>
-                  <div style={{padding:'14px 18px',borderBottom:'1px solid #F1F5F9',display:'flex',alignItems:'center',gap:10}}>
-                    <div style={{width:32,height:32,borderRadius:8,background:'#FEF3C7',display:'flex',alignItems:'center',justifyContent:'center'}}><i className="ti ti-eye" style={{color:'#F59E0B'}}></i></div>
-                    <div><div style={{fontSize:14,fontWeight:700}}>Document preview</div><div style={{fontSize:11,color:'#6b7a8d'}}>Switch type to see how each document looks to clients</div></div>
-                    <select className="form-input" style={{width:200,marginLeft:'auto',padding:'6px 10px',fontSize:12}} value={prevType} onChange={e=>setPrevType(e.target.value)}>
+                <div style={{ background: '#fff', border: '1px solid #E2E8F0', borderRadius: 12, marginBottom: 14, overflow: 'hidden' }}>
+                  <div style={{ padding: '14px 18px', borderBottom: '1px solid #F1F5F9', display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 8, background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-eye" style={{ color: '#F59E0B' }}></i></div>
+                    <div><div style={{ fontSize: 14, fontWeight: 700 }}>Document preview</div><div style={{ fontSize: 11, color: '#6b7a8d' }}>Switch type to see how each document looks to clients</div></div>
+                    <select className="form-input" style={{ width: 200, marginLeft: 'auto', padding: '6px 10px', fontSize: 12 }} value={prevType} onChange={e => setPrevType(e.target.value)}>
                       <option value="inv">Invoice</option>
                       <option value="adv">Advance receipt</option>
                       <option value="adc">Additional charge</option>
@@ -582,68 +582,68 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                       <option value="exp">Expense report</option>
                     </select>
                   </div>
-                  <div style={{padding:14}}>
+                  <div style={{ padding: 14 }}>
                     {/* Shared preview shell */}
                     {(() => {
                       const co = docs.companyName || user?.companyName || 'YENCODE Technologies';
                       const coEmail = docs.email || user?.email || 'company@email.com';
                       const coPhone = docs.phone || user?.phone || '+91 XXXXX XXXXX';
                       const coAddr = docs.address || user?.address || 'Chennai, Tamil Nadu, India';
-                      const bankLine = `Bank: ${docs.bankName||'HDFC Bank'} · A/C: ${docs.accountNo||'XXXXXXXXX'} · IFSC: ${docs.ifscCode||'HDFC0001234'} · UPI: ${docs.upiId||'company@okaxis'}`;
+                      const bankLine = `Bank: ${docs.bankName || 'HDFC Bank'} · A/C: ${docs.accountNo || 'XXXXXXXXX'} · IFSC: ${docs.ifscCode || 'HDFC0001234'} · UPI: ${docs.upiId || 'company@okaxis'}`;
                       const terms = docs.paymentTerms || 'Payment due within agreed terms. Late payments subject to 2% monthly interest.';
                       const footer = docs.footerNote || 'Thank you for your business!';
                       const sig = docs.signatory || 'Authorised Signatory';
 
-                      const typeLabels = { inv:'INVOICE', adv:'ADVANCE RECEIPT', adc:'ADDITIONAL CHARGE', mst:'MILESTONE BILL', pay:'PAYMENT RECEIPT', exp:'EXPENSE REPORT' };
-                      const typeNos   = { inv:'#INV-2026-1501', adv:'#ADV-001', adc:'#ADC-001', mst:'#MST-001', pay:'#PAY-001', exp:'#EXP-001' };
+                      const typeLabels = { inv: 'INVOICE', adv: 'ADVANCE RECEIPT', adc: 'ADDITIONAL CHARGE', mst: 'MILESTONE BILL', pay: 'PAYMENT RECEIPT', exp: 'EXPENSE REPORT' };
+                      const typeNos = { inv: '#INV-2026-1501', adv: '#ADV-001', adc: '#ADC-001', mst: '#MST-001', pay: '#PAY-001', exp: '#EXP-001' };
 
                       return (
-                        <div style={{fontFamily:'Nunito,sans-serif',fontSize:12,color:'#1a2332',background:'white',border:'1px solid #E2E8F0',borderRadius:10,overflow:'hidden'}}>
+                        <div style={{ fontFamily: 'Nunito,sans-serif', fontSize: 12, color: '#1a2332', background: 'white', border: '1px solid #E2E8F0', borderRadius: 10, overflow: 'hidden' }}>
                           {/* Header */}
-                          <div style={{background:'#00BCD4',padding:'16px 20px',display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:16}}>
-                            <div style={{display:'flex',alignItems:'flex-start',gap:14,flex:1}}>
-                              <div style={{width:44,height:44,background:'white',borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:16,color:'#00BCD4',flexShrink:0,overflow:'hidden'}}>
-                                {avatarUrl ? <img src={avatarUrl} alt="" style={{width:'100%',height:'100%',objectFit:'contain'}} /> : co[0]?.toUpperCase()}
+                          <div style={{ background: '#00BCD4', padding: '16px 20px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, flex: 1 }}>
+                              <div style={{ width: 44, height: 44, background: 'white', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 16, color: '#00BCD4', flexShrink: 0, overflow: 'hidden' }}>
+                                {avatarUrl ? <img src={avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : co[0]?.toUpperCase()}
                               </div>
-                              <div style={{color:'white',flex:1}}>
-                                <div style={{fontSize:15,fontWeight:800,marginBottom:2}}>{co}</div>
-                                <div style={{fontSize:11,opacity:.85,lineHeight:1.6}}>{coEmail} · {coPhone}<br/>{coAddr}</div>
+                              <div style={{ color: 'white', flex: 1 }}>
+                                <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 2 }}>{co}</div>
+                                <div style={{ fontSize: 11, opacity: .85, lineHeight: 1.6 }}>{coEmail} · {coPhone}<br />{coAddr}</div>
                               </div>
                             </div>
-                            <div style={{textAlign:'right',color:'white'}}>
-                              <div style={{fontSize:14,fontWeight:800,letterSpacing:'.04em'}}>{typeLabels[prevType]}</div>
-                              <div style={{fontSize:12,opacity:.8}}>{typeNos[prevType]}</div>
-                              <div style={{fontSize:11,opacity:.7,marginTop:2}}>Date: {new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</div>
+                            <div style={{ textAlign: 'right', color: 'white' }}>
+                              <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: '.04em' }}>{typeLabels[prevType]}</div>
+                              <div style={{ fontSize: 12, opacity: .8 }}>{typeNos[prevType]}</div>
+                              <div style={{ fontSize: 11, opacity: .7, marginTop: 2 }}>Date: {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
                             </div>
                           </div>
                           {/* Info bar */}
-                          <div style={{background:'#F8FAFC',borderBottom:'1px solid #E2E8F0',padding:'11px 20px',display:'flex',gap:20,flexWrap:'wrap'}}>
-                            <div><div style={{fontSize:10,fontWeight:700,color:'#6b7a8d',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:2}}>Bill to</div><div style={{fontSize:13,fontWeight:700}}>Urban Cafe</div></div>
-                            <div><div style={{fontSize:10,fontWeight:700,color:'#6b7a8d',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:2}}>Project</div><div style={{fontSize:13,fontWeight:700}}>Urban Cafe Billing Software</div></div>
-                            {prevType==='inv' && <div><div style={{fontSize:10,fontWeight:700,color:'#6b7a8d',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:2}}>Status</div><div style={{fontSize:12,fontWeight:700,color:'#166534',background:'#DCFCE7',padding:'2px 8px',borderRadius:20,display:'inline-block'}}>Paid</div></div>}
+                          <div style={{ background: '#F8FAFC', borderBottom: '1px solid #E2E8F0', padding: '11px 20px', display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+                            <div><div style={{ fontSize: 10, fontWeight: 700, color: '#6b7a8d', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 2 }}>Bill to</div><div style={{ fontSize: 13, fontWeight: 700 }}>Urban Cafe</div></div>
+                            <div><div style={{ fontSize: 10, fontWeight: 700, color: '#6b7a8d', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 2 }}>Project</div><div style={{ fontSize: 13, fontWeight: 700 }}>Urban Cafe Billing Software</div></div>
+                            {prevType === 'inv' && <div><div style={{ fontSize: 10, fontWeight: 700, color: '#6b7a8d', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 2 }}>Status</div><div style={{ fontSize: 12, fontWeight: 700, color: '#166534', background: '#DCFCE7', padding: '2px 8px', borderRadius: 20, display: 'inline-block' }}>Paid</div></div>}
                           </div>
                           {/* Line items */}
-                          <div style={{padding:14}}>
-                            <div style={{fontSize:10,fontWeight:700,textTransform:'uppercase',letterSpacing:'.06em',color:'#6b7a8d',marginBottom:8,paddingBottom:5,borderBottom:'1px solid #F1F5F9'}}>Line items</div>
-                            <table style={{width:'100%',borderCollapse:'collapse'}}>
-                              <thead><tr style={{background:'#E0F7FA'}}><th style={{padding:'7px 10px',fontSize:10,fontWeight:700,textTransform:'uppercase',color:'#0097A7',textAlign:'left'}}>#</th><th style={{padding:'7px 10px',fontSize:10,fontWeight:700,textTransform:'uppercase',color:'#0097A7',textAlign:'left'}}>Description</th><th style={{padding:'7px 10px',fontSize:10,fontWeight:700,textTransform:'uppercase',color:'#0097A7'}}>Qty</th><th style={{padding:'7px 10px',fontSize:10,fontWeight:700,textTransform:'uppercase',color:'#0097A7'}}>Unit price</th><th style={{padding:'7px 10px',fontSize:10,fontWeight:700,textTransform:'uppercase',color:'#0097A7'}}>Total</th></tr></thead>
+                          <div style={{ padding: 14 }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: '#6b7a8d', marginBottom: 8, paddingBottom: 5, borderBottom: '1px solid #F1F5F9' }}>Line items</div>
+                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                              <thead><tr style={{ background: '#E0F7FA' }}><th style={{ padding: '7px 10px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', color: '#0097A7', textAlign: 'left' }}>#</th><th style={{ padding: '7px 10px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', color: '#0097A7', textAlign: 'left' }}>Description</th><th style={{ padding: '7px 10px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', color: '#0097A7' }}>Qty</th><th style={{ padding: '7px 10px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', color: '#0097A7' }}>Unit price</th><th style={{ padding: '7px 10px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', color: '#0097A7' }}>Total</th></tr></thead>
                               <tbody>
-                                {prevType==='inv' && <><tr><td style={{padding:'10px',borderBottom:'1px solid #F1F5F9',fontSize:12}}>1</td><td style={{padding:'10px',borderBottom:'1px solid #F1F5F9',fontSize:12}}>UI Design & Wireframing</td><td style={{padding:'10px',borderBottom:'1px solid #F1F5F9',fontSize:12,textAlign:'center'}}>1</td><td style={{padding:'10px',borderBottom:'1px solid #F1F5F9',fontSize:12,textAlign:'center'}}>₹25,000</td><td style={{padding:'10px',borderBottom:'1px solid #F1F5F9',fontSize:12,textAlign:'center',fontWeight:800}}>₹29,500</td></tr><tr><td style={{padding:'10px',fontSize:12}}>2</td><td style={{padding:'10px',fontSize:12}}>Backend API Development</td><td style={{padding:'10px',fontSize:12,textAlign:'center'}}>1</td><td style={{padding:'10px',fontSize:12,textAlign:'center'}}>₹45,000</td><td style={{padding:'10px',fontSize:12,textAlign:'center',fontWeight:800}}>₹53,100</td></tr></>}
-                                {prevType==='adv' && <tr><td colSpan={2} style={{padding:'10px',fontSize:12}}>Phase 1 advance — upfront payment for kickoff</td><td style={{padding:'10px',fontSize:12,textAlign:'center'}}>Pending adjustment</td><td colSpan={2} style={{padding:'10px',fontSize:12,fontWeight:800,textAlign:'center'}}>₹25,000</td></tr>}
-                                {prevType==='adc' && <tr><td colSpan={2} style={{padding:'10px',fontSize:12}}>Additional API integrations beyond scope</td><td style={{padding:'10px',fontSize:12}}>Client requested 3 new gateways</td><td colSpan={2} style={{padding:'10px',fontWeight:800,textAlign:'center'}}>₹8,000</td></tr>}
-                                {prevType==='mst' && <tr><td style={{padding:'10px',fontSize:12}}>Phase 3</td><td style={{padding:'10px',fontSize:12}}>Backend Concept Development</td><td style={{padding:'10px',textAlign:'center',fontSize:12}}>100%</td><td colSpan={2} style={{padding:'10px',fontWeight:800,textAlign:'center'}}>₹20,000</td></tr>}
-                                {prevType==='pay' && <tr><td style={{padding:'10px',fontSize:12}}>INV-2026-1501</td><td style={{padding:'10px',fontSize:12}}>₹82,600</td><td style={{padding:'10px',fontSize:12,fontWeight:800,color:'#22C55E'}}>₹1,100 received</td><td colSpan={2} style={{padding:'10px',fontSize:12,fontWeight:800,color:'#EF4444'}}>₹81,500 balance</td></tr>}
-                                {prevType==='exp' && <><tr><td style={{padding:'10px',borderBottom:'1px solid #F1F5F9',fontSize:12}}>10 Jun</td><td style={{padding:'10px',borderBottom:'1px solid #F1F5F9',fontSize:12}}>Cloud server (AWS)</td><td colSpan={2} style={{padding:'10px',borderBottom:'1px solid #F1F5F9',fontSize:12}}>Amazon AWS</td><td style={{padding:'10px',borderBottom:'1px solid #F1F5F9',fontWeight:800}}>₹3,500</td></tr><tr><td style={{padding:'10px',fontSize:12}}>12 Jun</td><td style={{padding:'10px',fontSize:12}}>Design assets license</td><td colSpan={2} style={{padding:'10px',fontSize:12}}>Figma</td><td style={{padding:'10px',fontWeight:800}}>₹1,200</td></tr></>}
+                                {prevType === 'inv' && <><tr><td style={{ padding: '10px', borderBottom: '1px solid #F1F5F9', fontSize: 12 }}>1</td><td style={{ padding: '10px', borderBottom: '1px solid #F1F5F9', fontSize: 12 }}>UI Design & Wireframing</td><td style={{ padding: '10px', borderBottom: '1px solid #F1F5F9', fontSize: 12, textAlign: 'center' }}>1</td><td style={{ padding: '10px', borderBottom: '1px solid #F1F5F9', fontSize: 12, textAlign: 'center' }}>₹25,000</td><td style={{ padding: '10px', borderBottom: '1px solid #F1F5F9', fontSize: 12, textAlign: 'center', fontWeight: 800 }}>₹29,500</td></tr><tr><td style={{ padding: '10px', fontSize: 12 }}>2</td><td style={{ padding: '10px', fontSize: 12 }}>Backend API Development</td><td style={{ padding: '10px', fontSize: 12, textAlign: 'center' }}>1</td><td style={{ padding: '10px', fontSize: 12, textAlign: 'center' }}>₹45,000</td><td style={{ padding: '10px', fontSize: 12, textAlign: 'center', fontWeight: 800 }}>₹53,100</td></tr></>}
+                                {prevType === 'adv' && <tr><td colSpan={2} style={{ padding: '10px', fontSize: 12 }}>Phase 1 advance — upfront payment for kickoff</td><td style={{ padding: '10px', fontSize: 12, textAlign: 'center' }}>Pending adjustment</td><td colSpan={2} style={{ padding: '10px', fontSize: 12, fontWeight: 800, textAlign: 'center' }}>₹25,000</td></tr>}
+                                {prevType === 'adc' && <tr><td colSpan={2} style={{ padding: '10px', fontSize: 12 }}>Additional API integrations beyond scope</td><td style={{ padding: '10px', fontSize: 12 }}>Client requested 3 new gateways</td><td colSpan={2} style={{ padding: '10px', fontWeight: 800, textAlign: 'center' }}>₹8,000</td></tr>}
+                                {prevType === 'mst' && <tr><td style={{ padding: '10px', fontSize: 12 }}>Phase 3</td><td style={{ padding: '10px', fontSize: 12 }}>Backend Concept Development</td><td style={{ padding: '10px', textAlign: 'center', fontSize: 12 }}>100%</td><td colSpan={2} style={{ padding: '10px', fontWeight: 800, textAlign: 'center' }}>₹20,000</td></tr>}
+                                {prevType === 'pay' && <tr><td style={{ padding: '10px', fontSize: 12 }}>INV-2026-1501</td><td style={{ padding: '10px', fontSize: 12 }}>₹82,600</td><td style={{ padding: '10px', fontSize: 12, fontWeight: 800, color: '#22C55E' }}>₹1,100 received</td><td colSpan={2} style={{ padding: '10px', fontSize: 12, fontWeight: 800, color: '#EF4444' }}>₹81,500 balance</td></tr>}
+                                {prevType === 'exp' && <><tr><td style={{ padding: '10px', borderBottom: '1px solid #F1F5F9', fontSize: 12 }}>10 Jun</td><td style={{ padding: '10px', borderBottom: '1px solid #F1F5F9', fontSize: 12 }}>Cloud server (AWS)</td><td colSpan={2} style={{ padding: '10px', borderBottom: '1px solid #F1F5F9', fontSize: 12 }}>Amazon AWS</td><td style={{ padding: '10px', borderBottom: '1px solid #F1F5F9', fontWeight: 800 }}>₹3,500</td></tr><tr><td style={{ padding: '10px', fontSize: 12 }}>12 Jun</td><td style={{ padding: '10px', fontSize: 12 }}>Design assets license</td><td colSpan={2} style={{ padding: '10px', fontSize: 12 }}>Figma</td><td style={{ padding: '10px', fontWeight: 800 }}>₹1,200</td></tr></>}
                               </tbody>
                             </table>
                           </div>
                           {/* Footer */}
-                          <div style={{background:'#1a2332',color:'rgba(255,255,255,.85)',padding:'14px 20px'}}>
-                            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
-                              <div><div style={{fontSize:10,fontWeight:700,textTransform:'uppercase',letterSpacing:'.06em',color:'rgba(255,255,255,.5)',marginBottom:4}}>Payment details</div><div style={{fontSize:11,lineHeight:1.7}}>{bankLine}</div></div>
-                              <div><div style={{fontSize:10,fontWeight:700,textTransform:'uppercase',letterSpacing:'.06em',color:'rgba(255,255,255,.5)',marginBottom:4}}>Terms & conditions</div><div style={{fontSize:11,lineHeight:1.7}}>{terms}</div></div>
+                          <div style={{ background: '#1a2332', color: 'rgba(255,255,255,.85)', padding: '14px 20px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                              <div><div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: 'rgba(255,255,255,.5)', marginBottom: 4 }}>Payment details</div><div style={{ fontSize: 11, lineHeight: 1.7 }}>{bankLine}</div></div>
+                              <div><div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: 'rgba(255,255,255,.5)', marginBottom: 4 }}>Terms & conditions</div><div style={{ fontSize: 11, lineHeight: 1.7 }}>{terms}</div></div>
                             </div>
-                            <div style={{marginTop:10,paddingTop:10,borderTop:'1px solid rgba(255,255,255,.1)',display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:10,color:'rgba(255,255,255,.4)'}}>
+                            <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 10, color: 'rgba(255,255,255,.4)' }}>
                               <span>{footer}</span>
                               <span>{co} · {sig}</span>
                             </div>
@@ -655,7 +655,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                 </div>
 
                 {/* Save button */}
-                <div style={{display:'flex',justifyContent:'flex-end',gap:10}}>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                   <button className="sec-save-btn" onClick={saveDocs} disabled={docsSaving}>
                     {docsSaving ? 'Saving...' : <><i className="ti ti-device-floppy"></i> Save all settings</>}
                   </button>
@@ -675,21 +675,21 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                 <div className="ss-body">
                   <div className="form-group">
                     <label className="form-label">PAYMENT DUE</label>
-                    <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
-                      {[{val:"NOW",lbl:"NOW",sub:"Immediate"},{val:"7",lbl:"7",sub:"Net 7 days"},{val:"15",lbl:"15",sub:"Net 15 days"},{val:"30",lbl:"30",sub:"Net 30 days"}].map(opt => (
+                    <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                      {[{ val: "NOW", lbl: "NOW", sub: "Immediate" }, { val: "7", lbl: "7", sub: "Net 7 days" }, { val: "15", lbl: "15", sub: "Net 15 days" }, { val: "30", lbl: "30", sub: "Net 30 days" }].map(opt => (
                         <div key={opt.val} onClick={() => setBank(b => ({ ...b, paymentDue: opt.val }))}
-                          style={{ padding:"12px 20px", borderRadius:10, border:`2px solid ${bank.paymentDue===opt.val?"#00BCD4":"#E2E8F0"}`, background: bank.paymentDue===opt.val?"#E0F7FA":"#fff", cursor:"pointer", textAlign:"center", minWidth:80 }}>
-                          <div style={{ fontSize:18, fontWeight:900, color: bank.paymentDue===opt.val?"#00BCD4":"#1A2332" }}>{opt.lbl}</div>
-                          <div style={{ fontSize:11, color:"#718096", fontWeight:600 }}>{opt.sub}</div>
+                          style={{ padding: "12px 20px", borderRadius: 10, border: `2px solid ${bank.paymentDue === opt.val ? "#00BCD4" : "#E2E8F0"}`, background: bank.paymentDue === opt.val ? "#E0F7FA" : "#fff", cursor: "pointer", textAlign: "center", minWidth: 80 }}>
+                          <div style={{ fontSize: 18, fontWeight: 900, color: bank.paymentDue === opt.val ? "#00BCD4" : "#1A2332" }}>{opt.lbl}</div>
+                          <div style={{ fontSize: 11, color: "#718096", fontWeight: 600 }}>{opt.sub}</div>
                         </div>
                       ))}
                     </div>
                   </div>
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                     <div className="form-group">
                       <label className="form-label">PAYMENT METHOD</label>
                       <select className="form-input" value={bank.paymentMethod} onChange={e => setBank(b => ({ ...b, paymentMethod: e.target.value }))}>
-                        {["Bank Transfer / NEFT","UPI","Cash","Cheque","Credit Card","PayPal"].map(m => <option key={m}>{m}</option>)}
+                        {["Bank Transfer / NEFT", "UPI", "Cash", "Cheque", "Credit Card", "PayPal"].map(m => <option key={m}>{m}</option>)}
                       </select>
                     </div>
                     <div className="form-group">
@@ -702,7 +702,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                       </select>
                     </div>
                   </div>
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                     <div className="form-group">
                       <label className="form-label">BANK NAME</label>
                       <input className="form-input" value={bank.bankName} onChange={e => setBank(b => ({ ...b, bankName: e.target.value }))} placeholder="e.g. HDFC Bank" />
@@ -712,7 +712,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                       <input className="form-input" value={bank.accountNo} onChange={e => setBank(b => ({ ...b, accountNo: e.target.value }))} placeholder="e.g. 5020123456789" />
                     </div>
                   </div>
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                     <div className="form-group">
                       <label className="form-label">IFSC CODE</label>
                       <input className="form-input" value={bank.ifscCode} onChange={e => setBank(b => ({ ...b, ifscCode: e.target.value }))} placeholder="e.g. HDFC0001234" />
@@ -722,7 +722,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                       <input className="form-input" value={bank.upiId} onChange={e => setBank(b => ({ ...b, upiId: e.target.value }))} placeholder="e.g. yencode@okaxis" />
                     </div>
                   </div>
-                  <div style={{ marginTop:24 }}>
+                  <div style={{ marginTop: 24 }}>
                     <button className="sec-save-btn" onClick={saveBank} disabled={bankSaving}>
                       {bankSaving ? "Saving..." : "Save Bank Details"}
                     </button>
@@ -741,7 +741,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                   </div>
                 </div>
                 <div className="ss-body">
-                 
+
                   <div className="form-group" style={{ maxWidth: 400 }}>
                     <label className="form-label">New Password</label>
                     <input className="form-input" type="password" value={passwords.new} onChange={e => setPasswords(p => ({ ...p, new: e.target.value }))} placeholder="••••••••" />
@@ -751,7 +751,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                     <label className="form-label">Confirm New Password</label>
                     <input className="form-input" type="password" value={passwords.confirm} onChange={e => setPasswords(p => ({ ...p, confirm: e.target.value }))} placeholder="••••••••" />
                   </div>
-                  
+
                   <div className="section-save" style={{ justifyContent: "flex-start", marginTop: 24, paddingTop: 0, borderTop: "none" }}>
                     <button className="sec-save-btn" onClick={handleUpdatePassword} disabled={securityLoading}>
                       {securityLoading ? "Updating..." : "Update Password"}

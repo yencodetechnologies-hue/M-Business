@@ -509,7 +509,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
         <div class="cover-zone" id="coverZone" onclick="uploadCover()">
           <i class="ti ti-photo-plus"></i>
           <div class="cover-zone-txt">Upload Cover Image / Banner</div>
-          <div class="cover-zone-sub">PNG, JPG · Recommended 1200×400px</div>
+          <div class="cover-zone-sub">PNG, JPG · Recommended 1200✕400px</div>
         </div>
         <div class="form-row">
           <div class="fg"><label class="fl">Proposal Title</label><input class="fi" type="text" id="propTitle" placeholder="e.g. Corporate Website Redesign" oninput="up()"></div>

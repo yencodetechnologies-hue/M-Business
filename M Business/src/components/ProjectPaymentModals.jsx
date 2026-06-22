@@ -201,9 +201,9 @@ export default function ProjectPaymentModals({
           <div style={headerStyle}>
             <h3 style={titleStyle}>
               <div style={{ background: '#E0F7FA', color: '#00BCD4', padding: 8, borderRadius: 8 }}><i className="ti ti-file-invoice"></i></div>
-            {editData ? `Edit Invoice — ${editData.invoiceNo || ''}` : 'New Invoice'}
+              {editData ? `Edit Invoice — ${editData.invoiceNo || ''}` : 'New Invoice'}
             </h3>
-            <button style={closeBtnStyle} onClick={closeModals}>Close</button>
+            <button style={closeBtnStyle} onClick={closeModals}>✕</button>
           </div>
           <form onSubmit={e => handleSave(e, 'invoice')}>
 
@@ -506,7 +506,7 @@ export default function ProjectPaymentModals({
               <div style={{ background: '#DCFCE7', color: '#22C55E', padding: 8, borderRadius: 8 }}><i className="ti ti-credit-card"></i></div>
               Record Payment
             </h3>
-            <button style={closeBtnStyle} onClick={closeModals}>Close</button>
+            <button style={closeBtnStyle} onClick={closeModals}>✕</button>
           </div>
           <form onSubmit={e => handleSave(e, 'payment')}>
             <div style={rowStyle}>
@@ -553,7 +553,7 @@ export default function ProjectPaymentModals({
               <div style={{ background: '#EDE9FE', color: '#8B5CF6', padding: 8, borderRadius: 8 }}><i className="ti ti-pig-money"></i></div>
               Add Advance Payment
             </h3>
-            <button style={closeBtnStyle} onClick={closeModals}>Close</button>
+            <button style={closeBtnStyle} onClick={closeModals}>✕</button>
           </div>
           <form onSubmit={e => handleSave(e, 'advance')}>
             <div style={rowStyle}>
@@ -618,7 +618,7 @@ export default function ProjectPaymentModals({
               </div>
               Add Milestone Payment
             </h3>
-            <button style={closeBtnStyle} onClick={closeModals}>Close</button>
+            <button style={closeBtnStyle} onClick={closeModals}>✕</button>
           </div>
           <form onSubmit={e => handleSave(e, 'milestone')}>
             <div style={rowStyle}>
@@ -669,22 +669,18 @@ export default function ProjectPaymentModals({
                 <input type="date" required style={inputStyle} value={form.dueDate || ''} onChange={e => handleInputChange('dueDate', e.target.value)} />
               </div>
               <div>
-                <label style={labelStyle}>Status</label>
-                <select style={inputStyle} value={form.status || 'Upcoming'} onChange={e => handleInputChange('status', e.target.value)}>
-                  <option>Upcoming</option>
-                  <option>Invoiced</option>
-                  <option>Paid</option>
-                </select>
+                <div style={rowStyle}>
+                  <div>
+                    <label style={labelStyle}>Paid On</label>
+                    <input type="date" style={inputStyle} value={form.paidOn || ''} onChange={e => handleInputChange('paidOn', e.target.value)} />
+                  </div>
+                  <div></div>
+                </div>
               </div>
+
             </div>
 
-            <div style={rowStyle}>
-              <div>
-                <label style={labelStyle}>Paid On</label>
-                <input type="date" style={inputStyle} value={form.paidOn || ''} onChange={e => handleInputChange('paidOn', e.target.value)} />
-              </div>
-              <div></div>
-            </div>
+
 
             <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="checkbox" id="notify-mil" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
@@ -714,7 +710,7 @@ export default function ProjectPaymentModals({
               <div style={{ background: '#FFEDD5', color: '#F97316', padding: 8, borderRadius: 8 }}><i className="ti ti-circle-plus"></i></div>
               Add Additional Charge
             </h3>
-            <button style={closeBtnStyle} onClick={closeModals}>Close</button>
+            <button style={closeBtnStyle} onClick={closeModals}>✕</button>
           </div>
           <form onSubmit={e => handleSave(e, 'additional')}>
             <div style={rowStyle}>

@@ -1627,7 +1627,7 @@ function PackagesPage({ THEME, packages, onEdit, onDelete, darkMode }) {
                     e.currentTarget.style.transform = "translateY(0)";
                   }}
                 >
-             Delete
+                  Delete
                 </button>
               </div>
 
@@ -1932,7 +1932,7 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
             onClick={() => setViewTasksProj(null)}
             style={{ padding: "8px 16px", background: THEME.surface, color: THEME.text, border: `1px solid ${THEME.border}`, borderRadius: "8px", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
           >
-             Back to Projects
+            Back to Projects
           </button>
         </div>
         <div style={{ flex: 1 }}>
@@ -1975,7 +1975,7 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
           <div style={{ background: "#fff", borderRadius: 16, width: 560, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 24px 80px rgba(0,0,0,0.18)" }}>
             <div style={{ padding: "18px 24px 14px", borderBottom: "1px solid #eef0f4", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#1A2332" }}>Edit Edit Project</h3>
-              <button onClick={() => setEditProj(null)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#676879" }}>×</button>
+              <button onClick={() => setEditProj(null)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#676879" }}>✕</button>
             </div>
             <form onSubmit={handleEditSave} style={{ padding: "20px 24px" }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>

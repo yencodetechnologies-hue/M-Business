@@ -190,7 +190,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', background: '#fff', borderBottom: '1px solid #E0E6EA', position: 'sticky', top: 0, zIndex: 10 }}>
           <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>{isEdit ? 'Edit Client' : 'Add New Client'}</h2>
-          <button onClick={onBack} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#94A3B0' }}>×</button>
+          <button onClick={onBack} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#94A3B0' }}>✕</button>
         </div>
 
         <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -208,7 +208,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                   {formData.logoUrl ? <img src={formData.logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 28, color: '#94A3B0' }}>📷</span>}
                 </div>
                 <button type="button" style={{ background: '#00BCD4', color: 'white', padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer' }}> Choose logo</button>
-                <span style={{ fontSize: 12, color: '#94A3B0' }}>PNG, JPG or SVG · Max 2MB · Recommended 200×200px</span>
+                <span style={{ fontSize: 12, color: '#94A3B0' }}>PNG, JPG or SVG · Max 2MB · Recommended 200✕200px</span>
               </div>
               <input type="file" ref={fileInputRef} accept="image/*" style={{ display: 'none' }} onChange={handleLogoUpload} />
             </div>
@@ -341,7 +341,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                 {customInputMode.country ? (
                   <div style={{ display: 'flex', gap: 8 }}>
                     <input name="country" value={formData.country} onChange={handleChange} placeholder="Type custom country..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus />
-                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, country: false })); setFormData(prev => ({ ...prev, country: 'India' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, country: false })); setFormData(prev => ({ ...prev, country: 'India' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                   </div>
                 ) : (
                   <select name="country" value={formData.country} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
@@ -377,7 +377,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                 {customInputMode.paymentTerms ? (
                   <div style={{ display: 'flex', gap: 8 }}>
                     <input name="paymentTerms" value={formData.paymentTerms} onChange={handleChange} placeholder="Type custom terms..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus />
-                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, paymentTerms: false })); setFormData(prev => ({ ...prev, paymentTerms: '' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, paymentTerms: false })); setFormData(prev => ({ ...prev, paymentTerms: '' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                   </div>
                 ) : (
                   <select name="paymentTerms" value={formData.paymentTerms} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
@@ -391,7 +391,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                 {customInputMode.preferredPaymentMode ? (
                   <div style={{ display: 'flex', gap: 8 }}>
                     <input name="preferredPaymentMode" value={formData.preferredPaymentMode} onChange={handleChange} placeholder="Type custom mode..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus />
-                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, preferredPaymentMode: false })); setFormData(prev => ({ ...prev, preferredPaymentMode: '' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, preferredPaymentMode: false })); setFormData(prev => ({ ...prev, preferredPaymentMode: '' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                   </div>
                 ) : (
                   <select name="preferredPaymentMode" value={formData.preferredPaymentMode} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>

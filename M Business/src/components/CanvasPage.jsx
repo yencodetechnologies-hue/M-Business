@@ -127,7 +127,7 @@ function DraggableItem({ id, x, y, width, height, content, onDrag, onResize, onD
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: '0 2px 6px rgba(0,0,0,0.2)', zIndex: 20,
           }}
-        >×</button>
+        >✕</button>
       )}
 
       {/* ── Resize handles (8 directions) ── */}
@@ -231,7 +231,7 @@ function CanvasSizeControls({ currentSize, onSizeChange }) {
             >
               <span>{preset.name}</span>
               <span style={{ fontSize: 10, color: active ? P.muted : '#c4b5fd' }}>
-                {preset.width}×{preset.height}
+                {preset.width}✕{preset.height}
               </span>
             </button>
           );
@@ -248,7 +248,7 @@ function CanvasSizeControls({ currentSize, onSizeChange }) {
           placeholder="W"
           style={{ width: 68, padding: '6px 8px', border: `1px solid ${P.border}`, borderRadius: 6, fontSize: 12, outline: 'none', color: P.text }}
         />
-        <span style={{ color: P.muted, flexShrink: 0 }}>×</span>
+        <span style={{ color: P.muted, flexShrink: 0 }}>✕</span>
         <input
           type="number"
           value={customHeight}
@@ -269,7 +269,7 @@ function CanvasSizeControls({ currentSize, onSizeChange }) {
       </div>
 
       <div style={{ fontSize: 11, color: P.muted, marginTop: 10 }}>
-        {currentSize.width} × {currentSize.height}px &middot;{' '}
+        {currentSize.width} ✕ {currentSize.height}px &middot;{' '}
         {currentSize.width > currentSize.height ? 'Landscape' : currentSize.width < currentSize.height ? 'Portrait' : 'Square'}
       </div>
     </div>
@@ -385,7 +385,7 @@ export default function CanvasPage() {
                   >
                     <span>{item.content}</span>
                     <span style={{ fontSize: 10, color: P.muted }}>
-                      {Math.round(item.width)}×{Math.round(item.height)}
+                      {Math.round(item.width)}✕{Math.round(item.height)}
                     </span>
                   </div>
                 ))}
@@ -429,7 +429,7 @@ export default function CanvasPage() {
           </div>
 
           <div style={{ textAlign: 'center', marginTop: 10, fontSize: 12, color: P.muted }}>
-            {canvasSize.width} × {canvasSize.height}px &middot;{' '}
+            {canvasSize.width} ✕ {canvasSize.height}px &middot;{' '}
             {canvasSize.width > canvasSize.height ? 'Landscape' : canvasSize.width < canvasSize.height ? 'Portrait' : 'Square'}
           </div>
         </div>

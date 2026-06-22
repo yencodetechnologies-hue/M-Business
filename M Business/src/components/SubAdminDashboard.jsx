@@ -9363,87 +9363,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   </button>
                 </div>
 
-                {/* Subscription Status Alert (Blocking) Removed as requested */}
 
 
 
-                {/* Subscription Status Alert (Warning only) */}
 
-                {!subLoading && subStatus.alert && !subStatus.blocked && (
 
-                  <div style={{
 
-                    background: "linear-gradient(135deg,#fef3c7,#fde68a)",
-
-                    border: "2px solid #f59e0b",
-
-                    borderRadius: 12,
-
-                    padding: "16px 20px",
-
-                    marginBottom: 32,
-
-                    display: "flex",
-
-                    alignItems: "center",
-
-                    gap: 12
-
-                  }}>
-
-                    <div style={{ fontSize: 24 }}>Warning</div>
-
-                    <div style={{ flex: 1 }}>
-
-                      <div style={{ fontSize: 14, fontWeight: 700, color: "#92400e", marginBottom: 4 }}>
-
-                        Subscription Renewal Required
-
-                      </div>
-
-                      <div style={{ fontSize: 13, color: "#78350f" }}>
-
-                        Your {subscription?.planName} subscription expires in {subStatus.days} days. Please renew soon.
-
-                      </div>
-
-                    </div>
-
-                    <button
-
-                      onClick={() => { setForceUpgradeTab(true); setActive("mysubscriptions"); }}
-
-                      style={{
-
-                        background: "linear-gradient(135deg,#f59e0b,#d97706)",
-
-                        border: "none",
-
-                        borderRadius: 8,
-
-                        padding: "8px 16px",
-
-                        fontSize: 12,
-
-                        fontWeight: 700,
-
-                        color: "#fff",
-
-                        cursor: "pointer",
-
-                        fontFamily: "inherit"
-
-                      }}
-
-                    >
-
-                      Renew Now
-
-                    </button>
-
-                  </div>
-
-                )}
 
 
 

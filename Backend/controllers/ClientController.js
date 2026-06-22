@@ -44,15 +44,8 @@ exports.addClient = async (req, res) => {
       return res.status(400).json({ message: "Name and Email are required" });
     }
 
-    // ── Blacklist check ───────────────────────────────────────────────
     const normalizedEmail = email.toLowerCase().trim();
-    const isBlacklisted = await DeletedClient.findOne({ email: normalizedEmail });
-    if (isBlacklisted) {
-      console.log(`Blocked re-registration for deleted client email: ${normalizedEmail}`);
-      return res.status(403).json({
-        message: "This email address is unavailable and cannot be used to create a new client account."
-      });
-    }
+    // No blacklist block — deleted clients are allowed to re-register as fresh accounts
 
     const hashedPassword = password ? await bcrypt.hash(password, 10) : "";
 

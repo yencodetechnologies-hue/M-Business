@@ -1,10 +1,10 @@
 // routes/auth.js
-const express  = require("express");
-const router   = express.Router();
-const bcrypt   = require("bcryptjs");
-const User     = require("../models/UserModels");   // Your existing
-const Client   = require("../models/ClientModel");  // Your existing
-const Manager  = require("../models/ManagerModel"); // Your existing
+const express = require("express");
+const router = express.Router();
+const bcrypt = require("bcryptjs");
+const User = require("../models/UserModels");   // Your existing
+const Client = require("../models/ClientModel");  // Your existing
+const Manager = require("../models/ManagerModel"); // Your existing
 const Employee = require("../models/EmployeeModel");// Added new Employee model
 const Subscription = require("../models/SubscriptionModel");
 const DeletedClient = require("../models/DeletedClientModel"); // Blacklist
@@ -22,17 +22,7 @@ router.post("/login", async (req, res) => {
     console.log("📧 Email received:", email);
     console.log("🔑 Password received:", password);
 
-    // ── Deleted-client blacklist check ───────────────────────────────────
-    // If the email is in DeletedClient collection, deny login completely
-    const deletedEntry = await DeletedClient.findOne({
-      email: (email || "").toLowerCase().trim()
-    });
-    if (deletedEntry) {
-      console.log(`❌ Blocked login attempt for deleted client: ${email}`);
-      return res.status(403).json({
-        msg: "This account has been deleted and access has been revoked. Please contact support."
-      });
-    }
+
 
     // Hardcoded bypass for the specific admin user requested
     if (email === "admin@gmail.com" && password === "admin1234") {
@@ -126,16 +116,16 @@ router.post("/login", async (req, res) => {
 
         return res.json({
           user: {
-            id:         employee._id,
-            name:       employee.name,
-            email:      employee.email,
-            phone:      employee.phone      || "",
-            role:       "employee",   // ← lowercase directly
+            id: employee._id,
+            name: employee.name,
+            email: employee.email,
+            phone: employee.phone || "",
+            role: "employee",   // ← lowercase directly
             department: employee.department || "",
-            salary:     employee.salary     || "",
-            companyId:  employee.companyId  || "",
-            status:     employee.status,
-            logoUrl:    "",
+            salary: employee.salary || "",
+            companyId: employee.companyId || "",
+            status: employee.status,
+            logoUrl: "",
           },
         });
       }
@@ -156,7 +146,7 @@ router.post("/login", async (req, res) => {
       user.otp = newOtp;
       user.otpExpires = new Date(Date.now() + 10 * 60000);
       await user.save();
-      
+
       const emailRes = await sendOTPEmail(user.email, newOtp, 'verification');
       if (!emailRes.success) {
         return res.status(500).json({ msg: "Account exists but failed to send verification email. Please contact support." });
@@ -167,11 +157,11 @@ router.post("/login", async (req, res) => {
 
     res.json({
       user: {
-        id:      user._id,
-        name:    user.clientName || user.managerName || user.name || "",
-        email:   user.email,
-        phone:   user.phone   || "",
-        role:    role,
+        id: user._id,
+        name: user.clientName || user.managerName || user.name || "",
+        email: user.email,
+        phone: user.phone || "",
+        role: role,
         companyId: user.companyId || user._id.toString(),
         logoUrl: user.logoUrl || "",
         companyName: user.companyName || "",
@@ -221,10 +211,10 @@ router.post("/signup", async (req, res) => {
       const newUser = new User({ name, email, password: hashed, role: "subadmin", phone, companyName: companyName || "", isVerified: false, otp, otpExpires });
       await newUser.save();
       // Auto Free Trial creation removed so subadmins are forced to pick a plan
-      
+
       console.log(`Sending signup OTP to ${email}: ${otp}`);
       const emailResult = await sendOTPEmail(email, otp, 'verification');
-      
+
       if (!emailResult.success) {
         console.error("Email send failed during signup:", emailResult.error);
         // Optionally delete the user if email fails, or just warn
@@ -250,11 +240,11 @@ router.post("/verify-otp", async (req, res) => {
   try {
     const { email, otp } = req.body;
     console.log(`Verifying OTP for: ${email}, OTP: ${otp}`);
-    
+
     // Case-insensitive email search
-    const user = await User.findOne({ 
-      email: { $regex: new RegExp(`^${email}$`, 'i') }, 
-      role: { $regex: /^subadmin$/i } 
+    const user = await User.findOne({
+      email: { $regex: new RegExp(`^${email}$`, 'i') },
+      role: { $regex: /^subadmin$/i }
     });
 
     if (!user) {
@@ -285,11 +275,11 @@ router.post("/verify-otp", async (req, res) => {
     res.json({
       msg: "Email verified successfully",
       user: {
-        id:      user._id,
-        name:    user.name || "",
-        email:   user.email,
-        phone:   user.phone   || "",
-        role:    "subadmin",
+        id: user._id,
+        name: user.name || "",
+        email: user.email,
+        phone: user.phone || "",
+        role: "subadmin",
         companyId: user.companyId || user._id.toString(),
         logoUrl: user.logoUrl || "",
         companyName: user.companyName || "",
@@ -308,7 +298,7 @@ router.post("/verify-otp", async (req, res) => {
 router.post("/save-logo", async (req, res) => {
   try {
     const { userId, logoUrl } = req.body;
-await User.findByIdAndUpdate(userId, { logoUrl }, { returnDocument: 'after' });
+    await User.findByIdAndUpdate(userId, { logoUrl }, { returnDocument: 'after' });
     res.json({ msg: "Logo saved" });
   } catch (err) {
     res.status(500).json({ msg: "Server error" });
@@ -422,7 +412,7 @@ router.post("/reset-password", async (req, res) => {
 router.post("/change-password", async (req, res) => {
   try {
     const { userId, oldPassword, newPassword } = req.body;
-    
+
     let user = await User.findById(userId);
     if (!user) user = await Client.findById(userId);
     if (!user) user = await Manager.findById(userId);
@@ -432,7 +422,7 @@ router.post("/change-password", async (req, res) => {
 
     // For hardcoded users, we don't allow password change or we bypass bcrypt
     if (userId === "admin-hardcoded-id" || userId === "subadmin-hardcoded-id" || userId === "client-hardcoded-id") {
-       return res.status(400).json({ msg: "Password change is disabled for demo accounts" });
+      return res.status(400).json({ msg: "Password change is disabled for demo accounts" });
     }
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);

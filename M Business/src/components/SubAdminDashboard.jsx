@@ -5111,7 +5111,7 @@ function InterviewPage({ companyId, companyName }) {
 
                       <a href={viewModal._resolvedResumeUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--app-accent)", color: "#fff", padding: "8px 16px", borderRadius: 8, textDecoration: "none", fontSize: 13, fontWeight: 600, fontFamily: "inherit" }}>
 
-                         Open in New Tab
+                        Open in New Tab
 
                       </a>
 
@@ -9178,7 +9178,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                       <div style={{ fontSize: 13, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 14 }}>
 
-                         Choose Theme
+                        Choose Theme
 
                       </div>
 
@@ -9347,29 +9347,36 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   )}
 
                   <button onClick={() => setShowThemePicker(v => !v)}
-
                     style={{
-
                       width: 48, height: 48, borderRadius: "50%",
-
                       background: appTheme === "custom"
-
                         ? `linear-gradient(135deg, ${customColor}, ${customColor}dd)`
-
                         : `linear-gradient(135deg, ${THEMES[appTheme]?.accent}, ${THEMES[appTheme]?.dot})`,
-
                       border: "none", color: "#fff", fontSize: 20, cursor: "pointer",
-
                       boxShadow: `0 6px 20px ${appTheme === "custom" ? customColor : (THEMES[appTheme]?.dot || "var(--app-accent)")}60`,
-
                       display: "flex", alignItems: "center", justifyContent: "center",
-
                       transition: "all 0.2s"
-
                     }}>
-                      🎨
+                    🎨
                   </button>
-
+                  <button
+                    onClick={() => { const ph = (user?.phone || "").replace(/\D/g, ""); window.open(ph ? "https://wa.me/" + ph : "https://web.whatsapp.com/", "_blank"); }}
+                    title="Open WhatsApp"
+                    style={{
+                      width: 48, height: 48, borderRadius: "50%",
+                      background: "#25D366",
+                      border: "none", cursor: "pointer",
+                      boxShadow: "0 6px 20px rgba(37,211,102,0.6)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      transition: "all 0.2s", padding: 0,
+                      marginTop: 12
+                    }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 32 32" fill="none">
+                      <path d="M16 1C7.7 1 1 7.7 1 16c0 2.7.7 5.2 2 7.4L1 31l7.9-2c2.1 1.1 4.5 1.8 7.1 1.8 8.3 0 15-6.7 15-15S24.3 1 16 1z" fill="#fff" />
+                      <path d="M16 3.5C9 3.5 3.5 9 3.5 16c0 2.5.7 4.8 1.9 6.8l.3.5-1.3 4.7 4.9-1.3.5.3C11.6 28.1 13.7 28.5 16 28.5c7 0 12.5-5.5 12.5-12.5S23 3.5 16 3.5z" fill="#25D366" />
+                      <path d="M11.5 9.5c-.3-.7-.6-.7-.9-.7h-.7c-.3 0-.7.1-1.1.5-.4.4-1.5 1.5-1.5 3.6s1.6 4.2 1.8 4.5c.2.3 3 4.7 7.4 6.4 3.7 1.4 4.4 1.1 5.2 1 .8 0 2.5-1 2.8-2 .4-1 .4-1.8.3-2-.1-.2-.4-.3-.8-.5-.4-.2-2.5-1.2-2.8-1.3-.4-.1-.6-.2-.9.2-.3.4-1 1.3-1.3 1.6-.2.3-.5.3-.8.1-.4-.2-1.6-.6-3-1.9-1.1-1-1.9-2.2-2.1-2.6-.2-.4 0-.6.2-.8.2-.2.4-.4.5-.7.2-.2.2-.4.4-.7.1-.2 0-.5-.1-.7-.2-.2-.9-2.2-1.2-3z" fill="#fff" />
+                    </svg>
+                  </button>
                 </div>
 
                 {/* Subscription Status Alert (Blocking) Removed as requested */}
@@ -9776,7 +9783,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   <div onClick={() => setActive("clients")} style={{ fontSize: 13, fontWeight: 700, color: "#0097A7", cursor: "pointer" }}>
 
-                                    View All 
+                                    View All
 
                                   </div>
 
@@ -9910,35 +9917,34 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                     { icon: "ti-wallet", color: "#2563eb", bg: "rgba(37,99,235,0.1)", label: "Accounts", sub: "Income/Exp", act: "accounts" },
 
-                                    { icon: "ti-shield-check", color: "#7c3aed", bg: "rgba(124,58,237,0.1)", label: "Auditor", sub: "Audit Trail", act: "dashboard" }
-
+                                    { icon: "ti-shield-check", color: "#7c3aed", bg: "rgba(124,58,237,0.1)", label: "Auditor", sub: "Audit Trail", act: "dashboard" },
+                                    { icon: "whatsapp", color: "#25D366", bg: "rgba(37,211,102,0.12)", label: "WhatsApp", sub: "Open Chat", act: "__whatsapp__" }
                                   ].map((q, i) => (
-
                                     <div key={i} onClick={() => setActive(q.act)} style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderRadius: 12, border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s" }}>
-
                                       <div style={{ width: 34, height: 34, borderRadius: 10, background: q.bg, color: q.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>
-
                                         <i className={`ti ${q.icon}`}></i>
-
                                       </div>
-
                                       <div>
-
                                         <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>{q.label}</div>
-
                                         <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{q.sub}</div>
-
                                       </div>
-
                                     </div>
-
                                   ))}
-
-                                </div>
-
+                                  <div
+                                    onClick={() => { const ph = (user?.phone || "").replace(/\D/g, ""); window.open(ph ? "https://wa.me/" + ph : "https://web.whatsapp.com/", "_blank"); }}
+                                    style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderRadius: 12, border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s" }}
+                                    onMouseEnter={e => e.currentTarget.style.background = "rgba(37,211,102,0.06)"}
+                                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                                  >
+                                    <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(37,211,102,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                                      💬
+                                    </div>
+                                    <div>
+                                      <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>WhatsApp</div>
+                                      <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>Open Chat</div>
+                                    </div>
+                                  </div>                              </div>
                               </div>
-
-
 
                               {/* Team Section */}
 
@@ -10026,7 +10032,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   <div onClick={() => setActive("projects")} style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
 
-                                    View All 
+                                    View All
 
                                   </div>
 
@@ -10122,7 +10128,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   <div style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
 
-                                    HR Panel 
+                                    HR Panel
 
                                   </div>
 
@@ -10244,7 +10250,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   <div onClick={() => setActive("tasks")} style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
 
-                                    All Tasks 
+                                    All Tasks
 
                                   </div>
 
@@ -13047,7 +13053,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       </div>
 
-    </div>
+    </div >
 
   );
 

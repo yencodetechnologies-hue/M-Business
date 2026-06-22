@@ -10,6 +10,11 @@ const Task = require("../models/TaskModels");
 const Quotation = require("../models/QuotationModel");
 const Proposal = require("../models/ProposalModel");
 const Document = require("../models/DocumentModel");
+const Invoice = require("../models/InvoiceModels");
+const Task = require("../models/TaskModels");
+const Quotation = require("../models/QuotationModel");
+const Proposal = require("../models/ProposalModel");
+const Document = require("../models/DocumentModel");
 router.get("/projects/:name", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.name);
@@ -81,76 +86,81 @@ router.delete("/:id", async (req, res) => {
   try {
     const client = await Client.findById(req.params.id);
     if (client) {
-      const clientName = client.clientName || client.name || "";
-      const clientEmail = client.email ? client.email.toLowerCase().trim() : "";
+      const clientName = (client.clientName || client.name || "").trim();
+      const companyName = (client.companyName || client.company || "").trim();
+      const clientEmail = (client.email || "").toLowerCase().trim();
       const companyId = client.companyId || "";
 
-      // 1. Delete all projects linked to this client (by name or companyId)
-      const clientProjects = await Project.find({
-        $or: [
-          { client: { $regex: new RegExp(`^\\s*${clientName}\\s*$`, "i") } },
-          { clientId: client._id.toString() }
-        ]
-      });
-      const projectIds = clientProjects.map(p => p._id.toString());
+      const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const nameRegex = clientName ? new RegExp(`^\\s*${escapeRegExp(clientName)}\\s*$`, "i") : null;
+      const companyRegex = companyName ? new RegExp(`^\\s*${escapeRegExp(companyName)}\\s*$`, "i") : null;
 
+      // Build name-match conditions
+      const nameConditions = [];
+      if (nameRegex) nameConditions.push({ client: { $regex: nameRegex } });
+      if (companyRegex) nameConditions.push({ client: { $regex: companyRegex } });
+      const nameFilter = nameConditions.length > 0
+        ? { companyId, $or: nameConditions }
+        : { companyId, client: clientName };
+
+      // 1. Find all projects for this client then delete their tasks
+      const clientProjects = await Project.find(nameFilter).select("_id").lean();
+      const projectIds = clientProjects.map(p => p._id);
       if (projectIds.length > 0) {
-        // Delete tasks linked to those projects
         await Task.deleteMany({ projectId: { $in: projectIds } });
       }
 
-      // 2. Delete projects themselves
-      await Project.deleteMany({
-        $or: [
-          { client: { $regex: new RegExp(`^\\s*${clientName}\\s*$`, "i") } },
-          { clientId: client._id.toString() }
-        ]
-      });
+      // 2. Delete the projects themselves
+      await Project.deleteMany(nameFilter);
 
-      // 3. Delete invoices linked to this client
-      await Invoice.deleteMany({
-        $or: [
-          { client: { $regex: new RegExp(`^\\s*${clientName}\\s*$`, "i") } },
-          { clientId: client._id.toString() },
-          { clientEmail: clientEmail }
-        ]
-      });
+      // 3. Delete invoices
+      const invoiceNameConditions = [];
+      if (nameRegex) invoiceNameConditions.push({ client: { $regex: nameRegex } });
+      if (companyRegex) invoiceNameConditions.push({ client: { $regex: companyRegex } });
+      if (clientEmail) invoiceNameConditions.push({ clientEmail });
+      if (invoiceNameConditions.length > 0) {
+        await Invoice.deleteMany({ companyId, $or: invoiceNameConditions });
+      }
 
-      // 4. Delete quotations linked to this client
+      // 4. Delete quotations
       try {
-        await Quotation.deleteMany({
-          $or: [
-            { client: { $regex: new RegExp(`^\\s*${clientName}\\s*$`, "i") } },
-            { clientId: client._id.toString() }
-          ]
-        });
+        if (nameConditions.length > 0) {
+          await Quotation.deleteMany({ companyId, $or: nameConditions });
+        }
       } catch (e) { console.log("Quotation delete skipped:", e.message); }
 
-      // 5. Delete proposals linked to this client
+      // 5. Delete proposals
       try {
-        await Proposal.deleteMany({
-          $or: [
-            { client: { $regex: new RegExp(`^\\s*${clientName}\\s*$`, "i") } },
-            { clientId: client._id.toString() }
-          ]
-        });
+        const propConditions = [];
+        if (nameRegex) propConditions.push({ client: { $regex: nameRegex } }, { clientName: { $regex: nameRegex } });
+        if (companyRegex) propConditions.push({ client: { $regex: companyRegex } }, { clientName: { $regex: companyRegex } });
+        if (propConditions.length > 0) {
+          await Proposal.deleteMany({ $or: propConditions });
+        }
       } catch (e) { console.log("Proposal delete skipped:", e.message); }
 
-      // 6. Delete documents linked to this client
+      // 6. Delete documents
       try {
-        await Document.deleteMany({ clientId: client._id.toString() });
+        const docConditions = [];
+        if (nameRegex) docConditions.push({ client: { $regex: nameRegex } });
+        if (companyRegex) docConditions.push({ client: { $regex: companyRegex } });
+        if (docConditions.length > 0) {
+          await Document.deleteMany({ $or: docConditions });
+        }
       } catch (e) { console.log("Document delete skipped:", e.message); }
 
-      // 7. Delete feedback linked to this client
+      // 7. Delete feedback
       try {
-        await Feedback.deleteMany({ clientName: { $regex: new RegExp(`^\\s*${clientName}\\s*$`, "i") } });
+        if (nameRegex) await Feedback.deleteMany({ clientName: { $regex: nameRegex } });
       } catch (e) { console.log("Feedback delete skipped:", e.message); }
 
-      // 8. Remove from DeletedClient blacklist so same email CAN be re-registered fresh
+      // 8. Remove from blacklist so same email can re-register fresh
       await DeletedClient.deleteOne({ email: clientEmail });
 
-      // 9. Finally delete the client record itself
+      // 9. Delete the client record
       await client.deleteOne();
+
+      console.log(`✅ Client "${clientName}" and all associated data deleted.`);
     }
     res.json({ msg: "Client and all associated data deleted successfully" });
   } catch (err) {

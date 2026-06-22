@@ -45,8 +45,7 @@ exports.addClient = async (req, res) => {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
-    // No blacklist block — deleted clients are allowed to re-register as fresh accounts
-
+    // Deleted clients are allowed to re-register as a completely fresh account
     const hashedPassword = password ? await bcrypt.hash(password, 10) : "";
 
     const newClient = new Client({

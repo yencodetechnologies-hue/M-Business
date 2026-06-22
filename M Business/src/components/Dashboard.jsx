@@ -281,7 +281,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 // -----------------------------------------------------------
 // CLIENTS PAGE
 // -----------------------------------------------------------
-function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewProject, triggerCrop, onCreateProject  }) {
+function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewProject, triggerCrop, onCreateProject }) {
   const [search, setSearch] = useState("");
   const [viewClient, setViewClient] = useState(null);
   const [editClient, setEditClient] = useState(null);
@@ -459,6 +459,14 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
             })()}
           </div>
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
+            <button
+              onClick={() => {
+                const c = viewClient;
+                setViewClient(null);
+                if (onCreateProject) onCreateProject(c);
+              }}
+              style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#26C281,#0097A7)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}
+            >+ Add Project</button>
             <button onClick={() => { setViewClient(null); openEdit(viewClient); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
             <button onClick={() => { setViewClient(null); setDeleteTarget(viewClient); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Delete</button>
           </div>
@@ -469,115 +477,115 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
       {editClient && (
         <Mdl title="Edit Client" onClose={() => setEditClient(null)}>
           {/* LOGO */}
-          <div style={{marginBottom:16,padding:'14px',background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA'}}>
-            <div style={{fontSize:11,fontWeight:700,color:'#5A6A7A',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:10}}>Client Logo</div>
-            <div style={{display:'flex',alignItems:'center',gap:16}}>
-              <div style={{position:'relative',width:72,height:72}}>
-                <div style={{width:72,height:72,borderRadius:14,background:'#fff',border:'2px dashed #E0E6EA',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}>
-                  {editForm.logoUrl ? <img src={editForm.logoUrl} alt="Logo" style={{width:'100%',height:'100%',objectFit:'contain'}} /> : <span style={{fontSize:30}}>Company</span>}
+          <div style={{ marginBottom: 16, padding: '14px', background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 10 }}>Client Logo</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div style={{ position: 'relative', width: 72, height: 72 }}>
+                <div style={{ width: 72, height: 72, borderRadius: 14, background: '#fff', border: '2px dashed #E0E6EA', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                  {editForm.logoUrl ? <img src={editForm.logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : <span style={{ fontSize: 30 }}>Company</span>}
                 </div>
-                <label style={{position:'absolute',bottom:0,right:0,background:'#00BCD4',width:24,height:24,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',border:'2px solid #fff'}}>
-                  <span style={{fontSize:12}}></span>
-                  <input type="file" accept="image/*" style={{display:'none'}} onChange={e=>{const file=e.target.files[0];if(file){const r=new FileReader();r.onloadend=()=>setEditForm(p=>({...p,logoUrl:r.result}));r.readAsDataURL(file);}}} />
+                <label style={{ position: 'absolute', bottom: 0, right: 0, background: '#00BCD4', width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid #fff' }}>
+                  <span style={{ fontSize: 12 }}></span>
+                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const file = e.target.files[0]; if (file) { const r = new FileReader(); r.onloadend = () => setEditForm(p => ({ ...p, logoUrl: r.result })); r.readAsDataURL(file); } }} />
                 </label>
               </div>
-              <div style={{fontSize:12,color:'#94A3B0'}}>PNG, JPG · Max 2MB</div>
+              <div style={{ fontSize: 12, color: '#94A3B0' }}>PNG, JPG · Max 2MB</div>
             </div>
           </div>
 
           {/* CLIENT TYPE */}
-          <div style={{marginBottom:14}}>
-            <div style={{fontSize:11,fontWeight:700,color:'#5A6A7A',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:8}}>Client Type</div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
-              {[{val:'b2b',icon:'Company',label:'B2B',sub:'Company / Business'},{val:'b2c',icon:'Profile',label:'B2C',sub:'Individual'},{val:'freelancer',icon:'Job',label:'Freelancer',sub:'Consultant / Solo'}].map(t=>(
-                <div key={t.val} onClick={()=>setEditForm(p=>({...p,clientType:t.val}))}
-                  style={{border:`2px solid ${editForm.clientType===t.val?'#00BCD4':'#E0E6EA'}`,borderRadius:10,padding:'10px 8px',textAlign:'center',cursor:'pointer',background:editForm.clientType===t.val?'#E0F7FA':'#F4F6F8'}}>
-                  <div style={{fontSize:20,marginBottom:3}}>{t.icon}</div>
-                  <div style={{fontSize:12,fontWeight:700,color:editForm.clientType===t.val?'#007B8A':'#1A2332'}}>{t.label}</div>
-                  <div style={{fontSize:10,color:'#94A3B0'}}>{t.sub}</div>
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 8 }}>Client Type</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+              {[{ val: 'b2b', icon: 'Company', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: 'Profile', label: 'B2C', sub: 'Individual' }, { val: 'freelancer', icon: 'Job', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
+                <div key={t.val} onClick={() => setEditForm(p => ({ ...p, clientType: t.val }))}
+                  style={{ border: `2px solid ${editForm.clientType === t.val ? '#00BCD4' : '#E0E6EA'}`, borderRadius: 10, padding: '10px 8px', textAlign: 'center', cursor: 'pointer', background: editForm.clientType === t.val ? '#E0F7FA' : '#F4F6F8' }}>
+                  <div style={{ fontSize: 20, marginBottom: 3 }}>{t.icon}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: editForm.clientType === t.val ? '#007B8A' : '#1A2332' }}>{t.label}</div>
+                  <div style={{ fontSize: 10, color: '#94A3B0' }}>{t.sub}</div>
                 </div>
               ))}
             </div>
           </div>
 
           {/* BASIC INFO */}
-          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:12}}>
-            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>Company Basic Info</div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
-              <Fld label="Client / Display Name *" value={editForm.clientName} onChange={v=>{setEditForm(p=>({...p,clientName:v}));setEditErr(p=>({...p,clientName:''}));}} error={editErr.clientName} />
-              <Fld label="Company Name" value={editForm.companyName} onChange={v=>setEditForm(p=>({...p,companyName:v}))} />
-              <Fld label="Category / Industry" value={editForm.category} onChange={v=>setEditForm(p=>({...p,category:v}))} options={['','Web Development','Mobile App Development','UI/UX Design','Digital Marketing','IT Consulting','E-commerce','Healthcare','Education','Finance','Real Estate','Manufacturing','Retail','Logistics','Media & Entertainment','Other']} />
-              <Fld label="Company Tax / GST No." value={editForm.gstNumber} onChange={v=>setEditForm(p=>({...p,gstNumber:v}))} />
-              <Fld label="Client Source" value={editForm.source} onChange={v=>setEditForm(p=>({...p,source:v}))} options={['','Referral','Website / Organic','Social Media','Cold Outreach','LinkedIn','Event / Conference','Google Ads','Word of Mouth','Other']} />
-              <Fld label="Onboarded On" value={editForm.onboardedOn} onChange={v=>setEditForm(p=>({...p,onboardedOn:v}))} type="date" />
-              <Fld label="Status" value={editForm.status} onChange={v=>setEditForm(p=>({...p,status:v}))} options={['Active','Inactive']} />
+          <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Company Basic Info</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+              <Fld label="Client / Display Name *" value={editForm.clientName} onChange={v => { setEditForm(p => ({ ...p, clientName: v })); setEditErr(p => ({ ...p, clientName: '' })); }} error={editErr.clientName} />
+              <Fld label="Company Name" value={editForm.companyName} onChange={v => setEditForm(p => ({ ...p, companyName: v }))} />
+              <Fld label="Category / Industry" value={editForm.category} onChange={v => setEditForm(p => ({ ...p, category: v }))} options={['', 'Web Development', 'Mobile App Development', 'UI/UX Design', 'Digital Marketing', 'IT Consulting', 'E-commerce', 'Healthcare', 'Education', 'Finance', 'Real Estate', 'Manufacturing', 'Retail', 'Logistics', 'Media & Entertainment', 'Other']} />
+              <Fld label="Company Tax / GST No." value={editForm.gstNumber} onChange={v => setEditForm(p => ({ ...p, gstNumber: v }))} />
+              <Fld label="Client Source" value={editForm.source} onChange={v => setEditForm(p => ({ ...p, source: v }))} options={['', 'Referral', 'Website / Organic', 'Social Media', 'Cold Outreach', 'LinkedIn', 'Event / Conference', 'Google Ads', 'Word of Mouth', 'Other']} />
+              <Fld label="Onboarded On" value={editForm.onboardedOn} onChange={v => setEditForm(p => ({ ...p, onboardedOn: v }))} type="date" />
+              <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={['Active', 'Inactive']} />
             </div>
           </div>
 
           {/* PRIMARY CONTACT */}
-          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:12}}>
-            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>Document Primary Contact</div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
-              <Fld label="Contact Person Name" value={editForm.contactPersonName} onChange={v=>setEditForm(p=>({...p,contactPersonName:v}))} />
-              <Fld label="Designation" value={editForm.designation} onChange={v=>setEditForm(p=>({...p,designation:v}))} />
-              <Fld label="Email *" value={editForm.email} onChange={v=>{setEditForm(p=>({...p,email:v}));setEditErr(p=>({...p,email:''}));}} type="email" error={editErr.email} />
-              <Fld label="Alt. Email" value={editForm.altEmail} onChange={v=>setEditForm(p=>({...p,altEmail:v}))} type="email" />
-              <Fld label="Contact Person Mobile" value={editForm.contactPersonNo} onChange={v=>setEditForm(p=>({...p,contactPersonNo:v}))} />
-              <Fld label="Office Phone" value={editForm.phone} onChange={v=>setEditForm(p=>({...p,phone:v}))} />
+          <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Document Primary Contact</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+              <Fld label="Contact Person Name" value={editForm.contactPersonName} onChange={v => setEditForm(p => ({ ...p, contactPersonName: v }))} />
+              <Fld label="Designation" value={editForm.designation} onChange={v => setEditForm(p => ({ ...p, designation: v }))} />
+              <Fld label="Email *" value={editForm.email} onChange={v => { setEditForm(p => ({ ...p, email: v })); setEditErr(p => ({ ...p, email: '' })); }} type="email" error={editErr.email} />
+              <Fld label="Alt. Email" value={editForm.altEmail} onChange={v => setEditForm(p => ({ ...p, altEmail: v }))} type="email" />
+              <Fld label="Contact Person Mobile" value={editForm.contactPersonNo} onChange={v => setEditForm(p => ({ ...p, contactPersonNo: v }))} />
+              <Fld label="Office Phone" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
             </div>
           </div>
 
           {/* ADDRESS */}
-          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:12}}>
-            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>Location Address</div>
-            <div style={{marginBottom:12}}><Fld label="Street / Building Address" value={editForm.address} onChange={v=>setEditForm(p=>({...p,address:v}))} /></div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
-              <Fld label="City" value={editForm.city} onChange={v=>setEditForm(p=>({...p,city:v}))} />
-              <Fld label="State / Province" value={editForm.state} onChange={v=>setEditForm(p=>({...p,state:v}))} />
-              <Fld label="Pincode / ZIP" value={editForm.pincode} onChange={v=>setEditForm(p=>({...p,pincode:v}))} />
-              <Fld label="Country" value={editForm.country} onChange={v=>setEditForm(p=>({...p,country:v}))} options={['India','United States','United Kingdom','United Arab Emirates','Singapore','Australia','Canada','Germany','France','Other']} />
+          <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Location Address</div>
+            <div style={{ marginBottom: 12 }}><Fld label="Street / Building Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} /></div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+              <Fld label="City" value={editForm.city} onChange={v => setEditForm(p => ({ ...p, city: v }))} />
+              <Fld label="State / Province" value={editForm.state} onChange={v => setEditForm(p => ({ ...p, state: v }))} />
+              <Fld label="Pincode / ZIP" value={editForm.pincode} onChange={v => setEditForm(p => ({ ...p, pincode: v }))} />
+              <Fld label="Country" value={editForm.country} onChange={v => setEditForm(p => ({ ...p, country: v }))} options={['India', 'United States', 'United Kingdom', 'United Arab Emirates', 'Singapore', 'Australia', 'Canada', 'Germany', 'France', 'Other']} />
             </div>
           </div>
 
           {/* ONLINE PRESENCE */}
-          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:12}}>
-            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>Web Online Presence</div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
-              <Fld label="Website URL" value={editForm.website} onChange={v=>setEditForm(p=>({...p,website:v}))} />
-              <Fld label="LinkedIn Profile" value={editForm.linkedin} onChange={v=>setEditForm(p=>({...p,linkedin:v}))} />
+          <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Web Online Presence</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+              <Fld label="Website URL" value={editForm.website} onChange={v => setEditForm(p => ({ ...p, website: v }))} />
+              <Fld label="LinkedIn Profile" value={editForm.linkedin} onChange={v => setEditForm(p => ({ ...p, linkedin: v }))} />
             </div>
           </div>
 
           {/* BILLING & TERMS */}
-          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:12}}>
-            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}> Billing & Terms</div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
-              <Fld label="Billing Currency" value={editForm.billingCurrency} onChange={v=>setEditForm(p=>({...p,billingCurrency:v}))} options={['INR — Indian Rupee','USD — US Dollar','GBP — British Pound','EUR — Euro','AED — UAE Dirham','SGD — Singapore Dollar','AUD — Australian Dollar']} />
-              <Fld label="Payment Terms" value={editForm.paymentTerms} onChange={v=>setEditForm(p=>({...p,paymentTerms:v}))} options={['','Due on receipt','Net 7','Net 15','Net 30','Net 45','Net 60','50% Advance + 50% on delivery','Custom']} />
-              <Fld label="Credit Limit" value={editForm.creditLimit} onChange={v=>setEditForm(p=>({...p,creditLimit:v}))} type="number" />
-              <Fld label="Preferred Payment Mode" value={editForm.preferredPaymentMode} onChange={v=>setEditForm(p=>({...p,preferredPaymentMode:v}))} options={['','Bank Transfer / NEFT','UPI','Cheque','Credit Card','Cash','PayPal','Stripe','Other']} />
+          <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}> Billing & Terms</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+              <Fld label="Billing Currency" value={editForm.billingCurrency} onChange={v => setEditForm(p => ({ ...p, billingCurrency: v }))} options={['INR — Indian Rupee', 'USD — US Dollar', 'GBP — British Pound', 'EUR — Euro', 'AED — UAE Dirham', 'SGD — Singapore Dollar', 'AUD — Australian Dollar']} />
+              <Fld label="Payment Terms" value={editForm.paymentTerms} onChange={v => setEditForm(p => ({ ...p, paymentTerms: v }))} options={['', 'Due on receipt', 'Net 7', 'Net 15', 'Net 30', 'Net 45', 'Net 60', '50% Advance + 50% on delivery', 'Custom']} />
+              <Fld label="Credit Limit" value={editForm.creditLimit} onChange={v => setEditForm(p => ({ ...p, creditLimit: v }))} type="number" />
+              <Fld label="Preferred Payment Mode" value={editForm.preferredPaymentMode} onChange={v => setEditForm(p => ({ ...p, preferredPaymentMode: v }))} options={['', 'Bank Transfer / NEFT', 'UPI', 'Cheque', 'Credit Card', 'Cash', 'PayPal', 'Stripe', 'Other']} />
             </div>
           </div>
 
           {/* PORTAL PASSWORD */}
-          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:12}}>
-            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>Secure Portal Access</div>
-            <input type="password" value={editForm.password} onChange={e=>setEditForm(p=>({...p,password:e.target.value}))}
-              style={{width:'100%',border:'1.5px solid var(--app-border)',borderRadius:10,padding:'10px 14px',fontSize:13,color:T.text,background:'var(--app-bg)',boxSizing:'border-box',outline:'none'}}
+          <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Secure Portal Access</div>
+            <input type="password" value={editForm.password} onChange={e => setEditForm(p => ({ ...p, password: e.target.value }))}
+              style={{ width: '100%', border: '1.5px solid var(--app-border)', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: T.text, background: 'var(--app-bg)', boxSizing: 'border-box', outline: 'none' }}
               placeholder="Leave blank to keep current password" />
           </div>
 
           {/* INTERNAL NOTES */}
-          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:14}}>
-            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>Edit Internal Notes</div>
-            <textarea value={editForm.notes} onChange={e=>setEditForm(p=>({...p,notes:e.target.value}))}
-              style={{width:'100%',border:'1.5px solid #E0E6EA',borderRadius:10,padding:'10px 14px',fontSize:13,color:T.text,background:'#fff',boxSizing:'border-box',outline:'none',minHeight:70,resize:'vertical',fontFamily:'inherit'}}
+          <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Edit Internal Notes</div>
+            <textarea value={editForm.notes} onChange={e => setEditForm(p => ({ ...p, notes: e.target.value }))}
+              style={{ width: '100%', border: '1.5px solid #E0E6EA', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: T.text, background: '#fff', boxSizing: 'border-box', outline: 'none', minHeight: 70, resize: 'vertical', fontFamily: 'inherit' }}
               placeholder="Any internal context, special instructions..." />
           </div>
 
-          <div style={{display:'flex',justifyContent:'flex-end',gap:10,marginTop:4}}>
-            <button onClick={()=>setEditClient(null)} style={{background:'var(--app-bg)',border:'1px solid var(--app-border)',color:T.text,borderRadius:10,padding:'10px 16px',cursor:'pointer',fontWeight:600,fontSize:13,fontFamily:'inherit'}}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{background:'linear-gradient(135deg,var(--app-accent),var(--app-muted))',border:'none',borderRadius:10,padding:'10px 20px',fontSize:13,fontWeight:700,color:'#fff',cursor:saving?'not-allowed':'pointer',fontFamily:'inherit',opacity:saving?0.7:1}}>{saving?'Saving…':'Save Changes '}</button>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 4 }}>
+            <button onClick={() => setEditClient(null)} style={{ background: 'var(--app-bg)', border: '1px solid var(--app-border)', color: T.text, borderRadius: 10, padding: '10px 16px', cursor: 'pointer', fontWeight: 600, fontSize: 13, fontFamily: 'inherit' }}>Cancel</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: 'linear-gradient(135deg,var(--app-accent),var(--app-muted))', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 13, fontWeight: 700, color: '#fff', cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: saving ? 0.7 : 1 }}>{saving ? 'Saving…' : 'Save Changes '}</button>
           </div>
         </Mdl>
       )}
@@ -749,7 +757,7 @@ function EmployeesPage({ employees, setEmployees }) {
                             View
                           </button>
                           <a href={doc.url} download style={{ flex: 1, padding: "6px 10px", background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 7, fontSize: 11, fontWeight: 700, color: "#475569", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                             Download
+                            Download
                           </a>
                         </div>
                       </div>
@@ -1540,7 +1548,7 @@ function InterviewPage({ companyId, companyName }) {
                     />
                     <div style={{ padding: "12px", background: "#fff", borderTop: "1px solid var(--app-border)", display: "flex", justifyContent: "center" }}>
                       <a href={viewModal._resolvedResumeUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--app-accent)", color: "#fff", padding: "8px 16px", borderRadius: 8, textDecoration: "none", fontSize: 13, fontWeight: 600, fontFamily: "inherit" }}>
-                         Open in New Tab
+                        Open in New Tab
                       </a>
                     </div>
                   </div>
@@ -1742,7 +1750,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [empSaveLoading, setEmpSaveLoading] = useState(false);
 
   const [projects, setProjects] = useState([]);
-  const [np, setNp] = useState({ name: "", client: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "₹", team: "", status: "Pending", assignedTo: [] });
+  const [np, setNp] = useState({ name: "", client: "", companyName: "", phone: "", address: "", contactPersonName: "", contactPersonNo: "", contactEmail: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "₹", team: "", status: "Pending", assignedTo: [] });
   const [npError, setNpError] = useState({});
   const [projSaveLoading, setProjSaveLoading] = useState(false);
 
@@ -1797,7 +1805,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const fetchManagers = async () => { try { const res = await axios.get(BASE_URL + "/api/managers"); setManagers(res.data); } catch (e) { console.log(e); } };
   const [selectedProjectForTasks, setSelectedProjectForTasks] = useState(null);
   const [autoOpenTaskModal, setAutoOpenTaskModal] = useState(false);
-  
+
   const fetchTasks = async () => { try { const res = await axios.get(BASE_URL + "/api/tasks"); setTasks(res.data); } catch (e) { console.log(e); } };
   const fetchConfig = async () => { try { const cid = user?._id || user?.id; if (!cid) return; const res = await axios.get(`${BASE_URL}/api/config/${cid}`); setConfig(res.data); } catch (e) { console.log(e); } };
 
@@ -1909,7 +1917,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const companyNameStr = user?.companyName || "Your Business";
 
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "#f8fafc", fontFamily: T.fontDM}}>
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "#f8fafc", fontFamily: T.fontDM }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         *{box-sizing:border-box}
@@ -1955,7 +1963,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: T.text }}>{page?.icon} {page?.label}</h1>
               <p style={{ margin: "3px 0 0", color: "var(--app-muted)", fontSize: 12 }}>{companyNameStr} M Business · {user?.role || "Admin"}</p>
             </div>
-            <div className="header-actions" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0,fontSize:"14px" }}>
+            <div className="header-actions" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, fontSize: "14px" }}>
               {validActive === "clients" && <button onClick={() => { setActive("addClient"); }} style={B("var(--app-accent)")}>+ Add Client</button>}
               {validActive === "employees" && <button onClick={() => { setNeError({}); setModal("employee"); }} style={B("var(--app-accent)")}>+ Add Employee</button>}
               {validActive === "projects" && <button onClick={() => { setNpError({}); setModal("project"); }} style={B("var(--app-muted)")}>+ New Project</button>}
@@ -2045,7 +2053,29 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           </>}
 
           {/* ── Pages using new components ── */}
-          {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onAddClient={() => setActive("addClient")} />}
+          {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onAddClient={() => setActive("addClient")} onCreateProject={(c) => {
+            setNpError({});
+            setNp({
+              name: "",
+              client: c.clientName || c.name || "",
+              contactPersonName: c.contactPersonName || "",
+              contactPersonNo: c.contactPersonNo || c.phone || "",
+              contactEmail: c.email || "",
+              companyName: c.companyName || c.company || "",
+              phone: c.phone || "",
+              address: c.address || "",
+              purpose: "",
+              description: "",
+              start: "",
+              end: "",
+              budget: "",
+              currency: "₹",
+              team: "",
+              status: "Pending",
+              assignedTo: [],
+            });
+            setModal("project");
+          }} />}
           {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
           {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} config={config} onViewTasks={(p) => { setSelectedProjectForTasks(p); setActive("tasks"); }} />}
@@ -2057,7 +2087,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} onSelectProject={(p) => setSelectedProjectForTasks(p)} autoOpenAddModal={autoOpenTaskModal} onAddModalOpened={(val) => setAutoOpenTaskModal(!!val)} />}
           {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={user?.companyId || user?._id || ""} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} />}
           {validActive === "messaging" && <MessagingPage user={user} />}
-          {validActive === "settings" && <SettingsPage THEME={T} user={user} onProfileUpdate={(updates) => { const updated = { ...user, ...updates }; setUser(updated); try { localStorage.setItem("user", JSON.stringify(updated)); } catch {} }} />}
+          {validActive === "settings" && <SettingsPage THEME={T} user={user} onProfileUpdate={(updates) => { const updated = { ...user, ...updates }; setUser(updated); try { localStorage.setItem("user", JSON.stringify(updated)); } catch { } }} />}
 
           {validActive === "accounts" && <AccountsPage />}
           {validActive === "expenses" && <ExpensesPage />}
@@ -2127,119 +2157,119 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         ) : (
           <>
             {/* ── LOGO ── */}
-            <div style={{marginBottom:18,padding:'16px',background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA'}}>
-              <div style={{fontSize:11,fontWeight:700,color:'#5A6A7A',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:10}}>Client Logo</div>
-              <div style={{display:'flex',alignItems:'center',gap:16}}>
-                <div style={{position:'relative',width:72,height:72}}>
-                  <div style={{width:72,height:72,borderRadius:14,background:'#fff',border:'2px dashed #E0E6EA',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}>
-                    {nc.logoUrl ? <img src={nc.logoUrl} alt="Logo" style={{width:'100%',height:'100%',objectFit:'contain'}} /> : <span style={{fontSize:30}}>Company</span>}
+            <div style={{ marginBottom: 18, padding: '16px', background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 10 }}>Client Logo</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{ position: 'relative', width: 72, height: 72 }}>
+                  <div style={{ width: 72, height: 72, borderRadius: 14, background: '#fff', border: '2px dashed #E0E6EA', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                    {nc.logoUrl ? <img src={nc.logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : <span style={{ fontSize: 30 }}>Company</span>}
                   </div>
-                  <label style={{position:'absolute',bottom:0,right:0,background:'#00BCD4',width:24,height:24,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',border:'2px solid #fff'}}>
-                    <span style={{fontSize:12}}></span>
-                    <input type="file" accept="image/*" style={{display:'none'}} onChange={e => { const file=e.target.files[0]; if(file){const r=new FileReader();r.onloadend=()=>setNc(p=>({...p,logoUrl:r.result}));r.readAsDataURL(file);}}} />
+                  <label style={{ position: 'absolute', bottom: 0, right: 0, background: '#00BCD4', width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid #fff' }}>
+                    <span style={{ fontSize: 12 }}></span>
+                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const file = e.target.files[0]; if (file) { const r = new FileReader(); r.onloadend = () => setNc(p => ({ ...p, logoUrl: r.result })); r.readAsDataURL(file); } }} />
                   </label>
                 </div>
-                <div style={{fontSize:12,color:'#94A3B0'}}>PNG, JPG · Max 2MB<br/>Recommended 200×200px</div>
+                <div style={{ fontSize: 12, color: '#94A3B0' }}>PNG, JPG · Max 2MB<br />Recommended 200×200px</div>
               </div>
             </div>
 
             {/* ── CLIENT TYPE ── */}
-            <div style={{marginBottom:16}}>
-              <div style={{fontSize:11,fontWeight:700,color:'#5A6A7A',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:8}}>Client Type <span style={{color:'#EF5350'}}>*</span></div>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
-                {[{val:'b2b',icon:'Company',label:'B2B',sub:'Company / Business'},{val:'b2c',icon:'Profile',label:'B2C',sub:'Individual person'},{val:'freelancer',icon:'Job',label:'Freelancer',sub:'Consultant / Solo'}].map(t=>(
-                  <div key={t.val} onClick={()=>setNc(p=>({...p,clientType:t.val}))}
-                    style={{border:`2px solid ${nc.clientType===t.val?'#00BCD4':'#E0E6EA'}`,borderRadius:10,padding:'12px 8px',textAlign:'center',cursor:'pointer',background:nc.clientType===t.val?'#E0F7FA':'#F4F6F8',transition:'all .15s'}}>
-                    <div style={{fontSize:22,marginBottom:4}}>{t.icon}</div>
-                    <div style={{fontSize:12,fontWeight:700,color:nc.clientType===t.val?'#007B8A':'#1A2332'}}>{t.label}</div>
-                    <div style={{fontSize:10,color:'#94A3B0',marginTop:2}}>{t.sub}</div>
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 8 }}>Client Type <span style={{ color: '#EF5350' }}>*</span></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+                {[{ val: 'b2b', icon: 'Company', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: 'Profile', label: 'B2C', sub: 'Individual person' }, { val: 'freelancer', icon: 'Job', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
+                  <div key={t.val} onClick={() => setNc(p => ({ ...p, clientType: t.val }))}
+                    style={{ border: `2px solid ${nc.clientType === t.val ? '#00BCD4' : '#E0E6EA'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? '#E0F7FA' : '#F4F6F8', transition: 'all .15s' }}>
+                    <div style={{ fontSize: 22, marginBottom: 4 }}>{t.icon}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: nc.clientType === t.val ? '#007B8A' : '#1A2332' }}>{t.label}</div>
+                    <div style={{ fontSize: 10, color: '#94A3B0', marginTop: 2 }}>{t.sub}</div>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* ── BASIC INFO ── */}
-            <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:14}}>
-              <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>Company Basic Info</div>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
-                <Fld label="Client / Display Name *" value={nc.name} onChange={v=>{setNc({...nc,name:v});setNcError(p=>({...p,name:''}));}} error={ncError.name} />
-                <Fld label="Company Name" value={nc.company} onChange={v=>setNc({...nc,company:v})} />
-                <Fld label="Category / Industry" value={nc.category} onChange={v=>setNc({...nc,category:v})} options={['','Web Development','Mobile App Development','UI/UX Design','Digital Marketing','IT Consulting','E-commerce','Healthcare','Education','Finance','Real Estate','Manufacturing','Retail','Logistics','Media & Entertainment','Other']} />
-                <Fld label="Company Tax / GST No." value={nc.gstNumber} onChange={v=>setNc({...nc,gstNumber:v})} />
-                <Fld label="Client Source" value={nc.source} onChange={v=>setNc({...nc,source:v})} options={['','Referral','Website / Organic','Social Media','Cold Outreach','LinkedIn','Event / Conference','Google Ads','Word of Mouth','Other']} />
-                <Fld label="Onboarded On" value={nc.onboardedOn} onChange={v=>setNc({...nc,onboardedOn:v})} type="date" />
-                <Fld label="Status" value={nc.status} onChange={v=>setNc({...nc,status:v})} options={['Active','Inactive']} />
+            <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Company Basic Info</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+                <Fld label="Client / Display Name *" value={nc.name} onChange={v => { setNc({ ...nc, name: v }); setNcError(p => ({ ...p, name: '' })); }} error={ncError.name} />
+                <Fld label="Company Name" value={nc.company} onChange={v => setNc({ ...nc, company: v })} />
+                <Fld label="Category / Industry" value={nc.category} onChange={v => setNc({ ...nc, category: v })} options={['', 'Web Development', 'Mobile App Development', 'UI/UX Design', 'Digital Marketing', 'IT Consulting', 'E-commerce', 'Healthcare', 'Education', 'Finance', 'Real Estate', 'Manufacturing', 'Retail', 'Logistics', 'Media & Entertainment', 'Other']} />
+                <Fld label="Company Tax / GST No." value={nc.gstNumber} onChange={v => setNc({ ...nc, gstNumber: v })} />
+                <Fld label="Client Source" value={nc.source} onChange={v => setNc({ ...nc, source: v })} options={['', 'Referral', 'Website / Organic', 'Social Media', 'Cold Outreach', 'LinkedIn', 'Event / Conference', 'Google Ads', 'Word of Mouth', 'Other']} />
+                <Fld label="Onboarded On" value={nc.onboardedOn} onChange={v => setNc({ ...nc, onboardedOn: v })} type="date" />
+                <Fld label="Status" value={nc.status} onChange={v => setNc({ ...nc, status: v })} options={['Active', 'Inactive']} />
               </div>
             </div>
 
             {/* ── PRIMARY CONTACT ── */}
-            <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:14}}>
-              <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>Document Primary Contact</div>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
-                <Fld label="Contact Person Name" value={nc.contactPersonName} onChange={v=>setNc({...nc,contactPersonName:v})} />
-                <Fld label="Designation" value={nc.designation||''} onChange={v=>setNc({...nc,designation:v})} />
-                <Fld label="Email *" value={nc.email} onChange={v=>{setNc({...nc,email:v});setNcError(p=>({...p,email:''}));}} type="email" error={ncError.email} />
-                <Fld label="Alt. Email" value={nc.altEmail||''} onChange={v=>setNc({...nc,altEmail:v})} type="email" />
-                <Fld label="Contact Person Mobile" value={nc.contactPersonNo} onChange={v=>setNc({...nc,contactPersonNo:v})} />
-                <Fld label="Office Phone" value={nc.phone} onChange={v=>setNc({...nc,phone:v})} />
+            <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Document Primary Contact</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+                <Fld label="Contact Person Name" value={nc.contactPersonName} onChange={v => setNc({ ...nc, contactPersonName: v })} />
+                <Fld label="Designation" value={nc.designation || ''} onChange={v => setNc({ ...nc, designation: v })} />
+                <Fld label="Email *" value={nc.email} onChange={v => { setNc({ ...nc, email: v }); setNcError(p => ({ ...p, email: '' })); }} type="email" error={ncError.email} />
+                <Fld label="Alt. Email" value={nc.altEmail || ''} onChange={v => setNc({ ...nc, altEmail: v })} type="email" />
+                <Fld label="Contact Person Mobile" value={nc.contactPersonNo} onChange={v => setNc({ ...nc, contactPersonNo: v })} />
+                <Fld label="Office Phone" value={nc.phone} onChange={v => setNc({ ...nc, phone: v })} />
               </div>
             </div>
 
             {/* ── ADDRESS ── */}
-            <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:14}}>
-              <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>Location Address</div>
-              <div style={{marginBottom:12}}><Fld label="Street / Building Address" value={nc.address} onChange={v=>setNc({...nc,address:v})} /></div>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
-                <Fld label="City" value={nc.city} onChange={v=>setNc({...nc,city:v})} />
-                <Fld label="State / Province" value={nc.state} onChange={v=>setNc({...nc,state:v})} />
-                <Fld label="Pincode / ZIP" value={nc.pincode} onChange={v=>setNc({...nc,pincode:v})} />
-                <Fld label="Country" value={nc.country} onChange={v=>setNc({...nc,country:v})} options={['India','United States','United Kingdom','United Arab Emirates','Singapore','Australia','Canada','Germany','France','Other']} />
+            <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Location Address</div>
+              <div style={{ marginBottom: 12 }}><Fld label="Street / Building Address" value={nc.address} onChange={v => setNc({ ...nc, address: v })} /></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+                <Fld label="City" value={nc.city} onChange={v => setNc({ ...nc, city: v })} />
+                <Fld label="State / Province" value={nc.state} onChange={v => setNc({ ...nc, state: v })} />
+                <Fld label="Pincode / ZIP" value={nc.pincode} onChange={v => setNc({ ...nc, pincode: v })} />
+                <Fld label="Country" value={nc.country} onChange={v => setNc({ ...nc, country: v })} options={['India', 'United States', 'United Kingdom', 'United Arab Emirates', 'Singapore', 'Australia', 'Canada', 'Germany', 'France', 'Other']} />
               </div>
             </div>
 
             {/* ── ONLINE PRESENCE ── */}
-            <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:14}}>
-              <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>Web Online Presence</div>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
-                <Fld label="Website URL" value={nc.website} onChange={v=>setNc({...nc,website:v})} />
-                <Fld label="LinkedIn Profile" value={nc.linkedin} onChange={v=>setNc({...nc,linkedin:v})} />
+            <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Web Online Presence</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+                <Fld label="Website URL" value={nc.website} onChange={v => setNc({ ...nc, website: v })} />
+                <Fld label="LinkedIn Profile" value={nc.linkedin} onChange={v => setNc({ ...nc, linkedin: v })} />
               </div>
             </div>
 
             {/* ── BILLING & TERMS ── */}
-            <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:14}}>
-              <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}> Billing & Terms</div>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
-                <Fld label="Billing Currency" value={nc.billingCurrency} onChange={v=>setNc({...nc,billingCurrency:v})} options={['INR — Indian Rupee','USD — US Dollar','GBP — British Pound','EUR — Euro','AED — UAE Dirham','SGD — Singapore Dollar','AUD — Australian Dollar']} />
-                <Fld label="Payment Terms" value={nc.paymentTerms} onChange={v=>setNc({...nc,paymentTerms:v})} options={['','Due on receipt','Net 7','Net 15','Net 30','Net 45','Net 60','50% Advance + 50% on delivery','Custom']} />
-                <Fld label="Credit Limit" value={nc.creditLimit} onChange={v=>setNc({...nc,creditLimit:v})} type="number" />
-                <Fld label="Preferred Payment Mode" value={nc.preferredPaymentMode} onChange={v=>setNc({...nc,preferredPaymentMode:v})} options={['','Bank Transfer / NEFT','UPI','Cheque','Credit Card','Cash','PayPal','Stripe','Other']} />
+            <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}> Billing & Terms</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+                <Fld label="Billing Currency" value={nc.billingCurrency} onChange={v => setNc({ ...nc, billingCurrency: v })} options={['INR — Indian Rupee', 'USD — US Dollar', 'GBP — British Pound', 'EUR — Euro', 'AED — UAE Dirham', 'SGD — Singapore Dollar', 'AUD — Australian Dollar']} />
+                <Fld label="Payment Terms" value={nc.paymentTerms} onChange={v => setNc({ ...nc, paymentTerms: v })} options={['', 'Due on receipt', 'Net 7', 'Net 15', 'Net 30', 'Net 45', 'Net 60', '50% Advance + 50% on delivery', 'Custom']} />
+                <Fld label="Credit Limit" value={nc.creditLimit} onChange={v => setNc({ ...nc, creditLimit: v })} type="number" />
+                <Fld label="Preferred Payment Mode" value={nc.preferredPaymentMode} onChange={v => setNc({ ...nc, preferredPaymentMode: v })} options={['', 'Bank Transfer / NEFT', 'UPI', 'Cheque', 'Credit Card', 'Cash', 'PayPal', 'Stripe', 'Other']} />
               </div>
             </div>
 
             {/* ── PORTAL ACCESS ── */}
-            <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:14}}>
-              <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>Secure Portal Access</div>
-              <div style={{position:'relative',marginBottom:4}}>
-                <input type={showClientPass?'text':'password'} value={nc.password} onChange={e=>setNc({...nc,password:e.target.value})}
-                  style={{width:'100%',border:`1.5px solid ${ncError.password?'#EF4444':'var(--app-border)'}`,borderRadius:10,padding:'10px 46px 10px 14px',fontSize:13,color:T.text,background:'var(--app-bg)',boxSizing:'border-box',outline:'none'}}
+            <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Secure Portal Access</div>
+              <div style={{ position: 'relative', marginBottom: 4 }}>
+                <input type={showClientPass ? 'text' : 'password'} value={nc.password} onChange={e => setNc({ ...nc, password: e.target.value })}
+                  style={{ width: '100%', border: `1.5px solid ${ncError.password ? '#EF4444' : 'var(--app-border)'}`, borderRadius: 10, padding: '10px 46px 10px 14px', fontSize: 13, color: T.text, background: 'var(--app-bg)', boxSizing: 'border-box', outline: 'none' }}
                   placeholder="Set client portal password *" />
-                <button type="button" onClick={()=>setShowClientPass(!showClientPass)} style={{position:'absolute',right:14,top:'50%',transform:'translateY(-50%)',background:'none',border:'none',cursor:'pointer',color:'var(--app-muted)',fontSize:11,fontWeight:700,fontFamily:'inherit'}}>{showClientPass?'HIDE':'SHOW'}</button>
+                <button type="button" onClick={() => setShowClientPass(!showClientPass)} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--app-muted)', fontSize: 11, fontWeight: 700, fontFamily: 'inherit' }}>{showClientPass ? 'HIDE' : 'SHOW'}</button>
               </div>
-              {ncError.password && <div style={{fontSize:11,color:'#EF4444',marginTop:4}}>Warning {ncError.password}</div>}
+              {ncError.password && <div style={{ fontSize: 11, color: '#EF4444', marginTop: 4 }}>Warning {ncError.password}</div>}
             </div>
 
             {/* ── INTERNAL NOTES ── */}
-            <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:14}}>
-              <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>Edit Internal Notes</div>
-              <textarea value={nc.notes} onChange={e=>setNc({...nc,notes:e.target.value})}
-                style={{width:'100%',border:'1.5px solid #E0E6EA',borderRadius:10,padding:'10px 14px',fontSize:13,color:T.text,background:'#fff',boxSizing:'border-box',outline:'none',minHeight:70,resize:'vertical',fontFamily:'inherit'}}
+            <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Edit Internal Notes</div>
+              <textarea value={nc.notes} onChange={e => setNc({ ...nc, notes: e.target.value })}
+                style={{ width: '100%', border: '1.5px solid #E0E6EA', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: T.text, background: '#fff', boxSizing: 'border-box', outline: 'none', minHeight: 70, resize: 'vertical', fontFamily: 'inherit' }}
                 placeholder="Any internal context, special instructions, or notes..." />
             </div>
 
-            <div style={{display:'flex',justifyContent:'flex-end',gap:10,marginTop:6}}>
-              <button onClick={()=>setModal(null)} style={{background:'var(--app-bg)',border:'1px solid var(--app-border)',color:T.text,borderRadius:10,padding:'10px 16px',cursor:'pointer',fontWeight:600,fontSize:13}}>Cancel</button>
-              <button onClick={addClient} disabled={saveLoading} style={{...B('var(--app-accent)'),opacity:saveLoading?0.7:1}}>{saveLoading?'Saving...':'Add Client'}</button>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 6 }}>
+              <button onClick={() => setModal(null)} style={{ background: 'var(--app-bg)', border: '1px solid var(--app-border)', color: T.text, borderRadius: 10, padding: '10px 16px', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>Cancel</button>
+              <button onClick={addClient} disabled={saveLoading} style={{ ...B('var(--app-accent)'), opacity: saveLoading ? 0.7 : 1 }}>{saveLoading ? 'Saving...' : 'Add Client'}</button>
             </div>
           </>
         )}
@@ -2276,10 +2306,35 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <Fld label="Project Name *" value={np.name} onChange={v => { setNp({ ...np, name: v }); setNpError(p => ({ ...p, name: "" })); }} error={npError.name} />
           <div style={{ marginBottom: 14 }}>
             <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label>
-            <ClientDropdown clients={clients} value={np.client} onChange={v => { setNp({ ...np, client: v }); setNpError(p => ({ ...p, client: "" })); }} error={npError.client} onAddClient={() => { setModal("client"); setNcError({}); setShowClientPass(false); }} />
+            <ClientDropdown
+              clients={clients}
+              value={np.client}
+              onChange={v => {
+                const sel = clients.find(c => (c.clientName || c.name) === v);
+                setNp({
+                  ...np,
+                  client: v,
+                  companyName: sel?.companyName || sel?.company || np.companyName,
+                  phone: sel?.phone || np.phone,
+                  address: sel?.address || np.address,
+                  contactPersonName: sel?.contactPersonName || np.contactPersonName,
+                  contactPersonNo: sel?.contactPersonNo || np.contactPersonNo,
+                  contactEmail: sel?.email || np.contactEmail,
+                });
+                setNpError(p => ({ ...p, client: "" }));
+              }}
+              error={npError.client}
+              onAddClient={() => { setModal("client"); setNcError({}); setShowClientPass(false); }}
+            />
             {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {npError.client}</div>}
           </div>
           <Fld label="Purpose" value={np.purpose} onChange={v => setNp({ ...np, purpose: v })} />
+          <Fld label="Company Name" value={np.companyName} onChange={v => setNp({ ...np, companyName: v })} />
+          <Fld label="Contact Person" value={np.contactPersonName} onChange={v => setNp({ ...np, contactPersonName: v })} />
+          <Fld label="Contact Person No" value={np.contactPersonNo} onChange={v => setNp({ ...np, contactPersonNo: v })} />
+          <Fld label="Contact Email" value={np.contactEmail} onChange={v => setNp({ ...np, contactEmail: v })} />
+          <Fld label="Phone" value={np.phone} onChange={v => setNp({ ...np, phone: v })} />
+          <Fld label="Address" value={np.address} onChange={v => setNp({ ...np, address: v })} />
           <div style={{ marginBottom: 14 }}>
             <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>BUDGET</label>
             <div style={{ display: "flex", gap: 8 }}>

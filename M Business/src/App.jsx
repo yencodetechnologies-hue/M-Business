@@ -14,7 +14,7 @@ const QuotationViewer = lazy(() => import("./components/QuotationViewer"));
 const ReceiptViewer = lazy(() => import("./components/ReceiptViewer"));
 const TasksPage = lazy(() => import("./components/TaskPage"));
 const CalendarPage = lazy(() => import("./components/CalendarPage"));
-const ExpensesPage = lazy(() => import("./components/AccountsPage").then(m => ({ default: m.ExpensesPage })));
+const ExpensesPage = lazy(() => import("./components/AccountsPage").then(module => ({ default: module.ExpensesPage })));
 const ReportsPage = lazy(() => import("./components/ReportsPage"));
 const QuotationCreatorModern = lazy(() => import("./components/QuotationCreatorModern"));
 const QuotationCreator = lazy(() => import("./components/QuotationCreator"));

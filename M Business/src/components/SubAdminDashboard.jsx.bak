@@ -3934,6 +3934,12 @@ const handleEditPackage = (pkg) => {
           <Fld label="Contact Person Name" value={np.contactPersonName} onChange={v => setNp({ ...np, contactPersonName: v })} />
           <Fld label="Contact Person No" value={np.contactPersonNo} onChange={v => setNp({ ...np, contactPersonNo: v })} />
           <Fld label="Purpose" value={np.purpose} onChange={v => setNp({ ...np, purpose: v })} />
+          <Fld label="Company Name" value={np.companyName} onChange={v => setNp({ ...np, companyName: v })} />
+          <Fld label="Contact Person" value={np.contactPersonName} onChange={v => setNp({ ...np, contactPersonName: v })} />
+          <Fld label="Contact Person No" value={np.contactPersonNo} onChange={v => setNp({ ...np, contactPersonNo: v })} />
+          <Fld label="Contact Email" value={np.contactEmail} onChange={v => setNp({ ...np, contactEmail: v })} />
+          <Fld label="Phone" value={np.phone} onChange={v => setNp({ ...np, phone: v })} />
+          <Fld label="Address" value={np.address} onChange={v => setNp({ ...np, address: v })} />
           <div style={{ marginBottom: 14 }}>
             <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>BUDGET</label>
             <div style={{ display: "flex", gap: 8 }}>

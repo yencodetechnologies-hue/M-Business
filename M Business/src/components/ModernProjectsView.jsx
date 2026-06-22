@@ -413,11 +413,7 @@ export default function ModernProjectsView({
                                   <i className="ti ti-checklist" /> View Tasks
                                 </div>
                               )}
-                              {onNewInvoice && (
-                                <div className="mpv-menu-item" onClick={() => { setOpenMenu(null); onNewInvoice(p); }}>
-                                  <i className="ti ti-file-invoice" /> New Invoice
-                                </div>
-                              )}
+
                               {onDelete && (
                                 <div className="mpv-menu-item danger" onClick={() => { setOpenMenu(null); onDelete(p); }}>
                                   <i className="ti ti-trash" /> Delete

@@ -331,8 +331,12 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                   const sel = clients.find(c => (c.clientName || c.name) === selectedName);
                   if (sel) {
                     setContactPersonName(sel.contactPersonName || '');
-                    setContactPersonNo(sel.contactPersonNo || '');
+                    setContactPersonNo(sel.contactPersonNo || sel.phone || '');
                     setContactEmail(sel.email || '');
+                    // Auto-fill additional client fields
+                    if (typeof setCompanyName === 'function') setCompanyName(sel.companyName || sel.company || '');
+                    if (typeof setClientPhone === 'function') setClientPhone(sel.phone || '');
+                    if (typeof setClientAddress === 'function') setClientAddress(sel.address || '');
                   }
                 }}>
                   <option value="">Select client...</option>

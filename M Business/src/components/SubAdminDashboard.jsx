@@ -6383,11 +6383,10 @@ function VendorsPage({ vendors, setVendors }) {
 
 
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 // MAIN DASHBOARD
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
 
 export default function Dashboard({ setUser, user, fixedLogo }) {
 
@@ -6401,7 +6400,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
     const saved = localStorage.getItem("activeTab_subadmin") || "dashboard";
 
-    // Refresh à®ªà®£à¯à®£à¯à®®à¯à®ªà¯‹à®¤à¯ projects/project-details-à®² à®‡à®°à¯à®¨à¯à®¤à®¾ dashboard-à®•à¯à®•à¯ à®ªà¯‹
 
     if (["project-details", "create-project", "edit-project"].includes(saved)) return "projects";
 
@@ -6856,7 +6854,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const [projLoading, setProjLoading] = useState(false);
 
-  const [np, setNp] = useState({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "Rs.", team: "", status: "Pending", progress: 0, assignedTo: [] });
+  const [np, setNp] = useState({ name: "", client: "", companyName: "", phone: "", address: "", contactPersonName: "", contactPersonNo: "", contactEmail: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "Rs.", team: "", status: "Pending", progress: 0, assignedTo: [] });
 
   const [npError, setNpError] = useState({});
 
@@ -8858,7 +8856,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           {!enforceMySubscriptions ? (
 
-            <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)", padding: "2px 6px", lineHeight: 1 }}>â˜°</button>
+            <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)", padding: "2px 6px", lineHeight: 1 }}>☰</button>
 
           ) : (
 
@@ -11952,31 +11950,22 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 <div style={{ marginBottom: 14 }}>
 
                   <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label>
-
                   <ClientDropdown
-
                     clients={clients}
-
                     value={np.client}
-
                     onChange={v => {
-
                       const sel = clients.find(c => (c.clientName || c.name) === v);
-
                       setNp({
-
                         ...np,
-
                         client: v,
-
+                        companyName: sel?.companyName || sel?.company || "",
+                        phone: sel?.phone || "",
+                        address: sel?.address || "",
                         contactPersonName: sel?.contactPersonName || "",
-
-                        contactPersonNo: sel?.contactPersonNo || "",
-
+                        contactPersonNo: sel?.contactPersonNo || sel?.phone || "",
+                        contactEmail: sel?.email || "",
                       });
-
                       setNpError(p => ({ ...p, client: "" }));
-
                     }}
 
                     error={npError.client}
@@ -12005,10 +11994,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <Fld label="Contact Person Name" value={np.contactPersonName} onChange={v => setNp({ ...np, contactPersonName: v })} />
 
-                <Fld label="Contact Person No" value={np.contactPersonNo} onChange={v => setNp({ ...np, contactPersonNo: v })} />
-
                 <Fld label="Purpose" value={np.purpose} onChange={v => setNp({ ...np, purpose: v })} />
-
+                <Fld label="Company Name" value={np.companyName} onChange={v => setNp({ ...np, companyName: v })} />
+                <Fld label="Contact Person Name" value={np.contactPersonName} onChange={v => setNp({ ...np, contactPersonName: v })} />
+                <Fld label="Contact Person No" value={np.contactPersonNo} onChange={v => setNp({ ...np, contactPersonNo: v })} />
+                <Fld label="Contact Email" value={np.contactEmail} onChange={v => setNp({ ...np, contactEmail: v })} />
+                <Fld label="Phone" value={np.phone} onChange={v => setNp({ ...np, phone: v })} />
+                <Fld label="Address" value={np.address} onChange={v => setNp({ ...np, address: v })} />
                 <div style={{ marginBottom: 14 }}>
 
                   <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>BUDGET</label>

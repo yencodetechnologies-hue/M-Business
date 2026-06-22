@@ -23,48 +23,54 @@ router.post("/login", async (req, res) => {
 
     // Hardcoded bypass for the specific admin user requested
     if (email === "admin@gmail.com" && password === "admin1234") {
+      const u = await User.findOne({ email });
+      if (!u) return res.status(400).json({ msg: "Invalid email or password" });
       console.log("✅ Admin Login Succesful!");
       return res.json({
         user: {
-          id: "admin-hardcoded-id",
-          name: "Super Admin",
+          id: u._id,
+          name: u.name || "Super Admin",
           email: "admin@gmail.com",
           role: "admin",
-          companyId: "admin-company-id",
-          logoUrl: "",
-          companyName: "Your Business"
+          companyId: u.companyId || "admin-company-id",
+          logoUrl: u.logoUrl || "",
+          companyName: u.companyName || "Your Business"
         }
       });
     }
 
     // Hardcoded bypass for the specific subadmin user requested
     if (email === "subadmin@gmail.com" && password === "subadmin123") {
+      const u = await User.findOne({ email });
+      if (!u) return res.status(400).json({ msg: "Invalid email or password" });
       console.log("✅ Subadmin Login Succesful!");
       return res.json({
         user: {
-          id: "subadmin-hardcoded-id",
-          name: "Demo Subadmin",
+          id: u._id,
+          name: u.name || "Demo Subadmin",
           email: "subadmin@gmail.com",
           role: "subadmin",
-          companyId: "admin-company-id",
-          logoUrl: "",
-          companyName: "Your Business"
+          companyId: u.companyId || "admin-company-id",
+          logoUrl: u.logoUrl || "",
+          companyName: u.companyName || "Your Business"
         }
       });
     }
 
     // Hardcoded bypass for the specific client user requested
     if (email === "client@gmail.com" && password === "client123") {
+      const u = await Client.findOne({ email });
+      if (!u) return res.status(400).json({ msg: "Invalid email or password" });
       console.log("✅ Client Login Successful!");
       return res.json({
         user: {
-          id: "client-hardcoded-id",
-          name: "Demo Client",
+          id: u._id,
+          name: u.clientName || u.name || "Demo Client",
           email: "client@gmail.com",
           role: "client",
-          companyId: "client-company-id",
-          logoUrl: "",
-          companyName: "Your Business"
+          companyId: u.companyId || "client-company-id",
+          logoUrl: u.logoUrl || "",
+          companyName: u.companyName || "Your Business"
         }
       });
     }

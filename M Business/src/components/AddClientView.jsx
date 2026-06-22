@@ -189,7 +189,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', background: '#fff', borderBottom: '1px solid #E0E6EA', position: 'sticky', top: 0, zIndex: 10 }}>
           <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>{isEdit ? 'Edit Client' : 'Add New Client'}</h2>
-          <button onClick={onBack} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#94A3B0' }}>×</button>
+          <button onClick={onBack} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#94A3B0' }}>×</button>
         </div>
 
         <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: 20 }}>

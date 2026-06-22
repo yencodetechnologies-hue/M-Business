@@ -1,5 +1,5 @@
 const express = require("express");
-const router  = express.Router();
+const router = express.Router();
 const {
   getAllTasks,
   getBoardData,
@@ -17,27 +17,29 @@ const {
   addComment,
 } = require("../controllers/taskController");
 
-router.get("/board",          getBoardData);
+router.get("/board", getBoardData);
 
-router.get("/",               getAllTasks);
+router.get("/", getAllTasks);
 router.get("/client/:clientName", async (req, res) => {
   try {
     const Project = require("../models/ProjectModel");
-    const Task    = require("../models/TaskModels");
-    const name        = decodeURIComponent(req.params.clientName).trim();
+    const Task = require("../models/TaskModels");
+    const name = decodeURIComponent(req.params.clientName).trim();
     const companyName = req.query.company ? decodeURIComponent(req.query.company).trim() : "";
 
     const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const safeName    = escapeRegExp(name);
+    const safeName = escapeRegExp(name);
     const safeCompany = escapeRegExp(companyName);
 
     // 1. Find all projects belonging to this client
     const projectConditions = [];
-    if (safeName)    projectConditions.push({ client: { $regex: new RegExp(`^\\s*${safeName}\\s*$`,    "i") } });
+    if (safeName) projectConditions.push({ client: { $regex: new RegExp(`^\\s*${safeName}\\s*$`, "i") } });
     if (safeCompany) projectConditions.push({ client: { $regex: new RegExp(`^\\s*${safeCompany}\\s*$`, "i") } });
     const companyId = req.companyId || "";
-    const projectBaseFilter = companyId ? { companyId } : {};
-    const projects   = await Project.find(projectConditions.length ? { ...projectBaseFilter, $or: projectConditions } : projectBaseFilter);
+    // If no companyId, return empty — prevents deleted client's old tasks showing
+    if (!companyId) return res.json([]);
+    const projectBaseFilter = { companyId };
+    const projects = await Project.find(projectConditions.length ? { ...projectBaseFilter, $or: projectConditions } : projectBaseFilter);
     const projectIds = projects.map(p => p._id);
 
     // Build a lookup: projectId string -> project name
@@ -46,11 +48,11 @@ router.get("/client/:clientName", async (req, res) => {
 
     // 2. Find tasks linked to those projects OR directly assigned to the client
     const assignConditions = [];
-    if (safeName)    assignConditions.push({ assignTo: { $regex: new RegExp(`^\\s*${safeName}\\s*$`,    "i") } });
+    if (safeName) assignConditions.push({ assignTo: { $regex: new RegExp(`^\\s*${safeName}\\s*$`, "i") } });
     if (safeCompany) assignConditions.push({ assignTo: { $regex: new RegExp(`^\\s*${safeCompany}\\s*$`, "i") } });
 
     const taskFilter = {
-      $or: [ { projectId: { $in: projectIds } }, ...assignConditions ],
+      $or: [{ projectId: { $in: projectIds } }, ...assignConditions],
       isDeleted: false,
       ...(companyId ? { companyId } : {}),
     };
@@ -61,7 +63,7 @@ router.get("/client/:clientName", async (req, res) => {
     const tasksWithProject = tasks.map(t => {
       const obj = t.toObject();
       const pid = obj.projectId ? String(obj.projectId) : null;
-      obj.project    = pid ? (projectNameMap[pid] || "") : "";
+      obj.project = pid ? (projectNameMap[pid] || "") : "";
       obj.projectRef = pid || "";
       return obj;
     });
@@ -71,17 +73,17 @@ router.get("/client/:clientName", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-router.get("/:id",            getTask);
-router.get("/:id/members",    getTaskMembers);
-router.post("/",              createTask);
-router.post("/invite",        inviteMember);
-router.post("/respond",       respondToInvitation);
-router.put("/:id",            updateTask);
-router.patch("/:id/toggle",   toggleChecked);
-router.patch("/:id/move",     moveTask);
+router.get("/:id", getTask);
+router.get("/:id/members", getTaskMembers);
+router.post("/", createTask);
+router.post("/invite", inviteMember);
+router.post("/respond", respondToInvitation);
+router.put("/:id", updateTask);
+router.patch("/:id/toggle", toggleChecked);
+router.patch("/:id/move", moveTask);
 router.patch("/:id/auto-assign", autoAssignTask);
 router.patch("/:id/integrations", updateIntegrations);
 router.post("/:id/comment", addComment);
-router.delete("/:id",         deleteTask);
+router.delete("/:id", deleteTask);
 
 module.exports = router;

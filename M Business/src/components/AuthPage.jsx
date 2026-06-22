@@ -59,10 +59,24 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
     if (Object.keys(errs).length) { setLoginErr(errs); return; }
     try {
       setLoading(true); setError("");
-console.log("Sending:", loginData); // check what's actually being sent
-const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData);
+      console.log("Sending:", loginData);
+      const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData);
       const userData = res.data.user || res.data;
       const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
+
+      // Clear ALL stale cached data before setting new user session
+      // This ensures a re-created client never sees deleted account's data
+      const keysToKeep = ["accounts"];
+      Object.keys(localStorage).forEach(key => {
+        if (!keysToKeep.includes(key)) localStorage.removeItem(key);
+      });
+      // Also clear the accounts cache entry for this email so stale data is gone
+      try {
+        let accs = JSON.parse(localStorage.getItem("accounts") || "[]");
+        accs = accs.filter(a => a.email !== userWithLogo.email);
+        localStorage.setItem("accounts", JSON.stringify(accs));
+      } catch (e) { }
+
       localStorage.setItem("user", JSON.stringify(userWithLogo));
       setUser(userWithLogo);
     } catch (e) {
@@ -347,9 +361,9 @@ const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData);
         <div
           className={`form-side${tab === "register" ? " reg-form" : ""}`}
           style={{
- paddingLeft: isRegister ? "44%" : isLogin ? "52px" : undefined,
-    paddingRight: isRegister ? "44px" : isLogin ? "44%" : undefined,
-    opacity: formVisible ? 1 : 0,
+            paddingLeft: isRegister ? "44%" : isLogin ? "52px" : undefined,
+            paddingRight: isRegister ? "44px" : isLogin ? "44%" : undefined,
+            opacity: formVisible ? 1 : 0,
           }}
         >
           {/* REGISTER */}
@@ -445,7 +459,7 @@ const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData);
               <button className="purple-btn" onClick={handleRegister} disabled={loading}>
                 {loading ? <><span className="spinner" />Creating account...</> : "Sign Up"}
               </button>
-                       <p style={{ textAlign: "left", marginTop: 14, fontSize: 13, color: "rgba(255,255,255,0.32)" }}>
+              <p style={{ textAlign: "left", marginTop: 14, fontSize: 13, color: "rgba(255,255,255,0.32)" }}>
                 Already have an account? <button className="link-btn" onClick={() => switchTab("login")}>Login</button>
               </p>
             </div>
@@ -585,12 +599,12 @@ const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData);
               textAlign: "center"
             }}
           >
-        
+
             <h2 style={{ fontSize: 36, fontWeight: 900, lineHeight: 1.1, margin: "0 0 16px", color: "#fff" }}>
               WELCOME<br />BACK!
             </h2>
             <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.62)", lineHeight: 1.8, marginBottom: 30, maxWidth: 250 }}>
-            Manage your workspace efficiently
+              Manage your workspace efficiently
             </p>
             {/* <button className="outline-btn" onClick={() => switchTab(isRegister ? "login" : "register")}>
               {isRegister ? "Sign In" : "Sign Up"}

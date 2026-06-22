@@ -1,8 +1,8 @@
 // routes/quotationRoutes.js
-const express  = require("express");
-const router   = express.Router();
+const express = require("express");
+const router = express.Router();
 const Quotation = require("../models/QuotationModel");
-const Invoice   = require("../models/InvoiceModels");
+const Invoice = require("../models/InvoiceModels");
 
 // ── GET all ──────────────────────────────────────────────────────────────────
 router.get("/", async (req, res) => {
@@ -12,18 +12,18 @@ router.get("/", async (req, res) => {
     const quotations = docs.map((doc) => {
       const qt = doc.qt || {};
       const items = doc.items || [];
-      const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate)||0)*(parseFloat(i.quantity)||0), 0);
-      const total    = subtotal * (1 + (parseFloat(qt.gstRate)||0) / 100);
+      const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
+      const total = subtotal * (1 + (parseFloat(qt.gstRate) || 0) / 100);
       return {
-        id:          doc._id.toString(),
-        quoteNo:     qt.quoteNo     || doc.quoteNo || "—",
-        client:      qt.client      || doc.client  || "—",
-        project:     qt.project     || "",
-        date:        qt.date        || null,
-        expiryDate:  qt.expiryDate  || null,
-        status:      doc.status     || "draft",
+        id: doc._id.toString(),
+        quoteNo: qt.quoteNo || doc.quoteNo || "—",
+        client: qt.client || doc.client || "—",
+        project: qt.project || "",
+        date: qt.date || null,
+        expiryDate: qt.expiryDate || null,
+        status: doc.status || "draft",
         total,
-        savedAt:     doc.createdAt  || Date.now(),
+        savedAt: doc.createdAt || Date.now(),
         qt,
         items,
       };
@@ -41,11 +41,11 @@ router.get("/client/:clientName", async (req, res) => {
     const name = decodeURIComponent(req.params.clientName).trim();
     const companyName = req.query.company ? decodeURIComponent(req.query.company).trim() : "";
     const companyId = req.headers['x-company-id'] || "";
-    
+
     const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const safeName = escapeRegExp(name);
     const safeCompany = escapeRegExp(companyName);
-    
+
     const conditions = [];
     if (safeName) {
       conditions.push({ "qt.client": { $regex: new RegExp(safeName, "i") } });
@@ -55,35 +55,32 @@ router.get("/client/:clientName", async (req, res) => {
       conditions.push({ "qt.client": { $regex: new RegExp(safeCompany, "i") } });
       conditions.push({ client: { $regex: new RegExp(safeCompany, "i") } });
     }
-    
-    let filter = conditions.length > 0 ? { $or: conditions } : {};
 
-    // Isolation: Filter by companyId if provided
-    if (companyId) {
-      filter = {
-        $and: [
-          filter,
-          { $or: [{ companyId: companyId }, { companyId: "" }, { companyId: { $exists: false } }] }
-        ]
-      };
-    }
+    // If no companyId, return empty — prevents deleted client's old invoices showing
+    if (!companyId) return res.json([]);
+
+    // Always filter strictly by companyId
+    const companyFilter = { companyId };
+    let filter = conditions.length > 0
+      ? { ...companyFilter, $or: conditions }
+      : companyFilter;
     const docs = await Quotation.find(filter).sort({ createdAt: -1 }).lean();
-    
+
     const quotations = docs.map((doc) => {
       const qt = doc.qt || {};
       const items = doc.items || [];
-      const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate)||0)*(parseFloat(i.quantity)||0), 0);
-      const total    = subtotal * (1 + (parseFloat(qt.gstRate)||0) / 100);
+      const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
+      const total = subtotal * (1 + (parseFloat(qt.gstRate) || 0) / 100);
       return {
-        id:          doc._id.toString(),
-        quoteNo:     qt.quoteNo     || doc.quoteNo || "—",
-        client:      qt.client      || doc.client  || "—",
-        project:     qt.project     || "",
-        date:        qt.date        || null,
-        expiryDate:  qt.expiryDate  || null,
-        status:      doc.status     || "draft",
+        id: doc._id.toString(),
+        quoteNo: qt.quoteNo || doc.quoteNo || "—",
+        client: qt.client || doc.client || "—",
+        project: qt.project || "",
+        date: qt.date || null,
+        expiryDate: qt.expiryDate || null,
+        status: doc.status || "draft",
         total,
-        savedAt:     doc.createdAt  || Date.now(),
+        savedAt: doc.createdAt || Date.now(),
         qt,
         items,
       };
@@ -102,15 +99,15 @@ router.post("/", async (req, res) => {
 
     const existing = await Quotation.findOne({ "qt.quoteNo": qt.quoteNo });
     if (existing) {
-      existing.qt     = qt;
-      existing.items  = items;
+      existing.qt = qt;
+      existing.items = items;
       existing.status = status || existing.status;
       await existing.save();
 
       // Automatic Income Tracking for updates
       if (qt.amountPaid > 0) {
         const Income = require("../models/IncomeModel");
-        const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate)||0)*(parseFloat(i.quantity)||0), 0);
+        const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
         const gstRate = parseFloat(qt.gstRate) || 0;
         const total = qt.isGstIncluded ? subtotalRaw : subtotalRaw * (1 + gstRate / 100);
 
@@ -118,10 +115,10 @@ router.post("/", async (req, res) => {
         if (qt.transactionId) query.transactionId = qt.transactionId;
 
         const isPartial = qt.amountPaid < total;
-        const incomeTitle = isPartial 
-          ? `Advance/Part Payment for Quotation ${qt.quoteNo}` 
+        const incomeTitle = isPartial
+          ? `Advance/Part Payment for Quotation ${qt.quoteNo}`
           : `Full Payment for Quotation ${qt.quoteNo}`;
-        
+
         await Income.findOneAndUpdate(
           query,
           {
@@ -149,7 +146,7 @@ router.post("/", async (req, res) => {
     // Automatic Income Tracking
     if (qt.amountPaid > 0) {
       const Income = require("../models/IncomeModel");
-      const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate)||0)*(parseFloat(i.quantity)||0), 0);
+      const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
       const gstRate = parseFloat(qt.gstRate) || 0;
       const total = qt.isGstIncluded ? subtotalRaw : subtotalRaw * (1 + gstRate / 100);
 
@@ -157,10 +154,10 @@ router.post("/", async (req, res) => {
       if (qt.transactionId) query.transactionId = qt.transactionId;
 
       const isPartial = qt.amountPaid < total;
-      const incomeTitle = isPartial 
-        ? `Advance/Part Payment for Quotation ${qt.quoteNo}` 
+      const incomeTitle = isPartial
+        ? `Advance/Part Payment for Quotation ${qt.quoteNo}`
         : `Full Payment for Quotation ${qt.quoteNo}`;
-      
+
       await Income.findOneAndUpdate(
         query,
         {
@@ -193,7 +190,7 @@ router.put("/:id", async (req, res) => {
     const { qt, items, status } = req.body;
     if (!qt || !items) return res.status(400).json({ success: false, msg: "qt and items required" });
 
-    const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate)||0)*(parseFloat(i.quantity)||0), 0);
+    const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
     const gstRate = parseFloat(qt.gstRate) || 0;
     const total = qt.isGstIncluded ? subtotalRaw : subtotalRaw * (1 + gstRate / 100);
 
@@ -241,9 +238,9 @@ router.put("/:id", async (req, res) => {
 router.patch("/:id/status", async (req, res) => {
   try {
     const { status } = req.body;
-    const allowed = ["draft","sent","approved","rejected","expired","converted"];
+    const allowed = ["draft", "sent", "approved", "rejected", "expired", "converted"];
     if (!allowed.includes(status)) return res.status(400).json({ success: false, msg: "Invalid status" });
-    
+
     const companyId = req.companyId || "NONE";
     const doc = await Quotation.findOneAndUpdate(
       { _id: req.params.id, companyId },
@@ -289,24 +286,24 @@ router.post("/:id/convert", async (req, res) => {
     const qtDoc = await Quotation.findById(req.params.id).lean();
     if (!qtDoc) return res.status(404).json({ success: false, msg: "Quotation not found" });
 
-    const qt    = qtDoc.qt || {};
+    const qt = qtDoc.qt || {};
     const items = qtDoc.items || [];
 
     // Generate Invoice number from Quote number
     const invoiceNo = (qt.quoteNo || "QT").replace(/^QT/, "INV");
 
-    const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate)||0)*(parseFloat(i.quantity)||0), 0);
+    const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
     const gstRate = parseFloat(qt.gstRate) || 0;
     const isGstIncluded = qt.isGstIncluded || false;
     let subtotal, gstAmt, total;
     if (isGstIncluded) {
-      total    = subtotalRaw;
+      total = subtotalRaw;
       subtotal = total / (1 + gstRate / 100);
-      gstAmt   = total - subtotal;
+      gstAmt = total - subtotal;
     } else {
       subtotal = subtotalRaw;
-      gstAmt   = subtotal * (gstRate / 100);
-      total    = subtotal + gstAmt;
+      gstAmt = subtotal * (gstRate / 100);
+      total = subtotal + gstAmt;
     }
 
     // 1. Check if an invoice was ALREADY created for this specific Quotation
@@ -325,32 +322,32 @@ router.post("/:id/convert", async (req, res) => {
     }
 
     const today = new Date().toISOString().split("T")[0];
-    const due   = new Date(Date.now() + 30*86400000).toISOString().split("T")[0];
+    const due = new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0];
 
     const invoice = new Invoice({
-      invoiceNo:      finalInvoiceNo,
-      quotationId:    req.params.id,
-      orderNo:        qt.refNo        || "",
-      date:           today,
-      dueDate:        due,
-      client:         qt.client,
-      project:        qt.project       || "",
-      gstRate:        qt.gstRate       ?? 18,
-      isGstIncluded:  qt.isGstIncluded || false,
-      notes:          qt.notes         || "",
-      terms:          "Payment due within 30 days. Thank you for your business!",
-      companyName:    qt.companyName   || "",
-      companyEmail:   qt.companyEmail  || "",
-      companyPhone:   qt.companyPhone  || "",
-      companyAddress: qt.companyAddress|| "",
-      currency:       qt.currency      || "₹",
-      upiId:          qt.upiId         || "",
-      items: items.map((i) => ({ description: i.description, quantity: parseFloat(i.quantity)||0, rate: parseFloat(i.rate)||0 })),
+      invoiceNo: finalInvoiceNo,
+      quotationId: req.params.id,
+      orderNo: qt.refNo || "",
+      date: today,
+      dueDate: due,
+      client: qt.client,
+      project: qt.project || "",
+      gstRate: qt.gstRate ?? 18,
+      isGstIncluded: qt.isGstIncluded || false,
+      notes: qt.notes || "",
+      terms: "Payment due within 30 days. Thank you for your business!",
+      companyName: qt.companyName || "",
+      companyEmail: qt.companyEmail || "",
+      companyPhone: qt.companyPhone || "",
+      companyAddress: qt.companyAddress || "",
+      currency: qt.currency || "₹",
+      upiId: qt.upiId || "",
+      items: items.map((i) => ({ description: i.description, quantity: parseFloat(i.quantity) || 0, rate: parseFloat(i.rate) || 0 })),
       subtotal, gstAmt, total,
-      amountPaid:     parseFloat(qt.amountPaid) || 0,
-      paymentDate:    qt.paymentDate            || today,
-      paymentMode:    qt.paymentMode            || "GPay",
-      transactionId:  qt.transactionId          || "",
+      amountPaid: parseFloat(qt.amountPaid) || 0,
+      paymentDate: qt.paymentDate || today,
+      paymentMode: qt.paymentMode || "GPay",
+      transactionId: qt.transactionId || "",
       status: "draft",
       companyId: qtDoc.companyId || req.companyId || "",
     });

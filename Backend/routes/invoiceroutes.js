@@ -107,17 +107,14 @@ router.get("/client/:clientName", async (req, res) => {
       conditions.push({ client: { $regex: new RegExp(safeCompany, "i") } });
     }
 
-    let filter = conditions.length > 0 ? { $or: conditions } : {};
+    // If no companyId, return empty — prevents deleted client's old invoices showing
+    if (!companyId) return res.json([]);
 
-    // Isolation: Filter by companyId if provided
-    if (companyId) {
-      filter = {
-        $and: [
-          filter,
-          { $or: [{ companyId: companyId }, { companyId: "" }, { companyId: { $exists: false } }] }
-        ]
-      };
-    }
+    // Always filter strictly by companyId
+    const companyFilter = { companyId };
+    let filter = conditions.length > 0
+      ? { ...companyFilter, $or: conditions }
+      : companyFilter;
     const invoices = await Invoice.find(filter).sort({ createdAt: -1 }).lean();
 
     const normalised = await Promise.all(invoices.map(async (doc) => {

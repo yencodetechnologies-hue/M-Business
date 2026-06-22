@@ -170,8 +170,9 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           headers: { Authorization: `Bearer ${user?.token || ""}` }
         });
         toast.success('Client added successfully!');
+        // Pass new client to parent BEFORE navigating back so it can select it
         if (onClientAdded) onClientAdded(res.data.client);
-        onBack();
+        // Do NOT call onBack() — onClientAdded handler will handle navigation
       }
     } catch (err) {
       toast.error(err.response?.data?.message || `Failed to ${isEdit ? 'update' : 'save'} client`);

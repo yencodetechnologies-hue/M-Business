@@ -401,14 +401,15 @@ export default function ClientDashboard({ user, setUser }) {
     }
     const fetchAll = async () => {
       try {
+        const myClientId = user._id || user.id || "";
         const [projRes, taskRes, invRes, notifRes, docRes, meetRes, propRes] = await Promise.all([
-          axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}`, {
+          axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}&clientId=${encodeURIComponent(myClientId)}`, {
             headers: { 'x-company-id': user.companyId || "" }
           }),
-          axios.get(`${BASE_URL}/api/tasks/client/${encodeURIComponent(clientName)}`, {
+          axios.get(`${BASE_URL}/api/tasks/client/${encodeURIComponent(clientName)}?clientId=${encodeURIComponent(myClientId)}`, {
             headers: { 'x-company-id': user.companyId || "" }
           }),
-          axios.get(`${BASE_URL}/api/invoices/client/${encodeURIComponent(clientName)}`, {
+          axios.get(`${BASE_URL}/api/invoices/client/${encodeURIComponent(clientName)}?clientId=${encodeURIComponent(myClientId)}`, {
             headers: { 'x-company-id': user.companyId || "" }
           }),
           axios.get(`${BASE_URL}/api/notifications/${user._id || user.id}`),
@@ -426,14 +427,14 @@ export default function ClientDashboard({ user, setUser }) {
         setDocs(docRes.data || []);
         setMeetings(Array.isArray(meetRes.data) ? meetRes.data : []);
         const allProps = propRes.data || [];
-        const myClientId = String(user._id || user.id || "");
+        const myClientIdStr = String(user._id || user.id || "");
         const cn = (clientName || "").toLowerCase().trim();
         const filtered = allProps.filter(p => {
           const matchStatus = ["sent", "pending", "approved", "rejected"].includes(p.status);
           if (!matchStatus) return false;
           // Strict match: a proposal addressed to a specific client account
           // should only ever be visible to that exact client.
-          if (p.clientId) return String(p.clientId) === myClientId;
+          if (p.clientId) return String(p.clientId) === myClientIdStr;
           // Legacy proposals saved before clientId existed — exact name match only.
           const propClient = (p.client || p.clientName || "").toLowerCase().trim();
           return propClient === cn;

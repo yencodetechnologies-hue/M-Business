@@ -958,7 +958,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-function ClientsPage({ clients, setClients, projects = [], setProjects, onAddClient, onViewProject, triggerCrop, onCreateProject, user }) {
+function ClientsPage({ clients, setClients, projects = [], setProjects, onAddClient, onViewProject, triggerCrop, onCreateProject, user, activeClientIdForReturn, onActiveClientIdRestored, newClientId, onNewClientShown }) {
 
   const mainScrollRef = useRef(null);
 
@@ -1021,10 +1021,46 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
   useEffect(() => {
-
     if (!activeClientId && filtered.length > 0) setActiveClientId(filtered[0]._id);
-
   }, [clients]);
+
+  // Restore exact client active before navigating to create/edit project
+  useEffect(() => {
+    if (activeClientIdForReturn) {
+      setActiveClientId(activeClientIdForReturn);
+      setActiveTab("overview");
+      if (onActiveClientIdRestored) onActiveClientIdRestored();
+    }
+  }, [activeClientIdForReturn]);
+
+  // Select newly added client immediately after add
+  useEffect(() => {
+    if (newClientId) {
+      setActiveClientId(newClientId);
+      setActiveTab("overview");
+      setSearch("");
+      if (onNewClientShown) onNewClientShown();
+    }
+  }, [newClientId]);
+
+  // Restore the exact client that was active before navigating to create/edit project
+  useEffect(() => {
+    if (activeClientIdForReturn) {
+      setActiveClientId(activeClientIdForReturn);
+      setActiveTab("overview");
+      if (onActiveClientIdRestored) onActiveClientIdRestored();
+    }
+  }, [activeClientIdForReturn]);
+
+  // When a new client is added, immediately select it
+  useEffect(() => {
+    if (newClientId) {
+      setActiveClientId(newClientId);
+      setActiveTab("overview");
+      setSearch("");
+      if (onNewClientShown) onNewClientShown();
+    }
+  }, [newClientId]);
 
 
 
@@ -6396,6 +6432,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const [dashTasksProj, setDashTasksProj] = useState(null);
 
+  const [pendingNewClientId, setPendingNewClientId] = useState(null);
+
   const [active, setActive] = useState(() => {
 
     const saved = localStorage.getItem("activeTab_subadmin") || "dashboard";
@@ -6438,6 +6476,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [_navPending, startNavTransition] = useTransition();
 
   const [fromEditProject, setFromEditProject] = useState(false);
+  const [activeClientIdForReturn, setActiveClientIdForReturn] = useState(null);
 
   const [jumpInvoice, setJumpInvoice] = useState(null);
 
@@ -10343,14 +10382,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 onBack={() => {
                   const returnTo = sidebarOverride || "projects";
-
                   setSidebarOverride(null);
-
                   setJumpProject(null);
-
                   setActive(returnTo);
                 }}
-
                 onSuccess={(newProj) => {
 
                   const saved = newProj?.project || newProj;
@@ -10448,7 +10483,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 hideTopActions={fromEditProject}
 
-                onBack={() => { setFromEditProject(false); setActive("projects"); }}
+                onBack={() => {
+                  setFromEditProject(false);
+                  const returnTo = sidebarOverride || "projects";
+                  setSidebarOverride(null);
+                  setActive(returnTo);
+                }}
 
                 onEdit={(updatedProj) => {
 
@@ -10510,19 +10550,24 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             )}
 
-            {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client) => { setClients(prev => [...prev, client]); setActive("clients"); }} user={user} />}
+            {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client) => { setClients(prev => [...prev, client]); setPendingNewClientId(client._id); setActive("clients"); }} user={user} />}
 
-            {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
+            {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 
               setActive("addClient");
 
             }} triggerCrop={triggerCrop}
-
               onCreateProject={(proj, isEdit) => {
 
                 setSidebarOverride("clients");
+
+                // Save the active client ID so we return to the same client
+                const activeC = proj?._id
+                  ? clients.find(c => c._id === proj._id)
+                  : clients.find(c => (c.clientName || c.name) === proj?.client);
+                if (activeC) setActiveClientIdForReturn(activeC._id);
 
                 if (isEdit && proj) {
 
@@ -10534,13 +10579,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 } else {
 
-                  // Active client-à®“à®Ÿ details à®ªà¯à®¤à®¿à®¯ project-à®•à¯à®•à¯ pass à®ªà®£à¯à®£à¯
-
-                  const activeC = clients.find(c => c._id === proj?._id) || clients.find(c => (c.clientName || c.name) === proj?.client);
-
                   if (activeC) {
-
-                    // ClientsPage-à®²à¯ activeClient select à®†à®•à®¿ à®‡à®°à¯à®•à¯à®•à¯ — à®…à®¨à¯à®¤ client details save à®ªà®£à¯à®£à¯
 
                     setJumpProject({
 

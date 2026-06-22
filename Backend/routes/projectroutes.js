@@ -19,9 +19,19 @@ router.get("/", async (req, res) => {
 router.get("/client/:clientName", async (req, res) => {
   try {
     const companyId = req.companyId || "";
+    if (!companyId) return res.json([]);
+
+    const clientId = req.query.clientId ? String(req.query.clientId).trim() : "";
     const name = decodeURIComponent(req.params.clientName).trim();
     const companyName = req.query.company ? decodeURIComponent(req.query.company).trim() : "";
 
+    // If clientId is provided, use STRICT clientId match — prevents old name-matched data
+    if (clientId) {
+      const projects = await Project.find({ companyId, clientId }).sort({ createdAt: -1 });
+      return res.json(projects);
+    }
+
+    // Legacy fallback: name-based match for projects created before clientId existed
     const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const safeName = escapeRegExp(name);
     const safeCompany = escapeRegExp(companyName);
@@ -30,8 +40,9 @@ router.get("/client/:clientName", async (req, res) => {
     if (safeName) conditions.push({ client: { $regex: new RegExp(`^\\s*${safeName}\\s*$`, "i") } });
     if (safeCompany) conditions.push({ client: { $regex: new RegExp(`^\\s*${safeCompany}\\s*$`, "i") } });
 
-    const baseFilter = companyId ? { companyId } : {};
-    const filter = conditions.length > 0 ? { ...baseFilter, $or: conditions } : baseFilter;
+    const filter = conditions.length > 0
+      ? { companyId, $or: conditions }
+      : { companyId };
 
     const projects = await Project.find(filter).sort({ createdAt: -1 });
     res.json(projects);
@@ -121,6 +132,7 @@ router.post("/add", async (req, res) => {
       files: Array.isArray(files) ? files : [],
       loggedHours: Number(req.body.loggedHours) || 0,
       companyId: req.companyId || "",
+      clientId: req.body.clientId || "",
     });
 
     console.log("Attempting to save project...");
@@ -225,7 +237,8 @@ router.put("/:id", async (req, res) => {
       if (ProjectStatus) {
         await ProjectStatus.findOneAndUpdate(
           { name: project.name, companyId: project.companyId },
-          { $set: {
+          {
+            $set: {
               client: project.client,
               manager: project.manager || "",
               employee: (project.assignedTo && project.assignedTo.length) ? project.assignedTo.join(", ") : "",

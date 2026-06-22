@@ -11731,7 +11731,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   </div>
 
 
-
                   {/* ── ONLINE PRESENCE ── */}
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>

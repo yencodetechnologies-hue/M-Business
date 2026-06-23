@@ -57,7 +57,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
 
   // ── Tags ──
   const [tags, setTags] = useState(
-    existingQt.tags || (editEntry ? [] : [])
+    Array.isArray(existingQt.tags) ? existingQt.tags : []
   );
   const [tagInput, setTagInput] = useState('');
   const addTag = () => {
@@ -92,8 +92,16 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
   const removeFeature = (phaseId, featId) => setPhases(p => p.map(ph => ph.id === phaseId ? { ...ph, features: ph.features.filter(f => f.id !== featId) } : ph));
 
   // ── Inclusions / Exclusions ──
-  const [inclusions, setInclusions] = useState([{ id: 1, text: '3 rounds of revisions' }, { id: 2, text: 'Source code handover' }, { id: 3, text: '30-day support post launch' }]);
-  const [exclusions, setExclusions] = useState([{ id: 1, text: 'Domain & hosting charges' }, { id: 2, text: 'Content writing / copywriting' }, { id: 3, text: 'Third-party API costs' }]);
+  const [inclusions, setInclusions] = useState(
+    existingQt.inclusions?.length
+      ? existingQt.inclusions.map((item, i) => ({ id: item.id || i + 1, text: item.text || item }))
+      : [{ id: 1, text: '3 rounds of revisions' }, { id: 2, text: 'Source code handover' }, { id: 3, text: '30-day support post launch' }]
+  );
+  const [exclusions, setExclusions] = useState(
+    existingQt.exclusions?.length
+      ? existingQt.exclusions.map((item, i) => ({ id: item.id || i + 1, text: item.text || item }))
+      : [{ id: 1, text: 'Domain & hosting charges' }, { id: 2, text: 'Content writing / copywriting' }, { id: 3, text: 'Third-party API costs' }]
+  );
   const addIncl = () => setInclusions(p => [...p, { id: genId(), text: '' }]);
   const updIncl = (id, v) => setInclusions(p => p.map(i => i.id === id ? { ...i, text: v } : i));
   const removeIncl = (id) => setInclusions(p => p.filter(i => i.id !== id));
@@ -102,11 +110,20 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
   const removeExcl = (id) => setExclusions(p => p.filter(i => i.id !== id));
 
   // ── Line Items ──
-  const [items, setItems] = useState([
-    { id: 1, desc: 'UI/UX Design', qty: 1, rate: 18000 },
-    { id: 2, desc: 'Frontend Development', qty: 1, rate: 25000 },
-    { id: 3, desc: 'CMS Integration', qty: 1, rate: 12000 },
-  ]);
+  const [items, setItems] = useState(
+    existingItems.length
+      ? existingItems.map((item, i) => ({
+        id: item.id || i + 1,
+        desc: item.description || item.desc || '',
+        qty: item.quantity || item.qty || 1,
+        rate: item.rate || 0,
+      }))
+      : [
+        { id: 1, desc: 'UI/UX Design', qty: 1, rate: 18000 },
+        { id: 2, desc: 'Frontend Development', qty: 1, rate: 25000 },
+        { id: 3, desc: 'CMS Integration', qty: 1, rate: 12000 },
+      ]
+  );
   const addItem = () => setItems(p => [...p, { id: genId(), desc: '', qty: 1, rate: 0 }]);
   const removeItem = (id) => { if (items.length > 1) setItems(p => p.filter(i => i.id !== id)); };
   const updItem = (id, f, v) => setItems(p => p.map(i => i.id === id ? { ...i, [f]: v } : i));
@@ -134,9 +151,9 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
   const handleSave = async (status = 'draft') => {
     setSaving(true);
     try {
-      const payload = { 
-        qt: { 
-          ...qt, 
+      const payload = {
+        qt: {
+          ...qt,
           status,
           client: qt.toName,       // mapped for list
           project: qt.title,       // mapped for list
@@ -145,16 +162,16 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
           phases,
           inclusions,
           exclusions
-        }, 
+        },
         items: items.map(item => ({
           id: item.id,
           description: item.desc,
           quantity: item.qty,
           rate: item.rate
-        })), 
-        status 
+        })),
+        status
       };
-      
+
       const existingId = editEntry?.id || editEntry?._id;
       if (existingId) {
         // UPDATE existing quotation
@@ -171,7 +188,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
 
   // ── Valid until date ──
   const validUntil = (() => {
-    const days = parseInt(qt.validity) || 30;
+    const days = qt.validity === 'Custom' ? (parseInt(customValidity) || 30) : (parseInt(qt.validity) || 30);
     const d = new Date(qt.quoteDate || today);
     d.setDate(d.getDate() + days);
     return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -387,18 +404,18 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
           <button className="mqc-back" onClick={onBack}>
             <i className="ti ti-arrow-left" style={{ fontSize: 13 }}></i> Quotations
           </button>
-          <div className="mqc-topbar-title">Create Quotation</div>
+          <div className="mqc-topbar-title">{editEntry ? 'Edit Quotation' : 'Create Quotation'}</div>
         </div>
         <div className="mqc-actions">
           <button className="mqc-btn-outline" onClick={() => handleSave('draft')} disabled={saving}>
             <i className="ti ti-device-floppy" style={{ fontSize: 13 }}></i>
-            {saved ? 'Success Saved!' : saving ? 'Saving…' : 'Save Draft'}
+            {saved ? 'Saved!' : saving ? 'Saving…' : editEntry ? 'Update Draft' : 'Save Draft'}
           </button>
           <button className="mqc-btn-teal mqc-btn-amber" onClick={() => handleSave('sent')} disabled={saving}>
-            <i className="ti ti-send" style={{ fontSize: 13 }}></i> Send Quote
+            <i className="ti ti-send" style={{ fontSize: 13 }}></i> {editEntry ? 'Update & Send' : 'Send Quote'}
           </button>
           <button className="mqc-btn-teal mqc-btn-green" onClick={onBack}>
-            <i className="ti ti-receipt" style={{ fontSize: 13 }}></i>  Invoice
+            <i className="ti ti-receipt" style={{ fontSize: 13 }}></i> {editEntry ? 'Cancel' : 'Invoice'}
           </button>
         </div>
       </header>
@@ -772,6 +789,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
                       <>
                         {qt.toContact && <>{qt.toContact}<br /></>}
                         {qt.toEmail && <>{qt.toEmail}<br /></>}
+                        {qt.toPhone && <>{qt.toPhone}<br /></>}
                         {qt.toAddress}
                       </>
                     ) : (
@@ -795,6 +813,42 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
                   <div className="quo-scope-tags">
                     {tags.map(t => <span key={t} className="quo-scope-tag">{t}</span>)}
                   </div>
+                </div>
+              )}
+
+              {/* Project Overview — Visible to Client */}
+              {qt.overview && (
+                <div style={{ padding: '8px 10px', background: 'var(--teal-lighter)', borderRadius: 8, borderLeft: '3px solid var(--teal)', marginBottom: 12 }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--teal)', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 4 }}>
+                    Project Overview <span style={{ fontSize: 9, fontWeight: 600, color: 'var(--text3)', textTransform: 'none', letterSpacing: 0 }}>· Visible to Client</span>
+                  </div>
+                  <div style={{ fontSize: 10, color: 'var(--text2)', lineHeight: 1.7 }}>{qt.overview}</div>
+                </div>
+              )}
+
+              {/* Inclusions & Exclusions */}
+              {(inclusions.some(i => i.text.trim()) || exclusions.some(i => i.text.trim())) && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+                  {inclusions.some(i => i.text.trim()) && (
+                    <div style={{ padding: '8px 10px', background: 'var(--green-bg)', borderRadius: 8, borderLeft: '3px solid var(--green)' }}>
+                      <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--green)', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 5 }}>✓ What's Included</div>
+                      {inclusions.filter(i => i.text.trim()).map(i => (
+                        <div key={i.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 5, fontSize: 10, color: 'var(--text2)', marginBottom: 3, lineHeight: 1.5 }}>
+                          <span style={{ color: 'var(--green)', fontWeight: 800, flexShrink: 0 }}>•</span> {i.text}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {exclusions.some(i => i.text.trim()) && (
+                    <div style={{ padding: '8px 10px', background: 'var(--red-bg)', borderRadius: 8, borderLeft: '3px solid var(--red)' }}>
+                      <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--red)', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 5 }}>✗ What's Excluded</div>
+                      {exclusions.filter(i => i.text.trim()).map(i => (
+                        <div key={i.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 5, fontSize: 10, color: 'var(--text2)', marginBottom: 3, lineHeight: 1.5 }}>
+                          <span style={{ color: 'var(--red)', fontWeight: 800, flexShrink: 0 }}>•</span> {i.text}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -849,7 +903,13 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
               {/* Validity */}
               <div className="quo-validity">
                 <div className="quo-validity-text">
-                  Alarm This quotation is valid for <strong>{qt.validity === 'Custom' ? 'Custom' : `${qt.validity} days`}</strong> from the date of issue
+                  ⏰ This quotation is valid for{' '}
+                  <strong>
+                    {qt.validity === 'Custom'
+                      ? (customValidity ? `${customValidity} days` : 'Custom period')
+                      : `${qt.validity} days`}
+                  </strong>{' '}
+                  from the date of issue · Expires: {validUntil}
                 </div>
               </div>
 

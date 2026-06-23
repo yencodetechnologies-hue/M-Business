@@ -26,38 +26,38 @@ export default function QuotationCreatorModern(props) {
 const genId = () => Date.now() + Math.random();
 const today = new Date().toISOString().split('T')[0];
 const quoteNo = 'QUO-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 9000) + 1000);
-
 function ModernForm({ onBack, user, clients = [], editEntry = null }) {
   // ── Pre-fill from existing entry if editing ──
   const existingQt = editEntry?.qt || {};
   const existingItems = editEntry?.items || [];
+  const isEditing = !!editEntry;
 
   // ── Form fields ──
   const [qt, setQt] = useState({
     quoteNo: existingQt.quoteNo || editEntry?.quoteNo || quoteNo,
-    quoteDate: existingQt.date || existingQt.quoteDate || today,
-    title: existingQt.project || existingQt.title || '',
+    quoteDate: existingQt.quoteDate || existingQt.date || today,
+    title: existingQt.title || existingQt.project || '',
     type: existingQt.type || 'Web Development',
-    description: existingQt.description || existingQt.notes || '',
-    fromCompany: existingQt.companyName || user?.companyName || 'YENCODE Technologies',
-    fromName: existingQt.fromName || user?.ownerName || user?.name || 'Prabhu R',
-    fromEmail: existingQt.companyEmail || existingQt.fromEmail || user?.email || 'yencodetechnologies@gmail.com',
-    fromPhone: existingQt.companyPhone || existingQt.fromPhone || user?.phone || '+91 89254 33533',
-    toName: existingQt.client || editEntry?.client || '',
+    description: existingQt.description || '',
+    fromCompany: existingQt.fromCompany || existingQt.companyName || user?.companyName || '',
+    fromName: existingQt.fromName || user?.ownerName || user?.name || '',
+    fromEmail: existingQt.fromEmail || existingQt.companyEmail || user?.email || '',
+    fromPhone: existingQt.fromPhone || existingQt.companyPhone || user?.phone || '',
+    toName: existingQt.toName || existingQt.client || editEntry?.client || '',
     toContact: existingQt.toContact || '',
     toEmail: existingQt.toEmail || '',
     toPhone: existingQt.toPhone || '',
     toAddress: existingQt.toAddress || '',
     overview: existingQt.overview || '',
     validity: existingQt.validity || '30',
-    notes: existingQt.terms || existingQt.notes || '',
-    status: (editEntry?.status || existingQt.status || 'DRAFT').toUpperCase(),
+    notes: existingQt.notes || existingQt.terms || '',
+    status: (existingQt.status || editEntry?.status || 'DRAFT').toUpperCase(),
   });
   const upd = (f, v) => setQt(p => ({ ...p, [f]: v }));
 
   // ── Tags ──
   const [tags, setTags] = useState(
-    Array.isArray(existingQt.tags) ? existingQt.tags : []
+    Array.isArray(existingQt.tags) && existingQt.tags.length > 0 ? existingQt.tags : []
   );
   const [tagInput, setTagInput] = useState('');
   const addTag = () => {
@@ -74,13 +74,15 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
     { id: 3, title: 'Testing & Launch', desc: 'Cross-browser testing, performance optimisation, final revisions, deployment and post-launch support.', open: true, features: [{ id: 8, text: 'Cross-browser & device testing' }, { id: 9, text: 'Performance & speed optimisation' }, { id: 10, text: 'Production deployment' }, { id: 11, text: '30-day post-launch support' }] },
   ];
   const [phases, setPhases] = useState(
-    existingQt.phases?.map((ph, i) => ({
-      id: ph.id || i + 1,
-      title: ph.title || `Phase ${i + 1}`,
-      desc: ph.desc || '',
-      open: true,
-      features: (ph.features || []).map((f, fi) => ({ id: f.id || fi + 1, text: f.text || f })),
-    })) || defaultPhases
+    Array.isArray(existingQt.phases) && existingQt.phases.length > 0
+      ? existingQt.phases.map((ph, i) => ({
+        id: ph.id || i + 1,
+        title: ph.title || `Phase ${i + 1}`,
+        desc: ph.desc || '',
+        open: true,
+        features: (ph.features || []).map((f, fi) => ({ id: f.id || fi + 1, text: f.text || f })),
+      }))
+      : defaultPhases
   );
   const addPhase = () => setPhases(p => [...p, { id: genId(), title: 'New Phase', desc: '', open: true, features: [] }]);
   const removePhase = (id) => setPhases(p => p.filter(ph => ph.id !== id));
@@ -93,13 +95,13 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
 
   // ── Inclusions / Exclusions ──
   const [inclusions, setInclusions] = useState(
-    existingQt.inclusions?.length
-      ? existingQt.inclusions.map((item, i) => ({ id: item.id || i + 1, text: item.text || item }))
+    Array.isArray(existingQt.inclusions) && existingQt.inclusions.length > 0
+      ? existingQt.inclusions.map((item, i) => ({ id: item.id || i + 1, text: item.text || String(item) }))
       : [{ id: 1, text: '3 rounds of revisions' }, { id: 2, text: 'Source code handover' }, { id: 3, text: '30-day support post launch' }]
   );
   const [exclusions, setExclusions] = useState(
-    existingQt.exclusions?.length
-      ? existingQt.exclusions.map((item, i) => ({ id: item.id || i + 1, text: item.text || item }))
+    Array.isArray(existingQt.exclusions) && existingQt.exclusions.length > 0
+      ? existingQt.exclusions.map((item, i) => ({ id: item.id || i + 1, text: item.text || String(item) }))
       : [{ id: 1, text: 'Domain & hosting charges' }, { id: 2, text: 'Content writing / copywriting' }, { id: 3, text: 'Third-party API costs' }]
   );
   const addIncl = () => setInclusions(p => [...p, { id: genId(), text: '' }]);
@@ -109,14 +111,14 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
   const updExcl = (id, v) => setExclusions(p => p.map(i => i.id === id ? { ...i, text: v } : i));
   const removeExcl = (id) => setExclusions(p => p.filter(i => i.id !== id));
 
-  // ── Line Items ──
+  // ── Line Items — map from DB field names (description/quantity) to form field names (desc/qty) ──
   const [items, setItems] = useState(
-    existingItems.length
+    existingItems.length > 0
       ? existingItems.map((item, i) => ({
         id: item.id || i + 1,
         desc: item.description || item.desc || '',
-        qty: item.quantity || item.qty || 1,
-        rate: item.rate || 0,
+        qty: parseFloat(item.quantity || item.qty) || 1,
+        rate: parseFloat(item.rate) || 0,
       }))
       : [
         { id: 1, desc: 'UI/UX Design', qty: 1, rate: 18000 },
@@ -132,9 +134,15 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
   const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.qty) || 0), 0);
   const fmt = (n) => 'INR ' + Number(n).toLocaleString('en-IN');
 
-  // ── Validity selection ──
-  const validityOptions = ['7', '15', '30', '45', '60', 'Custom'];
-  const [customValidity, setCustomValidity] = useState('');
+  // ── Validity — restore custom value if saved validity is a number not in the preset list ──
+  const presetValidities = ['7', '15', '30', '45', '60'];
+  const savedValidity = existingQt.validity || '30';
+  const isCustomValidity = savedValidity && !presetValidities.includes(String(savedValidity)) && savedValidity !== 'Custom';
+  const [customValidity, setCustomValidity] = useState(isCustomValidity ? String(savedValidity) : '');
+  // Override validity field to 'Custom' if it was a custom number
+  if (isCustomValidity && qt.validity !== 'Custom') {
+    qt.validity = 'Custom';
+  }
 
   // ── Status ──
   const statuses = [
@@ -404,18 +412,18 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
           <button className="mqc-back" onClick={onBack}>
             <i className="ti ti-arrow-left" style={{ fontSize: 13 }}></i> Quotations
           </button>
-          <div className="mqc-topbar-title">{editEntry ? 'Edit Quotation' : 'Create Quotation'}</div>
+          <div className="mqc-topbar-title">{isEditing ? 'Edit Quotation' : 'Create Quotation'}</div>
         </div>
         <div className="mqc-actions">
           <button className="mqc-btn-outline" onClick={() => handleSave('draft')} disabled={saving}>
             <i className="ti ti-device-floppy" style={{ fontSize: 13 }}></i>
-            {saved ? 'Saved!' : saving ? 'Saving…' : editEntry ? 'Update Draft' : 'Save Draft'}
+            {saved ? 'Saved!' : saving ? 'Saving…' : isEditing ? 'Update Draft' : 'Save Draft'}
           </button>
           <button className="mqc-btn-teal mqc-btn-amber" onClick={() => handleSave('sent')} disabled={saving}>
-            <i className="ti ti-send" style={{ fontSize: 13 }}></i> {editEntry ? 'Update & Send' : 'Send Quote'}
+            <i className="ti ti-send" style={{ fontSize: 13 }}></i> {isEditing ? 'Update & Send' : 'Send Quote'}
           </button>
           <button className="mqc-btn-teal mqc-btn-green" onClick={onBack}>
-            <i className="ti ti-receipt" style={{ fontSize: 13 }}></i> {editEntry ? 'Cancel' : 'Invoice'}
+            <i className="ti ti-arrow-left" style={{ fontSize: 13 }}></i> {isEditing ? 'Cancel' : 'Back'}
           </button>
         </div>
       </header>

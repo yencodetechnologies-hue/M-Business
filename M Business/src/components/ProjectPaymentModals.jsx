@@ -86,7 +86,30 @@ export default function ProjectPaymentModals({
     setItems([{ id: 1, description: "", quantity: 1, rate: 0, gstRate: 18, isGstIncluded: false }]);
 
     if (editData) {
-      setForm(editData);
+      // If editing a payment and dueDate is missing, auto-fill from linked invoice
+      let enrichedEditData = { ...editData };
+      if (!editData.dueDate && editData.linkedInvoice) {
+        const parseAmt = (val) => { const n = Number(String(val || 0).replace(/[^0-9.-]+/g, '')); return isNaN(n) ? 0 : n; };
+        const linkedInv =
+          (project.invoices || []).find(inv => inv.invoiceNo === editData.linkedInvoice) ||
+          projectInvoices.find(inv => inv.invoiceNo === editData.linkedInvoice);
+        if (linkedInv) {
+          const rawDueDate = linkedInv.dueDate || (linkedInv.inv && linkedInv.inv.dueDate) || null;
+          if (rawDueDate) {
+            enrichedEditData.dueDate = rawDueDate.includes('T') ? rawDueDate.split('T')[0] : rawDueDate;
+          }
+          // Also fill description if missing
+          if (!editData.description) {
+            enrichedEditData.description =
+              linkedInv.description ||
+              (linkedInv.inv && (linkedInv.inv.notes || linkedInv.inv.description)) ||
+              linkedInv.notes ||
+              linkedInv.category ||
+              `Payment for ${editData.linkedInvoice}`;
+          }
+        }
+      }
+      setForm(enrichedEditData);
       const lineItems = editData.items || editData.lineItems;
       if (lineItems && lineItems.length > 0) {
         setItems(lineItems.map((it, idx) => ({ ...it, id: it.id || idx + 1 })));
@@ -578,19 +601,37 @@ export default function ProjectPaymentModals({
                   handleInputChange('linkedInvoice', selectedInvoiceNo);
                   if (selectedInvoiceNo) {
                     const parseAmt = (val) => { const n = Number(String(val || 0).replace(/[^0-9.-]+/g, '')); return isNaN(n) ? 0 : n; };
-                    const selectedInv = projectInvoices.find(inv => inv.invoiceNo === selectedInvoiceNo);
+
+                    // Search global API invoices first, then fall back to local project.invoices
+                    const selectedInv =
+                      projectInvoices.find(inv => inv.invoiceNo === selectedInvoiceNo) ||
+                      (project.invoices || []).find(inv => inv.invoiceNo === selectedInvoiceNo);
+
                     if (selectedInv) {
+                      // Auto-fill Amount (remaining balance)
                       const alreadyPaid = (project.paymentsReceived || []).reduce((sum, p) => p.linkedInvoice === selectedInvoiceNo ? sum + parseAmt(p.amount) : sum, 0);
-                      const remaining = parseAmt(selectedInv.amount) - alreadyPaid;
+                      const invAmount = parseAmt(selectedInv.amount || selectedInv.total);
+                      const remaining = invAmount - alreadyPaid;
                       handleInputChange('amount', remaining > 0 ? remaining : 0);
+
                       // Auto-fill Description from invoice
-                      const invoiceDesc = selectedInv.description || selectedInv.notes || selectedInv.category || `Payment for ${selectedInvoiceNo}`;
+                      const invoiceDesc =
+                        selectedInv.description ||
+                        (selectedInv.inv && (selectedInv.inv.notes || selectedInv.inv.description)) ||
+                        selectedInv.notes ||
+                        selectedInv.category ||
+                        `Payment for ${selectedInvoiceNo}`;
                       handleInputChange('description', invoiceDesc);
-                      // Auto-fill Due Date from invoice
-                      if (selectedInv.dueDate) {
-                        const dueDateFormatted = selectedInv.dueDate.includes('T')
-                          ? selectedInv.dueDate.split('T')[0]
-                          : selectedInv.dueDate;
+
+                      // Auto-fill Due Date — check all possible field locations
+                      const rawDueDate =
+                        selectedInv.dueDate ||
+                        (selectedInv.inv && selectedInv.inv.dueDate) ||
+                        null;
+                      if (rawDueDate) {
+                        const dueDateFormatted = rawDueDate.includes('T')
+                          ? rawDueDate.split('T')[0]
+                          : rawDueDate;
                         handleInputChange('dueDate', dueDateFormatted);
                       } else {
                         handleInputChange('dueDate', '');
@@ -603,18 +644,25 @@ export default function ProjectPaymentModals({
                   }
                 }}>
                   <option value="">-- Select Invoice --</option>
-                  {projectInvoices.map(inv => {
+                  {(() => {
                     const parseAmt = (val) => { const n = Number(String(val || 0).replace(/[^0-9.-]+/g, '')); return isNaN(n) ? 0 : n; };
-                    const alreadyPaid = (project.paymentsReceived || []).reduce((sum, p) => p.linkedInvoice === inv.invoiceNo ? sum + parseAmt(p.amount) : sum, 0);
-                    const invTotal = parseAmt(inv.amount || inv.total);
-                    const remaining = invTotal - alreadyPaid;
-                    const statusBadge = inv.status ? ` [${inv.status}]` : '';
-                    return (
-                      <option key={inv.invoiceNo} value={inv.invoiceNo}>
-                        {inv.invoiceNo} — ₹{invTotal.toLocaleString('en-IN')} | Due: ₹{remaining > 0 ? remaining.toLocaleString('en-IN') : '0'}{statusBadge}
-                      </option>
-                    );
-                  })}
+                    // Merge global + local invoices, deduplicate by invoiceNo
+                    const localInvoices = (project.invoices || []);
+                    const globalInvoiceNos = new Set(projectInvoices.map(inv => inv.invoiceNo));
+                    const localOnly = localInvoices.filter(inv => !globalInvoiceNos.has(inv.invoiceNo));
+                    const allInvoices = [...projectInvoices, ...localOnly];
+                    return allInvoices.map(inv => {
+                      const alreadyPaid = (project.paymentsReceived || []).reduce((sum, p) => p.linkedInvoice === inv.invoiceNo ? sum + parseAmt(p.amount) : sum, 0);
+                      const invTotal = parseAmt(inv.amount || inv.total);
+                      const remaining = invTotal - alreadyPaid;
+                      const statusBadge = inv.status ? ` [${inv.status}]` : '';
+                      return (
+                        <option key={inv.invoiceNo} value={inv.invoiceNo}>
+                          {inv.invoiceNo} — ₹{invTotal.toLocaleString('en-IN')} | Due: ₹{remaining > 0 ? remaining.toLocaleString('en-IN') : '0'}{statusBadge}
+                        </option>
+                      );
+                    });
+                  })()}
                 </select>
               </div>
             </div>
@@ -656,9 +704,16 @@ export default function ProjectPaymentModals({
               </div>
             </div>
             <div style={rowStyle}>
-              <div><label style={labelStyle}>Payment Mode</label><select style={inputStyle} value={form.paymentMode || 'Bank Transfer'} onChange={e => handleInputChange('paymentMode', e.target.value)}>
-                <option>Bank Transfer</option><option>UPI</option><option>Credit Card</option><option>Cash</option><option>Cheque</option>
-              </select></div>
+
+              <div><label style={labelStyle}>Payment Mode</label>
+                <select
+                  style={inputStyle}
+                  value={form.paymentMode || ''}
+                  onChange={e => handleInputChange('paymentMode', e.target.value)}
+                >
+
+                  <option value="">Select Mode</option> <option>Bank Transfer</option><option>UPI</option><option>Credit Card</option><option>Cash</option><option>Cheque</option>
+                </select></div>
               <div><label style={labelStyle}>Transaction Ref</label><input style={inputStyle} value={form.transactionRef || ''} onChange={e => handleInputChange('transactionRef', e.target.value)} placeholder="TXN / UTR / Cheque No." /></div>
             </div>
             <div style={{ marginBottom: 16 }}><label style={labelStyle}>Notes</label><textarea style={{ ...inputStyle, height: 80 }} value={form.notes || ''} onChange={e => handleInputChange('notes', e.target.value)} placeholder="Any additional notes..." /></div>
@@ -899,7 +954,7 @@ export default function ProjectPaymentModals({
               <div style={{ background: '#F3F4F6', color: '#6B7280', padding: 8, borderRadius: 8 }}><i className="ti ti-receipt"></i></div>
               Add Project Expense
             </h3>
-            <button style={closeBtnStyle} onClick={closeModals}>Close</button>
+            <button style={closeBtnStyle} onClick={closeModals}>✕</button>
           </div>
           <form onSubmit={e => handleSave(e, 'expense')}>
             <div style={rowStyle}>

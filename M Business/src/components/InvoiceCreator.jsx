@@ -381,6 +381,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           project: ed.project || newInvoicePrefill.project || '',
           date: ed.date || blank.date,
           dueDate: ed.dueDate || blank.dueDate,
+          dueDateType: ed.dueDate ? 'custom' : (ed.dueDateType || '30'),
           notes: ed.notes ?? blank.notes,
           terms: ed.terms ?? blank.terms,
           companyName: ed.companyName || blank.companyName,
@@ -1961,7 +1962,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                   {/* Put this under the existing label, instead of the terms grid */}
                   <div style={{ display: 'flex', gap: 10 }}>
                     <select className="inv-creator-form-select"
-                      value={inv.dueDateType || '30'}
+                      value={inv.dueDateType || 'custom'}
                       onChange={e => {
                         const val = e.target.value;
                         upd('dueDateType', val);
@@ -1978,9 +1979,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                       <option value="45">Next 45 days</option>
                       <option value="custom">Custom date</option>
                     </select>
-                    {inv.dueDateType === 'custom' && (
+                    {/* Always show the date input when a specific date is saved or custom is selected */}
+                    {(inv.dueDateType === 'custom' || (inv.dueDate && !['0', '15', '30', '45'].includes(inv.dueDateType))) && (
                       <input type="date" className="inv-creator-form-input"
-                        value={inv.dueDate}
+                        value={inv.dueDate || ''}
                         onChange={e => upd('dueDate', e.target.value)}
                         style={{ flex: 1 }} />
                     )}

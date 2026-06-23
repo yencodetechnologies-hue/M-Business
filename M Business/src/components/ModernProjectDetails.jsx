@@ -537,7 +537,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   // Milestone progress — drives the Overall Progress bar (milestone-only, not task-only)
   const milestonesArr = currProject.milestones || [];
-  const doneMilestones = milestonesArr.filter(m => m.done).length;
+  const doneMilestones = milestonesArr.filter(m => {
+    const mTasks = currTasks.filter(t => t.milestone === m.name && !t.isDeleted);
+    // Only count as done if it has tasks AND all are completed (or manually toggled with tasks)
+    return mTasks.length > 0 && m.done === true;
+  }).length;
   const totalMilestones = milestonesArr.length;
   const progressPct = totalMilestones > 0
     ? Math.round((doneMilestones / totalMilestones) * 100)
@@ -1100,7 +1104,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 const firstNotDone = (currProject.milestones || []).findIndex(x => {
                   const mTasks = currTasks.filter(t => t.milestone === x.name && !t.isDeleted);
                   const mAllCompleted = mTasks.length > 0 && mTasks.every(t => t.status === 'done' || t.status === 'completed');
-                  return x.done !== true && !mAllCompleted;
+                  // A milestone with no tasks is never "done" — it's always pending
+                  const xIsDone = mTasks.length > 0 ? (x.done === true || mAllCompleted) : false;
+                  return !xIsDone;
                 });
 
                 const isActive = !isDone && idx === firstNotDone;
@@ -1132,7 +1138,27 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     <div style={{ fontSize: 11, fontWeight: 700, color: P.textDark, textAlign: 'center', maxWidth: 80, wordBreak: 'break-word', position: 'relative', zIndex: 1 }}>{m.name}</div>
                     {m.date && <div style={{ fontSize: 10, color: P.textLight, textAlign: 'center', position: 'relative', zIndex: 1 }}>{new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</div>}
                     <div style={{ fontSize: 10, fontWeight: 700, color: textColor, position: 'relative', zIndex: 1 }}>{statusLabel}</div>
-                    <button onClick={e => { e.stopPropagation(); if (confirm('Delete milestone?')) { const ms = (currProject.milestones || []).filter((_, i) => i !== idx); axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms }).then(loadLatest); } }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 11, padding: 0, position: 'relative', zIndex: 1 }}>Delete</button>
+                    <button onClick={async e => {
+                      e.stopPropagation();
+                      if (!confirm('Delete milestone? This will also delete all tasks linked to this milestone.')) return;
+                      try {
+                        // Delete all tasks linked to this milestone
+                        const linkedTasks = currTasks.filter(tk => tk.milestone === m.name && !tk.isDeleted && (String(tk.projectId?._id || tk.projectId) === String(currProject._id) || tk.project === currProject.name));
+                        await Promise.all(linkedTasks.map(tk =>
+                          axios.delete(`${BASE_URL}/api/tasks/${tk._id}`).catch(() =>
+                            axios.put(`${BASE_URL}/api/tasks/${tk._id}`, { isDeleted: true })
+                          )
+                        ));
+                        // Remove milestone from project
+                        const ms = (currProject.milestones || []).filter((_, i) => i !== idx);
+                        const doneM = ms.filter(x => x.done).length;
+                        const newProgress = ms.length > 0 ? Math.round((doneM / ms.length) * 100) : 0;
+                        await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms, progress: newProgress });
+                        loadLatest();
+                        if (onUpdate) onUpdate();
+                        if (fetchTasks) fetchTasks();
+                      } catch (err) { console.error('Failed to delete milestone:', err); }
+                    }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 11, padding: 0, position: 'relative', zIndex: 1 }}>Delete</button>
                   </div>
                 );
               })}
@@ -1144,7 +1170,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             {(currProject.milestones || []).map((m, idx) => {
               const tasksForMilestone = currTasks.filter(t => t.milestone === m.name && !t.isDeleted);
               const allTasksCompleted = tasksForMilestone.length > 0 && tasksForMilestone.every(t => t.status === 'done' || t.status === 'completed');
-              const isDone = m.done === true || allTasksCompleted;
+              // Only mark done if tasks exist AND all are completed, OR manually toggled with tasks present
+              const isDone = tasksForMilestone.length > 0 ? (m.done === true || allTasksCompleted) : false;
               const firstNotDone = (currProject.milestones || []).findIndex(x => {
                 const mTasks = currTasks.filter(t => t.milestone === x.name && !t.isDeleted);
                 const mAllCompleted = mTasks.length > 0 && mTasks.every(t => t.status === 'done' || t.status === 'completed');
@@ -1169,7 +1196,27 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     </div>
                   </div>
                   <span style={{ fontSize: 11, fontWeight: 700, color: statusColor, padding: '3px 10px', borderRadius: 6, background: statusBg, flexShrink: 0 }}>{statusLabel}</span>
-                  <button onClick={e => { e.stopPropagation(); if (confirm('Delete milestone?')) { const ms = (currProject.milestones || []).filter((_, i) => i !== idx); axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms }).then(loadLatest); } }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 13, padding: 0, flexShrink: 0 }}>Delete</button>
+                  <button onClick={async e => {
+                    e.stopPropagation();
+                    if (!confirm('Delete milestone? This will also delete all tasks linked to this milestone.')) return;
+                    try {
+                      // Delete all tasks linked to this milestone
+                      const linkedTasks = currTasks.filter(tk => tk.milestone === m.name && !tk.isDeleted && (String(tk.projectId?._id || tk.projectId) === String(currProject._id) || tk.project === currProject.name));
+                      await Promise.all(linkedTasks.map(tk =>
+                        axios.delete(`${BASE_URL}/api/tasks/${tk._id}`).catch(() =>
+                          axios.put(`${BASE_URL}/api/tasks/${tk._id}`, { isDeleted: true })
+                        )
+                      ));
+                      // Remove milestone from project
+                      const ms = (currProject.milestones || []).filter((_, i) => i !== idx);
+                      const doneM = ms.filter(x => x.done).length;
+                      const newProgress = ms.length > 0 ? Math.round((doneM / ms.length) * 100) : 0;
+                      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms, progress: newProgress });
+                      loadLatest();
+                      if (onUpdate) onUpdate();
+                      if (fetchTasks) fetchTasks();
+                    } catch (err) { console.error('Failed to delete milestone:', err); }
+                  }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 13, padding: 0, flexShrink: 0 }}>Delete</button>
                 </div>
               );
             })}
@@ -1183,7 +1230,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               <input type="date" value={newMilestoneDate} onChange={e => setNewMilestoneDate(e.target.value)} style={{ padding: '6px 8px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', flex: 1 }} />
               <button type="submit" className="mpd-btn mpd-btn-primary" style={{ padding: '6px 12px', fontSize: 11 }}>Add</button>
-              <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMilestone(false)} style={{ padding: '6px 12px', fontSize: 11 }}>Close</button>
+              <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMilestone(false)} style={{ padding: '6px 12px', fontSize: 11 }}>✕</button>
             </div>
           </form>
         )}
@@ -1227,7 +1274,57 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         <div className="mpd-task-due">{t.date ? new Date(t.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}</div>
                       </div>
                       <button onClick={e => { e.stopPropagation(); setEditingTask(t); setNewTaskTitle(t.title || ''); setNewTaskDesc(t.description || ''); setNewTaskPriority(t.priority || 'medium'); setNewTaskAssignTo(t.assignTo ? t.assignTo.split(', ').filter(Boolean) : []); setNewTaskDue(t.date || ''); setNewTaskMilestone(t.milestone || ''); setShowAddTaskModal(true); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.primary, fontSize: 13, padding: '2px 6px' }}>Edit</button>
-                      <button onClick={e => { e.stopPropagation(); if (confirm('Delete?')) axios.delete(`${BASE_URL}/api/tasks/${t._id}`).catch(() => axios.put(`${BASE_URL}/api/tasks/${t._id}`, { isDeleted: true })).then(loadLatest); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 13, padding: '2px 6px' }}>Delete</button>
+                      <button onClick={async e => {
+                        e.stopPropagation();
+                        if (!confirm('Delete?')) return;
+                        try {
+                          // Delete the task
+                          await axios.delete(`${BASE_URL}/api/tasks/${t._id}`).catch(() =>
+                            axios.put(`${BASE_URL}/api/tasks/${t._id}`, { isDeleted: true })
+                          );
+
+                          // Recalculate milestone done flags — fetch latest tasks after deletion
+                          const latestTasksRes = await axios.get(`${BASE_URL}/api/tasks`, {
+                            headers: { 'x-company-id': currProject?.companyId || '' }
+                          });
+                          const allTasksAfterDelete = Array.isArray(latestTasksRes.data) ? latestTasksRes.data : [];
+                          const projTasksAfterDelete = allTasksAfterDelete.filter(tk => {
+                            if (!tk || tk.isDeleted) return false;
+                            const tPid = tk.projectId ? (tk.projectId._id ? String(tk.projectId._id) : String(tk.projectId)) : null;
+                            return tPid === String(currProject._id) || tk.project === currProject.name;
+                          });
+
+                          // Update milestone done flags based on remaining tasks
+                          const updatedMilestones = (currProject.milestones || []).map(m => {
+                            const remainingTasks = projTasksAfterDelete.filter(tk => tk.milestone === m.name && !tk.isDeleted);
+                            if (remainingTasks.length === 0) {
+                              // No tasks left — milestone cannot be done
+                              return { ...m, done: false };
+                            }
+                            const allDone = remainingTasks.every(tk => tk.status === 'done' || tk.status === 'completed');
+                            return { ...m, done: allDone };
+                          });
+
+                          // Recalculate overall progress
+                          const doneM = updatedMilestones.filter((m, idx) => {
+                            const mTasks = projTasksAfterDelete.filter(tk => tk.milestone === m.name && !tk.isDeleted);
+                            return mTasks.length > 0 && m.done === true;
+                          }).length;
+                          const totalM = updatedMilestones.length;
+                          const newProgress = totalM > 0 ? Math.round((doneM / totalM) * 100) : 0;
+
+                          await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
+                            milestones: updatedMilestones,
+                            progress: newProgress,
+                          });
+
+                          loadLatest();
+                          if (onUpdate) onUpdate();
+                          if (fetchTasks) fetchTasks();
+                        } catch (err) {
+                          console.error('Failed to delete task:', err);
+                        }
+                      }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 13, padding: '2px 6px' }}>Delete</button>
                     </div>
                   );
                 })
@@ -1817,7 +1914,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         {records.length > 0 ? (
                           <div>
                             {/* Headers */}
-                            <div style={{ display: 'grid', gridTemplateColumns: (p.key === 'add' || p.key === 'exp') ? '40px 2fr 1fr 1fr 1fr 1fr 80px' : p.key === 'pay' ? '40px 1.2fr 1fr 1fr 1fr 1fr 1fr 80px' : '40px 1fr 1fr 1fr 1fr 1fr 80px', gap: 8, padding: '8px 18px', background: '#FAFBFD', borderBottom: '1px solid #E8EDF2' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: (p.key === 'add' || p.key === 'exp') ? '40px 2fr 1fr 1fr 1fr 1fr 80px' : p.key === 'pay' ? '40px 1fr 1fr 1fr 1fr 1fr 1fr 1fr 80px' : '40px 1fr 1fr 1fr 1fr 1fr 80px', gap: 8, padding: '8px 18px', background: '#FAFBFD', borderBottom: '1px solid #E8EDF2' }}>
                               <div style={{ display: 'flex', alignItems: 'center' }}>
                                 <input type="checkbox" checked={records.length > 0 && selectedPaymentItems.length === records.length} onChange={e => {
                                   if (e.target.checked) setSelectedPaymentItems(records.map((_, idx) => idx));
@@ -1832,7 +1929,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                             </div>
                             {/* Rows */}
                             {records.map((rec, i) => (
-                              <div key={i} style={{ display: 'grid', gridTemplateColumns: (p.key === 'add' || p.key === 'exp') ? '40px 2fr 1fr 1fr 1fr 1fr 80px' : p.key === 'pay' ? '40px 1.2fr 1fr 1fr 1fr 1fr 1fr 80px' : '40px 1fr 1fr 1fr 1fr 1fr 80px', gap: 8, padding: '8px 18px', alignItems: 'center', minHeight: 56, borderBottom: '1px solid #E8EDF2', borderLeft: (p.key === 'add' || p.key === 'exp') ? `3px solid ${rec.status === 'Paid' ? '#22C55E' : '#F59E0B'}` : 'none' }}>
+                              <div key={i} style={{ display: 'grid', gridTemplateColumns: (p.key === 'add' || p.key === 'exp') ? '40px 2fr 1fr 1fr 1fr 1fr 80px' : p.key === 'pay' ? '40px 1fr 1fr 1fr 1fr 1fr 1fr 1fr 80px' : '40px 1fr 1fr 1fr 1fr 1fr 80px', gap: 8, padding: '8px 18px', alignItems: 'center', minHeight: 56, borderBottom: '1px solid #E8EDF2', borderLeft: (p.key === 'add' || p.key === 'exp') ? `3px solid ${rec.status === 'Paid' ? '#22C55E' : '#F59E0B'}` : 'none' }}>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                   <input type="checkbox" checked={selectedPaymentItems.includes(i)} onChange={e => {
                                     if (e.target.checked) setSelectedPaymentItems(prev => [...prev, i]);
@@ -1855,7 +1952,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   </div>
                                 ) : (
                                   <>
-                                    {/* Col 1: Payment # + Invoice ref */}
+                                    {/* Col 1: Payment # */}
                                     <div>
                                       <div style={{ fontSize: 12, fontWeight: 800, color: '#0D1B2A', display: 'flex', alignItems: 'center', gap: 6 }}>
                                         {rec.paymentNo || rec.advanceNo || rec.chargeNo || rec.milestoneNo}
@@ -1865,8 +1962,27 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                           </span>
                                         )}
                                       </div>
-                                      <div style={{ fontSize: 12, fontWeight: 700, color: '#7B8FA1' }}>{rec.linkedInvoice || rec.description || rec.name || '—'}</div>
+                                      <div style={{ fontSize: 11, fontWeight: 700, color: '#7B8FA1', marginTop: 2 }}>{rec.description || rec.name || '—'}</div>
                                     </div>
+
+                                    {/* Col 2 (Invoice column — separate cell for pay tab) */}
+                                    {p.key === 'pay' ? (
+                                      <div>
+                                        <div style={{ fontSize: 12, fontWeight: 800, color: '#00BCD4' }}>
+                                          {rec.linkedInvoice || '—'}
+                                        </div>
+                                        {rec.linkedInvoice && (() => {
+                                          const linkedInv = mergedInvoices.find(inv => inv.invoiceNo === rec.linkedInvoice);
+                                          const parseAmtLocal = (val) => { const n = Number(String(val || 0).replace(/[^0-9.-]+/g, '')); return isNaN(n) ? 0 : n; };
+                                          const invTotal = parseAmtLocal(linkedInv?.amount);
+                                          return invTotal > 0 ? (
+                                            <div style={{ fontSize: 10, color: '#7B8FA1', fontWeight: 600, marginTop: 2 }}>
+                                              {currency}{invTotal.toLocaleString()}
+                                            </div>
+                                          ) : null;
+                                        })()}
+                                      </div>
+                                    ) : <div></div>}
                                   </>
                                 )}
 
@@ -1875,10 +1991,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   {currency}{(rec.amount || 0).toLocaleString()}
                                 </div>
 
-                                {/* Col 3: Due Date — for pay tab only, fallback to linked invoice */}
+                                {/* Col 3: Due Date — for pay tab only, fallback to merged invoice list */}
                                 {p.key === 'pay' ? (() => {
-                                  const effectiveDueDate = rec.dueDate ||
-                                    (rec.linkedInvoice ? (currProject.invoices || []).find(inv => inv.invoiceNo === rec.linkedInvoice)?.dueDate : null);
+                                  // Check rec.dueDate first, then look up from both local invoices AND global invoices
+                                  const localInvDueDate = (currProject.invoices || []).find(inv => inv.invoiceNo === rec.linkedInvoice)?.dueDate;
+                                  const globalInvDueDate = mergedInvoices.find(inv => inv.invoiceNo === rec.linkedInvoice)?.dueDate;
+                                  const effectiveDueDate = rec.dueDate || localInvDueDate || globalInvDueDate || null;
                                   const isLate = effectiveDueDate && rec.paymentDate && new Date(rec.paymentDate) > new Date(effectiveDueDate);
                                   return (
                                     <div>
@@ -1888,7 +2006,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                       {isLate && <div style={{ fontSize: 9, fontWeight: 800, color: '#EF4444', marginTop: 2 }}>LATE</div>}
                                     </div>
                                   );
-                                })() : null}
+                                })() : <div></div>}
 
                                 {/* Col 4: Payment Date */}
                                 <div style={{ fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>
@@ -2031,7 +2149,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       {file.name}
                     </a>
                     <button onClick={() => handleDeleteFile(file._id)} style={{ background: 'transparent', border: 'none', color: P.red, cursor: 'pointer', fontSize: 14 }}>
-                      Close
+                      ✕
                     </button>
                   </div>
                 ))}
@@ -2190,7 +2308,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <div style={{ background: '#fff', width: '100%', maxWidth: 400, borderRadius: 16, boxShadow: '0 20px 40px rgba(0,0,0,0.2)', overflow: 'hidden' }}>
               <div style={{ padding: '20px 24px', borderBottom: '1px solid #E8EDF2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ fontSize: 16, fontWeight: 900, color: '#0D1B2A' }}>Send to Client Portal</div>
-                <button onClick={() => setShowSendPopup(false)} style={{ background: 'none', border: 'none', fontSize: 20, color: '#7B8FA1', cursor: 'pointer' }}>Close</button>
+                <button onClick={() => setShowSendPopup(false)} style={{ background: 'none', border: 'none', fontSize: 20, color: '#7B8FA1', cursor: 'pointer' }}>✕</button>
               </div>
               <div style={{ padding: 24 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 8 }}>Select Client</div>
@@ -2243,7 +2361,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     <button onClick={() => window.print()} style={{ padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>
                       <i className="ti ti-printer"></i> Print / PDF
                     </button>
-                    <button onClick={() => setPreviewInvoice(null)} style={{ padding: '6px 14px', background: '#374151', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>CloseClose</button>
+                    <button onClick={() => setPreviewInvoice(null)} style={{ padding: '6px 14px', background: '#374151', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>✕</button>
                   </div>
                 </div>
                 <div id="invoice-print-area" style={{ padding: '36px 40px', background: '#fff' }}>
@@ -2409,7 +2527,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   <i className="ti ti-upload" style={{ color: '#fff', fontSize: 18 }}></i>
                   <span style={{ color: '#fff', fontWeight: 800, fontSize: 15 }}>Upload File</span>
                 </div>
-                <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>Close</button>
+                <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>✕</button>
               </div>
 
               {/* Body */}

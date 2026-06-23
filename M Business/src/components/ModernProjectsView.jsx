@@ -425,11 +425,18 @@ export default function ModernProjectsView({
                                 </div>
                               )}
 
-                              {onDelete && (
-                                <div className="mpv-menu-item danger" onClick={() => { setOpenMenu(null); onDelete(p); }}>
-                                  <i className="ti ti-trash" /> Delete
-                                </div>
-                              )}
+                              <div className="mpv-menu-item danger" onClick={() => {
+                                setOpenMenu(null);
+                                if (onDelete) {
+                                  onDelete(p);
+                                } else {
+                                  if (window.confirm(`Delete project "${p.name}"? This cannot be undone.`)) {
+                                    alert('Please pass an onDelete prop to ModernProjectsView to handle deletion.');
+                                  }
+                                }
+                              }}>
+                                <i className="ti ti-trash" /> Delete Project
+                              </div>
                             </div>
                           )}
                         </div>

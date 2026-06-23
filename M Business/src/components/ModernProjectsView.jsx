@@ -104,12 +104,25 @@ const CSS = `
 .mpv-vb.on,.mpv-vb:hover { background:${P.primaryLight}; color:${P.primary}; }
 
 /* Grid */
-.mpv-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+.mpv-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+  overflow:visible;
+}
 .mpv-grid.list { grid-template-columns:1fr; }
 
 /* Project Card */
-.mpv-card { background:#fff; border-radius:14px; box-shadow:0 2px 12px rgba(0,188,212,.08);
-  overflow:hidden; cursor:pointer; border:2px solid transparent; transition:all .2s; }
+.mpv-card {
+  background:#fff;
+  border-radius:14px;
+  box-shadow:0 2px 12px rgba(0,188,212,.08);
+  overflow:visible;
+  position:relative;
+  cursor:pointer;
+  border:2px solid transparent;
+  transition:all .2s;
+}
 .mpv-card:hover { transform:translateY(-3px); box-shadow:0 8px 32px rgba(0,188,212,.14); border-color:${P.primaryMid}; }
 .mpv-card-top { padding:18px 18px 0; }
 .mpv-card-row1 { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
@@ -156,8 +169,18 @@ const CSS = `
 .mpv-more-btn { background:none; border:none; cursor:pointer; color:${P.textLight}; font-size:18px;
   padding:2px 6px; border-radius:6px; transition:all .15s; line-height:1; }
 .mpv-more-btn:hover { background:${P.bg}; color:${P.primary}; }
-.mpv-menu { position:absolute; right:0; top:28px; background:#fff; border:1.5px solid ${P.border};
-  border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.1); z-index:200; min-width:140px; overflow:hidden; }
+.mpv-menu {
+  position:absolute;
+  right:0;
+  top:35px;
+  background:#fff;
+  border:1.5px solid ${P.border};
+  border-radius:10px;
+  box-shadow:0 8px 24px rgba(0,0,0,.1);
+  z-index:9999;
+  min-width:140px;
+  overflow:hidden;
+}
 .mpv-menu-item { padding:9px 14px; font-size:13px; font-weight:600; cursor:pointer; color:${P.textMid};
   display:flex; align-items:center; gap:8px; transition:all .12s; border-bottom:1px solid ${P.bg}; }
 .mpv-menu-item:last-child { border-bottom:none; }
@@ -211,9 +234,13 @@ export default function ModernProjectsView({
 
   // Closemenu on outside click
   React.useEffect(() => {
-    const Close = () => setOpenMenu(null);
+    const close = () => setOpenMenu(null);
+
     document.addEventListener('mousedown', close);
-    return () => document.removeEventListener('mousedown', close);
+
+    return () => {
+      document.removeEventListener('mousedown', close);
+    };
   }, []);
 
   // Inject CSS once on mount
@@ -384,6 +411,9 @@ export default function ModernProjectsView({
               <div
                 key={p._id || p.id || Math.random()}
                 className="mpv-card"
+                style={{
+                  zIndex: isMenuOpen ? 9999 : 1
+                }}
                 onClick={() => onClickProject ? onClickProject(p) : (onViewTasks && onViewTasks(p))}
               >
                 <div className="mpv-card-top">

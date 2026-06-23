@@ -1811,57 +1811,122 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
   const renderPortal = () => {
-
     const c = activeClient;
-
     if (!c) return null;
-
     const portalUrl = `${window.location.origin}/client-portal/${c._id}`;
 
+    const handleOpenPortal = () => {
+      // Build the portal URL with client token for auto-login
+      const clientToken = btoa(JSON.stringify({
+        clientId: c._id,
+        email: c.email,
+        name: c.clientName || c.name,
+        companyName: c.companyName || c.company || "",
+        exp: Date.now() + 24 * 60 * 60 * 1000 // 24 hour expiry
+      }));
+      const portalWithToken = `${window.location.origin}/client-portal/${c._id}?token=${clientToken}`;
+      window.open(portalWithToken, "_blank");
+    };
+
+    const handleCopyLink = () => {
+      navigator.clipboard.writeText(portalUrl);
+      showToast("📋 Portal link copied!");
+    };
+
+    const handleShareWhatsApp = () => {
+      const text = `Hi ${c.clientName || c.name},\n\nYou can access your client portal here:\n${portalUrl}\n\nLogin with your registered email and password.`;
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
+    };
+
+    const handleSendEmail = () => {
+      const subject = `Your Client Portal Access - ${c.clientName || c.name}`;
+      const body = `Hi ${c.clientName || c.name},\n\nYou can access your client portal here:\n${portalUrl}\n\nLogin with your registered email and password.\n\nBest regards`;
+      window.open(`mailto:${c.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+    };
+
     return (
-
       <div>
-
+        {/* Portal Hero Card */}
         <div style={{ background: "linear-gradient(135deg,#004D5E,#00BCD4)", borderRadius: 14, padding: 20, color: "#fff", marginBottom: 16 }}>
-
-          <div style={{ fontSize: 10, fontWeight: 700, opacity: .6, textTransform: "uppercase", letterSpacing: .6, marginBottom: 6 }}>Client Portal</div>
-
-          <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 4 }}>{c.clientName || c.name}</div>
-
-          <div style={{ fontSize: 11, opacity: .7, marginBottom: 14, wordBreak: "break-all" }}>{portalUrl}</div>
-
-          <div style={{ display: "flex", gap: 8 }}>
-
-            <button onClick={() => { navigator.clipboard.writeText(portalUrl); showToast("📋 Portal link copied!"); }} style={{ flex: 1, padding: 8, background: "rgba(255,255,255,.15)", border: "1.5px solid rgba(255,255,255,.25)", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}><i className="ti ti-copy" style={{ fontSize: 13 }} />Copy Link</button>
-
-            <button onClick={() => window.open(portalUrl, "_blank")} style={{ flex: 1, padding: 8, background: "rgba(255,255,255,.15)", border: "1.5px solid rgba(255,255,255,.25)", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}><i className="ti ti-external-link" style={{ fontSize: 13 }} />Open Portal</button>
-
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+            <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+              🌐
+            </div>
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, opacity: .6, textTransform: "uppercase", letterSpacing: .6 }}>Client Portal</div>
+              <div style={{ fontSize: 15, fontWeight: 800 }}>{c.clientName || c.name}</div>
+            </div>
           </div>
 
+          {/* Portal URL display */}
+          <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 8, padding: "8px 12px", marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+            <div style={{ fontSize: 10, opacity: .8, wordBreak: "break-all", flex: 1, fontFamily: "monospace" }}>{portalUrl}</div>
+            <button
+              onClick={handleCopyLink}
+              style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 6, padding: "4px 8px", color: "#fff", fontSize: 10, fontWeight: 700, cursor: "pointer", flexShrink: 0, fontFamily: "inherit" }}
+            >
+              Copy
+            </button>
+          </div>
+
+          {/* Action Buttons */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            <button
+              onClick={handleOpenPortal}
+              style={{ padding: "10px 8px", background: "#fff", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 700, color: "#004D5E", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}
+            >
+              <i className="ti ti-external-link" style={{ fontSize: 13 }} /> Open Portal
+            </button>
+            <button
+              onClick={handleCopyLink}
+              style={{ padding: "10px 8px", background: "rgba(255,255,255,.15)", border: "1.5px solid rgba(255,255,255,.25)", borderRadius: 8, fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}
+            >
+              <i className="ti ti-copy" style={{ fontSize: 13 }} /> Copy Link
+            </button>
+            <button
+              onClick={handleShareWhatsApp}
+              style={{ padding: "10px 8px", background: "#25D366", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}
+            >
+              💬 WhatsApp
+            </button>
+            <button
+              onClick={handleSendEmail}
+              style={{ padding: "10px 8px", background: "rgba(255,255,255,.15)", border: "1.5px solid rgba(255,255,255,.25)", borderRadius: 8, fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}
+            >
+              <i className="ti ti-mail" style={{ fontSize: 13 }} /> Email Link
+            </button>
+          </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
-
-          {[{ val: clientProjects.length, label: "Projects" }, { val: "—", label: "Last Login" }, { val: c.status || "Active", label: "Status" }].map((s, i) => (
-
-            <div key={i} style={{ padding: "10px 12px", background: "#fff", borderRadius: 9, border: "1.5px solid #E0EEF0" }}>
-
-              <div style={{ fontSize: 16, fontWeight: 800, color: "#1A2E35" }}>{s.val}</div>
-
+        {/* Portal Stats */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 16 }}>
+          {[
+            { val: clientProjects.length, label: "Projects", icon: "ti-briefcase", color: "#00BCD4" },
+            { val: clientProjects.filter(p => (p.status || "").toLowerCase() === "completed").length, label: "Completed", icon: "ti-check", color: "#26C281" },
+            { val: c.status || "Active", label: "Status", icon: "ti-toggle-right", color: "#F5A623" }
+          ].map((s, i) => (
+            <div key={i} style={{ padding: "12px", background: "#fff", borderRadius: 9, border: "1.5px solid #E0EEF0", textAlign: "center" }}>
+              <i className={`ti ${s.icon}`} style={{ fontSize: 18, color: s.color, display: "block", marginBottom: 4 }} />
+              <div style={{ fontSize: 17, fontWeight: 800, color: "#1A2E35" }}>{s.val}</div>
               <div style={{ fontSize: 10, color: "#A0B8BE", marginTop: 2 }}>{s.label}</div>
-
             </div>
-
           ))}
-
         </div>
 
+        {/* Portal Access Info */}
+        <div style={{ background: "#F0FDFE", border: "1.5px solid #B2EBF2", borderRadius: 10, padding: "12px 14px" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#004D5E", marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
+            <i className="ti ti-info-circle" style={{ fontSize: 14 }} /> Portal Access Info
+          </div>
+          <div style={{ fontSize: 11, color: "#607D86", lineHeight: 1.6 }}>
+            <div>📧 Login Email: <strong>{c.email || "Not set"}</strong></div>
+            <div>🔐 Password: Set during client registration</div>
+            <div>🌐 Portal URL: <span style={{ fontFamily: "monospace", fontSize: 10 }}>{portalUrl}</span></div>
+          </div>
+        </div>
       </div>
-
     );
-
   };
-
 
 
   const renderTabContent = () => {
@@ -2044,20 +2109,24 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                   </div>
 
-                  <button
-
+             <button
                     onClick={() => setViewClientModal(true)}
-
                     style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "none", border: "1.5px solid #E0EEF0", borderRadius: 20, fontSize: 11, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }}
-
                     onMouseEnter={e => { e.currentTarget.style.borderColor = "#00BCD4"; e.currentTarget.style.color = "#00BCD4"; }}
-
                     onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}
-
                   >
-
                     <i className="ti ti-eye" style={{ fontSize: 12 }} />View
-
+                  </button>
+                  <button
+                    onClick={() => {
+                      const portalUrl = `${window.location.origin}/client-portal/${activeClient._id}`;
+                      window.open(portalUrl, "_blank");
+                    }}
+                    style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "#E0F7FA", border: "1.5px solid #00BCD4", borderRadius: 20, fontSize: 11, fontWeight: 700, color: "#00BCD4", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "#00BCD4"; e.currentTarget.style.color = "#fff"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "#E0F7FA"; e.currentTarget.style.color = "#00BCD4"; }}
+                  >
+                    <i className="ti ti-world" style={{ fontSize: 12 }} />Portal
                   </button>
 
                   <button onClick={() => openEdit(activeClient)} style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "none", border: "1.5px solid #E0EEF0", borderRadius: 20, fontSize: 11, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#00BCD4"; e.currentTarget.style.color = "#00BCD4"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}>

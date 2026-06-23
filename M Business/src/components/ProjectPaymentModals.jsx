@@ -207,15 +207,14 @@ export default function ProjectPaymentModals({
         updatePayload.updates = updatesPayload;
       }
 
-      // If it's an expense, also update the 'spent' counter for backward compatibility
+      // If it's an expense, recalculate spent from all expenses (no drift/accumulation)
       if (type === 'expense') {
         const parseAmt = (val) => {
           if (val === undefined || val === null) return 0;
           const num = Number(String(val).replace(/[^0-9.-]+/g, ''));
           return isNaN(num) ? 0 : num;
         };
-        const diff = editIndex !== undefined ? (parseAmt(form.amount) - parseAmt(currentList[editIndex]?.amount)) : parseAmt(form.amount);
-        updatePayload.spent = parseAmt(project.spent) + diff;
+        updatePayload.spent = updatedList.reduce((sum, exp) => sum + parseAmt(exp.amount), 0);
       }// ── AUTO-UPDATE INVOICE STATUS WHEN PAYMENT IS RECORDED ────────────────
       if (type === 'payment' && form.linkedInvoice) {
         const parseAmt = (val) => {
@@ -248,7 +247,11 @@ export default function ProjectPaymentModals({
             if (totalPaid >= invoiceTotal) {
               newStatus = isPaidLate ? 'Late Paid' : 'Paid';
             } else if (totalPaid > 0) {
-              newStatus = (dueDate && new Date() > dueDate) ? 'Overdue' : 'Partially Paid';
+              // Always mark Partially Paid — never override to Overdue when partial payment exists
+              newStatus = 'Partially Paid';
+            } else {
+              // No payments yet — check overdue
+              newStatus = (dueDate && new Date() > dueDate) ? 'Overdue' : (linkedInv.status || 'Pending');
             }
           }
 
@@ -670,17 +673,10 @@ export default function ProjectPaymentModals({
             <div style={rowStyle}>
               <div><label style={labelStyle}>Amount Received</label><input required type="number" style={inputStyle} value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="INR 0" /></div>
               <div>
-                <label style={labelStyle}>
-                  Due Date
-                  {form.linkedInvoice && form.dueDate && (
-                    <span style={{ marginLeft: 6, fontWeight: 700, color: new Date() > new Date(form.dueDate) ? '#EF4444' : '#22C55E', fontSize: 9, textTransform: 'none', letterSpacing: 0 }}>
-                      {new Date() > new Date(form.dueDate) ? '⚠ Overdue' : '✓ Within due date'}
-                    </span>
-                  )}
-                </label>
+                <label style={labelStyle}>Due Date</label>
                 <input
                   type="date"
-                  style={{ ...inputStyle, borderColor: form.dueDate && new Date() > new Date(form.dueDate) ? '#EF4444' : '#E8EDF2' }}
+                  style={inputStyle}
                   value={form.dueDate || ''}
                   onChange={e => handleInputChange('dueDate', e.target.value)}
                 />
@@ -688,20 +684,7 @@ export default function ProjectPaymentModals({
             </div>
             <div style={rowStyle}>
               <div><label style={labelStyle}>Payment Date</label><input type="date" required style={inputStyle} value={form.paymentDate || ''} onChange={e => handleInputChange('paymentDate', e.target.value)} /></div>
-              <div>
-                {form.dueDate && form.paymentDate && (
-                  <div style={{
-                    marginTop: 22, padding: '8px 12px', borderRadius: 8, fontSize: 11, fontWeight: 700,
-                    background: new Date(form.paymentDate) > new Date(form.dueDate) ? '#FEF2F2' : '#F0FDF4',
-                    color: new Date(form.paymentDate) > new Date(form.dueDate) ? '#EF4444' : '#16A34A',
-                    border: `1px solid ${new Date(form.paymentDate) > new Date(form.dueDate) ? '#FECACA' : '#BBF7D0'}`
-                  }}>
-                    {new Date(form.paymentDate) > new Date(form.dueDate)
-                      ? `⚠ Payment is ${Math.round((new Date(form.paymentDate) - new Date(form.dueDate)) / 86400000)} day(s) late → will be marked "Late Paid" or "Overdue"`
-                      : `✓ Payment is on time → will be marked "Paid" or "Partially Paid"`}
-                  </div>
-                )}
-              </div>
+              <div></div>
             </div>
             <div style={rowStyle}>
 

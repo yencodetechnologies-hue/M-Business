@@ -113,7 +113,7 @@ router.post("/add", async (req, res) => {
       start: start || "",
       end: end || "",
       deadline: deadline || end || "",
-      budget: budget || "",
+      budget: budget ? Number(budget) : 0,
       currency: currency || "₹",
       billed: Number(billed) || 0,
       received: Number(received) || 0,
@@ -218,6 +218,9 @@ router.put("/:id", async (req, res) => {
     if (updateData.assignedTo && !Array.isArray(updateData.assignedTo)) {
       updateData.assignedTo = [updateData.assignedTo];
     }
+    if (updateData.budget !== undefined) {
+      updateData.budget = Number(updateData.budget) || 0;
+    }
     if (updateData.portalOpts && !updateData.portalSettings) {
       updateData.portalSettings = updateData.portalOpts;
       delete updateData.portalOpts;
@@ -294,4 +297,27 @@ router.patch("/:id/updates/:updateId", async (req, res) => {
   );
   res.json(project);
 });
-module.exports = router;
+// PATCH — recalculate spent from expenses array (called after any expense add/edit/delete)
+router.patch("/:id/recalc-budget", async (req, res) => {
+  try {
+    const companyId = req.companyId || "";
+    const project = await Project.findOne({ _id: req.params.id, companyId });
+    if (!project) return res.status(404).json({ msg: "Project not found" });
+
+    const spent = (project.expenses || []).reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
+    project.spent = spent;
+    await project.save();
+
+    const budgetAmt = Number(project.budget) || 0;
+    const remaining = budgetAmt > 0 ? budgetAmt - spent : 0;
+    const usedPct = budgetAmt > 0 ? Math.round((spent / budgetAmt) * 100) : 0;
+    const exceeded = budgetAmt > 0 && spent > budgetAmt;
+
+    res.json({ msg: "Budget recalculated", spent, remaining, usedPct, exceeded });
+  } catch (err) {
+    console.error("recalc-budget error:", err.message);
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+});
+
+module.exports = router; module.exports = router;

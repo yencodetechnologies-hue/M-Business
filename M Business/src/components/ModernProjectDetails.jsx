@@ -506,7 +506,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const startD = currProject.start ? new Date(currProject.start).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
   const endD = currProject.end || currProject.deadline ? new Date(currProject.end || currProject.deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
 
-  const budgetAmt = currProject.budget ? Number(currProject.budget) : 0;
   const currency = currProject.currency || "₹";
   const portalSettings = currProject.portalSettings || {};
   const milestoneCount = (currProject.milestones || []).length;
@@ -554,7 +553,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     return isNaN(num) ? 0 : num;
   };
 
-  // Budget spent data (Auto-calculated from invoices)
+  // Auto-calculate Total Budget = ALL Invoices (local + global) + Additional Charges + Milestone Payments
   const billedGlobal = projectInvoices.reduce((sum, inv) => sum + parseAmt(inv.total), 0);
   const billedLocal = (currProject.invoices || []).reduce((sum, inv) => {
     const invAmount = parseAmt(inv.amount) || parseAmt(inv.total);
@@ -563,13 +562,21 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     return sum + invAmount + taxAmt;
   }, 0);
   const billed = billedGlobal + billedLocal;
+
+  const autoAdditionalTotal = (currProject.additionalCharges || []).reduce((sum, a) => sum + parseAmt(a.amount), 0);
+  const autoMilestoneTotal = (currProject.milestonePayments || []).reduce((sum, m) => sum + parseAmt(m.amount), 0);
+  const autoBudgetAmt = billed + autoAdditionalTotal + autoMilestoneTotal;
+  const manualBudget = currProject.budget ? Number(currProject.budget) : 0;
+  const budgetAmt = Math.max(autoBudgetAmt, manualBudget);
+
   const received = (currProject.paymentsReceived || []).reduce((sum, p) => sum + parseAmt(p.amount), 0);
   const pending = Math.max(0, billed - received);
-  const spent = (currProject.expenses && currProject.expenses.length > 0)
-    ? currProject.expenses.reduce((sum, exp) => sum + parseAmt(exp.amount), 0)
-    : parseAmt(currProject.spent);
-  const remaining = budgetAmt > 0 ? (budgetAmt - spent) : 0;
-  const budgetUsedPct = budgetAmt > 0 ? Math.round((spent / budgetAmt) * 100) : 0;
+  // Always calculate spent from expenses array (source of truth)
+  const spent = (currProject.expenses || []).reduce((sum, exp) => sum + parseAmt(exp.amount), 0);
+  const remaining = budgetAmt > 0 ? (budgetAmt - received) : 0;
+  const budgetUsedPct = budgetAmt > 0 ? Math.min(Math.round((spent / budgetAmt) * 100), 100) : 0;
+  const budgetExceeded = budgetAmt > 0 && spent > budgetAmt;
+  const overageAmt = budgetExceeded ? (spent - budgetAmt) : 0;
 
   const filteredTasks = projTasks.filter(t => {
     if (taskFilter === 'all') return true;
@@ -745,8 +752,23 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     if (!amt || amt <= 0) return;
     setAddingExpense(true);
     try {
-      const newSpent = (currProject.spent || 0) + amt;
-      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { spent: newSpent });
+      const currentExpenses = currProject.expenses || [];
+      const newExpense = {
+        expenseNo: `EXP-${String(currentExpenses.length + 1).padStart(3, '0')}`,
+        category: 'General',
+        description: 'Quick expense',
+        amount: amt,
+        date: new Date().toISOString().split('T')[0],
+        paymentMode: 'Cash',
+        status: 'Paid',
+        createdAt: new Date(),
+      };
+      const updatedExpenses = [newExpense, ...currentExpenses];
+      const newSpent = updatedExpenses.reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
+      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
+        expenses: updatedExpenses,
+        spent: newSpent,
+      });
       setExpenseAmt('');
       setShowAddExpense(false);
       loadLatest();
@@ -1703,13 +1725,22 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                 const today = new Date(); today.setHours(0, 0, 0, 0);
                                 const isPastDue = dueDate && today > dueDate;
 
+                                const lastPayment = (currProject?.paymentsReceived || [])
+                                  .filter(p => p.linkedInvoice === inv.invoiceNo && p.paymentDate)
+                                  .sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate))[0];
+                                const lastPaymentDate = lastPayment ? new Date(lastPayment.paymentDate) : null;
+                                const wasPaidLate = dueDate && lastPaymentDate && lastPaymentDate > dueDate;
+
                                 let autoStatus = inv.status || 'pending';
                                 if (invoiceTotal > 0) {
                                   if (totalPaid >= invoiceTotal) {
-                                    autoStatus = isPastDue ? 'Late Paid' : 'Paid';
+                                    // Fully paid
+                                    autoStatus = wasPaidLate ? 'Late Paid' : 'Paid';
                                   } else if (totalPaid > 0) {
-                                    autoStatus = isPastDue ? 'Overdue' : 'Partially Paid';
+                                    // Partial payment — always show Partially Paid, never Overdue
+                                    autoStatus = 'Partially Paid';
                                   } else {
+                                    // No payment at all
                                     if (isPastDue) autoStatus = 'Overdue';
                                     else {
                                       const cur = (inv.status || '').toLowerCase();
@@ -1723,6 +1754,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   paid: { bg: '#DCFCE7', color: '#15803D' },
                                   late_paid: { bg: '#D1FAE5', color: '#065F46' },
                                   partially_paid: { bg: '#FEF9C3', color: '#854D0E' },
+                                  part_paid: { bg: '#FEF9C3', color: '#854D0E' },
                                   overdue: { bg: '#FEE2E2', color: '#DC2626' },
                                   sent: { bg: '#DBEAFE', color: '#1D4ED8' },
                                   draft: { bg: '#F1F5F9', color: '#64748B' },
@@ -2100,7 +2132,28 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <div className="mpd-card-header">
               <div className="mpd-card-title"><i className="ti ti-wallet"></i> Budget</div>
             </div>
-            <div className="mpd-brow"><span className="mpd-lbl">Total Budget</span><span className="mpd-val">{currency}{budgetAmt.toLocaleString()}</span></div>
+
+            {/* Budget Exceeded Warning Banner */}
+            {budgetExceeded && (
+              <div style={{
+                background: '#FEE2E2', border: '1px solid #FECACA', borderRadius: 8,
+                padding: '8px 12px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 7
+              }}>
+                <i className="ti ti-alert-triangle" style={{ color: '#DC2626', fontSize: 16 }}></i>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: '#DC2626' }}>Budget Exceeded!</div>
+                  <div style={{ fontSize: 10, color: '#991B1B', fontWeight: 600 }}>
+                    Over by {currency}{overageAmt.toLocaleString()}
+                  </div>
+                </div>
+              </div>
+            )}
+            <div className="mpd-brow">
+              <span className="mpd-lbl">Total Budget
+                <span style={{ fontSize: 9, color: '#94A3B8', fontWeight: 600, marginLeft: 4 }}>(auto)</span>
+              </span>
+              <span className="mpd-val">{currency}{budgetAmt.toLocaleString()}</span>
+            </div>
             {[['Billed', 'billed', billed, ''], ['Received', 'received', received, 'mpd-g']].map(([lbl, key, val, cls]) => (
               <div key={key} className="mpd-brow">
                 <span className="mpd-lbl">{lbl}</span>
@@ -2113,12 +2166,36 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               <span className="mpd-lbl">Pending</span>
               <span className="mpd-val mpd-r">{currency}{pending.toLocaleString()}</span>
             </div>
-            <div className="mpd-brow"><span className="mpd-lbl">Spent</span><span className="mpd-val">{currency}{spent.toLocaleString()}</span></div>
-            <div className="mpd-brow"><span className="mpd-lbl">Remaining</span><span className="mpd-val mpd-p">{currency}{remaining.toLocaleString()}</span></div>
-            <div style={{ marginTop: 10 }}>
-              <div className="mpd-progress-bg"><div className="mpd-progress-fill mpd-purple" style={{ width: `${budgetUsedPct}%` }}></div></div>
-              <div style={{ fontSize: 11, color: P.textLight, marginTop: 4 }}>{budgetUsedPct}% used</div>
+            <div className="mpd-brow">
+              <span className="mpd-lbl">Spent (Expenses)</span>
+              <span className="mpd-val" style={{ color: budgetExceeded ? '#DC2626' : undefined, fontWeight: budgetExceeded ? 800 : 700 }}>
+                {currency}{spent.toLocaleString()}
+              </span>
             </div>
+            {budgetAmt > 0 && (
+              <div className="mpd-brow">
+                <span className="mpd-lbl">Remaining Budget</span>
+                <span className="mpd-val" style={{ color: remaining < 0 ? '#DC2626' : '#7C3AED', fontWeight: 800 }}>
+                  {remaining < 0 ? `-${currency}${Math.abs(remaining).toLocaleString()}` : `${currency}${remaining.toLocaleString()}`}
+                </span>
+              </div>
+            )}
+            {budgetAmt > 0 && (
+              <div style={{ marginTop: 10 }}>
+                <div className="mpd-progress-bg">
+                  <div
+                    className="mpd-progress-fill"
+                    style={{
+                      width: `${Math.min(budgetUsedPct, 100)}%`,
+                      background: budgetExceeded ? '#EF4444' : budgetUsedPct > 80 ? '#F97316' : '#8B5CF6'
+                    }}
+                  ></div>
+                </div>
+                <div style={{ fontSize: 11, color: budgetExceeded ? '#DC2626' : P.textLight, marginTop: 4, fontWeight: budgetExceeded ? 800 : 600 }}>
+                  {budgetUsedPct}% used · {currency}{spent.toLocaleString()} of {currency}{budgetAmt.toLocaleString()}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* FILES */}

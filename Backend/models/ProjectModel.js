@@ -11,7 +11,7 @@ const projectSchema = new mongoose.Schema({
   start: { type: String, default: "" },
   end: { type: String, default: "" },
   deadline: { type: String, default: "" },
-  budget: { type: String, default: "" },
+  budget: { type: Number, default: 0 },
   currency: { type: String, default: "₹" },
   billed: { type: Number, default: 0 },
   received: { type: Number, default: 0 },

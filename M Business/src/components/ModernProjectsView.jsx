@@ -230,15 +230,16 @@ export default function ModernProjectsView({
   // KPI counts
   const counts = useMemo(() => {
     const all = projects.length;
-    let active = 0, hold = 0, completed = 0, overdue = 0;
+    let active = 0, hold = 0, completed = 0, overdue = 0, totalBudget = 0;
     projects.forEach(p => {
       const { cls } = normaliseStatus(p.status);
       if (cls === 'active') active++;
       else if (cls === 'hold') hold++;
       else if (cls === 'completed') completed++;
       else if (cls === 'overdue') overdue++;
+      totalBudget += Number(p.budget) || 0;
     });
-    return { all, active, hold, completed, overdue };
+    return { all, active, hold, completed, overdue, totalBudget };
   }, [projects]);
 
   // Filter + Sort
@@ -274,6 +275,7 @@ export default function ModernProjectsView({
     { key: 'hold', label: 'On Hold', count: counts.hold, icon: 'ti-player-pause', iconBg: P.orangeLight, iconColor: P.orange },
     { key: 'completed', label: 'Completed', count: counts.completed, icon: 'ti-circle-check', iconBg: '#DBEAFE', iconColor: '#2563EB' },
     { key: 'overdue', label: 'Overdue', count: counts.overdue, icon: 'ti-alert-triangle', iconBg: P.redLight, iconColor: P.red },
+    { key: 'budget', label: 'Overall Value', count: counts.totalBudget, icon: 'ti-currency-rupee', iconBg: P.purpleLight, iconColor: P.purple, isCurrency: true },
   ];
 
   return (
@@ -286,13 +288,22 @@ export default function ModernProjectsView({
           <div
             key={k.key}
             className={`mpv-kpi${statusFilter === k.key ? ' active' : ''}`}
-            onClick={() => setStatus(k.key)}
+            onClick={() => k.key !== 'budget' && setStatus(k.key)}
+            style={{ cursor: k.key === 'budget' ? 'default' : 'pointer' }}
           >
             <div className="mpv-kpi-icon" style={{ background: k.iconBg }}>
               <i className={`ti ${k.icon}`} style={{ color: k.iconColor }} />
             </div>
             <div>
-              <div className="mpv-kpi-num">{k.count}</div>
+              <div className="mpv-kpi-num" style={{ fontSize: k.isCurrency && k.count >= 100000 ? 13 : undefined }}>
+                {k.isCurrency
+                  ? `₹${k.count >= 10000000
+                    ? (k.count / 10000000).toFixed(1) + 'Cr'
+                    : k.count >= 100000
+                      ? (k.count / 100000).toFixed(1) + 'L'
+                      : k.count.toLocaleString('en-IN')}`
+                  : k.count}
+              </div>
               <div className="mpv-kpi-lbl">{k.label}</div>
             </div>
           </div>

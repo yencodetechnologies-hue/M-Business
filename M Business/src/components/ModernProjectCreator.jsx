@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../config';
-
+import AddClientView from './AddClientView';
 // ── Shared Colors ──
 const P = {
   primary: '#00BCD4', primaryDark: '#0097A7', primaryLight: '#E0F7FA', primaryMid: '#B2EBF2',
@@ -105,6 +105,7 @@ function getAvatarColor(name) {
 
 export default function ModernProjectCreator({ onBack, clients = [], employees = [], onSuccess, editProject, prefillClient }) {
   const [loading, setLoading] = useState(false);
+  const [showAddClient, setShowAddClient] = useState(false);
 
   // Form State
   const [name, setName] = useState(editProject?.name || '');
@@ -226,7 +227,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
         billed: billed || 0,
         received: received || 0,
         pending: pending || 0,
-        spent: spent || 0,
+        spent: 0,
         assignedTo: assigned,
         milestones: milestones.filter(m => m.name.trim()),
         portalSettings: portalOpts
@@ -328,22 +329,57 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
             <div className="mpc-form-2col">
               <div className="mpc-form-group">
                 <label>Client *</label>
-                <select value={client} onChange={e => {
-                  const selectedName = e.target.value;
-                  setClient(selectedName);
-                  const sel = clients.find(c => (c.clientName || c.name) === selectedName);
-                  if (sel) {
-                    setContactPersonName(sel.contactPersonName || '');
-                    setContactPersonNo(sel.contactPersonNo || sel.phone || '');
-                    setContactEmail(sel.email || '');
-                    setCompanyName(sel.companyName || sel.company || '');
-                    setClientPhone(sel.phone || '');
-                    setClientAddress(sel.address || '');
-                  }
-                }}>
-                  <option value="">Select client...</option>
-                  {clients.map(c => <option key={c._id || c.id} value={c.clientName || c.name}>{c.clientName || c.name}</option>)}
-                </select>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <select
+                    value={client}
+                    onChange={e => {
+                      const selectedName = e.target.value;
+                      if (selectedName === '__add_client__') {
+                        setShowAddClient(true);
+                        return;
+                      }
+                      setClient(selectedName);
+                      const sel = clients.find(c => (c.clientName || c.name) === selectedName);
+                      if (sel) {
+                        setContactPersonName(sel.contactPersonName || '');
+                        setContactPersonNo(sel.contactPersonNo || sel.phone || '');
+                        setContactEmail(sel.email || '');
+                        setCompanyName(sel.companyName || sel.company || '');
+                        setClientPhone(sel.phone || '');
+                        setClientAddress(sel.address || '');
+                      }
+                    }}
+                    style={{ flex: 1 }}
+                  >
+                    <option value="">Select client...</option>
+                    <option value="__add_client__" style={{ color: "var(--app-accent)", fontWeight: 400 }}>➕ Add New Client</option>
+                    {clients.map(c => <option key={c._id || c.id} value={c.clientName || c.name}>{c.clientName || c.name}</option>)}
+                  </select>
+                </div>
+
+                {/* Inline Add Client Modal */}
+                {showAddClient && (
+                  <AddClientView
+                    onBack={() => setShowAddClient(false)}
+                    onClientAdded={(newClient) => {
+                      // Auto-select the newly created client
+                      const newName = newClient?.clientName || newClient?.name || '';
+                      if (newName) {
+                        setClient(newName);
+                        setContactPersonName(newClient.contactPersonName || '');
+                        setContactPersonNo(newClient.contactPersonNo || newClient.phone || '');
+                        setContactEmail(newClient.email || '');
+                        setCompanyName(newClient.companyName || newClient.company || '');
+                        setClientPhone(newClient.phone || '');
+                        setClientAddress(newClient.address || '');
+                        // Add to local clients list so it appears in dropdown
+                        clients.push(newClient);
+                      }
+                      setShowAddClient(false);
+                    }}
+                    user={JSON.parse(localStorage.getItem("user") || "{}")}
+                  />
+                )}
               </div>
               <div className="mpc-form-group">
                 <label>Category</label>
@@ -430,7 +466,12 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                 </div>
                 <div className="mpc-form-group">
                   <label>Spent Amount</label>
-                  <input type="number" value={spent} onChange={e => setSpent(e.target.value)} placeholder="0" />
+                  <input type="number" value={0} readOnly
+                    style={{ background: '#f0f4f8', cursor: 'not-allowed', color: '#94A3B8' }}
+                    title="Spent amount is calculated automatically from expense records" />
+                  <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>
+                    Auto-calculated from expense records
+                  </div>
                 </div>
               </div>
             )}

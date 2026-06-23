@@ -500,7 +500,7 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
             <div style={{ flex: 1, fontSize: 14, color: "#1e293b", fontWeight: 600, paddingTop: 6 }}>
               <Txt val={item} onCh={v => { const a = [...slide.items]; a[i] = v; upd({ items: a }); }} />
             </div>
-            {editing && slide.items.length > 1 && <button onClick={() => upd({ items: slide.items.filter((_, j) => j !== i) })} style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: 16, position: "absolute", top: 8, right: 10 }}>Close</button>}
+            {editing && slide.items.length > 1 && <button onClick={() => upd({ items: slide.items.filter((_, j) => j !== i) })} style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: 16, position: "absolute", top: 8, right: 10 }}>✕</button>}
           </div>
         ))}
         {editing && <button onClick={() => upd({ items: [...slide.items, "New objective here"] })} style={{ background: "none", border: `1.5px dashed ${t.p}50`, borderRadius: 12, padding: 12, fontSize: 13, color: t.p, cursor: "pointer", fontWeight: 700, fontFamily: "inherit" }}>+ Add Objective</button>}
@@ -569,7 +569,7 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
             <div style={{ width: 56, height: 56, borderRadius: "50%", background: t.g, margin: "0 auto 14px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: "#fff", fontWeight: 900 }}>{m.avatar || m.name[0]}</div>
             <div style={{ fontSize: 14, fontWeight: 800, color: "#0f172a", marginBottom: 4 }}><Txt val={m.name} onCh={v => { const a = [...slide.members]; a[i] = { ...a[i], name: v, avatar: (v[0] || "?").toUpperCase() + (v.split(" ")[1]?.[0] || "") }; upd({ members: a }); }} /></div>
             <div style={{ fontSize: 12, color: t.p, fontWeight: 600 }}><Txt val={m.role} onCh={v => { const a = [...slide.members]; a[i] = { ...a[i], role: v }; upd({ members: a }); }} /></div>
-            {editing && <button onClick={() => upd({ members: slide.members.filter((_, j) => j !== i) })} style={{ position: "absolute", top: 8, right: 8, background: "rgba(239,68,68,0.1)", border: "none", color: "#ef4444", borderRadius: 6, width: 22, height: 22, cursor: "pointer", fontSize: 11 }}>Close</button>}
+            {editing && <button onClick={() => upd({ members: slide.members.filter((_, j) => j !== i) })} style={{ position: "absolute", top: 8, right: 8, background: "rgba(239,68,68,0.1)", border: "none", color: "#ef4444", borderRadius: 6, width: 22, height: 22, cursor: "pointer", fontSize: 11 }}>✕</button>}
           </div>
         ))}
         {editing && <div onClick={() => upd({ members: [...slide.members, { name: "New Member", role: "Role", avatar: "NM" }] })} style={{ flex: "1 1 170px", padding: "24px 18px", borderRadius: 16, border: `2px dashed ${t.p}40`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", color: t.p, gap: 8 }}>

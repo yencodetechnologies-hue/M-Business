@@ -4,14 +4,14 @@ import { BASE_URL } from '../config';
 
 // ── palette -------------------------------------------------------
 const P = {
-  primary:'#00BCD4', primaryDark:'#0097A7', primaryLight:'#E0F7FA', primaryMid:'#B2EBF2',
-  textDark:'#1A2332', textMid:'#4A5568', textLight:'#718096',
-  bg:'#F0F4F8', white:'#FFFFFF', border:'#E2E8F0',
-  green:'#26C281', greenLight:'#D1FAE5',
-  orange:'#F59E0B', orangeLight:'#FEF3C7',
-  red:'#FF6B6B', redLight:'#FEE2E2',
-  purple:'#8B5CF6', purpleLight:'#EDE9FE',
-  radius:'14px', shadow:'0 2px 12px rgba(0,188,212,.08)', shadowLg:'0 8px 32px rgba(0,188,212,.14)',
+  primary: '#00BCD4', primaryDark: '#0097A7', primaryLight: '#E0F7FA', primaryMid: '#B2EBF2',
+  textDark: '#1A2332', textMid: '#4A5568', textLight: '#718096',
+  bg: '#F0F4F8', white: '#FFFFFF', border: '#E2E8F0',
+  green: '#26C281', greenLight: '#D1FAE5',
+  orange: '#F59E0B', orangeLight: '#FEF3C7',
+  red: '#FF6B6B', redLight: '#FEE2E2',
+  purple: '#8B5CF6', purpleLight: '#EDE9FE',
+  radius: '14px', shadow: '0 2px 12px rgba(0,188,212,.08)', shadowLg: '0 8px 32px rgba(0,188,212,.14)',
 };
 
 // ── CSS ------------------------------------------------------------
@@ -163,7 +163,7 @@ function getInitials(name) {
   return p.length >= 2 ? (p[0][0] + p[1][0]).toUpperCase() : name.substring(0, 2).toUpperCase();
 }
 
-const AV_COLORS = ['#00BCD4','#8B5CF6','#F59E0B','#26C281','#EC4899','#3B82F6','#EF4444','#10B981'];
+const AV_COLORS = ['#00BCD4', '#8B5CF6', '#F59E0B', '#26C281', '#EC4899', '#3B82F6', '#EF4444', '#10B981'];
 function avColor(name, i = 0) {
   if (!name) return AV_COLORS[i % AV_COLORS.length];
   return AV_COLORS[(name.charCodeAt(0) + i) % AV_COLORS.length];
@@ -194,11 +194,11 @@ function isLate(dateStr) {
 
 // ── UPDATE TYPE CONFIG ---------------------------------------------
 const UPDATE_TYPES = {
-  progress:  { cls: 'prog', border: 'pr', icon: 'ti-chart-line',    label: 'Progress' },
-  milestone: { cls: 'ms',   border: 'ms', icon: 'ti-flag',          label: 'Milestone' },
-  blocker:   { cls: 'bl',   border: 'bl', icon: 'ti-alert-triangle', label: 'Blocker' },
-  general:   { cls: 'gn',   border: 'gn', icon: 'ti-speakerphone',  label: 'General' },
-  delivery:  { cls: 'dl',   border: 'dl', icon: 'ti-package',       label: 'Delivery' },
+  progress: { cls: 'prog', border: 'pr', icon: 'ti-chart-line', label: 'Progress' },
+  milestone: { cls: 'ms', border: 'ms', icon: 'ti-flag', label: 'Milestone' },
+  blocker: { cls: 'bl', border: 'bl', icon: 'ti-alert-triangle', label: 'Blocker' },
+  general: { cls: 'gn', border: 'gn', icon: 'ti-speakerphone', label: 'General' },
+  delivery: { cls: 'dl', border: 'dl', icon: 'ti-package', label: 'Delivery' },
 };
 
 // ── TOAST hook -----------------------------------------------------
@@ -213,21 +213,21 @@ function useToast() {
 }
 
 // -------------------------------------------------------------------
-export default function ModernEmployeeProjectDetails({ project, tasks, user, onBack, onMessageTeam }) {
+export default function ModernEmployeeProjectDetails({ project, tasks, user, onBack, onMessageTeam, employeeMode = false, currentEmployeeName = "" }) {
   const { toasts, addToast } = useToast();
 
   // ── Log Time modal state ------------------------------------------
-  const [logModal, setLogModal]   = useState(false);
-  const [logDate, setLogDate]     = useState(new Date().toISOString().slice(0, 10));
-  const [logHours, setLogHours]   = useState('');
-  const [logTask, setLogTask]     = useState('General / Other');
-  const [logNotes, setLogNotes]   = useState('');
+  const [logModal, setLogModal] = useState(false);
+  const [logDate, setLogDate] = useState(new Date().toISOString().slice(0, 10));
+  const [logHours, setLogHours] = useState('');
+  const [logTask, setLogTask] = useState('General / Other');
+  const [logNotes, setLogNotes] = useState('');
   const [logSaving, setLogSaving] = useState(false);
 
   // ── Updates state -------------------------------------------------
-  const [updates, setUpdates]   = useState([]);
+  const [updates, setUpdates] = useState([]);
   const readStorageKey = `read_updates_${user?._id || user?.id || 'guest'}_${project._id}`;
-  const [readIds, setReadIds]   = useState(() => {
+  const [readIds, setReadIds] = useState(() => {
     try {
       const saved = localStorage.getItem(readStorageKey);
       return saved ? new Set(JSON.parse(saved)) : new Set();
@@ -253,17 +253,17 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
   if (!project) return null;
 
   // Derived data
-  const projName   = project.name || 'Unnamed Project';
+  const projName = project.name || 'Unnamed Project';
   const clientName = project.client || project.clientName || 'Internal';
-  const category   = project.purpose || project.category || 'Project';
-  const myRole     = user?.role ? (user.role.charAt(0).toUpperCase() + user.role.slice(1)) : 'Employee';
-  const startD     = fmtDate(project.start);
-  const endD       = project.end || project.deadline ? fmtDate(project.end || project.deadline) : '—';
-  const days       = daysLeft(project.end || project.deadline);
+  const category = project.purpose || project.category || 'Project';
+  const myRole = user?.role ? (user.role.charAt(0).toUpperCase() + user.role.slice(1)) : 'Employee';
+  const startD = fmtDate(project.start);
+  const endD = project.end || project.deadline ? fmtDate(project.end || project.deadline) : '—';
+  const days = daysLeft(project.end || project.deadline);
 
   const s = (project.status || '').toLowerCase().replace(/[\s_-]/g, '');
-  const isDone = ['done','completed','delivered','closed'].includes(s);
-  const isHold = ['onhold','hold','paused'].includes(s);
+  const isDone = ['done', 'completed', 'delivered', 'closed'].includes(s);
+  const isHold = ['onhold', 'hold', 'paused'].includes(s);
   const badgeCls = isDone ? 'epd2-badge-completed' : isHold ? 'epd2-badge-hold' : 'epd2-badge-active';
 
   // Tasks for this project
@@ -272,22 +272,35 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
     const tProjName = t.projectId && typeof t.projectId === 'object' ? t.projectId.name : t.project;
     const belongsToProj = (tProjId && (tProjId === project._id || tProjId === project.id)) || (tProjName && tProjName === project.name);
     if (!belongsToProj) return false;
-    
+
     // Clients can see all project tasks to track progress. Employees only see their own tasks.
     if (user?.role === 'client') return true;
-    
+
     const myName = (user?.name || '').toLowerCase().trim();
     const myId = user?._id || user?.id || '';
-    return (t.assignTo && t.assignTo.toLowerCase().trim() === myName) || 
-           (t.assignTo === myId) || 
-           (Array.isArray(t.assignedTo) && (t.assignedTo.includes(myId) || t.assignedTo.includes(user?.name))) || 
-           (t.assignedTo === myId || t.assignedTo === user?.name);
+    return (t.assignTo && t.assignTo.toLowerCase().trim() === myName) ||
+      (t.assignTo === myId) ||
+      (Array.isArray(t.assignedTo) && (t.assignedTo.includes(myId) || t.assignedTo.includes(user?.name))) ||
+      (t.assignedTo === myId || t.assignedTo === user?.name);
   });
-  const pct       = calcPct(project, pTasks);
-  const doneCount = pTasks.filter(t => ['done','completed'].includes((t.status||'').toLowerCase())).length;
+  // Employee mode: split tasks into "mine" vs "others"
+  const empName = (currentEmployeeName || user?.name || '').toLowerCase().trim();
+  const myTasks = (employeeMode && empName)
+    ? pTasks.filter(t => (t.assignTo || '').toLowerCase().includes(empName))
+    : pTasks;
+  const otherTasks = (employeeMode && empName)
+    ? pTasks.filter(t => !(t.assignTo || '').toLowerCase().includes(empName))
+    : [];
+
+  const pct = calcPct(project, pTasks);
+  const doneCount = pTasks.filter(t => ['done', 'completed'].includes((t.status || '').toLowerCase())).length;
   const openCount = pTasks.length - doneCount;
 
-  const assigned   = Array.isArray(project.assignedTo) ? project.assignedTo : (project.assignedTo ? [project.assignedTo] : []);
+  // Milestone progress based on employee's own tasks
+  const myCompletedCount = myTasks.filter(t => t.checked || t.completed || ['done', 'completed'].includes((t.status || '').toLowerCase())).length;
+  const myTotalCount = myTasks.length;
+  const myProgress = myTotalCount > 0 ? Math.round((myCompletedCount / myTotalCount) * 100) : 0;
+  const assigned = Array.isArray(project.assignedTo) ? project.assignedTo : (project.assignedTo ? [project.assignedTo] : []);
   const milestones = Array.isArray(project.milestones) && project.milestones.length > 0 ? project.milestones : [
     { name: 'Project Kickoff', done: true, date: project.start || new Date().toISOString() },
     { name: 'Initial Design Phase', done: false, date: '' },
@@ -296,7 +309,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
 
   // ── Sample updates (fallback when no backend updates exist) --------
   const sampleUpdates = project._id ? [] : [
-    { _id:'u1', type:'progress',  title:'Project progress updated', body:'Progress has been updated. Keep up the good work!', postedBy:'Admin', createdAt: new Date().toISOString(), unread:true },
+    { _id: 'u1', type: 'progress', title: 'Project progress updated', body: 'Progress has been updated. Keep up the good work!', postedBy: 'Admin', createdAt: new Date().toISOString(), unread: true },
   ];
 
   // ── Fetch project details from backend -----------
@@ -319,9 +332,9 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
 
   const getUpdKey = (u) => u._id || u.id || u.date || u.text;
   const displayUpdates = updates.length > 0 ? updates : sampleUpdates;
-  const unreadCount    = displayUpdates.filter(u => !readIds.has(getUpdKey(u)) && u.unread !== false).length;
+  const unreadCount = displayUpdates.filter(u => !readIds.has(getUpdKey(u)) && u.unread !== false).length;
 
-  const markRead    = (u) => setReadIds(prev => {
+  const markRead = (u) => setReadIds(prev => {
     const key = getUpdKey(u);
     if (!key) return prev;
     const n = new Set(prev);
@@ -329,7 +342,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
     return n;
   });
   const markAllRead = () => setReadIds(new Set(displayUpdates.map(u => getUpdKey(u)).filter(Boolean)));
-  const isUnread    = (u) => !readIds.has(getUpdKey(u)) && u.unread !== false;
+  const isUnread = (u) => !readIds.has(getUpdKey(u)) && u.unread !== false;
 
   // ── Log Time save --------------------------------------------------
   const handleSaveLog = async (e) => {
@@ -406,7 +419,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
           )}
           <div className="epd2-meta-item">
             <i className="ti ti-checklist"></i>
-            {pTasks.length} tasks assigned to you
+            {myTasks.length} tasks assigned to you
           </div>
           <div className="epd2-meta-item">
             <i className="ti ti-clock"></i>
@@ -420,11 +433,11 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
           )}
         </div>
         <div className="epd2-prog-hero">
-          <div className="epd2-prog-num">{pct}%</div>
+          <div className="epd2-prog-num">{employeeMode ? myProgress : pct}%</div>
           <div className="epd2-prog-bar-wrap">
-            <div className="epd2-prog-lbl">Overall Project Progress</div>
+            <div className="epd2-prog-lbl">{employeeMode ? 'Your Task Completion' : 'Overall Project Progress'}</div>
             <div className="epd2-prog-bg">
-              <div className="epd2-prog-fill" style={{ width: pct + '%' }}></div>
+              <div className="epd2-prog-fill" style={{ width: (employeeMode ? myProgress : pct) + '%' }}></div>
             </div>
           </div>
         </div>
@@ -461,11 +474,11 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
           )}
 
           {!updLoading && displayUpdates.map((upd, idx) => {
-            const tc   = getTypeConfig(upd.type);
+            const tc = getTypeConfig(upd.type);
             const unrd = isUnread(upd);
             const authorName = upd.author || upd.postedBy || upd.from || 'Admin';
             const postedByInitials = getInitials(authorName);
-            const postedByColor    = avColor(authorName);
+            const postedByColor = avColor(authorName);
 
             return (
               <div
@@ -567,55 +580,55 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
 
           {/* MY TASKS CARD */}
           {user?.role !== 'client' && (
-          <div className="epd2-card">
-            <div className="epd2-card-hdr">
-              <div className="epd2-card-title">
-                <i className="ti ti-checklist"></i>My Tasks on this Project
+            <div className="epd2-card">
+              <div className="epd2-card-hdr">
+                <div className="epd2-card-title">
+                  <i className="ti ti-checklist"></i>My Tasks on this Project
+                </div>
+                <button
+                  className="epd2-btn epd2-btn-outline epd2-btn-sm"
+                  onClick={() => setLogModal(true)}
+                >
+                  <i className="ti ti-clock"></i> Log Time
+                </button>
               </div>
-              <button
-                className="epd2-btn epd2-btn-outline epd2-btn-sm"
-                onClick={() => setLogModal(true)}
-              >
-                <i className="ti ti-clock"></i> Log Time
-              </button>
-            </div>
 
-            {pTasks.length === 0 ? (
-              <div style={{ padding: '20px 0', textAlign: 'center', color: P.textLight, fontSize: 13 }}>
-                No tasks assigned to you on this project.
-              </div>
-            ) : (
-              pTasks.map((t, i) => {
-                const tid      = t._id || t.id || i;
-                const isDoneT  = doneTasks.has(tid) || ['done','completed'].includes((t.status||'').toLowerCase());
-                const pri      = (t.priority || 'low').toLowerCase();
-                const priCls   = pri === 'high' ? 'h' : pri === 'medium' ? 'm' : 'l';
-                const dueStr   = t.due || t.dueDate || t.deadline || '';
-                const late     = !isDoneT && isLate(dueStr);
-                return (
-                  <div key={tid} className="epd2-task-row">
-                    <div
-                      className={`epd2-task-chk ${isDoneT ? 'done' : ''}`}
-                      onClick={() => toggleTask(tid)}
-                    >
-                      {isDoneT && <span style={{ color: '#fff', fontSize: 9, fontWeight: 900 }}>Yes</span>}
+              {myTasks.length === 0 ? (
+                <div style={{ padding: '20px 0', textAlign: 'center', color: P.textLight, fontSize: 13 }}>
+                  No tasks assigned to you on this project.
+                </div>
+              ) : (
+                myTasks.map((t, i) => {
+                  const tid = t._id || t.id || i;
+                  const isDoneT = doneTasks.has(tid) || ['done', 'completed'].includes((t.status || '').toLowerCase());
+                  const pri = (t.priority || 'low').toLowerCase();
+                  const priCls = pri === 'high' ? 'h' : pri === 'medium' ? 'm' : 'l';
+                  const dueStr = t.due || t.dueDate || t.deadline || '';
+                  const late = !isDoneT && isLate(dueStr);
+                  return (
+                    <div key={tid} className="epd2-task-row">
+                      <div
+                        className={`epd2-task-chk ${isDoneT ? 'done' : ''}`}
+                        onClick={() => toggleTask(tid)}
+                      >
+                        {isDoneT && <span style={{ color: '#fff', fontSize: 9, fontWeight: 900 }}>Yes</span>}
+                      </div>
+                      <div className={`epd2-task-prio ${priCls}`}></div>
+                      <div className={`epd2-task-name ${isDoneT ? 'done' : ''}`}>{t.name || t.title}</div>
+                      <div
+                        className={`epd2-task-due ${late ? 'late' : ''}`}
+                        style={isDoneT ? { color: P.green } : {}}
+                      >
+                        {isDoneT ? 'Done' : dueStr ? new Date(dueStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—'}
+                      </div>
                     </div>
-                    <div className={`epd2-task-prio ${priCls}`}></div>
-                    <div className={`epd2-task-name ${isDoneT ? 'done' : ''}`}>{t.name || t.title}</div>
-                    <div
-                      className={`epd2-task-due ${late ? 'late' : ''}`}
-                      style={isDoneT ? { color: P.green } : {}}
-                    >
-                      {isDoneT ? 'Done' : dueStr ? new Date(dueStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—'}
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-            )}
+                  );
+                })
+              )}
+            </div>
+          )}
         </div>
-      
+
 
         {/* ── RIGHT COLUMN ── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
@@ -699,7 +712,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                 );
               })
             )}
-            <button className="epd2-btn epd2-btn-outline" onClick={() => { if(onMessageTeam) { onMessageTeam(); } else { addToast('Opening team chat...', 'success'); } }} style={{ width: '100%', justifyContent: 'center', fontSize: 12, marginTop: 4 }}>
+            <button className="epd2-btn epd2-btn-outline" onClick={() => { if (onMessageTeam) { onMessageTeam(); } else { addToast('Opening team chat...', 'success'); } }} style={{ width: '100%', justifyContent: 'center', fontSize: 12, marginTop: 4 }}>
               <i className="ti ti-message-circle"></i> Message Team
             </button>
           </div>
@@ -713,15 +726,15 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
               <div style={{ fontSize: 12, color: P.textLight }}>No milestones defined.</div>
             ) : (
               milestones.map((m, i) => {
-                const name   = m.name || m;
-                const isDoneM  = m.done === true || m.status === 'done' || m.status === 'completed';
+                const name = m.name || m;
+                const isDoneM = m.done === true || m.status === 'done' || m.status === 'completed';
                 // The first non-done milestone is "active"
                 const firstNotDone = milestones.findIndex(x => !x.done && x.status !== 'done' && x.status !== 'completed');
                 const isActive = !isDoneM && i === firstNotDone;
                 const dotColor = isDoneM ? P.green : isActive ? P.primary : P.border;
                 const dotShadow = isActive ? `0 0 0 3px ${P.primaryMid}` : 'none';
                 const valColor = isDoneM ? P.green : isActive ? P.primary : P.textLight;
-                const valText  = isDoneM ? 'Done' : isActive ? 'Active' : (m.date ? fmtDate(m.date) : '—');
+                const valText = isDoneM ? 'Done' : isActive ? 'Active' : (m.date ? fmtDate(m.date) : '—');
                 return (
                   <div key={i} className="epd2-ms-row">
                     <div className="epd2-ms-dot" style={{ background: dotColor, boxShadow: dotShadow }}></div>

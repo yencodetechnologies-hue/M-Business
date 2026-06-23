@@ -25,12 +25,29 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
     tenure = years > 0 ? `${years} yr ${months} mo` : `${months} mo`;
   }
 
-  // Projects state
-  const [staticProjects, setStaticProjects] = useState([
-    { _id: "p1", name: "M Business", role: "UI/UX Design", progress: 65, status: "In Progress" },
-    { _id: "p2", name: "M Access", role: "Frontend Dev", progress: 15, status: "Pending" },
-    { _id: "p3", name: "YDMart App", role: "Backend API", progress: 100, status: "Completed" }
-  ]);
+  // Projects state — filtered to only this employee's assigned projects
+  const [staticProjects, setStaticProjects] = useState([]);
+
+  useEffect(() => {
+    if (!emp) return;
+    const empName = (emp.name || '').toLowerCase().trim();
+    const empId = emp._id || emp.employeeId || '';
+    const filtered = (projects || []).filter(p => {
+      const assigned = p.assignedTo || p.team || '';
+      if (Array.isArray(assigned)) {
+        return assigned.some(a =>
+          (typeof a === 'string' && (a.toLowerCase().includes(empName) || a === empId)) ||
+          (a?._id && a._id === empId) ||
+          (a?.name && a.name.toLowerCase().includes(empName))
+        );
+      }
+      if (typeof assigned === 'string') {
+        return assigned.toLowerCase().includes(empName) || assigned.includes(empId);
+      }
+      return false;
+    });
+    setStaticProjects(filtered);
+  }, [emp, projects]);
 
   const activeProjects = staticProjects.filter(p => (p.status || '').toLowerCase() !== 'completed');
   const totalWorkload = staticProjects.length > 0
@@ -185,7 +202,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         assignTo: emp.name,
         groupId
       };
-      
+
       const res = await axios.post(`${BASE_URL}/api/tasks`, payload);
       if (res.data) {
         const newTask = {
@@ -295,7 +312,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
     });
 
   // Filter out any dbRequested docs that have already been uploaded in apiDocs
-  const pendingDbRequested = dbRequested.filter(d => 
+  const pendingDbRequested = dbRequested.filter(d =>
     !apiDocs.some(ad => (ad.docType || ad.documentType || "").toLowerCase() === d.name.toLowerCase() || (ad.name || "").toLowerCase() === d.name.toLowerCase())
   );
 
@@ -436,7 +453,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
           <div>
             <div className="ed-name">{emp.name}</div>
             <div className="ed-roles">
-              <span>{emp.role || "Employee"}</span> · <span style={{color: "var(--teal)"}}>{emp.department || "General"}</span>
+              <span>{emp.role || "Employee"}</span> · <span style={{ color: "var(--teal)" }}>{emp.department || "General"}</span>
               <span className="ed-badge">{empId}</span>
             </div>
             <div className="ed-contacts">
@@ -475,11 +492,11 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         <div className="ed-card">
           <div className="ed-card-header">
             <div className="ed-card-title"><i className="ti ti-user-square"></i> Personal Information</div>
-            <button className="ed-btn" style={{padding: "6px 12px", fontSize: "11px", borderRadius: "8px"}} onClick={onEdit}><i className="ti ti-pencil"></i> Edit</button>
+            <button className="ed-btn" style={{ padding: "6px 12px", fontSize: "11px", borderRadius: "8px" }} onClick={onEdit}><i className="ti ti-pencil"></i> Edit</button>
           </div>
           <div className="ed-info-grid">
             <div className="ed-info-item"><div className="lbl">Full Name</div><div className="val">{emp.name || "—"}</div></div>
-            <div className="ed-info-item"><div className="lbl">Employee ID</div><div className="val" style={{color: "var(--teal)"}}>{empId}</div></div>
+            <div className="ed-info-item"><div className="lbl">Employee ID</div><div className="val" style={{ color: "var(--teal)" }}>{empId}</div></div>
             <div className="ed-info-item"><div className="lbl">Role</div><div className="val">{emp.role || "—"}</div></div>
             <div className="ed-info-item"><div className="lbl">Department</div><div className="val">{emp.department || "—"}</div></div>
             <div className="ed-info-item"><div className="lbl">Email</div><div className="val">{emp.email || "—"}</div></div>
@@ -500,12 +517,12 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         <div className="ed-card">
           <div className="ed-card-header">
             <div className="ed-card-title"><i className="ti ti-calendar-event"></i> Leave Requests</div>
-            <span style={{fontSize: "11px", fontWeight: "700", color: "var(--text-muted)"}}>
+            <span style={{ fontSize: "11px", fontWeight: "700", color: "var(--text-muted)" }}>
               {(emp.leaveRequests || []).filter(l => l.status === 'pending').length} pending
             </span>
           </div>
           {(emp.leaveRequests || []).length === 0 ? (
-            <div className="ed-empty"><i className="ti ti-calendar-off" style={{fontSize: 24, display: 'block', marginBottom: 8}}></i>No leave requests</div>
+            <div className="ed-empty"><i className="ti ti-calendar-off" style={{ fontSize: 24, display: 'block', marginBottom: 8 }}></i>No leave requests</div>
           ) : (
             <table className="ed-table">
               <thead><tr><th>Type</th><th>Dates</th><th>Status</th><th>Action</th></tr></thead>
@@ -513,9 +530,9 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                 {(emp.leaveRequests || []).map((leave, i) => (
                   <tr key={i}>
                     <td>{leave.type || leave.leaveType || "Leave"}</td>
-                    <td style={{color: "var(--text-muted)", fontSize: "11px"}}>
-                      {leave.startDate ? new Date(leave.startDate).toLocaleDateString('en-GB', {day:'2-digit', month:'short'}) : ""}
-                      {leave.endDate && leave.endDate !== leave.startDate ? ` – ${new Date(leave.endDate).toLocaleDateString('en-GB', {day:'2-digit', month:'short'})}` : ""}
+                    <td style={{ color: "var(--text-muted)", fontSize: "11px" }}>
+                      {leave.startDate ? new Date(leave.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : ""}
+                      {leave.endDate && leave.endDate !== leave.startDate ? ` – ${new Date(leave.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}` : ""}
                     </td>
                     <td>
                       <span style={{
@@ -527,10 +544,10 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                     <td>
                       {(!leave.status || leave.status === 'pending') ? (
                         <>
-                          <button className="ed-btn" style={{padding: "4px 8px", fontSize: "10px", background: "#ECFDF5", color: "var(--success)", borderColor: "#D1FAE5"}}>Approve</button>
-                          <button className="ed-btn" style={{padding: "4px 8px", fontSize: "10px", background: "#FEF2F2", color: "var(--danger)", borderColor: "#FEE2E2", marginLeft: "4px"}}>Reject</button>
+                          <button className="ed-btn" style={{ padding: "4px 8px", fontSize: "10px", background: "#ECFDF5", color: "var(--success)", borderColor: "#D1FAE5" }}>Approve</button>
+                          <button className="ed-btn" style={{ padding: "4px 8px", fontSize: "10px", background: "#FEF2F2", color: "var(--danger)", borderColor: "#FEE2E2", marginLeft: "4px" }}>Reject</button>
                         </>
-                      ) : <span style={{color: "var(--text-muted)"}}>—</span>}
+                      ) : <span style={{ color: "var(--text-muted)" }}>—</span>}
                     </td>
                   </tr>
                 ))}
@@ -547,10 +564,10 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         <div className="ed-card">
           <div className="ed-card-header">
             <div className="ed-card-title"><i className="ti ti-briefcase"></i> Assigned Projects</div>
-            <span style={{fontSize: "12px", fontWeight: "800", color: "var(--teal)"}}>{activeProjects.length} active</span>
+            <span style={{ fontSize: "12px", fontWeight: "800", color: "var(--teal)" }}>{activeProjects.length} active</span>
           </div>
           {staticProjects.length === 0 ? (
-            <div className="ed-empty"><i className="ti ti-briefcase-off" style={{fontSize: 24, display: 'block', marginBottom: 8}}></i>No projects assigned</div>
+            <div className="ed-empty"><i className="ti ti-briefcase-off" style={{ fontSize: 24, display: 'block', marginBottom: 8 }}></i>No projects assigned</div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column" }}>
               {staticProjects.map((proj, i) => {
@@ -561,14 +578,14 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                 return (
                   <div key={proj._id || i} className="ed-proj-item" onClick={() => onViewProject && onViewProject(proj)}>
                     <div className="ed-proj-info">
-                      <div className="ed-proj-icon" style={{background: pc.bg, color: pc.color}}><i className={`ti ${ic}`}></i></div>
+                      <div className="ed-proj-icon" style={{ background: pc.bg, color: pc.color }}><i className={`ti ${ic}`}></i></div>
                       <div>
                         <div className="ed-proj-name">{proj.name || proj.projectName || "Project"}</div>
                         <div className="ed-proj-role">{proj.role || proj.memberRole || "Member"}</div>
                       </div>
                     </div>
                     <div className="ed-proj-stat">
-                      <div className="ed-proj-perc" style={{color: pc.color}}>{perc}%</div>
+                      <div className="ed-proj-perc" style={{ color: pc.color }}>{perc}%</div>
                       <div className="ed-proj-lbl">{status}</div>
                     </div>
                   </div>
@@ -577,9 +594,9 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
             </div>
           )}
           {staticProjects.length > 0 && (
-            <div className="ed-progress-group" style={{marginTop: "16px", marginBottom: 0}}>
+            <div className="ed-progress-group" style={{ marginTop: "16px", marginBottom: 0 }}>
               <div className="ed-progress-header"><span>Overall Workload</span><span>{totalWorkload}%</span></div>
-              <div className="ed-progress-bar"><div className="ed-progress-fill" style={{width: `${totalWorkload}%`, background: "var(--teal)"}}></div></div>
+              <div className="ed-progress-bar"><div className="ed-progress-fill" style={{ width: `${totalWorkload}%`, background: "var(--teal)" }}></div></div>
             </div>
           )}
         </div>
@@ -588,20 +605,20 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         <div className="ed-card">
           <div className="ed-card-header">
             <div className="ed-card-title"><i className="ti ti-checkbox"></i> Tasks</div>
-            <span style={{fontSize: "11px", fontWeight: "700", color: "var(--text-muted)"}}>
+            <span style={{ fontSize: "11px", fontWeight: "700", color: "var(--text-muted)" }}>
               {pendingTasks.length} pending &nbsp;
-              <button className="ed-btn" onClick={() => setShowAddTaskModal(true)} style={{padding: "6px 12px", background: "var(--teal)", color: "#fff", border: "none", fontSize: "11px", borderRadius: "8px"}}>
+              <button className="ed-btn" onClick={() => setShowAddTaskModal(true)} style={{ padding: "6px 12px", background: "var(--teal)", color: "#fff", border: "none", fontSize: "11px", borderRadius: "8px" }}>
                 <i className="ti ti-plus"></i> Assign Task
               </button>
             </span>
           </div>
-          <div style={{display: "flex", gap: "16px", marginBottom: "16px", borderBottom: "1.5px solid var(--border)"}}>
+          <div style={{ display: "flex", gap: "16px", marginBottom: "16px", borderBottom: "1.5px solid var(--border)" }}>
             <div className={`ed-tab ${taskTab === 'all' ? 'active' : ''}`} onClick={() => setTaskTab('all')}>All</div>
             <div className={`ed-tab ${taskTab === 'pending' ? 'active' : ''}`} onClick={() => setTaskTab('pending')}>Pending</div>
             <div className={`ed-tab ${taskTab === 'completed' ? 'active' : ''}`} onClick={() => setTaskTab('completed')}>Completed</div>
           </div>
           {filteredTasks.length === 0 ? (
-            <div className="ed-empty"><i className="ti ti-checkbox" style={{fontSize: 24, display: 'block', marginBottom: 8}}></i>No tasks</div>
+            <div className="ed-empty"><i className="ti ti-checkbox" style={{ fontSize: 24, display: 'block', marginBottom: 8 }}></i>No tasks</div>
           ) : (
             <div>
               {filteredTasks.map((task, i) => {
@@ -612,17 +629,17 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                 return (
                   <div key={task._id || i} className="ed-task-item">
                     <div className={`ed-task-cb ${done ? 'done' : ''}`} onClick={() => handleToggleTask(task._id)} style={{ cursor: "pointer" }}>
-                      {done && <i className="ti ti-check" style={{fontSize: 12}}></i>}
+                      {done && <i className="ti ti-check" style={{ fontSize: 12 }}></i>}
                     </div>
                     <div className="ed-task-content" onClick={() => handleToggleTask(task._id)} style={{ cursor: "pointer" }}>
                       <div className={`ed-task-title ${done ? 'done' : ''}`}>{task.title || task.taskName || "Task"}</div>
-                      <div className="ed-task-due" style={{color: overdue ? 'var(--danger)' : '#64748B'}}>
+                      <div className="ed-task-due" style={{ color: overdue ? 'var(--danger)' : '#64748B' }}>
                         {overdue ? 'Overdue - ' : 'Due: '}
                         {formatDue(task.dueDate || task.due)}
                       </div>
                     </div>
                     <div className="ed-task-tag" style={tagStyle}>{priority.charAt(0).toUpperCase() + priority.slice(1)}</div>
-                    <i className="ti ti-x" onClick={() => handleDeleteTask(task._id)} style={{color: "var(--text-muted)", cursor: "pointer"}}></i>
+                    <i className="ti ti-x" onClick={() => handleDeleteTask(task._id)} style={{ color: "var(--text-muted)", cursor: "pointer" }}></i>
                   </div>
                 );
               })}
@@ -634,7 +651,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         <div className="ed-card">
           <div className="ed-card-header">
             <div className="ed-card-title"><i className="ti ti-folder"></i> Documents</div>
-            <button className="ed-btn" onClick={() => setShowRequestDocModal(true)} style={{padding: "6px 14px", fontSize: "11px", borderRadius: "8px", background: "var(--teal)", color: "#fff", border: "none"}}>
+            <button className="ed-btn" onClick={() => setShowRequestDocModal(true)} style={{ padding: "6px 14px", fontSize: "11px", borderRadius: "8px", background: "var(--teal)", color: "#fff", border: "none" }}>
               <i className="ti ti-download"></i> Request Document
             </button>
           </div>
@@ -642,9 +659,9 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
             Uploaded Documents <span>{docsToShow.length}</span>
           </div>
           {empDocsLoading ? (
-            <div className="ed-empty"><i className="ti ti-loader-2" style={{fontSize: 24, display: 'block', marginBottom: 8}}></i>Loading documents...</div>
+            <div className="ed-empty"><i className="ti ti-loader-2" style={{ fontSize: 24, display: 'block', marginBottom: 8 }}></i>Loading documents...</div>
           ) : docsToShow.length === 0 ? (
-            <div className="ed-empty"><i className="ti ti-folder-off" style={{fontSize: 24, display: 'block', marginBottom: 8}}></i>No documents uploaded</div>
+            <div className="ed-empty"><i className="ti ti-folder-off" style={{ fontSize: 24, display: 'block', marginBottom: 8 }}></i>No documents uploaded</div>
           ) : (
             <div className="ed-docs-list">
               {docsToShow.map((doc, i) => {
@@ -652,10 +669,10 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                 const docName = doc.name || doc.documentName || doc.fileName || "Document";
                 const docMeta = doc.type || doc.documentType || doc.category || "";
                 const uploadDate = doc.uploadedAt || doc.createdAt;
-                const metaStr = [uploadDate ? new Date(uploadDate).toLocaleDateString('en-GB', {month:'short', year:'numeric'}) : "", docMeta, "PDF"].filter(Boolean).join(' · ');
+                const metaStr = [uploadDate ? new Date(uploadDate).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }) : "", docMeta, "PDF"].filter(Boolean).join(' · ');
                 return (
                   <div key={doc._id || i} className="ed-doc-row">
-                    <div className="ed-doc-icon" style={{background: ds.bg, color: ds.color}}><i className={`ti ${ds.icon}`}></i></div>
+                    <div className="ed-doc-icon" style={{ background: ds.bg, color: ds.color }}><i className={`ti ${ds.icon}`}></i></div>
                     <div className="ed-doc-info">
                       <div className="ed-doc-name">{docName}</div>
                       <div className="ed-doc-meta">{metaStr}</div>
@@ -663,8 +680,8 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                     <div className="ed-doc-actions">
                       {doc.url && doc.url !== "#" ? (
                         <>
-                          <button className="ed-doc-btn view" onClick={() => window.open(doc.url, '_blank')}><i className="ti ti-eye" style={{fontSize:12}}></i> View</button>
-                          <button className="ed-doc-btn download" onClick={() => { const a = document.createElement('a'); a.href = doc.url; a.download = docName; a.click(); }}><i className="ti ti-download" style={{fontSize:12}}></i> Download</button>
+                          <button className="ed-doc-btn view" onClick={() => window.open(doc.url, '_blank')}><i className="ti ti-eye" style={{ fontSize: 12 }}></i> View</button>
+                          <button className="ed-doc-btn download" onClick={() => { const a = document.createElement('a'); a.href = doc.url; a.download = docName; a.click(); }}><i className="ti ti-download" style={{ fontSize: 12 }}></i> Download</button>
                         </>
                       ) : (
                         <span style={{ fontSize: 11, color: "var(--text-muted)", background: "#F1F5F9", padding: "4px 10px", borderRadius: 20, fontWeight: 700 }}>Sent</span>
@@ -683,7 +700,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
       <div style={{ background: "#FFF5F5", border: "1px solid #FFE4E4", borderRadius: "10px", padding: "14px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "24px" }}>
         <div>
           <div style={{ color: "#DC2626", fontWeight: "800", fontSize: "13px", display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
-            <i className="ti ti-alert-triangle" style={{fontSize: "14px"}}></i> Danger Zone
+            <i className="ti ti-alert-triangle" style={{ fontSize: "14px" }}></i> Danger Zone
           </div>
           <div style={{ color: "#9CA3AF", fontSize: "12px", fontWeight: "500" }}>
             Deactivating revokes all access. Deletion is permanent and cannot be undone.
@@ -707,20 +724,20 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
             <form onSubmit={handleAddTaskSubmit}>
               <div style={{ marginBottom: 16 }}>
                 <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Task Title</label>
-                <input 
-                  type="text" 
-                  value={newTaskTitle} 
-                  onChange={e => setNewTaskTitle(e.target.value)} 
-                  required 
-                  placeholder="e.g. Design Landing Page Layout" 
+                <input
+                  type="text"
+                  value={newTaskTitle}
+                  onChange={e => setNewTaskTitle(e.target.value)}
+                  required
+                  placeholder="e.g. Design Landing Page Layout"
                   style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700 }}
                 />
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
                 <div>
                   <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Priority</label>
-                  <select 
-                    value={newTaskPriority} 
+                  <select
+                    value={newTaskPriority}
                     onChange={e => setNewTaskPriority(e.target.value)}
                     style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700, background: "#fff" }}
                   >
@@ -731,9 +748,9 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Due Date</label>
-                  <input 
-                    type="date" 
-                    value={newTaskDueDate} 
+                  <input
+                    type="date"
+                    value={newTaskDueDate}
                     onChange={e => setNewTaskDueDate(e.target.value)}
                     style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700 }}
                   />
@@ -759,19 +776,19 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
             <form onSubmit={handleRequestDocSubmit}>
               <div style={{ marginBottom: 16 }}>
                 <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Document Name</label>
-                <input 
-                  type="text" 
-                  value={newDocName} 
-                  onChange={e => setNewDocName(e.target.value)} 
-                  required 
-                  placeholder="e.g. Aadhar Card" 
+                <input
+                  type="text"
+                  value={newDocName}
+                  onChange={e => setNewDocName(e.target.value)}
+                  required
+                  placeholder="e.g. Aadhar Card"
                   style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700 }}
                 />
               </div>
               <div style={{ marginBottom: 20 }}>
                 <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Document Type</label>
-                <select 
-                  value={newDocType} 
+                <select
+                  value={newDocType}
                   onChange={e => setNewDocType(e.target.value)}
                   style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700, background: "#fff" }}
                 >

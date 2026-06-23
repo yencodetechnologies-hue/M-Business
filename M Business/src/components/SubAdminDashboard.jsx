@@ -2331,6 +2331,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
   const [statusFilter, setStatusFilter] = useState("All Status");
 
   const [viewEmp, setViewEmp] = useState(null);
+  const [viewEmpProject, setViewEmpProject] = useState(null); // { project, tasks, emp }
 
   const [editEmp, setEditEmp] = useState(null);
 
@@ -2512,6 +2513,46 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
 
 
+  if (viewEmpProject) {
+    return (
+      <div style={{ padding: "0 0 32px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18, cursor: "pointer", color: "#00BCD4", fontWeight: 700 }}
+          onClick={() => setViewEmpProject(null)}>
+          <i className="ti ti-arrow-left" style={{ fontSize: 18 }}></i> Back to Employee
+        </div>
+        <ModernEmployeeProjectDetails
+          project={viewEmpProject.project}
+          tasks={viewEmpProject.tasks}
+          user={viewEmpProject.emp}
+          onBack={() => setViewEmpProject(null)}
+          onMessageTeam={() => { setViewEmpProject(null); setActive("messaging"); }}
+          employeeMode={true}
+          currentEmployeeName={viewEmpProject.emp?.name}
+        />
+      </div>
+    );
+  }
+  if (viewEmpProject) {
+    return (
+      <div style={{ padding: "0 0 32px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18, cursor: "pointer", color: "#00BCD4", fontWeight: 700 }}
+          onClick={() => setViewEmpProject(null)}>
+          <i className="ti ti-arrow-left" style={{ fontSize: 18 }}></i> Back to Employee
+        </div>
+        <ModernEmployeeProjectDetails
+          project={viewEmpProject.project}
+          tasks={viewEmpProject.tasks}
+          user={viewEmpProject.emp}
+          onBack={() => setViewEmpProject(null)}
+          onMessageTeam={() => { setViewEmpProject(null); setActive("messaging"); }}
+          employeeMode={true}
+          currentEmployeeName={viewEmpProject.emp?.name}
+        />
+      </div>
+    );
+  }
+
+
   if (viewEmp) {
 
     return (
@@ -2586,7 +2627,17 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
           tasks={tasks}
 
-          onViewProject={(p) => { setViewEmp(null); setJumpProject(p); setActive("projects"); }}
+          onViewProject={(p) => {
+            const empName = (viewEmp?.name || '').toLowerCase().trim();
+            const empTasks = (tasks || []).filter(t => {
+              const assignTo = (t.assignTo || '').toLowerCase();
+              return assignTo.includes(empName) &&
+                (t.projectId === p._id || t.projectId === p.id ||
+                  String(t.projectId) === String(p._id));
+            });
+            setViewEmpProject({ project: p, tasks: empTasks, emp: viewEmp });
+            setViewEmp(null);
+          }}
 
         />
 

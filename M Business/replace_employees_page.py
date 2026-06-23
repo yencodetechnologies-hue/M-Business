@@ -20,6 +20,7 @@ new_employees_page = """function EmployeesPage({ employees, setEmployees }) {
   const [deptFilter, setDeptFilter] = useState("All Departments");
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [viewEmp, setViewEmp] = useState(null);
+  const [viewEmpProject, setViewEmpProject] = useState(null); // { project, tasks, emp }
   const [editEmp, setEditEmp] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [editForm, setEditForm] = useState({});
@@ -91,6 +92,26 @@ const res = await fetch(`/api/tasks?person=${encodeURIComponent(user.name)}`, {
   const onboardingLink = `${window.location.origin}/employee-onboarding?company=${encodeURIComponent(user.companyName || "Our Company")}&companyId=${companyId}`;
   const [linkCopied, setLinkCopied] = useState(false);
   const copyLink = () => { navigator.clipboard.writeText(onboardingLink); setLinkCopied(true); setTimeout(() => setLinkCopied(false), 2000); };
+
+  if (viewEmpProject) {
+    return (
+      <div style={{ padding: "0 0 32px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18, cursor: "pointer", color: "#00BCD4", fontWeight: 700 }}
+          onClick={() => setViewEmpProject(null)}>
+          <i className="ti ti-arrow-left" style={{ fontSize: 18 }}></i> Back to Employee
+        </div>
+        <ModernEmployeeProjectDetails
+          project={viewEmpProject.project}
+          tasks={viewEmpProject.tasks}
+          user={viewEmpProject.emp}
+          onBack={() => setViewEmpProject(null)}
+          onMessageTeam={() => { setViewEmpProject(null); setActive("messaging"); }}
+          employeeMode={true}
+          currentEmployeeName={viewEmpProject.emp?.name}
+        />
+      </div>
+    );
+  }
 
   if (viewEmp) {
     return <EmployeeDetail emp={viewEmp} onBack={() => setViewEmp(null)} onEdit={() => { setViewEmp(null); openEdit(viewEmp); }} onDelete={() => { setViewEmp(null); setDeleteTarget(viewEmp); }} empDocs={empDocs} empDocsLoading={empDocsLoading} />;

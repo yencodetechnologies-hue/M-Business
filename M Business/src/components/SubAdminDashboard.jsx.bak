@@ -531,6 +531,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 function EmployeesPage({ employees, setEmployees }) {
   const [search, setSearch] = useState("");
   const [viewEmp, setViewEmp] = useState(null);
+  const [viewEmpProject, setViewEmpProject] = useState(null); // { project, tasks, emp }
   const [editEmp, setEditEmp] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [editForm, setEditForm] = useState({});

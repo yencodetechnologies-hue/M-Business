@@ -1938,9 +1938,7 @@ function AddGroupRow({ onAdd, triggerRef }) {
   );
 }
 
-/* ----------------------------------------------------------
-   GROUP BLOCK
----------------------------------------------------------- */
+
 /* ----------------------------------------------------------
    GROUP BLOCK
 ---------------------------------------------------------- */
@@ -2025,6 +2023,7 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
               {tasks.length === 0 && !adding && <div style={{ padding: "12px 16px", fontSize: 12, color: "#c4b5fd", fontStyle: "italic" }}>No tasks yet</div>}
 
               {tasks.map(t => (
+
                 <TaskRow key={t._id || t.id} task={t}
                   onCheck={onCheck} onField={onField} onStatus={onStatus} onPriority={onPriority}
                   onDup={onDup} onDel={onDel} onOpen={onOpen}

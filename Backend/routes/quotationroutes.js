@@ -3,6 +3,8 @@ const express = require("express");
 const router = express.Router();
 const Quotation = require("../models/QuotationModel");
 const Invoice = require("../models/InvoiceModels");
+const Notification = require("../models/NotificationModel");
+const Client = require("../models/ClientModel");
 
 // ── GET all ──────────────────────────────────────────────────────────────────
 router.get("/", async (req, res) => {
@@ -142,8 +144,48 @@ router.post("/", async (req, res) => {
 
       return res.json({ success: true, quotation: existing });
     }
-    const doc = new Quotation({ qt, items, status: status || "draft", companyId: req.companyId || "" });
+    // Resolve clientId from client name for strict portal filtering
+    const clientName = qt.client || qt.toName || "";
+    let resolvedClientId = "";
+    if (clientName) {
+      const clientDoc = await Client.findOne({
+        companyId: req.companyId || "",
+        $or: [
+          { clientName: { $regex: new RegExp(`^\\s*${clientName}\\s*$`, "i") } },
+          { name: { $regex: new RegExp(`^\\s*${clientName}\\s*$`, "i") } },
+        ]
+      }).lean();
+      if (clientDoc) resolvedClientId = String(clientDoc._id);
+    }
+
+    const normalizedStatus = (status || "draft").toLowerCase();
+    const doc = new Quotation({
+      qt, items,
+      status: normalizedStatus,
+      companyId: req.companyId || "",
+      clientId: resolvedClientId,
+    });
     await doc.save();
+
+    // Send notification to client when quotation is sent
+    if (normalizedStatus === "sent" && resolvedClientId) {
+      try {
+        const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
+        const gstRate = parseFloat(qt.gstRate) || 0;
+        const total = qt.isGstIncluded ? subtotalRaw : subtotalRaw * (1 + gstRate / 100);
+        const notif = new Notification({
+          userId: resolvedClientId,
+          text: `New quotation ${qt.quoteNo || ""} sent to you for ₹${total.toLocaleString("en-IN")} — ${qt.title || qt.project || ""}`,
+          type: "info",
+          icon: "📄",
+          link: "quotations",
+          companyId: req.companyId || "",
+        });
+        await notif.save();
+      } catch (notifErr) {
+        console.warn("Quotation notification error:", notifErr.message);
+      }
+    }
 
     // Automatic Income Tracking
     if (qt.amountPaid > 0) {
@@ -196,13 +238,49 @@ router.put("/:id", async (req, res) => {
     const gstRate = parseFloat(qt.gstRate) || 0;
     const total = qt.isGstIncluded ? subtotalRaw : subtotalRaw * (1 + gstRate / 100);
 
+    // Resolve clientId
+    const clientName = qt.client || qt.toName || "";
+    let resolvedClientId = "";
+    if (clientName) {
+      const clientDoc = await Client.findOne({
+        companyId: req.companyId || "",
+        $or: [
+          { clientName: { $regex: new RegExp(`^\\s*${clientName}\\s*$`, "i") } },
+          { name: { $regex: new RegExp(`^\\s*${clientName}\\s*$`, "i") } },
+        ]
+      }).lean();
+      if (clientDoc) resolvedClientId = String(clientDoc._id);
+    }
+
+    const normalizedStatus = (status || "draft").toLowerCase();
+    const prevDoc = await Quotation.findById(req.params.id).lean();
     const doc = await Quotation.findByIdAndUpdate(
       req.params.id,
-      { qt, items, status: status || "draft" },
+      { qt, items, status: normalizedStatus, clientId: resolvedClientId },
       { returnDocument: "after" }
     ).lean();
 
     if (!doc) return res.status(404).json({ success: false, msg: "Quotation not found" });
+
+    // Send notification when status changes TO "sent"
+    if (normalizedStatus === "sent" && prevDoc?.status !== "sent" && resolvedClientId) {
+      try {
+        const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
+        const gstRate = parseFloat(qt.gstRate) || 0;
+        const total = qt.isGstIncluded ? subtotalRaw : subtotalRaw * (1 + gstRate / 100);
+        const notif = new Notification({
+          userId: resolvedClientId,
+          text: `New quotation ${qt.quoteNo || ""} sent to you for ₹${total.toLocaleString("en-IN")} — ${qt.title || qt.project || ""}`,
+          type: "info",
+          icon: "📄",
+          link: "quotations",
+          companyId: req.companyId || "",
+        });
+        await notif.save();
+      } catch (notifErr) {
+        console.warn("Quotation notification error:", notifErr.message);
+      }
+    }
 
     // Sync Income
     if (qt.amountPaid > 0) {

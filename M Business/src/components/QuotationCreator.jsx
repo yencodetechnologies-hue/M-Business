@@ -561,37 +561,280 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     return doc;
   };
 
-  const triggerPDFShare = async (entry, type) => {
-    if (typeof showToast === 'function') showToast('Generating PDF...');
-    try {
-      const doc = await generatePDFFromEntry(entry);
-      const fileName = `Quotation_${entry.quoteNo || 'QUO'}.pdf`;
-      const qtData = entry.qt || {};
-      const text = `*${qtData.fromCompany || qtData.companyName || 'Your Business'}*\n\nQuotation: ${entry.quoteNo}\nTotal: ${formatCurrency(entry.total || 0, qtData.currency || 'INR')}`;
+  const buildPDFFromData = (entry) => {
+    const qtData = entry.qt || {};
+    const entryItems = entry.items || [];
 
-      if (type === 'wa') {
-        const blob = doc.output('blob');
-        const file = new File([blob], fileName, { type: 'application/pdf' });
+    const subtotalRaw = entryItems.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity || i.qty) || 0), 0);
+    const gstRate = parseFloat(qtData.gstRate) || 0;
+    const isGstInc = qtData.isGstIncluded || false;
+    let sub, gstAmt, tot;
+    if (isGstInc) { tot = subtotalRaw; sub = tot / (1 + gstRate / 100); gstAmt = tot - sub; }
+    else { sub = subtotalRaw; gstAmt = sub * gstRate / 100; tot = sub + gstAmt; }
+
+    const cur = qtData.currency || "INR";
+    const fmtN = (n) => cur + " " + Number(n).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fmtD = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+
+    const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+    const PW = 210; const PH = 297;
+    const ML = 14; const MR = 14;
+    const CW = PW - ML - MR;
+    let y = 0;
+
+    // ── Header band ──
+    doc.setFillColor(240, 253, 250);
+    doc.rect(0, 0, PW, 50, "F");
+
+    const company = qtData.fromCompany || qtData.companyName || effectiveCompanyName || "Company";
+    const init2 = company.substring(0, 2).toUpperCase();
+    doc.setFillColor(0, 188, 212);
+    doc.roundedRect(ML, 10, 18, 18, 3, 3, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(9); doc.setFont("helvetica", "bold");
+    doc.text(init2, ML + 9, 21, { align: "center" });
+
+    doc.setTextColor(6, 78, 59);
+    doc.setFontSize(15); doc.setFont("helvetica", "bold");
+    doc.text(company.toUpperCase(), ML + 22, 17);
+    doc.setFontSize(8); doc.setFont("helvetica", "normal"); doc.setTextColor(6, 95, 70);
+    if (qtData.fromEmail || qtData.companyEmail) doc.text(qtData.fromEmail || qtData.companyEmail, ML + 22, 22);
+    if (qtData.fromPhone || qtData.companyPhone) doc.text(qtData.fromPhone || qtData.companyPhone, ML + 22, 27);
+
+    doc.setFontSize(22); doc.setFont("helvetica", "bold"); doc.setTextColor(200, 240, 245);
+    doc.text("QUOTATION", PW - MR, 20, { align: "right" });
+    doc.setFontSize(11); doc.setTextColor(0, 188, 212);
+    doc.text(entry.quoteNo || qtData.quoteNo || "", PW - MR, 28, { align: "right" });
+    doc.setFontSize(7.5); doc.setFont("helvetica", "normal"); doc.setTextColor(100, 116, 139);
+    const qDate = qtData.quoteDate || qtData.date || "";
+    const qExp = qtData.expiryDate || "";
+    if (qDate) { doc.text("DATE", PW - MR - 26, 35); doc.setFont("helvetica", "bold"); doc.setTextColor(6, 78, 59); doc.text(fmtD(qDate), PW - MR, 35, { align: "right" }); }
+    if (qExp) { doc.setFont("helvetica", "normal"); doc.setTextColor(100, 116, 139); doc.text("VALID UNTIL", PW - MR - 26, 40); doc.setFont("helvetica", "bold"); doc.setTextColor(234, 88, 12); doc.text(fmtD(qExp), PW - MR, 40, { align: "right" }); }
+
+    // ── Divider ──
+    y = 53; doc.setDrawColor(209, 250, 229); doc.setLineWidth(0.4); doc.line(ML, y, PW - MR, y); y += 6;
+
+    // ── Prepared For / Project ──
+    const clientName = qtData.toName || qtData.client || entry.client || "";
+    const projectName = qtData.title || qtData.project || entry.project || "";
+    doc.setFontSize(7); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 188, 212);
+    doc.text("PREPARED FOR", ML, y);
+    if (projectName) doc.text("PROJECT", ML + CW / 2, y);
+    y += 5;
+    doc.setFontSize(12); doc.setFont("helvetica", "bold"); doc.setTextColor(17, 24, 39);
+    doc.text(clientName || "—", ML, y);
+    if (projectName) doc.text(projectName, ML + CW / 2, y);
+    doc.setFontSize(8); doc.setFont("helvetica", "normal"); doc.setTextColor(107, 114, 128);
+    let cy = y + 5;
+    if (qtData.toEmail) { doc.text(qtData.toEmail, ML, cy); cy += 4; }
+    if (qtData.toPhone) { doc.text(qtData.toPhone, ML, cy); cy += 4; }
+    if (qtData.toAddress) { doc.text(qtData.toAddress, ML, cy); cy += 4; }
+    y = Math.max(cy, y + 10) + 5;
+
+    // ── Table header ──
+    doc.setFillColor(240, 253, 250); doc.rect(ML, y, CW, 8, "F");
+    doc.setFontSize(7.5); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 188, 212);
+    doc.text("#", ML + 2, y + 5.5);
+    doc.text("DESCRIPTION", ML + 10, y + 5.5);
+    doc.text("QTY", ML + CW - 50, y + 5.5, { align: "right" });
+    doc.text("UNIT RATE", ML + CW - 26, y + 5.5, { align: "right" });
+    doc.text("AMOUNT", ML + CW, y + 5.5, { align: "right" });
+    y += 8;
+
+    // ── Table rows ──
+    entryItems.forEach((item, idx) => {
+      const desc = item.description || item.desc || "";
+      const qty = parseFloat(item.quantity || item.qty) || 0;
+      const rate = parseFloat(item.rate) || 0;
+      const amount = qty * rate;
+      if (idx % 2 === 1) { doc.setFillColor(248, 250, 252); doc.rect(ML, y, CW, 8, "F"); }
+      doc.setFontSize(8); doc.setFont("helvetica", "bold"); doc.setTextColor(110, 231, 183);
+      doc.text(String(idx + 1).padStart(2, "0"), ML + 2, y + 5.5);
+      doc.setFont("helvetica", "normal"); doc.setTextColor(17, 24, 39);
+      doc.text(desc, ML + 10, y + 5.5);
+      doc.setTextColor(55, 65, 81);
+      doc.text(String(qty), ML + CW - 50, y + 5.5, { align: "right" });
+      doc.text(fmtN(rate), ML + CW - 26, y + 5.5, { align: "right" });
+      doc.setFont("helvetica", "bold"); doc.setTextColor(17, 24, 39);
+      doc.text(fmtN(amount), ML + CW, y + 5.5, { align: "right" });
+      doc.setDrawColor(240, 253, 250); doc.setLineWidth(0.2); doc.line(ML, y + 8, ML + CW, y + 8);
+      y += 8;
+    });
+    y += 5;
+
+    // ── Totals ──
+    const tX = ML + CW / 2;
+    const drawRow = (lbl, val) => {
+      doc.setLineWidth(0.2); doc.setDrawColor(240, 253, 250); doc.line(tX, y + 6, ML + CW, y + 6);
+      doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.setTextColor(107, 114, 128);
+      doc.text(lbl, tX, y + 4.5);
+      doc.setFont("helvetica", "bold"); doc.setTextColor(17, 24, 39);
+      doc.text(val, ML + CW, y + 4.5, { align: "right" });
+      y += 7;
+    };
+    drawRow("Subtotal", fmtN(sub));
+    drawRow(`GST (${gstRate}%)${isGstInc ? " (Incl.)" : ""}`, fmtN(gstAmt));
+    drawRow("Total Amount", fmtN(tot));
+    const paid = parseFloat(qtData.amountPaid) || 0;
+    drawRow("Amount Paid", fmtN(paid));
+    y += 2;
+    doc.setFillColor(248, 250, 252); doc.roundedRect(tX, y, CW / 2, 12, 2, 2, "F");
+    doc.setDrawColor(226, 232, 240); doc.roundedRect(tX, y, CW / 2, 12, 2, 2, "S");
+    doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(100, 116, 139);
+    doc.text("BALANCE DUE", tX + 4, y + 7.5);
+    doc.setFontSize(13); doc.setTextColor(6, 78, 59);
+    doc.text(fmtN(tot - paid), ML + CW - 2, y + 8, { align: "right" });
+    y += 18;
+
+    // ── Notes ──
+    const notes = qtData.notes || qtData.terms || "";
+    if (notes) {
+      doc.setFillColor(240, 253, 250); doc.roundedRect(ML, y, CW * 0.6, 22, 2, 2, "F");
+      doc.setDrawColor(209, 250, 229); doc.roundedRect(ML, y, CW * 0.6, 22, 2, 2, "S");
+      doc.setFontSize(7); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 188, 212);
+      doc.text("NOTES", ML + 4, y + 5);
+      doc.setFont("helvetica", "normal"); doc.setTextColor(55, 65, 81);
+      const lines = doc.splitTextToSize(notes, CW * 0.6 - 8);
+      doc.text(lines.slice(0, 4), ML + 4, y + 10);
+      y += 26;
+    }
+
+    // ── Footer ──
+    doc.setFillColor(255, 255, 255); doc.rect(0, PH - 16, PW, 16, "F");
+    doc.setDrawColor(241, 245, 249); doc.setLineWidth(0.5); doc.line(0, PH - 16, PW, PH - 16);
+    doc.setFontSize(8); doc.setFont("helvetica", "normal"); doc.setTextColor(107, 114, 128);
+    doc.text(company, ML, PH - 8);
+    doc.setFont("helvetica", "bold"); doc.setTextColor(124, 58, 237);
+    doc.text("Thank you for considering us!", PW / 2, PH - 8, { align: "center" });
+    doc.text(entry.quoteNo || "", PW - MR, PH - 8, { align: "right" });
+
+    return doc;
+  };
+
+  const triggerPDFShare = async (entry, type) => {
+    // Generate directly from data — NO page navigation, NO DOM needed, NO waiting
+    showToast("Generating PDF...");
+    try {
+      const doc = buildPDFFromData(entry);
+      const fileName = `Quotation_${entry.quoteNo || "QUO"}.pdf`;
+      const qtData = entry.qt || {};
+      const entryItems = entry.items || items || [];
+      const entryTotal = entryItems.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity || i.qty) || 0), 0);
+      const text = `*${qtData.fromCompany || qtData.companyName || "Your Business"}*\n\nQuotation: ${entry.quoteNo}\nTotal: ₹${entryTotal.toLocaleString("en-IN")}`;
+
+      if (type === "print") {
+        // Open in browser PDF viewer with print dialog ready
+        doc.autoPrint();
+        const blobURL = doc.output("bloburl");
+        window.open(blobURL, "_blank");
+        showToast("PDF opened!");
+        return;
+      }
+
+      if (type === "wa") {
+        const blob = doc.output("blob");
+        const file = new File([blob], fileName, { type: "application/pdf" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({ title: `Quotation ${entry.quoteNo}`, text, files: [file] });
         } else {
           doc.save(fileName);
-          if (typeof showToast === 'function') showToast('PDF downloaded! Attach it in WhatsApp.');
-          window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+          showToast("PDF downloaded! Attach it in WhatsApp.");
+          window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
         }
-      } else {
-        // print / link / share — direct download, no page navigation
-        doc.save(fileName);
-        if (typeof showToast === 'function') showToast('PDF downloaded!');
+        return;
       }
+
+      // default — direct download, no page change
+      doc.save(fileName);
+      showToast("PDF downloaded!");
     } catch (err) {
-      console.error('PDF generation error:', err);
-      if (typeof showToast === 'function') showToast('Failed to generate PDF.');
+      console.error("PDF error:", err);
+      showToast("Failed to generate PDF.");
+    }
+  };
+  const shareQuotation = async (entry) => {
+    // Build the shareable public URL for this quotation
+    const qtData = entry.qt || qt;
+    const entryItems = entry.items || items || [];
+    const slimPayload = {
+      no: qtData.quoteNo || entry.quoteNo,
+      date: qtData.date || qtData.quoteDate,
+      exp: qtData.expiryDate,
+      co: qtData.companyName || qtData.fromCompany,
+      email: qtData.companyEmail || qtData.fromEmail,
+      phone: qtData.companyPhone || qtData.fromPhone,
+      addr: qtData.companyAddress,
+      cl: qtData.client || qtData.toName,
+      proj: qtData.project || qtData.title,
+      gst: qtData.gstRate,
+      notes: qtData.notes,
+      terms: qtData.terms,
+      incGst: qtData.isGstIncluded,
+      paid: qtData.amountPaid,
+      upi: qtData.upiId,
+      cur: qtData.currency,
+      items: entryItems.map(i => ({ d: i.description || i.desc, q: i.quantity || i.qty, r: i.rate })),
+      cid: user?.companyId || user?.company || user?._id || "",
+    };
+    let shareURL = `${FRONTEND_URL}/quotation-view?d=${encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload)))))}`;
+    if (shareURL.length > 2000) shareURL = `${FRONTEND_URL}/quotation-view?no=${entry.quoteNo}`;
+
+    const subtotal = entryItems.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity || i.qty) || 0), 0);
+    const shareTitle = `Quotation ${entry.quoteNo} — ${qtData.companyName || qtData.fromCompany || ""}`;
+    const shareText = `Hi, please find your quotation ${entry.quoteNo} for ₹${subtotal.toLocaleString("en-IN")}.\n\nView it here: ${shareURL}`;
+
+    // Use native Web Share API if available (works on mobile — triggers share sheet with all apps)
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: shareTitle, text: shareText, url: shareURL });
+        return;
+      } catch (e) {
+        if (e.name === "AbortError") return; // user cancelled
+      }
+    }
+
+    // Fallback: copy link to clipboard
+    try {
+      await navigator.clipboard.writeText(shareURL);
+      showToast("Link copied to clipboard!");
+    } catch {
+      showToast("Share link: " + shareURL);
     }
   };
 
-  const shareQuotation = (entry) => triggerPDFShare(entry, "link");
-  const shareWhatsApp = (entry) => triggerPDFShare(entry, "wa");
+  const shareWhatsApp = (entry) => {
+    const qtData = entry.qt || qt;
+    const entryItems = entry.items || items || [];
+    const subtotal = entryItems.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity || i.qty) || 0), 0);
+
+    const slimPayload = {
+      no: qtData.quoteNo || entry.quoteNo,
+      date: qtData.date || qtData.quoteDate,
+      exp: qtData.expiryDate,
+      co: qtData.companyName || qtData.fromCompany,
+      email: qtData.companyEmail || qtData.fromEmail,
+      phone: qtData.companyPhone || qtData.fromPhone,
+      addr: qtData.companyAddress,
+      cl: qtData.client || qtData.toName,
+      proj: qtData.project || qtData.title,
+      gst: qtData.gstRate,
+      notes: qtData.notes,
+      cur: qtData.currency,
+      items: entryItems.map(i => ({ d: i.description || i.desc, q: i.quantity || i.qty, r: i.rate })),
+      cid: user?.companyId || user?.company || user?._id || "",
+    };
+    let viewURL = `${FRONTEND_URL}/quotation-view?d=${encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload)))))}`;
+    if (viewURL.length > 2000) viewURL = `${FRONTEND_URL}/quotation-view?no=${entry.quoteNo}`;
+
+    const company = qtData.companyName || qtData.fromCompany || "Your Business";
+    const client = qtData.client || qtData.toName || "";
+    const project = qtData.project || qtData.title || "";
+    const validity = qtData.validity || "30";
+
+    const msg = `*${company}*\n\nDear ${client},\n\nPlease find your quotation below:\n\n📋 *Quotation No:* ${entry.quoteNo}\n💼 *Project:* ${project}\n💰 *Total:* ₹${subtotal.toLocaleString("en-IN")}\n⏰ *Valid for:* ${validity} days\n\n🔗 *View Quotation:* ${viewURL}\n\n_Kindly review and revert at your earliest convenience._\n\n_Thank you for your business!_`;
+
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+  };
   const loadEntry = (entry) => {
     setQt(entry.qt || blank);
     setItems(entry.items || [{ id: 1, description: "", quantity: 1, rate: "" }]);

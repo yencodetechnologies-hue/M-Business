@@ -198,21 +198,21 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
   // ── Client searchable dropdown ──
   const [clientDropOpen, setClientDropOpen] = useState(false);
   const [clientSearch, setClientSearch] = useState('');
-  const handleSave = async (status = 'draft') => {
+  const handleSave = async (statusArg = 'draft') => {
+    const normalStatus = statusArg.toLowerCase();
+    if (normalStatus === 'sent' && !qt.toName) {
+      alert('Please select a client before sending the quotation.');
+      return;
+    }
     setSaving(true);
     try {
       const payload = {
         qt: {
           ...qt,
-          status,
-          client: qt.toName,    // mapped for list display
-          project: qt.title,     // mapped for list display
-          date: qt.quoteDate, // mapped for list display
-          tags,
-          phases,
-          inclusions,
-          exclusions,
-          // preserve both naming conventions so Edit always finds values
+          status: normalStatus,
+          client: qt.toName,    // for list display
+          project: qt.title,     // for list display
+          date: qt.quoteDate, // for list display
           toName: qt.toName,
           title: qt.title,
           quoteDate: qt.quoteDate,
@@ -220,17 +220,20 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
           fromName: qt.fromName,
           fromEmail: qt.fromEmail,
           fromPhone: qt.fromPhone,
+          tags,
+          phases,
+          inclusions,
+          exclusions,
         },
         items: items.map(item => ({
           id: item.id,
-          description: item.desc,   // DB canonical name
-          quantity: item.qty,    // DB canonical name
+          description: item.desc,
+          quantity: item.qty,
           rate: item.rate,
-          // also save short names so both QuotationCreator card and ModernForm can read them
           desc: item.desc,
           qty: item.qty,
         })),
-        status
+        status: normalStatus,
       };
 
       const existingId = editEntry?.id || editEntry?._id;
@@ -239,12 +242,19 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
       } else {
         await axios.post(`${BASE_URL}/api/quotations`, payload);
       }
-    } catch (e) { console.warn('Save error', e); }
-    setSaving(false);
-    setSaved(true);
-    setTimeout(() => { setSaved(false); onBack(); }, 1200);
-  };
 
+      setSaving(false);
+      setSaved(true);
+      if (normalStatus === 'sent') {
+        alert(`✅ Quotation sent successfully to ${qt.toName}! It will appear in their dashboard immediately.`);
+      }
+      setTimeout(() => { setSaved(false); onBack(); }, normalStatus === 'sent' ? 400 : 1200);
+    } catch (e) {
+      console.error('Save error', e);
+      setSaving(false);
+      alert('Failed to save quotation. Please try again.');
+    }
+  };
   // ── Valid until date ──
   const validUntil = (() => {
     const days = qt.validity === 'Custom' ? (parseInt(customValidity) || 30) : (parseInt(qt.validity) || 30);
@@ -577,11 +587,12 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
             <div className="mqc-card-body">
 
               {/* ── Searchable Client Dropdown ── */}
-              <div className="mqc-form-group" style={{ position: 'relative', zIndex: clientDropOpen ? 200 : 1 }}>
+              <div className="mqc-form-group" style={{ position: 'relative', zIndex: clientDropOpen ? 50 : 1 }}>
                 <label className="mqc-label">Client / Company Name</label>
 
                 {/* Trigger box */}
                 <div
+                  onMouseDown={e => e.preventDefault()}
                   onClick={() => { setClientDropOpen(o => !o); setClientSearch(''); }}
                   style={{
                     width: '100%', padding: '10px 36px 10px 13px', background: 'var(--bg)',
@@ -605,16 +616,14 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
                   <span style={{ position: 'absolute', right: 12, top: '50%', transform: `translateY(-50%) rotate(${clientDropOpen ? 180 : 0}deg)`, fontSize: 10, color: 'var(--text3)', transition: 'transform .2s' }}>▼</span>
                 </div>
 
-                {/* Dropdown panel */}
+                {/* Dropdown panel — no fixed backdrop, no scroll freeze */}
                 {clientDropOpen && (
                   <>
-                    {/* Backdrop to close */}
-                    <div onClick={() => setClientDropOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 198 }} />
                     <div style={{
                       position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
-                      background: 'var(--surface)', border: '1.5px solid var(--border)',
+                      background: 'var(--surface)', border: '1.5px solid var(--teal)',
                       borderRadius: 12, boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-                      zIndex: 199, overflow: 'hidden'
+                      zIndex: 50, overflow: 'hidden'
                     }}>
                       {/* Search input */}
                       <div style={{ padding: '10px 10px 6px', borderBottom: '1px solid var(--border)' }}>
@@ -625,7 +634,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
                             placeholder="Search client name…"
                             value={clientSearch}
                             onChange={e => setClientSearch(e.target.value)}
-                            onClick={e => e.stopPropagation()}
+                            onBlur={() => setTimeout(() => setClientDropOpen(false), 180)}
                             style={{
                               width: '100%', padding: '8px 10px 8px 30px',
                               border: '1.5px solid var(--border)', borderRadius: 8,
@@ -641,6 +650,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
                         {/* Manual entry option */}
                         {clientSearch.trim() && !clients.some(c => (c.clientName || c.name || '').toLowerCase() === clientSearch.toLowerCase()) && (
                           <div
+                            onMouseDown={e => e.preventDefault()}
                             onClick={() => {
                               upd('toName', clientSearch.trim());
                               setClientDropOpen(false);
@@ -717,6 +727,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
                       {/* Clear selection */}
                       {qt.toName && (
                         <div
+                          onMouseDown={e => e.preventDefault()}
                           onClick={() => {
                             upd('toName', ''); upd('toContact', '');
                             upd('toEmail', ''); upd('toPhone', ''); upd('toAddress', '');

@@ -541,8 +541,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const milestonesArr = currProject.milestones || [];
   const doneMilestones = milestonesArr.filter(m => {
     const mTasks = currTasks.filter(t => t.milestone === m.name && !t.isDeleted);
-    // Only count as done if it has tasks AND all are completed (or manually toggled with tasks)
-    return mTasks.length > 0 && m.done === true;
+    if (mTasks.length > 0) {
+      // Has tasks: done only if all tasks are completed AND m.done is true
+      return m.done === true && mTasks.every(t => t.status === 'done' || t.status === 'completed');
+    }
+    // No tasks: done if manually toggled
+    return m.done === true;
   }).length;
   const totalMilestones = milestonesArr.length;
   const progressPct = totalMilestones > 0
@@ -793,13 +797,16 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         return m;
       });
 
-      // Recalculate progress from milestones if no tasks exist
       const totalM = updatedMilestones.length;
-      const doneM = updatedMilestones.filter(m => m.done).length;
-      const totalT = projTasks.length;
+
+      // Count done milestones the same way progressPct display does:
+      // a milestone is "done" if m.done === true (regardless of whether it has tasks)
+      // This matches the manual toggle use case shown in the screenshot
+      const doneM = updatedMilestones.filter(m => m.done === true).length;
+
       const newProgress = totalM > 0
         ? Math.round((doneM / totalM) * 100)
-        : (currProject.progress || 0);
+        : 0;
 
       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
         milestones: updatedMilestones,

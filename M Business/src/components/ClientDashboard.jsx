@@ -1999,7 +1999,7 @@ export default function ClientDashboard({ user, setUser }) {
                           <div style={{ padding: "10px 18px", borderTop: "1px solid " + C.border, fontSize: 11, color: C.text3, lineHeight: 1.7 }}>
                             <span style={{ fontWeight: 700, color: C.teal2 }}>Notes: </span>{notes}
                           </div>
-                        )}
+                        ))}
                       </div>
                     );
                   })}

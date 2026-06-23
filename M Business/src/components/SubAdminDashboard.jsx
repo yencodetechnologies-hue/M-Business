@@ -1450,7 +1450,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                         setProjects && setProjects(prev => prev.filter(proj => proj._id !== p._id));
 
-                        showToast("Delete Project deleted!");
+                        showToast("Delete Project deleted!");
 
                       } catch (err) {
 

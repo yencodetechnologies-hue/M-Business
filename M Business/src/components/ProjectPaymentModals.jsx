@@ -692,7 +692,7 @@ export default function ProjectPaymentModals({
             <div style={btnRowStyle}>
               <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
               <button type="submit" style={submitBtnStyle} disabled={saving}>
-                {saving ? 'Saving...' : 'Yes Save Milestone'}
+                {saving ? 'Saving' : 'Yes Save Milestone'}
               </button>
             </div>
           </form>

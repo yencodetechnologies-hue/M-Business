@@ -340,6 +340,7 @@ export default function ClientDashboard({ user, setUser }) {
   const [tasks, setTasks] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [proposals, setProposals] = useState([]);
+  const [quotations, setQuotations] = useState([]);
   const [notifs, setNotifs] = useState([]);
   const [docs, setDocs] = useState([]);
   const [meetings, setMeetings] = useState([]);
@@ -402,7 +403,7 @@ export default function ClientDashboard({ user, setUser }) {
     const fetchAll = async () => {
       try {
         const myClientId = user._id || user.id || "";
-        const [projRes, taskRes, invRes, notifRes, docRes, meetRes, propRes] = await Promise.all([
+        const [projRes, taskRes, invRes, notifRes, docRes, meetRes, propRes, quotRes] = await Promise.all([
           axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}&clientId=${encodeURIComponent(myClientId)}`, {
             headers: { 'x-company-id': user.companyId || "" }
           }),
@@ -417,6 +418,9 @@ export default function ClientDashboard({ user, setUser }) {
           axios.get(`${BASE_URL}/api/meetings?client=${encodeURIComponent(clientName)}`).catch(() => ({ data: [] })),
           axios.get(`${BASE_URL}/api/proposals/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}&clientId=${encodeURIComponent(user._id || user.id || "")}`, {
             headers: { 'x-company-id': user.companyId || "" }
+          }).catch(() => ({ data: [] })),
+          axios.get(`${BASE_URL}/api/quotations/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}`, {
+            headers: { 'x-company-id': user.companyId || "" }
           }).catch(() => ({ data: [] }))
         ]);
 
@@ -426,9 +430,19 @@ export default function ClientDashboard({ user, setUser }) {
         setNotifs(notifRes.data || []);
         setDocs(docRes.data || []);
         setMeetings(Array.isArray(meetRes.data) ? meetRes.data : []);
-        const allProps = propRes.data || [];
+
+        // Filter quotations — only show "sent" quotations addressed to this client
+        const allQuots = Array.isArray(quotRes.data) ? quotRes.data : (quotRes.data?.quotations || []);
         const myClientIdStr = String(user._id || user.id || "");
         const cn = (clientName || "").toLowerCase().trim();
+        const filteredQuots = allQuots.filter(q => {
+          if (q.status !== "sent") return false;
+          const qClient = (q.client || q.qt?.client || q.qt?.toName || "").toLowerCase().trim();
+          return qClient === cn;
+        });
+        setQuotations(filteredQuots);
+
+        const allProps = propRes.data || [];
         const filtered = allProps.filter(p => {
           const matchStatus = ["sent", "pending", "approved", "rejected"].includes(p.status);
           if (!matchStatus) return false;
@@ -1070,8 +1084,22 @@ export default function ClientDashboard({ user, setUser }) {
               )}
             </button>
             <button className={`tn-item ${active === "payments" ? "active" : ""}`} onClick={() => setActive("payments")}>Invoices</button>
+            <button className={`tn-item ${active === "quotations" ? "active" : ""}`} onClick={() => setActive("quotations")}>
+              Quotations {quotations.length > 0 && (
+                <span style={{ background: "#00BCD4", color: "#fff", borderRadius: 20, fontSize: 10, fontWeight: 800, padding: "1px 6px", marginLeft: 4 }}>
+                  {quotations.length}
+                </span>
+              )}
+            </button>
+            <button className={`tn-item ${active === "payments" ? "active" : ""}`} onClick={() => setActive("payments")}>Invoices</button>
+            <button className={`tn-item ${active === "quotations" ? "active" : ""}`} onClick={() => setActive("quotations")}>
+              Quotations{quotations.length > 0 && (
+                <span style={{ background: C.teal, color: "#fff", borderRadius: 20, fontSize: 10, fontWeight: 800, padding: "1px 6px", marginLeft: 4 }}>
+                  {quotations.length}
+                </span>
+              )}
+            </button>
             <button className={`tn-item ${active === "messages" ? "active" : ""}`} onClick={() => setActive("messages")}>Messages</button>
-            <button className={`tn-item ${active === "calendar" ? "active" : ""}`} onClick={() => setActive("calendar")}>Schedule</button>
           </div>
           <div className="tn-right">
             <div className="tn-notif" onClick={() => setActive("dashboard")}>
@@ -1885,6 +1913,98 @@ export default function ClientDashboard({ user, setUser }) {
             </div>
             <div style={{ maxWidth: 800, margin: "0 auto" }}>
               {renderInvoicesComponent()}
+            </div>
+          </div>
+        )}
+
+        {active === "quotations" && (
+          <div>
+            <div className="sec-header">
+              <div className="sec-title">
+                <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-file-invoice"></i></div>
+                My Quotations
+              </div>
+            </div>
+            <div style={{ maxWidth: 800, margin: "0 auto" }}>
+              {quotations.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "48px 20px", color: C.text3 }}>
+                  <i className="ti ti-file-invoice" style={{ fontSize: 44, display: "block", marginBottom: 14, opacity: 0.35 }}></i>
+                  <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>No quotations yet</div>
+                  <div style={{ fontSize: 13 }}>When your service provider sends you a quotation, it will appear here.</div>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                  {quotations.map((q) => {
+                    const qt = q.qt || {};
+                    const items = q.items || [];
+                    const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity || i.qty) || 1), 0);
+                    const total = q.total || subtotal;
+                    const quoteDate = qt.quoteDate || qt.date || q.date || "";
+                    const validity = qt.validity || "30";
+                    const overview = qt.overview || qt.description || "";
+                    const notes = qt.notes || qt.terms || "";
+                    return (
+                      <div key={q.id} style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,188,212,0.06)" }}>
+
+                        {/* Header */}
+                        <div style={{ background: C.tealLighter, padding: "14px 18px", borderBottom: "1px solid " + C.border, display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 8 }}>
+                          <div>
+                            <div style={{ fontSize: 14, fontWeight: 800, color: C.teal }}>#{q.quoteNo}</div>
+                            {(q.project || qt.title) && <div style={{ fontSize: 12, color: C.text2, marginTop: 3, fontWeight: 600 }}>{q.project || qt.title}</div>}
+                          </div>
+                          <div style={{ textAlign: "right" }}>
+                            <span style={{ background: C.teal, color: "#fff", borderRadius: 20, fontSize: 11, fontWeight: 700, padding: "3px 12px" }}>Sent</span>
+                            {quoteDate && <div style={{ fontSize: 11, color: C.text3, marginTop: 5 }}>{new Date(quoteDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</div>}
+                          </div>
+                        </div>
+
+                        {/* Overview */}
+                        {overview && (
+                          <div style={{ padding: "10px 18px", background: C.surface2, borderBottom: "1px solid " + C.border, fontSize: 12, color: C.text2, lineHeight: 1.7 }}>
+                            {overview}
+                          </div>
+                        )}
+
+                        {/* Line Items */}
+                        <div style={{ padding: "14px 18px" }}>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: C.text3, textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 8 }}>Items / Services</div>
+                          {items.map((item, idx) => {
+                            const qty = parseFloat(item.quantity || item.qty) || 1;
+                            const rate = parseFloat(item.rate) || 0;
+                            return (
+                              <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 0", borderBottom: idx < items.length - 1 ? "1px solid " + C.border : "none", fontSize: 13 }}>
+                                <span style={{ color: C.text, fontWeight: 600 }}>{item.description || item.desc || "—"}</span>
+                                <span style={{ color: C.text2, fontSize: 12 }}>
+                                  {qty} × ₹{rate.toLocaleString("en-IN")}
+                                  <span style={{ fontWeight: 800, color: C.text, marginLeft: 12 }}>₹{(qty * rate).toLocaleString("en-IN")}</span>
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Total + Validity */}
+                        <div style={{ padding: "12px 18px", borderTop: "2px solid " + C.tealLight, background: C.surface2, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+                          <div style={{ fontSize: 11, color: C.amber, fontWeight: 700, background: C.amberBg, padding: "4px 12px", borderRadius: 8, borderLeft: "3px solid " + C.amber }}>
+                            ⏰ Valid for {validity === "Custom" ? "custom period" : `${validity} days`} from issue
+                          </div>
+                          <div style={{ textAlign: "right" }}>
+                            <div style={{ fontSize: 11, color: C.text3 }}>Total Quoted</div>
+                            <div style={{ fontSize: 20, fontWeight: 900, color: C.teal }}>₹{total.toLocaleString("en-IN")}</div>
+                          </div>
+                        </div>
+
+                        {/* Notes */}
+                        {notes && (
+                          <div style={{ padding: "10px 18px", borderTop: "1px solid " + C.border, fontSize: 11, color: C.text3, lineHeight: 1.7 }}>
+                            <span style={{ fontWeight: 700, color: C.teal2 }}>Notes: </span>{notes}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         )}

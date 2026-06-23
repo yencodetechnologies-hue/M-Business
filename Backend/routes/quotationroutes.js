@@ -64,6 +64,8 @@ router.get("/client/:clientName", async (req, res) => {
     let filter = conditions.length > 0
       ? { ...companyFilter, $or: conditions }
       : companyFilter;
+    // Clients only see quotations explicitly sent to them
+    filter.status = "sent";
     const docs = await Quotation.find(filter).sort({ createdAt: -1 }).lean();
 
     const quotations = docs.map((doc) => {

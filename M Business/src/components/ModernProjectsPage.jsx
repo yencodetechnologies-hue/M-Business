@@ -147,6 +147,8 @@ export default function ModernProjectsPage({ user }) {
     active: projects.filter(p => ['active', 'inprogress', 'inreview', 'started'].includes((p.status || '').toLowerCase().replace(/[\s_-]/g, ''))).length,
     completed: projects.filter(p => ['completed', 'done', 'delivered', 'closed'].includes((p.status || '').toLowerCase().replace(/[\s_-]/g, ''))).length,
     onhold: projects.filter(p => ['onhold', 'hold', 'paused', 'suspended'].includes((p.status || '').toLowerCase().replace(/[\s_-]/g, ''))).length,
+    overdue: projects.filter(p => ['overdue', 'late'].includes((p.status || '').toLowerCase().replace(/[\s_-]/g, ''))).length,
+    totalValue: projects.reduce((sum, p) => sum + (Number(p.budget) || 0), 0),
   }), [projects]);
 
   // ── Filter ----------------------------------------------------
@@ -160,6 +162,7 @@ export default function ModernProjectsPage({ user }) {
       if (activeTab === 'Active') return cls === 'active';
       if (activeTab === 'Completed') return cls === 'completed';
       if (activeTab === 'On Hold') return cls === 'onhold';
+      if (activeTab === 'Overdue') return cls === 'overdue';
       return true;
     });
   }, [projects, searchQuery, activeTab]);
@@ -471,12 +474,13 @@ export default function ModernProjectsPage({ user }) {
           )}
 
           {/* Stats */}
-          <div className="m-stats-row">
+          <div className="m-stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 16, marginBottom: 24 }}>
             {[
               { label: 'Total Projects', value: stats.all, icon: 'ti-briefcase', bg: '#E0F7FA', color: '#00BCD4', tab: 'All' },
               { label: 'Active', value: stats.active, icon: 'ti-loader', bg: '#FEF3C7', color: '#F59E0B', tab: 'Active' },
               { label: 'Completed', value: stats.completed, icon: 'ti-circle-check', bg: '#D1FAE5', color: '#26C281', tab: 'Completed' },
               { label: 'On Hold', value: stats.onhold, icon: 'ti-clock-pause', bg: '#FEE2E2', color: '#FF6B6B', tab: 'On Hold' },
+              { label: 'Overdue', value: stats.overdue, icon: 'ti-alert-triangle', bg: '#FEE2E2', color: '#DC2626', tab: 'Overdue' },
             ].map(s => (
               <div key={s.tab} className="m-stat-card" onClick={() => setActiveTab(s.tab)} style={{ cursor: 'pointer' }}>
                 <div className="m-stat-icon" style={{ background: s.bg, color: s.color }}><i className={`ti ${s.icon}`}></i></div>
@@ -486,12 +490,29 @@ export default function ModernProjectsPage({ user }) {
                 </div>
               </div>
             ))}
+            <div className="m-stat-card" style={{ cursor: 'default', background: 'linear-gradient(135deg,#00BCD4,#006E7F)', border: 'none' }}>
+              <div className="m-stat-icon" style={{ background: 'rgba(255,255,255,0.2)', color: '#fff' }}>
+                <i className="ti ti-currency-rupee"></i>
+              </div>
+              <div>
+                <div className="m-stat-num" style={{ color: '#fff' }}>
+                  {loading ? '…' : stats.totalValue >= 10000000
+                    ? `₹${(stats.totalValue / 10000000).toFixed(2)}Cr`
+                    : stats.totalValue >= 100000
+                      ? `₹${(stats.totalValue / 100000).toFixed(2)}L`
+                      : `₹${stats.totalValue.toLocaleString('en-IN')}`}
+                </div>
+                <div className="m-stat-label" style={{ color: 'rgba(255,255,255,0.85)' }}>Overall Value</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.65)', fontWeight: 600, marginTop: 2 }}>
+                  {projects.filter(p => Number(p.budget) > 0).length} of {projects.length} budgeted
+                </div>
+              </div>
+            </div>
           </div>
-
           {/* Tabs */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
             <div className="m-tabs">
-              {['All', 'Active', 'Completed', 'On Hold'].map(tab => (
+              {['All', 'Active', 'Completed', 'On Hold', 'Overdue'].map(tab => (
                 <button key={tab} className={`m-tab ${activeTab === tab ? 'active' : ''}`} onClick={() => setActiveTab(tab)}>{tab}</button>
               ))}
             </div>
@@ -634,7 +655,7 @@ export default function ModernProjectsPage({ user }) {
             </div>
           )}
         </div>
-      </div>
+      </div >
 
       {/* ── MODALS ── */}
       {/* ── MODALS ── */}
@@ -643,18 +664,20 @@ export default function ModernProjectsPage({ user }) {
       {showLogTime && <LogTimeModal form={logForm} setForm={setLogForm} onSave={handleSaveLog} onClose={() => setShowLogTime(false)} saving={logSaving} projectName={logTimeProject?.name} />}
 
       {/* ── NEW INVOICE OVERLAY ── */}
-      {showInvoiceCreator && (
-        <div style={{ position: 'fixed', inset: 0, background: '#F4F7FB', zIndex: 9999, overflowY: 'auto' }}>
-          <InvoiceCreator
-            user={user}
-            clients={clients}
-            projects={projects}
-            newInvoicePrefill={invoicePrefill}
-            onBack={() => setShowInvoiceCreator(false)}
-          />
-        </div>
-      )}
-    </div>
+      {
+        showInvoiceCreator && (
+          <div style={{ position: 'fixed', inset: 0, background: '#F4F7FB', zIndex: 9999, overflowY: 'auto' }}>
+            <InvoiceCreator
+              user={user}
+              clients={clients}
+              projects={projects}
+              newInvoicePrefill={invoicePrefill}
+              onBack={() => setShowInvoiceCreator(false)}
+            />
+          </div>
+        )
+      }
+    </div >
   );
 }
 

@@ -631,7 +631,7 @@ function Fld({ label, value, onChange, options, type = "text", error, placeholde
 
       }} style={s} placeholder={placeholder || ""} disabled={disabled} />}
 
-      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {error}</div>}
+      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {error}</div>}
 
     </div>
 
@@ -1544,7 +1544,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                 setProjects && setProjects(prev => prev.filter(proj => proj._id !== p._id));
 
-                showToast("Delete Project deleted!");
+                showToast("Delete Project deleted!");
 
               } catch (err) {
 
@@ -2478,7 +2478,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
       }
 
-      showToast("Delete Employee deleted!");
+      showToast("Delete Employee deleted!");
 
     } catch {
 
@@ -3155,7 +3155,7 @@ function ManagersPage({ managers, setManagers }) {
 
     setDeleteTarget(null);
 
-    showToast(" Deleteï¸ Manager deleted!");
+    showToast(" Delete Manager deleted!");
 
   };
 
@@ -3465,7 +3465,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
     setDeleteTarget(null);
 
-    showToast(" Deleteï¸ Subadmin deleted!");
+    showToast(" Delete Subadmin deleted!");
 
   };
 
@@ -4508,7 +4508,7 @@ function SearchDropdown({ label, items, displayKey, value, onChange, error, plac
 
       {open && <div style={{ position: "fixed", inset: 0, zIndex: 998 }} onClick={() => { setOpen(false); setSearch(""); }} />}
 
-      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {error}</div>}
+      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {error}</div>}
 
     </div>
 
@@ -4746,7 +4746,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
           <Fld label="Project Name *" value={tsForm.name} onChange={v => { setTsForm({ ...tsForm, name: v }); setTsErr(p => ({ ...p, name: "" })); }} error={tsErr.name} />
 
-          <div style={{ marginBottom: 14 }}><label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label><ClientDropdown clients={clientNames.length ? clients : []} value={tsForm.client} onChange={v => { setTsForm({ ...tsForm, client: v }); setTsErr(p => ({ ...p, client: "" })); }} error={tsErr.client} />{tsErr.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {tsErr.client}</div>}</div>
+          <div style={{ marginBottom: 14 }}><label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label><ClientDropdown clients={clientNames.length ? clients : []} value={tsForm.client} onChange={v => { setTsForm({ ...tsForm, client: v }); setTsErr(p => ({ ...p, client: "" })); }} error={tsErr.client} />{tsErr.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning{tsErr.client}</div>}</div>
 
           <SearchDropdown label="Manager" items={managerNames} displayKey="name" value={tsForm.manager} onChange={v => setTsForm({ ...tsForm, manager: v })} placeholder="-- Select Manager --" />
 
@@ -11761,7 +11761,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     </div>
 
-                    {ncError.password && <div style={{ fontSize: 11, color: '#EF4444', marginTop: 4 }}>Warning {ncError.password}</div>}
+                    {ncError.password && <div style={{ fontSize: 11, color: '#EF4444', marginTop: 4 }}>Warning {ncError.password}</div>}
 
                   </div>
 
@@ -11859,7 +11859,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 </div>
 
-                {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.password}</div>}
+                {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning{neError.password}</div>}
 
               </div>
 
@@ -11940,7 +11940,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   />
 
-                  {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {npError.client}</div>}
+                  {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {npError.client}</div>}
 
                 </div>
 
@@ -12229,7 +12229,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 </div>
 
-                {nmError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {nmError.password}</div>}
+                {nmError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {nmError.password}</div>}
 
               </div>
 
@@ -12283,7 +12283,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 </div>
 
-                {nsError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {nsError.password}</div>}
+                {nsError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {nsError.password}</div>}
 
               </div>
 

@@ -193,9 +193,7 @@ export default function ProjectPaymentModals({
         };
         const diff = editIndex !== undefined ? (parseAmt(form.amount) - parseAmt(currentList[editIndex]?.amount)) : parseAmt(form.amount);
         updatePayload.spent = parseAmt(project.spent) + diff;
-      }
-
-      // ── AUTO-UPDATE INVOICE STATUS WHEN PAYMENT IS RECORDED ────────────────
+      }// ── AUTO-UPDATE INVOICE STATUS WHEN PAYMENT IS RECORDED ────────────────
       if (type === 'payment' && form.linkedInvoice) {
         const parseAmt = (val) => {
           if (val === undefined || val === null) return 0;
@@ -203,10 +201,9 @@ export default function ProjectPaymentModals({
           return isNaN(num) ? 0 : num;
         };
 
-        const thisPaymentAmt = parseAmt(form.amount);
         const linkedInvoiceNo = form.linkedInvoice;
 
-        // All payments for this invoice after this save (updatedList = paymentsReceived after save)
+        // All payments for this invoice after this save
         const allPaymentsForInvoice = updatedList.filter(p => p.linkedInvoice === linkedInvoiceNo);
         const totalPaid = allPaymentsForInvoice.reduce((sum, p) => sum + parseAmt(p.amount), 0);
 
@@ -217,24 +214,28 @@ export default function ProjectPaymentModals({
           const linkedInv = currentInvoices[linkedInvIndex];
           const invoiceTotal = parseAmt(linkedInv.amount);
 
+          // Resolve effective due date: form input > invoice stored value
+          const effectiveDueDate = form.dueDate || linkedInv.dueDate || null;
+          const paymentDate = form.paymentDate ? new Date(form.paymentDate) : new Date();
+          const dueDate = effectiveDueDate ? new Date(effectiveDueDate) : null;
+          const isPaidLate = dueDate && paymentDate > dueDate;
+
           let newStatus = linkedInv.status;
           if (invoiceTotal > 0) {
             if (totalPaid >= invoiceTotal) {
-              newStatus = 'Paid';
+              newStatus = isPaidLate ? 'Late Paid' : 'Paid';
             } else if (totalPaid > 0) {
-              newStatus = 'Partially Paid';
+              newStatus = (dueDate && new Date() > dueDate) ? 'Overdue' : 'Partially Paid';
             }
           }
 
-          // Only update invoices array if status actually changed
-          if (newStatus !== linkedInv.status) {
-            const updatedInvoices = currentInvoices.map((inv, idx) =>
-              idx === linkedInvIndex
-                ? { ...inv, status: newStatus, amountPaid: totalPaid }
-                : inv
-            );
-            updatePayload.invoices = updatedInvoices;
-          }
+          // Always update invoices — persist dueDate, amountPaid, status
+          const updatedInvoices = currentInvoices.map((inv, idx) =>
+            idx === linkedInvIndex
+              ? { ...inv, status: newStatus, amountPaid: totalPaid, dueDate: effectiveDueDate || inv.dueDate }
+              : inv
+          );
+          updatePayload.invoices = updatedInvoices;
         }
       }
       // ───────────────────────────────────────────────────────────────────────
@@ -582,7 +583,23 @@ export default function ProjectPaymentModals({
                       const alreadyPaid = (project.paymentsReceived || []).reduce((sum, p) => p.linkedInvoice === selectedInvoiceNo ? sum + parseAmt(p.amount) : sum, 0);
                       const remaining = parseAmt(selectedInv.amount) - alreadyPaid;
                       handleInputChange('amount', remaining > 0 ? remaining : 0);
+                      // Auto-fill Description from invoice
+                      const invoiceDesc = selectedInv.description || selectedInv.notes || selectedInv.category || `Payment for ${selectedInvoiceNo}`;
+                      handleInputChange('description', invoiceDesc);
+                      // Auto-fill Due Date from invoice
+                      if (selectedInv.dueDate) {
+                        const dueDateFormatted = selectedInv.dueDate.includes('T')
+                          ? selectedInv.dueDate.split('T')[0]
+                          : selectedInv.dueDate;
+                        handleInputChange('dueDate', dueDateFormatted);
+                      } else {
+                        handleInputChange('dueDate', '');
+                      }
                     }
+                  } else {
+                    // Cleared — reset auto-filled fields
+                    handleInputChange('description', '');
+                    handleInputChange('dueDate', '');
                   }
                 }}>
                   <option value="">-- Select Invoice --</option>
@@ -604,7 +621,39 @@ export default function ProjectPaymentModals({
             <div style={{ marginBottom: 16 }}><label style={labelStyle}>Description</label><input required style={inputStyle} value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="e.g. Sprint 2 Balance Payment" /></div>
             <div style={rowStyle}>
               <div><label style={labelStyle}>Amount Received</label><input required type="number" style={inputStyle} value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="INR 0" /></div>
+              <div>
+                <label style={labelStyle}>
+                  Due Date
+                  {form.linkedInvoice && form.dueDate && (
+                    <span style={{ marginLeft: 6, fontWeight: 700, color: new Date() > new Date(form.dueDate) ? '#EF4444' : '#22C55E', fontSize: 9, textTransform: 'none', letterSpacing: 0 }}>
+                      {new Date() > new Date(form.dueDate) ? '⚠ Overdue' : '✓ Within due date'}
+                    </span>
+                  )}
+                </label>
+                <input
+                  type="date"
+                  style={{ ...inputStyle, borderColor: form.dueDate && new Date() > new Date(form.dueDate) ? '#EF4444' : '#E8EDF2' }}
+                  value={form.dueDate || ''}
+                  onChange={e => handleInputChange('dueDate', e.target.value)}
+                />
+              </div>
+            </div>
+            <div style={rowStyle}>
               <div><label style={labelStyle}>Payment Date</label><input type="date" required style={inputStyle} value={form.paymentDate || ''} onChange={e => handleInputChange('paymentDate', e.target.value)} /></div>
+              <div>
+                {form.dueDate && form.paymentDate && (
+                  <div style={{
+                    marginTop: 22, padding: '8px 12px', borderRadius: 8, fontSize: 11, fontWeight: 700,
+                    background: new Date(form.paymentDate) > new Date(form.dueDate) ? '#FEF2F2' : '#F0FDF4',
+                    color: new Date(form.paymentDate) > new Date(form.dueDate) ? '#EF4444' : '#16A34A',
+                    border: `1px solid ${new Date(form.paymentDate) > new Date(form.dueDate) ? '#FECACA' : '#BBF7D0'}`
+                  }}>
+                    {new Date(form.paymentDate) > new Date(form.dueDate)
+                      ? `⚠ Payment is ${Math.round((new Date(form.paymentDate) - new Date(form.dueDate)) / 86400000)} day(s) late → will be marked "Late Paid" or "Overdue"`
+                      : `✓ Payment is on time → will be marked "Paid" or "Partially Paid"`}
+                  </div>
+                )}
+              </div>
             </div>
             <div style={rowStyle}>
               <div><label style={labelStyle}>Payment Mode</label><select style={inputStyle} value={form.paymentMode || 'Bank Transfer'} onChange={e => handleInputChange('paymentMode', e.target.value)}>

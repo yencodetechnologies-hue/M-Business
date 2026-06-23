@@ -1594,38 +1594,60 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                             <div style={{ fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{(inv.issueDate || inv.date) ? new Date(inv.issueDate || inv.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
                             {/* Due Date */}
                             <div style={{ fontSize: 12, fontWeight: (inv.status || '').toLowerCase() === 'overdue' ? 800 : 700, color: (inv.status || '').toLowerCase() === 'overdue' ? '#EF4444' : '#2D3E50' }}>{(inv.dueDate || inv.inv?.dueDate) ? new Date(inv.dueDate || inv.inv?.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
-                            {/* Status */}
+                            {/* Status — auto-computed from payments + due date */}
                             <div>
                               {(() => {
-                                const st = (inv.status || 'pending').toLowerCase();
+                                const parseAmtLocal = (val) => { const n = Number(String(val || 0).replace(/[^0-9.-]+/g, '')); return isNaN(n) ? 0 : n; };
+                                const invoiceTotal = parseAmtLocal(inv.amount);
+                                const totalPaid = (currProject?.paymentsReceived || [])
+                                  .filter(p => p.linkedInvoice === inv.invoiceNo)
+                                  .reduce((sum, p) => sum + parseAmtLocal(p.amount), 0);
+                                const dueDate = inv.dueDate ? new Date(inv.dueDate) : null;
+                                const today = new Date(); today.setHours(0, 0, 0, 0);
+                                const isPastDue = dueDate && today > dueDate;
+
+                                let autoStatus = inv.status || 'pending';
+                                if (invoiceTotal > 0) {
+                                  if (totalPaid >= invoiceTotal) {
+                                    autoStatus = isPastDue ? 'Late Paid' : 'Paid';
+                                  } else if (totalPaid > 0) {
+                                    autoStatus = isPastDue ? 'Overdue' : 'Partially Paid';
+                                  } else {
+                                    if (isPastDue) autoStatus = 'Overdue';
+                                    else {
+                                      const cur = (inv.status || '').toLowerCase();
+                                      autoStatus = cur === 'sent' ? 'Sent' : cur === 'draft' ? 'Draft' : inv.status || 'Pending';
+                                    }
+                                  }
+                                }
+
+                                const stKey = autoStatus.toLowerCase().replace(/ /g, '_');
                                 const map = {
                                   paid: { bg: '#DCFCE7', color: '#15803D' },
-                                  part_paid: { bg: '#D1FAE5', color: '#065F46' },
-                                  unpaid: { bg: '#FEF3C7', color: '#B45309' },
-                                  pending: { bg: '#FEF3C7', color: '#B45309' },
+                                  late_paid: { bg: '#D1FAE5', color: '#065F46' },
+                                  partially_paid: { bg: '#FEF9C3', color: '#854D0E' },
                                   overdue: { bg: '#FEE2E2', color: '#DC2626' },
                                   sent: { bg: '#DBEAFE', color: '#1D4ED8' },
                                   draft: { bg: '#F1F5F9', color: '#64748B' },
+                                  pending: { bg: '#FEF3C7', color: '#B45309' },
                                 };
-                                const s = map[st] || map.pending;
+                                const s = map[stKey] || map.pending;
+                                const remaining = invoiceTotal - totalPaid;
+
                                 return (
-                                  <select value={inv.status || 'pending'} onChange={async e => {
-                                    const newStatus = e.target.value;
-                                    if (inv._source === 'global') {
-                                      await axios.patch(`${BASE_URL}/api/invoices/${inv._globalId}/status`, { status: newStatus });
-                                    } else {
-                                      const updatedInvoices = (currProject.invoices || []).map((x, xi) => xi === i ? { ...x, status: newStatus } : x);
-                                      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { invoices: updatedInvoices });
-                                    }
-                                    loadLatest();
-                                  }} style={{ background: s.bg, color: s.color, border: 'none', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800, cursor: 'pointer', outline: 'none', fontFamily: 'inherit' }}>
-                                    <option value="draft">Draft</option>
-                                    <option value="sent">Sent</option>
-                                    <option value="part_paid">Part Paid</option>
-                                    <option value="paid">Paid</option>
-                                    <option value="unpaid">Unpaid</option>
-                                    <option value="overdue">Overdue</option>
-                                  </select>
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                                    <span style={{ background: s.bg, color: s.color, borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800, display: 'inline-block', whiteSpace: 'nowrap' }}>
+                                      {autoStatus}
+                                    </span>
+                                    {totalPaid > 0 && remaining > 0 && (
+                                      <span style={{ fontSize: 9, color: '#7B8FA1', fontWeight: 700 }}>
+                                        {currency}{totalPaid.toLocaleString()} / {currency}{invoiceTotal.toLocaleString()}
+                                      </span>
+                                    )}
+                                    {totalPaid > 0 && remaining <= 0 && (
+                                      <span style={{ fontSize: 9, color: '#15803D', fontWeight: 700 }}>Fully paid</span>
+                                    )}
+                                  </div>
                                 );
                               })()}
                             </div>
@@ -1795,14 +1817,14 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         {records.length > 0 ? (
                           <div>
                             {/* Headers */}
-                            <div style={{ display: 'grid', gridTemplateColumns: (p.key === 'add' || p.key === 'exp') ? '40px 2fr 1fr 1fr 1fr 1fr 80px' : '40px 1fr 1fr 1fr 1fr 1fr 80px', gap: 8, padding: '8px 18px', background: '#FAFBFD', borderBottom: '1px solid #E8EDF2' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: (p.key === 'add' || p.key === 'exp') ? '40px 2fr 1fr 1fr 1fr 1fr 80px' : p.key === 'pay' ? '40px 1.2fr 1fr 1fr 1fr 1fr 1fr 80px' : '40px 1fr 1fr 1fr 1fr 1fr 80px', gap: 8, padding: '8px 18px', background: '#FAFBFD', borderBottom: '1px solid #E8EDF2' }}>
                               <div style={{ display: 'flex', alignItems: 'center' }}>
                                 <input type="checkbox" checked={records.length > 0 && selectedPaymentItems.length === records.length} onChange={e => {
                                   if (e.target.checked) setSelectedPaymentItems(records.map((_, idx) => idx));
                                   else setSelectedPaymentItems([]);
                                 }} style={{ cursor: 'pointer' }} />
                               </div>
-                              {p.key === 'pay' && ['Payment #', 'Invoice', 'Amount', 'Date', 'Mode', ''].map(h => <div key={h} style={{ fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase' }}>{h}</div>)}
+                              {p.key === 'pay' && ['Payment #', 'Invoice', 'Amount Received', 'Due Date', 'Payment Date', 'Payment Mode', ''].map(h => <div key={h} style={{ fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase' }}>{h}</div>)}
                               {p.key === 'adv' && ['Advance #', 'Description', 'Amount', 'Date', 'Status', ''].map(h => <div key={h} style={{ fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase' }}>{h}</div>)}
                               {p.key === 'add' && ['Charge', 'Amount', 'Date', 'Category', 'Status', ''].map(h => <div key={h} style={{ fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase' }}>{h}</div>)}
                               {p.key === 'mile' && ['Milestone #', 'Name', 'Amount', 'Due Date', 'Status', ''].map(h => <div key={h} style={{ fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase' }}>{h}</div>)}
@@ -1810,7 +1832,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                             </div>
                             {/* Rows */}
                             {records.map((rec, i) => (
-                              <div key={i} style={{ display: 'grid', gridTemplateColumns: (p.key === 'add' || p.key === 'exp') ? '40px 2fr 1fr 1fr 1fr 1fr 80px' : '40px 1fr 1fr 1fr 1fr 1fr 80px', gap: 8, padding: '8px 18px', alignItems: 'center', minHeight: 56, borderBottom: '1px solid #E8EDF2', borderLeft: (p.key === 'add' || p.key === 'exp') ? `3px solid ${rec.status === 'Paid' ? '#22C55E' : '#F59E0B'}` : 'none' }}>
+                              <div key={i} style={{ display: 'grid', gridTemplateColumns: (p.key === 'add' || p.key === 'exp') ? '40px 2fr 1fr 1fr 1fr 1fr 80px' : p.key === 'pay' ? '40px 1.2fr 1fr 1fr 1fr 1fr 1fr 80px' : '40px 1fr 1fr 1fr 1fr 1fr 80px', gap: 8, padding: '8px 18px', alignItems: 'center', minHeight: 56, borderBottom: '1px solid #E8EDF2', borderLeft: (p.key === 'add' || p.key === 'exp') ? `3px solid ${rec.status === 'Paid' ? '#22C55E' : '#F59E0B'}` : 'none' }}>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                   <input type="checkbox" checked={selectedPaymentItems.includes(i)} onChange={e => {
                                     if (e.target.checked) setSelectedPaymentItems(prev => [...prev, i]);
@@ -1833,6 +1855,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   </div>
                                 ) : (
                                   <>
+                                    {/* Col 1: Payment # + Invoice ref */}
                                     <div>
                                       <div style={{ fontSize: 12, fontWeight: 800, color: '#0D1B2A', display: 'flex', alignItems: 'center', gap: 6 }}>
                                         {rec.paymentNo || rec.advanceNo || rec.chargeNo || rec.milestoneNo}
@@ -1847,9 +1870,35 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   </>
                                 )}
 
-                                <div style={{ fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</div>
-                                <div style={{ fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{rec.paymentDate || rec.dateReceived || rec.date || rec.dueDate ? new Date(rec.paymentDate || rec.dateReceived || rec.date || rec.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
+                                {/* Col 2: Amount Received */}
+                                <div style={{ fontSize: 13, fontWeight: 800, color: '#15803D' }}>
+                                  {currency}{(rec.amount || 0).toLocaleString()}
+                                </div>
 
+                                {/* Col 3: Due Date — for pay tab only, fallback to linked invoice */}
+                                {p.key === 'pay' ? (() => {
+                                  const effectiveDueDate = rec.dueDate ||
+                                    (rec.linkedInvoice ? (currProject.invoices || []).find(inv => inv.invoiceNo === rec.linkedInvoice)?.dueDate : null);
+                                  const isLate = effectiveDueDate && rec.paymentDate && new Date(rec.paymentDate) > new Date(effectiveDueDate);
+                                  return (
+                                    <div>
+                                      <div style={{ fontSize: 12, fontWeight: 700, color: isLate ? '#EF4444' : '#2D3E50' }}>
+                                        {effectiveDueDate ? new Date(effectiveDueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                                      </div>
+                                      {isLate && <div style={{ fontSize: 9, fontWeight: 800, color: '#EF4444', marginTop: 2 }}>LATE</div>}
+                                    </div>
+                                  );
+                                })() : null}
+
+                                {/* Col 4: Payment Date */}
+                                <div style={{ fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>
+                                  {p.key === 'pay'
+                                    ? (rec.paymentDate ? new Date(rec.paymentDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—')
+                                    : (rec.paymentDate || rec.dateReceived || rec.date ? new Date(rec.paymentDate || rec.dateReceived || rec.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—')
+                                  }
+                                </div>
+
+                                {/* Col 5: Payment Mode / Category */}
                                 {(p.key === 'add' || p.key === 'exp') ? (
                                   <div>
                                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 800, background: '#FFEDD5', color: '#C2410C' }}>
@@ -1860,6 +1909,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   <div style={{ fontSize: 11, fontWeight: 800, color: '#475569' }}>{rec.paymentMode || rec.adjustmentStatus || rec.status || '—'}</div>
                                 )}
 
+                                {/* Col 6: Status badge — add/exp tabs only */}
                                 {(p.key === 'add' || p.key === 'exp') ? (
                                   <div>
                                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 900, background: rec.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: rec.status === 'Paid' ? '#15803D' : '#B45309' }}>
@@ -1869,6 +1919,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   </div>
                                 ) : null}
 
+                                {/* Actions */}
                                 <div style={{ display: 'flex', gap: 4 }}>
                                   <button onClick={() => {
                                     let modalKey = '';

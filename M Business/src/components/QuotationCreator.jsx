@@ -14,7 +14,7 @@ function generateQuoteNo() {
 function formatCurrency(val, symbol = "INR", compact = false, disableCompact = false) {
   const num = parseFloat(val) || 0;
   const absNum = Math.abs(num);
-  
+
   if (!disableCompact && ((compact && absNum >= 100000) || absNum >= 10000000)) {
     try {
       const isINR = symbol === "INR";
@@ -28,7 +28,7 @@ function formatCurrency(val, symbol = "INR", compact = false, disableCompact = f
       // Fallback
     }
   }
-  
+
   const isINR = symbol === "INR";
   return symbol + (" ") + num.toLocaleString(isINR ? "en-IN" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
@@ -151,7 +151,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
         };
         setQuotations(prev => [newDoc, ...prev]);
         setStep("list");
-        if(typeof showToast === 'function') showToast("Quotation saved successfully!");
+        if (typeof showToast === 'function') showToast("Quotation saved successfully!");
       }
     };
     window.addEventListener('message', handleMsg);
@@ -173,6 +173,11 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
   const [listSearch, setListSearch] = useState("");
   const [activeTab, setActiveTab] = useState("All");
   const [viewEntry, setViewEntry] = useState(null);
+  const [toastMsg, setToastMsg] = useState(null);
+  const showToast = (msg) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 3000);
+  };
 
   const today = new Date().toISOString().split("T")[0];
   const expDefault = new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0];
@@ -293,131 +298,305 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     setSaving(false);
     setStep("preview");
   };
+  const generatePDFFromEntry = async (entry) => {
+    // Build PDF directly from entry data — no DOM rendering, no page navigation needed
+    const qtData = entry.qt || {};
+    const entryItems = entry.items || [];
 
-  const triggerPDFShare = async (entry, type, force = false) => {
-    if (step !== "preview" && !force) {
-      loadEntry(entry);
-      setTimeout(() => {
-        setStep("preview");
-        setTimeout(() => triggerPDFShare(entry, type, true), 1000);
-      }, 0);
-      return;
+    const subtotalRaw = entryItems.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity || i.qty) || 0), 0);
+    const gstRate = parseFloat(qtData.gstRate) || 0;
+    const isGstIncluded = qtData.isGstIncluded || false;
+    let sub, gstAmt, tot;
+    if (isGstIncluded) {
+      tot = subtotalRaw;
+      sub = tot / (1 + gstRate / 100);
+      gstAmt = tot - sub;
+    } else {
+      sub = subtotalRaw;
+      gstAmt = sub * (gstRate / 100);
+      tot = sub + gstAmt;
     }
-    const element = document.querySelector(".qt-paper");
-    if (!element) return;
-    
-    showToast("Pending Generating PDF...");
 
-    // Helper: resolve CSS variables so html2canvas captures correct colours on all OS/browsers
-    const resolveCssVars = (el) => {
-      const computed = getComputedStyle(document.documentElement);
-      const walk = (node) => {
-        if (node.nodeType === 1) {
-          const st = node.getAttribute('style') || '';
-          if (st.includes('var(')) {
-            node.setAttribute('style', st.replace(/var\(([^)]+)\)/g, (_, n) =>
-              computed.getPropertyValue(n.trim()).trim() || ''));
-          }
-          Array.from(node.children).forEach(walk);
-        }
-      };
-      walk(el);
+    const currency = qtData.currency || 'INR';
+    const fmt = (n) => formatCurrency(n, currency, false, true);
+
+    const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    const PW = 210; // page width mm
+    const PH = 297; // page height mm
+    const ML = 14;  // margin left
+    const MR = 14;  // margin right
+    const CW = PW - ML - MR; // content width
+    let y = 0;
+
+    // ── HEADER BACKGROUND ──
+    doc.setFillColor(240, 253, 250);
+    doc.rect(0, 0, PW, 52, 'F');
+
+    // ── LOGO / COMPANY INITIALS ──
+    const companyName = qtData.fromCompany || qtData.companyName || 'Company';
+    const initials = companyName.substring(0, 2).toUpperCase();
+    doc.setFillColor(0, 188, 212);
+    doc.roundedRect(ML, 10, 16, 16, 3, 3, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text(initials, ML + 8, 20.5, { align: 'center' });
+
+    // ── COMPANY NAME ──
+    doc.setTextColor(6, 78, 59);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text(companyName.toUpperCase(), ML + 20, 18);
+
+    const fromEmail = qtData.fromEmail || qtData.companyEmail || '';
+    const fromPhone = qtData.fromPhone || qtData.companyPhone || '';
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(6, 95, 70);
+    if (fromEmail) { doc.text(fromEmail, ML + 20, 23); }
+    if (fromPhone) { doc.text(fromPhone, ML + 20, 27); }
+
+    // ── QUOTATION TITLE (right side) ──
+    doc.setFontSize(28);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 188, 212);
+    doc.setGState && doc.setGState(new doc.GState({ opacity: 0.15 }));
+    doc.text('QUOTATION', PW - MR, 22, { align: 'right' });
+    doc.setGState && doc.setGState(new doc.GState({ opacity: 1 }));
+
+    doc.setFontSize(12);
+    doc.setTextColor(0, 188, 212);
+    doc.text(entry.quoteNo || qtData.quoteNo || '', PW - MR, 30, { align: 'right' });
+
+    // Date & Valid Until
+    const quoteDate = qtData.quoteDate || qtData.date || '';
+    const expiryDate = qtData.expiryDate || '';
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 116, 139);
+    if (quoteDate) {
+      doc.text('DATE', PW - MR - 28, 36);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(6, 78, 59);
+      doc.text(formatDate(quoteDate), PW - MR, 36, { align: 'right' });
+    }
+    if (expiryDate) {
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139);
+      doc.text('VALID UNTIL', PW - MR - 28, 41);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(234, 88, 12);
+      doc.text(formatDate(expiryDate), PW - MR, 41, { align: 'right' });
+    }
+
+    // ── DIVIDER ──
+    y = 55;
+    doc.setDrawColor(209, 250, 229);
+    doc.setLineWidth(0.5);
+    doc.line(ML, y, PW - MR, y);
+    y += 6;
+
+    // ── PREPARED FOR / PROJECT ──
+    const clientName = qtData.toName || qtData.client || entry.client || '';
+    const projectName = qtData.title || qtData.project || entry.project || '';
+
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 188, 212);
+    doc.text('PREPARED FOR', ML, y);
+    if (projectName) doc.text('PROJECT', ML + CW / 2, y);
+
+    y += 5;
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(17, 24, 39);
+    doc.text(clientName || '—', ML, y);
+    if (projectName) doc.text(projectName, ML + CW / 2, y);
+
+    const toEmail = qtData.toEmail || '';
+    const toPhone = qtData.toPhone || '';
+    const toAddress = qtData.toAddress || '';
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(107, 114, 128);
+    let clientY = y + 5;
+    if (toEmail) { doc.text(toEmail, ML, clientY); clientY += 4; }
+    if (toPhone) { doc.text(toPhone, ML, clientY); clientY += 4; }
+    if (toAddress) { doc.text(toAddress, ML, clientY); clientY += 4; }
+    y = Math.max(clientY, y + 10) + 4;
+
+    // ── DIVIDER ──
+    doc.setDrawColor(240, 253, 250);
+    doc.setLineWidth(0.3);
+    doc.line(ML, y, PW - MR, y);
+    y += 6;
+
+    // ── ITEMS TABLE HEADER ──
+    doc.setFillColor(240, 253, 250);
+    doc.rect(ML, y, CW, 8, 'F');
+
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 188, 212);
+    doc.text('#', ML + 2, y + 5.5);
+    doc.text('DESCRIPTION', ML + 10, y + 5.5);
+    doc.text('QTY', ML + CW - 52, y + 5.5, { align: 'right' });
+    doc.text('UNIT RATE', ML + CW - 28, y + 5.5, { align: 'right' });
+    doc.text('AMOUNT', ML + CW, y + 5.5, { align: 'right' });
+    y += 8;
+
+    // ── ITEMS ROWS ──
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(17, 24, 39);
+    entryItems.forEach((item, idx) => {
+      const desc = item.description || item.desc || '';
+      const qty = parseFloat(item.quantity || item.qty) || 0;
+      const rate = parseFloat(item.rate) || 0;
+      const amount = qty * rate;
+      const rowBg = idx % 2 === 1;
+
+      if (rowBg) {
+        doc.setFillColor(248, 250, 252);
+        doc.rect(ML, y, CW, 8, 'F');
+      }
+
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(110, 231, 183);
+      doc.text(String(idx + 1).padStart(2, '0'), ML + 2, y + 5.5);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(17, 24, 39);
+      doc.text(desc, ML + 10, y + 5.5);
+      doc.text(String(qty), ML + CW - 52, y + 5.5, { align: 'right' });
+
+      doc.setTextColor(55, 65, 81);
+      doc.text(fmt(rate), ML + CW - 28, y + 5.5, { align: 'right' });
+
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(17, 24, 39);
+      doc.text(fmt(amount), ML + CW, y + 5.5, { align: 'right' });
+
+      doc.setDrawColor(240, 253, 250);
+      doc.setLineWidth(0.2);
+      doc.line(ML, y + 8, ML + CW, y + 8);
+      y += 8;
+    });
+
+    y += 6;
+
+    // ── TOTALS ──
+    const totalsX = ML + CW / 2;
+    const totalsW = CW / 2;
+
+    const drawTotalRow = (label, value, isBold = false) => {
+      doc.setFillColor(248, 250, 252);
+      doc.setDrawColor(240, 253, 250);
+      doc.setLineWidth(0.2);
+      doc.line(totalsX, y + 6, ML + CW, y + 6);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', isBold ? 'bold' : 'normal');
+      doc.setTextColor(107, 114, 128);
+      doc.text(label, totalsX, y + 4.5);
+      doc.setTextColor(17, 24, 39);
+      doc.text(value, ML + CW, y + 4.5, { align: 'right' });
+      y += 7;
     };
 
+    drawTotalRow('Subtotal', fmt(sub));
+    drawTotalRow(`GST (${gstRate}%)${isGstIncluded ? ' (Incl.)' : ''}`, fmt(gstAmt));
+    drawTotalRow('Total Amount', fmt(tot));
+
+    const amountPaid = parseFloat(qtData.amountPaid) || 0;
+    drawTotalRow('Amount Paid', fmt(amountPaid));
+
+    // Balance Due box
+    y += 2;
+    doc.setFillColor(248, 250, 252);
+    doc.roundedRect(totalsX, y, totalsW, 12, 2, 2, 'F');
+    doc.setDrawColor(226, 232, 240);
+    doc.roundedRect(totalsX, y, totalsW, 12, 2, 2, 'S');
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(100, 116, 139);
+    doc.text('BALANCE DUE', totalsX + 4, y + 7.5);
+    doc.setFontSize(13);
+    doc.setTextColor(6, 78, 59);
+    doc.text(fmt(tot - amountPaid), ML + CW - 2, y + 8, { align: 'right' });
+    y += 18;
+
+    // ── NOTES ──
+    const notes = qtData.notes || qtData.terms || '';
+    if (notes) {
+      doc.setFillColor(240, 253, 250);
+      doc.roundedRect(ML, y, CW * 0.6, 22, 2, 2, 'F');
+      doc.setDrawColor(209, 250, 229);
+      doc.roundedRect(ML, y, CW * 0.6, 22, 2, 2, 'S');
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(0, 188, 212);
+      doc.text('NOTES', ML + 4, y + 5);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(55, 65, 81);
+      const noteLines = doc.splitTextToSize(notes, CW * 0.6 - 8);
+      doc.text(noteLines.slice(0, 4), ML + 4, y + 10);
+      y += 26;
+    }
+
+    // ── FOOTER ──
+    doc.setFillColor(255, 255, 255);
+    doc.rect(0, PH - 16, PW, 16, 'F');
+    doc.setDrawColor(241, 245, 249);
+    doc.setLineWidth(0.5);
+    doc.line(0, PH - 16, PW, PH - 16);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(107, 114, 128);
+    doc.text(companyName, ML, PH - 8);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(124, 58, 237);
+    doc.text('Thank you for considering us!', PW / 2, PH - 8, { align: 'center' });
+    doc.text(entry.quoteNo || '', PW - MR, PH - 8, { align: 'right' });
+
+    return doc;
+  };
+
+  const triggerPDFShare = async (entry, type) => {
+    if (typeof showToast === 'function') showToast('Generating PDF...');
     try {
-      // Capture full element including footer
-      const elemH = element.scrollHeight;
-      const elemW = element.scrollWidth;
+      const doc = await generatePDFFromEntry(entry);
+      const fileName = `Quotation_${entry.quoteNo || 'QUO'}.pdf`;
+      const qtData = entry.qt || {};
+      const text = `*${qtData.fromCompany || qtData.companyName || 'Your Business'}*\n\nQuotation: ${entry.quoteNo}\nTotal: ${formatCurrency(entry.total || 0, qtData.currency || 'INR')}`;
 
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        letterRendering: true,
-        width: elemW,
-        height: elemH,
-        windowWidth: elemW,
-        windowHeight: elemH,
-        scrollX: 0,
-        scrollY: -window.scrollY,
-        onclone: (doc) => {
-          const el = doc.querySelector('.qt-paper');
-          if (el) {
-            resolveCssVars(el);
-            el.style.width = elemW + 'px';
-            el.style.maxWidth = 'none';
-            el.style.overflow = 'visible';
-            el.style.borderRadius = '0';
-            el.style.boxShadow = 'none';
-          }
+      if (type === 'wa') {
+        const blob = doc.output('blob');
+        const file = new File([blob], fileName, { type: 'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ title: `Quotation ${entry.quoteNo}`, text, files: [file] });
+        } else {
+          doc.save(fileName);
+          if (typeof showToast === 'function') showToast('PDF downloaded! Attach it in WhatsApp.');
+          window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
         }
-      });
-
-      // Always fit image onto exactly one A4 page
-      const A4_W = 210;
-      const A4_H = 297;
-      const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
-
-      // Calculate dimensions that fit within A4 maintaining aspect ratio
-      const imgAspect = canvas.width / canvas.height;
-      let finalW = A4_W;
-      let finalH = A4_W / imgAspect;
-
-      // If still taller than A4, scale down by height
-      if (finalH > A4_H) {
-        finalH = A4_H;
-        finalW = A4_H * imgAspect;
-      }
-
-      // Center on the page
-      const xOff = (A4_W - finalW) / 2;
-      const yOff = (A4_H - finalH) / 2;
-
-      const imgData = canvas.toDataURL('image/jpeg', 0.98);
-      pdf.addImage(imgData, 'JPEG', xOff, yOff, finalW, finalH);
-      // Safety net: delete any extra pages
-      while (pdf.internal.getNumberOfPages() > 1) {
-        pdf.deletePage(pdf.internal.getNumberOfPages());
-      }
-
-      const blob = pdf.output('blob');
-      const file = new File([blob], `Quotation_${entry.quoteNo}.pdf`, { type: 'application/pdf' });
-      const qtData = entry.qt || qt;
-      const text = `*${qtData.companyName || "Your Business"}*\n\nQuotation: ${entry.quoteNo}\nTotal: ${formatCurrency(entry.total || total, qtData.currency)}`;
-      
-      if (type === "wa") {
-         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-             await navigator.share({ title: `Quotation ${entry.quoteNo}`, text, files: [file] });
-         } else {
-             const url = URL.createObjectURL(blob);
-             const a = document.createElement("a");
-             a.href = url; a.download = file.name; a.click(); URL.revokeObjectURL(url);
-             showToast("PDF downloaded! Attach it in WhatsApp.");
-             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
-         }
       } else {
-         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-             await navigator.share({ title: `Quotation ${entry.quoteNo}`, text, files: [file] });
-         } else {
-             const url = URL.createObjectURL(blob);
-             const a = document.createElement("a");
-             a.href = url; a.download = file.name; a.click(); URL.revokeObjectURL(url);
-             showToast("PDF downloaded!");
-         }
+        // print / link / share — direct download, no page navigation
+        doc.save(fileName);
+        if (typeof showToast === 'function') showToast('PDF downloaded!');
       }
     } catch (err) {
-      console.log(err);
-      alert("Error Failed to generate PDF");
+      console.error('PDF generation error:', err);
+      if (typeof showToast === 'function') showToast('Failed to generate PDF.');
     }
   };
 
   const shareQuotation = (entry) => triggerPDFShare(entry, "link");
   const shareWhatsApp = (entry) => triggerPDFShare(entry, "wa");
-
   const loadEntry = (entry) => {
     setQt(entry.qt || blank);
     setItems(entry.items || [{ id: 1, description: "", quantity: 1, rate: "" }]);
     setErrors({});
+    setViewEntry(entry);
     setStep("form");
   };
 
@@ -468,13 +647,14 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
   // ---------- LIST ----------
   if (step === "list") {
+    // toast is rendered below inside the list return, handled globally
     const enriched = qtList.map((e) => {
       const expiry = e.qt?.expiryDate || e.expiryDate;
       let status = e.status || "draft";
       if (status === "sent" && expiry && new Date(expiry) < new Date()) status = "expired";
       return { ...e, status };
     });
-    
+
     // Derived values
     const totalQuotes = enriched.length;
     const totalValue = enriched.reduce((s, e) => s + (parseFloat(e.qt?.total || e.total) || 0), 0);
@@ -484,10 +664,10 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     const pendingList = enriched.filter(e => e.status === "sent" || e.status === "pending");
     const pendingCount = pendingList.length;
     const pendingValue = pendingList.reduce((s, e) => s + (parseFloat(e.qt?.total || e.total) || 0), 0);
-    
+
     const sentCount = pendingCount + wonCount + enriched.filter(e => e.status === "rejected").length;
     const winRate = sentCount > 0 ? Math.round((wonCount / sentCount) * 100) : 0;
-    
+
     // Funnel stats
     const rejectedCount = enriched.filter(e => e.status === "rejected").length;
     const draftedCount = enriched.filter(e => e.status === "draft").length;
@@ -498,12 +678,12 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
       if (!listSearch) return true;
       const term = listSearch.toLowerCase();
       return (e.quoteNo || "").toLowerCase().includes(term) ||
-             (e.client || "").toLowerCase().includes(term) ||
-             (e.qt?.project || e.project || "").toLowerCase().includes(term);
+        (e.client || "").toLowerCase().includes(term) ||
+        (e.qt?.project || e.project || "").toLowerCase().includes(term);
     });
 
     const getStatusTheme = (st) => {
-      switch(st) {
+      switch (st) {
         case "approved": case "converted": return "c-green";
         case "sent": return "c-blue";
         case "pending": return "c-amber";
@@ -511,9 +691,9 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
         default: return "c-purple"; // draft
       }
     };
-    
+
     const getBadge = (st) => {
-      switch(st) {
+      switch (st) {
         case "approved": return <span className="badge accepted">Accepted</span>;
         case "converted": return <span className="badge converted">Converted</span>;
         case "sent": return <span className="badge sent">Sent</span>;
@@ -525,7 +705,11 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
     return (
       <div style={{ fontFamily: "var(--font, 'Nunito', sans-serif)", minHeight: "100%", background: "var(--bg, #F5FAFA)" }}>
-        
+        {toastMsg && (
+          <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 99999, background: '#1A2E35', color: '#fff', borderRadius: 12, padding: '12px 20px', fontSize: 13, fontWeight: 700, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <i className="ti ti-check" style={{ fontSize: 15, color: '#26C281' }}></i> {toastMsg}
+          </div>
+        )}
         <div className="content">
           <div className="page-header">
             <div>
@@ -535,13 +719,13 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             <div className="header-actions">
               <div className="search-wrap" style={{ width: 250 }}>
                 <i className="ti ti-search" style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)", color: "var(--text3)", fontSize: 16 }}></i>
-              
-                <input 
-                  type="text" 
-                  placeholder="Search quotations…" 
-                  value={listSearch} 
-                  onChange={e => setListSearch(e.target.value)} 
-                  style={{ width: "100%", padding: "11px 14px 11px 40px", background: "var(--surface)", border: "1.5px solid var(--border)", borderRadius: 12, fontSize: 13, color: "var(--text)", fontFamily: "var(--font)", outline: "none", transition: "all .15s" }} 
+
+                <input
+                  type="text"
+                  placeholder="Search quotations…"
+                  value={listSearch}
+                  onChange={e => setListSearch(e.target.value)}
+                  style={{ width: "100%", padding: "11px 14px 11px 40px", background: "var(--surface)", border: "1.5px solid var(--border)", borderRadius: 12, fontSize: 13, color: "var(--text)", fontFamily: "var(--font)", outline: "none", transition: "all .15s" }}
                 />
               </div>
               <button className="create-btn" onClick={() => { clearForm(); if (onNewQuotation) { onNewQuotation(); } else { setStep("form"); } }}>
@@ -600,14 +784,14 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             {filtered.map(entry => {
               const qtD = entry.qt || {};
               const t = parseFloat(qtD.total || entry.total || 0).toLocaleString("en-IN");
-              const init = (entry.client || "U").substring(0,2).toUpperCase();
-              
+              const init = (entry.client || "U").substring(0, 2).toUpperCase();
+
               return (
                 <div key={entry.id || entry.quoteNo} className={`quote-card ${getStatusTheme(entry.status)}`} onClick={() => { loadEntry(entry); setStep("preview"); }}>
                   <div className="qc-top">
                     <span className="qc-id">#{entry.quoteNo || "QT-XXXX"}</span>
-                    <select 
-                      value={entry.status} 
+                    <select
+                      value={entry.status}
                       onChange={(e) => { e.stopPropagation(); handleStatusChange(entry, e.target.value); }}
                       style={{ border: "1px solid #e2e8f0", borderRadius: 6, padding: "2px 6px", fontSize: 10, fontWeight: 700, color: "#374151", background: "#fff", cursor: "pointer", outline: "none", marginLeft: "auto" }}
                       onClick={e => e.stopPropagation()}
@@ -656,7 +840,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                 </div>
               );
             })}
-            
+
             <div className="add-quote-card" onClick={() => { clearForm(); if (onNewQuotation) { onNewQuotation(); } else { setStep("form"); } }}>
               <div className="add-icon"><i className="ti ti-plus"></i></div>
               <div style={{ fontSize: 13, fontWeight: 700, color: "var(--teal)" }}>Create New Quotation</div>
@@ -680,26 +864,26 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                 <div className="funnel-step">
                   <span className="fs-label">Sent</span>
                   <div className="fs-bar-wrap">
-                    <div className="fs-bar" style={{ width: `${totalQuotes > 0 ? (sentCount/totalQuotes)*100 : 0}%`, background: "var(--blue)" }}>{sentCount > 0 ? `${sentCount} sent` : ""}</div>
+                    <div className="fs-bar" style={{ width: `${totalQuotes > 0 ? (sentCount / totalQuotes) * 100 : 0}%`, background: "var(--blue)" }}>{sentCount > 0 ? `${sentCount} sent` : ""}</div>
                   </div>
                   <span className="fs-count">{sentCount}</span>
-                  <span className="fs-pct">{totalQuotes > 0 ? Math.round((sentCount/totalQuotes)*100) : 0}%</span>
+                  <span className="fs-pct">{totalQuotes > 0 ? Math.round((sentCount / totalQuotes) * 100) : 0}%</span>
                 </div>
                 <div className="funnel-step">
                   <span className="fs-label">Accepted</span>
                   <div className="fs-bar-wrap">
-                    <div className="fs-bar" style={{ width: `${totalQuotes > 0 ? (wonCount/totalQuotes)*100 : 0}%`, background: "var(--green)" }}>{wonCount > 0 ? `${wonCount} won` : ""}</div>
+                    <div className="fs-bar" style={{ width: `${totalQuotes > 0 ? (wonCount / totalQuotes) * 100 : 0}%`, background: "var(--green)" }}>{wonCount > 0 ? `${wonCount} won` : ""}</div>
                   </div>
                   <span className="fs-count">{wonCount}</span>
-                  <span className="fs-pct">{totalQuotes > 0 ? Math.round((wonCount/totalQuotes)*100) : 0}%</span>
+                  <span className="fs-pct">{totalQuotes > 0 ? Math.round((wonCount / totalQuotes) * 100) : 0}%</span>
                 </div>
                 <div className="funnel-step">
                   <span className="fs-label">Rejected</span>
                   <div className="fs-bar-wrap">
-                    <div className="fs-bar" style={{ width: `${totalQuotes > 0 ? (rejectedCount/totalQuotes)*100 : 0}%`, background: "var(--red)" }}></div>
+                    <div className="fs-bar" style={{ width: `${totalQuotes > 0 ? (rejectedCount / totalQuotes) * 100 : 0}%`, background: "var(--red)" }}></div>
                   </div>
                   <span className="fs-count">{rejectedCount}</span>
-                  <span className="fs-pct">{totalQuotes > 0 ? Math.round((rejectedCount/totalQuotes)*100) : 0}%</span>
+                  <span className="fs-pct">{totalQuotes > 0 ? Math.round((rejectedCount / totalQuotes) * 100) : 0}%</span>
                 </div>
               </div>
             </div>
@@ -746,6 +930,11 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
     return (
       <div className="print-wrapper" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#ecfdf5", minHeight: "100vh", padding: "20px 12px" }}>
+        {toastMsg && (
+          <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 99999, background: '#1A2E35', color: '#fff', borderRadius: 12, padding: '12px 20px', fontSize: 13, fontWeight: 700, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <i className="ti ti-check" style={{ fontSize: 15, color: '#26C281' }}></i> {toastMsg}
+          </div>
+        )}
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
           * { box-sizing: border-box; }
@@ -774,10 +963,17 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
         `}</style>
 
         <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
-          <button onClick={() => setStep("form")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}> Edit</button>
+
           <button onClick={() => setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Document List</button>
-          <button onClick={() => shareQuotation({ id: qt.quoteNo, quoteNo: qt.quoteNo, total })} style={{ padding: "10px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}> Share</button>
-          <button onClick={() => shareWhatsApp({ id: qt.quoteNo, quoteNo: qt.quoteNo, total })} style={{ padding: "10px 18px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }}>Comment WhatsApp</button>
+          <button onClick={() => {
+            if (onEditQuotation && viewEntry) {
+              onEditQuotation(viewEntry);
+            } else {
+              setStep("form");
+            }
+          }} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Edit</button>
+          <button onClick={() => shareQuotation({ id: qt.quoteNo, quoteNo: qt.quoteNo, total })} style={{ padding: "10px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>Share</button>
+          <button onClick={() => shareWhatsApp({ id: qt.quoteNo, quoteNo: qt.quoteNo, total })} style={{ padding: "10px 18px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }}>WhatsApp</button>
           <button onClick={() => triggerPDFShare({ id: qt.quoteNo, quoteNo: qt.quoteNo, total }, "print")} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>Print / PDF</button>
         </div>
 
@@ -999,7 +1195,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           Warning Please fill all required fields before saving.
         </div>
       )}
-                                                                                                                                                                               
+
       {/* Quote Details */}
       <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 12 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Quotation Details</div>

@@ -6,6 +6,7 @@ import { BASE_URL } from '../config';
 export default function QuotationCreatorModern(props) {
   const [showModernForm, setShowModernForm] = useState(false);
   const [editEntry, setEditEntry] = useState(null);
+  const [listRefreshKey, setListRefreshKey] = useState(0);
 
   const handleNew = () => {
     setEditEntry(null);
@@ -17,10 +18,17 @@ export default function QuotationCreatorModern(props) {
     setShowModernForm(true);
   };
 
+  const handleBack = () => {
+    setShowModernForm(false);
+    setEditEntry(null);
+    // Force QuotationCreator to re-mount and re-fetch the latest list
+    setListRefreshKey(k => k + 1);
+  };
+
   if (!showModernForm) {
-    return <QuotationCreator {...props} onNewQuotation={handleNew} onEditQuotation={handleEdit} />;
+    return <QuotationCreator key={listRefreshKey} {...props} onNewQuotation={handleNew} onEditQuotation={handleEdit} />;
   }
-  return <ModernForm onBack={() => setShowModernForm(false)} editEntry={editEntry} {...props} />;
+  return <ModernForm onBack={handleBack} editEntry={editEntry} {...props} />;
 }
 
 const genId = () => Date.now() + Math.random();
@@ -28,36 +36,57 @@ const today = new Date().toISOString().split('T')[0];
 const quoteNo = 'QUO-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 9000) + 1000);
 function ModernForm({ onBack, user, clients = [], editEntry = null }) {
   // ── Pre-fill from existing entry if editing ──
+  // The API returns: entry.qt (saved form data), entry.items (line items),
+  // entry.id (MongoDB _id), entry.client (top-level shortcut), entry.status
   const existingQt = editEntry?.qt || {};
   const existingItems = editEntry?.items || [];
   const isEditing = !!editEntry;
 
+  // ── Resolve all field names — DB saves with legacy names, form uses new names ──
+  // DB field  →  Form field
+  // qt.client  →  toName        (client name)
+  // qt.project →  title         (project title)
+  // qt.date    →  quoteDate     (quote date)
+  // qt.companyName → fromCompany
+  // qt.companyEmail → fromEmail
+  // qt.companyPhone → fromPhone
+  const resolvedToName = existingQt.toName || existingQt.client || editEntry?.client || '';
+  const resolvedTitle = existingQt.title || existingQt.project || '';
+  const resolvedQuoteDate = existingQt.quoteDate || existingQt.date || today;
+  const resolvedFromCompany = existingQt.fromCompany || existingQt.companyName || user?.companyName || '';
+  const resolvedFromName = existingQt.fromName || user?.ownerName || user?.name || '';
+  const resolvedFromEmail = existingQt.fromEmail || existingQt.companyEmail || user?.email || '';
+  const resolvedFromPhone = existingQt.fromPhone || existingQt.companyPhone || user?.phone || '';
+  const resolvedNotes = existingQt.notes || existingQt.terms || '';
+  const resolvedValidity = existingQt.validity || '30';
+  const resolvedStatus = (existingQt.status || editEntry?.status || 'DRAFT').toUpperCase();
+
   // ── Form fields ──
   const [qt, setQt] = useState({
     quoteNo: existingQt.quoteNo || editEntry?.quoteNo || quoteNo,
-    quoteDate: existingQt.quoteDate || existingQt.date || today,
-    title: existingQt.title || existingQt.project || '',
+    quoteDate: resolvedQuoteDate,
+    title: resolvedTitle,
     type: existingQt.type || 'Web Development',
     description: existingQt.description || '',
-    fromCompany: existingQt.fromCompany || existingQt.companyName || user?.companyName || '',
-    fromName: existingQt.fromName || user?.ownerName || user?.name || '',
-    fromEmail: existingQt.fromEmail || existingQt.companyEmail || user?.email || '',
-    fromPhone: existingQt.fromPhone || existingQt.companyPhone || user?.phone || '',
-    toName: existingQt.toName || existingQt.client || editEntry?.client || '',
+    fromCompany: resolvedFromCompany,
+    fromName: resolvedFromName,
+    fromEmail: resolvedFromEmail,
+    fromPhone: resolvedFromPhone,
+    toName: resolvedToName,
     toContact: existingQt.toContact || '',
     toEmail: existingQt.toEmail || '',
     toPhone: existingQt.toPhone || '',
     toAddress: existingQt.toAddress || '',
     overview: existingQt.overview || '',
-    validity: existingQt.validity || '30',
-    notes: existingQt.notes || existingQt.terms || '',
-    status: (existingQt.status || editEntry?.status || 'DRAFT').toUpperCase(),
+    validity: resolvedValidity,
+    notes: resolvedNotes,
+    status: resolvedStatus,
   });
   const upd = (f, v) => setQt(p => ({ ...p, [f]: v }));
 
   // ── Tags ──
   const [tags, setTags] = useState(
-    Array.isArray(existingQt.tags) && existingQt.tags.length > 0 ? existingQt.tags : []
+    Array.isArray(existingQt.tags) && existingQt.tags.length > 0 ? [...existingQt.tags] : []
   );
   const [tagInput, setTagInput] = useState('');
   const addTag = () => {
@@ -80,7 +109,10 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
         title: ph.title || `Phase ${i + 1}`,
         desc: ph.desc || '',
         open: true,
-        features: (ph.features || []).map((f, fi) => ({ id: f.id || fi + 1, text: f.text || f })),
+        features: (ph.features || []).map((f, fi) => ({
+          id: f.id || fi + 1,
+          text: typeof f === 'string' ? f : (f.text || ''),
+        })),
       }))
       : defaultPhases
   );
@@ -96,12 +128,18 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
   // ── Inclusions / Exclusions ──
   const [inclusions, setInclusions] = useState(
     Array.isArray(existingQt.inclusions) && existingQt.inclusions.length > 0
-      ? existingQt.inclusions.map((item, i) => ({ id: item.id || i + 1, text: item.text || String(item) }))
+      ? existingQt.inclusions.map((item, i) => ({
+        id: item.id || i + 1,
+        text: typeof item === 'string' ? item : (item.text || ''),
+      }))
       : [{ id: 1, text: '3 rounds of revisions' }, { id: 2, text: 'Source code handover' }, { id: 3, text: '30-day support post launch' }]
   );
   const [exclusions, setExclusions] = useState(
     Array.isArray(existingQt.exclusions) && existingQt.exclusions.length > 0
-      ? existingQt.exclusions.map((item, i) => ({ id: item.id || i + 1, text: item.text || String(item) }))
+      ? existingQt.exclusions.map((item, i) => ({
+        id: item.id || i + 1,
+        text: typeof item === 'string' ? item : (item.text || ''),
+      }))
       : [{ id: 1, text: 'Domain & hosting charges' }, { id: 2, text: 'Content writing / copywriting' }, { id: 3, text: 'Third-party API costs' }]
   );
   const addIncl = () => setInclusions(p => [...p, { id: genId(), text: '' }]);
@@ -111,13 +149,13 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
   const updExcl = (id, v) => setExclusions(p => p.map(i => i.id === id ? { ...i, text: v } : i));
   const removeExcl = (id) => setExclusions(p => p.filter(i => i.id !== id));
 
-  // ── Line Items — map from DB field names (description/quantity) to form field names (desc/qty) ──
+  // ── Line Items — DB saves as {description, quantity, rate}, form uses {desc, qty, rate} ──
   const [items, setItems] = useState(
     existingItems.length > 0
       ? existingItems.map((item, i) => ({
         id: item.id || i + 1,
         desc: item.description || item.desc || '',
-        qty: parseFloat(item.quantity || item.qty) || 1,
+        qty: parseFloat(item.quantity ?? item.qty) || 1,
         rate: parseFloat(item.rate) || 0,
       }))
       : [
@@ -134,12 +172,11 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
   const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.qty) || 0), 0);
   const fmt = (n) => 'INR ' + Number(n).toLocaleString('en-IN');
 
-  // ── Validity — restore custom value if saved validity is a number not in the preset list ──
-  const presetValidities = ['7', '15', '30', '45', '60'];
-  const savedValidity = existingQt.validity || '30';
-  const isCustomValidity = savedValidity && !presetValidities.includes(String(savedValidity)) && savedValidity !== 'Custom';
-  const [customValidity, setCustomValidity] = useState(isCustomValidity ? String(savedValidity) : '');
-  // Override validity field to 'Custom' if it was a custom number
+  // ── Validity — handle custom days (any value not in the preset list) ──
+  const presetValidities = ['7', '15', '30', '45', '60', 'Custom'];
+  const isCustomValidity = resolvedValidity && !presetValidities.includes(String(resolvedValidity));
+  const [customValidity, setCustomValidity] = useState(isCustomValidity ? String(resolvedValidity) : '');
+  // If saved validity was a custom number (e.g. "21"), select the Custom button and put value in input
   if (isCustomValidity && qt.validity !== 'Custom') {
     qt.validity = 'Custom';
   }
@@ -156,6 +193,11 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
   // ── Save ──
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+
+
+  // ── Client searchable dropdown ──
+  const [clientDropOpen, setClientDropOpen] = useState(false);
+  const [clientSearch, setClientSearch] = useState('');
   const handleSave = async (status = 'draft') => {
     setSaving(true);
     try {
@@ -163,29 +205,38 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
         qt: {
           ...qt,
           status,
-          client: qt.toName,       // mapped for list
-          project: qt.title,       // mapped for list
-          date: qt.quoteDate,      // mapped for list
+          client: qt.toName,    // mapped for list display
+          project: qt.title,     // mapped for list display
+          date: qt.quoteDate, // mapped for list display
           tags,
           phases,
           inclusions,
-          exclusions
+          exclusions,
+          // preserve both naming conventions so Edit always finds values
+          toName: qt.toName,
+          title: qt.title,
+          quoteDate: qt.quoteDate,
+          fromCompany: qt.fromCompany,
+          fromName: qt.fromName,
+          fromEmail: qt.fromEmail,
+          fromPhone: qt.fromPhone,
         },
         items: items.map(item => ({
           id: item.id,
-          description: item.desc,
-          quantity: item.qty,
-          rate: item.rate
+          description: item.desc,   // DB canonical name
+          quantity: item.qty,    // DB canonical name
+          rate: item.rate,
+          // also save short names so both QuotationCreator card and ModernForm can read them
+          desc: item.desc,
+          qty: item.qty,
         })),
         status
       };
 
       const existingId = editEntry?.id || editEntry?._id;
       if (existingId) {
-        // UPDATE existing quotation
         await axios.put(`${BASE_URL}/api/quotations/${existingId}`, payload);
       } else {
-        // CREATE new quotation
         await axios.post(`${BASE_URL}/api/quotations`, payload);
       }
     } catch (e) { console.warn('Save error', e); }
@@ -522,32 +573,176 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
             <div className="mqc-card-header">
               <div className="mqc-card-icon" style={{ background: 'var(--amber-bg)', color: 'var(--amber)' }}><i className="ti ti-user-circle"></i></div>
               <div className="mqc-card-title">Prepared For (Client)</div>
-              {clients.length > 0 && (
-                <select className="mqc-select" style={{ marginLeft: 'auto', width: 'auto', minWidth: 140, fontSize: 11 }}
-                  onChange={e => {
-                    const c = clients.find(cl => (cl.clientName || cl.name) === e.target.value);
-                    if (c) {
-                      upd('toName', c.clientName || c.name || '');
-                      upd('toContact', c.contactPerson || '');
-                      upd('toEmail', c.email || '');
-                      upd('toPhone', c.phone || '');
-                      upd('toAddress', c.address || c.city || '');
-                    }
-                  }}>
-                  <option value="">— Select Client —</option>
-                  {clients.map((c, i) => <option key={i} value={c.clientName || c.name}>{c.clientName || c.name}</option>)}
-                </select>
-              )}
             </div>
             <div className="mqc-card-body">
-              <div className="mqc-form-row">
-                <div className="mqc-form-group">
-                  <label className="mqc-label">Client / Company Name</label>
-                  <input className="mqc-input" placeholder="e.g. STA Corporation" value={qt.toName} onChange={e => upd('toName', e.target.value)} />
+
+              {/* ── Searchable Client Dropdown ── */}
+              <div className="mqc-form-group" style={{ position: 'relative', zIndex: clientDropOpen ? 200 : 1 }}>
+                <label className="mqc-label">Client / Company Name</label>
+
+                {/* Trigger box */}
+                <div
+                  onClick={() => { setClientDropOpen(o => !o); setClientSearch(''); }}
+                  style={{
+                    width: '100%', padding: '10px 36px 10px 13px', background: 'var(--bg)',
+                    border: `1.5px solid ${clientDropOpen ? 'var(--teal)' : 'var(--border)'}`,
+                    borderRadius: 10, fontSize: 13, color: qt.toName ? 'var(--text)' : 'var(--text3)',
+                    cursor: 'pointer', userSelect: 'none', boxSizing: 'border-box',
+                    display: 'flex', alignItems: 'center', gap: 8, minHeight: 42,
+                    boxShadow: clientDropOpen ? '0 0 0 3px rgba(0,188,212,.08)' : 'none',
+                    transition: 'all .15s'
+                  }}>
+                  {qt.toName ? (
+                    <>
+                      <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 10, fontWeight: 700, flexShrink: 0 }}>
+                        {qt.toName[0].toUpperCase()}
+                      </div>
+                      <span style={{ fontWeight: 700 }}>{qt.toName}</span>
+                    </>
+                  ) : (
+                    <span style={{ color: 'var(--text3)' }}>— Select or type client name —</span>
+                  )}
+                  <span style={{ position: 'absolute', right: 12, top: '50%', transform: `translateY(-50%) rotate(${clientDropOpen ? 180 : 0}deg)`, fontSize: 10, color: 'var(--text3)', transition: 'transform .2s' }}>▼</span>
                 </div>
+
+                {/* Dropdown panel */}
+                {clientDropOpen && (
+                  <>
+                    {/* Backdrop to close */}
+                    <div onClick={() => setClientDropOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 198 }} />
+                    <div style={{
+                      position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
+                      background: 'var(--surface)', border: '1.5px solid var(--border)',
+                      borderRadius: 12, boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                      zIndex: 199, overflow: 'hidden'
+                    }}>
+                      {/* Search input */}
+                      <div style={{ padding: '10px 10px 6px', borderBottom: '1px solid var(--border)' }}>
+                        <div style={{ position: 'relative' }}>
+                          <i className="ti ti-search" style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)', fontSize: 13, color: 'var(--text3)' }}></i>
+                          <input
+                            autoFocus
+                            placeholder="Search client name…"
+                            value={clientSearch}
+                            onChange={e => setClientSearch(e.target.value)}
+                            onClick={e => e.stopPropagation()}
+                            style={{
+                              width: '100%', padding: '8px 10px 8px 30px',
+                              border: '1.5px solid var(--border)', borderRadius: 8,
+                              fontSize: 12, background: 'var(--bg)', color: 'var(--text)',
+                              outline: 'none', fontFamily: 'var(--font)', boxSizing: 'border-box'
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Client list */}
+                      <div style={{ maxHeight: 220, overflowY: 'auto' }}>
+                        {/* Manual entry option */}
+                        {clientSearch.trim() && !clients.some(c => (c.clientName || c.name || '').toLowerCase() === clientSearch.toLowerCase()) && (
+                          <div
+                            onClick={() => {
+                              upd('toName', clientSearch.trim());
+                              setClientDropOpen(false);
+                              setClientSearch('');
+                            }}
+                            style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', cursor: 'pointer', borderBottom: '1px solid var(--border)', background: 'var(--teal-lighter)' }}
+                            onMouseEnter={e => e.currentTarget.style.background = 'var(--teal-light)'}
+                            onMouseLeave={e => e.currentTarget.style.background = 'var(--teal-lighter)'}
+                          >
+                            <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 14, fontWeight: 700, flexShrink: 0 }}>+</div>
+                            <div>
+                              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--teal)' }}>Use "{clientSearch.trim()}"</div>
+                              <div style={{ fontSize: 10, color: 'var(--text3)' }}>Enter manually — not from client list</div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Filtered client rows */}
+                        {clients
+                          .filter(c => {
+                            const name = (c.clientName || c.name || '').toLowerCase();
+                            const company = (c.companyName || '').toLowerCase();
+                            const q = clientSearch.toLowerCase();
+                            return !q || name.includes(q) || company.includes(q);
+                          })
+                          .map((c, i) => {
+                            const name = c.clientName || c.name || '';
+                            const company = c.companyName || '';
+                            const isSel = qt.toName === name;
+                            return (
+                              <div
+                                key={i}
+                                onClick={() => {
+                                  upd('toName', name);
+                                  upd('toContact', c.contactPersonName || c.contactPerson || '');
+                                  upd('toEmail', c.email || '');
+                                  upd('toPhone', c.contactPersonNo || c.phone || '');
+                                  upd('toAddress', c.address || c.city || '');
+                                  setClientDropOpen(false);
+                                  setClientSearch('');
+                                }}
+                                style={{
+                                  display: 'flex', alignItems: 'center', gap: 10,
+                                  padding: '10px 14px', cursor: 'pointer',
+                                  background: isSel ? 'var(--teal-lighter)' : 'transparent',
+                                  borderBottom: '1px solid var(--border)'
+                                }}
+                                onMouseEnter={e => { if (!isSel) e.currentTarget.style.background = 'var(--surface2)'; }}
+                                onMouseLeave={e => { if (!isSel) e.currentTarget.style.background = 'transparent'; }}
+                              >
+                                <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,var(--teal),var(--teal4))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
+                                  {name[0]?.toUpperCase() || '?'}
+                                </div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
+                                  {company && <div style={{ fontSize: 11, color: 'var(--text3)' }}>{company}</div>}
+                                </div>
+                                {isSel && <span style={{ fontSize: 14, color: 'var(--teal)', flexShrink: 0 }}>✓</span>}
+                              </div>
+                            );
+                          })}
+
+                        {/* Empty state */}
+                        {clients.filter(c => {
+                          const name = (c.clientName || c.name || '').toLowerCase();
+                          const company = (c.companyName || '').toLowerCase();
+                          const q = clientSearch.toLowerCase();
+                          return !q || name.includes(q) || company.includes(q);
+                        }).length === 0 && !clientSearch.trim() && (
+                            <div style={{ padding: 16, textAlign: 'center', color: 'var(--text3)', fontSize: 13 }}>No clients found.</div>
+                          )}
+                      </div>
+
+                      {/* Clear selection */}
+                      {qt.toName && (
+                        <div
+                          onClick={() => {
+                            upd('toName', ''); upd('toContact', '');
+                            upd('toEmail', ''); upd('toPhone', ''); upd('toAddress', '');
+                            setClientDropOpen(false); setClientSearch('');
+                          }}
+                          style={{ padding: '8px 14px', borderTop: '1px solid var(--border)', fontSize: 11, fontWeight: 700, color: 'var(--red)', cursor: 'pointer', textAlign: 'center' }}
+                          onMouseEnter={e => e.currentTarget.style.background = 'var(--red-bg)'}
+                          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                        >
+                          ✕ Clear selection
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Auto-filled fields — shown after client is selected */}
+              <div className="mqc-form-row">
                 <div className="mqc-form-group">
                   <label className="mqc-label">Contact Person</label>
                   <input className="mqc-input" placeholder="Name of contact" value={qt.toContact} onChange={e => upd('toContact', e.target.value)} />
+                </div>
+                <div className="mqc-form-group">
+                  <label className="mqc-label">Phone</label>
+                  <input className="mqc-input" type="tel" placeholder="+91 XXXXX XXXXX" value={qt.toPhone} onChange={e => upd('toPhone', e.target.value)} />
                 </div>
               </div>
               <div className="mqc-form-row">
@@ -556,14 +751,23 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
                   <input className="mqc-input" type="email" placeholder="client@email.com" value={qt.toEmail} onChange={e => upd('toEmail', e.target.value)} />
                 </div>
                 <div className="mqc-form-group">
-                  <label className="mqc-label">Phone</label>
-                  <input className="mqc-input" type="tel" placeholder="+91 XXXXX XXXXX" value={qt.toPhone} onChange={e => upd('toPhone', e.target.value)} />
+                  <label className="mqc-label">Address / Location</label>
+                  <input className="mqc-input" placeholder="Client city or address" value={qt.toAddress} onChange={e => upd('toAddress', e.target.value)} />
                 </div>
               </div>
-              <div className="mqc-form-group">
-                <label className="mqc-label">Address / Location</label>
-                <input className="mqc-input" placeholder="Client city or address" value={qt.toAddress} onChange={e => upd('toAddress', e.target.value)} />
-              </div>
+
+              {/* Selected client info badge */}
+              {qt.toName && clients.some(c => (c.clientName || c.name) === qt.toName) && (() => {
+                const sc = clients.find(c => (c.clientName || c.name) === qt.toName);
+                return (
+                  <div style={{ marginTop: 10, padding: '8px 12px', background: 'var(--teal-lighter)', borderRadius: 8, border: '1px solid var(--teal-light)', display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+                    {sc.companyName && <span style={{ fontSize: 11, color: 'var(--teal)', fontWeight: 700 }}>🏢 {sc.companyName}</span>}
+                    {sc.gstNumber && <span style={{ fontSize: 11, color: 'var(--text2)', fontWeight: 600 }}>GST: {sc.gstNumber}</span>}
+                    {sc.city && <span style={{ fontSize: 11, color: 'var(--text2)' }}>📍 {sc.city}</span>}
+                  </div>
+                );
+              })()}
+
             </div>
           </div>
 

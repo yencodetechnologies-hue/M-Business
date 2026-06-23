@@ -330,9 +330,14 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
     </div>
   );
 }
-export default function ClientDashboard({ user, setUser }) {
+export default function ClientDashboard({ user, setUser, portalMode = false }) {
   useAssets();
   const [active, setActive] = useState(() => localStorage.getItem("activeTab_client") || "dashboard");
+
+  // Portal mode: read clientId from URL and auto-load that client's data
+  const portalClientId = portalMode
+    ? window.location.pathname.split("/client-portal/")[1]?.split("?")[0]
+    : null;
   const [selectedClientProject, setSelectedClientProject] = useState(null);
   useEffect(() => { localStorage.setItem("activeTab_client", active); if (active !== "projects") setSelectedClientProject(null); }, [active]);
 
@@ -402,7 +407,9 @@ export default function ClientDashboard({ user, setUser }) {
     }
     const fetchAll = async () => {
       try {
-        const myClientId = user._id || user.id || "";
+        const myClientId = portalMode
+          ? (portalClientId || user._id || user.id || "")
+          : (user._id || user.id || "");
         const [projRes, taskRes, invRes, notifRes, docRes, meetRes, propRes, quotRes] = await Promise.all([
           axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}&clientId=${encodeURIComponent(myClientId)}`, {
             headers: { 'x-company-id': user.companyId || "" }
@@ -1023,8 +1030,10 @@ export default function ClientDashboard({ user, setUser }) {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', height: '100vh', background: C.bg, alignItems: 'center', justifyContent: 'center', color: C.text, fontFamily: 'sans-serif' }}>
-
+      <div style={{ display: 'flex', height: '100vh', background: '#F0FDFE', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16, fontFamily: 'Nunito, sans-serif' }}>
+        <div style={{ width: 48, height: 48, border: '4px solid #E0EEF0', borderTop: '4px solid #00BCD4', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+        <div style={{ fontSize: 14, fontWeight: 700, color: '#607D86' }}>Loading your portal...</div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }

@@ -130,6 +130,14 @@ export default function App() {
           <Route path="/employee-onboarding" element={<EmployeeOnboarding />} />
           <Route path="/modern-projects" element={user ? <ModernProjectsPage user={user} /> : <Navigate to="/" replace />} />
 
+          <Route
+            path="/client-portal/:clientId"
+            element={<ClientDashboard user={user} setUser={handleSetUser} portalMode={true} />}
+          />
+          <Route
+            path="/client-portal/:clientId"
+            element={<ClientDashboard user={user} setUser={handleSetUser} portalMode={true} />}
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>

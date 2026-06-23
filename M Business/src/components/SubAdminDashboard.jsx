@@ -1793,27 +1793,19 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
             <div>
 
               <div style={{ fontSize: 12, fontWeight: 700, color: "#1A2E35", lineHeight: 1.4 }} dangerouslySetInnerHTML={{ __html: a.title }} />
-
               <div style={{ fontSize: 10, color: "#A0B8BE", marginTop: 2 }}>{a.time}</div>
-
             </div>
-
           </div>
-
         ))}
-
       </div>
-
     );
 
   };
 
-
-
   const renderPortal = () => {
     const c = activeClient;
     if (!c) return null;
-    const portalUrl = `${window.location.origin}/client-portal/${c._id}`;
+    const portalUrl = `/client-portal/${c._id}`;
 
     const handleOpenPortal = () => {
       // Build the portal URL with client token for auto-login
@@ -2109,7 +2101,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                   </div>
 
-             <button
+                  <button
                     onClick={() => setViewClientModal(true)}
                     style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "none", border: "1.5px solid #E0EEF0", borderRadius: 20, fontSize: 11, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }}
                     onMouseEnter={e => { e.currentTarget.style.borderColor = "#00BCD4"; e.currentTarget.style.color = "#00BCD4"; }}

@@ -568,6 +568,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   const autoAdditionalTotal = (currProject.additionalCharges || []).reduce((sum, a) => sum + parseAmt(a.amount), 0);
   const autoMilestoneTotal = (currProject.milestonePayments || []).reduce((sum, m) => sum + parseAmt(m.amount), 0);
+  const advanceTotal = (currProject.advances || []).reduce((sum, a) => sum + parseAmt(a.amount), 0);
   const autoBudgetAmt = billed + autoAdditionalTotal + autoMilestoneTotal;
   const manualBudget = currProject.budget ? Number(currProject.budget) : 0;
   const budgetAmt = Math.max(autoBudgetAmt, manualBudget);
@@ -576,7 +577,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const pending = Math.max(0, billed - received);
   // Always calculate spent from expenses array (source of truth)
   const spent = (currProject.expenses || []).reduce((sum, exp) => sum + parseAmt(exp.amount), 0);
-  const remaining = budgetAmt > 0 ? (budgetAmt - received) : 0;
+  // Remaining = Total Budget - Payments Received - Advances already paid
+  const remaining = budgetAmt > 0 ? Math.max(0, budgetAmt - received - advanceTotal) : 0;
   const budgetUsedPct = budgetAmt > 0 ? Math.min(Math.round((spent / budgetAmt) * 100), 100) : 0;
   const budgetExceeded = budgetAmt > 0 && spent > budgetAmt;
   const overageAmt = budgetExceeded ? (spent - budgetAmt) : 0;
@@ -1930,56 +1932,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     return (
                       <div key={section.key} style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
 
-                        {/* Section Header / Toggle — ALWAYS ON TOP */}
-                        <div onClick={() => toggleSection(section.key)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: expandedSections[section.key] ? '1px solid #E8EDF2' : 'none', background: '#FAFBFD', cursor: 'pointer' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 900, color: '#0D1B2A' }}>
-                            <i className="ti ti-chevron-down" style={{ color: '#7B8FA1', fontSize: 15, transition: 'transform 0.2s ease', transform: expandedSections[section.key] ? 'rotate(0deg)' : 'rotate(-90deg)' }}></i>
-                            <i className={`ti ${section.icon}`} style={{ color: section.color, fontSize: 17 }}></i>
-                            {section.label}
-                            <span style={{ background: `${section.color}18`, color: section.color, fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{records.length}</span>
-                          </div>
-                          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }} onClick={(e) => e.stopPropagation()}>
-                            {section.key === 'inv' && (
-                              <button onClick={() => { if (onNewInvoice) onNewInvoice(currProject); else setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true })); }}
-                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Invoice
-                              </button>
-                            )}
-                            {section.key === 'pay' && (
-                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showPayment: true }))}
-                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Record Payment
-                              </button>
-                            )}
-                            {section.key === 'adv' && (
-                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdvance: true }))}
-                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Advance
-                              </button>
-                            )}
-                            {section.key === 'add' && (
-                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdditional: true }))}
-                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Additional Charge
-                              </button>
-                            )}
-                            {section.key === 'mile' && (
-                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showMilestonePayment: true }))}
-                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Milestone
-                              </button>
-                            )}
-                            {section.key === 'exp' && (
-                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showExpense: true }))}
-                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Add Expense
-                              </button>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Records Table — shown BELOW header when expanded */}
-                        {expandedSections[section.key] && (records.length === 0 ? (
+                        {/* Records Table — ALWAYS VISIBLE ON TOP */}
+                        {records.length === 0 ? (
                           <div style={{ padding: '28px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
                             <i className={`ti ${section.icon}`} style={{ fontSize: 28, display: 'block', marginBottom: 8, opacity: .25, color: section.color }}></i>
                             No {section.label.toLowerCase()} recorded yet.
@@ -2125,7 +2079,64 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               </table>
                             )}
                           </div>
-                        ))}
+                        )}
+
+                        {/* Section Header / Toggle — BELOW RECORDS */}
+                        <div onClick={() => toggleSection(section.key)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderTop: records.length > 0 ? '1px solid #E8EDF2' : 'none', background: '#FAFBFD', cursor: 'pointer' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 900, color: '#0D1B2A' }}>
+                            <i className="ti ti-chevron-down" style={{ color: '#7B8FA1', fontSize: 15, transition: 'transform 0.2s ease', transform: expandedSections[section.key] ? 'rotate(0deg)' : 'rotate(-90deg)' }}></i>
+                            <i className={`ti ${section.icon}`} style={{ color: section.color, fontSize: 17 }}></i>
+                            {section.label}
+                            <span style={{ background: `${section.color}18`, color: section.color, fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{records.length}</span>
+                          </div>
+                          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }} onClick={(e) => e.stopPropagation()}>
+                            {section.key === 'inv' && (
+                              <button onClick={() => { if (onNewInvoice) onNewInvoice(currProject); else setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true })); }}
+                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Invoice
+                              </button>
+                            )}
+                            {section.key === 'pay' && (
+                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showPayment: true }))}
+                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Record Payment
+                              </button>
+                            )}
+                            {section.key === 'adv' && (
+                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdvance: true }))}
+                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Advance
+                              </button>
+                            )}
+                            {section.key === 'add' && (
+                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdditional: true }))}
+                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Additional Charge
+                              </button>
+                            )}
+                            {section.key === 'mile' && (
+                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showMilestonePayment: true }))}
+                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Milestone
+                              </button>
+                            )}
+                            {section.key === 'exp' && (
+                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showExpense: true }))}
+                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Add Expense
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Expanded details section — shown BELOW header when toggled */}
+                        {expandedSections[section.key] && (
+                          <div style={{ padding: '14px 18px', borderTop: '1px solid #E8EDF2', background: '#FAFBFD' }}>
+                            <div style={{ fontSize: 12, color: '#7B8FA1', fontWeight: 600 }}>
+                              {section.label} summary · {records.length} record{records.length !== 1 ? 's' : ''} · Total: {currency}{records.reduce((sum, r) => sum + (Number(r.amount) || 0), 0).toLocaleString()}
+                            </div>
+                          </div>
+                        )}
 
                       </div>
                     );
@@ -2381,6 +2392,24 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 </span>
               </div>
             ))}
+            {advanceTotal > 0 && (
+              <div className="mpd-brow">
+                <span className="mpd-lbl">Advance Paid</span>
+                <span className="mpd-val" style={{ color: '#8B5CF6' }}>− {currency}{advanceTotal.toLocaleString()}</span>
+              </div>
+            )}
+            {autoAdditionalTotal > 0 && (
+              <div className="mpd-brow">
+                <span className="mpd-lbl">Additional Charges</span>
+                <span className="mpd-val" style={{ color: '#F97316' }}>+ {currency}{autoAdditionalTotal.toLocaleString()}</span>
+              </div>
+            )}
+            {autoMilestoneTotal > 0 && (
+              <div className="mpd-brow">
+                <span className="mpd-lbl">Milestone Payments</span>
+                <span className="mpd-val" style={{ color: '#F59E0B' }}>+ {currency}{autoMilestoneTotal.toLocaleString()}</span>
+              </div>
+            )}
             <div className="mpd-brow">
               <span className="mpd-lbl">Pending</span>
               <span className="mpd-val mpd-r">{currency}{pending.toLocaleString()}</span>

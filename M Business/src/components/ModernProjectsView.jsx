@@ -79,7 +79,12 @@ const CSS = `
 .mpv-root * { box-sizing:border-box; }
 
 /* KPI */
-.mpv-kpi-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:22px; }
+.mpv-kpi-grid {
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:14px;
+  margin-bottom:22px;
+}
 .mpv-kpi { background:#fff; border-radius:14px; padding:16px 18px; box-shadow:0 2px 12px rgba(0,188,212,.08);
   display:flex; align-items:center; gap:12px; cursor:pointer; transition:all .18s;
   border:2px solid transparent; }

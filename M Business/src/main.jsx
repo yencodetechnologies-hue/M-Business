@@ -14,6 +14,8 @@ axios.interceptors.request.use((config) => {
     const user = JSON.parse(userStr);
     const cid = user.companyId || user.company || user._id || user.id;
     if (cid) config.headers["x-company-id"] = cid;
+    if (user.name) config.headers["x-user-name"] = user.name;
+    if (user.role) config.headers["x-user-role"] = user.role;
   }
   return config;
 });

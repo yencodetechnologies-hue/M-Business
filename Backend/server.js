@@ -9,8 +9,8 @@ const isLocalhost = (origin) =>
   origin && (
     origin.startsWith('http://localhost') ||
     origin.startsWith('http://127.0.0.1') ||
-        origin.startsWith('http://192.168.')
-    
+    origin.startsWith('http://192.168.')
+
   );
 
 const allowedOrigins = [
@@ -35,7 +35,7 @@ app.use(cors({
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "x-company-id", "Accept"]
+  allowedHeaders: ["Content-Type", "Authorization", "x-company-id", "x-user-name", "x-user-role", "Accept"]
 }));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
@@ -43,7 +43,11 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 app.use((req, res, next) => {
   req.companyId = req.headers['x-company-id'] || "";
-  console.log(`[API REQUEST] ${req.method} ${req.url} (companyId: "${req.companyId}")`);
+  req.userName = req.headers['x-user-name'] || "";
+  req.userRole = req.headers['x-user-role'] || "";
+  req.userName = req.headers['x-user-name'] || "";
+  req.userRole = req.headers['x-user-role'] || "";
+  console.log(`[API REQUEST] ${req.method} ${req.url} (companyId: "${req.companyId}", user: "${req.userName}", role: "${req.userRole}")`);
   const start = Date.now();
   res.on('finish', () => {
     console.log(`[API RESPONSE] ${req.method} ${req.url} -> ${res.statusCode} (${Date.now() - start}ms)`);
@@ -139,11 +143,11 @@ app.get("/", (req, res) => {
 app.get("/debug-vendors", (req, res) => {
   try {
     const vendorRoutes = require('./routes/vendorRoutes');
-    res.json({ 
+    res.json({
       message: "Vendor routes loaded successfully",
       routes: [
         "POST /api/vendors - Create vendor",
-        "GET /api/vendors - Get all vendors", 
+        "GET /api/vendors - Get all vendors",
         "PUT /api/vendors/:id - Update vendor",
         "DELETE /api/vendors/:id - Delete vendor"
       ]

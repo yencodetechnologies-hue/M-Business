@@ -147,7 +147,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
 
   const normalizeMilestones = (list) => {
     if (!Array.isArray(list) || list.length === 0) {
-      return [{ name: 'Development Complete', date: '' }];
+      return [];
     }
     return list.map(m => ({
       name: m?.name || '',

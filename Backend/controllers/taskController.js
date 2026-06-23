@@ -1,27 +1,42 @@
-const Task  = require("../models/TaskModels");
+const Task = require("../models/TaskModels");
 const Group = require("../models/GroupModels");
 const TaskInvitation = require("../models/TaskInvitationModel");
 const User = require("../models/UserModels");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 
+const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 exports.getAllTasks = async (req, res) => {
   try {
     const companyId = req.companyId || "";
     const filter = { isDeleted: false };
     if (companyId) filter.companyId = companyId;
-    if (req.query.groupId)  filter.groupId  = req.query.groupId;
-    if (req.query.status)   filter.status   = req.query.status;
-if (req.query.assignTo) {
-  filter.assignTo = { $regex: new RegExp(`^\\s*${req.query.assignTo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`, "i") };
-}
-if (req.query.person) {
-  filter.$or = [
-    { assignTo: { $regex: new RegExp(`^\\s*${req.query.person.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`, "i") } },
-    { assignedTo: req.query.person },
-    { "invitedMembers.email": req.query.person }
-  ];
-}
+    if (req.query.groupId) filter.groupId = req.query.groupId;
+    if (req.query.status) filter.status = req.query.status;
+
+    const callerRole = (req.userRole || req.query.role || "").toLowerCase().trim();
+    const callerName = req.userName || req.query.callerName || "";
+    const isEmployee = callerRole === "employee";
+
+    if (isEmployee && callerName) {
+      const nameRegex = new RegExp(`^\\s*${escapeRegExp(callerName)}\\s*$`, "i");
+      filter.$or = [
+        { assignTo: nameRegex },
+        { "invitedMembers.email": nameRegex }
+      ];
+    } else {
+      if (req.query.assignTo) {
+        filter.assignTo = { $regex: new RegExp(`^\\s*${escapeRegExp(req.query.assignTo)}\\s*$`, "i") };
+      }
+      if (req.query.person) {
+        filter.$or = [
+          { assignTo: { $regex: new RegExp(`^\\s*${escapeRegExp(req.query.person)}\\s*$`, "i") } },
+          { assignedTo: req.query.person },
+          { "invitedMembers.email": req.query.person }
+        ];
+      }
+    }
 
     const tasks = await Task.find(filter)
       .populate("projectId", "name color")
@@ -41,8 +56,10 @@ exports.getBoardData = async (req, res) => {
     if (companyId) groupFilter.companyId = companyId;
     const groups = await Group.find(groupFilter).sort({ order: 1, createdAt: 1 });
 
-    const employeeName = req.query.employeeName || "";
-    const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const callerRole = (req.userRole || req.query.role || "").toLowerCase().trim();
+    const callerName = req.userName || req.query.callerName || "";
+    const isEmployee = callerRole === "employee";
+    const employeeName = isEmployee ? callerName : (req.query.employeeName || "");
 
     const board = await Promise.all(
       groups.map(async (g) => {
@@ -51,10 +68,10 @@ exports.getBoardData = async (req, res) => {
 
         if (employeeName) {
           const nameRegex = new RegExp(`^\\s*${escapeRegExp(employeeName)}\\s*$`, "i");
-       taskFilter.$or = [
-  { assignTo: nameRegex },
-  { "invitedMembers.email": nameRegex }
-];
+          taskFilter.$or = [
+            { assignTo: nameRegex },
+            { "invitedMembers.email": nameRegex }
+          ];
         }
 
         const tasks = await Task.find(taskFilter)
@@ -62,31 +79,31 @@ exports.getBoardData = async (req, res) => {
           .sort({ order: 1, createdAt: 1 });
 
         return {
-          id:    g._id,
-          _id:   g._id,
+          id: g._id,
+          _id: g._id,
           label: g.label,
           color: g.color,
-          open:  g.open,
+          open: g.open,
           tasks: tasks.map((t) => ({
-            id:            t._id,
-            _id:           t._id,
-            title:         t.title,
-            description:   t.description,
-            notes:         t.notes,
-            status:        t.status,
-            priority:      t.priority,
-            assignTo:      t.assignTo,
-            type:          t.type,
-            date:          t.date,
-            time:          t.time,
+            id: t._id,
+            _id: t._id,
+            title: t.title,
+            description: t.description,
+            notes: t.notes,
+            status: t.status,
+            priority: t.priority,
+            assignTo: t.assignTo,
+            type: t.type,
+            date: t.date,
+            time: t.time,
             estimatedTime: t.estimatedTime,
-            checked:       t.checked,
-            groupId:       t.groupId,
-            projectId:     t.projectId,
-            milestone:     t.milestone,
-            subtasks:      t.subtasks || [],
-            comments:      t.comments || [],
-            createdAt:     t.createdAt,
+            checked: t.checked,
+            groupId: t.groupId,
+            projectId: t.projectId,
+            milestone: t.milestone,
+            subtasks: t.subtasks || [],
+            comments: t.comments || [],
+            createdAt: t.createdAt,
           })),
         };
       })
@@ -126,7 +143,7 @@ exports.createTask = async (req, res) => {
     if (!group) return res.status(400).json({ message: "Group not found or unauthorized" });
 
     const lastTask = await Task.findOne({ groupId, isDeleted: false, companyId }).sort({ order: -1 });
-    const order    = lastTask ? lastTask.order + 1 : 0;
+    const order = lastTask ? lastTask.order + 1 : 0;
 
     const task = await Task.create({
       title, description, notes, status, priority,
@@ -150,9 +167,9 @@ exports.createTask = async (req, res) => {
 exports.updateTask = async (req, res) => {
   try {
     const allowed = [
-      "title","description","notes","status","priority",
-      "assignTo","type","date","time","estimatedTime",
-      "checked","groupId","projectId","order","subtasks","comments","milestone"
+      "title", "description", "notes", "status", "priority",
+      "assignTo", "type", "date", "time", "estimatedTime",
+      "checked", "groupId", "projectId", "order", "subtasks", "comments", "milestone"
     ];
 
     const updates = {};
@@ -167,7 +184,7 @@ exports.updateTask = async (req, res) => {
     const task = await Task.findOneAndUpdate(
       { _id: req.params.id, isDeleted: false, companyId },
       { $set: updates },
-      { returnDocument: 'after', runValidators: true }
+      { returnDocument: "after", runValidators: true }
     ).populate("projectId", "name color");
 
     if (!task) return res.status(404).json({ message: "Task not found" });
@@ -198,7 +215,7 @@ exports.deleteTask = async (req, res) => {
     const task = await Task.findOneAndUpdate(
       { _id: req.params.id, isDeleted: false, companyId },
       { isDeleted: true },
-      { returnDocument: 'after' }
+      { returnDocument: "after" }
     );
     if (!task) return res.status(404).json({ message: "Task not found" });
     res.json({ message: "Task deleted", _id: task._id });
@@ -219,7 +236,7 @@ exports.moveTask = async (req, res) => {
     const task = await Task.findOneAndUpdate(
       { _id: req.params.id, isDeleted: false, companyId },
       { groupId },
-      { returnDocument: 'after' }
+      { returnDocument: "after" }
     ).populate("projectId", "name color");
 
     if (!task) return res.status(404).json({ message: "Task not found" });
@@ -233,18 +250,12 @@ exports.inviteMember = async (req, res) => {
   try {
     const { taskId, email } = req.body;
     const companyId = req.companyId || "NONE";
-    
+
     const task = await Task.findOne({ _id: taskId, isDeleted: false, companyId });
     if (!task) return res.status(404).json({ message: "Task not found" });
 
-    const existingInvitation = await TaskInvitation.findOne({ 
-      task: taskId, 
-      email, 
-      status: "pending" 
-    });
-    if (existingInvitation) {
-      return res.status(400).json({ message: "Invitation already sent" });
-    }
+    const existingInvitation = await TaskInvitation.findOne({ task: taskId, email, status: "pending" });
+    if (existingInvitation) return res.status(400).json({ message: "Invitation already sent" });
 
     const token = crypto.randomBytes(32).toString("hex");
     const invitation = await TaskInvitation.create({
@@ -256,10 +267,7 @@ exports.inviteMember = async (req, res) => {
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-      }
+      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
     });
 
     const inviteUrl = `${process.env.FRONTEND_URL}/invite/${token}`;
@@ -284,10 +292,10 @@ exports.inviteMember = async (req, res) => {
 exports.respondToInvitation = async (req, res) => {
   try {
     const { token, action } = req.body;
-    
+
     const invitation = await TaskInvitation.findOne({ token });
     if (!invitation) return res.status(404).json({ message: "Invalid invitation" });
-    
+
     if (invitation.expiresAt < new Date()) {
       return res.status(400).json({ message: "Invitation expired" });
     }
@@ -297,7 +305,7 @@ exports.respondToInvitation = async (req, res) => {
 
     if (action === "accept") {
       let user = await User.findOne({ email: invitation.email });
-      
+
       if (!user) {
         user = await User.create({
           name: invitation.email.split("@")[0],
@@ -309,11 +317,9 @@ exports.respondToInvitation = async (req, res) => {
 
       await Task.findByIdAndUpdate(
         invitation.task,
-        { 
+        {
           $addToSet: { assignedTo: user._id },
-          $pull: { 
-            invitedMembers: { email: invitation.email }
-          }
+          $pull: { invitedMembers: { email: invitation.email } }
         }
       );
     }
@@ -328,12 +334,12 @@ exports.autoAssignTask = async (req, res) => {
   try {
     const { taskId } = req.params;
     const companyId = req.companyId || "NONE";
-    
+
     const task = await Task.findOne({ _id: taskId, isDeleted: false, companyId });
     if (!task) return res.status(404).json({ message: "Task not found" });
 
-    const availableUsers = await User.find({ 
-      companyId, 
+    const availableUsers = await User.find({
+      companyId,
       role: { $in: ["member", "manager"] }
     }).sort({ createdAt: 1 });
 
@@ -342,16 +348,16 @@ exports.autoAssignTask = async (req, res) => {
     }
 
     const randomUser = availableUsers[Math.floor(Math.random() * availableUsers.length)];
-    
+
     const updatedTask = await Task.findByIdAndUpdate(
-  taskId,
-  { 
-    $addToSet: { assignedTo: randomUser._id },
-    assignTo: randomUser.name,  // This is required
-    autoAssign: true
-  },
-  { returnDocument: 'after' }
-).populate("assignedTo", "name email");
+      taskId,
+      {
+        $addToSet: { assignedTo: randomUser._id },
+        assignTo: randomUser.name,
+        autoAssign: true
+      },
+      { returnDocument: "after" }
+    ).populate("assignedTo", "name email");
 
     res.json(updatedTask);
   } catch (err) {
@@ -364,11 +370,11 @@ exports.updateIntegrations = async (req, res) => {
     const { taskId } = req.params;
     const { integrations } = req.body;
     const companyId = req.companyId || "NONE";
-    
+
     const task = await Task.findOneAndUpdate(
       { _id: taskId, isDeleted: false, companyId },
       { integrations },
-      { returnDocument: 'after' }
+      { returnDocument: "after" }
     );
 
     if (!task) return res.status(404).json({ message: "Task not found" });
@@ -382,19 +388,14 @@ exports.getTaskMembers = async (req, res) => {
   try {
     const { taskId } = req.params;
     const companyId = req.companyId || "NONE";
-    
+
     const task = await Task.findOne({ _id: taskId, isDeleted: false, companyId })
       .populate("assignedTo", "name email")
       .populate("invitedMembers.invitedBy", "name email");
 
     if (!task) return res.status(404).json({ message: "Task not found" });
 
-    const members = {
-      assigned: task.assignedTo,
-      invited: task.invitedMembers
-    };
-
-    res.json(members);
+    res.json({ assigned: task.assignedTo, invited: task.invitedMembers });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -409,7 +410,7 @@ exports.addComment = async (req, res) => {
     const task = await Task.findOneAndUpdate(
       { _id: id, isDeleted: false, companyId },
       { $push: { comments: { user, text, date: new Date() } } },
-      { returnDocument: 'after' }
+      { returnDocument: "after" }
     );
 
     if (!task) return res.status(404).json({ message: "Task not found" });

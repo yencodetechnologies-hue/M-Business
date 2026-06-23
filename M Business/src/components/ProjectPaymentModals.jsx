@@ -66,6 +66,20 @@ export default function ProjectPaymentModals({
   // Generic form state
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
+  const [projectInvoices, setProjectInvoices] = useState([]);
+
+  useEffect(() => {
+    if (showPayment && project?.name) {
+      const companyId = project.companyId || localStorage.getItem('companyId') || '';
+      axios.get(`${BASE_URL}/api/invoices/project/${encodeURIComponent(project.name)}`, {
+        headers: { 'x-company-id': companyId }
+      })
+        .then(res => {
+          if (res.data?.invoices) setProjectInvoices(res.data.invoices);
+        })
+        .catch(() => setProjectInvoices([]));
+    }
+  }, [showPayment, project]);
 
   useEffect(() => {
     setForm({});
@@ -114,7 +128,6 @@ export default function ProjectPaymentModals({
   const handleInputChange = useCallback((field, value) => {
     setForm(prev => ({ ...prev, [field]: value }));
   }, []);
-
   const handleSave = async (e, type) => {
     e.preventDefault();
     setSaving(true);
@@ -182,6 +195,50 @@ export default function ProjectPaymentModals({
         updatePayload.spent = parseAmt(project.spent) + diff;
       }
 
+      // ── AUTO-UPDATE INVOICE STATUS WHEN PAYMENT IS RECORDED ────────────────
+      if (type === 'payment' && form.linkedInvoice) {
+        const parseAmt = (val) => {
+          if (val === undefined || val === null) return 0;
+          const num = Number(String(val).replace(/[^0-9.-]+/g, ''));
+          return isNaN(num) ? 0 : num;
+        };
+
+        const thisPaymentAmt = parseAmt(form.amount);
+        const linkedInvoiceNo = form.linkedInvoice;
+
+        // All payments for this invoice after this save (updatedList = paymentsReceived after save)
+        const allPaymentsForInvoice = updatedList.filter(p => p.linkedInvoice === linkedInvoiceNo);
+        const totalPaid = allPaymentsForInvoice.reduce((sum, p) => sum + parseAmt(p.amount), 0);
+
+        const currentInvoices = project.invoices || [];
+        const linkedInvIndex = currentInvoices.findIndex(inv => inv.invoiceNo === linkedInvoiceNo);
+
+        if (linkedInvIndex !== -1) {
+          const linkedInv = currentInvoices[linkedInvIndex];
+          const invoiceTotal = parseAmt(linkedInv.amount);
+
+          let newStatus = linkedInv.status;
+          if (invoiceTotal > 0) {
+            if (totalPaid >= invoiceTotal) {
+              newStatus = 'Paid';
+            } else if (totalPaid > 0) {
+              newStatus = 'Partially Paid';
+            }
+          }
+
+          // Only update invoices array if status actually changed
+          if (newStatus !== linkedInv.status) {
+            const updatedInvoices = currentInvoices.map((inv, idx) =>
+              idx === linkedInvIndex
+                ? { ...inv, status: newStatus, amountPaid: totalPaid }
+                : inv
+            );
+            updatePayload.invoices = updatedInvoices;
+          }
+        }
+      }
+      // ───────────────────────────────────────────────────────────────────────
+
       await axios.put(`${BASE_URL}/api/projects/${project._id}`, updatePayload);
 
       onSaveSuccess();
@@ -193,7 +250,6 @@ export default function ProjectPaymentModals({
       setSaving(false);
     }
   };
-
   if (showNewInvoice) {
     return (
       <div style={overlayStyle}>
@@ -510,11 +566,40 @@ export default function ProjectPaymentModals({
           </div>
           <form onSubmit={e => handleSave(e, 'payment')}>
             <div style={rowStyle}>
-              <div><label style={labelStyle}>Payment #</label><input required style={inputStyle} value={form.paymentNo || ''} onChange={e => handleInputChange('paymentNo', e.target.value)} placeholder="PAY-004" /></div>
-              <div><label style={labelStyle}>Linked Invoice</label><select style={inputStyle} value={form.linkedInvoice || ''} onChange={e => handleInputChange('linkedInvoice', e.target.value)}>
-                <option value="">-- Select Invoice --</option>
-                {(project.invoices || []).map(inv => <option key={inv.invoiceNo} value={inv.invoiceNo}>{inv.invoiceNo} - {inv.description}</option>)}
-              </select></div>
+              <div>
+                <label style={labelStyle}>Payment #</label>
+                <input required style={inputStyle} value={form.paymentNo || ''} onChange={e => handleInputChange('paymentNo', e.target.value)} placeholder="PAY-004" />
+              </div>
+              <div>
+                <label style={labelStyle}>Linked Invoice</label>
+                <select style={inputStyle} value={form.linkedInvoice || ''} onChange={e => {
+                  const selectedInvoiceNo = e.target.value;
+                  handleInputChange('linkedInvoice', selectedInvoiceNo);
+                  if (selectedInvoiceNo) {
+                    const parseAmt = (val) => { const n = Number(String(val || 0).replace(/[^0-9.-]+/g, '')); return isNaN(n) ? 0 : n; };
+                    const selectedInv = projectInvoices.find(inv => inv.invoiceNo === selectedInvoiceNo);
+                    if (selectedInv) {
+                      const alreadyPaid = (project.paymentsReceived || []).reduce((sum, p) => p.linkedInvoice === selectedInvoiceNo ? sum + parseAmt(p.amount) : sum, 0);
+                      const remaining = parseAmt(selectedInv.amount) - alreadyPaid;
+                      handleInputChange('amount', remaining > 0 ? remaining : 0);
+                    }
+                  }
+                }}>
+                  <option value="">-- Select Invoice --</option>
+                  {projectInvoices.map(inv => {
+                    const parseAmt = (val) => { const n = Number(String(val || 0).replace(/[^0-9.-]+/g, '')); return isNaN(n) ? 0 : n; };
+                    const alreadyPaid = (project.paymentsReceived || []).reduce((sum, p) => p.linkedInvoice === inv.invoiceNo ? sum + parseAmt(p.amount) : sum, 0);
+                    const invTotal = parseAmt(inv.amount || inv.total);
+                    const remaining = invTotal - alreadyPaid;
+                    const statusBadge = inv.status ? ` [${inv.status}]` : '';
+                    return (
+                      <option key={inv.invoiceNo} value={inv.invoiceNo}>
+                        {inv.invoiceNo} — ₹{invTotal.toLocaleString('en-IN')} | Due: ₹{remaining > 0 ? remaining.toLocaleString('en-IN') : '0'}{statusBadge}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
             </div>
             <div style={{ marginBottom: 16 }}><label style={labelStyle}>Description</label><input required style={inputStyle} value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="e.g. Sprint 2 Balance Payment" /></div>
             <div style={rowStyle}>

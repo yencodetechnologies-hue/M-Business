@@ -88,7 +88,51 @@ router.get("/", async (req, res) => {
     return res.status(500).json({ success: false, msg: err.message });
   }
 });
+// ── GET invoices by project name ──────────────────────────────────────────────
+router.get("/project/:projectName", async (req, res) => {
+  try {
+    const companyId = req.headers['x-company-id'] || req.companyId || "";
+    const projectName = decodeURIComponent(req.params.projectName).trim();
 
+    if (!companyId) return res.json([]);
+
+    const invoices = await Invoice.find({
+      companyId,
+      project: { $regex: new RegExp(`^\\s*${projectName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`, "i") }
+    }).sort({ createdAt: -1 }).lean();
+
+    const result = invoices.map(doc => {
+      let total = 0;
+      (doc.items || []).forEach(item => {
+        const q = parseFloat(item.quantity) || 0;
+        const r = parseFloat(item.rate) || 0;
+        const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(doc.gstRate) || 18);
+        const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (doc.isGstIncluded || false);
+        const base = q * r;
+        total += isIncl ? base : base * (1 + rateGst / 100);
+      });
+
+      return {
+        id: doc._id.toString(),
+        invoiceNo: doc.invoiceNo || "—",
+        client: doc.client || "—",
+        project: doc.project || "",
+        date: doc.date || null,
+        dueDate: doc.dueDate || null,
+        status: doc.status || "draft",
+        total: doc.total || total,
+        amount: doc.total || total,
+        amountPaid: doc.amountPaid || 0,
+        currency: doc.currency || "₹",
+      };
+    });
+
+    res.json({ success: true, invoices: result });
+  } catch (err) {
+    console.error("GET /api/invoices/project/:projectName error:", err);
+    res.status(500).json({ success: false, msg: err.message });
+  }
+});
 router.get("/client/:clientName", async (req, res) => {
   try {
     const companyId = req.headers['x-company-id'] || req.companyId || "";

@@ -338,6 +338,37 @@ export default function ClientDashboard({ user, setUser, portalMode = false }) {
   const portalClientId = portalMode
     ? window.location.pathname.split("/client-portal/")[1]?.split("?")[0] || ""
     : "";
+
+  // Auto-login from token when SubAdmin clicks "Open Portal"
+  useEffect(() => {
+    if (!portalMode) return;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("token");
+      if (!token) return;
+      const decoded = JSON.parse(atob(token));
+      if (decoded.exp && Date.now() > decoded.exp) return;
+      const autoUser = {
+        _id: decoded.clientId,
+        id: decoded.clientId,
+        clientName: decoded.name || decoded.clientName || "",
+        name: decoded.name || decoded.clientName || "",
+        email: decoded.email || "",
+        companyName: decoded.companyName || "",
+        companyId: decoded.companyId || "",
+        role: "client",
+      };
+      if (!user && setUser) {
+        setUser(autoUser);
+      }
+      // Clean token from URL so refresh doesn't re-trigger
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+    } catch (e) {
+      console.warn("Portal token decode failed:", e);
+    }
+  }, [portalMode]);
+
   const [selectedClientProject, setSelectedClientProject] = useState(null);
   useEffect(() => { localStorage.setItem("activeTab_client", active); if (active !== "projects") setSelectedClientProject(null); }, [active]);
 

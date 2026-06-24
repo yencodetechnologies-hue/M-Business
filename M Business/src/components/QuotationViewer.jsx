@@ -6,7 +6,7 @@ import { BASE_URL } from "../config";
 function formatCurrency(val, symbol = "INR", compact = false, disableCompact = false) {
   const num = parseFloat(val) || 0;
   const absNum = Math.abs(num);
-  
+
   if (!disableCompact && ((compact && absNum >= 100000) || absNum >= 10000000)) {
     try {
       const isINR = symbol === "INR";
@@ -20,7 +20,7 @@ function formatCurrency(val, symbol = "INR", compact = false, disableCompact = f
       // Fallback
     }
   }
-  
+
   const isINR = symbol === "INR";
   return symbol + (" ") + num.toLocaleString(isINR ? "en-IN" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
@@ -57,7 +57,7 @@ export default function QuotationViewer() {
       const items = (slim.items || []).map((i, idx) => ({
         id: idx + 1, description: i.d, quantity: i.q, rate: i.r,
       }));
-      const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate)||0) * (parseFloat(i.quantity)||0), 0);
+      const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
       let subtotal, gstAmt, total;
       if (qt.isGstIncluded) {
         total = subtotalRaw;
@@ -79,7 +79,7 @@ export default function QuotationViewer() {
               setData(prev => prev ? ({ ...prev, qt: { ...prev.qt, logoUrl: res.data.logoUrl } }) : prev);
             }
           })
-          .catch(() => {});
+          .catch(() => { });
       }
     } catch (e) {
       setError("Could not read quotation data.");
@@ -126,13 +126,13 @@ export default function QuotationViewer() {
         * { box-sizing: border-box; }
         .qt-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(5,150,105,0.15); overflow: hidden; display: flex; flex-direction: column; }
         @media print {
-          @page { size: A4 portrait; margin: 0; }
-          html, body { margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; background: white !important; }
+          @page { size: A4 portrait; margin: 10mm; }
+          html, body { margin: 0 !important; padding: 0 !important; background: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           .no-print, .no-print * { display: none !important; }
-          .qt-paper { position: absolute !important; top: 0 !important; left: 0 !important; width: 210mm !important; max-width: 210mm !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; display: block !important; page-break-after: always; break-after: page; }
-          .qt-paper:last-child { page-break-after: auto; break-after: auto; }
-          .qt-table-wrap { overflow-x: visible !important; overflow: visible !important; }
-          body > div { height: auto !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; }
+          .qt-paper { position: static !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; display: block !important; overflow: visible !important; }
+          .qt-table-wrap { overflow: visible !important; }
+          body > div { padding: 0 !important; margin: 0 !important; background: white !important; }
+          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
         @media (max-width:600px) { .qt-hgrid { flex-direction:column!important; } .qt-btgrid { grid-template-columns:1fr!important; } }
       `}</style>
@@ -144,7 +144,7 @@ export default function QuotationViewer() {
         </button>
         <button className="action-btn" onClick={handleShare}
           style={{ padding: "10px 22px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>
-           Share Link
+          Share Link
         </button>
       </div>
 

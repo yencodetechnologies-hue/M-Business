@@ -633,6 +633,30 @@ export default function ModernProjectsPage({ user }) {
                         {pt.filter(t => ['done', 'completed'].includes(t.status)).length}/{pt.length} tasks done
                       </div>
                     )}
+
+                    {/* STATUS BADGE AT BOTTOM */}
+                    <div style={{ padding: '10px 16px', borderTop: '1px solid rgba(0,0,0,.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{
+                        padding: '5px 18px',
+                        borderRadius: 20,
+                        fontSize: 12,
+                        fontWeight: 800,
+                        background: cls === 'active' ? '#E0F7FA' : cls === 'completed' ? '#D1FAE5' : cls === 'onhold' ? '#FEF3C7' : cls === 'overdue' ? '#FEE2E2' : '#E0F7FA',
+                        color: cls === 'active' ? '#0097A7' : cls === 'completed' ? '#065F46' : cls === 'onhold' ? '#D97706' : cls === 'overdue' ? '#DC2626' : '#0097A7',
+                        border: `1.5px solid ${cls === 'active' ? '#00BCD4' : cls === 'completed' ? '#26C281' : cls === 'onhold' ? '#F59E0B' : cls === 'overdue' ? '#FF6B6B' : '#00BCD4'}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6
+                      }}>
+                        <span style={{
+                          width: 7, height: 7, borderRadius: '50%',
+                          background: cls === 'active' ? '#00BCD4' : cls === 'completed' ? '#26C281' : cls === 'onhold' ? '#F59E0B' : cls === 'overdue' ? '#FF6B6B' : '#00BCD4',
+                          display: 'inline-block'
+                        }}></span>
+                        {statusLabel}
+                      </span>
+                    </div>
+
                   </div>
                 );
               })}

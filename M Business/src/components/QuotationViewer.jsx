@@ -136,12 +136,28 @@ export default function QuotationViewer() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; }
-        .qt-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(5,150,105,0.15); overflow: hidden; display: flex; flex-direction: column; }
+        .qt-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(5,150,105,0.15); overflow: hidden; display: flex; flex-direction: column; min-height: 1050px; }
+        .qt-footer { background: #f8fafc; padding: 14px 32px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; border-top: 1px solid #e2e8f0; margin-top: auto; }
         @media print {
-          @page { size: A4 portrait; margin: 0 !important; }
+          @page { size: A4 portrait; margin: 10mm; }
           html, body { margin: 0 !important; padding: 0 !important; background: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           .no-print, .no-print * { display: none !important; }
-          .qt-paper { position: static !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; display: block !important; overflow: visible !important; }
+          .qt-paper {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            display: flex !important;
+            flex-direction: column !important;
+            min-height: calc(297mm - 20mm) !important;
+            overflow: visible !important;
+          }
+          .qt-footer {
+            margin-top: auto !important;
+            position: static !important;
+          }
+          .qt-footer-spacer { display: none !important; }
           .qt-table-wrap { overflow: visible !important; }
           body > div { padding: 0 !important; margin: 0 !important; background: white !important; }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -170,9 +186,11 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fff; -webkit-p
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   body { margin: 0 !important; padding: 0 !important; }
 }
-.qt-paper { max-width: 100% !important; width: 210mm !important; margin: 0 auto !important; background: #fff !important; border-radius: 0 !important; box-shadow: none !important; display: flex !important; flex-direction: column !important; overflow: visible !important; }
+.qt-paper { max-width: 100% !important; width: 100% !important; min-height: calc(297mm - 20mm) !important; margin: 0 !important; background: #fff !important; border-radius: 0 !important; box-shadow: none !important; display: flex !important; flex-direction: column !important; overflow: visible !important; }
 .qt-table-wrap { overflow: visible !important; }
 .no-print { display: none !important; }
+.qt-footer { margin-top: auto !important; position: static !important; background: #f8fafc !important; padding: 14px 32px !important; display: flex !important; justify-content: space-between !important; align-items: center !important; border-top: 1px solid #e2e8f0 !important; }
+.qt-footer-spacer { display: none !important; }
 ${styles}
 </style>
 </head>
@@ -319,10 +337,11 @@ window.onload = function() {
           </div>
         </div>
 
-        <div style={{ flex: 1 }} />
+        {/* Spacer so content doesn't hide behind fixed footer in print */}
+        <div className="qt-footer-spacer" style={{ display: "none" }} />
 
-        {/* Footer */}
-        <div style={{ background: "#f8fafc", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: "1px solid #e2e8f0" }}>
+        {/* Footer — fixed to bottom in print */}
+        <div className="qt-footer">
           <div style={{ fontSize: 11, color: "#94a3b8" }}>{qt.companyName}</div>
           <div style={{ fontSize: 12, fontWeight: 700, color: "#059669" }}>{qt.footerMessage || "Thank you for your business!"}</div>
           <div style={{ fontSize: 11, color: "#94a3b8" }}>{qt.quoteNo}</div>

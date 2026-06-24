@@ -11,6 +11,10 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
   const [leaveSaving, setLeaveSaving] = useState(false);
   const [localLeaves, setLocalLeaves] = useState(emp.leaveRequests || []);
 
+  useEffect(() => {
+    setLocalLeaves(emp.leaveRequests || []);
+  }, [emp._id]);
+
   const handleAddLeave = async () => {
     if (!leaveForm.startDate || !leaveForm.endDate) {
       alert('Please select start and end dates');
@@ -19,17 +23,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
     const finalType = leaveForm.type === 'Other' ? (leaveForm.customType.trim() || 'Other') : leaveForm.type;
     setLeaveSaving(true);
     try {
-      // Save to backend Leave collection
-      const res = await axios.post(`${BASE_URL}/api/employee-dashboard/leave`, {
-        employeeName: emp.name,
-        type: finalType,
-        from: leaveForm.startDate,
-        to: leaveForm.endDate,
-        reason: leaveForm.reason,
-      });
-      const savedLeave = res.data.leave || {};
       const newLeave = {
-        _id: savedLeave._id,
         type: finalType,
         startDate: leaveForm.startDate,
         endDate: leaveForm.endDate,
@@ -37,10 +31,18 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         status: 'pending',
         createdAt: new Date().toISOString()
       };
+      // Save to Leave collection (for bell notifications)
+      await axios.post(`${BASE_URL}/api/employee-dashboard/leave`, {
+        employeeName: emp.name,
+        type: finalType,
+        from: leaveForm.startDate,
+        to: leaveForm.endDate,
+        reason: leaveForm.reason,
+      });
+      // Also save to employee record so it survives refresh
       const updatedLeaves = [...localLeaves, newLeave];
-      setLocalLeaves(updatedLeaves);
-      // Also persist to employee record so it survives refresh
       await axios.put(`${BASE_URL}/api/employees/${emp._id}`, { leaveRequests: updatedLeaves });
+      setLocalLeaves(updatedLeaves);
       setShowLeaveModal(false);
       setLeaveForm({ type: 'Sick Leave', customType: '', startDate: '', endDate: '', reason: '' });
     } catch (e) {
@@ -776,7 +778,6 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
               </div>
               <button onClick={() => setShowLeaveModal(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#94a3b8' }}>✕</button>
             </div>
-
             <div style={{ marginBottom: 14 }}>
               <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#718096', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.5px' }}>Leave Type</label>
               <select value={leaveForm.type} onChange={e => setLeaveForm(p => ({ ...p, type: e.target.value, customType: '' }))}
@@ -784,17 +785,12 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                 {['Sick Leave', 'Casual Leave', 'Annual Leave', 'Maternity Leave', 'Paternity Leave', 'Unpaid Leave', 'Other'].map(t => <option key={t}>{t}</option>)}
               </select>
               {leaveForm.type === 'Other' && (
-                <input
-                  type="text"
-                  placeholder="Type your leave reason..."
-                  value={leaveForm.customType}
+                <input type="text" placeholder="Type your custom leave type..." value={leaveForm.customType}
                   onChange={e => setLeaveForm(p => ({ ...p, customType: e.target.value }))}
                   style={{ width: '100%', marginTop: 8, padding: '10px 14px', border: '1.5px solid #00BCD4', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }}
-                  autoFocus
-                />
+                  autoFocus />
               )}
             </div>
-
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
               <div>
                 <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#718096', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.5px' }}>Start Date *</label>
@@ -807,14 +803,12 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                   style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
               </div>
             </div>
-
             <div style={{ marginBottom: 20 }}>
               <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#718096', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.5px' }}>Reason (Optional)</label>
               <textarea value={leaveForm.reason} onChange={e => setLeaveForm(p => ({ ...p, reason: e.target.value }))}
                 placeholder="Reason for leave..."
                 style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', minHeight: 70, resize: 'vertical', boxSizing: 'border-box' }} />
             </div>
-
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setShowLeaveModal(false)}
                 style={{ flex: 1, padding: '11px', background: '#F1F5F9', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#64748b', cursor: 'pointer', fontFamily: 'inherit' }}>
@@ -828,8 +822,6 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
           </div>
         </div>
       )}
-
-
 
       {/* ADD TASK MODAL */}
       {showAddTaskModal && (

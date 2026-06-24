@@ -963,7 +963,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const [filterMode, setFilterMode] = useState("all");
 
   const [activeClientId, setActiveClientId] = useState(null);
-
+  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
 
   const [editClient, setEditClient] = useState(null);
@@ -1017,8 +1017,18 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
   useEffect(() => {
-    if (!activeClientId && filtered.length > 0) setActiveClientId(filtered[0]._id);
-  }, [clients]);
+    if (clients !== undefined) {
+      setIsLoading(false);
+    }
+    if (filtered.length > 0) {
+      if (!activeClientId) {
+        setActiveClientId(filtered[0]._id);
+      } else {
+        const still = filtered.find(c => c._id === activeClientId);
+        if (!still) setActiveClientId(filtered[0]._id);
+      }
+    }
+  }, [clients, search, filterMode]);
 
   // Restore exact client active before navigating to create/edit project
   useEffect(() => {
@@ -1947,6 +1957,18 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
 
+  if (isLoading) {
+    return (
+      <div style={{ display: "flex", height: "100%", alignItems: "center", justifyContent: "center", background: "#F5FAFA" }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ width: 48, height: 48, border: "4px solid #E0EEF0", borderTop: "4px solid #00BCD4", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
+          <div style={{ fontSize: 14, fontWeight: 700, color: "#A0B8BE" }}>Loading clients...</div>
+        </div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
   return (
 
     <div style={{ display: "flex", height: "100%", overflow: "hidden", background: "#F5FAFA" }}>
@@ -2223,21 +2245,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
         </div>
 
-      ) : (
-
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}>
-
-          <div style={{ width: 56, height: 56, borderRadius: 14, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#00BCD4" }}></div>
-
-          <div style={{ fontSize: 15, fontWeight: 800, color: "#1A2E35" }}>Select a Client</div>
-
-          <div style={{ fontSize: 12, color: "#A0B8BE" }}>Choose a client from the list to view details</div>
-
-          <button onClick={onAddClient} style={{ padding: "9px 20px", background: "#00BCD4", border: "none", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", marginTop: 8 }}>+ Add First Client</button>
-
-        </div>
-
-      )}
+      ) : null}
 
 
 
@@ -9070,21 +9078,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
               {/* Dynamic Action Buttons based on validActive */}
-
               {validActive === "clients" && (
-
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-
-                  {subscription && (
-
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)" }}>
-
-                      {clients.length} / {getSubscriptionLimit("client") === Infinity ? "Unlimited" : getSubscriptionLimit("client")} Used
-
-                    </span>
-
-                  )}
-
                   <button
 
                     className="create-btn"

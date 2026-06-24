@@ -1627,6 +1627,75 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     ))}
                   </div>
 
+                  {/* ACTIVE TAB CONTENT AT TOP (non-inv tabs) */}
+                  {activePayTab !== 'inv' && (() => {
+                    const activeSection = [
+                      { key: 'adv', label: 'Advance Payments', btnLabel: 'New Advance', icon: 'ti-pig-money', color: '#8B5CF6', modal: 'showAdvance' },
+                      { key: 'add', label: 'Additional Charges', btnLabel: 'Additional Charge', icon: 'ti-circle-plus', color: '#F97316', modal: 'showAdditional' },
+                      { key: 'mile', label: 'Milestone Payments', btnLabel: 'New Milestone', icon: 'ti-flag', color: '#F59E0B', modal: 'showMilestonePayment' },
+                      { key: 'pay', label: 'Payments Received', btnLabel: 'Record Payment', icon: 'ti-credit-card', color: '#22C55E', modal: 'showPayment' },
+                      { key: 'exp', label: 'Expenses', btnLabel: 'Add Expense', icon: 'ti-receipt', color: '#6B7280', modal: 'showExpense' },
+                    ].find(s => s.key === activePayTab);
+                    if (!activeSection) return null;
+                    const arrayKeyMap = { pay: 'paymentsReceived', adv: 'advances', add: 'additionalCharges', mile: 'milestonePayments', exp: 'expenses' };
+                    const arrayName = arrayKeyMap[activePayTab];
+                    const records = currProject[arrayName] || [];
+                    return (
+                      <div style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>
+                            <i className={`ti ${activeSection.icon}`} style={{ color: activeSection.color, fontSize: 15 }}></i>
+                            {activeSection.label}
+                            <span style={{ background: `${activeSection.color}18`, color: activeSection.color, fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{records.length}</span>
+                          </div>
+                          <button
+                            onClick={() => setPaymentModalsState(prev => ({ ...prev, [activeSection.modal]: true }))}
+                            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                            <i className={`ti ${activeSection.icon}`} style={{ fontSize: 13 }}></i> + {activeSection.btnLabel}
+                          </button>
+                        </div>
+                        {records.length === 0 ? (
+                          <div style={{ padding: '32px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
+                            <i className={`ti ${activeSection.icon}`} style={{ fontSize: 32, display: 'block', marginBottom: 10, opacity: .3, color: activeSection.color }}></i>
+                            No {activeSection.label.toLowerCase()} recorded yet.
+                          </div>
+                        ) : (
+                          <div style={{ overflowX: 'auto' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
+                              <thead>
+                                <tr style={{ background: '#F8FAFC' }}>
+                                  {activePayTab === 'pay' && ['Payment #', 'Linked Invoice', 'Amount', 'Due Date', 'Payment Date', 'Mode', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}
+                                  {activePayTab === 'adv' && ['Advance #', 'Description', 'Amount', 'Date', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}
+                                  {activePayTab === 'add' && ['Charge #', 'Description', 'Amount', 'Date', 'Category', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}
+                                  {activePayTab === 'mile' && ['Milestone #', 'Name', 'Amount', 'Due Date', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}
+                                  {activePayTab === 'exp' && ['Expense #', 'Description', 'Amount', 'Date', 'Category', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {records.map((rec, i) => (
+                                  <tr key={i} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                                    <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.paymentNo || rec.advanceNo || rec.chargeNo || rec.milestoneNo || rec.expenseNo || `#${i + 1}`}</td>
+                                    <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: activePayTab === 'pay' ? '#00BCD4' : '#374151' }}>{activePayTab === 'pay' ? (rec.linkedInvoice || '—') : (rec.description || rec.name || '—')}</td>
+                                    <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
+                                    <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{(rec.paymentDate || rec.dateReceived || rec.date) ? new Date(rec.paymentDate || rec.dateReceived || rec.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                                    {(activePayTab === 'add' || activePayTab === 'exp') && <td style={{ padding: '12px 14px' }}><span style={{ background: '#FFEDD5', color: '#C2410C', borderRadius: 20, padding: '3px 9px', fontSize: 11, fontWeight: 800 }}>{rec.category || 'Other'}</span></td>}
+                                    <td style={{ padding: '12px 14px' }}><span style={{ background: rec.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: rec.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.status || rec.paymentMode || 'Pending'}</span></td>
+                                    <td style={{ padding: '12px 14px' }}>
+                                      <div style={{ display: 'flex', gap: 4 }}>
+                                        <button onClick={() => { const modalMap = { pay: 'showPayment', adv: 'showAdvance', add: 'showAdditional', mile: 'showMilestonePayment', exp: 'showExpense' }; setPaymentModalsState(prev => ({ ...prev, [modalMap[activePayTab]]: true, editData: rec, editIndex: i })); }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+                                        <button onClick={() => handleDeleteRecord(arrayName, i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+
                   {/* INVOICE TABLE */}
                   <div data-paytab="inv" style={{ display: activePayTab === 'inv' ? 'block' : 'none', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
@@ -1925,7 +1994,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   </div>
                   {/* ALL SECTIONS ALWAYS VISIBLE */}
                   {[
-                    { key: 'inv', label: 'Invoices', icon: 'ti-file-invoice', color: '#3B82F6' },
+                    ...(activePayTab !== 'inv' ? [{ key: 'inv', label: 'Invoices', icon: 'ti-file-invoice', color: '#3B82F6' }] : []),
                     { key: 'adv', label: 'Advance Payments', icon: 'ti-pig-money', color: '#8B5CF6' },
                     { key: 'add', label: 'Additional Charges', icon: 'ti-circle-plus', color: '#F97316' },
                     { key: 'mile', label: 'Milestone Payments', icon: 'ti-flag', color: '#F59E0B' },

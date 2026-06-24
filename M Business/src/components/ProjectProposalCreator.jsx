@@ -1125,7 +1125,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   // correct doc has been loaded from the API (fixes the blank-editor flash when
   // navigating via ?edit= or ?view= URL params before data is ready).
   const [view, setView] = useState("list");    // list | editor
-  const [proposals, setProposals] = useState([]);
+  const [proposals, setProposals] = useState(() => load());
   const [doc, setDoc] = useState(null);
   // True when we arrived via ?edit= or ?view= URL param and are waiting for the
   // proposal data to load — prevents the list from flickering before the editor opens.
@@ -1174,7 +1174,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   const [toast, setToast] = useState(null);
   const [rejectModal, setRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
-  const [loading, setLoading] = useState(true);     // loading state for proposals
+  const [loading, setLoading] = useState(false);     // loading state for proposals// loading state for proposals
   const [search, setSearch] = useState("");
   const [showResizeMenu, setShowResizeMenu] = useState(false);
   const [isViewMode, setIsViewMode] = useState(new URLSearchParams(window.location.search).get("view") !== null);  // true when ?view= is in URL (client view)
@@ -1264,7 +1264,6 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   };
 
   const fetchProposals = async () => {
-    setLoading(true);
     try {
       console.log(" Fetching proposals from backend...");
       const res = await axios.get(`${BASE_URL}/api/proposals`);
@@ -1272,6 +1271,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
       const list = res.data || [];
       setProposals(list);
+      save(list);
 
       if (list.length > 0) {
         console.log("Proposals loaded successfully");
@@ -1319,7 +1319,6 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
         setProposals([]);
       }
     } finally {
-      setLoading(false);
     }
   };
 
@@ -1584,27 +1583,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
   // ══ LIST VIEW --------------------------------------------------------------
 
-  // While loading, show a full-screen spinner so the list never flickers into view.
-  if (loading) {
-    return (
-      <div style={{
-        position: "fixed", inset: 0, display: "flex", flexDirection: "column",
-        alignItems: "center", justifyContent: "center",
-        background: "var(--bg, #F5FAFA)", zIndex: 9999, gap: 18
-      }}>
-        <div style={{
-          width: 52, height: 52, borderRadius: "50%",
-          border: "4px solid var(--app-border, #E0EEF0)",
-          borderTopColor: "var(--app-accent, #00BCD4)",
-          animation: "spin 0.7s linear infinite"
-        }} />
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-        <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-muted, #96B0B8)" }}>
-          {isUrlNavigation ? "Opening proposal…" : "Loading proposals…"}
-        </div>
-      </div>
-    );
-  }
+
 
   if (view === "list") {
     const total = proposals.length;

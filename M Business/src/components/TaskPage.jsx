@@ -1518,7 +1518,14 @@ function ProjectCell({ task, projects, onField }) {
         alignItems: "center",
         gap: 6
       }}>
-
+        {project ? (
+          <>
+            <span style={{ fontSize: 13 }}>📁</span>
+            <span>{project.name}</span>
+          </>
+        ) : (
+          <span style={{ fontSize: 11, opacity: 0.5 }}>No project</span>
+        )}
       </div>
 
       {/* Show only if open is true */}
@@ -2470,24 +2477,15 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
         if (String(tProjId) !== String(selectedProjectId)) return false;
       } else if (selectedProjectName) {
         if (String(tProjId) !== String(selectedProjectName)) return false;
-      } else {
-        // No project selected (General Dashboard) -> Hide ALL tasks that belong to ANY project
-        if (hasProject) return false;
       }
+      // No project selected → show ALL tasks (no hiding)
 
       if (filters.owner.size > 0 && !filters.owner.has(t.assignTo || "")) return false;
       if (filters.status.size > 0 && !filters.status.has(t.status)) return false;
       if (search && !t.title?.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     }))
-  })).filter((g, i) => {
-    // If no project selected, hide empty groups to keep the board clean
-    if (!selectedProjectId && !selectedProjectName) {
-      return g.tasks.length > 0 || i === 0;
-    }
-    // If project selected, show groups that have tasks for this project
-    return g.tasks.length > 0;
-  });
+  })).filter(g => g.tasks.length > 0);
 
   let displayGroups;
   if (groupBy === "default") {
@@ -2504,7 +2502,41 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
         tasks: allTasks
       }];
     } else {
-      displayGroups = filteredGroups.map(g => ({ ...g, isVirtual: false }));
+      // Group all tasks by their project name for the "All Projects" dashboard
+      const allTasks = filteredGroups.flatMap(g => g.tasks);
+      const noProjectTasks = allTasks.filter(t => {
+        const tid = t.projectId?._id || t.projectId || t.project;
+        return !tid || String(tid).trim() === "" || tid === "null" || tid === "undefined";
+      });
+      const projectGroups = projects
+        .map(p => ({
+          _id: p._id || p.id,
+          label: p.name,
+          color: P.accent,
+          open: true,
+          isVirtual: true,
+          tasks: allTasks.filter(t => {
+            const tid = t.projectId?._id || t.projectId || t.project;
+            return String(tid) === String(p._id || p.id);
+          })
+        }))
+        .filter(g => g.tasks.length > 0);
+
+      displayGroups = [
+        ...projectGroups,
+        ...(noProjectTasks.length > 0 ? [{
+          _id: "no-project",
+          label: "General Tasks",
+          color: P.mid,
+          open: true,
+          isVirtual: true,
+          tasks: noProjectTasks
+        }] : [])
+      ];
+
+      if (displayGroups.length === 0) {
+        displayGroups = filteredGroups.map(g => ({ ...g, isVirtual: false }));
+      }
     }
   }
   else { const all = filteredGroups.flatMap(g => g.tasks || []); if (groupBy === "status") { displayGroups = STATUS_LIST.map(s => ({ _id: "v" + s, label: s, color: STATUS_CFG[s].bg, open: true, isVirtual: true, tasks: all.filter(t => t.status === s) })).filter(g => g.tasks.length > 0); } else { const today = new Date(); today.setHours(0, 0, 0, 0); const nw = new Date(today); nw.setDate(nw.getDate() + 7); displayGroups = [{ _id: "vov", label: "Overdue", color: "#e2445c", open: true, isVirtual: true, tasks: all.filter(t => { const d = new Date(t.date); return !isNaN(d) && d < today && t.status !== "Done"; }) }, { _id: "vto", label: "Today", color: "#fdab3d", open: true, isVirtual: true, tasks: all.filter(t => { const d = new Date(t.date); d.setHours(0, 0, 0, 0); return !isNaN(d) && d.getTime() === today.getTime(); }) }, { _id: "vwk", label: "This Week", color: P.accent, open: true, isVirtual: true, tasks: all.filter(t => { const d = new Date(t.date); return !isNaN(d) && d > today && d < nw; }) }, { _id: "vla", label: "Later", color: P.mid, open: true, isVirtual: true, tasks: all.filter(t => { const d = new Date(t.date); return !isNaN(d) && d >= nw; }) }, { _id: "vnd", label: "No date", color: "#c4b5fd", open: true, isVirtual: true, tasks: all.filter(t => !t.date || isNaN(new Date(t.date))) }].filter(g => g.tasks.length > 0); } }

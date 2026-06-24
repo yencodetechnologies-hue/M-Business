@@ -963,7 +963,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const [filterMode, setFilterMode] = useState("all");
 
   const [activeClientId, setActiveClientId] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
 
   const [editClient, setEditClient] = useState(null);
@@ -1959,17 +1959,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
 
-  if (isLoading) {
-    return (
-      <div style={{ display: "flex", height: "100%", alignItems: "center", justifyContent: "center", background: "#F5FAFA" }}>
-        <div style={{ textAlign: "center" }}>
-          <div style={{ width: 48, height: 48, border: "4px solid #E0EEF0", borderTop: "4px solid #00BCD4", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
-          <div style={{ fontSize: 14, fontWeight: 700, color: "#A0B8BE" }}>Loading clients...</div>
-        </div>
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      </div>
-    );
-  }
+
 
   return (
 

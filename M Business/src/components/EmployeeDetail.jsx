@@ -517,9 +517,29 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         <div className="ed-card">
           <div className="ed-card-header">
             <div className="ed-card-title"><i className="ti ti-calendar-event"></i> Leave Requests</div>
-            <span style={{ fontSize: "11px", fontWeight: "700", color: "var(--text-muted)" }}>
-              {(emp.leaveRequests || []).filter(l => l.status === 'pending').length} pending
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: "11px", fontWeight: "700", color: "var(--text-muted)" }}>
+                {(emp.leaveRequests || []).filter(l => l.status === 'pending').length} pending
+              </span>
+              <button
+                className="ed-btn"
+                style={{ padding: "5px 12px", fontSize: "11px", borderRadius: "8px", background: "var(--teal)", color: "#fff", border: "none", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}
+                onClick={() => {
+                  const type = prompt("Leave type (e.g. Sick, Casual, Annual):");
+                  if (!type) return;
+                  const startDate = prompt("Start date (YYYY-MM-DD):");
+                  if (!startDate) return;
+                  const endDate = prompt("End date (YYYY-MM-DD, or same as start):") || startDate;
+                  const newLeave = { type, startDate, endDate, status: "pending" };
+                  const updated = [...(emp.leaveRequests || []), newLeave];
+                  if (typeof onEdit === "function") {
+                    onEdit({ ...emp, leaveRequests: updated });
+                  }
+                }}
+              >
+                <i className="ti ti-plus" style={{ fontSize: 12 }}></i> Add Leave
+              </button>
+            </div>
           </div>
           {(emp.leaveRequests || []).length === 0 ? (
             <div className="ed-empty"><i className="ti ti-calendar-off" style={{ fontSize: 24, display: 'block', marginBottom: 8 }}></i>No leave requests</div>

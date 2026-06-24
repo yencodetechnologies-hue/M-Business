@@ -710,48 +710,36 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
     return doc;
   };
-
   const triggerPDFShare = async (entry, type) => {
-    // Generate directly from data — NO page navigation, NO DOM needed, NO waiting
-    showToast("Generating PDF...");
-    try {
-      const doc = buildPDFFromData(entry);
-      const fileName = `Quotation_${entry.quoteNo || "QUO"}.pdf`;
-      const qtData = entry.qt || {};
-      const entryItems = entry.items || items || [];
-      const entryTotal = entryItems.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity || i.qty) || 0), 0);
-      const text = `*${qtData.fromCompany || qtData.companyName || "Your Business"}*\n\nQuotation: ${entry.quoteNo}\nTotal: ₹${entryTotal.toLocaleString("en-IN")}`;
-
-      if (type === "print") {
-        // Open in browser PDF viewer with print dialog ready
-        doc.autoPrint();
-        const blobURL = doc.output("bloburl");
-        window.open(blobURL, "_blank");
-        showToast("PDF opened!");
-        return;
-      }
-
-      if (type === "wa") {
-        const blob = doc.output("blob");
-        const file = new File([blob], fileName, { type: "application/pdf" });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({ title: `Quotation ${entry.quoteNo}`, text, files: [file] });
-        } else {
-          doc.save(fileName);
-          showToast("PDF downloaded! Attach it in WhatsApp.");
-          window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
-        }
-        return;
-      }
-
-      // default — direct download, no page change
-      doc.save(fileName);
-      showToast("PDF downloaded!");
-    } catch (err) {
-      console.error("PDF error:", err);
-      showToast("Failed to generate PDF.");
-    }
+    const qtData = entry.qt || qt;
+    const entryItems = entry.items || items || [];
+    const slimPayload = {
+      no: qtData.quoteNo || entry.quoteNo,
+      date: qtData.date || qtData.quoteDate,
+      exp: qtData.expiryDate,
+      co: qtData.companyName || qtData.fromCompany,
+      email: qtData.companyEmail || qtData.fromEmail,
+      phone: qtData.companyPhone || qtData.fromPhone,
+      addr: qtData.companyAddress,
+      cl: qtData.client || qtData.toName,
+      proj: qtData.project || qtData.title,
+      gst: qtData.gstRate,
+      notes: qtData.notes,
+      terms: qtData.terms,
+      incGst: qtData.isGstIncluded,
+      paid: qtData.amountPaid,
+      upi: qtData.upiId,
+      cur: qtData.currency,
+      logo: qtData.logoUrl || "",
+      items: entryItems.map(i => ({ d: i.description || i.desc, q: i.quantity || i.qty, r: i.rate })),
+      cid: user?.companyId || user?.company || user?._id || "",
+    };
+    const encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload)))));
+    const viewURL = `${FRONTEND_URL}/quotation-view?d=${encoded}&print=1`;
+    window.open(viewURL, "_blank");
+    showToast("Opening quotation — click Print / Save PDF to download.");
   };
+
   const shareQuotation = async (entry) => {
     // Build the shareable public URL for this quotation
     const qtData = entry.qt || qt;

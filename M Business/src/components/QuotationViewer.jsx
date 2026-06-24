@@ -35,6 +35,18 @@ export default function QuotationViewer() {
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
 
+  // Auto-trigger print if ?print=1 is in URL (called from PDF button)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("print") === "1") {
+      const timer = setTimeout(() => {
+        // Trigger the clean print button click instead of window.print()
+        document.querySelector(".action-btn")?.click();
+      }, 1400);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
@@ -126,7 +138,7 @@ export default function QuotationViewer() {
         * { box-sizing: border-box; }
         .qt-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(5,150,105,0.15); overflow: hidden; display: flex; flex-direction: column; }
         @media print {
-          @page { size: A4 portrait; margin: 10mm; }
+          @page { size: A4 portrait; margin: 0 !important; }
           html, body { margin: 0 !important; padding: 0 !important; background: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           .no-print, .no-print * { display: none !important; }
           .qt-paper { position: static !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; display: block !important; overflow: visible !important; }
@@ -138,7 +150,47 @@ export default function QuotationViewer() {
       `}</style>
 
       <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
-        <button className="action-btn" onClick={() => window.print()}
+        <button className="action-btn" onClick={() => {
+          const printWin = window.open("", "_blank", "width=900,height=700");
+          if (!printWin) { window.print(); return; }
+          const html = document.querySelector(".qt-paper")?.outerHTML || "";
+          const styles = Array.from(document.styleSheets)
+            .map(s => { try { return Array.from(s.cssRules).map(r => r.cssText).join("\n"); } catch { return ""; } })
+            .join("\n");
+          printWin.document.write(`<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fff; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+@page { size: A4 portrait; margin: 0 !important; }
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body { margin: 0 !important; padding: 0 !important; }
+}
+.qt-paper { max-width: 100% !important; width: 210mm !important; margin: 0 auto !important; background: #fff !important; border-radius: 0 !important; box-shadow: none !important; display: flex !important; flex-direction: column !important; overflow: visible !important; }
+.qt-table-wrap { overflow: visible !important; }
+.no-print { display: none !important; }
+${styles}
+</style>
+</head>
+<body>
+${html}
+<script>
+window.onload = function() {
+  setTimeout(function() {
+    window.focus();
+    window.print();
+    setTimeout(function() { window.close(); }, 1000);
+  }, 600);
+};
+<\/script>
+</body>
+</html>`);
+          printWin.document.close();
+        }}
           style={{ padding: "10px 22px", background: "linear-gradient(135deg,#059669,#065f46)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>
           Print / Save PDF
         </button>

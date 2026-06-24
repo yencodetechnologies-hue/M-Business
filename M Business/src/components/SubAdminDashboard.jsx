@@ -954,7 +954,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 
 
 
-function ClientsPage({ clients, setClients, projects = [], setProjects, onAddClient, onViewProject, triggerCrop, onCreateProject, user, activeClientIdForReturn, onActiveClientIdRestored, newClientId, onNewClientShown }) {
+function ClientsPage({ clients, setClients, projects = [], setProjects, onAddClient, onViewProject, triggerCrop, onCreateProject, user, activeClientIdForReturn, onActiveClientIdRestored, newClientId, onNewClientShown, isFetching }) {
 
   const mainScrollRef = useRef(null);
 
@@ -1017,7 +1017,9 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
   useEffect(() => {
-    if (clients !== undefined) {
+    if (isFetching !== undefined) {
+      setIsLoading(isFetching);
+    } else if (clients !== undefined) {
       setIsLoading(false);
     }
     if (filtered.length > 0) {
@@ -10643,7 +10645,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client) => { setClients(prev => [...prev, client]); setPendingNewClientId(client._id); setActive("clients"); }} user={user} />}
 
-            {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
+            {validActive === "clients" && <ClientsPage isFetching={isLoading} clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 

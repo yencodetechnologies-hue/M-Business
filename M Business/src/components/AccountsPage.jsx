@@ -424,6 +424,10 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
   const [form, setForm] = useState({ title: "", category: "Office", expenseType: "Operational", paymentMode: "Cash", amount: "", status: "Pending" });
   const [toast, setToast] = useState("");
   const [saving, setSaving] = useState(false);
+  const [viewItem, setViewItem] = useState(null);
+  const [editItem, setEditItem] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [deleting, setDeleting] = useState(null);
 
   const save = async () => {
     if (!form.title || !form.amount) return alert("Please fill required fields");
@@ -431,12 +435,45 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
     try {
       const res = await axios.post(EXPENSES_API, { ...form, amount: Number(form.amount) });
       setExpenses(prev => [res.data, ...prev]);
-      setToast("Success Expense Added!");
+      setToast("✅ Expense Added!");
       setModal(null);
+      setForm({ title: "", category: "Office", expenseType: "Operational", paymentMode: "Cash", amount: "", status: "Pending" });
       setTimeout(() => setToast(""), 3000);
     } catch (e) {
       alert("Save failed");
     } finally { setSaving(false); }
+  };
+
+  const openEdit = (e) => {
+    setEditItem(e);
+    setEditForm({ title: e.title, category: e.category, expenseType: e.expenseType || "Operational", paymentMode: e.paymentMode || "Cash", amount: e.amount, status: e.status || "Pending" });
+  };
+
+  const saveEdit = async () => {
+    if (!editForm.title || !editForm.amount) return alert("Please fill required fields");
+    setSaving(true);
+    try {
+      const res = await axios.put(`${EXPENSES_API}/${editItem._id}`, { ...editForm, amount: Number(editForm.amount) });
+      setExpenses(prev => prev.map(x => x._id === editItem._id ? res.data : x));
+      setToast("✅ Expense Updated!");
+      setEditItem(null);
+      setTimeout(() => setToast(""), 3000);
+    } catch (e) {
+      alert("Update failed");
+    } finally { setSaving(false); }
+  };
+
+  const handleDelete = async (exp) => {
+    if (!window.confirm(`Delete expense "${exp.title}"? This cannot be undone.`)) return;
+    setDeleting(exp._id);
+    try {
+      await axios.delete(`${EXPENSES_API}/${exp._id}`);
+      setExpenses(prev => prev.filter(x => x._id !== exp._id));
+      setToast("🗑️ Expense Deleted");
+      setTimeout(() => setToast(""), 3000);
+    } catch (e) {
+      alert("Delete failed");
+    } finally { setDeleting(null); }
   };
 
   return (
@@ -593,7 +630,11 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
                       <td>{new Date(e.createdAt || e.date).toLocaleDateString()}</td>
                       <td><span className={`badge ${e.status === "Approved" ? "approved" : e.status === "Pending" ? "pending" : e.status === "Rejected" ? "rejected" : "draft"}`}>{e.status || "Pending"}</span></td>
                       <td className="amount-neg">-{formatCurrency(e.amount)}</td>
-                      <td><div className="row-actions"><button className="row-btn"><i className="ti ti-pencil"></i></button><button className="row-btn danger"><i className="ti ti-trash"></i></button></div></td>
+                      <td><div className="row-actions">
+                        <button className="row-btn" title="View" onClick={() => setViewItem(e)}><i className="ti ti-eye"></i></button>
+                        <button className="row-btn" title="Edit" onClick={() => openEdit(e)}><i className="ti ti-pencil"></i></button>
+                        <button className="row-btn danger" title="Delete" disabled={deleting === e._id} onClick={() => handleDelete(e)}><i className={deleting === e._id ? "ti ti-loader-2" : "ti ti-trash"}></i></button>
+                      </div></td>
                     </tr>
                   ))}
                 </tbody>
@@ -673,9 +714,48 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
         <Modal THEME={THEME} title="Add Expense" onClose={() => setModal(null)}>
           <Fld THEME={THEME} label="Title" value={form.title} onChange={v => setForm({ ...form, title: v })} placeholder="e.g. Server Hosting" />
           <Fld THEME={THEME} label="Category" value={form.category} onChange={v => setForm({ ...form, category: v })} options={CATEGORIES} />
+          <Fld THEME={THEME} label="Expense Type" value={form.expenseType} onChange={v => setForm({ ...form, expenseType: v })} options={["Operational", "Vendor", "Salary", "Capital", "Other"]} />
+          <Fld THEME={THEME} label="Payment Mode" value={form.paymentMode} onChange={v => setForm({ ...form, paymentMode: v })} options={["Cash", "Bank Transfer", "UPI", "Card", "Cheque"]} />
+          <Fld THEME={THEME} label="Status" value={form.status} onChange={v => setForm({ ...form, status: v })} options={["Pending", "Approved", "Rejected"]} />
           <Fld THEME={THEME} label="Amount" type="number" value={form.amount} onChange={v => setForm({ ...form, amount: v })} prefix="₹" />
           <button onClick={save} disabled={saving} style={{ width: "100%", padding: 18, borderRadius: 16, background: THEME.accent, color: "#fff", border: "none", fontWeight: 900, marginTop: 12, cursor: "pointer", fontSize: 16, boxShadow: `0 10px 20px ${THEME.accent}40` }}>
             {saving ? "Processing..." : "Save Expense Entry"}
+          </button>
+        </Modal>
+      )}
+
+      {/* VIEW MODAL */}
+      {viewItem && (
+        <Modal THEME={THEME} title="Expense Details" onClose={() => setViewItem(null)}>
+          {[
+            ["Title", viewItem.title],
+            ["Category", viewItem.category],
+            ["Type", viewItem.expenseType],
+            ["Payment Mode", viewItem.paymentMode],
+            ["Status", viewItem.status],
+            ["Amount", formatCurrency(viewItem.amount)],
+            ["Date", new Date(viewItem.createdAt || viewItem.date).toLocaleDateString()],
+          ].map(([label, val]) => (
+            <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--app-border)", fontSize: 13 }}>
+              <span style={{ fontWeight: 700, color: "var(--app-muted)" }}>{label}</span>
+              <span style={{ fontWeight: 600, color: "var(--app-sidebar)" }}>{val || "—"}</span>
+            </div>
+          ))}
+          <button onClick={() => { setViewItem(null); openEdit(viewItem); }} style={{ width: "100%", padding: 14, borderRadius: 12, background: THEME.accent, color: "#fff", border: "none", fontWeight: 800, marginTop: 16, cursor: "pointer", fontSize: 14 }}>Edit This Expense</button>
+        </Modal>
+      )}
+
+      {/* EDIT MODAL */}
+      {editItem && (
+        <Modal THEME={THEME} title="Edit Expense" onClose={() => setEditItem(null)}>
+          <Fld THEME={THEME} label="Title" value={editForm.title} onChange={v => setEditForm({ ...editForm, title: v })} />
+          <Fld THEME={THEME} label="Category" value={editForm.category} onChange={v => setEditForm({ ...editForm, category: v })} options={CATEGORIES} />
+          <Fld THEME={THEME} label="Expense Type" value={editForm.expenseType} onChange={v => setEditForm({ ...editForm, expenseType: v })} options={["Operational", "Vendor", "Salary", "Capital", "Other"]} />
+          <Fld THEME={THEME} label="Payment Mode" value={editForm.paymentMode} onChange={v => setEditForm({ ...editForm, paymentMode: v })} options={["Cash", "Bank Transfer", "UPI", "Card", "Cheque"]} />
+          <Fld THEME={THEME} label="Status" value={editForm.status} onChange={v => setEditForm({ ...editForm, status: v })} options={["Pending", "Approved", "Rejected"]} />
+          <Fld THEME={THEME} label="Amount" type="number" value={editForm.amount} onChange={v => setEditForm({ ...editForm, amount: v })} prefix="₹" />
+          <button onClick={saveEdit} disabled={saving} style={{ width: "100%", padding: 18, borderRadius: 16, background: THEME.accent, color: "#fff", border: "none", fontWeight: 900, marginTop: 12, cursor: "pointer", fontSize: 16, boxShadow: `0 10px 20px ${THEME.accent}40` }}>
+            {saving ? "Updating..." : "Update Expense"}
           </button>
         </Modal>
       )}
@@ -689,6 +769,11 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
   const [form, setForm] = useState({ title: "", client: "", amount: "", category: "Project Payment", status: "Received" });
   const [clients, setClients] = useState([]);
   const [toast, setToast] = useState("");
+  const [viewItem, setViewItem] = useState(null);
+  const [editItem, setEditItem] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(null);
 
   useEffect(() => {
     axios.get(`${BASE_URL}/api/clients`).then(r => setClients(r.data));
@@ -696,13 +781,46 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
 
   const save = async () => {
     if (!form.client || !form.amount) return alert("Fill required fields");
+    setSaving(true);
     try {
       const res = await axios.post(INCOME_API, { ...form, amount: Number(form.amount) });
       setIncome(prev => [res.data, ...prev]);
-      setToast("Success Income Recorded!");
+      setToast("✅ Income Recorded!");
       setModal(null);
+      setForm({ title: "", client: "", amount: "", category: "Project Payment", status: "Received" });
       setTimeout(() => setToast(""), 3000);
     } catch (e) { alert("Failed to save"); }
+    finally { setSaving(false); }
+  };
+
+  const openEdit = (inc) => {
+    setEditItem(inc);
+    setEditForm({ title: inc.title, client: inc.client, amount: inc.amount, category: inc.category || "Project Payment", status: inc.status || "Received", paymentMode: inc.paymentMode || "Bank Transfer" });
+  };
+
+  const saveEdit = async () => {
+    if (!editForm.client || !editForm.amount) return alert("Fill required fields");
+    setSaving(true);
+    try {
+      const res = await axios.put(`${INCOME_API}/${editItem._id}`, { ...editForm, amount: Number(editForm.amount) });
+      setIncome(prev => prev.map(x => x._id === editItem._id ? res.data : x));
+      setToast("✅ Payment Updated!");
+      setEditItem(null);
+      setTimeout(() => setToast(""), 3000);
+    } catch (e) { alert("Update failed"); }
+    finally { setSaving(false); }
+  };
+
+  const handleDelete = async (inc) => {
+    if (!window.confirm(`Delete payment "${inc.title || inc.client}"? This cannot be undone.`)) return;
+    setDeleting(inc._id);
+    try {
+      await axios.delete(`${INCOME_API}/${inc._id}`);
+      setIncome(prev => prev.filter(x => x._id !== inc._id));
+      setToast("🗑️ Payment Deleted");
+      setTimeout(() => setToast(""), 3000);
+    } catch (e) { alert("Delete failed"); }
+    finally { setDeleting(null); }
   };
 
   return (
@@ -891,7 +1009,11 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
                     <td style={{ fontSize: 11, color: "var(--text3)", fontFamily: "monospace" }}>{inc._id ? inc._id.substring(0, 8).toUpperCase() : "TXN—"}</td>
                     <td><span className={`badge ${inc.status === "Pending" ? "pending" : "received"}`}>{inc.status || "Received"}</span></td>
                     <td className="amount-pos">+{formatCurrency(inc.amount)}</td>
-                    <td><div className="row-actions"><button className="row-btn"><i className="ti ti-eye"></i></button><button className="row-btn"><i className="ti ti-download"></i></button></div></td>
+                    <td><div className="row-actions">
+                      <button className="row-btn" title="View" onClick={() => setViewItem(inc)}><i className="ti ti-eye"></i></button>
+                      <button className="row-btn" title="Edit" onClick={() => openEdit(inc)}><i className="ti ti-pencil"></i></button>
+                      <button className="row-btn danger" title="Delete" disabled={deleting === inc._id} onClick={() => handleDelete(inc)}><i className={deleting === inc._id ? "ti ti-loader-2" : "ti ti-trash"}></i></button>
+                    </div></td>
                   </tr>
                 ))}
               </tbody>
@@ -973,8 +1095,51 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
             <ClientDropdown THEME={THEME} clients={clients} value={form.client} onChange={v => setForm({ ...form, client: v })} />
           </div>
           <Fld THEME={THEME} label="Payment Title" value={form.title} onChange={v => setForm({ ...form, title: v })} placeholder="e.g. Milestone 1 Payment" />
+          <Fld THEME={THEME} label="Category" value={form.category} onChange={v => setForm({ ...form, category: v })} options={["Project Payment", "Advance", "Milestone", "Final Payment", "Other"]} />
+          <Fld THEME={THEME} label="Payment Mode" value={form.paymentMode || "Bank Transfer"} onChange={v => setForm({ ...form, paymentMode: v })} options={["Bank Transfer", "UPI", "Cash", "Card", "Cheque"]} />
+          <Fld THEME={THEME} label="Status" value={form.status} onChange={v => setForm({ ...form, status: v })} options={["Received", "Pending"]} />
           <Fld THEME={THEME} label="Amount" type="number" value={form.amount} onChange={v => setForm({ ...form, amount: v })} prefix="₹" />
-          <button onClick={save} style={{ width: "100%", padding: 18, borderRadius: 16, background: THEME.accent, color: "#fff", border: "none", fontWeight: 900, marginTop: 12, cursor: "pointer", fontSize: 16, boxShadow: `0 10px 20px ${THEME.accent}40` }}>Record Payment</button>
+          <button onClick={save} disabled={saving} style={{ width: "100%", padding: 18, borderRadius: 16, background: THEME.accent, color: "#fff", border: "none", fontWeight: 900, marginTop: 12, cursor: "pointer", fontSize: 16, boxShadow: `0 10px 20px ${THEME.accent}40` }}>{saving ? "Saving..." : "Record Payment"}</button>
+        </Modal>
+      )}
+
+      {/* VIEW MODAL */}
+      {viewItem && (
+        <Modal THEME={THEME} title="Payment Details" onClose={() => setViewItem(null)}>
+          {[
+            ["Title", viewItem.title],
+            ["Client", viewItem.client],
+            ["Category", viewItem.category],
+            ["Payment Mode", viewItem.paymentMode],
+            ["Status", viewItem.status],
+            ["Amount", formatCurrency(viewItem.amount)],
+            ["Ref ID", viewItem._id ? viewItem._id.substring(0, 8).toUpperCase() : "—"],
+            ["Date", new Date(viewItem.createdAt || viewItem.date).toLocaleDateString()],
+          ].map(([label, val]) => (
+            <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--app-border)", fontSize: 13 }}>
+              <span style={{ fontWeight: 700, color: "var(--app-muted)" }}>{label}</span>
+              <span style={{ fontWeight: 600, color: "var(--app-sidebar)" }}>{val || "—"}</span>
+            </div>
+          ))}
+          <button onClick={() => { setViewItem(null); openEdit(viewItem); }} style={{ width: "100%", padding: 14, borderRadius: 12, background: THEME.accent, color: "#fff", border: "none", fontWeight: 800, marginTop: 16, cursor: "pointer", fontSize: 14 }}>Edit This Payment</button>
+        </Modal>
+      )}
+
+      {/* EDIT MODAL */}
+      {editItem && (
+        <Modal THEME={THEME} title="Edit Payment" onClose={() => setEditItem(null)}>
+          <div style={{ marginBottom: 18 }}>
+            <label style={{ display: "block", fontSize: 11, color: THEME.accent, fontWeight: 800, letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase", opacity: 0.9 }}>CLIENT</label>
+            <ClientDropdown THEME={THEME} clients={clients} value={editForm.client} onChange={v => setEditForm({ ...editForm, client: v })} />
+          </div>
+          <Fld THEME={THEME} label="Payment Title" value={editForm.title} onChange={v => setEditForm({ ...editForm, title: v })} />
+          <Fld THEME={THEME} label="Category" value={editForm.category} onChange={v => setEditForm({ ...editForm, category: v })} options={["Project Payment", "Advance", "Milestone", "Final Payment", "Other"]} />
+          <Fld THEME={THEME} label="Payment Mode" value={editForm.paymentMode} onChange={v => setEditForm({ ...editForm, paymentMode: v })} options={["Bank Transfer", "UPI", "Cash", "Card", "Cheque"]} />
+          <Fld THEME={THEME} label="Status" value={editForm.status} onChange={v => setEditForm({ ...editForm, status: v })} options={["Received", "Pending"]} />
+          <Fld THEME={THEME} label="Amount" type="number" value={editForm.amount} onChange={v => setEditForm({ ...editForm, amount: v })} prefix="₹" />
+          <button onClick={saveEdit} disabled={saving} style={{ width: "100%", padding: 18, borderRadius: 16, background: THEME.accent, color: "#fff", border: "none", fontWeight: 900, marginTop: 12, cursor: "pointer", fontSize: 16, boxShadow: `0 10px 20px ${THEME.accent}40` }}>
+            {saving ? "Updating..." : "Update Payment"}
+          </button>
         </Modal>
       )}
     </>

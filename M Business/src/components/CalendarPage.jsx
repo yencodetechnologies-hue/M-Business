@@ -344,26 +344,34 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
 
       {/* Stats Row */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20 }}>
-        {stats.map(({ t, v, c, i }) => (
-          <div key={t} style={{
-            background: finalTheme.card,
-            borderRadius: 24,
-            padding: "24px",
-            boxShadow: finalTheme.shadow || "var(--app-shadow)",
-            border: `1.5px solid ${finalTheme.border}`,
-            transition: "transform 0.3s ease"
-          }}
-            onMouseEnter={e => e.currentTarget.style.transform = "translateY(-5px)"}
-            onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}>
-            <div style={{
-              width: 44, height: 44, borderRadius: 12, background: c.startsWith('var') ? `rgba(var(--app-accent-rgb), 0.1)` : `${c}15`,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 22, marginBottom: 12, color: c
-            }}>{i}</div>
-            <div style={{ fontSize: 11, color: finalTheme.muted, fontWeight: 800, letterSpacing: 0.8, marginBottom: 4 }}>{t.toUpperCase()}</div>
-            <div style={{ fontSize: 28, fontWeight: 900, color: finalTheme.text || "var(--app-text)", letterSpacing: "-0.5px" }}>{v}</div>
-          </div>
-        ))}
+        {stats.map(({ t, v, c, i }) => {
+          const filterKey = t === "Total" ? "All" : t;
+          const isActive = filter === filterKey;
+          return (
+            <div key={t}
+              onClick={() => { setFilter(filterKey); setSelectedDate(null); }}
+              style={{
+                background: isActive ? (c.startsWith('var') ? `rgba(var(--app-accent-rgb), 0.08)` : `${c}12`) : finalTheme.card,
+                borderRadius: 24,
+                padding: "24px",
+                boxShadow: finalTheme.shadow || "var(--app-shadow)",
+                border: isActive ? `2px solid ${c}` : `1.5px solid ${finalTheme.border}`,
+                transition: "all 0.2s ease",
+                cursor: "pointer"
+              }}
+              onMouseEnter={e => e.currentTarget.style.transform = "translateY(-5px)"}
+              onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
+            >
+              <div style={{
+                width: 44, height: 44, borderRadius: 12, background: c.startsWith('var') ? `rgba(var(--app-accent-rgb), 0.1)` : `${c}15`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 22, marginBottom: 12, color: c
+              }}>{i}</div>
+              <div style={{ fontSize: 11, color: isActive ? c : finalTheme.muted, fontWeight: 800, letterSpacing: 0.8, marginBottom: 4 }}>{t.toUpperCase()}</div>
+              <div style={{ fontSize: 28, fontWeight: 900, color: isActive ? c : (finalTheme.text || "var(--app-text)"), letterSpacing: "-0.5px" }}>{v}</div>
+            </div>
+          );
+        })}
       </div>
 
       {/* ── MAIN SPLIT LAYOUT --------------------------------------- */}

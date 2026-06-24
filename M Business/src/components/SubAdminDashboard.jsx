@@ -2369,7 +2369,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             <button onClick={() => { setViewClientModal(false); openEdit(activeClient); }} style={{ padding: "9px 18px", background: "#00BCD4", border: "none", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
 
-            <button onClick={() => setViewClientModal(false)} style={{ padding: "9px 18px", background: "#F5FAFA", border: "1px solid #E0EEF0", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit" }}>Close</button>
+            <button onClick={() => setViewClientModal(false)} style={{ padding: "9px 18px", background: "#F5FAFA", border: "1px solid #E0EEF0", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit" }}>✕</button>
 
           </div>
 
@@ -2863,7 +2863,7 @@ ${onboardingLink}`;
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
 
-        <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+        <div onClick={() => setStatusFilter("All Status")} style={{ background: statusFilter === "All Status" ? "#E0F7FA" : "#fff", border: `1px solid ${statusFilter === "All Status" ? "#00BCD4" : "var(--border)"}`, borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
 
           <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "rgba(0,188,212,0.08)", color: "#00BCD4" }}><i className="ti ti-users"></i></div>
 
@@ -2871,7 +2871,7 @@ ${onboardingLink}`;
 
         </div>
 
-        <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+        <div onClick={() => setStatusFilter("Active")} style={{ background: statusFilter === "Active" ? "#dcfce7" : "#fff", border: `1px solid ${statusFilter === "Active" ? "#16a34a" : "var(--border)"}`, borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
 
           <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#dcfce7", color: "#16a34a" }}><i className="ti ti-check"></i></div>
 
@@ -2879,7 +2879,7 @@ ${onboardingLink}`;
 
         </div>
 
-        <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+        <div onClick={() => setStatusFilter("On Leave")} style={{ background: statusFilter === "On Leave" ? "#fef3c7" : "#fff", border: `1px solid ${statusFilter === "On Leave" ? "#d97706" : "var(--border)"}`, borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
 
           <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#fef3c7", color: "#d97706" }}><i className="ti ti-clock"></i></div>
 
@@ -2887,7 +2887,7 @@ ${onboardingLink}`;
 
         </div>
 
-        <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+        <div onClick={() => setStatusFilter("Inactive")} style={{ background: statusFilter === "Inactive" ? "#fee2e2" : "#fff", border: `1px solid ${statusFilter === "Inactive" ? "#dc2626" : "var(--border)"}`, borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
 
           <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#fee2e2", color: "#dc2626" }}><i className="ti ti-user-off"></i></div>
 
@@ -5612,7 +5612,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
           <div style={{ display: "flex", gap: 10 }}>
 
-            <button onClick={onClose} style={{ flex: 1, padding: "10px", background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 9, fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)", cursor: "pointer", fontFamily: "inherit" }}>Close</button>
+            <button onClick={onClose} style={{ flex: 1, padding: "10px", background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 9, fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)", cursor: "pointer", fontFamily: "inherit" }}>✕</button>
 
             <button onClick={onLogout} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>🚪 Logout</button>
 
@@ -5637,12 +5637,6 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 }
 
 
-
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-
-// SIDEBAR
-
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, companyLogo, onLogoChange, enforceMySubscriptions, onLogoUploadClick, setSelectedProjectForTasks }) {
 
@@ -7094,7 +7088,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
   const [pendingLeaves, setPendingLeaves] = useState([]);
-
+  const [showNotifPanel, setShowNotifPanel] = useState(false);
   const [employeeDocs, setEmployeeDocs] = useState([]);
 
 
@@ -7286,7 +7280,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     fetchPendingLeaves(); fetchEmployeeDocs();
 
   }, []);
-
+  // Close notification panel when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showNotifPanel && !e.target.closest('.topbar-icon')) {
+        setShowNotifPanel(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showNotifPanel]);
 
 
   // ── Listen for SEND_DOCUMENT from template designer iframe ──
@@ -9060,14 +9063,68 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <input type="text" placeholder="Search..." value={dashSearch} onChange={(e) => setDashSearch(e.target.value)} />
 
             </div>
-
             <div className="topbar-right">
 
-              <div className="topbar-icon"><i className="ti ti-bell"></i><span className="notif-dot"></span></div>
+              <div className="topbar-icon" onClick={() => { setShowNotifPanel(v => !v); fetchPendingLeaves(); }} style={{ position: 'relative', cursor: 'pointer' }}>
+                <i className="ti ti-bell"></i>
+                {pendingLeaves.length > 0 && (
+                  <span style={{ position: 'absolute', top: -4, right: -4, background: '#EF4444', color: '#fff', borderRadius: '50%', width: 16, height: 16, fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{pendingLeaves.length}</span>
+                )}
+                {showNotifPanel && (
+                  <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: 44, right: 0, width: 380, background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', border: '1px solid #E2E8F0', zIndex: 99999, overflow: 'hidden' }}>
+                    <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'linear-gradient(135deg,#00BCD4,#0097A7)' }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <i className="ti ti-bell"></i> Notifications
+                        {pendingLeaves.length > 0 && <span style={{ background: '#EF4444', color: '#fff', borderRadius: 20, padding: '2px 8px', fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length}</span>}
+                      </div>
+                      <button onClick={() => setShowNotifPanel(false)} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 26, height: 26, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                    </div>
+                    <div style={{ maxHeight: 420, overflowY: 'auto', padding: '12px 16px' }}>
+                      <div style={{ fontSize: 11, fontWeight: 800, color: '#718096', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 10 }}>
+                        <i className="ti ti-user-x" style={{ marginRight: 5, color: '#00BCD4' }}></i> Leave Requests
+                      </div>
+                      {pendingLeaves.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '20px 0', color: '#A0AEC0', fontSize: 13 }}>
+                          <i className="ti ti-bell-off" style={{ fontSize: 28, display: 'block', marginBottom: 8, opacity: 0.4 }}></i>
+                          No pending notifications
+                        </div>
+                      ) : (
+                        pendingLeaves.map((l, i) => {
+                          const initials = l.employeeName ? l.employeeName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'EE';
+                          const colors = ['#f59e0b', '#a855f7', '#0ea5e9', '#ec4899', '#22c55e'];
+                          const bg = colors[i % colors.length];
+                          const detail = `${l.type || 'Leave'} · ${l.from || ''} ${l.to ? '- ' + l.to : ''}`;
+                          return (
+                            <div key={l._id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: i === pendingLeaves.length - 1 ? 'none' : '1px solid #F0F4F8' }}>
+                              <div style={{ width: 38, height: 38, borderRadius: '50%', background: bg, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, flexShrink: 0 }}>{initials}</div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: '#1A2332' }}>{l.employeeName}</div>
+                                <div style={{ fontSize: 11, color: '#718096', marginTop: 2 }}>{detail}</div>
+                                <span style={{ display: 'inline-block', marginTop: 4, background: '#FEF3C7', color: '#D97706', borderRadius: 20, padding: '2px 8px', fontSize: 10, fontWeight: 800 }}>Pending</span>
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
+                                <button onClick={() => handleApproveLeave(l._id)} style={{ background: '#DCFCE7', color: '#166534', border: 'none', padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                  <i className="ti ti-check"></i> Approve
+                                </button>
+                                <button onClick={() => handleRejectLeave(l._id)} style={{ background: '#FEF2F2', color: '#DC2626', border: 'none', padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                  <i className="ti ti-x"></i> Reject
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                    <div style={{ padding: '12px 16px', borderTop: '1px solid #E2E8F0', textAlign: 'center' }}>
+                      <button onClick={() => setShowNotifPanel(false)} style={{ background: 'none', border: 'none', color: '#00BCD4', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               <div className="topbar-icon" onClick={() => setActive("settings")}><i className="ti ti-settings"></i></div>
-
-
 
               {/* Dynamic Action Buttons based on validActive */}
               {validActive === "clients" && (
@@ -11376,7 +11433,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 >
 
-                  Close
+                  ✕
 
                 </button>
 
@@ -11516,7 +11573,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     >
 
-                      Done & Close
+                      ✕
 
                     </button>
 
@@ -12688,7 +12745,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
 
-                  <button onClick={() => setViewPackage(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 20px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Close</button>
+                  <button onClick={() => setViewPackage(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 20px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>✕</button>
 
                 </div>
 
@@ -12968,7 +13025,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <div style={{ display: "flex", gap: 10 }}>
 
-                    <button onClick={() => setViewProject(null)} style={{ flex: 1, padding: "11px", background: "var(--app-accent-gradient)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Close</button>
+                    <button onClick={() => setViewProject(null)} style={{ flex: 1, padding: "11px", background: "var(--app-accent-gradient)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>✕</button>
 
                   </div>
 

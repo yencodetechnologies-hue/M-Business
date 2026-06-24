@@ -559,7 +559,7 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
             }}
             title="Share Link"
           >
-            
+
           </button>
           <button
             onClick={shareWhatsApp}
@@ -608,7 +608,7 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
               fontFamily: "inherit"
             }}
           >
-            Close
+            ✕
           </button>
         </div>
       </div>

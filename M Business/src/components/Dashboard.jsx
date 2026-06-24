@@ -2155,7 +2155,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 onClick={() => { setModal(null); setClientSuccessData(null); }}
                 style={{ width: "100%", background: "#fff", border: "1.5px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "12px", fontWeight: 700, cursor: "pointer" }}
               >
-                Close
+                ✕
               </button>
             </div>
           </div>

@@ -575,36 +575,35 @@ export default function ClientDashboard({ user, setUser, portalMode = false }) {
 
   const executePayment = async () => {
     if (!paymentInvoice) return;
+    const remainingAmount = paymentInvoice.total - (paymentInvoice.amountPaid || 0);
     setPaymentProcessing(true);
     try {
-      const remainingAmount = paymentInvoice.total - (paymentInvoice.amountPaid || 0);
+      const txnId = "TXN" + Math.floor(Math.random() * 1000000000);
       const res = await axios.patch(`${BASE_URL}/api/invoices/${paymentInvoice.id || paymentInvoice._id}/status`, {
         status: "paid",
         amountPaid: remainingAmount,
         paymentMode: "GPay",
         paymentDate: new Date().toISOString().split("T")[0],
-        transactionId: "TXN" + Math.floor(Math.random() * 1000000000)
+        transactionId: txnId
       });
       if (res.data?.success || res.status === 200) {
-        // Update local invoices state
         setInvoices(invoices.map(inv => {
           if (inv.id === paymentInvoice.id || inv._id === paymentInvoice._id) {
             return { ...inv, status: "paid", amountPaid: inv.total };
           }
           return inv;
         }));
-        alert("Payment of INR " + remainingAmount.toLocaleString("en-IN") + " completed successfully!");
+        setPayModalOpen(false);
+        setPaymentInvoice(null);
+        alert("✅ Payment of ₹" + remainingAmount.toLocaleString("en-IN") + " marked as paid!\nTransaction ID: " + txnId);
       }
     } catch (err) {
-      console.error("Payment failed:", err);
-      alert("Payment failed: " + (err.response?.data?.msg || err.message));
+      console.error("Payment update failed:", err);
+      alert("❌ Payment failed: " + (err.response?.data?.msg || err.message));
     } finally {
       setPaymentProcessing(false);
-      setPayModalOpen(false);
-      setPaymentInvoice(null);
     }
   };
-
   // Dynamic Calendar — uses real currentDate state
   const getCalendarDays = () => {
     const year = currentDate.getFullYear();
@@ -1130,14 +1129,8 @@ export default function ClientDashboard({ user, setUser, portalMode = false }) {
                 </span>
               )}
             </button>
-            <button className={`tn-item ${active === "payments" ? "active" : ""}`} onClick={() => setActive("payments")}>Invoices</button>
-            <button className={`tn-item ${active === "quotations" ? "active" : ""}`} onClick={() => setActive("quotations")}>
-              Quotations{quotations.length > 0 && (
-                <span style={{ background: C.teal, color: "#fff", borderRadius: 20, fontSize: 10, fontWeight: 800, padding: "1px 6px", marginLeft: 4 }}>
-                  {quotations.length}
-                </span>
-              )}
-            </button>
+
+
             <button className={`tn-item ${active === "messages" ? "active" : ""}`} onClick={() => setActive("messages")}>Messages</button>
           </div>
           <div className="tn-right">

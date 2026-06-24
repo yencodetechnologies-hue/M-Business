@@ -553,7 +553,7 @@ router.patch("/:id/status", async (req, res) => {
       invoice = await Invoice.findByIdAndUpdate(
         req.params.id,
         { ...updateData, $inc: { amountPaid: parseFloat(amountPaid) || 0 } },
-        { returnDocument: "after" }
+        { new: true }
       );
     } else {
       // Standard status update
@@ -561,7 +561,7 @@ router.patch("/:id/status", async (req, res) => {
       invoice = await Invoice.findByIdAndUpdate(
         req.params.id,
         updateData,
-        { returnDocument: "after" }
+        { new: true }
       );
     }
 
@@ -574,10 +574,14 @@ router.patch("/:id/status", async (req, res) => {
       const syncAmount = parseFloat(amountPaid);
 
       // Always create a NEW Income record for each payment action to maintain history
+      const allowedModes = ["GPay", "PhonePe", "NEFT", "RTGS", "Cash", "Cheque", "Card", "UPI", "Bank Transfer"];
+      const rawMode = invoice.paymentMode || "GPay";
+      const safeMode = allowedModes.includes(rawMode) ? rawMode : "GPay";
+
       const newIncome = new Income({
         title: syncAmount < invoice.total ? `Part Payment for Invoice ${invoice.invoiceNo}` : `Full Payment for Invoice ${invoice.invoiceNo}`,
         category: syncAmount < invoice.total ? "Advance" : "Project Payment",
-        paymentMode: invoice.paymentMode || "GPay",
+        paymentMode: safeMode,
         amount: syncAmount,
         client: invoice.client,
         invoiceNo: invoice.invoiceNo,

@@ -6,6 +6,50 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
   if (!emp) return null;
 
   const [taskTab, setTaskTab] = useState('all');
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [leaveForm, setLeaveForm] = useState({ type: 'Sick Leave', customType: '', startDate: '', endDate: '', reason: '' });
+  const [leaveSaving, setLeaveSaving] = useState(false);
+  const [localLeaves, setLocalLeaves] = useState(emp.leaveRequests || []);
+
+  const handleAddLeave = async () => {
+    if (!leaveForm.startDate || !leaveForm.endDate) {
+      alert('Please select start and end dates');
+      return;
+    }
+    const finalType = leaveForm.type === 'Other' ? (leaveForm.customType.trim() || 'Other') : leaveForm.type;
+    setLeaveSaving(true);
+    try {
+      // Save to backend Leave collection
+      const res = await axios.post(`${BASE_URL}/api/employee-dashboard/leave`, {
+        employeeName: emp.name,
+        type: finalType,
+        from: leaveForm.startDate,
+        to: leaveForm.endDate,
+        reason: leaveForm.reason,
+      });
+      const savedLeave = res.data.leave || {};
+      const newLeave = {
+        _id: savedLeave._id,
+        type: finalType,
+        startDate: leaveForm.startDate,
+        endDate: leaveForm.endDate,
+        reason: leaveForm.reason,
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      };
+      const updatedLeaves = [...localLeaves, newLeave];
+      setLocalLeaves(updatedLeaves);
+      // Also persist to employee record so it survives refresh
+      await axios.put(`${BASE_URL}/api/employees/${emp._id}`, { leaveRequests: updatedLeaves });
+      setShowLeaveModal(false);
+      setLeaveForm({ type: 'Sick Leave', customType: '', startDate: '', endDate: '', reason: '' });
+    } catch (e) {
+      console.error(e);
+      alert('Failed to save leave: ' + (e.response?.data?.msg || e.message));
+    } finally {
+      setLeaveSaving(false);
+    }
+  };
 
   const getInitials = (name) => {
     if (!name) return "?";
@@ -519,35 +563,24 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
             <div className="ed-card-title"><i className="ti ti-calendar-event"></i> Leave Requests</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <span style={{ fontSize: "11px", fontWeight: "700", color: "var(--text-muted)" }}>
-                {(emp.leaveRequests || []).filter(l => l.status === 'pending').length} pending
+                {localLeaves.filter(l => l.status === 'pending').length} pending
               </span>
               <button
                 className="ed-btn"
                 style={{ padding: "5px 12px", fontSize: "11px", borderRadius: "8px", background: "var(--teal)", color: "#fff", border: "none", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}
-                onClick={() => {
-                  const type = prompt("Leave type (e.g. Sick, Casual, Annual):");
-                  if (!type) return;
-                  const startDate = prompt("Start date (YYYY-MM-DD):");
-                  if (!startDate) return;
-                  const endDate = prompt("End date (YYYY-MM-DD, or same as start):") || startDate;
-                  const newLeave = { type, startDate, endDate, status: "pending" };
-                  const updated = [...(emp.leaveRequests || []), newLeave];
-                  if (typeof onEdit === "function") {
-                    onEdit({ ...emp, leaveRequests: updated });
-                  }
-                }}
+                onClick={() => setShowLeaveModal(true)}
               >
                 <i className="ti ti-plus" style={{ fontSize: 12 }}></i> Add Leave
               </button>
             </div>
           </div>
-          {(emp.leaveRequests || []).length === 0 ? (
+          {localLeaves.length === 0 ? (
             <div className="ed-empty"><i className="ti ti-calendar-off" style={{ fontSize: 24, display: 'block', marginBottom: 8 }}></i>No leave requests</div>
           ) : (
             <table className="ed-table">
               <thead><tr><th>Type</th><th>Dates</th><th>Status</th><th>Action</th></tr></thead>
               <tbody>
-                {(emp.leaveRequests || []).map((leave, i) => (
+                {localLeaves.map((leave, i) => (
                   <tr key={i}>
                     <td>{leave.type || leave.leaveType || "Leave"}</td>
                     <td style={{ color: "var(--text-muted)", fontSize: "11px" }}>
@@ -731,6 +764,71 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
           <button className="ed-btn" style={{ background: "#FFF1F1", color: "#DC2626", border: "1px solid #FECACA", fontSize: "12px", padding: "6px 14px" }} onClick={onDelete}><i className="ti ti-trash"></i> Delete Employee</button>
         </div>
       </div>
+      {/* ADD LEAVE MODAL */}
+      {showLeaveModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(6px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+          onClick={() => setShowLeaveModal(false)}>
+          <div style={{ background: '#fff', borderRadius: 18, width: '100%', maxWidth: 440, padding: '28px 28px 22px', boxShadow: '0 24px 60px rgba(0,0,0,0.18)', fontFamily: "'Nunito', sans-serif" }}
+            onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+              <div style={{ fontSize: 17, fontWeight: 800, color: '#0f1c2e', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <i className="ti ti-calendar-plus" style={{ color: '#00BCD4' }}></i> Add Leave Request
+              </div>
+              <button onClick={() => setShowLeaveModal(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#94a3b8' }}>✕</button>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#718096', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.5px' }}>Leave Type</label>
+              <select value={leaveForm.type} onChange={e => setLeaveForm(p => ({ ...p, type: e.target.value, customType: '' }))}
+                style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', background: '#fff' }}>
+                {['Sick Leave', 'Casual Leave', 'Annual Leave', 'Maternity Leave', 'Paternity Leave', 'Unpaid Leave', 'Other'].map(t => <option key={t}>{t}</option>)}
+              </select>
+              {leaveForm.type === 'Other' && (
+                <input
+                  type="text"
+                  placeholder="Type your leave reason..."
+                  value={leaveForm.customType}
+                  onChange={e => setLeaveForm(p => ({ ...p, customType: e.target.value }))}
+                  style={{ width: '100%', marginTop: 8, padding: '10px 14px', border: '1.5px solid #00BCD4', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }}
+                  autoFocus
+                />
+              )}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#718096', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.5px' }}>Start Date *</label>
+                <input type="date" value={leaveForm.startDate} onChange={e => setLeaveForm(p => ({ ...p, startDate: e.target.value }))}
+                  style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#718096', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.5px' }}>End Date *</label>
+                <input type="date" value={leaveForm.endDate} onChange={e => setLeaveForm(p => ({ ...p, endDate: e.target.value }))}
+                  style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#718096', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.5px' }}>Reason (Optional)</label>
+              <textarea value={leaveForm.reason} onChange={e => setLeaveForm(p => ({ ...p, reason: e.target.value }))}
+                placeholder="Reason for leave..."
+                style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', minHeight: 70, resize: 'vertical', boxSizing: 'border-box' }} />
+            </div>
+
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => setShowLeaveModal(false)}
+                style={{ flex: 1, padding: '11px', background: '#F1F5F9', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#64748b', cursor: 'pointer', fontFamily: 'inherit' }}>
+                Cancel
+              </button>
+              <button onClick={handleAddLeave} disabled={leaveSaving}
+                style={{ flex: 1, padding: '11px', background: 'linear-gradient(135deg,#00BCD4,#0097A7)', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#fff', cursor: leaveSaving ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: leaveSaving ? 0.7 : 1 }}>
+                {leaveSaving ? 'Saving...' : '+ Add Leave'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
 
       {/* ADD TASK MODAL */}

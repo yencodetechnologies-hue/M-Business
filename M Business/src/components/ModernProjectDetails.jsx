@@ -541,12 +541,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const milestonesArr = currProject.milestones || [];
   const doneMilestones = milestonesArr.filter(m => {
     const mTasks = currTasks.filter(t => t.milestone === m.name && !t.isDeleted);
-    if (mTasks.length > 0) {
-      // Has tasks: done only if all tasks are completed AND m.done is true
-      return m.done === true && mTasks.every(t => t.status === 'done' || t.status === 'completed');
-    }
-    // No tasks: done if manually toggled
-    return m.done === true;
+    // Only count as done if it has tasks AND all are completed (or manually toggled with tasks)
+    return mTasks.length > 0 && m.done === true;
   }).length;
   const totalMilestones = milestonesArr.length;
   const progressPct = totalMilestones > 0
@@ -572,7 +568,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   const autoAdditionalTotal = (currProject.additionalCharges || []).reduce((sum, a) => sum + parseAmt(a.amount), 0);
   const autoMilestoneTotal = (currProject.milestonePayments || []).reduce((sum, m) => sum + parseAmt(m.amount), 0);
-  const advanceTotal = (currProject.advances || []).reduce((sum, a) => sum + parseAmt(a.amount), 0);
   const autoBudgetAmt = billed + autoAdditionalTotal + autoMilestoneTotal;
   const manualBudget = currProject.budget ? Number(currProject.budget) : 0;
   const budgetAmt = Math.max(autoBudgetAmt, manualBudget);
@@ -581,8 +576,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const pending = Math.max(0, billed - received);
   // Always calculate spent from expenses array (source of truth)
   const spent = (currProject.expenses || []).reduce((sum, exp) => sum + parseAmt(exp.amount), 0);
-  // Remaining = Total Budget - Payments Received - Advances already paid
-  const remaining = budgetAmt > 0 ? Math.max(0, budgetAmt - received - advanceTotal) : 0;
+  const remaining = budgetAmt > 0 ? (budgetAmt - received) : 0;
   const budgetUsedPct = budgetAmt > 0 ? Math.min(Math.round((spent / budgetAmt) * 100), 100) : 0;
   const budgetExceeded = budgetAmt > 0 && spent > budgetAmt;
   const overageAmt = budgetExceeded ? (spent - budgetAmt) : 0;
@@ -797,16 +791,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         return m;
       });
 
+      // Recalculate progress from milestones if no tasks exist
       const totalM = updatedMilestones.length;
-
-      // Count done milestones the same way progressPct display does:
-      // a milestone is "done" if m.done === true (regardless of whether it has tasks)
-      // This matches the manual toggle use case shown in the screenshot
-      const doneM = updatedMilestones.filter(m => m.done === true).length;
-
+      const doneM = updatedMilestones.filter(m => m.done).length;
+      const totalT = projTasks.length;
       const newProgress = totalM > 0
         ? Math.round((doneM / totalM) * 100)
-        : 0;
+        : (currProject.progress || 0);
 
       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
         milestones: updatedMilestones,
@@ -1627,75 +1618,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     ))}
                   </div>
 
-                  {/* ACTIVE TAB CONTENT AT TOP (non-inv tabs) */}
-                  {activePayTab !== 'inv' && (() => {
-                    const activeSection = [
-                      { key: 'adv', label: 'Advance Payments', btnLabel: 'New Advance', icon: 'ti-pig-money', color: '#8B5CF6', modal: 'showAdvance' },
-                      { key: 'add', label: 'Additional Charges', btnLabel: 'Additional Charge', icon: 'ti-circle-plus', color: '#F97316', modal: 'showAdditional' },
-                      { key: 'mile', label: 'Milestone Payments', btnLabel: 'New Milestone', icon: 'ti-flag', color: '#F59E0B', modal: 'showMilestonePayment' },
-                      { key: 'pay', label: 'Payments Received', btnLabel: 'Record Payment', icon: 'ti-credit-card', color: '#22C55E', modal: 'showPayment' },
-                      { key: 'exp', label: 'Expenses', btnLabel: 'Add Expense', icon: 'ti-receipt', color: '#6B7280', modal: 'showExpense' },
-                    ].find(s => s.key === activePayTab);
-                    if (!activeSection) return null;
-                    const arrayKeyMap = { pay: 'paymentsReceived', adv: 'advances', add: 'additionalCharges', mile: 'milestonePayments', exp: 'expenses' };
-                    const arrayName = arrayKeyMap[activePayTab];
-                    const records = currProject[arrayName] || [];
-                    return (
-                      <div style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>
-                            <i className={`ti ${activeSection.icon}`} style={{ color: activeSection.color, fontSize: 15 }}></i>
-                            {activeSection.label}
-                            <span style={{ background: `${activeSection.color}18`, color: activeSection.color, fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{records.length}</span>
-                          </div>
-                          <button
-                            onClick={() => setPaymentModalsState(prev => ({ ...prev, [activeSection.modal]: true }))}
-                            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                            <i className={`ti ${activeSection.icon}`} style={{ fontSize: 13 }}></i> + {activeSection.btnLabel}
-                          </button>
-                        </div>
-                        {records.length === 0 ? (
-                          <div style={{ padding: '32px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
-                            <i className={`ti ${activeSection.icon}`} style={{ fontSize: 32, display: 'block', marginBottom: 10, opacity: .3, color: activeSection.color }}></i>
-                            No {activeSection.label.toLowerCase()} recorded yet.
-                          </div>
-                        ) : (
-                          <div style={{ overflowX: 'auto' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
-                              <thead>
-                                <tr style={{ background: '#F8FAFC' }}>
-                                  {activePayTab === 'pay' && ['Payment #', 'Linked Invoice', 'Amount', 'Due Date', 'Payment Date', 'Mode', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}
-                                  {activePayTab === 'adv' && ['Advance #', 'Description', 'Amount', 'Date', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}
-                                  {activePayTab === 'add' && ['Charge #', 'Description', 'Amount', 'Date', 'Category', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}
-                                  {activePayTab === 'mile' && ['Milestone #', 'Name', 'Amount', 'Due Date', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}
-                                  {activePayTab === 'exp' && ['Expense #', 'Description', 'Amount', 'Date', 'Category', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {records.map((rec, i) => (
-                                  <tr key={i} style={{ borderBottom: '1px solid #F1F5F9' }}>
-                                    <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.paymentNo || rec.advanceNo || rec.chargeNo || rec.milestoneNo || rec.expenseNo || `#${i + 1}`}</td>
-                                    <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: activePayTab === 'pay' ? '#00BCD4' : '#374151' }}>{activePayTab === 'pay' ? (rec.linkedInvoice || '—') : (rec.description || rec.name || '—')}</td>
-                                    <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
-                                    <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{(rec.paymentDate || rec.dateReceived || rec.date) ? new Date(rec.paymentDate || rec.dateReceived || rec.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
-                                    {(activePayTab === 'add' || activePayTab === 'exp') && <td style={{ padding: '12px 14px' }}><span style={{ background: '#FFEDD5', color: '#C2410C', borderRadius: 20, padding: '3px 9px', fontSize: 11, fontWeight: 800 }}>{rec.category || 'Other'}</span></td>}
-                                    <td style={{ padding: '12px 14px' }}><span style={{ background: rec.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: rec.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.status || rec.paymentMode || 'Pending'}</span></td>
-                                    <td style={{ padding: '12px 14px' }}>
-                                      <div style={{ display: 'flex', gap: 4 }}>
-                                        <button onClick={() => { const modalMap = { pay: 'showPayment', adv: 'showAdvance', add: 'showAdditional', mile: 'showMilestonePayment', exp: 'showExpense' }; setPaymentModalsState(prev => ({ ...prev, [modalMap[activePayTab]]: true, editData: rec, editIndex: i })); }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
-                                        <button onClick={() => handleDeleteRecord(arrayName, i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })()}
-
                   {/* INVOICE TABLE */}
                   <div data-paytab="inv" style={{ display: activePayTab === 'inv' ? 'block' : 'none', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
@@ -1994,7 +1916,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   </div>
                   {/* ALL SECTIONS ALWAYS VISIBLE */}
                   {[
-                    ...(activePayTab !== 'inv' ? [{ key: 'inv', label: 'Invoices', icon: 'ti-file-invoice', color: '#3B82F6' }] : []),
+                    { key: 'inv', label: 'Invoices', icon: 'ti-file-invoice', color: '#3B82F6' },
                     { key: 'adv', label: 'Advance Payments', icon: 'ti-pig-money', color: '#8B5CF6' },
                     { key: 'add', label: 'Additional Charges', icon: 'ti-circle-plus', color: '#F97316' },
                     { key: 'mile', label: 'Milestone Payments', icon: 'ti-flag', color: '#F59E0B' },
@@ -2008,8 +1930,56 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     return (
                       <div key={section.key} style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
 
-                        {/* Records Table — ALWAYS VISIBLE ON TOP */}
-                        {records.length === 0 ? (
+                        {/* Section Header / Toggle — ALWAYS ON TOP */}
+                        <div onClick={() => toggleSection(section.key)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: expandedSections[section.key] ? '1px solid #E8EDF2' : 'none', background: '#FAFBFD', cursor: 'pointer' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 900, color: '#0D1B2A' }}>
+                            <i className="ti ti-chevron-down" style={{ color: '#7B8FA1', fontSize: 15, transition: 'transform 0.2s ease', transform: expandedSections[section.key] ? 'rotate(0deg)' : 'rotate(-90deg)' }}></i>
+                            <i className={`ti ${section.icon}`} style={{ color: section.color, fontSize: 17 }}></i>
+                            {section.label}
+                            <span style={{ background: `${section.color}18`, color: section.color, fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{records.length}</span>
+                          </div>
+                          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }} onClick={(e) => e.stopPropagation()}>
+                            {section.key === 'inv' && (
+                              <button onClick={() => { if (onNewInvoice) onNewInvoice(currProject); else setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true })); }}
+                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Invoice
+                              </button>
+                            )}
+                            {section.key === 'pay' && (
+                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showPayment: true }))}
+                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Record Payment
+                              </button>
+                            )}
+                            {section.key === 'adv' && (
+                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdvance: true }))}
+                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Advance
+                              </button>
+                            )}
+                            {section.key === 'add' && (
+                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdditional: true }))}
+                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Additional Charge
+                              </button>
+                            )}
+                            {section.key === 'mile' && (
+                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showMilestonePayment: true }))}
+                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Milestone
+                              </button>
+                            )}
+                            {section.key === 'exp' && (
+                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showExpense: true }))}
+                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Add Expense
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Records Table — shown BELOW header when expanded */}
+                        {expandedSections[section.key] && (records.length === 0 ? (
                           <div style={{ padding: '28px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
                             <i className={`ti ${section.icon}`} style={{ fontSize: 28, display: 'block', marginBottom: 8, opacity: .25, color: section.color }}></i>
                             No {section.label.toLowerCase()} recorded yet.
@@ -2155,64 +2125,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               </table>
                             )}
                           </div>
-                        )}
-
-                        {/* Section Header / Toggle — BELOW RECORDS */}
-                        <div onClick={() => toggleSection(section.key)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderTop: records.length > 0 ? '1px solid #E8EDF2' : 'none', background: '#FAFBFD', cursor: 'pointer' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 900, color: '#0D1B2A' }}>
-                            <i className="ti ti-chevron-down" style={{ color: '#7B8FA1', fontSize: 15, transition: 'transform 0.2s ease', transform: expandedSections[section.key] ? 'rotate(0deg)' : 'rotate(-90deg)' }}></i>
-                            <i className={`ti ${section.icon}`} style={{ color: section.color, fontSize: 17 }}></i>
-                            {section.label}
-                            <span style={{ background: `${section.color}18`, color: section.color, fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{records.length}</span>
-                          </div>
-                          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }} onClick={(e) => e.stopPropagation()}>
-                            {section.key === 'inv' && (
-                              <button onClick={() => { if (onNewInvoice) onNewInvoice(currProject); else setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true })); }}
-                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Invoice
-                              </button>
-                            )}
-                            {section.key === 'pay' && (
-                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showPayment: true }))}
-                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Record Payment
-                              </button>
-                            )}
-                            {section.key === 'adv' && (
-                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdvance: true }))}
-                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Advance
-                              </button>
-                            )}
-                            {section.key === 'add' && (
-                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdditional: true }))}
-                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Additional Charge
-                              </button>
-                            )}
-                            {section.key === 'mile' && (
-                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showMilestonePayment: true }))}
-                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Milestone
-                              </button>
-                            )}
-                            {section.key === 'exp' && (
-                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showExpense: true }))}
-                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Add Expense
-                              </button>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Expanded details section — shown BELOW header when toggled */}
-                        {expandedSections[section.key] && (
-                          <div style={{ padding: '14px 18px', borderTop: '1px solid #E8EDF2', background: '#FAFBFD' }}>
-                            <div style={{ fontSize: 12, color: '#7B8FA1', fontWeight: 600 }}>
-                              {section.label} summary · {records.length} record{records.length !== 1 ? 's' : ''} · Total: {currency}{records.reduce((sum, r) => sum + (Number(r.amount) || 0), 0).toLocaleString()}
-                            </div>
-                          </div>
-                        )}
+                        ))}
 
                       </div>
                     );
@@ -2468,24 +2381,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 </span>
               </div>
             ))}
-            {advanceTotal > 0 && (
-              <div className="mpd-brow">
-                <span className="mpd-lbl">Advance Paid</span>
-                <span className="mpd-val" style={{ color: '#8B5CF6' }}>− {currency}{advanceTotal.toLocaleString()}</span>
-              </div>
-            )}
-            {autoAdditionalTotal > 0 && (
-              <div className="mpd-brow">
-                <span className="mpd-lbl">Additional Charges</span>
-                <span className="mpd-val" style={{ color: '#F97316' }}>+ {currency}{autoAdditionalTotal.toLocaleString()}</span>
-              </div>
-            )}
-            {autoMilestoneTotal > 0 && (
-              <div className="mpd-brow">
-                <span className="mpd-lbl">Milestone Payments</span>
-                <span className="mpd-val" style={{ color: '#F59E0B' }}>+ {currency}{autoMilestoneTotal.toLocaleString()}</span>
-              </div>
-            )}
             <div className="mpd-brow">
               <span className="mpd-lbl">Pending</span>
               <span className="mpd-val mpd-r">{currency}{pending.toLocaleString()}</span>

@@ -737,7 +737,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     const encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload)))));
     const viewURL = `${FRONTEND_URL}/quotation-view?d=${encoded}&print=1`;
     window.open(viewURL, "_blank");
-    showToast("Opening quotation — click Print / Save PDF to download.");
+    showToast("");
   };
 
   const shareQuotation = async (entry) => {

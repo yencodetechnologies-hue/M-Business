@@ -133,7 +133,7 @@ tr:hover td{background:#FAFCFE;}
             <button className="btn btn-primary" onClick={() => setIsAddVendorModalOpen(true)}><i className="ti ti-plus"></i>Add Vendor</button>
           </div>
         </div>
-        <div className="content" ref={mainScrollRef}>
+        <div className="content">
           <div className="kpi-grid kpi-grid-4">
             <div className="kpi vendor"><div className="kpi-label">Total Vendors</div><div className="kpi-value">{totalVendors}</div><div className="kpi-sub neutral"><i className="ti ti-truck"></i>Active suppliers</div></div>
             <div className="kpi pending"><div className="kpi-label">Total Payable</div><div className="kpi-value">₹{totalPayable.toLocaleString('en-IN')}</div><div className="kpi-sub down"><i className="ti ti-alert-circle"></i>{vendors.filter(v => v.amount > v.paidAmount).length} overdue</div></div>

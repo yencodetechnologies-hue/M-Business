@@ -1,185 +1,276 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { BASE_URL } from '../config';
 
-export default function FinIncome() {
-  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-  const [isAddIncomeModalOpen, setIsAddIncomeModalOpen] = useState(false);
-const mainScrollRef = useRef(null);
-  const openImport = () => setIsImportModalOpen(true);
-  const closeImport = () => setIsImportModalOpen(false);
+const API = `${BASE_URL}/api/income`;
+const fmt = (n) => '₹' + Number(n || 0).toLocaleString('en-IN');
 
-  const saveIncome = () => {
-    setIsAddIncomeModalOpen(false);
-    alert('Income entry saved!');
+const CATEGORIES = ['Project Payment', 'Advance', 'Service Fee', 'Maintenance', 'Miscellaneous'];
+const MODES = ['Cash', 'Card', 'UPI', 'Bank Transfer', 'Cheque', 'NEFT', 'RTGS', 'GPay', 'PhonePe'];
+
+function Toast({ msg, type }) {
+  if (!msg) return null;
+  return (
+    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 9999, background: type === 'error' ? '#EF4444' : '#26C281', color: '#fff', borderRadius: 12, padding: '13px 22px', fontWeight: 700, fontSize: 14, boxShadow: '0 4px 20px rgba(0,0,0,.18)' }}>
+      {msg}
+    </div>
+  );
+}
+
+export default function FinIncome({ income: propIncome, setIncome: propSetIncome, fetchIncome: propFetch }) {
+  const [income, setIncome] = useState(propIncome || []);
+  const [loading, setLoading] = useState(!propIncome);
+  const [search, setSearch] = useState('');
+  const [catFilter, setCatFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [toast, setToast] = useState({ msg: '', type: 'success' });
+  const [viewItem, setViewItem] = useState(null);
+  const [editItem, setEditItem] = useState(null);
+  const [addOpen, setAddOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(null);
+  const emptyForm = { client: '', title: '', category: 'Project Payment', amount: '', paymentMode: 'GPay', status: 'Received', date: new Date().toISOString().slice(0, 10) };
+  const [form, setForm] = useState(emptyForm);
+  const [editForm, setEditForm] = useState({});
+
+  const showToast = (msg, type = 'success') => { setToast({ msg, type }); setTimeout(() => setToast({ msg: '' }), 3000); };
+
+  useEffect(() => {
+    if (propIncome) { setIncome(propIncome); setLoading(false); return; }
+    setLoading(true);
+    axios.get(API).then(r => { setIncome(r.data || []); setLoading(false); }).catch(() => setLoading(false));
+  }, [propIncome]);
+
+  const syncUp = (updated) => {
+    setIncome(updated);
+    if (propSetIncome) propSetIncome(updated);
   };
 
-  const toast = (msg) => alert(msg);
+  const handleAdd = async () => {
+    if (!form.client || !form.amount) return showToast('Fill required fields (Client & Amount)', 'error');
+    setSaving(true);
+    try {
+      const res = await axios.post(API, { ...form, amount: Number(form.amount) });
+      syncUp([res.data, ...income]);
+      setAddOpen(false);
+      setForm(emptyForm);
+      showToast('✅ Income recorded!');
+    } catch { showToast('Failed to add', 'error'); }
+    finally { setSaving(false); }
+  };
+
+  const handleEdit = async () => {
+    if (!editForm.client || !editForm.amount) return showToast('Fill required fields', 'error');
+    setSaving(true);
+    try {
+      const res = await axios.put(`${API}/${editItem._id}`, { ...editForm, amount: Number(editForm.amount) });
+      syncUp(income.map(x => x._id === editItem._id ? res.data : x));
+      setEditItem(null);
+      showToast('✅ Income updated!');
+    } catch { showToast('Failed to update', 'error'); }
+    finally { setSaving(false); }
+  };
+
+  const handleDelete = async (inc) => {
+    if (!window.confirm(`Delete income from "${inc.client}"?`)) return;
+    setDeleting(inc._id);
+    try {
+      await axios.delete(`${API}/${inc._id}`);
+      syncUp(income.filter(x => x._id !== inc._id));
+      showToast('🗑️ Income deleted');
+    } catch { showToast('Failed to delete', 'error'); }
+    finally { setDeleting(null); }
+  };
+
+  const filtered = income.filter(i => {
+    const matchSearch = !search || (i.client || '').toLowerCase().includes(search.toLowerCase()) || (i.title || '').toLowerCase().includes(search.toLowerCase()) || (i.description || '').toLowerCase().includes(search.toLowerCase());
+    const matchCat = catFilter === 'All' || i.category === catFilter;
+    const matchStatus = statusFilter === 'All' || i.status === statusFilter;
+    return matchSearch && matchCat && matchStatus;
+  });
+
+  const total = income.reduce((s, i) => s + Number(i.amount || 0), 0);
+  const received = income.filter(i => i.status !== 'Pending').reduce((s, i) => s + Number(i.amount || 0), 0);
+  const pending = income.filter(i => i.status === 'Pending').reduce((s, i) => s + Number(i.amount || 0), 0);
+
+  const S = {
+    overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(3px)' },
+    modal: { background: '#fff', borderRadius: 18, padding: '28px 30px', width: 560, maxWidth: '95vw', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,.18)' },
+    label: { display: 'block', fontSize: 11, fontWeight: 800, color: '#4A5568', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 },
+    input: { width: '100%', padding: '11px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 14, color: '#1A2332', background: '#F0F4F8', outline: 'none', boxSizing: 'border-box' },
+    btn: (bg, color = '#fff') => ({ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 18px', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer', border: 'none', background: bg, color }),
+    actionBtn: (danger) => ({ background: 'transparent', border: `1.5px solid ${danger ? '#FCA5A5' : '#E2E8F0'}`, borderRadius: 8, padding: '5px 10px', cursor: 'pointer', color: danger ? '#EF4444' : '#4A5568', fontSize: 13, display: 'inline-flex', alignItems: 'center' }),
+  };
 
   return (
     <>
       <style>{`
-/* ── M Business Finance Design System ── */
-:root {
-  --primary:#00BCD4; --primary-dark:#0097A7; --primary-light:#E0F7FA; --primary-mid:#B2EBF2;
-  --text-dark:#1A2332; --text-mid:#4A5568; --text-light:#718096;
-  --bg:#F0F4F8; --white:#FFFFFF; --border:#E2E8F0;
-  --green:#26C281; --green-light:#D1FAE5; --green-dark:#065F46;
-  --orange:#F59E0B; --orange-light:#FEF3C7; --orange-dark:#92400E;
-  --red:#FF6B6B; --red-dark:#EF4444; --red-light:#FEE2E2;
-  --purple:#8B5CF6; --purple-light:#EDE9FE;
-  --blue:#3B82F6; --blue-light:#DBEAFE;
-  --radius:14px; --shadow:0 2px 12px rgba(0,188,212,.08); --shadow-lg:0 8px 32px rgba(0,188,212,.14);
-}
-* { box-sizing: border-box; }
-a { text-decoration: none; color: inherit; }
-.main{ flex:1; display:flex; flex-direction:column; min-height:100vh; background: var(--bg); font-family: 'Nunito', sans-serif; color: var(--text-dark); }
-.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 26px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
-.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-light);}
-.breadcrumb a{color:var(--primary);font-weight:700;}
-.topbar-actions{display:flex;align-items:center;gap:10px;}
-.content{padding:26px;flex:1;}
-.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s;}
-.btn-primary{background:var(--primary);color:#fff;}.btn-primary:hover{background:var(--primary-dark);}
-.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text-mid);}.btn-outline:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light);}
-.btn-green{background:var(--green);color:#fff;}.btn-green:hover{background:#1aab6d;}
-.btn-sm{padding:6px 12px;font-size:12px;}
-.card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;}
-.kpi-grid{display:grid;gap:16px;margin-bottom:22px;}
-.kpi-grid-4{grid-template-columns:repeat(4,1fr);}
-.kpi{background:var(--white);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);border-left:4px solid transparent;}
-.kpi.income{border-left-color:var(--green);}
-.kpi.pending{border-left-color:var(--orange);}
-.kpi-label{font-size:11px;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;}
-.kpi-value{font-size:24px;font-weight:900;color:var(--text-dark);margin-bottom:4px;}
-.kpi-sub{font-size:12px;font-weight:600;display:flex;align-items:center;gap:4px;}
-.kpi-sub.up{color:var(--green);}
-.kpi-sub.down{color:var(--red);}
-.kpi-sub.neutral{color:var(--text-light);}
-.table-wrap{overflow-x:auto;}
-table{width:100%;border-collapse:collapse;font-size:13px;}
-thead tr{background:var(--bg);}
-th{padding:10px 14px;text-align:left;font-size:11px;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:.7px;white-space:nowrap;}
-td{padding:12px 14px;border-bottom:1px solid var(--bg);color:var(--text-dark);font-weight:600;}
-tr:last-child td{border-bottom:none;}
-tr:hover td{background:#FAFCFE;}
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
-.badge-paid{background:var(--green-light);color:var(--green-dark);}
-.badge-pending{background:var(--orange-light);color:var(--orange-dark);}
-.badge-overdue{background:var(--red-light);color:var(--red-dark);}
-.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
-.search-box{display:flex;align-items:center;gap:8px;background:var(--white);border:1.5px solid var(--border);border-radius:10px;padding:9px 14px;min-width:220px;}
-.search-box:focus-within{border-color:var(--primary);}
-.search-box i{color:var(--text-light);font-size:16px;}
-.search-box input{border:none;outline:none;background:transparent;font-family:'Nunito',sans-serif;font-size:13px;width:100%;}
-.filter-sel{padding:9px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;color:var(--text-mid);background:var(--white);outline:none;cursor:pointer;}
-.filter-sel:focus{border-color:var(--primary);}
-.export-row{display:flex;gap:8px;flex-wrap:wrap;}
-.exp-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid;transition:all .15s;}
-.exp-pdf{background:var(--red-light);color:var(--red-dark);border-color:#FCA5A5;}.exp-pdf:hover{background:var(--red-dark);color:#fff;}
-.exp-excel{background:var(--green-light);color:var(--green-dark);border-color:#6EE7B7;}.exp-excel:hover{background:var(--green);color:#fff;}
-.exp-csv{background:var(--blue-light);color:#1E40AF;border-color:#93C5FD;}.exp-csv:hover{background:var(--blue);color:#fff;}
-.amt-in{color:var(--green);font-weight:800;}
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
-.modal-bg.open{display:flex;}
-.modal{background:var(--white);border-radius:18px;padding:28px 30px;width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.18);}
-.modal-title{font-size:18px;font-weight:900;color:var(--text-dark);display:flex;align-items:center;gap:10px;margin-bottom:22px;}
-.form-group{margin-bottom:16px;}
-.form-group label{display:block;font-size:11px;font-weight:800;color:var(--text-mid);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;color:var(--text-dark);background:var(--bg);outline:none;}
-.form-group input:focus,.form-group select:focus{border-color:var(--primary);background:#fff;}
-.form-2col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;padding-top:16px;border-top:1px solid var(--border);}
+        .fi-table td, .fi-table th { padding: 12px 14px; border-bottom: 1px solid #F0F4F8; font-size: 13px; }
+        .fi-table th { font-size: 11px; font-weight: 800; color: #718096; text-transform: uppercase; letter-spacing: .7px; background: #F0F4F8; }
+        .fi-table tr:hover td { background: #FAFCFE; }
+        .fi-badge-received, .fi-badge-paid { background: #D1FAE5; color: #065F46; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .fi-badge-pending { background: #FEF3C7; color: #92400E; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .fi-badge-overdue { background: #FEE2E2; color: #EF4444; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
       `}</style>
-      <div className="main">
-        <div className="topbar">
-          <div className="breadcrumb"><a href="#">Finance</a><i className="ti ti-chevron-right"></i><span>Income</span></div>
-          <div className="topbar-actions">
-            <button className="btn btn-outline" onClick={openImport} style={{borderColor:'var(--primary)',color:'var(--primary)'}}><i className="ti ti-upload"></i>Import Statement</button>
-            <div className="export-row">
-              <button className="exp-btn exp-pdf" onClick={() => toast('Exporting PDF...')}><i className="ti ti-file-type-pdf"></i>PDF</button>
-              <button className="exp-btn exp-excel" onClick={() => toast('Exporting Excel...')}><i className="ti ti-file-spreadsheet"></i>Excel</button>
-              <button className="exp-btn exp-csv" onClick={() => toast('Exporting CSV...')}><i className="ti ti-file-text"></i>CSV</button>
+      <Toast {...toast} />
+
+      <div style={{ padding: 26, background: '#F0F4F8', minHeight: '100%', fontFamily: 'Nunito,sans-serif' }}>
+
+        {/* HEADER */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22, flexWrap: 'wrap', gap: 10 }}>
+          <div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: '#1A2332' }}>Payments / Income</div>
+            <div style={{ fontSize: 13, color: '#718096', marginTop: 2 }}>Track all incoming payments and revenue</div>
+          </div>
+          <button style={S.btn('#26C281')} onClick={() => { setForm(emptyForm); setAddOpen(true); }}>
+            <i className="ti ti-plus" /> Record Income
+          </button>
+        </div>
+
+        {/* KPI CARDS */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 16, marginBottom: 22 }}>
+          {[['Total Income', total, '#26C281', income.length + ' records'], ['Received', received, '#00BCD4', income.filter(i => i.status !== 'Pending').length + ' payments'], ['Pending', pending, '#F59E0B', income.filter(i => i.status === 'Pending').length + ' outstanding']].map(([label, val, color, sub]) => (
+            <div key={label} style={{ background: '#fff', borderRadius: 14, padding: '18px 20px', boxShadow: '0 2px 12px rgba(0,188,212,.08)', borderLeft: `4px solid ${color}` }}>
+              <div style={{ fontSize: 11, fontWeight: 800, color: '#718096', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 }}>{label}</div>
+              <div style={{ fontSize: 24, fontWeight: 900, color: '#1A2332' }}>{fmt(val)}</div>
+              <div style={{ fontSize: 12, color: '#718096', marginTop: 4 }}>{sub}</div>
             </div>
-            <button className="btn btn-green" onClick={() => setIsAddIncomeModalOpen(true)}><i className="ti ti-plus"></i>Add Income</button>
+          ))}
+        </div>
+
+        {/* FILTERS */}
+        <div style={{ display: 'flex', gap: 10, marginBottom: 18, flexWrap: 'wrap', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fff', border: '1.5px solid #E2E8F0', borderRadius: 10, padding: '9px 14px', minWidth: 220 }}>
+            <i className="ti ti-search" style={{ color: '#718096' }} />
+            <input placeholder="Search income records..." value={search} onChange={e => setSearch(e.target.value)} style={{ border: 'none', outline: 'none', fontFamily: 'Nunito,sans-serif', fontSize: 13, width: '100%', background: 'transparent' }} />
+          </div>
+          <select value={catFilter} onChange={e => setCatFilter(e.target.value)} style={{ padding: '9px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 600, color: '#4A5568', background: '#fff', outline: 'none', cursor: 'pointer' }}>
+            <option value="All">All Types</option>
+            {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+          </select>
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ padding: '9px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 600, color: '#4A5568', background: '#fff', outline: 'none', cursor: 'pointer' }}>
+            <option value="All">All Status</option>
+            <option>Received</option><option>Pending</option><option>Overdue</option>
+          </select>
+        </div>
+
+        {/* TABLE */}
+        <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 2px 12px rgba(0,188,212,.08)', overflow: 'hidden' }}>
+          <div style={{ overflowX: 'auto' }}>
+            <table className="fi-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr>
+                  <th>Date</th><th>Client</th><th>Title / Description</th><th>Category</th>
+                  <th>Amount</th><th>Payment Mode</th><th>Status</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: '#718096' }}>Loading income records...</td></tr>
+                ) : filtered.length === 0 ? (
+                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: '#718096' }}>{income.length === 0 ? 'No income recorded yet. Click "Record Income" to start.' : 'No results match your filters.'}</td></tr>
+                ) : filtered.map(inc => (
+                  <tr key={inc._id}>
+                    <td style={{ whiteSpace: 'nowrap' }}>{new Date(inc.date || inc.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</td>
+                    <td style={{ fontWeight: 700 }}>{inc.client || '—'}</td>
+                    <td>{inc.title || inc.description || '—'}</td>
+                    <td>{inc.category || '—'}</td>
+                    <td style={{ color: '#26C281', fontWeight: 800 }}>+{fmt(inc.amount)}</td>
+                    <td>{inc.paymentMode || '—'}</td>
+                    <td><span className={`fi-badge-${(inc.status || 'received').toLowerCase()}`}>{inc.status || 'Received'}</span></td>
+                    <td>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <button style={S.actionBtn(false)} title="View" onClick={() => setViewItem(inc)}><i className="ti ti-eye" /></button>
+                        <button style={S.actionBtn(false)} title="Edit" onClick={() => { setEditItem(inc); setEditForm({ client: inc.client || '', title: inc.title || '', description: inc.description || '', category: inc.category || 'Project Revenue', amount: inc.amount, paymentMode: inc.paymentMode || 'Bank Transfer', status: inc.status || 'Received', date: (inc.date || inc.createdAt || '').slice(0, 10) }); }}><i className="ti ti-pencil" /></button>
+                        <button style={S.actionBtn(true)} title="Delete" disabled={deleting === inc._id} onClick={() => handleDelete(inc)}><i className={deleting === inc._id ? 'ti ti-loader-2' : 'ti ti-trash'} /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div style={{ padding: '12px 16px', borderTop: '1px solid #E2E8F0', fontSize: 13, color: '#718096' }}>
+            Showing {filtered.length} of {income.length} records
           </div>
         </div>
-        <div className="content" ref={mainScrollRef}>
-          <div className="kpi-grid kpi-grid-4" style={{marginBottom:'22px'}}>
-            <div className="kpi income"><div className="kpi-label">This Month</div><div className="kpi-value">₹18,42,000</div><div className="kpi-sub up"><i className="ti ti-trending-up"></i>+12% vs May</div></div>
-            <div className="kpi income"><div className="kpi-label">Project Revenue</div><div className="kpi-value">₹15,87,500</div><div className="kpi-sub neutral"><i className="ti ti-layout-kanban"></i>6 projects</div></div>
-            <div className="kpi pending"><div className="kpi-label">Pending / Dues</div><div className="kpi-value">₹3,21,000</div><div className="kpi-sub down"><i className="ti ti-clock"></i>4 invoices</div></div>
-            <div className="kpi income"><div className="kpi-label">YTD Income</div><div className="kpi-value">₹92,14,000</div><div className="kpi-sub up"><i className="ti ti-trending-up"></i>FY 2025-26</div></div>
-          </div>
-          
-          <div className="toolbar">
-            <div className="search-box"><i className="ti ti-search"></i><input placeholder="Search income records..." /></div>
-            <select className="filter-sel"><option>All Types</option><option>Project Revenue</option><option>Retainer</option></select>
-            <select className="filter-sel"><option>All Status</option><option>Paid</option><option>Pending</option></select>
-            <select className="filter-sel"><option>June 2026</option><option>May 2026</option><option>All Time</option></select>
-          </div>
-          
-          <div className="card">
-            <div className="table-wrap">
-              <table>
-                <thead>
-                  <tr><th><input type="checkbox" style={{accentColor:'var(--primary)'}} /></th><th>Date</th><th>Invoice/Ref</th><th>Client</th><th>Description</th><th>Category</th><th>Amount</th><th>Payment Mode</th><th>Status</th><th>Action</th></tr>
-                </thead>
-                <tbody>
-                  <tr><td><input type="checkbox" /></td><td>Jun 5</td><td style={{color:'var(--primary)',fontWeight:700}}>INV-2026-019</td><td>NovaMart Inc.</td><td>E-Commerce Platform — Milestone 3</td><td>Project Revenue</td><td className="amt-in">₹2,12,500</td><td>Bank Transfer</td><td><span className="badge badge-pending">Pending</span></td><td><button className="btn btn-outline btn-sm"><i className="ti ti-eye"></i></button></td></tr>
-                  <tr><td><input type="checkbox" /></td><td>Jun 3</td><td style={{color:'var(--primary)',fontWeight:700}}>INV-2026-018</td><td>MediCore Pvt Ltd</td><td>HealthTrack App — Milestone 1</td><td>Project Revenue</td><td className="amt-in">₹1,87,500</td><td>NEFT</td><td><span className="badge badge-paid">Paid</span></td><td><button className="btn btn-outline btn-sm"><i className="ti ti-eye"></i></button></td></tr>
-                  <tr><td><input type="checkbox" /></td><td>May 31</td><td style={{color:'var(--primary)',fontWeight:700}}>INV-2026-017</td><td>LogiTrack Systems</td><td>ERP Portal — Advance (30%)</td><td>Project Revenue</td><td className="amt-in">₹3,50,000</td><td>Cheque</td><td><span className="badge badge-paid">Paid</span></td><td><button className="btn btn-outline btn-sm"><i className="ti ti-eye"></i></button></td></tr>
-                  <tr><td><input type="checkbox" /></td><td>May 28</td><td style={{color:'var(--primary)',fontWeight:700}}>INV-2026-016</td><td>AquaFin Seafoods</td><td>Brand Identity — Final Delivery</td><td>Project Revenue</td><td className="amt-in">₹1,20,000</td><td>UPI</td><td><span className="badge badge-paid">Paid</span></td><td><button className="btn btn-outline btn-sm"><i className="ti ti-eye"></i></button></td></tr>
-                  <tr><td><input type="checkbox" /></td><td>May 25</td><td style={{color:'var(--primary)',fontWeight:700}}>INV-2026-015</td><td>TechNest Startups</td><td>Monthly Retainer — May</td><td>Retainer</td><td className="amt-in">₹85,000</td><td>NEFT</td><td><span className="badge badge-paid">Paid</span></td><td><button className="btn btn-outline btn-sm"><i className="ti ti-eye"></i></button></td></tr>
-                  <tr><td><input type="checkbox" /></td><td>May 20</td><td style={{color:'var(--primary)',fontWeight:700}}>INV-2026-014</td><td>SunRise Exports</td><td>Corporate Website — Final</td><td>Project Revenue</td><td className="amt-in">₹95,000</td><td>Bank Transfer</td><td><span className="badge badge-overdue">Overdue</span></td><td><button className="btn btn-outline btn-sm"><i className="ti ti-eye"></i></button></td></tr>
-                </tbody>
-              </table>
+      </div>
+
+      {/* VIEW MODAL */}
+      {viewItem && (
+        <div style={S.overlay} onClick={e => e.target === e.currentTarget && setViewItem(null)}>
+          <div style={S.modal}>
+            <div style={{ fontSize: 18, fontWeight: 900, color: '#1A2332', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <i className="ti ti-cash" style={{ color: '#26C281' }} /> Income Details
             </div>
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:'16px',paddingTop:'14px',borderTop:'1px solid var(--border)',fontSize:'13px',color:'var(--text-light)'}}>
-              <span>Showing 6 of 48 records</span>
-              <div style={{display:'flex',gap:'6px'}}>
-                <button className="btn btn-outline btn-sm"> Prev</button>
-                <button className="btn btn-primary btn-sm">1</button>
-                <button className="btn btn-outline btn-sm">2</button>
-                <button className="btn btn-outline btn-sm">Next </button>
+            {[['Client', viewItem.client], ['Title', viewItem.title], ['Description', viewItem.description], ['Category', viewItem.category], ['Amount', fmt(viewItem.amount)], ['Payment Mode', viewItem.paymentMode], ['Status', viewItem.status], ['Date', new Date(viewItem.date || viewItem.createdAt).toLocaleDateString('en-IN')]].map(([l, v]) => (
+              <div key={l} style={{ display: 'flex', justifyContent: 'space-between', padding: '11px 0', borderBottom: '1px solid #F0F4F8', fontSize: 13 }}>
+                <span style={{ fontWeight: 700, color: '#718096' }}>{l}</span>
+                <span style={{ fontWeight: 700, color: '#1A2332' }}>{v || '—'}</span>
               </div>
+            ))}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 22 }}>
+              <button style={S.btn('#F0F4F8', '#1A2332')} onClick={() => setViewItem(null)}>Close</button>
+              <button style={S.btn('#26C281')} onClick={() => { const item = viewItem; setViewItem(null); setEditItem(item); setEditForm({ client: item.client || '', title: item.title || '', description: item.description || '', category: item.category || 'Project Revenue', amount: item.amount, paymentMode: item.paymentMode || 'Bank Transfer', status: item.status || 'Received', date: (item.date || item.createdAt || '').slice(0, 10) }); }}>Edit</button>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
-      <div className={`modal-bg ${isAddIncomeModalOpen ? 'open' : ''}`} onClick={(e) => { if(e.target.className.includes('modal-bg')) setIsAddIncomeModalOpen(false) }}>
-        <div className="modal">
-          <div className="modal-title"><i className="ti ti-arrow-bar-down" style={{color:'var(--green)'}}></i>Add Income Entry</div>
-          <div className="form-2col">
-            <div className="form-group"><label>Date *</label><input type="date" defaultValue="2026-06-05" /></div>
-            <div className="form-group"><label>Invoice / Ref No.</label><input placeholder="e.g. INV-2026-020" /></div>
-          </div>
-          <div className="form-2col">
-            <div className="form-group"><label>Client *</label><select><option>NovaMart Inc.</option><option>MediCore Pvt Ltd</option></select></div>
-            <div className="form-group"><label>Category</label><select><option>Project Revenue</option><option>Retainer</option></select></div>
-          </div>
-          <div className="form-group"><label>Description *</label><input placeholder="Brief description of income..." /></div>
-          <div className="form-2col">
-            <div className="form-group"><label>Amount (₹) *</label><input type="number" placeholder="e.g. 150000" /></div>
-            <div className="form-group"><label>Payment Mode</label><select><option>Bank Transfer</option><option>NEFT/RTGS</option></select></div>
-          </div>
-          <div className="form-2col">
-            <div className="form-group"><label>Payment Status</label><select><option>Paid</option><option>Pending</option></select></div>
-            <div className="form-group"><label>Bank Account</label><select><option>HDFC — ••••4821</option></select></div>
-          </div>
-          <div className="form-group"><label>Attach Receipt / Invoice</label><input type="file" accept=".pdf,.jpg,.png" style={{fontSize:'13px'}} /></div>
-          <div className="modal-footer">
-            <button className="btn btn-outline" onClick={() => setIsAddIncomeModalOpen(false)}>Cancel</button>
-            <button className="btn btn-green" onClick={saveIncome}><i className="ti ti-check"></i>Save Income</button>
+      {/* ADD MODAL */}
+      {addOpen && (
+        <div style={S.overlay} onClick={e => e.target === e.currentTarget && setAddOpen(false)}>
+          <div style={S.modal}>
+            <div style={{ fontSize: 18, fontWeight: 900, color: '#1A2332', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <i className="ti ti-plus" style={{ color: '#26C281' }} /> Record Income
+            </div>
+            {[['Client *', 'client', 'text', 'Client name'], ['Title *', 'title', 'text', 'e.g. Milestone 1 Payment'], ['Amount (₹) *', 'amount', 'number', '0.00'], ['Date', 'date', 'date', '']].map(([label, key, type, ph]) => (
+              <div key={key} style={{ marginBottom: 14 }}>
+                <label style={S.label}>{label}</label>
+                <input type={type} placeholder={ph} value={form[key]} onChange={e => setForm({ ...form, [key]: e.target.value })} style={S.input} />
+              </div>
+            ))}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 14 }}>
+              {[['Category', 'category', CATEGORIES], ['Payment Mode', 'paymentMode', MODES], ['Status', 'status', ['Received', 'Pending', 'Cancelled']]].map(([label, key, opts]) => (
+                <div key={key}>
+                  <label style={S.label}>{label}</label>
+                  <select value={form[key]} onChange={e => setForm({ ...form, [key]: e.target.value })} style={S.input}>{opts.map(o => <option key={o}>{o}</option>)}</select>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 22, paddingTop: 16, borderTop: '1px solid #E2E8F0' }}>
+              <button style={S.btn('#F0F4F8', '#1A2332')} onClick={() => setAddOpen(false)}>Cancel</button>
+              <button style={S.btn('#26C281')} disabled={saving} onClick={handleAdd}>{saving ? 'Saving...' : 'Save Income'}</button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {isImportModalOpen && (
-        <div className="modal-bg open" onClick={(e) => { if(e.target.className.includes('modal-bg')) closeImport() }}>
-          <div className="modal" style={{textAlign:'center', padding: '40px'}}>
-            <h3>Import Modal</h3>
-            <p>Placeholder for import modal UI.</p>
-            <button className="btn btn-outline" onClick={closeImport}>Close</button>
+      {/* EDIT MODAL */}
+      {editItem && (
+        <div style={S.overlay} onClick={e => e.target === e.currentTarget && setEditItem(null)}>
+          <div style={S.modal}>
+            <div style={{ fontSize: 18, fontWeight: 900, color: '#1A2332', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <i className="ti ti-pencil" style={{ color: '#26C281' }} /> Edit Income
+            </div>
+            {[['Client *', 'client', 'text', ''], ['Title', 'title', 'text', ''], ['Description', 'description', 'text', ''], ['Amount (₹) *', 'amount', 'number', ''], ['Date', 'date', 'date', '']].map(([label, key, type, ph]) => (
+              <div key={key} style={{ marginBottom: 14 }}>
+                <label style={S.label}>{label}</label>
+                <input type={type} placeholder={ph} value={editForm[key]} onChange={e => setEditForm({ ...editForm, [key]: e.target.value })} style={S.input} />
+              </div>
+            ))}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 14 }}>
+              {[['Category', 'category', CATEGORIES], ['Payment Mode', 'paymentMode', MODES], ['Status', 'status', ['Received', 'Pending', 'Cancelled']]].map(([label, key, opts]) => (
+                <div key={key}>
+                  <label style={S.label}>{label}</label>
+                  <select value={editForm[key]} onChange={e => setEditForm({ ...editForm, [key]: e.target.value })} style={S.input}>{opts.map(o => <option key={o}>{o}</option>)}</select>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 22, paddingTop: 16, borderTop: '1px solid #E2E8F0' }}>
+              <button style={S.btn('#F0F4F8', '#1A2332')} onClick={() => setEditItem(null)}>Cancel</button>
+              <button style={S.btn('#26C281')} disabled={saving} onClick={handleEdit}>{saving ? 'Updating...' : 'Update Income'}</button>
+            </div>
           </div>
         </div>
       )}

@@ -2673,6 +2673,8 @@ useEffect(() => {
   const [mgrSaveLoading, setMgrSaveLoading] = useState(false);
   const [showMgrPass, setShowMgrPass] = useState(false);
   const [tasks, setTasks] = useState([]);
+  const [income, setIncome] = useState([]);
+  const [expenses, setExpenses] = useState([]);
   const [config, setConfig] = useState(null);
   const [viewProject, setViewProject] = useState(null);
 

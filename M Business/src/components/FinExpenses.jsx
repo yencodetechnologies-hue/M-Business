@@ -1,205 +1,284 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { BASE_URL } from '../config';
 
-export default function FinExpenses() {
-  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-  const [isAddExpModalOpen, setIsAddExpModalOpen] = useState(false);
-const mainScrollRef = useRef(null);
-  const openImport = () => setIsImportModalOpen(true);
-  const closeImport = () => setIsImportModalOpen(false);
+const API = `${BASE_URL}/api/expenses`;
+const fmt = (n) => '₹' + Number(n || 0).toLocaleString('en-IN');
 
-  const saveExp = () => {
-    setIsAddExpModalOpen(false);
-    alert('Expense saved!');
+const CATEGORIES = ['Food', 'Travel', 'Office', 'Utilities', 'Marketing', 'Salary', 'Miscellaneous'];
+const MODES = ['Cash', 'Card', 'UPI', 'Bank Transfer', 'Cheque', 'NEFT', 'RTGS', 'GPay', 'PhonePe'];
+const EXPENSE_TYPES = ['Operational', 'Capital', 'Recurring', 'One-Time'];
+
+function Toast({ msg, type }) {
+  if (!msg) return null;
+  return (
+    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 9999, background: type === 'error' ? '#EF4444' : '#26C281', color: '#fff', borderRadius: 12, padding: '13px 22px', fontWeight: 700, fontSize: 14, boxShadow: '0 4px 20px rgba(0,0,0,.18)' }}>
+      {msg}
+    </div>
+  );
+}
+
+export default function FinExpenses({ expenses: propExpenses, setExpenses: propSetExpenses, fetchExpenses: propFetch }) {
+  const [expenses, setExpenses] = useState(propExpenses || []);
+  const [loading, setLoading] = useState(!propExpenses);
+  const [search, setSearch] = useState('');
+  const [catFilter, setCatFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [toast, setToast] = useState({ msg: '', type: 'success' });
+  const [viewItem, setViewItem] = useState(null);
+  const [editItem, setEditItem] = useState(null);
+  const [addOpen, setAddOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(null);
+  const emptyForm = { title: '', description: '', category: 'Office', expenseType: 'Operational', amount: '', paymentMode: 'Cash', status: 'Pending', date: new Date().toISOString().slice(0, 10) };
+  const [form, setForm] = useState(emptyForm);
+  const [editForm, setEditForm] = useState({});
+
+  const showToast = (msg, type = 'success') => { setToast({ msg, type }); setTimeout(() => setToast({ msg: '' }), 3000); };
+
+  useEffect(() => {
+    if (propExpenses) { setExpenses(propExpenses); setLoading(false); return; }
+    setLoading(true);
+    axios.get(API).then(r => { setExpenses(r.data || []); setLoading(false); }).catch(() => setLoading(false));
+  }, [propExpenses]);
+
+  const syncUp = (updated) => {
+    setExpenses(updated);
+    if (propSetExpenses) propSetExpenses(updated);
   };
 
-  const toast = (msg) => alert(msg);
+  const handleAdd = async () => {
+    if (!form.title || !form.amount) return showToast('Fill required fields (Title & Amount)', 'error');
+    setSaving(true);
+    try {
+      const res = await axios.post(API, { ...form, amount: Number(form.amount) });
+      const updated = [res.data, ...expenses];
+      syncUp(updated);
+      setAddOpen(false);
+      setForm(emptyForm);
+      showToast('✅ Expense added!');
+    } catch { showToast('Failed to add', 'error'); }
+    finally { setSaving(false); }
+  };
+
+  const handleEdit = async () => {
+    if (!editForm.title || !editForm.amount) return showToast('Fill required fields', 'error');
+    setSaving(true);
+    try {
+      const res = await axios.put(`${API}/${editItem._id}`, { ...editForm, amount: Number(editForm.amount) });
+      const updated = expenses.map(x => x._id === editItem._id ? res.data : x);
+      syncUp(updated);
+      setEditItem(null);
+      showToast('✅ Expense updated!');
+    } catch { showToast('Failed to update', 'error'); }
+    finally { setSaving(false); }
+  };
+
+  const handleDelete = async (exp) => {
+    if (!window.confirm(`Delete "${exp.title || exp.description}"?`)) return;
+    setDeleting(exp._id);
+    try {
+      await axios.delete(`${API}/${exp._id}`);
+      const updated = expenses.filter(x => x._id !== exp._id);
+      syncUp(updated);
+      showToast('🗑️ Expense deleted');
+    } catch { showToast('Failed to delete', 'error'); }
+    finally { setDeleting(null); }
+  };
+
+  const filtered = expenses.filter(e => {
+    const matchSearch = !search || (e.vendor || '').toLowerCase().includes(search.toLowerCase()) || (e.description || '').toLowerCase().includes(search.toLowerCase());
+    const matchCat = catFilter === 'All' || e.category === catFilter;
+    const matchStatus = statusFilter === 'All' || e.status === statusFilter;
+    return matchSearch && matchCat && matchStatus;
+  });
+
+  const total = expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
+  const byCategory = CATEGORIES.map(c => ({ name: c, total: expenses.filter(e => e.category === c).reduce((s, e) => s + Number(e.amount || 0), 0) })).filter(c => c.total > 0).slice(0, 3);
+
+  const S = {
+    overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(3px)' },
+    modal: { background: '#fff', borderRadius: 18, padding: '28px 30px', width: 560, maxWidth: '95vw', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,.18)' },
+    label: { display: 'block', fontSize: 11, fontWeight: 800, color: '#4A5568', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 },
+    input: { width: '100%', padding: '11px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 14, color: '#1A2332', background: '#F0F4F8', outline: 'none', boxSizing: 'border-box' },
+    btn: (bg, color = '#fff') => ({ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 18px', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer', border: 'none', background: bg, color }),
+    actionBtn: (danger) => ({ background: 'transparent', border: `1.5px solid ${danger ? '#FCA5A5' : '#E2E8F0'}`, borderRadius: 8, padding: '5px 10px', cursor: 'pointer', color: danger ? '#EF4444' : '#4A5568', fontSize: 13, display: 'inline-flex', alignItems: 'center' }),
+  };
 
   return (
     <>
       <style>{`
-/* ── M Business Finance Design System ── */
-:root {
-  --primary:#00BCD4; --primary-dark:#0097A7; --primary-light:#E0F7FA; --primary-mid:#B2EBF2;
-  --text-dark:#1A2332; --text-mid:#4A5568; --text-light:#718096;
-  --bg:#F0F4F8; --white:#FFFFFF; --border:#E2E8F0;
-  --green:#26C281; --green-light:#D1FAE5; --green-dark:#065F46;
-  --orange:#F59E0B; --orange-light:#FEF3C7; --orange-dark:#92400E;
-  --red:#FF6B6B; --red-dark:#EF4444; --red-light:#FEE2E2;
-  --purple:#8B5CF6; --purple-light:#EDE9FE;
-  --blue:#3B82F6; --blue-light:#DBEAFE;
-  --radius:14px; --shadow:0 2px 12px rgba(0,188,212,.08); --shadow-lg:0 8px 32px rgba(0,188,212,.14);
-}
-* { box-sizing: border-box; }
-a { text-decoration: none; color: inherit; }
-.main{ flex:1; display:flex; flex-direction:column; min-height:100vh; background: var(--bg); font-family: 'Nunito', sans-serif; color: var(--text-dark); }
-.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 26px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
-.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-light);}
-.breadcrumb a{color:var(--primary);font-weight:700;}
-.topbar-actions{display:flex;align-items:center;gap:10px;}
-.content{padding:26px;flex:1;}
-.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s;}
-.btn-primary{background:var(--primary);color:#fff;}.btn-primary:hover{background:var(--primary-dark);}
-.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text-mid);}.btn-outline:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light);}
-.btn-green{background:var(--green);color:#fff;}.btn-green:hover{background:#1aab6d;}
-.btn-red{background:var(--red-light);color:var(--red-dark);border:1.5px solid #FCA5A5;}.btn-red:hover{background:var(--red-dark);color:#fff;}
-.btn-sm{padding:6px 12px;font-size:12px;}
-.card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;}
-.kpi-grid{display:grid;gap:16px;margin-bottom:22px;}
-.kpi-grid-4{grid-template-columns:repeat(4,1fr);}
-.kpi{background:var(--white);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);border-left:4px solid transparent;}
-.kpi.expense{border-left-color:var(--red);}
-.kpi.pending{border-left-color:var(--orange);}
-.kpi-label{font-size:11px;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;}
-.kpi-value{font-size:24px;font-weight:900;color:var(--text-dark);margin-bottom:4px;}
-.kpi-sub{font-size:12px;font-weight:600;display:flex;align-items:center;gap:4px;}
-.kpi-sub.up{color:var(--green);}
-.kpi-sub.down{color:var(--red);}
-.kpi-sub.neutral{color:var(--text-light);}
-.table-wrap{overflow-x:auto;}
-table{width:100%;border-collapse:collapse;font-size:13px;}
-thead tr{background:var(--bg);}
-th{padding:10px 14px;text-align:left;font-size:11px;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:.7px;white-space:nowrap;}
-td{padding:12px 14px;border-bottom:1px solid var(--bg);color:var(--text-dark);font-weight:600;}
-tr:last-child td{border-bottom:none;}
-tr:hover td{background:#FAFCFE;}
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
-.badge-paid{background:var(--green-light);color:var(--green-dark);}
-.badge-pending{background:var(--orange-light);color:var(--orange-dark);}
-.badge-overdue{background:var(--red-light);color:var(--red-dark);}
-.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
-.search-box{display:flex;align-items:center;gap:8px;background:var(--white);border:1.5px solid var(--border);border-radius:10px;padding:9px 14px;min-width:220px;}
-.search-box:focus-within{border-color:var(--primary);}
-.search-box i{color:var(--text-light);font-size:16px;}
-.search-box input{border:none;outline:none;background:transparent;font-family:'Nunito',sans-serif;font-size:13px;width:100%;}
-.filter-sel{padding:9px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;color:var(--text-mid);background:var(--white);outline:none;cursor:pointer;}
-.filter-sel:focus{border-color:var(--primary);}
-.export-row{display:flex;gap:8px;flex-wrap:wrap;}
-.exp-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid;transition:all .15s;}
-.exp-pdf{background:var(--red-light);color:var(--red-dark);border-color:#FCA5A5;}.exp-pdf:hover{background:var(--red-dark);color:#fff;}
-.exp-excel{background:var(--green-light);color:var(--green-dark);border-color:#6EE7B7;}.exp-excel:hover{background:var(--green);color:#fff;}
-.exp-csv{background:var(--blue-light);color:#1E40AF;border-color:#93C5FD;}.exp-csv:hover{background:var(--blue);color:#fff;}
-.amt-out{color:var(--red-dark);font-weight:800;}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
-.progress-bg{background:var(--bg);border-radius:20px;height:8px;overflow:hidden;}
-.progress-fill{height:100%;border-radius:20px;}
-.pf-red{background:linear-gradient(90deg,var(--red),#DC2626);}
-.pf-orange{background:linear-gradient(90deg,var(--orange),#D97706);}
-.pf-primary{background:linear-gradient(90deg,var(--primary),var(--primary-dark));}
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
-.modal-bg.open{display:flex;}
-.modal{background:var(--white);border-radius:18px;padding:28px 30px;width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.18);}
-.modal-title{font-size:18px;font-weight:900;color:var(--text-dark);display:flex;align-items:center;gap:10px;margin-bottom:22px;}
-.form-group{margin-bottom:16px;}
-.form-group label{display:block;font-size:11px;font-weight:800;color:var(--text-mid);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;color:var(--text-dark);background:var(--bg);outline:none;}
-.form-group input:focus,.form-group select:focus{border-color:var(--primary);background:#fff;}
-.form-2col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.form-3col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
-.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;padding-top:16px;border-top:1px solid var(--border);}
+        .fe-table td, .fe-table th { padding: 12px 14px; border-bottom: 1px solid #F0F4F8; font-size: 13px; }
+        .fe-table th { font-size: 11px; font-weight: 800; color: #718096; text-transform: uppercase; letter-spacing: .7px; background: #F0F4F8; }
+        .fe-table tr:hover td { background: #FAFCFE; }
+        .fe-badge-paid { background: #D1FAE5; color: #065F46; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .fe-badge-pending { background: #FEF3C7; color: #92400E; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .fe-badge-overdue { background: #FEE2E2; color: #EF4444; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
       `}</style>
+      <Toast {...toast} />
 
-      <div className="main">
-        <div className="topbar">
-          <div className="breadcrumb"><a href="#">Finance</a><i className="ti ti-chevron-right"></i><span>Expenses</span></div>
-          <div className="topbar-actions">
-            <button className="btn btn-outline" onClick={openImport} style={{borderColor:'var(--primary)',color:'var(--primary)'}}><i className="ti ti-upload"></i>Import Statement</button>
-            <div className="export-row">
-              <button className="exp-btn exp-pdf" onClick={() => toast('Exporting PDF...')}><i className="ti ti-file-type-pdf"></i>PDF</button>
-              <button className="exp-btn exp-excel" onClick={() => toast('Exporting Excel...')}><i className="ti ti-file-spreadsheet"></i>Excel</button>
-              <button className="exp-btn exp-csv" onClick={() => toast('Exporting CSV...')}><i className="ti ti-file-text"></i>CSV</button>
-            </div>
-            <button className="btn btn-red" style={{background:'var(--red-dark)',color:'#fff',border:'none'}} onClick={() => setIsAddExpModalOpen(true)}><i className="ti ti-plus"></i>Add Expense</button>
+      <div style={{ padding: 26, background: '#F0F4F8', minHeight: '100%', fontFamily: 'Nunito,sans-serif' }}>
+
+        {/* HEADER */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22, flexWrap: 'wrap', gap: 10 }}>
+          <div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: '#1A2332' }}>Expenses</div>
+            <div style={{ fontSize: 13, color: '#718096', marginTop: 2 }}>Track and manage all business outgoings</div>
           </div>
+          <button style={S.btn('#EF4444')} onClick={() => { setForm(emptyForm); setAddOpen(true); }}>
+            <i className="ti ti-plus" /> Add Expense
+          </button>
         </div>
-        <div className="content" ref={mainScrollRef}>
-          <div className="kpi-grid kpi-grid-4">
-            <div className="kpi expense"><div className="kpi-label">This Month</div><div className="kpi-value">₹9,87,500</div><div className="kpi-sub down"><i className="ti ti-trending-up"></i>+5% vs May</div></div>
-            <div className="kpi expense"><div className="kpi-label">Payroll</div><div className="kpi-value">₹5,40,000</div><div className="kpi-sub neutral"><i className="ti ti-users"></i>6 employees</div></div>
-            <div className="kpi pending"><div className="kpi-label">Vendor Payables</div><div className="kpi-value">₹1,45,000</div><div className="kpi-sub down"><i className="ti ti-alert-circle"></i>2 overdue</div></div>
-            <div className="kpi expense"><div className="kpi-label">YTD Expenses</div><div className="kpi-value">₹54,32,000</div><div className="kpi-sub neutral"><i className="ti ti-calendar"></i>FY 2025-26</div></div>
-          </div>
 
-          <div className="grid-3" style={{marginBottom:'20px'}}>
-            <div style={{background:'var(--white)',borderRadius:'var(--radius)',padding:'16px 18px',boxShadow:'var(--shadow)',borderTop:'3px solid var(--red-dark)'}}>
-              <div style={{fontSize:'11px',fontWeight:800,color:'var(--text-light)',textTransform:'uppercase',letterSpacing:'.7px',marginBottom:'8px'}}>Payroll</div>
-              <div style={{fontSize:'20px',fontWeight:900,color:'var(--text-dark)'}}>₹5,40,000</div>
-              <div className="progress-bg" style={{marginTop:'8px'}}><div className="progress-fill pf-red" style={{width:'55%'}}></div></div>
-              <div style={{fontSize:'11px',color:'var(--text-light)',marginTop:'5px'}}>55% of expenses</div>
-            </div>
-            <div style={{background:'var(--white)',borderRadius:'var(--radius)',padding:'16px 18px',boxShadow:'var(--shadow)',borderTop:'3px solid var(--orange)'}}>
-              <div style={{fontSize:'11px',fontWeight:800,color:'var(--text-light)',textTransform:'uppercase',letterSpacing:'.7px',marginBottom:'8px'}}>Operations</div>
-              <div style={{fontSize:'20px',fontWeight:900,color:'var(--text-dark)'}}>₹1,82,000</div>
-              <div className="progress-bg" style={{marginTop:'8px'}}><div className="progress-fill pf-orange" style={{width:'18%'}}></div></div>
-              <div style={{fontSize:'11px',color:'var(--text-light)',marginTop:'5px'}}>18% of expenses</div>
-            </div>
-            <div style={{background:'var(--white)',borderRadius:'var(--radius)',padding:'16px 18px',boxShadow:'var(--shadow)',borderTop:'3px solid var(--primary)'}}>
-              <div style={{fontSize:'11px',fontWeight:800,color:'var(--text-light)',textTransform:'uppercase',letterSpacing:'.7px',marginBottom:'8px'}}>Infrastructure</div>
-              <div style={{fontSize:'20px',fontWeight:900,color:'var(--text-dark)'}}>₹1,24,500</div>
-              <div className="progress-bg" style={{marginTop:'8px'}}><div className="progress-fill pf-primary" style={{width:'13%'}}></div></div>
-              <div style={{fontSize:'11px',color:'var(--text-light)',marginTop:'5px'}}>13% of expenses</div>
-            </div>
+        {/* KPI CARDS */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 16, marginBottom: 22 }}>
+          <div style={{ background: '#fff', borderRadius: 14, padding: '18px 20px', boxShadow: '0 2px 12px rgba(0,188,212,.08)', borderLeft: '4px solid #EF4444' }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: '#718096', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 }}>Total Expenses</div>
+            <div style={{ fontSize: 24, fontWeight: 900, color: '#1A2332' }}>{fmt(total)}</div>
+            <div style={{ fontSize: 12, color: '#718096', marginTop: 4 }}>{expenses.length} records</div>
           </div>
-
-          <div className="toolbar">
-            <div className="search-box"><i className="ti ti-search"></i><input placeholder="Search expenses..." /></div>
-            <select className="filter-sel"><option>All Categories</option><option>Payroll</option><option>Operations</option></select>
-            <select className="filter-sel"><option>All Status</option><option>Paid</option><option>Pending</option></select>
-            <select className="filter-sel"><option>June 2026</option><option>May 2026</option></select>
-          </div>
-
-          <div className="card">
-            <div className="table-wrap">
-              <table>
-                <thead><tr><th><input type="checkbox" style={{accentColor:'var(--primary)'}} /></th><th>Date</th><th>Ref No.</th><th>Vendor / Payee</th><th>Description</th><th>Category</th><th>Amount</th><th>Payment Mode</th><th>Status</th><th>Actions</th></tr></thead>
-                <tbody>
-                  <tr><td><input type="checkbox" /></td><td>Jun 1</td><td style={{color:'var(--red-dark)',fontWeight:700}}>EXP-0061</td><td>Internal — HR</td><td>Salaries — June 2026</td><td><span style={{background:'var(--red-light)',color:'var(--red-dark)',padding:'2px 8px',borderRadius:'20px',fontSize:'11px',fontWeight:700}}>Payroll</span></td><td className="amt-out">₹5,40,000</td><td>Bank Transfer</td><td><span className="badge badge-paid">Paid</span></td><td><div style={{display:'flex',gap:'6px'}}><button className="btn btn-outline btn-sm"><i className="ti ti-eye"></i></button></div></td></tr>
-                  <tr><td><input type="checkbox" /></td><td>Jun 4</td><td style={{color:'var(--red-dark)',fontWeight:700}}>EXP-0062</td><td>Amazon Web Services</td><td>Cloud Infrastructure</td><td><span style={{background:'var(--primary-light)',color:'var(--primary-dark)',padding:'2px 8px',borderRadius:'20px',fontSize:'11px',fontWeight:700}}>Infrastructure</span></td><td className="amt-out">₹42,000</td><td>Auto-debit</td><td><span className="badge badge-paid">Paid</span></td><td><div style={{display:'flex',gap:'6px'}}><button className="btn btn-outline btn-sm"><i className="ti ti-eye"></i></button></div></td></tr>
-                </tbody>
-              </table>
+          {byCategory.map(c => (
+            <div key={c.name} style={{ background: '#fff', borderRadius: 14, padding: '18px 20px', boxShadow: '0 2px 12px rgba(0,188,212,.08)', borderLeft: '4px solid #00BCD4' }}>
+              <div style={{ fontSize: 11, fontWeight: 800, color: '#718096', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 }}>{c.name}</div>
+              <div style={{ fontSize: 24, fontWeight: 900, color: '#1A2332' }}>{fmt(c.total)}</div>
+              <div style={{ fontSize: 12, color: '#718096', marginTop: 4 }}>{total > 0 ? Math.round(c.total / total * 100) : 0}% of expenses</div>
             </div>
-          </div>
+          ))}
         </div>
-      </div>
 
-      <div className={`modal-bg ${isAddExpModalOpen ? 'open' : ''}`} onClick={(e) => { if(e.target.className.includes('modal-bg')) setIsAddExpModalOpen(false) }}>
-        <div className="modal">
-          <div className="modal-title"><i className="ti ti-arrow-bar-up" style={{color:'var(--red-dark)'}}></i>Add Expense</div>
-          <div className="form-2col">
-            <div className="form-group"><label>Date *</label><input type="date" defaultValue="2026-06-05" /></div>
-            <div className="form-group"><label>Ref No.</label><input placeholder="e.g. EXP-0065" defaultValue="EXP-0065" /></div>
+        {/* FILTERS */}
+        <div style={{ display: 'flex', gap: 10, marginBottom: 18, flexWrap: 'wrap', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fff', border: '1.5px solid #E2E8F0', borderRadius: 10, padding: '9px 14px', minWidth: 220 }}>
+            <i className="ti ti-search" style={{ color: '#718096' }} />
+            <input placeholder="Search expenses..." value={search} onChange={e => setSearch(e.target.value)} style={{ border: 'none', outline: 'none', fontFamily: 'Nunito,sans-serif', fontSize: 13, width: '100%', background: 'transparent' }} />
           </div>
-          <div className="form-2col">
-            <div className="form-group"><label>Vendor / Payee *</label><input placeholder="Who was paid?" /></div>
-            <div className="form-group"><label>Category *</label>
-              <select>
-                <option>Payroll</option><option>Operations</option><option>Infrastructure</option>
-              </select>
-            </div>
+          <select value={catFilter} onChange={e => setCatFilter(e.target.value)} style={{ padding: '9px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 600, color: '#4A5568', background: '#fff', outline: 'none', cursor: 'pointer' }}>
+            <option value="All">All Categories</option>
+            {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+          </select>
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ padding: '9px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 600, color: '#4A5568', background: '#fff', outline: 'none', cursor: 'pointer' }}>
+            <option value="All">All Status</option>
+            <option>Paid</option><option>Pending</option><option>Overdue</option>
+          </select>
+        </div>
+
+        {/* TABLE */}
+        <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 2px 12px rgba(0,188,212,.08)', overflow: 'hidden' }}>
+          <div style={{ overflowX: 'auto' }}>
+            <table className="fe-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr>
+                  <th>Date</th><th>Vendor / Payee</th><th>Description</th><th>Category</th>
+                  <th>Amount</th><th>Payment Mode</th><th>Status</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: '#718096' }}>Loading expenses...</td></tr>
+                ) : filtered.length === 0 ? (
+                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: '#718096' }}>{expenses.length === 0 ? 'No expenses yet. Click "Add Expense" to get started.' : 'No results match your filters.'}</td></tr>
+                ) : filtered.map(exp => (
+                  <tr key={exp._id}>
+                    <td style={{ whiteSpace: 'nowrap' }}>{exp.date ? new Date(exp.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : new Date(exp.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</td>
+                    <td style={{ fontWeight: 700 }}>{exp.title || '—'}</td>
+                    <td>{exp.description || '—'}</td>
+                    <td><span style={{ background: '#FEE2E2', color: '#EF4444', padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{exp.category}</span></td>
+                    <td style={{ color: '#EF4444', fontWeight: 800 }}>−{fmt(exp.amount)}</td>
+                    <td>{exp.paymentMode || exp.payment_mode || '—'}</td>
+                    <td><span className={`fe-badge-${(exp.status || 'paid').toLowerCase()}`}>{exp.status || 'Paid'}</span></td>
+                    <td>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <button style={S.actionBtn(false)} title="View" onClick={() => setViewItem(exp)}><i className="ti ti-eye" /></button>
+                        <button style={S.actionBtn(false)} title="Edit" onClick={() => { setEditItem(exp); setEditForm({ title: exp.title || '', description: exp.description || '', category: exp.category || 'Office', expenseType: exp.expenseType || 'Operational', amount: exp.amount, paymentMode: exp.paymentMode || 'Cash', status: exp.status || 'Pending', date: (exp.date || exp.createdAt || '').slice(0, 10) }); }}><i className="ti ti-pencil" /></button>
+                        <button style={S.actionBtn(true)} title="Delete" disabled={deleting === exp._id} onClick={() => handleDelete(exp)}><i className={deleting === exp._id ? 'ti ti-loader-2' : 'ti ti-trash'} /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <div className="form-group"><label>Description</label><input placeholder="What was this expense for?" /></div>
-          <div className="form-3col">
-            <div className="form-group"><label>Amount (₹) *</label><input type="number" placeholder="0.00" /></div>
-            <div className="form-group"><label>Payment Mode</label><select><option>Bank Transfer</option><option>NEFT/RTGS</option></select></div>
-            <div className="form-group"><label>Status</label><select><option>Paid</option><option>Pending</option></select></div>
-          </div>
-          <div className="form-2col">
-            <div className="form-group"><label>Bank Account</label><select><option>HDFC — ••••4821</option></select></div>
-            <div className="form-group"><label>Linked Vendor</label><select><option>— None —</option><option>Amazon Web Services</option></select></div>
-          </div>
-          <div className="form-group"><label>Receipt / Proof</label><input type="file" accept=".pdf,.jpg,.png" style={{fontSize:'13px'}} /></div>
-          <div className="modal-footer">
-            <button className="btn btn-outline" onClick={() => setIsAddExpModalOpen(false)}>Cancel</button>
-            <button className="btn btn-red" style={{background:'var(--red-dark)',color:'#fff',border:'none'}} onClick={saveExp}><i className="ti ti-check"></i>Save Expense</button>
+          <div style={{ padding: '12px 16px', borderTop: '1px solid #E2E8F0', fontSize: 13, color: '#718096' }}>
+            Showing {filtered.length} of {expenses.length} records
           </div>
         </div>
       </div>
 
-      {isImportModalOpen && (
-        <div className="modal-bg open" onClick={(e) => { if(e.target.className.includes('modal-bg')) closeImport() }}>
-          <div className="modal" style={{textAlign:'center', padding: '40px'}}>
-            <h3>Import Modal</h3>
-            <p>Placeholder for import modal UI.</p>
-            <button className="btn btn-outline" onClick={closeImport}>Close</button>
+      {/* VIEW MODAL */}
+      {viewItem && (
+        <div style={S.overlay} onClick={e => e.target === e.currentTarget && setViewItem(null)}>
+          <div style={S.modal}>
+            <div style={{ fontSize: 18, fontWeight: 900, color: '#1A2332', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <i className="ti ti-receipt" style={{ color: '#EF4444' }} /> Expense Details
+            </div>
+            {[['Title', viewItem.title], ['Description', viewItem.description], ['Category', viewItem.category], ['Expense Type', viewItem.expenseType], ['Amount', fmt(viewItem.amount)], ['Payment Mode', viewItem.paymentMode], ['Status', viewItem.status], ['Date', new Date(viewItem.date || viewItem.createdAt).toLocaleDateString('en-IN')]].map(([l, v]) => (
+              <div key={l} style={{ display: 'flex', justifyContent: 'space-between', padding: '11px 0', borderBottom: '1px solid #F0F4F8', fontSize: 13 }}>
+                <span style={{ fontWeight: 700, color: '#718096' }}>{l}</span>
+                <span style={{ fontWeight: 700, color: '#1A2332' }}>{v || '—'}</span>
+              </div>
+            ))}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 22 }}>
+              <button style={S.btn('#F0F4F8', '#1A2332')} onClick={() => setViewItem(null)}>Close</button>
+              <button style={S.btn('#EF4444')} onClick={() => { const item = viewItem; setViewItem(null); setEditItem(item); setEditForm({ title: item.title || '', description: item.description || '', category: item.category || 'Office', expenseType: item.expenseType || 'Operational', amount: item.amount, paymentMode: item.paymentMode || 'Cash', status: item.status || 'Pending', date: (item.date || item.createdAt || '').slice(0, 10) }); }}>Edit</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ADD MODAL */}
+      {addOpen && (
+        <div style={S.overlay} onClick={e => e.target === e.currentTarget && setAddOpen(false)}>
+          <div style={S.modal}>
+            <div style={{ fontSize: 18, fontWeight: 900, color: '#1A2332', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <i className="ti ti-plus" style={{ color: '#EF4444' }} /> Add Expense
+            </div>
+            {[['Title *', 'title', 'text', 'e.g. Office Rent, AWS Bill'], ['Description', 'description', 'text', 'What was this for?'], ['Amount (₹) *', 'amount', 'number', '0.00'], ['Date', 'date', 'date', '']].map(([label, key, type, ph]) => (
+              <div key={key} style={{ marginBottom: 14 }}>
+                <label style={S.label}>{label}</label>
+                <input type={type} placeholder={ph} value={form[key]} onChange={e => setForm({ ...form, [key]: e.target.value })} style={S.input} />
+              </div>
+            ))}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
+              {[['Category', 'category', CATEGORIES], ['Expense Type', 'expenseType', EXPENSE_TYPES], ['Payment Mode', 'paymentMode', MODES], ['Status', 'status', ['Pending', 'Approved', 'Rejected']]].map(([label, key, opts]) => (
+                <div key={key}>
+                  <label style={S.label}>{label}</label>
+                  <select value={form[key]} onChange={e => setForm({ ...form, [key]: e.target.value })} style={S.input}>{opts.map(o => <option key={o}>{o}</option>)}</select>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 22, paddingTop: 16, borderTop: '1px solid #E2E8F0' }}>
+              <button style={S.btn('#F0F4F8', '#1A2332')} onClick={() => setAddOpen(false)}>Cancel</button>
+              <button style={S.btn('#EF4444')} disabled={saving} onClick={handleAdd}>{saving ? 'Saving...' : 'Save Expense'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT MODAL */}
+      {editItem && (
+        <div style={S.overlay} onClick={e => e.target === e.currentTarget && setEditItem(null)}>
+          <div style={S.modal}>
+            <div style={{ fontSize: 18, fontWeight: 900, color: '#1A2332', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <i className="ti ti-pencil" style={{ color: '#EF4444' }} /> Edit Expense
+            </div>
+            {[['Title *', 'title', 'text', ''], ['Description', 'description', 'text', ''], ['Amount (₹) *', 'amount', 'number', ''], ['Date', 'date', 'date', '']].map(([label, key, type, ph]) => (
+              <div key={key} style={{ marginBottom: 14 }}>
+                <label style={S.label}>{label}</label>
+                <input type={type} placeholder={ph} value={editForm[key]} onChange={e => setEditForm({ ...editForm, [key]: e.target.value })} style={S.input} />
+              </div>
+            ))}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
+              {[['Category', 'category', CATEGORIES], ['Expense Type', 'expenseType', EXPENSE_TYPES], ['Payment Mode', 'paymentMode', MODES], ['Status', 'status', ['Pending', 'Approved', 'Rejected']]].map(([label, key, opts]) => (
+                <div key={key}>
+                  <label style={S.label}>{label}</label>
+                  <select value={editForm[key]} onChange={e => setEditForm({ ...editForm, [key]: e.target.value })} style={S.input}>{opts.map(o => <option key={o}>{o}</option>)}</select>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 22, paddingTop: 16, borderTop: '1px solid #E2E8F0' }}>
+              <button style={S.btn('#F0F4F8', '#1A2332')} onClick={() => setEditItem(null)}>Cancel</button>
+              <button style={S.btn('#EF4444')} disabled={saving} onClick={handleEdit}>{saving ? 'Updating...' : 'Update Expense'}</button>
+            </div>
           </div>
         </div>
       )}

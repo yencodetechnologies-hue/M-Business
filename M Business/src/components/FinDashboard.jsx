@@ -3,11 +3,91 @@ import React, { useState, useRef } from 'react';
 export default function FinDashboard() {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [impCurrentStep, setImpCurrentStep] = useState(1);
-  const [selectedBank, setSelectedBank] = useState('HDFC');
+  const [selectedBank, setSelectedBank] = useState('');
   const [importedFile, setImportedFile] = useState(null);
   const mainScrollRef = useRef(null);
+  const [dashboardData, setDashboardData] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+  const [bankAccounts, setBankAccounts] = useState([]);
+  const [expenseBreakdown, setExpenseBreakdown] = useState([]);
+  const [cashflow, setCashflow] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedPeriod, setSelectedPeriod] = useState('This Month — June 2026');
+  const stepLabels = ['', 'Select Bank', 'Upload File', 'Map Columns', 'Review & Import'];
 
-  const stepLabels = ['','Select Bank','Upload File','Map Columns','Review & Import'];
+
+  const STATIC_DATA = {
+    'This Month — June 2026': {
+      kpis: { totalIncome: 1842000, totalExpenses: 987500, netProfit: 854500, pendingReceivables: 321000, vendorPayables: 145000, incomeChange: 12, expenseChange: 5, profitMargin: 46, pendingInvoices: 4, overdueVendors: 2 },
+      cashflow: [{ month: 'Jan', income: 1520000, expense: 890000 }, { month: 'Feb', income: 1380000, expense: 820000 }, { month: 'Mar', income: 1650000, expense: 960000 }, { month: 'Apr', income: 1720000, expense: 910000 }, { month: 'May', income: 1640000, expense: 935000 }, { month: 'Jun', income: 1842000, expense: 987500 }],
+      transactions: [{ date: 'Jun 5', description: 'NovaMart — Invoice INV-2026-019', category: 'Project Revenue', type: 'Income', amount: 212500, status: 'Pending' }, { date: 'Jun 4', description: 'AWS Cloud — Monthly Infrastructure', category: 'Infrastructure', type: 'Expense', amount: 42000, status: 'Paid' }, { date: 'Jun 3', description: 'MediCore — Milestone 1 Payment', category: 'Project Revenue', type: 'Income', amount: 187500, status: 'Paid' }, { date: 'Jun 2', description: 'Office Rent — June 2026', category: 'Operations', type: 'Expense', amount: 75000, status: 'Paid' }, { date: 'Jun 1', description: 'Salaries — June Payroll', category: 'Payroll', type: 'Expense', amount: 540000, status: 'Paid' }, { date: 'May 31', description: 'LogiTrack — Advance (30%)', category: 'Project Revenue', type: 'Income', amount: 350000, status: 'Paid' }],
+      bankAccounts: [{ bank: 'HDFC Bank', type: 'Current A/C', last4: '4821', balance: 1284320, synced: '2h ago', primary: true }, { bank: 'ICICI Bank', type: 'Savings A/C', last4: '7734', balance: 421800, synced: '2h ago', primary: false }],
+      expenseBreakdown: [{ category: 'Payroll', amount: 540000, percent: 55 }, { category: 'Operations', amount: 182000, percent: 18 }, { category: 'Infrastructure', amount: 124500, percent: 13 }, { category: 'Vendors', amount: 88000, percent: 9 }],
+    },
+    'May 2026': {
+      kpis: { totalIncome: 1640000, totalExpenses: 935000, netProfit: 705000, pendingReceivables: 278000, vendorPayables: 122000, incomeChange: 8, expenseChange: 3, profitMargin: 43, pendingInvoices: 3, overdueVendors: 1 },
+      cashflow: [{ month: 'Dec', income: 1400000, expense: 820000 }, { month: 'Jan', income: 1520000, expense: 890000 }, { month: 'Feb', income: 1380000, expense: 820000 }, { month: 'Mar', income: 1650000, expense: 960000 }, { month: 'Apr', income: 1720000, expense: 910000 }, { month: 'May', income: 1640000, expense: 935000 }],
+      transactions: [{ date: 'May 30', description: 'TechNest — Monthly Retainer', category: 'Retainer', type: 'Income', amount: 85000, status: 'Paid' }, { date: 'May 28', description: 'AquaFin — Brand Identity Final', category: 'Project Revenue', type: 'Income', amount: 120000, status: 'Paid' }, { date: 'May 25', description: 'SunRise Exports — Corporate Website', category: 'Project Revenue', type: 'Income', amount: 95000, status: 'Overdue' }, { date: 'May 20', description: 'Google Workspace Renewal', category: 'Infrastructure', type: 'Expense', amount: 18500, status: 'Paid' }, { date: 'May 15', description: 'Salaries — May Payroll', category: 'Payroll', type: 'Expense', amount: 540000, status: 'Paid' }, { date: 'May 10', description: 'Office Supplies & Stationery', category: 'Operations', type: 'Expense', amount: 12000, status: 'Paid' }],
+      bankAccounts: [{ bank: 'HDFC Bank', type: 'Current A/C', last4: '4821', balance: 1102400, synced: '1d ago', primary: true }, { bank: 'ICICI Bank', type: 'Savings A/C', last4: '7734', balance: 389200, synced: '1d ago', primary: false }],
+      expenseBreakdown: [{ category: 'Payroll', amount: 540000, percent: 58 }, { category: 'Operations', amount: 168000, percent: 18 }, { category: 'Infrastructure', amount: 110000, percent: 12 }, { category: 'Vendors', amount: 76000, percent: 8 }],
+    },
+    'Q1 2026': {
+      kpis: { totalIncome: 4950000, totalExpenses: 2670000, netProfit: 2280000, pendingReceivables: 540000, vendorPayables: 380000, incomeChange: 22, expenseChange: 8, profitMargin: 46, pendingInvoices: 7, overdueVendors: 3 },
+      cashflow: [{ month: 'Oct', income: 1480000, expense: 870000 }, { month: 'Nov', income: 1560000, expense: 900000 }, { month: 'Dec', income: 1910000, expense: 900000 }, { month: 'Jan', income: 1520000, expense: 890000 }, { month: 'Feb', income: 1380000, expense: 820000 }, { month: 'Mar', income: 1650000, expense: 960000 }],
+      transactions: [{ date: 'Mar 31', description: 'Q1 Final Settlements', category: 'Project Revenue', type: 'Income', amount: 420000, status: 'Paid' }, { date: 'Mar 25', description: 'Infra Upgrade — Server Costs', category: 'Infrastructure', type: 'Expense', amount: 85000, status: 'Paid' }, { date: 'Mar 15', description: 'Salaries — March Payroll', category: 'Payroll', type: 'Expense', amount: 540000, status: 'Paid' }, { date: 'Feb 28', description: 'RetailMax — Phase 2 Milestone', category: 'Project Revenue', type: 'Income', amount: 290000, status: 'Paid' }, { date: 'Jan 20', description: 'Annual Software Licenses', category: 'Infrastructure', type: 'Expense', amount: 62000, status: 'Paid' }, { date: 'Jan 10', description: 'New Client Advance — LogiTrack', category: 'Project Revenue', type: 'Income', amount: 350000, status: 'Paid' }],
+      bankAccounts: [{ bank: 'HDFC Bank', type: 'Current A/C', last4: '4821', balance: 2140000, synced: '3d ago', primary: true }, { bank: 'ICICI Bank', type: 'Savings A/C', last4: '7734', balance: 680000, synced: '3d ago', primary: false }],
+      expenseBreakdown: [{ category: 'Payroll', amount: 1620000, percent: 61 }, { category: 'Operations', amount: 480000, percent: 18 }, { category: 'Infrastructure', amount: 320000, percent: 12 }, { category: 'Vendors', amount: 250000, percent: 9 }],
+    },
+    'FY 2025-26': {
+      kpis: { totalIncome: 9214000, totalExpenses: 5432000, netProfit: 3782000, pendingReceivables: 876000, vendorPayables: 540000, incomeChange: 31, expenseChange: 14, profitMargin: 41, pendingInvoices: 11, overdueVendors: 4 },
+      cashflow: [{ month: 'Jul', income: 1280000, expense: 780000 }, { month: 'Aug', income: 1420000, expense: 840000 }, { month: 'Sep', income: 1560000, expense: 890000 }, { month: 'Oct', income: 1480000, expense: 870000 }, { month: 'Nov', income: 1560000, expense: 900000 }, { month: 'Dec', income: 1914000, expense: 1152000 }],
+      transactions: [{ date: 'Dec 31', description: 'Year-end Revenue Collection', category: 'Project Revenue', type: 'Income', amount: 840000, status: 'Paid' }, { date: 'Dec 15', description: 'Annual Payroll Bonus', category: 'Payroll', type: 'Expense', amount: 320000, status: 'Paid' }, { date: 'Nov 30', description: 'MegaCorp — Year Contract', category: 'Retainer', type: 'Income', amount: 560000, status: 'Paid' }, { date: 'Oct 20', description: 'Office Renovation', category: 'Operations', type: 'Expense', amount: 180000, status: 'Paid' }, { date: 'Sep 15', description: 'HealthTrack App — Full Payment', category: 'Project Revenue', type: 'Income', amount: 480000, status: 'Paid' }, { date: 'Aug 10', description: 'Annual Insurance Premium', category: 'Operations', type: 'Expense', amount: 95000, status: 'Paid' }],
+      bankAccounts: [{ bank: 'HDFC Bank', type: 'Current A/C', last4: '4821', balance: 3420000, synced: '1w ago', primary: true }, { bank: 'ICICI Bank', type: 'Savings A/C', last4: '7734', balance: 1180000, synced: '1w ago', primary: false }],
+      expenseBreakdown: [{ category: 'Payroll', amount: 3240000, percent: 60 }, { category: 'Operations', amount: 980000, percent: 18 }, { category: 'Infrastructure', amount: 700000, percent: 13 }, { category: 'Vendors', amount: 512000, percent: 9 }],
+    },
+  };
+
+  const fetchDashboardData = () => {
+    setLoading(true); setError(null);
+    // Simulate a brief load for smooth UX
+    setTimeout(() => {
+      const data = STATIC_DATA[selectedPeriod] || STATIC_DATA['This Month — June 2026'];
+      setDashboardData(data.kpis);
+      setCashflow(data.cashflow);
+      setTransactions(data.transactions);
+      setBankAccounts(data.bankAccounts);
+      setExpenseBreakdown(data.expenseBreakdown);
+      if (data.bankAccounts.length > 0) setSelectedBank(data.bankAccounts[0].bank);
+      setLoading(false);
+    }, 400);
+  };
+
+  React.useEffect(() => { fetchDashboardData(); }, [selectedPeriod]);
+
+  const handleDeleteTransaction = (index) => {
+    if (!window.confirm("Delete this transaction?")) return;
+    setTransactions(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleEditTransaction = (index) => {
+    const tx = transactions[index];
+    const newDesc = window.prompt("Edit description:", tx.description);
+    if (newDesc === null) return;
+    setTransactions(prev => prev.map((t, i) => i === index ? { ...t, description: newDesc } : t));
+  };
+
+
+
+
+  const fmt = (num) => {
+    if (!num && num !== 0) return '₹0';
+    if (num >= 100000) return `₹${(num / 100000).toFixed(2).replace(/\.00$/, '')} L`;
+    return `₹${num.toLocaleString('en-IN')}`;
+  };
+  const maxCashflow = cashflow.length ? Math.max(...cashflow.map(m => Math.max(m.income, m.expense))) : 1;
+  const pfColors = ['pf-red', 'pf-orange', 'pf-primary', ''];
+  const pfStyles = [null, null, null, { background: 'var(--purple)' }];
 
   const openImport = () => {
     setIsImportModalOpen(true);
@@ -24,17 +104,17 @@ export default function FinDashboard() {
 
   const handleFile = (e) => {
     const f = e.target.files[0];
-    if(!f) return;
+    if (!f) return;
     setImportedFile(f);
   };
 
   const impNext = () => {
-    if(impCurrentStep === 4){
+    if (impCurrentStep === 4) {
       setIsImportModalOpen(false);
       alert('Yes 144 transactions imported successfully! 4 duplicates skipped.');
       return;
     }
-    if(impCurrentStep === 2 && !importedFile){
+    if (impCurrentStep === 2 && !importedFile) {
       alert('Please select a file first');
       return;
     }
@@ -172,10 +252,10 @@ tr:hover td{background:#FAFCFE;}
         <div className="topbar">
           <div className="page-title">Finance Overview</div>
           <div className="topbar-actions">
-            <button className="btn btn-outline" onClick={openImport} style={{borderColor:'var(--primary)',color:'var(--primary)'}}>
+            <button className="btn btn-outline" onClick={openImport} style={{ borderColor: 'var(--primary)', color: 'var(--primary)' }}>
               <i className="ti ti-upload"></i>Import Statement
             </button>
-            <select className="filter-sel">
+            <select className="filter-sel" value={selectedPeriod} onChange={e => setSelectedPeriod(e.target.value)}>
               <option>This Month — June 2026</option>
               <option>May 2026</option>
               <option>Q1 2026</option>
@@ -184,182 +264,210 @@ tr:hover td{background:#FAFCFE;}
             <button className="btn btn-outline">
               <i className="ti ti-file-analytics"></i>Reports
             </button>
-            <button className="btn btn-primary" style={{background:'var(--purple)'}}>
+            <button className="btn btn-primary" style={{ background: 'var(--purple)' }}>
               <i className="ti ti-shield-check"></i>Auditor Portal
             </button>
           </div>
         </div>
-        
+
         <div className="content" ref={mainScrollRef}>
-          <div className="kpi-grid kpi-grid-5">
-            <div className="kpi income">
-              <div className="kpi-label">Total Income</div>
-              <div className="kpi-value">₹18,42,000</div>
-              <div className="kpi-sub up"><i className="ti ti-trending-up"></i>+12% vs last month</div>
+          {loading && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ width: '44px', height: '44px', border: '4px solid var(--primary-mid)', borderTop: '4px solid var(--primary)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></div>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-light)' }}>Loading dashboard data...</div>
+              <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
             </div>
-            <div className="kpi expense">
-              <div className="kpi-label">Total Expenses</div>
-              <div className="kpi-value">₹9,87,500</div>
-              <div className="kpi-sub down"><i className="ti ti-trending-up"></i>+5% vs last month</div>
+          )}
+          {error && (
+            <div style={{ background: 'var(--red-light)', border: '1.5px solid #FCA5A5', borderRadius: '12px', padding: '16px 20px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <i className="ti ti-alert-circle" style={{ color: 'var(--red-dark)', fontSize: '20px' }}></i>
+              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--red-dark)' }}>{error}</span>
+              <button className="btn btn-sm" style={{ marginLeft: 'auto', background: 'var(--red-dark)', color: '#fff', border: 'none' }} onClick={fetchDashboardData}>Retry</button>
             </div>
-            <div className="kpi profit">
-              <div className="kpi-label">Net Profit</div>
-              <div className="kpi-value">₹8,54,500</div>
-              <div className="kpi-sub up"><i className="ti ti-trending-up"></i>+19% margin</div>
-            </div>
-            <div className="kpi pending">
-              <div className="kpi-label">Pending Receivables</div>
-              <div className="kpi-value">₹3,21,000</div>
-              <div className="kpi-sub neutral"><i className="ti ti-clock"></i>4 invoices due</div>
-            </div>
-            <div className="kpi vendor">
-              <div className="kpi-label">Vendor Payables</div>
-              <div className="kpi-value">₹1,45,000</div>
-              <div className="kpi-sub down"><i className="ti ti-alert-circle"></i>2 overdue</div>
-            </div>
-          </div>
-
-          <div className="grid-main-side" style={{marginBottom:'20px'}}>
-            <div>
-              <div className="card" style={{marginBottom:'20px'}}>
-                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'18px'}}>
-                  <div style={{fontSize:'15px',fontWeight:800,color:'var(--text-dark)',display:'flex',alignItems:'center',gap:'8px'}}>
-                    <i className="ti ti-chart-bar" style={{color:'var(--primary)',fontSize:'18px'}}></i>Monthly Cashflow
-                  </div>
-                  <div style={{display:'flex',gap:'14px',fontSize:'12px',fontWeight:700}}>
-                    <span style={{display:'flex',alignItems:'center',gap:'5px',color:'var(--green)'}}>
-                      <span style={{width:'10px',height:'10px',background:'var(--green)',borderRadius:'50%',display:'inline-block'}}></span>Income
-                    </span>
-                    <span style={{display:'flex',alignItems:'center',gap:'5px',color:'var(--red-dark)'}}>
-                      <span style={{width:'10px',height:'10px',background:'var(--red-dark)',borderRadius:'50%',display:'inline-block'}}></span>Expenses
-                    </span>
+          )}
+          {!loading && dashboardData && (
+            <>
+              <div className="kpi-grid kpi-grid-5">
+                <div className="kpi income">
+                  <div className="kpi-label">Total Income</div>
+                  <div className="kpi-value">{fmt(dashboardData.totalIncome)}</div>
+                  <div className={`kpi-sub ${dashboardData.incomeChange >= 0 ? 'up' : 'down'}`}>
+                    <i className={`ti ti-trending-${dashboardData.incomeChange >= 0 ? 'up' : 'down'}`}></i>
+                    {dashboardData.incomeChange >= 0 ? '+' : ''}{dashboardData.incomeChange}% vs last month
                   </div>
                 </div>
-                
-                <div style={{display:'flex',alignItems:'flex-end',gap:'10px',height:'160px',paddingBottom:'24px',position:'relative'}}>
-                  <div style={{position:'absolute',bottom:'24px',left:0,right:0,display:'flex',flexDirection:'column',gap:0}}>
-                    <div style={{height:'1px',background:'var(--border)',marginBottom:'40px'}}></div>
-                    <div style={{height:'1px',background:'var(--border)',marginBottom:'40px'}}></div>
-                    <div style={{height:'1px',background:'var(--border)',marginBottom:'40px'}}></div>
+                <div className="kpi expense">
+                  <div className="kpi-label">Total Expenses</div>
+                  <div className="kpi-value">{fmt(dashboardData.totalExpenses)}</div>
+                  <div className={`kpi-sub ${dashboardData.expenseChange <= 0 ? 'up' : 'down'}`}>
+                    <i className="ti ti-trending-up"></i>+{dashboardData.expenseChange}% vs last month
                   </div>
-                  <div style={{display:'flex',alignItems:'flex-end',gap:'10px',width:'100%',height:'100%',position:'relative',zIndex:1}}>
-                    {['Jan', 'Feb', 'Mar', 'Apr', 'May'].map(month => (
-                      <div key={month} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:'3px'}}>
-                        <div style={{display:'flex',gap:'3px',alignItems:'flex-end',height:'130px'}}>
-                          <div style={{width:'14px',background:'var(--green)',borderRadius:'4px 4px 0 0',height:'72%',opacity:'.85'}}></div>
-                          <div style={{width:'14px',background:'var(--red-dark)',borderRadius:'4px 4px 0 0',height:'55%',opacity:'.85'}}></div>
+                </div>
+                <div className="kpi profit">
+                  <div className="kpi-label">Net Profit</div>
+                  <div className="kpi-value">{fmt(dashboardData.netProfit)}</div>
+                  <div className="kpi-sub up"><i className="ti ti-trending-up"></i>+{dashboardData.profitMargin}% margin</div>
+                </div>
+                <div className="kpi pending">
+                  <div className="kpi-label">Pending Receivables</div>
+                  <div className="kpi-value">{fmt(dashboardData.pendingReceivables)}</div>
+                  <div className="kpi-sub neutral"><i className="ti ti-clock"></i>{dashboardData.pendingInvoices} invoices due</div>
+                </div>
+                <div className="kpi vendor">
+                  <div className="kpi-label">Vendor Payables</div>
+                  <div className="kpi-value">{fmt(dashboardData.vendorPayables)}</div>
+                  <div className="kpi-sub down"><i className="ti ti-alert-circle"></i>{dashboardData.overdueVendors} overdue</div>
+                </div>
+              </div>
+
+              <div className="grid-main-side" style={{ marginBottom: '20px' }}>
+                <div>
+                  <div className="card" style={{ marginBottom: '20px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
+                      <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <i className="ti ti-chart-bar" style={{ color: 'var(--primary)', fontSize: '18px' }}></i>Monthly Cashflow
+                      </div>
+                      <div style={{ display: 'flex', gap: '14px', fontSize: '12px', fontWeight: 700 }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'var(--green)' }}>
+                          <span style={{ width: '10px', height: '10px', background: 'var(--green)', borderRadius: '50%', display: 'inline-block' }}></span>Income
+                        </span>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'var(--red-dark)' }}>
+                          <span style={{ width: '10px', height: '10px', background: 'var(--red-dark)', borderRadius: '50%', display: 'inline-block' }}></span>Expenses
+                        </span>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: '10px', height: '160px', paddingBottom: '24px', position: 'relative' }}>
+                      <div style={{ position: 'absolute', bottom: '24px', left: 0, right: 0 }}>
+                        <div style={{ height: '1px', background: 'var(--border)', marginBottom: '40px' }}></div>
+                        <div style={{ height: '1px', background: 'var(--border)', marginBottom: '40px' }}></div>
+                        <div style={{ height: '1px', background: 'var(--border)', marginBottom: '40px' }}></div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '10px', width: '100%', height: '100%', position: 'relative', zIndex: 1 }}>
+                        {cashflow.map((m, idx) => {
+                          const isLast = idx === cashflow.length - 1;
+                          const incH = Math.round((m.income / maxCashflow) * 100);
+                          const expH = Math.round((m.expense / maxCashflow) * 100);
+                          return (
+                            <div key={m.month} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px' }}>
+                              <div style={{ display: 'flex', gap: '3px', alignItems: 'flex-end', height: '130px' }}>
+                                <div style={{ width: '14px', background: 'var(--green)', borderRadius: '4px 4px 0 0', height: `${incH}%`, opacity: isLast ? 1 : 0.85, boxShadow: isLast ? '0 0 0 2px var(--green-light)' : 'none' }}></div>
+                                <div style={{ width: '14px', background: 'var(--red-dark)', borderRadius: '4px 4px 0 0', height: `${expH}%`, opacity: isLast ? 1 : 0.85, boxShadow: isLast ? '0 0 0 2px var(--red-light)' : 'none' }}></div>
+                              </div>
+                              <div style={{ fontSize: '10px', color: isLast ? 'var(--primary)' : 'var(--text-light)', fontWeight: isLast ? 800 : 700 }}>{m.month}{isLast ? ' ●' : ''}</div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="card">
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                      <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <i className="ti ti-list" style={{ color: 'var(--primary)' }}></i>Recent Transactions
+                      </div>
+                      <button className="btn btn-outline btn-sm" onClick={fetchDashboardData}><i className="ti ti-refresh"></i>Refresh</button>
+                    </div>
+                    <div className="table-wrap">
+                      <table>
+                        <thead>
+                          <tr><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th>Amount</th><th>Status</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody>
+                          {transactions.map((tx, i) => (
+                            <tr key={i}>
+                              <td>{tx.date}</td>
+                              <td>{tx.description}</td>
+                              <td>{tx.category}</td>
+                              <td><span className={`badge badge-${tx.type === 'Income' ? 'income' : 'expense'}`}>{tx.type}</span></td>
+                              <td className={tx.type === 'Income' ? 'amt-in' : 'amt-out'}>{tx.type === 'Income' ? '+' : '−'}{fmt(tx.amount)}</td>
+                              <td><span className={`badge badge-${tx.status === 'Paid' ? 'paid' : tx.status === 'Pending' ? 'pending' : 'overdue'}`}>{tx.status}</span></td>
+                              <td>
+                                <div style={{ display: 'flex', gap: '6px' }}>
+                                  <button className="btn btn-sm btn-outline" onClick={() => handleEditTransaction(i)} style={{ padding: '4px 8px' }}><i className="ti ti-pencil"></i></button>
+                                  <button className="btn btn-sm btn-red" onClick={() => handleDeleteTransaction(i)} style={{ padding: '4px 8px' }}><i className="ti ti-trash"></i></button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                  <div className="card">
+                    <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '14px' }}>
+                      <i className="ti ti-building-bank" style={{ color: 'var(--primary)' }}></i>Bank Accounts
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      {bankAccounts.map((acc, i) => (
+                        <div key={i} style={acc.primary ? { background: 'linear-gradient(135deg,var(--primary),var(--primary-dark))', borderRadius: '12px', padding: '14px 16px', color: '#fff' } : { background: 'var(--bg)', borderRadius: '12px', padding: '14px 16px', border: '1.5px solid var(--border)' }}>
+                          <div style={{ fontSize: '10px', fontWeight: 700, opacity: acc.primary ? 0.8 : 1, color: acc.primary ? undefined : 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '.7px' }}>{acc.bank} — {acc.type}</div>
+                          <div style={{ fontSize: '20px', fontWeight: 900, margin: '6px 0', color: acc.primary ? '#fff' : 'var(--text-dark)' }}>{fmt(acc.balance)}</div>
+                          <div style={{ fontSize: '11px', opacity: acc.primary ? 0.8 : 1, color: acc.primary ? undefined : 'var(--text-light)' }}>•••• •••• {acc.last4} · Synced {acc.synced}</div>
                         </div>
-                        <div style={{fontSize:'10px',color:'var(--text-light)',fontWeight:700}}>{month}</div>
-                      </div>
-                    ))}
-                    <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:'3px'}}>
-                      <div style={{display:'flex',gap:'3px',alignItems:'flex-end',height:'130px'}}>
-                        <div style={{width:'14px',background:'var(--green)',borderRadius:'4px 4px 0 0',height:'100%',boxShadow:'0 0 0 2px var(--green-light)'}}></div>
-                        <div style={{width:'14px',background:'var(--red-dark)',borderRadius:'4px 4px 0 0',height:'74%',boxShadow:'0 0 0 2px var(--red-light)'}}></div>
-                      </div>
-                      <div style={{fontSize:'10px',color:'var(--primary)',fontWeight:800}}>Jun ●</div>
+                      ))}
                     </div>
+                    <button className="btn btn-outline" style={{ width: '100%', justifyContent: 'center', fontSize: '12px', marginTop: '12px' }}>
+                      <i className="ti ti-building-bank"></i>Manage Banks
+                    </button>
                   </div>
-                </div>
-              </div>
 
-              <div className="card">
-                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'16px'}}>
-                  <div style={{fontSize:'15px',fontWeight:800,color:'var(--text-dark)',display:'flex',alignItems:'center',gap:'8px'}}>
-                    <i className="ti ti-list" style={{color:'var(--primary)'}}></i>Recent Transactions
+                  <div className="card">
+                    <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '14px' }}>
+                      <i className="ti ti-chart-donut" style={{ color: 'var(--primary)' }}></i>Expense Breakdown
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      {expenseBreakdown.map((item, i) => (
+                        <div key={i}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '5px' }}>
+                            <span style={{ fontWeight: 700 }}>{item.category}</span>
+                            <span style={{ fontWeight: 800 }}>{fmt(item.amount)} <span style={{ color: 'var(--text-light)', fontWeight: 600 }}>({item.percent}%)</span></span>
+                          </div>
+                          <div className="progress-bg">
+                            <div className={`progress-fill ${pfColors[i] || ''}`} style={{ width: `${item.percent}%`, ...(pfStyles[i] || {}) }}></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <button className="btn btn-outline btn-sm"><i className="ti ti-external-link"></i>View All</button>
-                </div>
-                <div className="table-wrap">
-                  <table>
-                    <thead>
-                      <tr><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th>Amount</th><th>Status</th></tr>
-                    </thead>
-                    <tbody>
-                      <tr><td>Jun 5</td><td>NovaMart — Invoice INV-019</td><td>Project Revenue</td><td><span className="badge badge-income">Income</span></td><td className="amt-in">+₹2,12,500</td><td><span className="badge badge-pending">Pending</span></td></tr>
-                      <tr><td>Jun 4</td><td>AWS Cloud — Monthly Bill</td><td>Infrastructure</td><td><span className="badge badge-expense">Expense</span></td><td className="amt-out">−₹42,000</td><td><span className="badge badge-paid">Paid</span></td></tr>
-                      <tr><td>Jun 3</td><td>MediCore — Milestone Payment</td><td>Project Revenue</td><td><span className="badge badge-income">Income</span></td><td className="amt-in">+₹1,87,500</td><td><span className="badge badge-paid">Paid</span></td></tr>
-                      <tr><td>Jun 2</td><td>Office Rent — June</td><td>Operations</td><td><span className="badge badge-expense">Expense</span></td><td className="amt-out">−₹75,000</td><td><span className="badge badge-paid">Paid</span></td></tr>
-                      <tr><td>Jun 1</td><td>Salaries — June payroll</td><td>Payroll</td><td><span className="badge badge-expense">Expense</span></td><td className="amt-out">−₹5,40,000</td><td><span className="badge badge-paid">Paid</span></td></tr>
-                      <tr><td>May 31</td><td>LogiTrack — Advance</td><td>Project Revenue</td><td><span className="badge badge-income">Income</span></td><td className="amt-in">+₹3,50,000</td><td><span className="badge badge-paid">Paid</span></td></tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
 
-            <div style={{display:'flex',flexDirection:'column',gap:'18px'}}>
-              <div className="card">
-                <div style={{fontSize:'14px',fontWeight:800,color:'var(--text-dark)',display:'flex',alignItems:'center',gap:'7px',marginBottom:'14px'}}>
-                  <i className="ti ti-building-bank" style={{color:'var(--primary)'}}></i>Bank Accounts
-                </div>
-                <div style={{display:'flex',flexDirection:'column',gap:'12px'}}>
-                  <div style={{background:'linear-gradient(135deg,var(--primary),var(--primary-dark))',borderRadius:'12px',padding:'14px 16px',color:'#fff'}}>
-                    <div style={{fontSize:'10px',fontWeight:700,opacity:'.8',textTransform:'uppercase',letterSpacing:'.7px'}}>HDFC Current A/C</div>
-                    <div style={{fontSize:'20px',fontWeight:900,margin:'6px 0'}}>₹12,84,320</div>
-                    <div style={{fontSize:'11px',opacity:'.8'}}>••••  ••••  4821 &nbsp;·&nbsp; Synced 2h ago</div>
-                  </div>
-                  <div style={{background:'var(--bg)',borderRadius:'12px',padding:'14px 16px',border:'1.5px solid var(--border)'}}>
-                    <div style={{fontSize:'10px',fontWeight:700,color:'var(--text-light)',textTransform:'uppercase',letterSpacing:'.7px'}}>ICICI Savings A/C</div>
-                    <div style={{fontSize:'20px',fontWeight:900,margin:'6px 0',color:'var(--text-dark)'}}>₹4,21,800</div>
-                    <div style={{fontSize:'11px',color:'var(--text-light)'}}>••••  ••••  7734 &nbsp;·&nbsp; Synced 2h ago</div>
-                  </div>
-                </div>
-                <button className="btn btn-outline" style={{width:'100%',justifyContent:'center',fontSize:'12px',marginTop:'12px'}}>
-                  <i className="ti ti-building-bank"></i>Manage Banks
-                </button>
-              </div>
-
-              <div className="card">
-                <div style={{fontSize:'14px',fontWeight:800,color:'var(--text-dark)',display:'flex',alignItems:'center',gap:'7px',marginBottom:'14px'}}>
-                  <i className="ti ti-chart-donut" style={{color:'var(--primary)'}}></i>Expense Breakdown
-                </div>
-                <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
-                  <div>
-                    <div style={{display:'flex',justifyContent:'space-between',fontSize:'12px',marginBottom:'5px'}}>
-                      <span style={{fontWeight:700}}>Payroll</span><span style={{fontWeight:800,color:'var(--text-dark)'}}>₹5,40,000 <span style={{color:'var(--text-light)',fontWeight:600}}>(55%)</span></span>
+                  <div className="card">
+                    <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-dark)', marginBottom: '12px' }}>Quick Actions</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <button className="btn btn-outline" style={{ justifyContent: 'flex-start', fontSize: '13px' }}><i className="ti ti-arrow-bar-down" style={{ color: 'var(--green)' }}></i>Record Income</button>
+                      <button className="btn btn-outline" style={{ justifyContent: 'flex-start', fontSize: '13px' }}><i className="ti ti-arrow-bar-up" style={{ color: 'var(--red-dark)' }}></i>Add Expense</button>
+                      <button className="btn btn-outline" style={{ justifyContent: 'flex-start', fontSize: '13px' }}><i className="ti ti-truck" style={{ color: 'var(--purple)' }}></i>Manage Vendors</button>
+                      <button className="btn btn-outline" style={{ justifyContent: 'flex-start', fontSize: '13px' }} onClick={fetchDashboardData}><i className="ti ti-refresh" style={{ color: 'var(--primary)' }}></i>Refresh Data</button>
                     </div>
-                    <div className="progress-bg"><div className="progress-fill pf-red" style={{width:'55%'}}></div></div>
-                  </div>
-                  <div>
-                    <div style={{display:'flex',justifyContent:'space-between',fontSize:'12px',marginBottom:'5px'}}>
-                      <span style={{fontWeight:700}}>Operations</span><span style={{fontWeight:800}}>₹1,82,000 <span style={{color:'var(--text-light)',fontWeight:600}}>(18%)</span></span>
-                    </div>
-                    <div className="progress-bg"><div className="progress-fill pf-orange" style={{width:'18%'}}></div></div>
-                  </div>
-                  <div>
-                    <div style={{display:'flex',justifyContent:'space-between',fontSize:'12px',marginBottom:'5px'}}>
-                      <span style={{fontWeight:700}}>Infrastructure</span><span style={{fontWeight:800}}>₹1,24,500 <span style={{color:'var(--text-light)',fontWeight:600}}>(13%)</span></span>
-                    </div>
-                    <div className="progress-bg"><div className="progress-fill pf-primary" style={{width:'13%'}}></div></div>
-                  </div>
-                  <div>
-                    <div style={{display:'flex',justifyContent:'space-between',fontSize:'12px',marginBottom:'5px'}}>
-                      <span style={{fontWeight:700}}>Vendors</span><span style={{fontWeight:800}}>₹88,000 <span style={{color:'var(--text-light)',fontWeight:600}}>(9%)</span></span>
-                    </div>
-                    <div className="progress-bg"><div className="progress-fill" style={{width:'9%',background:'var(--purple)'}}></div></div>
                   </div>
                 </div>
               </div>
-
-              <div className="card">
-                <div style={{fontSize:'14px',fontWeight:800,color:'var(--text-dark)',marginBottom:'12px'}}>Quick Actions</div>
-                <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
-                  <button className="btn btn-outline" style={{justifyContent:'flex-start',fontSize:'13px'}}><i className="ti ti-arrow-bar-down" style={{color:'var(--green)'}}></i>Record Income</button>
-                  <button className="btn btn-outline" style={{justifyContent:'flex-start',fontSize:'13px'}}><i className="ti ti-arrow-bar-up" style={{color:'var(--red-dark)'}}></i>Add Expense</button>
-                  <button className="btn btn-outline" style={{justifyContent:'flex-start',fontSize:'13px'}}><i className="ti ti-truck" style={{color:'var(--purple)'}}></i>Manage Vendors</button>
-                  <button className="btn btn-outline" style={{justifyContent:'flex-start',fontSize:'13px'}}><i className="ti ti-download" style={{color:'var(--primary)'}}></i>Export Statement</button>
-                </div>
-              </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
 
-        <div className={`imp-modal-bg ${isImportModalOpen ? 'open' : ''}`} onClick={(e) => { if(e.target.className.includes('imp-modal-bg')) closeImport() }}>
+        <div className={`imp-modal-bg ${isImportModalOpen ? 'open' : ''}`} onClick={(e) => { if (e.target.className.includes('imp-modal-bg')) closeImport() }}>
           <div className="imp-modal">
-            <div className="imp-header">
+            <div className="imp-header" style={{ position: 'relative' }}>
               <h2><i className="ti ti-upload"></i>Import Bank Statement</h2>
               <p>Upload CSV, Excel (.xlsx) or PDF statement from your bank — we'll read and map it automatically.</p>
+              <button
+                onClick={closeImport}
+                style={{
+                  position: 'absolute', top: '16px', right: '16px',
+                  background: 'rgba(255,255,255,0.2)', border: 'none',
+                  borderRadius: '50%', width: '32px', height: '32px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', color: '#fff', fontSize: '18px', fontWeight: 700,
+                  lineHeight: 1, transition: 'background .15s'
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.35)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                title="Close"
+              >×</button>
             </div>
             <div className="imp-body">
               <div className="imp-steps">
@@ -372,21 +480,24 @@ tr:hover td{background:#FAFCFE;}
                 <div className={`imp-step ${impCurrentStep === 4 ? 'active' : ''}`}><div className="imp-step-num">4</div>Review & Import</div>
               </div>
 
-              {impCurrentStep === 1 && (
-                <div>
-                  <div style={{fontSize:'13px',fontWeight:700,color:'var(--text-mid)',marginBottom:'12px'}}>Which account is this statement for?</div>
-                  <div className="bank-selector">
-                    <div className={`bs-opt ${selectedBank === 'HDFC' ? 'sel' : ''}`} onClick={() => handleBankSelect('HDFC')}>
-                      <div className="bs-opt-icon" style={{background:'var(--primary-light)'}}><i className="ti ti-building-bank" style={{color:'var(--primary)'}}></i></div>
-                      <div><div className="bs-opt-name">HDFC Bank</div><div className="bs-opt-acc">Current A/C ••••4821</div></div>
-                    </div>
-                    <div className={`bs-opt ${selectedBank === 'ICICI' ? 'sel' : ''}`} onClick={() => handleBankSelect('ICICI')}>
-                      <div className="bs-opt-icon" style={{background:'var(--purple-light)'}}><i className="ti ti-building-bank" style={{color:'var(--purple)'}}></i></div>
-                      <div><div className="bs-opt-name">ICICI Bank</div><div className="bs-opt-acc">Savings A/C ••••7734</div></div>
-                    </div>
-                  </div>
-                </div>
-              )}
+          {impCurrentStep === 1 && (
+  <div>
+    <div style={{fontSize:'13px',fontWeight:700,color:'var(--text-mid)',marginBottom:'12px'}}>Which account is this statement for?</div>
+    <div className="bank-selector">
+      {bankAccounts.map((acc) => (
+        <div key={acc.bank} className={`bs-opt ${selectedBank === acc.bank ? 'sel' : ''}`} onClick={() => handleBankSelect(acc.bank)}>
+          <div className="bs-opt-icon" style={{background: acc.primary ? 'var(--primary-light)' : 'var(--purple-light)'}}>
+            <i className="ti ti-building-bank" style={{color: acc.primary ? 'var(--primary)' : 'var(--purple)'}}></i>
+          </div>
+          <div>
+            <div className="bs-opt-name">{acc.bank}</div>
+            <div className="bs-opt-acc">{acc.type} ••••{acc.last4}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
               {impCurrentStep === 2 && (
                 <div>
                   <div className="drop-zone">
@@ -396,16 +507,16 @@ tr:hover td{background:#FAFCFE;}
                     <p>or click to browse files</p>
                   </div>
                   {importedFile && (
-                    <div style={{background:'var(--green-light)',borderRadius:'10px',padding:'12px 16px',marginTop:'12px',display:'flex',alignItems:'center',gap:'10px'}}>
-                      <i className="ti ti-circle-check" style={{color:'var(--green)',fontSize:'20px'}}></i>
-                      <div><div style={{fontSize:'13px',fontWeight:700,color:'var(--green-dark)'}}>{importedFile.name}</div></div>
+                    <div style={{ background: 'var(--green-light)', borderRadius: '10px', padding: '12px 16px', marginTop: '12px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <i className="ti ti-circle-check" style={{ color: 'var(--green)', fontSize: '20px' }}></i>
+                      <div><div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--green-dark)' }}>{importedFile.name}</div></div>
                     </div>
                   )}
                 </div>
               )}
               {impCurrentStep === 3 && (
                 <div>
-                  <div style={{fontSize:'13px',fontWeight:700,color:'var(--text-mid)',marginBottom:'14px'}}>Map your file's columns</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-mid)', marginBottom: '14px' }}>Map your file's columns</div>
                   <div className="col-mapper">
                     <div className="cm-row"><div className="cm-label">Date Column *</div><select className="cm-sel"><option>Column A — Date</option></select></div>
                     <div className="cm-row"><div className="cm-label">Description *</div><select className="cm-sel"><option>Column B — Narration</option></select></div>
@@ -416,15 +527,15 @@ tr:hover td{background:#FAFCFE;}
                 <div>
                   <div className="imp-summary">
                     <div className="is-box"><div className="is-num">148</div><div className="is-lbl">Total Rows</div></div>
-                    <div className="is-box" style={{borderColor:'var(--green)'}}><div className="is-num" style={{color:'var(--green)'}}>62</div><div className="is-lbl">Credits</div></div>
+                    <div className="is-box" style={{ borderColor: 'var(--green)' }}><div className="is-num" style={{ color: 'var(--green)' }}>62</div><div className="is-lbl">Credits</div></div>
                   </div>
                 </div>
               )}
             </div>
             <div className="imp-footer">
-              <button className="btn btn-outline" onClick={impPrev} style={{display: impCurrentStep > 1 ? 'flex' : 'none'}}><i className="ti ti-arrow-left"></i>Back</button>
-              <div style={{fontSize:'12px',color:'var(--text-light)',fontWeight:600}}>Step {impCurrentStep} of 4 — {stepLabels[impCurrentStep]}</div>
-              <button className="btn btn-primary" onClick={impNext} style={{background: impCurrentStep === 4 ? 'var(--green)' : 'var(--primary)'}}>
+              <button className="btn btn-outline" onClick={impPrev} style={{ display: impCurrentStep > 1 ? 'flex' : 'none' }}><i className="ti ti-arrow-left"></i>Back</button>
+              <div style={{ fontSize: '12px', color: 'var(--text-light)', fontWeight: 600 }}>Step {impCurrentStep} of 4 — {stepLabels[impCurrentStep]}</div>
+              <button className="btn btn-primary" onClick={impNext} style={{ background: impCurrentStep === 4 ? 'var(--green)' : 'var(--primary)' }}>
                 {impCurrentStep === 4 ? <><i className="ti ti-upload"></i> Import Now</> : <>Next <i className="ti ti-arrow-right"></i></>}
               </button>
             </div>

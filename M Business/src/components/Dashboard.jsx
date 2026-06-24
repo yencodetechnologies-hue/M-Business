@@ -1761,6 +1761,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [mgrSaveLoading, setMgrSaveLoading] = useState(false);
   const [showMgrPass, setShowMgrPass] = useState(false);
   const [tasks, setTasks] = useState([]);
+  const [income, setIncome] = useState([]);
+  const [expenses, setExpenses] = useState([]);
   const [config, setConfig] = useState(null);
   const [viewProject, setViewProject] = useState(null);
   const [subscription, setSubscription] = useState(null);
@@ -1795,7 +1797,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     const m = s.match(/\d+/);
     return m ? parseInt(m[0]) : 10;
   };
-  useEffect(() => { fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchTasks(); fetchConfig(); fetchSubscription(); }, []);
+  useEffect(() => { fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchTasks(); fetchConfig(); fetchSubscription(); fetchIncome(); fetchExpenses(); }, []);
 
   const handleLogout = () => { localStorage.removeItem("user"); setUser(null); };
   const onLogoChange = async (logo) => { setCompanyLogo(logo || fixedLogo); const updatedUser = { ...user, logoUrl: logo || "" }; localStorage.setItem("user", JSON.stringify(updatedUser)); setUser(updatedUser); try { await axios.post(BASE_URL + "/api/auth/save-logo", { userId: user._id || user.id, logoUrl: logo || "" }); } catch (e) { console.log(e); } };
@@ -1808,6 +1810,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [autoOpenTaskModal, setAutoOpenTaskModal] = useState(false);
 
   const fetchTasks = async () => { try { const res = await axios.get(BASE_URL + "/api/tasks"); setTasks(res.data); } catch (e) { console.log(e); } };
+  const fetchIncome = async () => { try { const res = await axios.get(BASE_URL + "/api/income"); setIncome(res.data || []); } catch (e) { console.log(e); } };
+  const fetchExpenses = async () => { try { const res = await axios.get(BASE_URL + "/api/expenses"); setExpenses(res.data || []); } catch (e) { console.log(e); } };
   const fetchConfig = async () => { try { const cid = user?._id || user?.id; if (!cid) return; const res = await axios.get(`${BASE_URL}/api/config/${cid}`); setConfig(res.data); } catch (e) { console.log(e); } };
 
   const addClient = async () => {
@@ -2090,9 +2094,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "messaging" && <MessagingPage user={user} />}
           {validActive === "settings" && <SettingsPage THEME={T} user={user} onProfileUpdate={(updates) => { const updated = { ...user, ...updates }; setUser(updated); try { localStorage.setItem("user", JSON.stringify(updated)); } catch { } }} />}
 
-          {validActive === "accounts" && <AccountsPage />}
-          {validActive === "expenses" && <ExpensesPage />}
-          {validActive === "income" && <IncomePage />}
+          {validActive === "accounts" && <AccountsPage THEME={T} income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+          {validActive === "expenses" && <ExpensesPage THEME={T} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+          {validActive === "income" && <IncomePage THEME={T} income={income} setIncome={setIncome} fetchIncome={fetchIncome} />}
           {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
           {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
           {validActive === "reports" && <ReportsPage clients={clients} projects={projects} employees={employees} managers={managers} />}

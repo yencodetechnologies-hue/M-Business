@@ -336,8 +336,8 @@ export default function ClientDashboard({ user, setUser, portalMode = false }) {
 
   // Portal mode: read clientId from URL and auto-load that client's data
   const portalClientId = portalMode
-    ? window.location.pathname.split("/client-portal/")[1]?.split("?")[0]
-    : null;
+    ? window.location.pathname.split("/client-portal/")[1]?.split("?")[0] || ""
+    : "";
   const [selectedClientProject, setSelectedClientProject] = useState(null);
   useEffect(() => { localStorage.setItem("activeTab_client", active); if (active !== "projects") setSelectedClientProject(null); }, [active]);
 
@@ -1027,7 +1027,6 @@ export default function ClientDashboard({ user, setUser, portalMode = false }) {
       .cp-root .files-grid { grid-template-columns: 1fr; }
     }
   `;
-
   if (loading) {
     return (
       <div style={{ display: 'flex', height: '100vh', background: '#F0FDFE', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16, fontFamily: 'Nunito, sans-serif' }}>

@@ -1,6 +1,6 @@
-const express  = require("express");
-const router   = express.Router();
-const bcrypt   = require("bcryptjs");
+const express = require("express");
+const router = express.Router();
+const bcrypt = require("bcryptjs");
 const Employee = require("../models/EmployeeModel");
 const { sendEmployeeStatusUpdateEmail } = require("../config/email");
 const SubAdmin = require("../models/SubAdminModels");
@@ -36,7 +36,7 @@ router.post("/add", checkResourceLimit('employee'), async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const employee = new Employee({
-      name, email, phone: phone || "", role: role || "Employee", department: department || "", 
+      name, email, phone: phone || "", role: role || "Employee", department: department || "",
       salary: salary || "", status: "Pending", password: hashedPassword,
       companyId: req.body.companyId || req.companyId || "", profilePhoto: profilePhoto || "",
       bankDetails: bankDetails || { bankName: "", accountNumber: "", ifscCode: "" },
@@ -76,11 +76,11 @@ router.put("/:id", async (req, res) => {
     const employee = await Employee.findByIdAndUpdate(
       req.params.id,
       { $set: updateData },
-      { new: true, runValidators: true }
+      { new: true, runValidators: false }
     );
-    
+
     if (!employee) return res.status(404).json({ msg: "Employee not found" });
-    
+
     console.log("Update successful:", employee.email);
     res.json(employee);
   } catch (err) {

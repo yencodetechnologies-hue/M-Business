@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
 
 const employeeSchema = new mongoose.Schema({
-  name:       { type: String, required: true },
-  email:      { type: String, required: true, unique: true },
-  phone:      { type: String, default: "" },
-  role:       { type: String, default: "" },
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  phone: { type: String, default: "" },
+  role: { type: String, default: "" },
   department: { type: String, default: "" },
-  salary:     { type: String, default: "" },
-  password: { type: String, default: "" } , 
-  status:     { type: String, enum: ["Pending", "Approved", "Rejected", "Inactive"], default: "Pending" },
+  salary: { type: String, default: "" },
+  password: { type: String, default: "" },
+  status: { type: String, enum: ["Pending", "Approved", "Rejected", "Inactive"], default: "Pending" },
   companyId: { type: String, default: "" },
   profilePhoto: { type: String, default: "" },
   bankDetails: {
@@ -18,9 +18,17 @@ const employeeSchema = new mongoose.Schema({
   },
   otp: { type: String, default: "" },
   otpExpires: { type: Date },
-  dateOfBirth:    { type: String, default: "" },
-  joiningDate:    { type: String, default: "" },
-  maritalStatus:  { type: String, enum: ["Unmarried", "Married"], default: "Unmarried" },
-  address:        { type: String, default: "" }
+  dateOfBirth: { type: String, default: "" },
+  joiningDate: { type: String, default: "" },
+  maritalStatus: { type: String, enum: ["Unmarried", "Married"], default: "Unmarried" },
+  address: { type: String, default: "" },
+  leaveRequests: [{
+    type: { type: String, default: "Casual Leave" },
+    startDate: { type: String, default: "" },
+    endDate: { type: String, default: "" },
+    reason: { type: String, default: "" },
+    status: { type: String, default: "pending" },
+    createdAt: { type: String, default: "" }
+  }]
 }, { timestamps: true });
 module.exports = mongoose.model("Employee", employeeSchema);

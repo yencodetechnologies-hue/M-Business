@@ -10156,7 +10156,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                             <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{p.name || p.title}</div>
 
-                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{clients.find(c => c._id === p.clientId)?.clientName || "Internal"} â€¢ Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
+                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{clients.find(c => c._id === p.clientId)?.clientName || "Internal"} Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
 
                                           </div>
 
@@ -10254,7 +10254,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                     };
 
-                                    const detail = `${l.type || "Leave"} â€¢ ${l.from} - ${l.to}${getDuration()}`;
+                                    const detail = `${l.type || "Leave"} ${l.from} - ${l.to}${getDuration()}`;
 
 
 
@@ -10356,7 +10356,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                         <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e", marginBottom: 2 }}>{t.title}</div>
 
-                                        <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{employees.find(e => e._id === t.assignee)?.name || "Unassigned"} â€¢ Due {t.deadline ? new Date(t.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
+                                        <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{employees.find(e => e._id === t.assignee)?.name || "Unassigned"} Due {t.deadline ? new Date(t.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
 
                                       </div>
 

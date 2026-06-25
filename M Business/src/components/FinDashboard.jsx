@@ -16,7 +16,6 @@ export default function FinDashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState('This Month — June 2026');
   const stepLabels = ['', 'Select Bank', 'Upload File', 'Map Columns', 'Review & Import'];
 
-
   const STATIC_DATA = {
     'This Month — June 2026': {
       kpis: { totalIncome: 1842000, totalExpenses: 987500, netProfit: 854500, pendingReceivables: 321000, vendorPayables: 145000, incomeChange: 12, expenseChange: 5, profitMargin: 46, pendingInvoices: 4, overdueVendors: 2 },
@@ -47,12 +46,11 @@ export default function FinDashboard() {
       expenseBreakdown: [{ category: 'Payroll', amount: 3240000, percent: 60 }, { category: 'Operations', amount: 980000, percent: 18 }, { category: 'Infrastructure', amount: 700000, percent: 13 }, { category: 'Vendors', amount: 512000, percent: 9 }],
     },
   };
-
-  const fetchDashboardData = () => {
+  const fetchDashboardData = (period) => {
+    const activePeriod = period || selectedPeriod;
     setLoading(true); setError(null);
-    // Simulate a brief load for smooth UX
     setTimeout(() => {
-      const data = STATIC_DATA[selectedPeriod] || STATIC_DATA['This Month — June 2026'];
+      const data = STATIC_DATA[activePeriod] || STATIC_DATA['This Month — June 2026'];
       setDashboardData(data.kpis);
       setCashflow(data.cashflow);
       setTransactions(data.transactions);
@@ -63,7 +61,7 @@ export default function FinDashboard() {
     }, 400);
   };
 
-  React.useEffect(() => { fetchDashboardData(); }, [selectedPeriod]);
+  React.useEffect(() => { fetchDashboardData(selectedPeriod); }, [selectedPeriod]);
 
   const handleDeleteTransaction = (index) => {
     if (!window.confirm("Delete this transaction?")) return;
@@ -255,12 +253,18 @@ tr:hover td{background:#FAFCFE;}
             <button className="btn btn-outline" onClick={openImport} style={{ borderColor: 'var(--primary)', color: 'var(--primary)' }}>
               <i className="ti ti-upload"></i>Import Statement
             </button>
-            <select className="filter-sel" value={selectedPeriod} onChange={e => setSelectedPeriod(e.target.value)}>
-              <option>This Month — June 2026</option>
-              <option>May 2026</option>
-              <option>Q1 2026</option>
-              <option>FY 2025-26</option>
-            </select>
+            <input
+              type="month"
+              className="filter-sel"
+              defaultValue="2026-06"
+              onChange={e => {
+                const [year, month] = e.target.value.split('-');
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                const label = `${monthNames[parseInt(month) - 1]} ${year}`;
+                setSelectedPeriod(label);
+              }}
+              style={{ cursor: 'pointer' }}
+            />
             <button className="btn btn-outline">
               <i className="ti ti-file-analytics"></i>Reports
             </button>
@@ -480,24 +484,24 @@ tr:hover td{background:#FAFCFE;}
                 <div className={`imp-step ${impCurrentStep === 4 ? 'active' : ''}`}><div className="imp-step-num">4</div>Review & Import</div>
               </div>
 
-          {impCurrentStep === 1 && (
-  <div>
-    <div style={{fontSize:'13px',fontWeight:700,color:'var(--text-mid)',marginBottom:'12px'}}>Which account is this statement for?</div>
-    <div className="bank-selector">
-      {bankAccounts.map((acc) => (
-        <div key={acc.bank} className={`bs-opt ${selectedBank === acc.bank ? 'sel' : ''}`} onClick={() => handleBankSelect(acc.bank)}>
-          <div className="bs-opt-icon" style={{background: acc.primary ? 'var(--primary-light)' : 'var(--purple-light)'}}>
-            <i className="ti ti-building-bank" style={{color: acc.primary ? 'var(--primary)' : 'var(--purple)'}}></i>
-          </div>
-          <div>
-            <div className="bs-opt-name">{acc.bank}</div>
-            <div className="bs-opt-acc">{acc.type} ••••{acc.last4}</div>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
+              {impCurrentStep === 1 && (
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-mid)', marginBottom: '12px' }}>Which account is this statement for?</div>
+                  <div className="bank-selector">
+                    {bankAccounts.map((acc) => (
+                      <div key={acc.bank} className={`bs-opt ${selectedBank === acc.bank ? 'sel' : ''}`} onClick={() => handleBankSelect(acc.bank)}>
+                        <div className="bs-opt-icon" style={{ background: acc.primary ? 'var(--primary-light)' : 'var(--purple-light)' }}>
+                          <i className="ti ti-building-bank" style={{ color: acc.primary ? 'var(--primary)' : 'var(--purple)' }}></i>
+                        </div>
+                        <div>
+                          <div className="bs-opt-name">{acc.bank}</div>
+                          <div className="bs-opt-acc">{acc.type} ••••{acc.last4}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               {impCurrentStep === 2 && (
                 <div>
                   <div className="drop-zone">

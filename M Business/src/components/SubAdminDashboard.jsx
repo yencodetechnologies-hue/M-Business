@@ -2383,7 +2383,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 }
 
-function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], setActive, setJumpProject }) {
+function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], setActive, setJumpProject, user, clients = [] }) {
 
   const [search, setSearch] = useState("");
 
@@ -2562,9 +2562,8 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
 
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-
-  const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
+  const localUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const companyId = (user || localUser)?.companyId || (user || localUser)?.company || (user || localUser)?._id || (user || localUser)?.id || "";
 
   const onboardingLink = `${window.location.origin}/employee-onboarding?company=${encodeURIComponent(user.companyName || "Our Company")}&companyId=${companyId}`;
 
@@ -2573,46 +2572,41 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
   const copyLink = () => { navigator.clipboard.writeText(onboardingLink); setLinkCopied(true); setTimeout(() => setLinkCopied(false), 2000); };
 
 
-
   if (viewEmpProject) {
     return (
       <div style={{ padding: "0 0 32px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18, cursor: "pointer", color: "#00BCD4", fontWeight: 700 }}
-          onClick={() => setViewEmpProject(null)}>
+        <div
+          style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18, cursor: "pointer", color: "#00BCD4", fontWeight: 700 }}
+          onClick={() => { setViewEmpProject(null); }}
+        >
           <i className="ti ti-arrow-left" style={{ fontSize: 18 }}></i> Back to Employee
         </div>
-        <ModernEmployeeProjectDetails
+        <ModernProjectDetails
           project={viewEmpProject.project}
-          tasks={viewEmpProject.tasks}
-          user={viewEmpProject.emp}
+          tasks={tasks}
+          employees={employees}
+          user={user}
+          clients={clients}
           onBack={() => setViewEmpProject(null)}
+          onDelete={async () => {
+            try {
+              await axios.delete(`${BASE_URL}/api/projects/${viewEmpProject.project._id}`);
+              setViewEmpProject(null);
+            } catch (e) { console.error(e); }
+          }}
+          onEdit={() => {
+            setJumpProject(viewEmpProject.project);
+            setViewEmpProject(null);
+            setActive("edit-project");
+          }}
+          onUpdate={() => { }}
+          fetchProjects={() => { }}
+          fetchTasks={() => { }}
           onMessageTeam={() => { setViewEmpProject(null); setActive("messaging"); }}
-          employeeMode={true}
-          currentEmployeeName={viewEmpProject.emp?.name}
         />
       </div>
     );
   }
-  if (viewEmpProject) {
-    return (
-      <div style={{ padding: "0 0 32px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18, cursor: "pointer", color: "#00BCD4", fontWeight: 700 }}
-          onClick={() => setViewEmpProject(null)}>
-          <i className="ti ti-arrow-left" style={{ fontSize: 18 }}></i> Back to Employee
-        </div>
-        <ModernEmployeeProjectDetails
-          project={viewEmpProject.project}
-          tasks={viewEmpProject.tasks}
-          user={viewEmpProject.emp}
-          onBack={() => setViewEmpProject(null)}
-          onMessageTeam={() => { setViewEmpProject(null); setActive("messaging"); }}
-          employeeMode={true}
-          currentEmployeeName={viewEmpProject.emp?.name}
-        />
-      </div>
-    );
-  }
-
 
   if (viewEmp) {
 
@@ -10743,7 +10737,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projectsWithProgress} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} />}
+            {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projectsWithProgress} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} user={user} clients={clients} />}
 
             {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
 

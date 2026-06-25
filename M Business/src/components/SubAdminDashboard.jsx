@@ -11789,7 +11789,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                         <div key={t.val} onClick={() => setNc(p => ({ ...p, clientType: t.val }))}
 
-                          style={{ border: `2px solid ${nc.clientType === t.val ? '#00BCD4' : '#E0E6EA'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? '#E0F7FA' : '#F4F6F8', transition: 'all .15s' }}>
+                          style={{ border: `2px solid ${nc.clientType === t.val ? '#00BCD4' : '#E0E6EA'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? '#E0F7FA' : '#F4F6F8', transition: 'all .15s', position: 'relative' }}>
+
+                          {nc.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: '#00BCD4', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
 
                           <div style={{ fontSize: 22, marginBottom: 4 }}>{t.icon}</div>
 

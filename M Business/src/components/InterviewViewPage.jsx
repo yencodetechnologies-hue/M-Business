@@ -124,7 +124,7 @@ function ResumeModal({ candidate, onClose, onStatusChange }) {
             </div>
           )}
           <button onClick={downloadResume} style={btnStyle("var(--app-accent)")}>
-             Download Resume — {candidate.resumeName || "file"}
+            Download Resume — {candidate.resumeName || "file"}
           </button>
         </>
       ) : (
@@ -401,10 +401,10 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
                       <td style={{ padding: "12px 12px" }}>
                         <div style={{ display: "flex", gap: 6 }}>
                           <button onClick={() => setViewProfile(c)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>
-                            Profile Profile
+                            Profile
                           </button>
                           <button onClick={() => deleteCandidate(idx)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>
-                       Delete
+                            Delete
                           </button>
                         </div>
                       </td>

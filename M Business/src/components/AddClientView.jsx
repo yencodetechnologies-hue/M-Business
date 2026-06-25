@@ -451,7 +451,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
 
                     {isEdit ? 'Updating' : 'Saving'}
                   </span>
-                ) : (isEdit ? '✅ Update Client' : '➕ Add Client')}
+                ) : (isEdit ? '✅ Update Client' : '👤 Add Client')}
               </button>
             </div>
           </div>

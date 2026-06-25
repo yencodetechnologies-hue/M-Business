@@ -796,7 +796,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
         <div style={{ textAlign: "center", marginBottom: 20 }}>
           <h2 style={{ fontSize: 32, fontWeight: 800, color: T.text, margin: "0 0 10px", letterSpacing: "-0.5px" }}>Choose Your Plan</h2>
           <p style={{ color: "var(--app-accent)", fontWeight: 600, fontSize: 15, margin: "0 0 4px" }}>Select the best plan for your business growth</p>
-          <div style={{ fontSize: 12, color: "rgba(var(--app-accent-rgb), 0.5)", fontWeight: 600, letterSpacing: 0.5 }}>Management Suite - subadmin</div>
+          <div style={{ fontSize: 12, color: "rgba(var(--app-accent-rgb), 0.5)", fontWeight: 600, letterSpacing: 0.5 }}>Management Suite</div>
         </div>
 
         <div style={{

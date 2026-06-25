@@ -497,9 +497,10 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
           <div style={{ marginBottom: 14 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 8 }}>Client Type</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
-              {[{ val: 'b2b', icon: 'Company', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: 'Profile', label: 'B2C', sub: 'Individual' }, { val: 'freelancer', icon: 'Job', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
+              {[{ val: 'b2b', icon: '🏢', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: '👤', label: 'B2C', sub: 'Individual' }, { val: 'freelancer', icon: '💼', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
                 <div key={t.val} onClick={() => setEditForm(p => ({ ...p, clientType: t.val }))}
-                  style={{ border: `2px solid ${editForm.clientType === t.val ? '#00BCD4' : '#E0E6EA'}`, borderRadius: 10, padding: '10px 8px', textAlign: 'center', cursor: 'pointer', background: editForm.clientType === t.val ? '#E0F7FA' : '#F4F6F8' }}>
+                  style={{ border: `2px solid ${editForm.clientType === t.val ? '#00BCD4' : '#E0E6EA'}`, borderRadius: 10, padding: '10px 8px', textAlign: 'center', cursor: 'pointer', background: editForm.clientType === t.val ? '#E0F7FA' : '#F4F6F8', position: 'relative' }}>
+                  {editForm.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: '#00BCD4', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
                   <div style={{ fontSize: 20, marginBottom: 3 }}>{t.icon}</div>
                   <div style={{ fontSize: 12, fontWeight: 700, color: editForm.clientType === t.val ? '#007B8A' : '#1A2332' }}>{t.label}</div>
                   <div style={{ fontSize: 10, color: '#94A3B0' }}>{t.sub}</div>
@@ -2182,9 +2183,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 8 }}>Client Type <span style={{ color: '#EF5350' }}>*</span></div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
-                {[{ val: 'b2b', icon: 'Company', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: 'Profile', label: 'B2C', sub: 'Individual person' }, { val: 'freelancer', icon: 'Job', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
+                {[{ val: 'b2b', icon: '🏢', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: '👤', label: 'B2C', sub: 'Individual person' }, { val: 'freelancer', icon: '💼', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
                   <div key={t.val} onClick={() => setNc(p => ({ ...p, clientType: t.val }))}
-                    style={{ border: `2px solid ${nc.clientType === t.val ? '#00BCD4' : '#E0E6EA'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? '#E0F7FA' : '#F4F6F8', transition: 'all .15s' }}>
+                    style={{ border: `2px solid ${nc.clientType === t.val ? '#00BCD4' : '#E0E6EA'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? '#E0F7FA' : '#F4F6F8', transition: 'all .15s', position: 'relative' }}>
+                    {nc.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: '#00BCD4', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
                     <div style={{ fontSize: 22, marginBottom: 4 }}>{t.icon}</div>
                     <div style={{ fontSize: 12, fontWeight: 700, color: nc.clientType === t.val ? '#007B8A' : '#1A2332' }}>{t.label}</div>
                     <div style={{ fontSize: 10, color: '#94A3B0', marginTop: 2 }}>{t.sub}</div>

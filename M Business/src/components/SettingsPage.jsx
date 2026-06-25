@@ -358,7 +358,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
   // Sidebar navigation items
   const navItems = [
     { id: "profile", icon: "Profile", label: "Profile" },
-    { id: "branding", icon: "Theme", label: "Branding" },
+    { id: "branding", icon: "🎨", label: "Branding" },
     { id: "documents", icon: "Document", label: "Documents" },
     { id: "security", icon: "Secure", label: "Security" },
     { id: "bank", icon: "Bank", label: "Bank Details" }

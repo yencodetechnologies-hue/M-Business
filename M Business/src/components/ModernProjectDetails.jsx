@@ -544,8 +544,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const milestonesArr = currProject.milestones || [];
   const doneMilestones = milestonesArr.filter(m => {
     const mTasks = currTasks.filter(t => t.milestone === m.name && !t.isDeleted);
-    // Only count as done if it has tasks AND all are completed (or manually toggled with tasks)
-    return mTasks.length > 0 && m.done === true;
+    const allTasksCompleted = mTasks.length > 0 && mTasks.every(t => t.status === 'done' || t.status === 'completed');
+    // Count as done if manually marked done (works even with no tasks), OR if all its tasks are completed
+    return m.done === true || allTasksCompleted;
   }).length;
   const totalMilestones = milestonesArr.length;
   const progressPct = totalMilestones > 0

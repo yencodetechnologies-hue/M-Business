@@ -98,9 +98,11 @@ const CSS = `
 .mpv-toolbar { display:flex; align-items:center; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
 .mpv-search { display:flex; align-items:center; gap:8px; background:#fff; border:1.5px solid ${P.border};
   border-radius:10px; padding:9px 14px; flex:1; min-width:200px; max-width:340px; transition:border .15s; }
-.mpv-search:focus-within { border-color:${P.primary}; }
+.mpv-search:focus-within { border-color:${P.border}; }
 .mpv-search i { color:${P.textLight}; font-size:17px; }
-.mpv-search input { border:none; outline:none; background:transparent; font-family:'Nunito',sans-serif; font-size:14px; width:100%; color:${P.textDark}; }
+.mpv-search input { border:none; outline:none; box-shadow:none; background:#fff; -webkit-appearance:none; appearance:none; font-family:'Nunito',sans-serif; font-size:14px; width:100%; color:${P.textDark}; }
+.mpv-search input:focus { border:none; outline:none; box-shadow:none; background:#fff; }
+.mpv-search input:-webkit-autofill { -webkit-box-shadow:0 0 0 30px #fff inset !important; box-shadow:0 0 0 30px #fff inset !important; }
 .mpv-sel { padding:9px 14px; border:1.5px solid ${P.border}; border-radius:10px; font-family:'Nunito',sans-serif;
   font-size:13px; font-weight:600; color:${P.textMid}; background:#fff; outline:none; cursor:pointer; }
 .mpv-sel:focus { border-color:${P.primary}; }

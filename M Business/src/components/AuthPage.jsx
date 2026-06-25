@@ -222,7 +222,7 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; }
         input::placeholder { color: rgba(255,255,255,0.25); }
-        input:focus { border-bottom-color: #00BCD4 !important; }
+        input:focus { border-bottom-color: rgba(255,255,255,0.2) !important; outline: none; box-shadow: none; }
         input:-webkit-autofill {
           -webkit-box-shadow: 0 0 0 40px #100820 inset !important;
           -webkit-text-fill-color: #fff !important;

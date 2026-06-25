@@ -43,7 +43,7 @@ export default function AuditorLogin({ onLogin }) {
 .form-group{margin-bottom:18px;}
 .form-group label{display:block;font-size:11px;font-weight:800;color:#4A5568;text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px;}
 .inp{width:100%;padding:13px 16px;border:1.5px solid #E2E8F0;border-radius:12px;font-family:"Nunito",sans-serif;font-size:14px;color:#1A2332;background:#F7FAFC;outline:none;transition:all .15s;}
-.inp:focus{border-color:#8B5CF6;background:#fff;box-shadow:0 0 0 3px rgba(139,92,246,.08);}
+.inp:focus{border-color:#E2E8F0;background:#F7FAFC;box-shadow:none;outline:none;}
 .inp-icon-wrap{position:relative;}
 .inp-icon-wrap .inp{padding-left:44px;}
 .inp-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#718096;font-size:18px;}
@@ -66,16 +66,16 @@ export default function AuditorLogin({ onLogin }) {
           <div className="panel-title">Auditor <span>Portal</span><br />Access</div>
           <div className="panel-sub">Securely review your client's financial records, download statements, and add audit remarks — all in one place.</div>
           <div className="features">
-            <div className="feat"><div className="feat-icon" style={{background:'rgba(139,92,246,.2)'}}><i className="ti ti-file-analytics" style={{color:'#8B5CF6'}}></i></div>View full income & expense statements</div>
-            <div className="feat"><div className="feat-icon" style={{background:'rgba(0,188,212,.2)'}}><i className="ti ti-building-bank" style={{color:'#00BCD4'}}></i></div>Bank reconciliation & transaction review</div>
-            <div className="feat"><div className="feat-icon" style={{background:'rgba(38,194,129,.2)'}}><i className="ti ti-download" style={{color:'#26C281'}}></i></div>Download PDF, Excel & CSV reports</div>
-            <div className="feat"><div className="feat-icon" style={{background:'rgba(245,158,11,.2)'}}><i className="ti ti-message-2" style={{color:'#F59E0B'}}></i></div>Add audit notes & flag transactions</div>
+            <div className="feat"><div className="feat-icon" style={{ background: 'rgba(139,92,246,.2)' }}><i className="ti ti-file-analytics" style={{ color: '#8B5CF6' }}></i></div>View full income & expense statements</div>
+            <div className="feat"><div className="feat-icon" style={{ background: 'rgba(0,188,212,.2)' }}><i className="ti ti-building-bank" style={{ color: '#00BCD4' }}></i></div>Bank reconciliation & transaction review</div>
+            <div className="feat"><div className="feat-icon" style={{ background: 'rgba(38,194,129,.2)' }}><i className="ti ti-download" style={{ color: '#26C281' }}></i></div>Download PDF, Excel & CSV reports</div>
+            <div className="feat"><div className="feat-icon" style={{ background: 'rgba(245,158,11,.2)' }}><i className="ti ti-message-2" style={{ color: '#F59E0B' }}></i></div>Add audit notes & flag transactions</div>
           </div>
         </div>
         <div className="right-panel">
           <div className="login-title">Auditor Sign In</div>
           <div className="login-sub">Enter your credentials to access the audit portal</div>
-          <div className="secure-badge"><i className="ti ti-shield-check" style={{fontSize:'15px'}}></i>256-bit encrypted secure access</div>
+          <div className="secure-badge"><i className="ti ti-shield-check" style={{ fontSize: '15px' }}></i>256-bit encrypted secure access</div>
           <div className="form-group">
             <label>Auditor Email *</label>
             <div className="inp-icon-wrap">
@@ -94,19 +94,19 @@ export default function AuditorLogin({ onLogin }) {
             <label>Client Company</label>
             <div className="inp-icon-wrap">
               <i className="ti ti-building inp-icon"></i>
-              <input className="inp" defaultValue="YENCODE Technologies Pvt Ltd" readOnly style={{background:'#F7FAFC',color:'#718096'}} />
+              <input className="inp" defaultValue="YENCODE Technologies Pvt Ltd" readOnly style={{ background: '#F7FAFC', color: '#718096' }} />
             </div>
           </div>
-          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'18px',fontSize:'13px'}}>
-            <label style={{display:'flex',alignItems:'center',gap:'8px',cursor:'pointer',fontWeight:600,color:'#4A5568'}}><input type="checkbox" style={{accentColor:'#8B5CF6'}} /> Remember this device</label>
-            <a href="#" style={{color:'#8B5CF6',fontWeight:700,textDecoration:'none'}}>Forgot password?</a>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px', fontSize: '13px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600, color: '#4A5568' }}><input type="checkbox" style={{ accentColor: '#8B5CF6' }} /> Remember this device</label>
+            <a href="#" style={{ color: '#8B5CF6', fontWeight: 700, textDecoration: 'none' }}>Forgot password?</a>
           </div>
           <button className="login-btn" onClick={doLogin}><i className="ti ti-shield-lock"></i>Sign In to Audit Portal</button>
           <div className="divider">or verify with</div>
           <button className="otp-btn" onClick={otpLogin}><i className="ti ti-device-mobile"></i>Sign In with OTP</button>
           <div className="login-footer">
             Not an auditor? <a href="#">Back to Admin</a><br /><br />
-            <span style={{fontSize:'11px'}}>Access is restricted to authorised auditors only.<br />All sessions are logged for compliance.</span>
+            <span style={{ fontSize: '11px' }}>Access is restricted to authorised auditors only.<br />All sessions are logged for compliance.</span>
           </div>
         </div>
       </div>

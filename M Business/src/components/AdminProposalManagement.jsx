@@ -312,30 +312,6 @@ function Badge({ status }) {
   );
 }
 
-function Search({ value, onChange, placeholder }) {
-  return (
-    <div style={{ position: "relative", marginBottom: 16 }}>
-      <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>Search</span>
-      <input
-        type="text"
-        placeholder={placeholder || "Search..."}
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        style={{
-          width: "100%",
-          padding: "10px 14px 10px 40px",
-          border: "1.5px solid var(--app-border)",
-          borderRadius: 10,
-          fontSize: 13,
-          color: T.text,
-          background: "var(--app-bg)",
-          outline: "none",
-          fontFamily: "inherit"
-        }}
-      />
-    </div>
-  );
-}
 
 function CompanyDropdown({ clients, value, onChange, error }) {
   const [search, setSearch] = useState("");

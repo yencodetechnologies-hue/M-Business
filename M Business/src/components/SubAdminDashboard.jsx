@@ -757,7 +757,7 @@ function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel = "Del
 
         <div style={{ width: 52, height: 52, borderRadius: "50%", background: danger ? "rgba(var(--red-rgb),0.1)" : "rgba(var(--app-accent-rgb),0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, margin: "0 auto 14px" }}>
 
-          {danger ? "Delete" : "Yes"}
+          {danger ? <i className="ti ti-trash" style={{ color: "#EF4444" }} /> : <i className="ti ti-check" style={{ color: "var(--app-accent)" }} />}
 
         </div>
 
@@ -5937,7 +5937,7 @@ const DEFAULT_PLANS = [
 
   {
 
-    title: "Trial", price: 0, icon: "âœ¨", type: "free",
+    title: "Trial", price: 0, icon: "🌱", type: "free",
 
     features: ["30 Days Free Trial", "5 Projects", "5 Invoices", "Single business manage", "Managers: 1", "Clients: 5", "Employees: 20"]
 
@@ -5953,7 +5953,7 @@ const DEFAULT_PLANS = [
 
   {
 
-    title: "Professional", price: 2999, icon: "Launch", type: "pro",
+    title: "Professional", price: 2999, icon: "🌱", type: "pro",
 
     features: ["Unlimited Projects", "Unlimited Invoices", "Multiple business manage", "Managers: 3", "Clients: 10", "Employees: 50", "Priority Support"]
 
@@ -9083,9 +9083,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             <div className="search-wrap">
 
-              <i className="ti ti-search"></i>
 
-              <input type="text" placeholder="Search..." value={dashSearch} onChange={(e) => setDashSearch(e.target.value)} />
+
+
 
             </div>
             <div className="topbar-right">

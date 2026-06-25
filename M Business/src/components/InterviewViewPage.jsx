@@ -78,6 +78,7 @@ function StatusPicker({ current = "pending", onChange }) {
       ))}
     </div>
     </div >
+    </div >
   );
 }
 

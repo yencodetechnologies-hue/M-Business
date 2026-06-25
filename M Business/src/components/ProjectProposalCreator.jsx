@@ -1595,9 +1595,9 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   const successRate = decided > 0 ? Math.round((wonCount / decided) * 100) : 0;
   if (view === "list") {
     const total = proposals.length;
-    const totalVal = proposals.reduce((s, p) => s + (p.value || 0), 0);
+const totalVal = proposals.reduce((s, p) => s + (Number(p.value) || Number(p.total) || 0), 0);
     const wonCount = proposals.filter(p => p.status === "approved" || p.status === "won").length;
-    const wonVal = proposals.filter(p => p.status === "approved" || p.status === "won").reduce((s, p) => s + (p.value || 0), 0);
+const wonVal = proposals.filter(p => p.status === "approved" || p.status === "won").reduce((s, p) => s + (Number(p.value) || Number(p.total) || 0), 0);
     const activeCount = proposals.filter(p => p.status === "pending" || p.status === "negotiation" || p.status === "sent").length;
     const decided = proposals.filter(p => p.status === "approved" || p.status === "won" || p.status === "rejected" || p.status === "lost").length;
     const successRate = decided > 0 ? Math.round((wonCount / decided) * 100) : 0;
@@ -1627,10 +1627,11 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
     const fmtDate = (d) => { try { return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }); } catch { return "—"; } };
 
+  const getVal = (p) => Number(p.value) || Number(p.total) || 0;
     const pipelineStages = [
       { label: "Won", color: "var(--green)", count: wonCount, val: wonVal },
-      { label: "Active", color: "var(--purple)", count: activeCount, val: proposals.filter(p => p.status === "pending" || p.status === "negotiation" || p.status === "sent").reduce((s, p) => s + (p.value || 0), 0) },
-      { label: "Draft", color: "var(--text3)", count: proposals.filter(p => !p.status || p.status === "draft").length, val: proposals.filter(p => !p.status || p.status === "draft").reduce((s, p) => s + (p.value || 0), 0) },
+      { label: "Active", color: "var(--purple)", count: activeCount, val: proposals.filter(p => p.status === "pending" || p.status === "negotiation" || p.status === "sent").reduce((s, p) => s + getVal(p), 0) },
+      { label: "Draft", color: "var(--text3)", count: proposals.filter(p => !p.status || p.status === "draft").length, val: proposals.filter(p => !p.status || p.status === "draft").reduce((s, p) => s + getVal(p), 0) },
     ];
 
     const themeGrad = (p) => {
@@ -1786,7 +1787,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                     const clientInitial = (p.client || "?").charAt(0).toUpperCase();
                     const grad = themeGrad(p);
                     const created = p.updated || p.createdAt || p.created;
-                    const value = p.value || 0;
+                   const value = Number(p.value) || Number(p.total) || 0;
                     const slides = p.slides?.length || 0;
                     return (
                       <div key={p.id || p._id} className="proposal-card" onClick={() => { setOpenMenuId(null); openDoc(p); }}>

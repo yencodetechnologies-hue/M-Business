@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 export default function FinReports() {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const mainScrollRef = useRef(null);
   const [activePeriod, setActivePeriod] = useState('This Month');
 
   const openImport = () => setIsImportModalOpen(true);
@@ -85,102 +86,102 @@ a { text-decoration: none; color: inherit; }
         <div className="topbar">
           <div className="breadcrumb"><a href="#">Finance</a><i className="ti ti-chevron-right"></i><span>Reports & Export</span></div>
           <div className="topbar-actions">
-            <button className="btn btn-outline" onClick={openImport} style={{borderColor:'var(--primary)',color:'var(--primary)'}}><i className="ti ti-upload"></i>Import Statement</button>
-            <button className="btn btn-outline" style={{background:'var(--purple)',color:'#fff',border:'none'}}><i className="ti ti-shield-check"></i>Auditor Portal</button>
+            <button className="btn btn-outline" onClick={openImport} style={{ borderColor: 'var(--primary)', color: 'var(--primary)' }}><i className="ti ti-upload"></i>Import Statement</button>
+            <button className="btn btn-outline" style={{ background: 'var(--purple)', color: '#fff', border: 'none' }}><i className="ti ti-shield-check"></i>Auditor Portal</button>
           </div>
         </div>
         <div className="content" ref={mainScrollRef}>
           <div className="period-selector">
             <div className="period-title"><i className="ti ti-calendar"></i>Select Period for Reports</div>
-            <div style={{display:'flex',gap:'14px',flexWrap:'wrap',alignItems:'center'}}>
+            <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
               <div className="period-chips">
                 {periods.map(p => (
                   <button key={p} className={`pc-chip ${activePeriod === p ? 'on' : ''}`} onClick={() => setActivePeriod(p)}>{p}</button>
                 ))}
               </div>
-              <div style={{display:'flex',gap:'8px',marginLeft:'auto'}}>
-                <input type="date" defaultValue="2026-06-01" className="filter-sel" style={{fontSize:'12px'}} />
-                <input type="date" defaultValue="2026-06-30" className="filter-sel" style={{fontSize:'12px'}} />
+              <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
+                <input type="date" defaultValue="2026-06-01" className="filter-sel" style={{ fontSize: '12px' }} />
+                <input type="date" defaultValue="2026-06-30" className="filter-sel" style={{ fontSize: '12px' }} />
               </div>
             </div>
           </div>
 
-          <div className="grid-3" style={{marginBottom:'22px'}}>
+          <div className="grid-3" style={{ marginBottom: '22px' }}>
             <div className="report-card income-rep">
-              <div className="report-icon" style={{background:'var(--green-light)'}}><i className="ti ti-arrow-bar-down" style={{color:'var(--green)'}}></i></div>
+              <div className="report-icon" style={{ background: 'var(--green-light)' }}><i className="ti ti-arrow-bar-down" style={{ color: 'var(--green)' }}></i></div>
               <div className="report-title">Income Statement</div>
               <div className="report-desc">All inward transactions — project revenue, retainers, advances. Filterable by client, category, date.</div>
               <div className="rep-export-row">
-                <button className="exp-btn exp-pdf" onClick={() => exportReport('Income Statement','PDF')}><i className="ti ti-file-type-pdf"></i>PDF</button>
-                <button className="exp-btn exp-excel" onClick={() => exportReport('Income Statement','Excel')}><i className="ti ti-file-spreadsheet"></i>Excel</button>
-                <button className="exp-btn exp-csv" onClick={() => exportReport('Income Statement','CSV')}><i className="ti ti-file-text"></i>CSV</button>
+                <button className="exp-btn exp-pdf" onClick={() => exportReport('Income Statement', 'PDF')}><i className="ti ti-file-type-pdf"></i>PDF</button>
+                <button className="exp-btn exp-excel" onClick={() => exportReport('Income Statement', 'Excel')}><i className="ti ti-file-spreadsheet"></i>Excel</button>
+                <button className="exp-btn exp-csv" onClick={() => exportReport('Income Statement', 'CSV')}><i className="ti ti-file-text"></i>CSV</button>
               </div>
             </div>
             <div className="report-card expense-rep">
-              <div className="report-icon" style={{background:'var(--red-light)'}}><i className="ti ti-arrow-bar-up" style={{color:'var(--red-dark)'}}></i></div>
+              <div className="report-icon" style={{ background: 'var(--red-light)' }}><i className="ti ti-arrow-bar-up" style={{ color: 'var(--red-dark)' }}></i></div>
               <div className="report-title">Expense Statement</div>
               <div className="report-desc">All outward transactions — payroll, vendor payments, operations, infrastructure. Category-wise breakdown.</div>
               <div className="rep-export-row">
-                <button className="exp-btn exp-pdf" onClick={() => exportReport('Expense Statement','PDF')}><i className="ti ti-file-type-pdf"></i>PDF</button>
-                <button className="exp-btn exp-excel" onClick={() => exportReport('Expense Statement','Excel')}><i className="ti ti-file-spreadsheet"></i>Excel</button>
-                <button className="exp-btn exp-csv" onClick={() => exportReport('Expense Statement','CSV')}><i className="ti ti-file-text"></i>CSV</button>
+                <button className="exp-btn exp-pdf" onClick={() => exportReport('Expense Statement', 'PDF')}><i className="ti ti-file-type-pdf"></i>PDF</button>
+                <button className="exp-btn exp-excel" onClick={() => exportReport('Expense Statement', 'Excel')}><i className="ti ti-file-spreadsheet"></i>Excel</button>
+                <button className="exp-btn exp-csv" onClick={() => exportReport('Expense Statement', 'CSV')}><i className="ti ti-file-text"></i>CSV</button>
               </div>
             </div>
             <div className="report-card pl-rep">
-              <div className="report-icon" style={{background:'var(--primary-light)'}}><i className="ti ti-chart-bar" style={{color:'var(--primary)'}}></i></div>
+              <div className="report-icon" style={{ background: 'var(--primary-light)' }}><i className="ti ti-chart-bar" style={{ color: 'var(--primary)' }}></i></div>
               <div className="report-title">P&L Statement</div>
               <div className="report-desc">Profit & Loss — income vs expenses, net profit margin, month-on-month comparison.</div>
               <div className="rep-export-row">
-                <button className="exp-btn exp-pdf" onClick={() => exportReport('P&L Statement','PDF')}><i className="ti ti-file-type-pdf"></i>PDF</button>
-                <button className="exp-btn exp-excel" onClick={() => exportReport('P&L Statement','Excel')}><i className="ti ti-file-spreadsheet"></i>Excel</button>
-                <button className="exp-btn exp-csv" onClick={() => exportReport('P&L Statement','CSV')}><i className="ti ti-file-text"></i>CSV</button>
+                <button className="exp-btn exp-pdf" onClick={() => exportReport('P&L Statement', 'PDF')}><i className="ti ti-file-type-pdf"></i>PDF</button>
+                <button className="exp-btn exp-excel" onClick={() => exportReport('P&L Statement', 'Excel')}><i className="ti ti-file-spreadsheet"></i>Excel</button>
+                <button className="exp-btn exp-csv" onClick={() => exportReport('P&L Statement', 'CSV')}><i className="ti ti-file-text"></i>CSV</button>
               </div>
             </div>
             <div className="report-card bank-rep">
-              <div className="report-icon" style={{background:'var(--orange-light)'}}><i className="ti ti-building-bank" style={{color:'var(--orange)'}}></i></div>
+              <div className="report-icon" style={{ background: 'var(--orange-light)' }}><i className="ti ti-building-bank" style={{ color: 'var(--orange)' }}></i></div>
               <div className="report-title">Bank Statement</div>
               <div className="report-desc">Full reconciled bank transactions — credits, debits, opening & closing balance per account.</div>
               <div className="rep-export-row">
-                <button className="exp-btn exp-pdf" onClick={() => exportReport('Bank Statement','PDF')}><i className="ti ti-file-type-pdf"></i>PDF</button>
-                <button className="exp-btn exp-excel" onClick={() => exportReport('Bank Statement','Excel')}><i className="ti ti-file-spreadsheet"></i>Excel</button>
-                <button className="exp-btn exp-csv" onClick={() => exportReport('Bank Statement','CSV')}><i className="ti ti-file-text"></i>CSV</button>
+                <button className="exp-btn exp-pdf" onClick={() => exportReport('Bank Statement', 'PDF')}><i className="ti ti-file-type-pdf"></i>PDF</button>
+                <button className="exp-btn exp-excel" onClick={() => exportReport('Bank Statement', 'Excel')}><i className="ti ti-file-spreadsheet"></i>Excel</button>
+                <button className="exp-btn exp-csv" onClick={() => exportReport('Bank Statement', 'CSV')}><i className="ti ti-file-text"></i>CSV</button>
               </div>
             </div>
             <div className="report-card vendor-rep">
-              <div className="report-icon" style={{background:'var(--purple-light)'}}><i className="ti ti-truck" style={{color:'var(--purple)'}}></i></div>
+              <div className="report-icon" style={{ background: 'var(--purple-light)' }}><i className="ti ti-truck" style={{ color: 'var(--purple)' }}></i></div>
               <div className="report-title">Vendor Report</div>
               <div className="report-desc">All vendor payments, outstanding dues, GST numbers, YTD spend per vendor.</div>
               <div className="rep-export-row">
-                <button className="exp-btn exp-pdf" onClick={() => exportReport('Vendor Report','PDF')}><i className="ti ti-file-type-pdf"></i>PDF</button>
-                <button className="exp-btn exp-excel" onClick={() => exportReport('Vendor Report','Excel')}><i className="ti ti-file-spreadsheet"></i>Excel</button>
-                <button className="exp-btn exp-csv" onClick={() => exportReport('Vendor Report','CSV')}><i className="ti ti-file-text"></i>CSV</button>
+                <button className="exp-btn exp-pdf" onClick={() => exportReport('Vendor Report', 'PDF')}><i className="ti ti-file-type-pdf"></i>PDF</button>
+                <button className="exp-btn exp-excel" onClick={() => exportReport('Vendor Report', 'Excel')}><i className="ti ti-file-spreadsheet"></i>Excel</button>
+                <button className="exp-btn exp-csv" onClick={() => exportReport('Vendor Report', 'CSV')}><i className="ti ti-file-text"></i>CSV</button>
               </div>
             </div>
             <div className="report-card full-rep">
-              <div className="report-icon" style={{background:'var(--bg)'}}><i className="ti ti-file-analytics" style={{color:'var(--text-dark)'}}></i></div>
+              <div className="report-icon" style={{ background: 'var(--bg)' }}><i className="ti ti-file-analytics" style={{ color: 'var(--text-dark)' }}></i></div>
               <div className="report-title">Full Financial Report</div>
               <div className="report-desc">Complete package — income + expenses + P&L + bank + vendors in one combined document.</div>
               <div className="rep-export-row">
-                <button className="exp-btn exp-pdf" onClick={() => exportReport('Full Financial Report','PDF')} style={{flex:1,justifyContent:'center'}}><i className="ti ti-file-type-pdf"></i>Full PDF</button>
-                <button className="exp-btn exp-excel" onClick={() => exportReport('Full Financial Report','Excel')} style={{flex:1,justifyContent:'center'}}><i className="ti ti-file-spreadsheet"></i>Excel</button>
+                <button className="exp-btn exp-pdf" onClick={() => exportReport('Full Financial Report', 'PDF')} style={{ flex: 1, justifyContent: 'center' }}><i className="ti ti-file-type-pdf"></i>Full PDF</button>
+                <button className="exp-btn exp-excel" onClick={() => exportReport('Full Financial Report', 'Excel')} style={{ flex: 1, justifyContent: 'center' }}><i className="ti ti-file-spreadsheet"></i>Excel</button>
               </div>
             </div>
           </div>
 
           <div className="share-section">
-            <h3><i className="ti ti-shield-check" style={{marginRight:'8px'}}></i>Share with Auditor</h3>
+            <h3><i className="ti ti-shield-check" style={{ marginRight: '8px' }}></i>Share with Auditor</h3>
             <p>Send the complete financial package directly to your auditor portal. They can download statements, verify transactions and add remarks.</p>
-            <div style={{display:'flex',gap:'10px',flexWrap:'wrap'}}>
-              <button className="btn" style={{background:'rgba(255,255,255,.2)',color:'#fff',border:'1px solid rgba(255,255,255,.3)'}} onClick={shareAuditor}><i className="ti ti-send"></i>Send to Auditor Portal</button>
-              <button className="btn" style={{background:'rgba(255,255,255,.2)',color:'#fff',border:'1px solid rgba(255,255,255,.3)'}}><i className="ti ti-external-link"></i>Open Auditor Portal</button>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              <button className="btn" style={{ background: 'rgba(255,255,255,.2)', color: '#fff', border: '1px solid rgba(255,255,255,.3)' }} onClick={shareAuditor}><i className="ti ti-send"></i>Send to Auditor Portal</button>
+              <button className="btn" style={{ background: 'rgba(255,255,255,.2)', color: '#fff', border: '1px solid rgba(255,255,255,.3)' }}><i className="ti ti-external-link"></i>Open Auditor Portal</button>
             </div>
           </div>
         </div>
       </div>
 
       {isImportModalOpen && (
-        <div className="modal-bg open" onClick={(e) => { if(e.target.className.includes('modal-bg')) closeImport() }}>
-          <div className="modal" style={{textAlign:'center', padding: '40px'}}>
+        <div className="modal-bg open" onClick={(e) => { if (e.target.className.includes('modal-bg')) closeImport() }}>
+          <div className="modal" style={{ textAlign: 'center', padding: '40px' }}>
             <h3>Import Modal</h3>
             <p>Placeholder for import modal UI.</p>
             <button className="btn btn-outline" onClick={closeImport}>Close</button>

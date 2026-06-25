@@ -7,6 +7,11 @@ export default function FinVendors() {
   const [isAddVendorModalOpen, setIsAddVendorModalOpen] = useState(false);
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [viewVendor, setViewVendor] = useState(null);
+  const [payingVendor, setPayingVendor] = useState(null);
+  const [payAmount, setPayAmount] = useState('');
+  const [savingPay, setSavingPay] = useState(false);
   const [newVendor, setNewVendor] = useState({
     vendorName: '', vendorProduct: '', amount: 0, tax: 0, gst: 0, paidAmount: 0, productDescription: '', modeOfPayment: 'Bank Transfer'
   });
@@ -14,7 +19,7 @@ export default function FinVendors() {
   const fetchVendors = async () => {
     try {
       const res = await axios.get(`${BASE_URL}/api/vendors`, {
-        headers: { "company-id": localStorage.getItem("companyId") || "" }
+        headers: { "x-company-id": localStorage.getItem("companyId") || "" }
       });
       setVendors(res.data || []);
     } catch (e) {
@@ -34,7 +39,7 @@ export default function FinVendors() {
   const saveVendor = async () => {
     try {
       await axios.post(`${BASE_URL}/api/vendors`, newVendor, {
-        headers: { "company-id": localStorage.getItem("companyId") || "" }
+        headers: { "x-company-id": localStorage.getItem("companyId") || "" }
       });
       setIsAddVendorModalOpen(false);
       alert('Vendor added!');
@@ -44,8 +49,37 @@ export default function FinVendors() {
       alert('Failed to add vendor');
     }
   };
+  const handlePay = async (vendor) => {
+    const amt = Number(payAmount);
+    if (!amt || amt <= 0) return alert('Enter a valid amount');
+    setSavingPay(true);
+    try {
+      await axios.put(`${BASE_URL}/api/vendors/${vendor._id}`, {
+        ...vendor,
+        paidAmount: Number(vendor.paidAmount) + amt
+      }, { headers: { "x-company-id": localStorage.getItem("companyId") || "" } });
+      setPayingVendor(null);
+      setPayAmount('');
+      fetchVendors();
+    } catch { alert('Payment failed'); }
+    finally { setSavingPay(false); }
+  };
 
-  const openVendor = () => alert('Opening vendor details');
+  const handleDeleteVendor = async (vendor) => {
+    if (!window.confirm(`Delete vendor "${vendor.vendorName}"?`)) return;
+    try {
+      await axios.delete(`${BASE_URL}/api/vendors/${vendor._id}`, {
+        headers: { "x-company-id": localStorage.getItem("companyId") || "" }
+      });
+      fetchVendors();
+    } catch { alert('Failed to delete vendor'); }
+  };
+
+  const filteredVendors = vendors.filter(v =>
+    !search ||
+    (v.vendorName || '').toLowerCase().includes(search.toLowerCase()) ||
+    (v.vendorProduct || '').toLowerCase().includes(search.toLowerCase())
+  );
 
   const totalVendors = vendors.length;
   const totalPayable = vendors.reduce((s, v) => s + (v.amount - v.paidAmount), 0);
@@ -128,7 +162,7 @@ tr:hover td{background:#FAFCFE;}
         <div className="topbar">
           <div className="breadcrumb"><a href="#">Finance</a><i className="ti ti-chevron-right"></i><span>Vendors</span></div>
           <div className="topbar-actions">
-            <button className="btn btn-outline" onClick={openImport} style={{borderColor:'var(--primary)',color:'var(--primary)'}}><i className="ti ti-upload"></i>Import Statement</button>
+            <button className="btn btn-outline" onClick={openImport} style={{ borderColor: 'var(--primary)', color: 'var(--primary)' }}><i className="ti ti-upload"></i>Import Statement</button>
             <button className="btn btn-outline"><i className="ti ti-arrow-bar-up"></i>Pay a Vendor</button>
             <button className="btn btn-primary" onClick={() => setIsAddVendorModalOpen(true)}><i className="ti ti-plus"></i>Add Vendor</button>
           </div>
@@ -141,30 +175,35 @@ tr:hover td{background:#FAFCFE;}
             <div className="kpi income"><div className="kpi-label">Total Vendor Spend</div><div className="kpi-value">₹{totalSpend.toLocaleString('en-IN')}</div><div className="kpi-sub neutral"><i className="ti ti-calendar"></i>Overall</div></div>
           </div>
           <div className="toolbar">
-            <div className="search-box"><i className="ti ti-search"></i><input placeholder="Search vendors..." /></div>
-            <select className="filter-sel"><option>All Categories</option><option>IT & Software</option><option>Design</option></select>
-            <select className="filter-sel"><option>All Status</option><option>Active</option><option>Inactive</option></select>
+            <div className="search-box"><i className="ti ti-search"></i><input placeholder="Search vendors..." value={search} onChange={e => setSearch(e.target.value)} /></div>
           </div>
           <div className="card">
             <div className="table-wrap">
               <table>
                 <thead><tr><th>Vendor Name</th><th>Category</th><th>Total Paid</th><th>Outstanding</th><th>Last Payment</th><th>Status</th><th>Actions</th></tr></thead>
                 <tbody>
-                  {loading ? <tr><td colSpan="7">Loading...</td></tr> : vendors.map((v, i) => {
-                    const outstanding = v.amount - v.paidAmount;
-                    const isPaid = outstanding <= 0;
-                    return (
-                      <tr key={v._id || i}>
-                        <td><div style={{display:'flex',alignItems:'center',gap:'10px'}}><div className="av av-sm" style={{background:'var(--primary)',borderRadius:'8px'}}>{v.vendorName.substring(0,2).toUpperCase()}</div><div><div style={{fontWeight:700}}>{v.vendorName}</div><div style={{fontSize:'11px',color:'var(--text-light)'}}>{v.vendorProduct}</div></div></div></td>
-                        <td><span style={{background:'var(--primary-light)',color:'var(--primary-dark)',padding:'2px 8px',borderRadius:'20px',fontSize:'11px',fontWeight:700}}>{v.vendorProduct || 'Service'}</span></td>
-                        <td className="amt-out">₹{Number(v.paidAmount || 0).toLocaleString('en-IN')}</td>
-                        <td className="amt-neutral" style={{color: outstanding > 0 ? 'var(--orange)' : 'inherit'}}>₹{Number(outstanding || 0).toLocaleString('en-IN')}</td>
-                        <td style={{fontSize:'12px'}}>{new Date(v.date).toLocaleDateString()}</td>
-                        <td><span className={`badge ${isPaid ? 'badge-paid' : 'badge-pending'}`}>{isPaid ? 'Paid' : 'Pending'}</span></td>
-                        <td><div style={{display:'flex',gap:'5px'}}><button className="btn btn-outline btn-sm" onClick={openVendor}><i className="ti ti-eye"></i></button>{!isPaid && <button className="btn btn-green btn-sm" onClick={() => alert('Processing payment...')}><i className="ti ti-cash"></i>Pay</button>}</div></td>
-                      </tr>
-                    );
-                  })}
+                  {loading ? <tr><td colSpan="7" style={{ padding: 20 }}>Loading...</td></tr>
+                    : filteredVendors.length === 0 ? <tr><td colSpan="7" style={{ padding: 20, textAlign: 'center', color: 'var(--text-light)' }}>No vendors found.</td></tr>
+                      : filteredVendors.map((v, i) => {
+                        const outstanding = Number(v.amount || 0) - Number(v.paidAmount || 0);
+                        const isPaid = outstanding <= 0;
+                        const dateStr = v.dateOfPurchase || v.date || v.createdAt;
+                        return (
+                          <tr key={v._id || i}>
+                            <td><div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><div className="av av-sm" style={{ background: 'var(--primary)', borderRadius: '8px' }}>{(v.vendorName || 'V').substring(0, 2).toUpperCase()}</div><div><div style={{ fontWeight: 700 }}>{v.vendorName}</div><div style={{ fontSize: '11px', color: 'var(--text-light)' }}>{v.vendorProduct}</div></div></div></td>
+                            <td><span style={{ background: 'var(--primary-light)', color: 'var(--primary-dark)', padding: '2px 8px', borderRadius: '20px', fontSize: '11px', fontWeight: 700 }}>{v.vendorProduct || 'Service'}</span></td>
+                            <td className="amt-out">₹{Number(v.paidAmount || 0).toLocaleString('en-IN')}</td>
+                            <td style={{ color: outstanding > 0 ? 'var(--orange)' : 'var(--text-dark)', fontWeight: 800 }}>₹{Number(Math.max(0, outstanding)).toLocaleString('en-IN')}</td>
+                            <td style={{ fontSize: '12px' }}>{dateStr ? new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                            <td><span className={`badge ${isPaid ? 'badge-paid' : 'badge-pending'}`}>{isPaid ? 'Paid' : 'Pending'}</span></td>
+                            <td><div style={{ display: 'flex', gap: '5px' }}>
+                              <button className="btn btn-outline btn-sm" onClick={() => setViewVendor(v)}><i className="ti ti-eye"></i></button>
+                              {!isPaid && <button className="btn btn-green btn-sm" onClick={() => { setPayingVendor(v); setPayAmount(''); }}><i className="ti ti-cash"></i>Pay</button>}
+                              <button className="btn btn-outline btn-sm" style={{ color: 'var(--red-dark)', borderColor: '#FCA5A5' }} onClick={() => handleDeleteVendor(v)}><i className="ti ti-trash"></i></button>
+                            </div></td>
+                          </tr>
+                        );
+                      })}
                 </tbody>
               </table>
             </div>
@@ -172,33 +211,73 @@ tr:hover td{background:#FAFCFE;}
         </div>
       </div>
 
-      <div className={`modal-bg ${isAddVendorModalOpen ? 'open' : ''}`} onClick={(e) => { if(e.target.className.includes('modal-bg')) setIsAddVendorModalOpen(false) }}>
+      <div className={`modal-bg ${isAddVendorModalOpen ? 'open' : ''}`} onClick={(e) => { if (e.target.className.includes('modal-bg')) setIsAddVendorModalOpen(false) }}>
         <div className="modal">
           <div className="modal-title"><i className="ti ti-truck"></i>Add Vendor</div>
           <div className="form-2col">
-            <div className="form-group"><label>Vendor Name *</label><input placeholder="Company or individual name" value={newVendor.vendorName} onChange={e => setNewVendor({...newVendor, vendorName: e.target.value})} /></div>
-            <div className="form-group"><label>Product / Category *</label><input placeholder="e.g. Server Hosting" value={newVendor.vendorProduct} onChange={e => setNewVendor({...newVendor, vendorProduct: e.target.value})} /></div>
+            <div className="form-group"><label>Vendor Name *</label><input placeholder="Company or individual name" value={newVendor.vendorName} onChange={e => setNewVendor({ ...newVendor, vendorName: e.target.value })} /></div>
+            <div className="form-group"><label>Product / Category *</label><input placeholder="e.g. Server Hosting" value={newVendor.vendorProduct} onChange={e => setNewVendor({ ...newVendor, vendorProduct: e.target.value })} /></div>
           </div>
           <div className="form-2col">
-            <div className="form-group"><label>Total Amount *</label><input type="number" placeholder="0" value={newVendor.amount} onChange={e => setNewVendor({...newVendor, amount: Number(e.target.value)})} /></div>
-            <div className="form-group"><label>Paid Amount</label><input type="number" placeholder="0" value={newVendor.paidAmount} onChange={e => setNewVendor({...newVendor, paidAmount: Number(e.target.value)})} /></div>
+            <div className="form-group"><label>Total Amount *</label><input type="number" placeholder="0" value={newVendor.amount} onChange={e => setNewVendor({ ...newVendor, amount: Number(e.target.value) })} /></div>
+            <div className="form-group"><label>Paid Amount</label><input type="number" placeholder="0" value={newVendor.paidAmount} onChange={e => setNewVendor({ ...newVendor, paidAmount: Number(e.target.value) })} /></div>
           </div>
           <div className="form-2col">
-            <div className="form-group"><label>Tax (%)</label><input type="number" placeholder="0" value={newVendor.tax} onChange={e => setNewVendor({...newVendor, tax: Number(e.target.value)})} /></div>
-            <div className="form-group"><label>GST (%)</label><input type="number" placeholder="0" value={newVendor.gst} onChange={e => setNewVendor({...newVendor, gst: Number(e.target.value)})} /></div>
+            <div className="form-group"><label>Tax (%)</label><input type="number" placeholder="0" value={newVendor.tax} onChange={e => setNewVendor({ ...newVendor, tax: Number(e.target.value) })} /></div>
+            <div className="form-group"><label>GST (%)</label><input type="number" placeholder="0" value={newVendor.gst} onChange={e => setNewVendor({ ...newVendor, gst: Number(e.target.value) })} /></div>
           </div>
-          <div className="form-group"><label>Description</label><textarea placeholder="Vendor description..." style={{minHeight:'70px'}} value={newVendor.productDescription} onChange={e => setNewVendor({...newVendor, productDescription: e.target.value})}></textarea></div>
-          <div className="form-group"><label>Payment Mode</label><select value={newVendor.modeOfPayment} onChange={e => setNewVendor({...newVendor, modeOfPayment: e.target.value})}><option>Bank Transfer</option><option>Cash</option><option>Credit Card</option></select></div>
+          <div className="form-group"><label>Description</label><textarea placeholder="Vendor description..." style={{ minHeight: '70px' }} value={newVendor.productDescription} onChange={e => setNewVendor({ ...newVendor, productDescription: e.target.value })}></textarea></div>
+          <div className="form-group"><label>Payment Mode</label><select value={newVendor.modeOfPayment} onChange={e => setNewVendor({ ...newVendor, modeOfPayment: e.target.value })}><option>Bank Transfer</option><option>Cash</option><option>Credit Card</option></select></div>
           <div className="modal-footer">
             <button className="btn btn-outline" onClick={() => setIsAddVendorModalOpen(false)}>Cancel</button>
             <button className="btn btn-primary" onClick={saveVendor}><i className="ti ti-check"></i>Save Vendor</button>
           </div>
         </div>
       </div>
-      
+
+      {/* VIEW VENDOR MODAL */}
+      {viewVendor && (
+        <div className="modal-bg open" onClick={e => { if (e.target.className.includes('modal-bg')) setViewVendor(null) }}>
+          <div className="modal">
+            <div className="modal-title"><i className="ti ti-truck"></i>Vendor Details</div>
+            {[['Vendor Name', viewVendor.vendorName], ['Product / Service', viewVendor.vendorProduct], ['Description', viewVendor.productDescription], ['Total Amount', '₹' + Number(viewVendor.amount || 0).toLocaleString('en-IN')], ['Paid Amount', '₹' + Number(viewVendor.paidAmount || 0).toLocaleString('en-IN')], ['Outstanding', '₹' + Number(Math.max(0, (viewVendor.amount || 0) - (viewVendor.paidAmount || 0))).toLocaleString('en-IN')], ['Tax', viewVendor.tax + '%'], ['GST', viewVendor.gst + '%'], ['Payment Mode', viewVendor.modeOfPayment]].map(([l, v]) => (
+              <div key={l} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid var(--bg)', fontSize: 13 }}>
+                <span style={{ fontWeight: 700, color: 'var(--text-light)' }}>{l}</span>
+                <span style={{ fontWeight: 700, color: 'var(--text-dark)' }}>{v || '—'}</span>
+              </div>
+            ))}
+            <div className="modal-footer">
+              <button className="btn btn-outline" onClick={() => setViewVendor(null)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PAY VENDOR MODAL */}
+      {payingVendor && (
+        <div className="modal-bg open" onClick={e => { if (e.target.className.includes('modal-bg')) setPayingVendor(null) }}>
+          <div className="modal" style={{ width: '420px' }}>
+            <div className="modal-title"><i className="ti ti-cash"></i>Pay Vendor</div>
+            <p style={{ fontSize: 13, color: 'var(--text-mid)', marginBottom: 16 }}>
+              Recording payment to <strong>{payingVendor.vendorName}</strong>. Outstanding: <strong>₹{Number(Math.max(0, (payingVendor.amount || 0) - (payingVendor.paidAmount || 0))).toLocaleString('en-IN')}</strong>
+            </p>
+            <div className="form-group">
+              <label>Amount to Pay (₹) *</label>
+              <input type="number" placeholder="0" value={payAmount} onChange={e => setPayAmount(e.target.value)} />
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-outline" onClick={() => setPayingVendor(null)}>Cancel</button>
+              <button className="btn btn-primary" disabled={savingPay} onClick={() => handlePay(payingVendor)}>
+                {savingPay ? 'Processing...' : 'Confirm Payment'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {isImportModalOpen && (
-        <div className="modal-bg open" onClick={(e) => { if(e.target.className.includes('modal-bg')) closeImport() }}>
-          <div className="modal" style={{textAlign:'center', padding: '40px'}}>
+        <div className="modal-bg open" onClick={(e) => { if (e.target.className.includes('modal-bg')) closeImport() }}>
+          <div className="modal" style={{ textAlign: 'center', padding: '40px' }}>
             <h3>Import Modal</h3>
             <p>Placeholder for import modal UI.</p>
             <button className="btn btn-outline" onClick={closeImport}>Close</button>

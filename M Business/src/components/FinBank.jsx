@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 
@@ -8,13 +8,20 @@ export default function FinBank() {
   const [banks, setBanks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newBank, setNewBank] = useState({ bankName: 'HDFC Bank', accountType: 'Current', accountNo: '', ifscCode: '', holderName: '' });
+  const mainScrollRef = useRef(null);
+  const [selectedBankId, setSelectedBankId] = useState(null);
+  const [income, setIncome] = useState([]);
+  const [expenses, setExpenses] = useState([]);
+  const [loadingTxns, setLoadingTxns] = useState(true);
 
   const fetchBanks = async () => {
     try {
       const res = await axios.get(`${BASE_URL}/api/banks`, {
-        headers: { "company-id": localStorage.getItem("companyId") || "" }
+        headers: { "x-company-id": localStorage.getItem("companyId") || "" }
       });
-      setBanks(res.data || []);
+      const data = res.data || [];
+      setBanks(data);
+      if (data.length > 0) setSelectedBankId(data[0]._id);
     } catch (e) {
       console.error(e);
     } finally {
@@ -22,9 +29,37 @@ export default function FinBank() {
     }
   };
 
+  const fetchTransactions = async () => {
+    setLoadingTxns(true);
+    try {
+      const hdr = { "x-company-id": localStorage.getItem("companyId") || "" };
+      const [incRes, expRes] = await Promise.all([
+        axios.get(`${BASE_URL}/api/income`, { headers: hdr }),
+        axios.get(`${BASE_URL}/api/expenses`, { headers: hdr }),
+      ]);
+      setIncome(incRes.data || []);
+      setExpenses(expRes.data || []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingTxns(false);
+    }
+  };
+
   useEffect(() => {
     fetchBanks();
+    fetchTransactions();
   }, []);
+
+  const totalBalance = banks.reduce((s, b) => s + Number(b.balance || 0), 0);
+  const totalCredits = income.reduce((s, i) => s + Number(i.amount || 0), 0);
+  const totalDebits = expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
+  const selectedBank = banks.find(b => b._id === selectedBankId) || banks[0];
+
+  const recentTxns = [
+    ...income.map(i => ({ _id: i._id, type: 'in', label: i.title || i.client || 'Income', sub: i.date || i.createdAt, amount: Number(i.amount || 0) })),
+    ...expenses.map(e => ({ _id: e._id, type: 'out', label: e.title || e.description || 'Expense', sub: e.date || e.createdAt, amount: Number(e.amount || 0) })),
+  ].sort((a, b) => new Date(b.sub) - new Date(a.sub)).slice(0, 8);
 
   const openImport = () => setIsImportModalOpen(true);
   const closeImport = () => setIsImportModalOpen(false);
@@ -33,9 +68,9 @@ export default function FinBank() {
     try {
       await axios.post(`${BASE_URL}/api/banks`, {
         ...newBank,
-        balance: Math.floor(Math.random() * 500000) + 10000 // random starting balance for demo
+        balance: 0
       }, {
-        headers: { "company-id": localStorage.getItem("companyId") || "" }
+        headers: { "x-company-id": localStorage.getItem("companyId") || "" }
       });
       setIsLinkBankModalOpen(false);
       alert('Bank account linked! Verify the test deposit.');
@@ -133,78 +168,96 @@ a { text-decoration: none; color: inherit; }
         <div className="topbar">
           <div className="breadcrumb"><a href="#">Finance</a><i className="ti ti-chevron-right"></i><span>Bank Accounts</span></div>
           <div className="topbar-actions">
-            <button className="btn btn-outline" onClick={openImport} style={{borderColor:'var(--primary)',color:'var(--primary)'}}><i className="ti ti-upload"></i>Import Statement</button>
+            <button className="btn btn-outline" onClick={openImport} style={{ borderColor: 'var(--primary)', color: 'var(--primary)' }}><i className="ti ti-upload"></i>Import Statement</button>
             <button className="btn btn-outline" onClick={() => toast('Syncing all accounts...')}>Sync All</button>
             <button className="btn btn-primary" onClick={() => setIsLinkBankModalOpen(true)}><i className="ti ti-plus"></i>Link Bank Account</button>
           </div>
         </div>
         <div className="content" ref={mainScrollRef}>
-          <div className="grid-2" style={{marginBottom:'22px'}}>
-            {loading ? <div style={{padding:20}}>Loading banks...</div> : banks.length === 0 ? <div style={{padding:20}}>No bank accounts linked yet.</div> : banks.map((bank, idx) => {
+          <div className="grid-2" style={{ marginBottom: '22px' }}>
+            {loading ? <div style={{ padding: 20 }}>Loading banks...</div> : banks.length === 0 ? <div style={{ padding: 20 }}>No bank accounts linked yet.</div> : banks.map((bank, idx) => {
               const colorTheme = colors[idx % colors.length];
               return (
-                <div key={bank._id || idx} className="bank-card" style={{background: colorTheme.bg}}>
+                <div key={bank._id || idx} className="bank-card" style={{ background: colorTheme.bg }}>
                   <div className="bank-name">{bank.bankName} — {bank.accountType} Account</div>
                   <div className="bank-bal">₹{Number(bank.balance || 0).toLocaleString('en-IN')}</div>
                   <div className="bank-acc"><i className="ti ti-credit-card"></i> •••• •••• •••• {bank.accountNo?.slice(-4) || 'XXXX'} &nbsp;·&nbsp; IFSC: {bank.ifscCode || 'N/A'}</div>
-                  <div style={{display:'flex',gap:'8px',marginTop:'14px'}}>
-                    <span style={{background:'rgba(255,255,255,.2)',borderRadius:'8px',padding:'4px 12px',fontSize:'11px',fontWeight:700}}>{idx === 0 ? 'Primary' : 'Secondary'}</span>
-                    <span style={{background:'rgba(255,255,255,.2)',borderRadius:'8px',padding:'4px 12px',fontSize:'11px',fontWeight:700}}>{bank.accountType} A/C</span>
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '14px' }}>
+                    <span style={{ background: 'rgba(255,255,255,.2)', borderRadius: '8px', padding: '4px 12px', fontSize: '11px', fontWeight: 700 }}>{idx === 0 ? 'Primary' : 'Secondary'}</span>
+                    <span style={{ background: 'rgba(255,255,255,.2)', borderRadius: '8px', padding: '4px 12px', fontSize: '11px', fontWeight: 700 }}>{bank.accountType} A/C</span>
                   </div>
                 </div>
               );
             })}
           </div>
 
-          <div className="kpi-grid kpi-grid-4" style={{marginBottom:'22px'}}>
-            <div className="kpi profit"><div className="kpi-label">Total Balance</div><div className="kpi-value">₹{banks.reduce((s,b)=>s+Number(b.balance||0), 0).toLocaleString('en-IN')}</div><div className="kpi-sub up"><i className="ti ti-building-bank"></i>Across {banks.length} accounts</div></div>
-            <div className="kpi income"><div className="kpi-label">Matched Txns</div><div className="kpi-value">142</div><div className="kpi-sub up"><i className="ti ti-check"></i>96% reconciled</div></div>
-            <div className="kpi pending"><div className="kpi-label">Unmatched</div><div className="kpi-value">6</div><div className="kpi-sub down"><i className="ti ti-alert-circle"></i>Need review</div></div>
-            <div className="kpi expense"><div className="kpi-label">Last Reconciled</div><div className="kpi-value">Jun 4</div><div className="kpi-sub neutral"><i className="ti ti-clock"></i>Yesterday</div></div>
+          <div className="kpi-grid kpi-grid-4" style={{ marginBottom: '22px' }}>
+            <div className="kpi profit"><div className="kpi-label">Total Balance</div><div className="kpi-value">₹{totalBalance.toLocaleString('en-IN')}</div><div className="kpi-sub up"><i className="ti ti-building-bank"></i>Across {banks.length} accounts</div></div>
+            <div className="kpi income"><div className="kpi-label">Total Credits</div><div className="kpi-value">₹{totalCredits.toLocaleString('en-IN')}</div><div className="kpi-sub up"><i className="ti ti-arrow-down"></i>{income.length} transactions</div></div>
+            <div className="kpi pending"><div className="kpi-label">Total Debits</div><div className="kpi-value">₹{totalDebits.toLocaleString('en-IN')}</div><div className="kpi-sub down"><i className="ti ti-arrow-up"></i>{expenses.length} transactions</div></div>
+            <div className="kpi expense"><div className="kpi-label">Net Flow</div><div className="kpi-value" style={{ color: totalCredits - totalDebits >= 0 ? 'var(--green)' : 'var(--red-dark)' }}>₹{Math.abs(totalCredits - totalDebits).toLocaleString('en-IN')}</div><div className={`kpi-sub ${totalCredits >= totalDebits ? 'up' : 'down'}`}><i className={`ti ti-trending-${totalCredits >= totalDebits ? 'up' : 'down'}`}></i>{totalCredits >= totalDebits ? 'Surplus' : 'Deficit'}</div></div>
           </div>
 
           <div className="grid-main-side">
             <div>
               <div className="card">
-                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'16px'}}>
-                  <div style={{fontSize:'15px',fontWeight:800,color:'var(--text-dark)',display:'flex',alignItems:'center',gap:'8px'}}><i className="ti ti-list" style={{color:'var(--primary)'}}></i>Bank Statement — HDFC ••••4821</div>
-                  <select className="filter-sel" style={{fontSize:'12px',padding:'6px 12px'}}>
-                    <option>HDFC — ••••4821</option><option>ICICI — ••••7734</option>
-                  </select>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                  <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <i className="ti ti-list" style={{ color: 'var(--primary)' }}></i>
+                    Recent Transactions — {selectedBank ? `${selectedBank.bankName} ••••${(selectedBank.accountNo || '').slice(-4)}` : 'All Accounts'}
+                  </div>
+                  {banks.length > 1 && (
+                    <select className="filter-sel" style={{ fontSize: '12px', padding: '6px 12px' }} value={selectedBankId || ''} onChange={e => setSelectedBankId(e.target.value)}>
+                      {banks.map(b => <option key={b._id} value={b._id}>{b.bankName} — ••••{(b.accountNo || '').slice(-4)}</option>)}
+                    </select>
+                  )}
                 </div>
-                <div style={{display:'flex',gap:'8px',marginBottom:'14px'}}>
-                  <span style={{background:'var(--green-light)',color:'var(--green-dark)',padding:'4px 12px',borderRadius:'8px',fontSize:'12px',fontWeight:700}}><i className="ti ti-circle-check"></i> 142 Matched</span>
-                  <span style={{background:'var(--orange-light)',color:'var(--orange-dark)',padding:'4px 12px',borderRadius:'8px',fontSize:'12px',fontWeight:700}}><i className="ti ti-alert-circle"></i> 6 Unmatched</span>
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '14px' }}>
+                  <span style={{ background: 'var(--green-light)', color: 'var(--green-dark)', padding: '4px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 700 }}><i className="ti ti-arrow-down"></i> {income.length} Credits</span>
+                  <span style={{ background: 'var(--red-light)', color: 'var(--red-dark)', padding: '4px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 700 }}><i className="ti ti-arrow-up"></i> {expenses.length} Debits</span>
                 </div>
-                <div className="rec-row">
-                  <div className="rec-icon in"><i className="ti ti-arrow-down"></i></div>
-                  <div style={{flex:1}}><div style={{fontSize:'13px',fontWeight:700}}>Credit — NovaMart Inc.</div><div style={{fontSize:'11px',color:'var(--text-light)'}}>Jun 3 · Ref: NEFT/TXN2026060312</div></div>
-                  <div className="amt-in" style={{fontSize:'14px'}}>+₹1,87,500</div>
-                  <span className="rec-match"><i className="ti ti-check"></i> Matched</span>
-                </div>
-                <div className="rec-row">
-                  <div className="rec-icon out"><i className="ti ti-arrow-up"></i></div>
-                  <div style={{flex:1}}><div style={{fontSize:'13px',fontWeight:700}}>Debit — AWS Auto-debit</div><div style={{fontSize:'11px',color:'var(--text-light)'}}>Jun 4</div></div>
-                  <div className="amt-out" style={{fontSize:'14px'}}>−₹42,000</div>
-                  <span className="rec-match"><i className="ti ti-check"></i> Matched</span>
+                {loadingTxns ? (
+                  <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-light)' }}>Loading transactions...</div>
+                ) : recentTxns.length === 0 ? (
+                  <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-light)' }}>No transactions yet.</div>
+                ) : recentTxns.map(tx => (
+                  <div key={tx._id} className="rec-row">
+                    <div className={`rec-icon ${tx.type}`}><i className={`ti ti-arrow-${tx.type === 'in' ? 'down' : 'up'}`}></i></div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '13px', fontWeight: 700 }}>{tx.type === 'in' ? 'Credit' : 'Debit'} — {tx.label}</div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-light)' }}>{tx.sub ? new Date(tx.sub).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
+                    </div>
+                    <div className={tx.type === 'in' ? 'amt-in' : 'amt-out'} style={{ fontSize: '14px' }}>{tx.type === 'in' ? '+' : '−'}₹{tx.amount.toLocaleString('en-IN')}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+              <div className="card">
+                <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-dark)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '7px' }}><i className="ti ti-building-bank" style={{ color: 'var(--primary)' }}></i>Account Summary</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid var(--bg)' }}><span style={{ color: 'var(--text-light)', fontWeight: 600 }}>Total Accounts</span><span style={{ fontWeight: 700 }}>{banks.length}</span></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid var(--bg)' }}><span style={{ color: 'var(--text-light)', fontWeight: 600 }}>Total Credits</span><span className="amt-in">+₹{totalCredits.toLocaleString('en-IN')}</span></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid var(--bg)' }}><span style={{ color: 'var(--text-light)', fontWeight: 600 }}>Total Debits</span><span className="amt-out">−₹{totalDebits.toLocaleString('en-IN')}</span></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0' }}><span style={{ fontWeight: 800, color: 'var(--text-dark)' }}>Net Balance</span><span style={{ fontWeight: 900, color: 'var(--primary)', fontSize: '16px' }}>₹{totalBalance.toLocaleString('en-IN')}</span></div>
                 </div>
               </div>
             </div>
-            <div style={{display:'flex',flexDirection:'column',gap:'18px'}}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
               <div className="card">
-                <div style={{fontSize:'14px',fontWeight:800,color:'var(--text-dark)',marginBottom:'14px',display:'flex',alignItems:'center',gap:'7px'}}><i className="ti ti-building-bank" style={{color:'var(--primary)'}}></i>Account Summary</div>
-                <div style={{display:'flex',flexDirection:'column',gap:'8px',fontSize:'13px'}}>
-                  <div style={{display:'flex',justifyContent:'space-between',padding:'7px 0',borderBottom:'1px solid var(--bg)'}}><span style={{color:'var(--text-light)',fontWeight:600}}>Opening Balance</span><span style={{fontWeight:700}}>₹8,62,320</span></div>
-                  <div style={{display:'flex',justifyContent:'space-between',padding:'7px 0',borderBottom:'1px solid var(--bg)'}}><span style={{color:'var(--text-light)',fontWeight:600}}>Total Credits</span><span className="amt-in">+₹18,42,000</span></div>
-                  <div style={{display:'flex',justifyContent:'space-between',padding:'7px 0',borderBottom:'1px solid var(--bg)'}}><span style={{color:'var(--text-light)',fontWeight:600}}>Total Debits</span><span className="amt-out">−₹14,20,000</span></div>
-                  <div style={{display:'flex',justifyContent:'space-between',padding:'7px 0'}}><span style={{fontWeight:800,color:'var(--text-dark)'}}>Closing Balance</span><span style={{fontWeight:900,color:'var(--primary)',fontSize:'16px'}}>₹12,84,320</span></div>
+                <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-dark)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '7px' }}><i className="ti ti-building-bank" style={{ color: 'var(--primary)' }}></i>Account Summary</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid var(--bg)' }}><span style={{ color: 'var(--text-light)', fontWeight: 600 }}>Opening Balance</span><span style={{ fontWeight: 700 }}>₹8,62,320</span></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid var(--bg)' }}><span style={{ color: 'var(--text-light)', fontWeight: 600 }}>Total Credits</span><span className="amt-in">+₹18,42,000</span></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid var(--bg)' }}><span style={{ color: 'var(--text-light)', fontWeight: 600 }}>Total Debits</span><span className="amt-out">−₹14,20,000</span></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0' }}><span style={{ fontWeight: 800, color: 'var(--text-dark)' }}>Closing Balance</span><span style={{ fontWeight: 900, color: 'var(--primary)', fontSize: '16px' }}>₹12,84,320</span></div>
                 </div>
               </div>
               <div className="card">
-                <div style={{fontSize:'14px',fontWeight:800,color:'var(--text-dark)',marginBottom:'12px'}}>Export Statement</div>
-                <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
-                  <button className="exp-btn exp-pdf" style={{justifyContent:'flex-start'}} onClick={() => toast('Downloading PDF statement...')}><i className="ti ti-file-type-pdf"></i>Download PDF</button>
-                  <button className="exp-btn exp-excel" style={{justifyContent:'flex-start'}} onClick={() => toast('Downloading Excel...')}><i className="ti ti-file-spreadsheet"></i>Download Excel</button>
+                <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-dark)', marginBottom: '12px' }}>Export Statement</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <button className="exp-btn exp-pdf" style={{ justifyContent: 'flex-start' }} onClick={() => toast('Downloading PDF statement...')}><i className="ti ti-file-type-pdf"></i>Download PDF</button>
+                  <button className="exp-btn exp-excel" style={{ justifyContent: 'flex-start' }} onClick={() => toast('Downloading Excel...')}><i className="ti ti-file-spreadsheet"></i>Download Excel</button>
                 </div>
               </div>
             </div>
@@ -212,19 +265,19 @@ a { text-decoration: none; color: inherit; }
         </div>
       </div>
 
-      <div className={`modal-bg ${isLinkBankModalOpen ? 'open' : ''}`} onClick={(e) => { if(e.target.className.includes('modal-bg')) setIsLinkBankModalOpen(false) }}>
+      <div className={`modal-bg ${isLinkBankModalOpen ? 'open' : ''}`} onClick={(e) => { if (e.target.className.includes('modal-bg')) setIsLinkBankModalOpen(false) }}>
         <div className="modal modal-sm">
           <div className="modal-title"><i className="ti ti-building-bank"></i>Link Bank Account</div>
-          <div className="form-group"><label>Bank Name *</label><select value={newBank.bankName} onChange={e => setNewBank({...newBank, bankName: e.target.value})}><option>HDFC Bank</option><option>ICICI Bank</option><option>State Bank of India</option><option>Axis Bank</option></select></div>
-          <div className="form-group"><label>Account Number *</label><input placeholder="Enter account number" value={newBank.accountNo} onChange={e => setNewBank({...newBank, accountNo: e.target.value})} /></div>
+          <div className="form-group"><label>Bank Name *</label><select value={newBank.bankName} onChange={e => setNewBank({ ...newBank, bankName: e.target.value })}><option>HDFC Bank</option><option>ICICI Bank</option><option>State Bank of India</option><option>Axis Bank</option></select></div>
+          <div className="form-group"><label>Account Number *</label><input placeholder="Enter account number" value={newBank.accountNo} onChange={e => setNewBank({ ...newBank, accountNo: e.target.value })} /></div>
           <div className="form-group"><label>Confirm Account Number *</label><input placeholder="Re-enter account number" /></div>
           <div className="form-2col">
-            <div className="form-group"><label>IFSC Code *</label><input placeholder="e.g. HDFC0001234" value={newBank.ifscCode} onChange={e => setNewBank({...newBank, ifscCode: e.target.value})} /></div>
-            <div className="form-group"><label>Account Type</label><select value={newBank.accountType} onChange={e => setNewBank({...newBank, accountType: e.target.value})}><option>Current</option><option>Savings</option></select></div>
+            <div className="form-group"><label>IFSC Code *</label><input placeholder="e.g. HDFC0001234" value={newBank.ifscCode} onChange={e => setNewBank({ ...newBank, ifscCode: e.target.value })} /></div>
+            <div className="form-group"><label>Account Type</label><select value={newBank.accountType} onChange={e => setNewBank({ ...newBank, accountType: e.target.value })}><option>Current</option><option>Savings</option></select></div>
           </div>
-          <div className="form-group"><label>Account Holder Name</label><input value={newBank.holderName} onChange={e => setNewBank({...newBank, holderName: e.target.value})} placeholder="e.g. YENCODE Technologies" /></div>
-          <div style={{background:'var(--orange-light)',borderRadius:'10px',padding:'12px 14px',fontSize:'12px',color:'var(--orange-dark)',fontWeight:600,marginBottom:'16px',display:'flex',alignItems:'flex-start',gap:'8px'}}>
-            <i className="ti ti-shield-lock" style={{fontSize:'16px',marginTop:'1px'}}></i>
+          <div className="form-group"><label>Account Holder Name</label><input value={newBank.holderName} onChange={e => setNewBank({ ...newBank, holderName: e.target.value })} placeholder="e.g. YENCODE Technologies" /></div>
+          <div style={{ background: 'var(--orange-light)', borderRadius: '10px', padding: '12px 14px', fontSize: '12px', color: 'var(--orange-dark)', fontWeight: 600, marginBottom: '16px', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+            <i className="ti ti-shield-lock" style={{ fontSize: '16px', marginTop: '1px' }}></i>
             A small test deposit of ₹1 will be made to verify the account.
           </div>
           <div className="modal-footer">
@@ -235,8 +288,8 @@ a { text-decoration: none; color: inherit; }
       </div>
 
       {isImportModalOpen && (
-        <div className="modal-bg open" onClick={(e) => { if(e.target.className.includes('modal-bg')) closeImport() }}>
-          <div className="modal" style={{textAlign:'center', padding: '40px'}}>
+        <div className="modal-bg open" onClick={(e) => { if (e.target.className.includes('modal-bg')) closeImport() }}>
+          <div className="modal" style={{ textAlign: 'center', padding: '40px' }}>
             <h3>Import Modal</h3>
             <p>Placeholder for import modal UI.</p>
             <button className="btn btn-outline" onClick={closeImport}>Close</button>

@@ -275,33 +275,39 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
   const badgeCls = isDone ? 'epd2-badge-completed' : isHold ? 'epd2-badge-hold' : 'epd2-badge-active';
 
   // Tasks for this project
+  const empName = (currentEmployeeName || user?.name || '').toLowerCase().trim();
+
   const pTasks = tasks.filter(t => {
     const tProjId = t.projectId && typeof t.projectId === 'object' ? t.projectId._id : t.projectId;
     const tProjName = t.projectId && typeof t.projectId === 'object' ? t.projectId.name : t.project;
     const belongsToProj = (tProjId && (tProjId === project._id || tProjId === project.id)) || (tProjName && tProjName === project.name);
     if (!belongsToProj) return false;
 
-    // Clients can see all project tasks to track progress. Employees only see their own tasks.
+    // employeeMode = admin viewing an employee's project → return ALL tasks for this project
+    // then myTasks below will filter to just that employee's tasks
+    if (employeeMode) return true;
+
+    // Client can see all tasks
     if (user?.role === 'client') return true;
 
+    // Regular employee login: only their own tasks
     const myName = (user?.name || '').toLowerCase().trim();
     const myId = user?._id || user?.id || '';
-    // assignTo may still hold legacy comma-separated values like "kk, emp"
-    // from before tasks became single-assignee — split and match by name.
     const assignToNames = (t.assignTo || '').toLowerCase().split(',').map(n => n.trim());
     return assignToNames.includes(myName) ||
       (t.assignTo === myId) ||
       (Array.isArray(t.assignedTo) && (t.assignedTo.includes(myId) || t.assignedTo.includes(user?.name))) ||
       (t.assignedTo === myId || t.assignedTo === user?.name);
   });
-  // Employee mode: split tasks into "mine" vs "others"
-  const empName = (currentEmployeeName || user?.name || '').toLowerCase().trim();
+
+  // Filter to only the specific employee's tasks
   const myTasks = (employeeMode && empName)
-    ? pTasks.filter(t => (t.assignTo || '').toLowerCase().includes(empName))
+    ? pTasks.filter(t => {
+      const assignTo = (t.assignTo || '').toLowerCase();
+      return assignTo.split(',').map(n => n.trim()).some(n => n === empName || n.includes(empName));
+    })
     : pTasks;
-  const otherTasks = (employeeMode && empName)
-    ? pTasks.filter(t => !(t.assignTo || '').toLowerCase().includes(empName))
-    : [];
+  const otherTasks = [];
 
   const pct = calcPct(project, pTasks);
   const doneCount = pTasks.filter(t => ['done', 'completed'].includes((t.status || '').toLowerCase())).length;

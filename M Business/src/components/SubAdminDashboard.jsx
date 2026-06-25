@@ -2528,6 +2528,27 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
     try {
 
+      const empName = deleteTarget.name || deleteTarget.employeeName;
+
+      // 1) Find all tasks assigned to this employee and unassign them
+      const affectedTasks = (tasks || []).filter(t => {
+        if (!t.assignTo || t.assignTo === "Unassigned") return false;
+        const names = t.assignTo.split(", ").map(n => n.trim()).filter(Boolean);
+        return names.includes(empName);
+      });
+
+      // 2) Remove employee name from each affected task's assignTo
+      await Promise.all(affectedTasks.map(t => {
+        const names = t.assignTo.split(", ").map(n => n.trim()).filter(Boolean);
+        const updatedNames = names.filter(n => n !== empName);
+        return axios.put(`${BASE_URL}/api/tasks/${t._id}`, {
+          assignTo: updatedNames.length > 0 ? updatedNames.join(", ") : "Unassigned"
+        }, {
+          headers: { 'x-company-id': deleteTarget.companyId || companyId || '' }
+        });
+      }));
+
+      // 3) Delete the employee
       await axios.delete(`${BASE_URL}/api/employees/${deleteTarget._id}`);
 
       setEmployees(p => p.filter(e => e._id !== deleteTarget._id));
@@ -2540,7 +2561,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
       }
 
-      showToast("Delete Employee deleted!");
+      showToast("Employee deleted and unassigned from tasks!");
 
     } catch {
 
@@ -2554,7 +2575,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
       }
 
-      showToast("Delete Deleted locally!");
+      showToast("Deleted locally!");
 
     }
 

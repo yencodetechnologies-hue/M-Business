@@ -119,9 +119,34 @@ router.put("/status/:id", async (req, res) => {
 // DELETE employee
 router.delete("/:id", async (req, res) => {
   try {
+    const Task = require("../models/TaskModels");
+
+    const employee = await Employee.findById(req.params.id);
+    if (!employee) return res.status(404).json({ msg: "Employee not found" });
+
+    const empName = employee.name;
+
+    // Find all tasks assigned to this employee
+    const affectedTasks = await Task.find({
+      companyId: employee.companyId,
+      isDeleted: false,
+      assignTo: { $regex: new RegExp(`(^|,\\s*)${empName}(\\s*,|$)`, "i") }
+    });
+
+    // Remove employee name from each task's assignTo
+    await Promise.all(affectedTasks.map(async (task) => {
+      const names = task.assignTo.split(",").map(n => n.trim()).filter(Boolean);
+      const updatedNames = names.filter(n => n.toLowerCase() !== empName.toLowerCase());
+      task.assignTo = updatedNames.length > 0 ? updatedNames.join(", ") : "Unassigned";
+      return task.save();
+    }));
+
+    // Now delete the employee
     await Employee.findByIdAndDelete(req.params.id);
-    res.json({ msg: "Employee deleted" });
+
+    res.json({ msg: "Employee deleted and unassigned from all tasks" });
   } catch (err) {
+    console.error("DELETE employee error:", err);
     res.status(500).json({ msg: "Server error" });
   }
 });

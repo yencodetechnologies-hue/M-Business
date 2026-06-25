@@ -2257,7 +2257,39 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 </div>
                 {/* Removing a teammate is a managerial action — hidden from employees */}
                 {user?.role !== 'employee' && (
-                  <button onClick={() => { if (window.confirm('Remove ' + a + ' from team?')) { const updated = (currProject.assignedTo || []).filter((_, idx) => idx !== i); axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated }).then(loadLatest); } }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 14, padding: '4px 6px' }} title="Remove">Delete</button>
+                  <button onClick={async () => {
+                    if (!window.confirm('Remove ' + a + ' from team?')) return;
+
+                    // 1) Remove from project team
+                    const updated = (currProject.assignedTo || []).filter((_, idx) => idx !== i);
+                    await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated });
+
+                    // 2) Unassign from all tasks in this project that have this member
+                    try {
+                      const tasksRes = await axios.get(`${BASE_URL}/api/tasks`, {
+                        headers: { 'x-company-id': currProject.companyId || '' }
+                      });
+                      const allTasks = Array.isArray(tasksRes.data) ? tasksRes.data : [];
+                      const projectTasks = allTasks.filter(t =>
+                        (t.projectId === currProject._id || t.projectId?._id === currProject._id) &&
+                        t.assignTo && t.assignTo !== 'Unassigned' &&
+                        t.assignTo.split(', ').map(n => n.trim()).includes(a)
+                      );
+                      await Promise.all(projectTasks.map(t => {
+                        const names = t.assignTo.split(', ').map(n => n.trim()).filter(Boolean);
+                        const updatedNames = names.filter(n => n !== a);
+                        return axios.put(`${BASE_URL}/api/tasks/${t._id}`, {
+                          assignTo: updatedNames.length > 0 ? updatedNames.join(', ') : 'Unassigned'
+                        }, {
+                          headers: { 'x-company-id': currProject.companyId || '' }
+                        });
+                      }));
+                    } catch (e) {
+                      console.error('Failed to unassign tasks:', e);
+                    }
+
+                    loadLatest();
+                  }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 14, padding: '4px 6px' }} title="Remove">Delete</button>
                 )}
               </div>
             ))}
@@ -2440,7 +2472,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 <div style={{ marginBottom: 16 }}>
                   <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Assign To</label>
                   <div style={{ border: `1.5px solid ${P.border}`, borderRadius: 8, maxHeight: 150, overflowY: 'auto', padding: '4px 0' }}>
-                    {(employees || []).map(emp => {
+                    {(employees || []).filter(emp => assigned.includes(emp.name || emp.employeeName)).map(emp => {
                       const name = emp.name || emp.employeeName || '';
                       if (!name) return null;
                       const selected = Array.isArray(newTaskAssignTo) && newTaskAssignTo.includes(name);

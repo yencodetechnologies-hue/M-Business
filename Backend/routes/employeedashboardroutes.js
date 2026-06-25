@@ -157,7 +157,8 @@ router.get("/projects/:name", async (req, res) => {
     const query = {
       companyId,
       $or: [
-        { assignedTo: nameRegex },
+        { assignedTo: nameRegex },        // matches string field
+        { assignedTo: { $elemMatch: { $regex: `^\\s*${safeName}\\s*$`, $options: "i" } } }, // matches array of strings
         { manager: nameRegex }
       ]
     };
@@ -682,7 +683,11 @@ router.get("/summary/:name", async (req, res) => {
 
     const query = {
       companyId,
-      $or: [{ assignedTo: nameRegex }, { manager: nameRegex }]
+      $or: [
+        { assignedTo: nameRegex },
+        { assignedTo: { $elemMatch: { $regex: `^\\s*${safeName}\\s*$`, $options: "i" } } },
+        { manager: nameRegex }
+      ]
     };
     if (user) query.$or.push({ assignedTo: user._id });
     if (employee) query.$or.push({ assignedTo: employee._id });

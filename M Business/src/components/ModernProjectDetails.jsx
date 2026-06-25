@@ -669,7 +669,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       return null;
     }
   };
-
   const handleCreateTask = async (e) => {
     e.preventDefault();
     if (!newTaskTitle.trim()) return;
@@ -680,6 +679,14 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         alert("Could not find or create a task group.");
         return;
       }
+      // IMPORTANT: the backend (server.js middleware) only ever reads the
+      // companyId from the "x-company-id" HTTP header — it ignores any
+      // companyId sent in the request body. Sending it in the body (as
+      // before) had no effect at all, which is why reassigned/edited tasks
+      // never showed up correctly on the employee's Tasks list.
+      const resolvedCompanyId = user?.companyId || user?.company || user?._id || user?.id || currProject.companyId || '';
+      const companyHeaders = { headers: { 'x-company-id': resolvedCompanyId } };
+
       if (editingTask) {
         await axios.put(`${BASE_URL}/api/tasks/${editingTask._id}`, {
           title: newTaskTitle.trim(),
@@ -689,7 +696,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           date: newTaskDue,
           milestone: newTaskMilestone,
           status: newTaskStatus
-        });
+        }, companyHeaders);
       } else {
         await axios.post(`${BASE_URL}/api/tasks`, {
           title: newTaskTitle.trim(),
@@ -700,25 +707,18 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           milestone: newTaskMilestone,
           groupId: gId,
           projectId: currProject._id,
-          status: newTaskStatus,
-          companyId: currProject.companyId || ''
-        });
+          status: newTaskStatus
+        }, companyHeaders);
       }
-      setNewTaskTitle('');
-      setNewTaskDesc('');
-      setNewTaskPriority('medium');
-      setNewTaskAssignTo([]);
-      setNewTaskDue('');
-      setNewTaskMilestone('');
-      setNewTaskStatus('Not Started');
-      setShowAddTaskModal(false);
 
+      setShowAddTaskModal(false);
+      setEditingTask(null);
       loadLatest();
       if (onUpdate) onUpdate();
       if (fetchTasks) fetchTasks();
     } catch (err) {
-      console.error("Failed to add task:", err);
-      alert("Failed to add task.");
+      console.error("Failed to save task:", err);
+      alert("Failed to save task.");
     } finally {
       setAddingTask(false);
     }
@@ -754,6 +754,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       setPostingUpdate(false);
     }
   };
+
   const handleAddExpense = async (e) => {
     e.preventDefault();
     const amt = parseFloat(expenseAmt);
@@ -787,6 +788,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       setAddingExpense(false);
     }
   };
+
   const handleToggleMilestone = async (index) => {
     try {
       const updatedMilestones = (currProject.milestones || []).map((m, idx) => {
@@ -796,7 +798,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         return m;
       });
 
-      // Recalculate progress from milestones if no tasks exist
       const totalM = updatedMilestones.length;
       const doneM = updatedMilestones.filter(m => m.done).length;
       const totalT = projTasks.length;
@@ -915,6 +916,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       setUploadingFile(false);
     }
   };
+
   const handleModalFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) setUploadFileObj(file);
@@ -2235,9 +2237,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           <div className="mpd-card">
             <div className="mpd-card-header">
               <div className="mpd-card-title"><i className="ti ti-users"></i> Team</div>
-              <button className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMemberModal(true)} style={{ padding: '5px 10px', fontSize: 11 }}>
-                <i className="ti ti-plus"></i> Add Team Members
-              </button>
+              {/* Add Team Members is a managerial action — hidden from employees */}
+              {user?.role !== 'employee' && (
+                <button className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMemberModal(true)} style={{ padding: '5px 10px', fontSize: 11 }}>
+                  <i className="ti ti-plus"></i> Add Team Members
+                </button>
+              )}
             </div>
             {assigned.length === 0 ? <div style={{ fontSize: 12, color: P.textLight }}>No team members assigned.</div> : null}
             {assigned.map((a, i) => (
@@ -2249,7 +2254,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     {employees.find(e => (e.name || e.employeeName) === a)?.role || 'Member'}
                   </div>
                 </div>
-                <button onClick={() => { if (window.confirm('Remove ' + a + ' from team?')) { const updated = (currProject.assignedTo || []).filter((_, idx) => idx !== i); axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated }).then(loadLatest); } }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 14, padding: '4px 6px' }} title="Remove">Delete</button>
+                {/* Removing a teammate is a managerial action — hidden from employees */}
+                {user?.role !== 'employee' && (
+                  <button onClick={() => { if (window.confirm('Remove ' + a + ' from team?')) { const updated = (currProject.assignedTo || []).filter((_, idx) => idx !== i); axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated }).then(loadLatest); } }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 14, padding: '4px 6px' }} title="Remove">Delete</button>
+                )}
               </div>
             ))}
           </div>

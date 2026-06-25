@@ -2413,7 +2413,7 @@ function VendorsPage({ vendors, setVendors }) {
     setEditForm({
       vendorName: v.vendorName || "",
       vendorProduct: v.vendorProduct || "",
-      amountTaxGst: v.amountTaxGst || "",
+      amountTaxGst: v.amountTaxGst || v.amount || "",
       date: v.date ? new Date(v.date).toISOString().split('T')[0] : "",
       paidAmount: v.paidAmount || "",
       productDescription: v.productDescription || "",
@@ -2472,7 +2472,7 @@ function VendorsPage({ vendors, setVendors }) {
             <tbody>
               {filtered.length === 0 ? <tr><td colSpan={8} style={{ padding: 30, textAlign: "center", color: "#a78bfa" }}>No vendors found</td></tr>
                 : filtered.map((v, i) => {
-                  const total = Number(v.amountTaxGst || 0);
+                  const total = Number(v.amountTaxGst || v.amount || 0);
                   const paid = Number(v.paidAmount || 0);
                   const balance = total - paid;
                   return (

@@ -286,7 +286,10 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
 
     const myName = (user?.name || '').toLowerCase().trim();
     const myId = user?._id || user?.id || '';
-    return (t.assignTo && t.assignTo.toLowerCase().trim() === myName) ||
+    // assignTo may still hold legacy comma-separated values like "kk, emp"
+    // from before tasks became single-assignee — split and match by name.
+    const assignToNames = (t.assignTo || '').toLowerCase().split(',').map(n => n.trim());
+    return assignToNames.includes(myName) ||
       (t.assignTo === myId) ||
       (Array.isArray(t.assignedTo) && (t.assignedTo.includes(myId) || t.assignedTo.includes(user?.name))) ||
       (t.assignedTo === myId || t.assignedTo === user?.name);
@@ -697,13 +700,14 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
               <span className="epd2-info-lbl">My tasks</span>
               <span className="epd2-info-val">{openCount} open · {doneCount} done</span>
             </div>
-            {(project.contactPersonName || project.manager) && (
+            {/* Client/manager contact details are hidden from plain employees — only managers/admins should see this */}
+            {user?.role !== 'employee' && (project.contactPersonName || project.manager) && (
               <div className="epd2-info-row">
                 <span className="epd2-info-lbl">Contact</span>
                 <span className="epd2-info-val" style={{ fontWeight: 700 }}>{project.contactPersonName || project.manager}</span>
               </div>
             )}
-            {project.contactPersonNo && (
+            {user?.role !== 'employee' && project.contactPersonNo && (
               <div className="epd2-info-row">
                 <span className="epd2-info-lbl">Phone</span>
                 <span className="epd2-info-val">
@@ -711,7 +715,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                 </span>
               </div>
             )}
-            {(project.contactEmail || project.clientEmail || user?.email) && (
+            {user?.role !== 'employee' && (project.contactEmail || project.clientEmail || user?.email) && (
               <div className="epd2-info-row">
                 <span className="epd2-info-lbl">Email</span>
                 <span className="epd2-info-val" style={{ fontSize: 11, wordBreak: 'break-all' }}>

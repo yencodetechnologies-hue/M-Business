@@ -6236,7 +6236,7 @@ function VendorsPage({ vendors, setVendors }) {
 
       vendorProduct: v.vendorProduct || "",
 
-      amountTaxGst: v.amountTaxGst || "",
+      amountTaxGst: v.amountTaxGst || v.amount || "",
 
       date: v.date ? new Date(v.date).toISOString().split('T')[0] : "",
 
@@ -6276,7 +6276,15 @@ function VendorsPage({ vendors, setVendors }) {
 
       setSaving(true);
 
-      const payload = { ...editForm };
+      const amt = parseFloat(editForm.amountTaxGst) || 0;
+
+      const payload = {
+        ...editForm,
+        amount: amt,
+        tax: amt,
+        gst: amt,
+        paidAmount: parseFloat(editForm.paidAmount) || 0,
+      };
 
       if (!payload.date) delete payload.date;
 
@@ -6284,7 +6292,9 @@ function VendorsPage({ vendors, setVendors }) {
 
       const res = await axios.put(`${BASE_URL}/api/vendors/${editVendor._id}`, payload);
 
-      setVendors(prev => prev.map(v => v._id === editVendor._id ? { ...v, ...res.data } : v));
+      const updatedVendor = { ...editVendor, ...editForm, ...res.data, amountTaxGst: amt };
+
+      setVendors(prev => prev.map(v => v._id === editVendor._id ? updatedVendor : v));
 
       setEditVendor(null);
 
@@ -6354,7 +6364,7 @@ function VendorsPage({ vendors, setVendors }) {
 
                 : filtered.map((v, i) => {
 
-                  const total = Number(v.amountTaxGst || 0);
+                  const total = Number(v.amountTaxGst || v.amount || 0);
 
                   const paid = Number(v.paidAmount || 0);
 
@@ -6420,11 +6430,11 @@ function VendorsPage({ vendors, setVendors }) {
 
           </div>
 
-          <InfoRow icon="💰" label="Total Amount" value={formatCurrency(viewVendor.amountTaxGst, viewVendor.currency)} />
+          <InfoRow icon="💰" label="Total Amount" value={formatCurrency(viewVendor.amountTaxGst || viewVendor.amount, viewVendor.currency)} />
 
           <InfoRow icon="💸" label="Paid Amount" value={formatCurrency(viewVendor.paidAmount, viewVendor.currency)} />
 
-          <InfoRow icon="⚖️" label="Balance Due" value={formatCurrency((viewVendor.amountTaxGst || 0) - (viewVendor.paidAmount || 0), viewVendor.currency)} />
+          <InfoRow icon="⚖️" label="Balance Due" value={formatCurrency(((viewVendor.amountTaxGst || viewVendor.amount || 0)) - (viewVendor.paidAmount || 0), viewVendor.currency)} />
 
           <InfoRow icon="💳" label="Mode of Payment" value={viewVendor.modeOfPayment} />
 

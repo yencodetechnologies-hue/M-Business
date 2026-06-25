@@ -247,8 +247,16 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
 
   const [updLoading, setUpdLoading] = useState(false);
 
-  // ── Task done toggle (local) ---------------------------------------
-  const [doneTasks, setDoneTasks] = useState(new Set());
+  // ── Task done state — initialized from real task statuses ----------
+  const [doneTasks, setDoneTasks] = useState(() => {
+    const done = new Set();
+    (tasks || []).forEach(t => {
+      if (t.checked || t.completed || ['done', 'completed'].includes((t.status || '').toLowerCase())) {
+        done.add(t._id);
+      }
+    });
+    return done;
+  });
 
   if (!project) return null;
 
@@ -295,9 +303,13 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
   const pct = calcPct(project, pTasks);
   const doneCount = pTasks.filter(t => ['done', 'completed'].includes((t.status || '').toLowerCase())).length;
   const openCount = pTasks.length - doneCount;
-
-  // Milestone progress based on employee's own tasks
-  const myCompletedCount = myTasks.filter(t => t.checked || t.completed || ['done', 'completed'].includes((t.status || '').toLowerCase())).length;
+  // Progress = completed tasks ÷ total tasks assigned to this employee
+  const myCompletedCount = myTasks.filter(t =>
+    doneTasks.has(t._id) ||
+    t.checked ||
+    t.completed ||
+    ['done', 'completed'].includes((t.status || '').toLowerCase())
+  ).length;
   const myTotalCount = myTasks.length;
   const myProgress = myTotalCount > 0 ? Math.round((myCompletedCount / myTotalCount) * 100) : 0;
   const assigned = Array.isArray(project.assignedTo) ? project.assignedTo : (project.assignedTo ? [project.assignedTo] : []);
@@ -367,13 +379,40 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
   };
 
   // ── Local task toggle ----------------------------------------------
-  const toggleTask = (taskId) => {
+  // ── Task toggle — saves to DB and updates progress -----------------
+  const toggleTask = async (taskId) => {
+    // Find the task
+    const task = myTasks.find(t => t._id === taskId);
+    if (!task) return;
+    const isCurrentlyDone = task.checked || task.completed ||
+      ['done', 'completed'].includes((task.status || '').toLowerCase());
+    const newStatus = isCurrentlyDone ? 'in_progress' : 'completed';
+
+    // Optimistic local update
     setDoneTasks(prev => {
       const n = new Set(prev);
-      if (n.has(taskId)) n.delete(taskId);
-      else { n.add(taskId); addToast('Task marked complete! Yes', 'success'); }
+      if (isCurrentlyDone) n.delete(taskId);
+      else n.add(taskId);
       return n;
     });
+
+    try {
+      await axios.put(`${BASE_URL}/api/tasks/${taskId}`, {
+        status: newStatus,
+        checked: !isCurrentlyDone
+      });
+      if (!isCurrentlyDone) addToast('Task marked complete! ✓', 'success');
+      else addToast('Task marked incomplete', 'success');
+    } catch (err) {
+      // Revert on failure
+      setDoneTasks(prev => {
+        const n = new Set(prev);
+        if (isCurrentlyDone) n.add(taskId);
+        else n.delete(taskId);
+        return n;
+      });
+      addToast('Failed to update task. Try again.', 'error');
+    }
   };
 
   // ── UPDATE type helper ---------------------------------------------

@@ -298,6 +298,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [newTaskDue, setNewTaskDue] = useState('');
   const [newTaskDesc, setNewTaskDesc] = useState('');
   const [newTaskMilestone, setNewTaskMilestone] = useState('');
+  const [newTaskStatus, setNewTaskStatus] = useState('Not Started');
   const [addingTask, setAddingTask] = useState(false);
 
   const [updateText, setUpdateText] = useState('');
@@ -594,9 +595,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   // Task/Milestone/File Actions
   const handleToggleTask = async (task) => {
     try {
-      const isCurrentlyDone = task.status === 'done' || task.status === 'completed';
+      const isCurrentlyDone = task.status === 'done' || task.status === 'completed' || task.checked === true;
       const newStatus = isCurrentlyDone ? 'in_progress' : 'completed';
-      await axios.put(`${BASE_URL}/api/tasks/${task._id}`, { status: newStatus });
+      await axios.put(`${BASE_URL}/api/tasks/${task._id}`, { status: newStatus, checked: !isCurrentlyDone });
 
       // Recalculate task counts and save to project DB
       const latestTasks = await axios.get(`${BASE_URL}/api/tasks`, {
@@ -686,7 +687,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           priority: newTaskPriority,
           assignTo: Array.isArray(newTaskAssignTo) ? newTaskAssignTo.join(', ') : newTaskAssignTo,
           date: newTaskDue,
-          milestone: newTaskMilestone
+          milestone: newTaskMilestone,
+          status: newTaskStatus
         });
       } else {
         await axios.post(`${BASE_URL}/api/tasks`, {
@@ -698,17 +700,18 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           milestone: newTaskMilestone,
           groupId: gId,
           projectId: currProject._id,
-          status: 'Not Started'
+          status: newTaskStatus,
+          companyId: currProject.companyId || ''
         });
       }
-
       setNewTaskTitle('');
       setNewTaskDesc('');
       setNewTaskPriority('medium');
-      setNewTaskAssignTo('Unassigned');
+      setNewTaskAssignTo([]);
       setNewTaskDue('');
       setNewTaskMilestone('');
-      setShowAddTaskModal(null);
+      setNewTaskStatus('Not Started');
+      setShowAddTaskModal(false);
 
       loadLatest();
       if (onUpdate) onUpdate();
@@ -1286,7 +1289,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 <div style={{ padding: 20, textAlign: 'center', color: P.textLight, fontSize: 13 }}>No tasks found for this filter.</div>
               ) : (
                 filteredTasks.map(t => {
-                  const isDone = t.status === 'done' || t.status === 'completed';
+                  const isDone = t.status === 'done' || t.status === 'completed' || t.checked === true;
                   return (
                     <div key={t._id} className="mpd-task-row" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 0', borderBottom: `1px solid ${P.bg}` }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, cursor: 'pointer' }} onClick={() => handleToggleTask(t)}>
@@ -1294,13 +1297,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         <div className={`mpd-task-prio ${t.priority === 'high' ? 'mpd-h' : (t.priority === 'medium' ? 'mpd-m' : 'mpd-l')}`}></div>
                         <div className={`mpd-task-name ${isDone ? 'mpd-done' : ''}`}>{t.title || t.name}</div>
                         <div className="mpd-task-assign">
-                          {t.assignTo && t.assignTo.match(/^[a-f0-9]{24}$/i)
-                            ? (employees?.find(e => e._id === t.assignTo)?.name || 'Unassigned')
-                            : (t.assignTo || 'Unassigned')}
+                          {t.assignTo
+                            ? t.assignTo.split(', ').filter(Boolean).join(', ')
+                            : 'Unassigned'}
                         </div>
                         <div className="mpd-task-due">{t.date ? new Date(t.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}</div>
                       </div>
-                      <button onClick={e => { e.stopPropagation(); setEditingTask(t); setNewTaskTitle(t.title || ''); setNewTaskDesc(t.description || ''); setNewTaskPriority(t.priority || 'medium'); setNewTaskAssignTo(t.assignTo ? t.assignTo.split(', ').filter(Boolean) : []); setNewTaskDue(t.date || ''); setNewTaskMilestone(t.milestone || ''); setShowAddTaskModal(true); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.primary, fontSize: 13, padding: '2px 6px' }}>Edit</button>
+                      <button onClick={e => { e.stopPropagation(); setEditingTask(t); setNewTaskTitle(t.title || ''); setNewTaskDesc(t.description || ''); setNewTaskPriority(t.priority || 'medium'); setNewTaskAssignTo(t.assignTo ? t.assignTo.split(', ').filter(Boolean) : []); setNewTaskDue(t.date || ''); setNewTaskMilestone(t.milestone || ''); setNewTaskStatus(t.status || 'Not Started'); setShowAddTaskModal(true); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.primary, fontSize: 13, padding: '2px 6px' }}>Edit</button>
                       <button onClick={async e => {
                         e.stopPropagation();
                         if (!confirm('Delete?')) return;
@@ -2374,14 +2377,19 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <div style={{ background: '#fff', borderRadius: P.radius, width: 440, padding: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.15)', boxSizing: 'border-box', maxHeight: '90vh', overflowY: 'auto' }}>
               <h3 style={{ margin: '0 0 16px', fontSize: 18, color: P.textDark }}>{editingTask ? 'Edit Task' : 'Add New Task'}</h3>
               <form onSubmit={handleCreateTask}>
+                {/* Task Name */}
                 <div style={{ marginBottom: 12 }}>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Task Name</label>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Task Name *</label>
                   <input type="text" value={newTaskTitle} onChange={e => setNewTaskTitle(e.target.value)} placeholder="Enter task title" required style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }} />
                 </div>
+
+                {/* Description */}
                 <div style={{ marginBottom: 12 }}>
                   <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Description</label>
                   <textarea value={newTaskDesc} onChange={e => setNewTaskDesc(e.target.value)} placeholder="Enter details..." style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', resize: 'vertical', minHeight: 60, boxSizing: 'border-box' }} />
                 </div>
+
+                {/* Priority + Due Date */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
                   <div>
                     <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Priority</label>
@@ -2396,29 +2404,44 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     <input type="date" value={newTaskDue} onChange={e => setNewTaskDue(e.target.value)} style={{ width: '100%', padding: '9px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }} />
                   </div>
                 </div>
-                <div style={{ marginBottom: 12 }}>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Link to Milestone (Optional)</label>
-                  <select value={newTaskMilestone} onChange={e => setNewTaskMilestone(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
-                    <option value="">-- No Milestone --</option>
-                    {(currProject.milestones || []).map((m, i) => (
-                      <option key={i} value={m.name}>{m.name}</option>
-                    ))}
-                  </select>
+
+                {/* Status + Milestone — ONE ROW, ONE STATUS only */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Status</label>
+                    <select value={newTaskStatus} onChange={e => setNewTaskStatus(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
+                      <option value="Not Started">Not Started</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Completed">Completed</option>
+                      <option value="On Hold">On Hold</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Link to Milestone</label>
+                    <select value={newTaskMilestone} onChange={e => setNewTaskMilestone(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
+                      <option value="">-- No Milestone --</option>
+                      {(currProject.milestones || []).map((m, i) => (
+                        <option key={i} value={m.name}>{m.name}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
+
+                {/* Assign To */}
                 <div style={{ marginBottom: 16 }}>
                   <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Assign To</label>
                   <div style={{ border: `1.5px solid ${P.border}`, borderRadius: 8, maxHeight: 150, overflowY: 'auto', padding: '4px 0' }}>
                     {(employees || []).map(emp => {
-                      const name = emp.name || emp.employeeName || 'Unassigned';
-                      const selected = Array.isArray(newTaskAssignTo) ? newTaskAssignTo.includes(name) : false;
+                      const name = emp.name || emp.employeeName || '';
+                      if (!name) return null;
+                      const selected = Array.isArray(newTaskAssignTo) && newTaskAssignTo.includes(name);
                       return (
                         <div key={emp._id} onClick={() => {
-                          if (name === 'Unassigned') { setNewTaskAssignTo([]); return; }
-                          const cur = Array.isArray(newTaskAssignTo) ? newTaskAssignTo.filter(n => n !== 'Unassigned') : [];
+                          const cur = Array.isArray(newTaskAssignTo) ? [...newTaskAssignTo] : [];
                           setNewTaskAssignTo(selected ? cur.filter(n => n !== name) : [...cur, name]);
                         }} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 12px', cursor: 'pointer', background: selected ? P.primaryLight : 'transparent' }}>
                           <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${selected ? P.primary : P.border}`, background: selected ? P.primary : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            {selected && <span style={{ color: '#fff', fontSize: 10, fontWeight: 900, lineHeight: 1 }}>Yes</span>}
+                            {selected && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900, lineHeight: 1 }}>✓</span>}
                           </div>
                           <span style={{ fontSize: 13, color: P.textDark, fontWeight: selected ? 700 : 500 }}>{name}</span>
                         </div>
@@ -2428,11 +2451,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   {Array.isArray(newTaskAssignTo) && newTaskAssignTo.length > 0 && (
                     <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                       {newTaskAssignTo.map(n => (
-                        <span key={n} style={{ background: P.primaryLight, color: P.primary, padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{n} ✕</span>
+                        <span key={n} onClick={() => setNewTaskAssignTo(newTaskAssignTo.filter(x => x !== n))} style={{ background: P.primaryLight, color: P.primary, padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>{n} ✕</span>
                       ))}
                     </div>
                   )}
                 </div>
+
+                {/* Buttons */}
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                   <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddTaskModal(false)}>Cancel</button>
                   <button type="submit" className="mpd-btn mpd-btn-primary" disabled={addingTask}>{addingTask ? 'Adding...' : editingTask ? 'Update Task' : 'Add Task'}</button>

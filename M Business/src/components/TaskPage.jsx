@@ -696,7 +696,7 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
   const [search, setSearch] = useState("");
   const [localEmployees, setLocalEmployees] = useState(employees || []);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [newEmp, setNewEmp] = useState({ name: "", email: "", password: "", phone: "", role: "employee", department: "", salary: "" });
+  const [newEmp, setNewEmp] = useState({ name: "", email: "", password: "", phone: "", role: "Manager", department: "", salary: "", dateOfBirth: "", joiningDate: "", maritalStatus: "Unmarried", status: "Pending", address: "", bankName: "", ifscCode: "", accountNumber: "" });
   const [saveError, setSaveError] = useState("");
   const [saving, setSaving] = useState(false);
   const inputRef = useRef();
@@ -751,7 +751,7 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
       setShowAddModal(false);
 
       // Reset state
-      setNewEmp({ name: "", email: "", password: "", phone: "", role: "employee", department: "", salary: "" });
+      setNewEmp({ name: "", email: "", password: "", phone: "", role: "Manager", department: "", salary: "", dateOfBirth: "", joiningDate: "", maritalStatus: "Unmarried", status: "Pending", address: "", bankName: "", ifscCode: "", accountNumber: "" });
     } catch (err) {
       setSaveError(err.response?.data?.msg || err.response?.data?.message || "Failed to create employee");
     } finally {
@@ -875,8 +875,10 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
           <div style={{
             background: "#fff",
             borderRadius: 16,
-            width: 400,
-            padding: 24,
+            width: 680,
+            maxHeight: "90vh",
+            overflowY: "auto",
+            padding: 28,
             boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
             border: "1px solid #e2e8f0"
           }} onClick={e => e.stopPropagation()}>
@@ -895,74 +897,113 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
             )}
 
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <div>
-                <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Full Name *</label>
-                <input
-                  type="text"
-                  value={newEmp.name}
-                  onChange={e => setNewEmp({ ...newEmp, name: e.target.value })}
-                  placeholder="Enter name"
-                  style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }}
-                />
+
+              {/* Row 1 — Full Name + Email */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Full Name *</label>
+                  <input type="text" value={newEmp.name} onChange={e => setNewEmp({ ...newEmp, name: e.target.value })} placeholder="Enter full name" style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Email *</label>
+                  <input type="email" value={newEmp.email} onChange={e => setNewEmp({ ...newEmp, email: e.target.value })} placeholder="Enter email" style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                </div>
               </div>
 
-              <div>
-                <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Email Address *</label>
-                <input
-                  type="email"
-                  value={newEmp.email}
-                  onChange={e => setNewEmp({ ...newEmp, email: e.target.value })}
-                  placeholder="Enter email"
-                  style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }}
-                />
+              {/* Row 2 — Phone + Role */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Phone Number</label>
+                  <input type="text" value={newEmp.phone} onChange={e => setNewEmp({ ...newEmp, phone: e.target.value })} placeholder="Enter phone" style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Role / Position</label>
+                  <select value={newEmp.role} onChange={e => setNewEmp({ ...newEmp, role: e.target.value })} style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box", background: "#fff", color: "#1e293b" }}>
+                    <option value="Manager">Manager</option>
+                    <option value="employee">Employee</option>
+                    <option value="Subadmin">Admin</option>
+                  </select>
+                </div>
               </div>
 
+              {/* Row 3 — Department + Salary */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Department</label>
+                  <input type="text" value={newEmp.department} onChange={e => setNewEmp({ ...newEmp, department: e.target.value })} placeholder="e.g. Engineering" style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Salary</label>
+                  <input type="number" value={newEmp.salary} onChange={e => setNewEmp({ ...newEmp, salary: e.target.value })} placeholder="e.g. 50000" style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                </div>
+              </div>
+
+              {/* Row 4 — Date of Birth + Joining Date */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Date of Birth</label>
+                  <input type="date" value={newEmp.dateOfBirth} onChange={e => setNewEmp({ ...newEmp, dateOfBirth: e.target.value })} style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Joining Date</label>
+                  <input type="date" value={newEmp.joiningDate} onChange={e => setNewEmp({ ...newEmp, joiningDate: e.target.value })} style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                </div>
+              </div>
+
+              {/* Row 5 — Marital Status + Status */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Marital Status</label>
+                  <select value={newEmp.maritalStatus} onChange={e => setNewEmp({ ...newEmp, maritalStatus: e.target.value })} style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box", background: "#fff", color: "#1e293b" }}>
+                    <option value="Unmarried">Unmarried</option>
+                    <option value="Married">Married</option>
+                    <option value="Divorced">Divorced</option>
+                    <option value="Widowed">Widowed</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Status</label>
+                  <select value={newEmp.status} onChange={e => setNewEmp({ ...newEmp, status: e.target.value })} style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box", background: "#fff", color: "#1e293b" }}>
+                    <option value="Pending">Pending</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Row 6 — Address */}
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Address</label>
+                <input type="text" value={newEmp.address} onChange={e => setNewEmp({ ...newEmp, address: e.target.value })} placeholder="Enter address" style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+              </div>
+
+              {/* Bank Details Section */}
+              <div style={{ marginTop: 4 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: "var(--app-accent)", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+                  🏦 BANK DETAILS
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <div>
+                    <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Bank Name</label>
+                    <input type="text" value={newEmp.bankName} onChange={e => setNewEmp({ ...newEmp, bankName: e.target.value })} placeholder="e.g. HDFC Bank" style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>IFSC Code</label>
+                    <input type="text" value={newEmp.ifscCode} onChange={e => setNewEmp({ ...newEmp, ifscCode: e.target.value })} placeholder="e.g. HDFC0001234" style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                  </div>
+                </div>
+                <div style={{ marginTop: 12 }}>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Account Number</label>
+                  <input type="text" value={newEmp.accountNumber} onChange={e => setNewEmp({ ...newEmp, accountNumber: e.target.value })} placeholder="Enter account number" style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                </div>
+              </div>
+
+              {/* Password */}
               <div>
                 <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Password *</label>
-                <input
-                  type="password"
-                  value={newEmp.password}
-                  onChange={e => setNewEmp({ ...newEmp, password: e.target.value })}
-                  placeholder="Min 4 characters"
-                  style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }}
-                />
+                <input type="password" value={newEmp.password} onChange={e => setNewEmp({ ...newEmp, password: e.target.value })} placeholder="Min 4 characters" style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
               </div>
 
-              <div>
-                <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Role</label>
-                <select
-                  value={newEmp.role}
-                  onChange={e => setNewEmp({ ...newEmp, role: e.target.value })}
-                  style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box", background: "#fff", color: "#1e293b", fontWeight: 500 }}
-                >
-                  <option value="employee">Employee</option>
-                  <option value="manager">Manager</option>
-                  <option value="Subadmin">Admin</option>
-                </select>
-              </div>
-
-              <div style={{ display: "flex", gap: 10 }}>
-                <div style={{ flex: 1 }}>
-                  <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Phone</label>
-                  <input
-                    type="text"
-                    value={newEmp.phone}
-                    onChange={e => setNewEmp({ ...newEmp, phone: e.target.value })}
-                    placeholder="Optional"
-                    style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Department</label>
-                  <input
-                    type="text"
-                    value={newEmp.department}
-                    onChange={e => setNewEmp({ ...newEmp, department: e.target.value })}
-                    placeholder="Optional"
-                    style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }}
-                  />
-                </div>
-              </div>
             </div>
 
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 20 }}>

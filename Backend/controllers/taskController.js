@@ -201,9 +201,12 @@ exports.toggleChecked = async (req, res) => {
     const companyId = req.companyId || "";
     const task = await Task.findOne({ _id: req.params.id, isDeleted: false, companyId });
     if (!task) return res.status(404).json({ message: "Task not found" });
-    task.checked = !task.checked;
+    const isCurrentlyDone = task.checked ||
+      task.status === 'completed' || task.status === 'done';
+    task.checked = !isCurrentlyDone;
+    task.status = isCurrentlyDone ? 'in_progress' : 'completed';
     await task.save();
-    res.json({ _id: task._id, checked: task.checked });
+    res.json({ _id: task._id, checked: task.checked, status: task.status });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

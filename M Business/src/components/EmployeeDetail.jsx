@@ -96,9 +96,6 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
   }, [emp, projects]);
 
   const activeProjects = staticProjects.filter(p => (p.status || '').toLowerCase() !== 'completed');
-  const totalWorkload = staticProjects.length > 0
-    ? Math.round(staticProjects.reduce((sum, p) => sum + (p.progress || p.percentage || 0), 0) / staticProjects.length)
-    : 0;
 
   const projIcons = ['ti-world', 'ti-device-mobile', 'ti-chart-bar', 'ti-code', 'ti-building', 'ti-rocket'];
   const projColors = [
@@ -114,6 +111,19 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
   const [staticTasks, setStaticTasks] = useState([]);
   const [tasksLoading, setTasksLoading] = useState(false);
 
+  // Overall Workload = completed tasks ÷ total tasks assigned to this employee × 100
+  const empNameLower = (emp?.name || '').toLowerCase().trim();
+  const myAssignedTasks = staticTasks.filter(t =>
+    (t.assignTo || '').toLowerCase().includes(empNameLower) && empNameLower !== ''
+  );
+  const myCompletedTasks = myAssignedTasks.filter(t =>
+    t.completed || t.done ||
+    ['done', 'completed'].includes((t.status || '').toLowerCase())
+  );
+  const totalWorkload = myAssignedTasks.length > 0
+    ? Math.round((myCompletedTasks.length / myAssignedTasks.length) * 100)
+    : 0;
+
   const loadTasks = async () => {
     if (!emp?.name) return;
     setTasksLoading(true);
@@ -123,15 +133,22 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
       if (companyId) headers['x-company-id'] = companyId;
       const res = await axios.get(`${BASE_URL}/api/employee-dashboard/tasks/${encodeURIComponent(emp.name)}`, { headers });
       const mapped = (res.data || []).map(t => {
-        const isDone = t.checked || t.completed || t.done || (t.status || '').toLowerCase() === 'completed';
+        const rawStatus = (t.status || '').toLowerCase();
+        const isDone = t.checked || t.completed || t.done || rawStatus === 'completed' || rawStatus === 'done';
+        const displayStatus = isDone ? 'Completed'
+          : rawStatus === 'in_progress' || rawStatus === 'in progress' ? 'In Progress'
+            : rawStatus === 'on hold' ? 'On Hold'
+              : rawStatus === 'not started' ? 'Not Started'
+                : t.status || 'Pending';
         return {
           ...t,
           title: t.title || t.taskName || "",
-          priority: t.priority || "Medium",
-          status: isDone ? "Completed" : "Pending",
+          priority: t.priority || "medium",
+          status: displayStatus,
           completed: isDone,
           done: isDone,
-          dueDate: t.date || t.dueDate || ""
+          dueDate: t.date || t.dueDate || "",
+          projectName: t.projectId?.name || t.project || ""
         };
       });
       setStaticTasks(mapped);
@@ -146,8 +163,8 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
     loadTasks();
   }, [emp?.name]);
 
-  const pendingTasks = staticTasks.filter(t => (t.status || '').toLowerCase() === 'pending' || (!t.completed && !t.done && t.status !== 'completed'));
-  const completedTasks = staticTasks.filter(t => t.completed || t.done || (t.status || '').toLowerCase() === 'completed');
+  const pendingTasks = staticTasks.filter(t => !t.completed && !t.done);
+  const completedTasks = staticTasks.filter(t => t.completed || t.done);
   const filteredTasks = taskTab === 'all' ? staticTasks : taskTab === 'pending' ? pendingTasks : completedTasks;
 
   // Documents state
@@ -182,24 +199,33 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
 
   // Interactions
   const handleToggleTask = async (taskId) => {
-    // Optimistic UI update
+    // Find current task
+    const task = staticTasks.find(t => t._id === taskId);
+    if (!task) return;
+    const isCurrentlyDone = task.completed || task.done ||
+      (task.status || '').toLowerCase() === 'completed' ||
+      (task.status || '').toLowerCase() === 'done';
+    const newStatus = isCurrentlyDone ? 'in_progress' : 'completed';
+
+    // Optimistic UI update immediately
     setStaticTasks(prev => prev.map(t => {
       if (t._id === taskId) {
-        const done = t.completed || t.done || (t.status || '').toLowerCase() === 'completed';
         return {
           ...t,
-          status: done ? "Pending" : "Completed",
-          completed: !done,
-          done: !done
+          status: isCurrentlyDone ? 'In Progress' : 'Completed',
+          completed: !isCurrentlyDone,
+          done: !isCurrentlyDone
         };
       }
       return t;
     }));
 
     try {
-      await axios.patch(`${BASE_URL}/api/tasks/${taskId}/toggle`);
+      // Use same PUT endpoint as ModernProjectDetails so both screens sync
+      await axios.put(`${BASE_URL}/api/tasks/${taskId}`, { status: newStatus });
     } catch (err) {
       console.error("Failed to toggle task status:", err);
+      // Revert on failure
       loadTasks();
     }
   };
@@ -688,9 +714,21 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                     </div>
                     <div className="ed-task-content" onClick={() => handleToggleTask(task._id)} style={{ cursor: "pointer" }}>
                       <div className={`ed-task-title ${done ? 'done' : ''}`}>{task.title || task.taskName || "Task"}</div>
-                      <div className="ed-task-due" style={{ color: overdue ? 'var(--danger)' : '#64748B' }}>
-                        {overdue ? 'Overdue - ' : 'Due: '}
-                        {formatDue(task.dueDate || task.due)}
+                      {task.projectName && (
+                        <div style={{ fontSize: 10, color: 'var(--teal)', fontWeight: 700, marginBottom: 2 }}>
+                          <i className="ti ti-briefcase" style={{ fontSize: 10 }}></i> {task.projectName}
+                        </div>
+                      )}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div className="ed-task-due" style={{ color: overdue ? 'var(--danger)' : '#64748B' }}>
+                          {overdue ? 'Overdue - ' : 'Due: '}
+                          {formatDue(task.dueDate || task.due)}
+                        </div>
+                        <span style={{
+                          fontSize: 10, fontWeight: 700, padding: '1px 7px', borderRadius: 20,
+                          background: task.status === 'Completed' ? '#D1FAE5' : task.status === 'In Progress' ? '#DBEAFE' : task.status === 'On Hold' ? '#FEF3C7' : '#F1F5F9',
+                          color: task.status === 'Completed' ? '#065F46' : task.status === 'In Progress' ? '#1E40AF' : task.status === 'On Hold' ? '#92400E' : '#475569'
+                        }}>{task.status}</span>
                       </div>
                     </div>
                     <div className="ed-task-tag" style={tagStyle}>{priority.charAt(0).toUpperCase() + priority.slice(1)}</div>

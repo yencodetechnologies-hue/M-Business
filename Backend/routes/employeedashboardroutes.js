@@ -122,7 +122,7 @@ router.get("/profile/:name", async (req, res) => {
     const companyId = req.headers['x-company-id'] || "";
     const query = { name: new RegExp(`^${name}$`, "i") };
     if (companyId) query.companyId = companyId;
-    
+
     const emp = await Employee.findOne(query);
     if (!emp) return res.status(404).json({ msg: "Employee not found" });
     res.json(emp);
@@ -136,9 +136,9 @@ router.get("/projects/:name", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.name).trim();
     if (!name) return res.json([]);
-    
+
     let companyId = req.headers['x-company-id'] || "";
-    
+
     const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const safeName = escapeRegExp(name);
     const nameRegex = new RegExp(`^\\s*${safeName}\\s*$`, "i");
@@ -153,7 +153,7 @@ router.get("/projects/:name", async (req, res) => {
     }
 
     if (!companyId) return res.status(400).json({ msg: "Company ID required" });
-    
+
     const query = {
       companyId,
       $or: [
@@ -161,7 +161,7 @@ router.get("/projects/:name", async (req, res) => {
         { manager: nameRegex }
       ]
     };
-    
+
     const projects = await Project.find(query).sort({ createdAt: -1 });
     res.json(projects);
 
@@ -179,13 +179,13 @@ router.get("/tasks/:name", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.name).trim();
     if (!name) return res.json([]);
-    
+
     let companyId = req.headers['x-company-id'] || "";
-    
+
     const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const safeName = escapeRegExp(name);
     const nameRegex = new RegExp(`^\\s*${safeName}\\s*$`, "i");
-    
+
     // Find identities in both User and Employee collections
     // If companyId is missing, find by name only to "recover" the company context
     const idFilter = companyId ? { name: nameRegex, companyId } : { name: nameRegex };
@@ -193,17 +193,21 @@ router.get("/tasks/:name", async (req, res) => {
       User.findOne(idFilter),
       Employee.findOne(idFilter)
     ]);
-    
+
     // If companyId was missing, use the one from the found identity
     if (!companyId) {
       companyId = user?.companyId || employee?.companyId || "";
     }
-    
+
     if (!companyId) return res.status(400).json({ msg: "Company ID required or could not be resolved" });
-    
+
+    // Match name anywhere in the comma-separated assignTo string
+    const partialNameRegex = new RegExp(safeName, "i");
+
     const query = {
       companyId,
       $or: [
+        { assignTo: partialNameRegex },
         { assignTo: nameRegex }
       ],
       isDeleted: false
@@ -211,7 +215,7 @@ router.get("/tasks/:name", async (req, res) => {
 
     if (user) query.$or.push({ assignedTo: user._id });
     if (employee) query.$or.push({ assignedTo: employee._id });
-    
+
     const tasks = await Task.find(query)
       .populate("projectId", "name color")
       .sort({ createdAt: -1 });
@@ -229,7 +233,7 @@ router.get("/attendance/:name", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.name).trim();
     let companyId = req.headers['x-company-id'] || "";
-    
+
     const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const safeName = escapeRegExp(name);
     const nameRegex = new RegExp(`^\\s*${safeName}\\s*$`, "i");
@@ -243,12 +247,12 @@ router.get("/attendance/:name", async (req, res) => {
     }
 
     if (!companyId) return res.status(400).json({ msg: "Company ID required" });
-    
-    const query = { 
+
+    const query = {
       companyId,
       employeeName: { $regex: nameRegex }
     };
-    
+
     const records = await Attendance.find(query).sort({ date: -1 });
     res.json(records);
   } catch (err) { res.status(500).json({ msg: "Server error", error: err.message }); }
@@ -313,19 +317,19 @@ router.get("/leave/all/list", async (req, res) => {
     const filter = {};
     if (req.query.status) filter.status = req.query.status;
     if (req.query.name) filter.employeeName = { $regex: new RegExp(req.query.name, "i") };
-    
+
     if (companyId) {
       const employees = await Employee.find({ companyId });
       const employeeIds = employees.map(e => e._id);
       const employeeNames = employees.map(e => e.name);
-      
+
       const companyFilter = {
         $or: [
           { employeeId: { $in: employeeIds } },
           { employeeName: { $in: employeeNames } }
         ]
       };
-      
+
       // Merge with existing filter
       const mergedFilter = { $and: [filter, companyFilter] };
       res.json(await Leave.find(mergedFilter).sort({ createdAt: -1 }));
@@ -339,7 +343,7 @@ router.get("/leave/:name", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.name).trim();
     let companyId = req.headers['x-company-id'] || "";
-    
+
     const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const safeName = escapeRegExp(name);
     const nameRegex = new RegExp(`^\\s*${safeName}\\s*$`, "i");
@@ -353,12 +357,12 @@ router.get("/leave/:name", async (req, res) => {
     }
 
     if (!companyId) return res.status(400).json({ msg: "Company ID required" });
-    
-    const query = { 
+
+    const query = {
       companyId,
-      employeeName: nameRegex 
+      employeeName: nameRegex
     };
-    
+
     const leaves = await Leave.find(query).sort({ from: -1 });
     res.json(leaves);
   } catch (err) { res.status(500).json({ msg: "Server error", error: err.message }); }
@@ -446,7 +450,7 @@ router.get("/permission/:name", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.name).trim();
     let companyId = req.headers['x-company-id'] || "";
-    
+
     const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const safeName = escapeRegExp(name);
     const nameRegex = new RegExp(`^\\s*${safeName}\\s*$`, "i");
@@ -460,12 +464,12 @@ router.get("/permission/:name", async (req, res) => {
     }
 
     if (!companyId) return res.status(400).json({ msg: "Company ID required" });
-    
-    const query = { 
+
+    const query = {
       companyId,
-      employeeName: nameRegex 
+      employeeName: nameRegex
     };
-    
+
     const perms = await Permission.find(query).sort({ createdAt: -1 });
     res.json(perms);
   } catch (err) { res.status(500).json({ msg: "Server error", error: err.message }); }
@@ -520,7 +524,7 @@ router.get("/salary/:name", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.name).trim();
     let companyId = req.headers['x-company-id'] || "";
-    
+
     const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const safeName = escapeRegExp(name);
     const nameRegex = new RegExp(`^\\s*${safeName}\\s*$`, "i");
@@ -534,12 +538,12 @@ router.get("/salary/:name", async (req, res) => {
     }
 
     if (!companyId) return res.status(400).json({ msg: "Company ID required" });
-    
-    const query = { 
+
+    const query = {
       companyId,
-      employeeName: nameRegex 
+      employeeName: nameRegex
     };
-    
+
     const slips = await Salary.find(query).sort({ createdAt: -1 });
     res.json(slips);
   } catch (err) { res.status(500).json({ msg: "Server error", error: err.message }); }
@@ -581,7 +585,7 @@ router.get("/documents/:name/:docType", async (req, res) => {
     const name = decodeURIComponent(req.params.name).trim();
     const companyId = req.headers['x-company-id'] || "";
     const { docType } = req.params;
-    
+
     const query = { employeeName: new RegExp(`^${name}$`, "i") };
     if (companyId) query.companyId = companyId;
 
@@ -589,7 +593,7 @@ router.get("/documents/:name/:docType", async (req, res) => {
       const docs = await EmployeeDoc.find(query);
       return res.json(docs);
     }
-    
+
     query.docType = docType;
     const doc = await EmployeeDoc.findOne(query);
     res.json(doc || {});
@@ -658,7 +662,7 @@ router.get("/summary/:name", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.name).trim();
     let companyId = req.headers['x-company-id'] || "";
-    
+
     const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const safeName = escapeRegExp(name);
     const nameRegex = new RegExp(`^\\s*${safeName}\\s*$`, "i");
@@ -676,29 +680,29 @@ router.get("/summary/:name", async (req, res) => {
     const user = await User.findOne({ name: nameRegex, companyId });
     const employee = await Employee.findOne({ name: nameRegex, companyId });
 
-    const query = { 
+    const query = {
       companyId,
-      $or: [{ assignedTo: nameRegex }, { manager: nameRegex }] 
+      $or: [{ assignedTo: nameRegex }, { manager: nameRegex }]
     };
     if (user) query.$or.push({ assignedTo: user._id });
     if (employee) query.$or.push({ assignedTo: employee._id });
 
-    const taskQuery = { 
+    const taskQuery = {
       companyId,
-      $or: [{ assignTo: nameRegex }], 
-      isDeleted: false 
+      $or: [{ assignTo: nameRegex }],
+      isDeleted: false
     };
     if (user) taskQuery.$or.push({ assignedTo: user._id });
     if (employee) taskQuery.$or.push({ assignedTo: employee._id });
 
-    const attQuery = { 
+    const attQuery = {
       companyId,
-      employeeName: nameRegex 
+      employeeName: nameRegex
     };
 
-    const salQuery = { 
+    const salQuery = {
       companyId,
-      employeeName: nameRegex 
+      employeeName: nameRegex
     };
 
     const [projects, tasks, attendance, salary] = await Promise.all([

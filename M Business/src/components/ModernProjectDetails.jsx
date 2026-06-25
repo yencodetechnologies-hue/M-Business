@@ -2471,31 +2471,20 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 {/* Assign To */}
                 <div style={{ marginBottom: 16 }}>
                   <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Assign To</label>
-                  <div style={{ border: `1.5px solid ${P.border}`, borderRadius: 8, maxHeight: 150, overflowY: 'auto', padding: '4px 0' }}>
-                    {(employees || []).filter(emp => assigned.includes(emp.name || emp.employeeName)).map(emp => {
+                  <select
+                    value={Array.isArray(newTaskAssignTo) && newTaskAssignTo.length > 0 ? newTaskAssignTo[0] : ''}
+                    onChange={e => setNewTaskAssignTo(e.target.value ? [e.target.value] : [])}
+                    style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', fontSize: 13, color: P.textDark, background: '#fff', boxSizing: 'border-box' }}
+                  >
+                    <option value=''>-- Select Employee --</option>
+                    {(employees || []).map(emp => {
                       const name = emp.name || emp.employeeName || '';
                       if (!name) return null;
-                      const selected = Array.isArray(newTaskAssignTo) && newTaskAssignTo.includes(name);
                       return (
-                        <div key={emp._id} onClick={() => {
-                          const cur = Array.isArray(newTaskAssignTo) ? [...newTaskAssignTo] : [];
-                          setNewTaskAssignTo(selected ? cur.filter(n => n !== name) : [...cur, name]);
-                        }} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 12px', cursor: 'pointer', background: selected ? P.primaryLight : 'transparent' }}>
-                          <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${selected ? P.primary : P.border}`, background: selected ? P.primary : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            {selected && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900, lineHeight: 1 }}>✓</span>}
-                          </div>
-                          <span style={{ fontSize: 13, color: P.textDark, fontWeight: selected ? 700 : 500 }}>{name}</span>
-                        </div>
+                        <option key={emp._id} value={name}>{name}</option>
                       );
                     })}
-                  </div>
-                  {Array.isArray(newTaskAssignTo) && newTaskAssignTo.length > 0 && (
-                    <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                      {newTaskAssignTo.map(n => (
-                        <span key={n} onClick={() => setNewTaskAssignTo(newTaskAssignTo.filter(x => x !== n))} style={{ background: P.primaryLight, color: P.primary, padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>{n} ✕</span>
-                      ))}
-                    </div>
-                  )}
+                  </select>
                 </div>
 
                 {/* Buttons */}

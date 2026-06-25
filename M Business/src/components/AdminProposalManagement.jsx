@@ -915,13 +915,20 @@ export default function AdminProposalManagement() {
     fetchProposals(); // Refresh proposals after closing editor
   };
 
-  const filtered = proposals.filter(p =>
-    (p.title || "").toLowerCase().includes(search.toLowerCase()) ||
-    (p.client || "").toLowerCase().includes(search.toLowerCase()) ||
-    (p.assignedEmployee || "").toLowerCase().includes(search.toLowerCase()) ||
-    (p.status || "").toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = proposals.filter(p => {
+    const matchesSearch =
+      (p.title || "").toLowerCase().includes(search.toLowerCase()) ||
+      (p.client || "").toLowerCase().includes(search.toLowerCase()) ||
+      (p.assignedEmployee || "").toLowerCase().includes(search.toLowerCase()) ||
+      (p.status || "").toLowerCase().includes(search.toLowerCase());
 
+    const propDate = p.createdAt || p.sentAt || p.updatedAt || p.updated;
+    const matchesMonth = propDate
+      ? new Date(propDate).toISOString().slice(0, 7) === selectedMonth
+      : true;
+
+    return matchesSearch && matchesMonth;
+  });
 
 
   return (

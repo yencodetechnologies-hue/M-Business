@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react';
-
+import React, { useState, useRef, useEffect } from 'react';
+import axios from 'axios';
+import { BASE_URL } from '../config';
 export default function FinDashboard() {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [impCurrentStep, setImpCurrentStep] = useState(1);
@@ -13,55 +14,37 @@ export default function FinDashboard() {
   const [cashflow, setCashflow] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedPeriod, setSelectedPeriod] = useState('This Month — June 2026');
+  const now = new Date();
+  const currentMonthLabel = `This Month — ${now.toLocaleString('en-IN', { month: 'long' })} ${now.getFullYear()}`;
+  const [selectedPeriod, setSelectedPeriod] = useState(currentMonthLabel);
   const stepLabels = ['', 'Select Bank', 'Upload File', 'Map Columns', 'Review & Import'];
 
-  const STATIC_DATA = {
-    'This Month — June 2026': {
-      kpis: { totalIncome: 1842000, totalExpenses: 987500, netProfit: 854500, pendingReceivables: 321000, vendorPayables: 145000, incomeChange: 12, expenseChange: 5, profitMargin: 46, pendingInvoices: 4, overdueVendors: 2 },
-      cashflow: [{ month: 'Jan', income: 1520000, expense: 890000 }, { month: 'Feb', income: 1380000, expense: 820000 }, { month: 'Mar', income: 1650000, expense: 960000 }, { month: 'Apr', income: 1720000, expense: 910000 }, { month: 'May', income: 1640000, expense: 935000 }, { month: 'Jun', income: 1842000, expense: 987500 }],
-      transactions: [{ date: 'Jun 5', description: 'NovaMart — Invoice INV-2026-019', category: 'Project Revenue', type: 'Income', amount: 212500, status: 'Pending' }, { date: 'Jun 4', description: 'AWS Cloud — Monthly Infrastructure', category: 'Infrastructure', type: 'Expense', amount: 42000, status: 'Paid' }, { date: 'Jun 3', description: 'MediCore — Milestone 1 Payment', category: 'Project Revenue', type: 'Income', amount: 187500, status: 'Paid' }, { date: 'Jun 2', description: 'Office Rent — June 2026', category: 'Operations', type: 'Expense', amount: 75000, status: 'Paid' }, { date: 'Jun 1', description: 'Salaries — June Payroll', category: 'Payroll', type: 'Expense', amount: 540000, status: 'Paid' }, { date: 'May 31', description: 'LogiTrack — Advance (30%)', category: 'Project Revenue', type: 'Income', amount: 350000, status: 'Paid' }],
-      bankAccounts: [{ bank: 'HDFC Bank', type: 'Current A/C', last4: '4821', balance: 1284320, synced: '2h ago', primary: true }, { bank: 'ICICI Bank', type: 'Savings A/C', last4: '7734', balance: 421800, synced: '2h ago', primary: false }],
-      expenseBreakdown: [{ category: 'Payroll', amount: 540000, percent: 55 }, { category: 'Operations', amount: 182000, percent: 18 }, { category: 'Infrastructure', amount: 124500, percent: 13 }, { category: 'Vendors', amount: 88000, percent: 9 }],
-    },
-    'May 2026': {
-      kpis: { totalIncome: 1640000, totalExpenses: 935000, netProfit: 705000, pendingReceivables: 278000, vendorPayables: 122000, incomeChange: 8, expenseChange: 3, profitMargin: 43, pendingInvoices: 3, overdueVendors: 1 },
-      cashflow: [{ month: 'Dec', income: 1400000, expense: 820000 }, { month: 'Jan', income: 1520000, expense: 890000 }, { month: 'Feb', income: 1380000, expense: 820000 }, { month: 'Mar', income: 1650000, expense: 960000 }, { month: 'Apr', income: 1720000, expense: 910000 }, { month: 'May', income: 1640000, expense: 935000 }],
-      transactions: [{ date: 'May 30', description: 'TechNest — Monthly Retainer', category: 'Retainer', type: 'Income', amount: 85000, status: 'Paid' }, { date: 'May 28', description: 'AquaFin — Brand Identity Final', category: 'Project Revenue', type: 'Income', amount: 120000, status: 'Paid' }, { date: 'May 25', description: 'SunRise Exports — Corporate Website', category: 'Project Revenue', type: 'Income', amount: 95000, status: 'Overdue' }, { date: 'May 20', description: 'Google Workspace Renewal', category: 'Infrastructure', type: 'Expense', amount: 18500, status: 'Paid' }, { date: 'May 15', description: 'Salaries — May Payroll', category: 'Payroll', type: 'Expense', amount: 540000, status: 'Paid' }, { date: 'May 10', description: 'Office Supplies & Stationery', category: 'Operations', type: 'Expense', amount: 12000, status: 'Paid' }],
-      bankAccounts: [{ bank: 'HDFC Bank', type: 'Current A/C', last4: '4821', balance: 1102400, synced: '1d ago', primary: true }, { bank: 'ICICI Bank', type: 'Savings A/C', last4: '7734', balance: 389200, synced: '1d ago', primary: false }],
-      expenseBreakdown: [{ category: 'Payroll', amount: 540000, percent: 58 }, { category: 'Operations', amount: 168000, percent: 18 }, { category: 'Infrastructure', amount: 110000, percent: 12 }, { category: 'Vendors', amount: 76000, percent: 8 }],
-    },
-    'Q1 2026': {
-      kpis: { totalIncome: 4950000, totalExpenses: 2670000, netProfit: 2280000, pendingReceivables: 540000, vendorPayables: 380000, incomeChange: 22, expenseChange: 8, profitMargin: 46, pendingInvoices: 7, overdueVendors: 3 },
-      cashflow: [{ month: 'Oct', income: 1480000, expense: 870000 }, { month: 'Nov', income: 1560000, expense: 900000 }, { month: 'Dec', income: 1910000, expense: 900000 }, { month: 'Jan', income: 1520000, expense: 890000 }, { month: 'Feb', income: 1380000, expense: 820000 }, { month: 'Mar', income: 1650000, expense: 960000 }],
-      transactions: [{ date: 'Mar 31', description: 'Q1 Final Settlements', category: 'Project Revenue', type: 'Income', amount: 420000, status: 'Paid' }, { date: 'Mar 25', description: 'Infra Upgrade — Server Costs', category: 'Infrastructure', type: 'Expense', amount: 85000, status: 'Paid' }, { date: 'Mar 15', description: 'Salaries — March Payroll', category: 'Payroll', type: 'Expense', amount: 540000, status: 'Paid' }, { date: 'Feb 28', description: 'RetailMax — Phase 2 Milestone', category: 'Project Revenue', type: 'Income', amount: 290000, status: 'Paid' }, { date: 'Jan 20', description: 'Annual Software Licenses', category: 'Infrastructure', type: 'Expense', amount: 62000, status: 'Paid' }, { date: 'Jan 10', description: 'New Client Advance — LogiTrack', category: 'Project Revenue', type: 'Income', amount: 350000, status: 'Paid' }],
-      bankAccounts: [{ bank: 'HDFC Bank', type: 'Current A/C', last4: '4821', balance: 2140000, synced: '3d ago', primary: true }, { bank: 'ICICI Bank', type: 'Savings A/C', last4: '7734', balance: 680000, synced: '3d ago', primary: false }],
-      expenseBreakdown: [{ category: 'Payroll', amount: 1620000, percent: 61 }, { category: 'Operations', amount: 480000, percent: 18 }, { category: 'Infrastructure', amount: 320000, percent: 12 }, { category: 'Vendors', amount: 250000, percent: 9 }],
-    },
-    'FY 2025-26': {
-      kpis: { totalIncome: 9214000, totalExpenses: 5432000, netProfit: 3782000, pendingReceivables: 876000, vendorPayables: 540000, incomeChange: 31, expenseChange: 14, profitMargin: 41, pendingInvoices: 11, overdueVendors: 4 },
-      cashflow: [{ month: 'Jul', income: 1280000, expense: 780000 }, { month: 'Aug', income: 1420000, expense: 840000 }, { month: 'Sep', income: 1560000, expense: 890000 }, { month: 'Oct', income: 1480000, expense: 870000 }, { month: 'Nov', income: 1560000, expense: 900000 }, { month: 'Dec', income: 1914000, expense: 1152000 }],
-      transactions: [{ date: 'Dec 31', description: 'Year-end Revenue Collection', category: 'Project Revenue', type: 'Income', amount: 840000, status: 'Paid' }, { date: 'Dec 15', description: 'Annual Payroll Bonus', category: 'Payroll', type: 'Expense', amount: 320000, status: 'Paid' }, { date: 'Nov 30', description: 'MegaCorp — Year Contract', category: 'Retainer', type: 'Income', amount: 560000, status: 'Paid' }, { date: 'Oct 20', description: 'Office Renovation', category: 'Operations', type: 'Expense', amount: 180000, status: 'Paid' }, { date: 'Sep 15', description: 'HealthTrack App — Full Payment', category: 'Project Revenue', type: 'Income', amount: 480000, status: 'Paid' }, { date: 'Aug 10', description: 'Annual Insurance Premium', category: 'Operations', type: 'Expense', amount: 95000, status: 'Paid' }],
-      bankAccounts: [{ bank: 'HDFC Bank', type: 'Current A/C', last4: '4821', balance: 3420000, synced: '1w ago', primary: true }, { bank: 'ICICI Bank', type: 'Savings A/C', last4: '7734', balance: 1180000, synced: '1w ago', primary: false }],
-      expenseBreakdown: [{ category: 'Payroll', amount: 3240000, percent: 60 }, { category: 'Operations', amount: 980000, percent: 18 }, { category: 'Infrastructure', amount: 700000, percent: 13 }, { category: 'Vendors', amount: 512000, percent: 9 }],
-    },
-  };
-  const fetchDashboardData = (period) => {
-    const activePeriod = period || selectedPeriod;
+  const fetchDashboardData = async () => {
     setLoading(true); setError(null);
-    setTimeout(() => {
-      const data = STATIC_DATA[activePeriod] || STATIC_DATA['This Month — June 2026'];
-      setDashboardData(data.kpis);
-      setCashflow(data.cashflow);
-      setTransactions(data.transactions);
-      setBankAccounts(data.bankAccounts);
-      setExpenseBreakdown(data.expenseBreakdown);
-      if (data.bankAccounts.length > 0) setSelectedBank(data.bankAccounts[0].bank);
+    try {
+      const [kpiRes, txRes, bankRes, expRes, cashflowRes] = await Promise.all([
+        axios.get(`${BASE_URL}/api/finance/kpis?period=${encodeURIComponent(selectedPeriod)}`).catch(() => null),
+        axios.get(`${BASE_URL}/api/finance/transactions?period=${encodeURIComponent(selectedPeriod)}`).catch(() => null),
+        axios.get(`${BASE_URL}/api/finance/bank-accounts`).catch(() => null),
+        axios.get(`${BASE_URL}/api/finance/expense-breakdown?period=${encodeURIComponent(selectedPeriod)}`).catch(() => null),
+        axios.get(`${BASE_URL}/api/finance/cashflow?period=${encodeURIComponent(selectedPeriod)}`).catch(() => null),
+      ]);
+      if (kpiRes?.data) setDashboardData(kpiRes.data);
+      if (txRes?.data) setTransactions(txRes.data);
+      if (bankRes?.data) {
+        setBankAccounts(bankRes.data);
+        if (bankRes.data.length > 0) setSelectedBank(bankRes.data[0].bank);
+      }
+      if (expRes?.data) setExpenseBreakdown(expRes.data);
+      if (cashflowRes?.data) setCashflow(cashflowRes.data);
+    } catch (err) {
+      setError('Failed to load dashboard data. Please try again.');
+    } finally {
       setLoading(false);
-    }, 400);
+    }
   };
 
-  React.useEffect(() => { fetchDashboardData(selectedPeriod); }, [selectedPeriod]);
+  useEffect(() => { fetchDashboardData(); }, [selectedPeriod]);
 
   const handleDeleteTransaction = (index) => {
     if (!window.confirm("Delete this transaction?")) return;
@@ -79,9 +62,9 @@ export default function FinDashboard() {
 
 
   const fmt = (num) => {
-    if (!num && num !== 0) return '₹0';
-    if (num >= 100000) return `₹${(num / 100000).toFixed(2).replace(/\.00$/, '')} L`;
-    return `₹${num.toLocaleString('en-IN')}`;
+    const n = Number(num) || 0;
+    if (n >= 100000) return `₹${(n / 100000).toFixed(2).replace(/\.00$/, '')} L`;
+    return `₹${n.toLocaleString('en-IN')}`;
   };
   const maxCashflow = cashflow.length ? Math.max(...cashflow.map(m => Math.max(m.income, m.expense))) : 1;
   const pfColors = ['pf-red', 'pf-orange', 'pf-primary', ''];
@@ -256,7 +239,7 @@ tr:hover td{background:#FAFCFE;}
             <input
               type="month"
               className="filter-sel"
-              defaultValue="2026-06"
+              defaultValue={`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`}
               onChange={e => {
                 const [year, month] = e.target.value.split('-');
                 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];

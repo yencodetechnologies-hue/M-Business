@@ -1178,6 +1178,8 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   const [search, setSearch] = useState("");
   const [showResizeMenu, setShowResizeMenu] = useState(false);
   const [isViewMode, setIsViewMode] = useState(new URLSearchParams(window.location.search).get("view") !== null);  // true when ?view= is in URL (client view)
+  const [selectedMonth, setSelectedMonth] = useState(`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`);
+  const [activeCard, setActiveCard] = useState("all");
   const [propTab, setPropTab] = useState("all");
   const [propSearch, setPropSearch] = useState("");
   const [newForm, setNewForm] = useState({ title: "", client: "", value: "" });
@@ -1584,7 +1586,13 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   // ══ LIST VIEW --------------------------------------------------------------
 
 
-
+  const total = proposals.length;
+  const totalVal = proposals.reduce((s, p) => s + (Number(p.value) || Number(p.total) || 0), 0);
+  const wonCount = proposals.filter(p => p.status === "won" || p.status === "approved").length;
+  const wonVal = proposals.filter(p => p.status === "won" || p.status === "approved").reduce((s, p) => s + (Number(p.value) || Number(p.total) || 0), 0);
+  const activeCount = proposals.filter(p => p.status === "sent" || p.status === "negotiation" || p.status === "pending").length;
+  const decided = proposals.filter(p => ["won", "approved", "lost", "rejected"].includes(p.status)).length;
+  const successRate = decided > 0 ? Math.round((wonCount / decided) * 100) : 0;
   if (view === "list") {
     const total = proposals.length;
     const totalVal = proposals.reduce((s, p) => s + (p.value || 0), 0);
@@ -1602,7 +1610,9 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
               propTab === "won" ? (p.status === "approved" || p.status === "won") :
                 propTab === "lost" ? (p.status === "rejected" || p.status === "lost") : true;
       const matchSearch = !propSearch || (p.title || "").toLowerCase().includes(propSearch.toLowerCase()) || (p.client || "").toLowerCase().includes(propSearch.toLowerCase());
-      return matchTab && matchSearch;
+      const propDate = p.createdAt || p.sentAt || p.updatedAt || p.updated;
+      const matchMonth = propDate ? new Date(propDate).toISOString().slice(0, 7) === selectedMonth : true;
+      return matchTab && matchSearch && matchMonth;
     });
 
     const statusBadge = (s) => {
@@ -1678,14 +1688,30 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
               <p style={{ fontSize: 12, color: "var(--text3,#A0B8BE)", marginTop: 3 }}>Manage and track your client project proposals</p>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <button className="filter-btn"><i className="ti ti-calendar" style={{ fontSize: 13 }}></i> {new Date().toLocaleString("en-IN", { month: "long", year: "numeric" })}</button>
+              <input
+                type="month"
+                value={selectedMonth}
+                onChange={e => setSelectedMonth(e.target.value)}
+                style={{
+                  padding: "8px 14px",
+                  border: "1.5px solid var(--border,#E0EEF0)",
+                  borderRadius: 10,
+                  fontFamily: "inherit",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "var(--text,#1A2E35)",
+                  background: "#fff",
+                  cursor: "pointer",
+                  outline: "none"
+                }}
+              />
               <button className="new-prop-btn" onClick={openNewModal}><i className="ti ti-plus" style={{ fontSize: 15 }}></i> New Proposal</button>
             </div>
           </div>
 
           {/* STATS ROW */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 22 }}>
-            <div className="stat-card">
+            <div className="stat-card" onClick={() => { setActiveCard("all"); setPropTab("all"); }} style={{ border: activeCard === "all" ? "2px solid var(--teal,#00BCD4)" : "1.5px solid var(--border,#E0EEF0)", boxShadow: activeCard === "all" ? "0 4px 16px rgba(0,188,212,.18)" : "" }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--teal-light,#E0F7FA)", color: "var(--teal,#00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-presentation"></i></div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{total}</div>
@@ -1693,7 +1719,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                 <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--teal,#00BCD4)" }}>₹{totalVal.toLocaleString("en-IN")} pipeline</div>
               </div>
             </div>
-            <div className="stat-card">
+            <div className="stat-card" onClick={() => { setActiveCard("won"); setPropTab("won"); }} style={{ border: activeCard === "won" ? "2px solid var(--green,#26C281)" : "1.5px solid var(--border,#E0EEF0)", boxShadow: activeCard === "won" ? "0 4px 16px rgba(38,194,129,.18)" : "" }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--green-bg,#E8FAF3)", color: "var(--green,#26C281)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-trophy"></i></div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{wonCount}</div>
@@ -1701,7 +1727,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                 <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--green,#26C281)" }}>₹{wonVal.toLocaleString("en-IN")} closed</div>
               </div>
             </div>
-            <div className="stat-card">
+            <div className="stat-card" onClick={() => { setActiveCard("inprogress"); setPropTab("negotiation"); }} style={{ border: activeCard === "inprogress" ? "2px solid var(--purple,#7C5CFC)" : "1.5px solid var(--border,#E0EEF0)", boxShadow: activeCard === "inprogress" ? "0 4px 16px rgba(124,92,252,.18)" : "" }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--purple-bg,#EEE9FF)", color: "var(--purple,#7C5CFC)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-arrows-exchange"></i></div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{activeCount}</div>
@@ -1709,7 +1735,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                 <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--purple,#7C5CFC)" }}>Active pipeline</div>
               </div>
             </div>
-            <div className="stat-card">
+            <div className="stat-card" onClick={() => { setActiveCard("successrate"); setPropTab("won"); }} style={{ border: activeCard === "successrate" ? "2px solid var(--amber,#F5A623)" : "1.5px solid var(--border,#E0EEF0)", boxShadow: activeCard === "successrate" ? "0 4px 16px rgba(245,166,35,.18)" : "" }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--amber-bg,#FEF5E6)", color: "var(--amber,#F5A623)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-percentage"></i></div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{successRate}%</div>
@@ -1723,7 +1749,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
             <div style={{ display: "flex", gap: 4, background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 12, padding: 4 }}>
               {["all", "draft", "sent", "negotiation", "won", "lost"].map(t => (
-                <button key={t} className={`prop-tab${propTab === t ? " active" : ""}`} onClick={() => setPropTab(t)}>
+                <button key={t} className={`prop-tab${propTab === t ? " active" : ""}`} onClick={() => { setPropTab(t); setActiveCard(t === "all" ? "all" : t === "won" ? "won" : t === "negotiation" ? "inprogress" : ""); }}>
                   {t.charAt(0).toUpperCase() + t.slice(1)}
                 </button>
               ))}
@@ -1961,6 +1987,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
           />
         )}
       </div>
+
     );
   }
 

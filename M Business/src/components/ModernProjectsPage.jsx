@@ -807,7 +807,7 @@ function DeleteModal({ name, onConfirm, onCancel, deleting }) {
           <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#FEE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
             <i className="ti ti-trash" style={{ fontSize: 26, color: '#DC2626' }}></i>
           </div>
-          <div style={{ fontSize: 17, fontWeight: 800, color: '#1A2332', marginBottom: 8 }}>Delete Project?</div>
+          <div style={{ fontSize: 17, fontWeight: 800, color: '#1A2332', marginBottom: 8 }}>Delete Project</div>
           <div style={{ fontSize: 13, color: '#718096', marginBottom: 24 }}>Are you sure you want to delete <strong>"{name}"</strong>? This cannot be undone.</div>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
             <button onClick={onCancel} style={BTN_OUTLINE}>Cancel</button>

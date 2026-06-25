@@ -568,7 +568,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     const taxAmt = inv.taxType === 'inclusive' ? 0 : Math.round(invAmount * (taxPercent / 100));
     return sum + invAmount + taxAmt;
   }, 0);
-  const billed = billedGlobal + billedLocal;
+  const billedFromInvoices = billedGlobal + billedLocal;
+  // Fall back to manually entered billed value if no invoices exist
+  const manualBilled = parseAmt(currProject.billed);
+  const billed = billedFromInvoices > 0 ? billedFromInvoices : manualBilled;
 
   const autoAdditionalTotal = (currProject.additionalCharges || []).reduce((sum, a) => sum + parseAmt(a.amount), 0);
   const autoMilestoneTotal = (currProject.milestonePayments || []).reduce((sum, m) => sum + parseAmt(m.amount), 0);
@@ -576,7 +579,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const manualBudget = currProject.budget ? Number(currProject.budget) : 0;
   const budgetAmt = Math.max(autoBudgetAmt, manualBudget);
 
-  const received = (currProject.paymentsReceived || []).reduce((sum, p) => sum + parseAmt(p.amount), 0);
+  // Fall back to manually entered received value if no payments recorded
+  const receivedFromPayments = (currProject.paymentsReceived || []).reduce((sum, p) => sum + parseAmt(p.amount), 0);
+  const manualReceived = parseAmt(currProject.received);
+  const received = receivedFromPayments > 0 ? receivedFromPayments : manualReceived;
+
   const pending = Math.max(0, billed - received);
   // Always calculate spent from expenses array (source of truth)
   const spent = (currProject.expenses || []).reduce((sum, exp) => sum + parseAmt(exp.amount), 0);
@@ -1005,9 +1012,112 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             )}
             <button className="mpd-btn mpd-btn-outline" onClick={handleShare} style={{ gap: 6 }}><i className="ti ti-share"></i> Share</button>
             <button className="mpd-btn mpd-btn-outline" style={{ gap: 6 }} onClick={() => {
-              const text = `Project: ${projName}\nClient: ${clientName}\nStatus: ${currProject.status}\nProgress: ${progressPct}%\nBudget: ${currency}${budgetAmt.toLocaleString()}`;
-              const blob = new Blob([text], { type: 'text/plain' });
-              const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${projName}.txt`; a.click();
+              const printWindow = window.open('', '_blank');
+              printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                  <title>${projName} - Project Report</title>
+                  <style>
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff; color: #1A2332; padding: 40px; }
+                    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #00BCD4; padding-bottom: 20px; margin-bottom: 30px; }
+                    .header-left h1 { font-size: 26px; font-weight: 900; color: #1A2332; margin-bottom: 6px; }
+                    .header-left p { font-size: 13px; color: #718096; }
+                    .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; margin-right: 6px; }
+                    .badge-active { background: #D1FAE5; color: #065F46; }
+                    .badge-high { background: #FEE2E2; color: #991B1B; }
+                    .badge-medium { background: #FEF3C7; color: #92400E; }
+                    .badge-low { background: #DBEAFE; color: #1E40AF; }
+                    .logo-area { text-align: right; }
+                    .logo-area .company { font-size: 18px; font-weight: 900; color: #00BCD4; }
+                    .logo-area .date { font-size: 12px; color: #718096; margin-top: 4px; }
+                    .section { margin-bottom: 28px; }
+                    .section-title { font-size: 13px; font-weight: 800; color: #00BCD4; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; padding-bottom: 6px; border-bottom: 1px solid #E2E8F0; }
+                    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+                    .grid4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+                    .info-box { background: #F7FAFC; border-radius: 10px; padding: 14px 16px; border: 1px solid #E2E8F0; }
+                    .info-box .label { font-size: 10px; font-weight: 800; color: #718096; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px; }
+                    .info-box .value { font-size: 15px; font-weight: 800; color: #1A2332; }
+                    .stat-box { background: #F0F9FF; border-radius: 10px; padding: 16px; text-align: center; border: 1.5px solid #BAE6FD; }
+                    .stat-box .num { font-size: 22px; font-weight: 900; color: #00BCD4; }
+                    .stat-box .lbl { font-size: 10px; font-weight: 800; color: #718096; text-transform: uppercase; margin-top: 4px; }
+                    .progress-bar-wrap { background: #E2E8F0; border-radius: 99px; height: 10px; margin-top: 8px; overflow: hidden; }
+                    .progress-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg,#00BCD4,#26C281); }
+                    .team-chip { display: inline-block; background: #E0F7FA; color: #0097A7; border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 700; margin: 3px; }
+                    .milestone-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-radius: 8px; background: #F7FAFC; border: 1px solid #E2E8F0; margin-bottom: 8px; font-size: 13px; }
+                    .milestone-row .ms-name { font-weight: 700; color: #1A2332; }
+                    .milestone-row .ms-date { color: #718096; font-weight: 600; }
+                    .desc-box { background: #F7FAFC; border-radius: 10px; padding: 16px; font-size: 13px; color: #4A5568; line-height: 1.7; border: 1px solid #E2E8F0; }
+                    .footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #E2E8F0; display: flex; justify-content: space-between; font-size: 11px; color: #A0AEC0; }
+                    @media print { body { padding: 20px; } }
+                  </style>
+                </head>
+                <body>
+                  <div class="header">
+                    <div class="header-left">
+                      <h1>${projName}</h1>
+                      <p style="margin:8px 0;">
+                        <span class="badge badge-active">${currProject.status || 'Active'}</span>
+                        <span class="badge badge-${(currProject.priority || 'medium').toLowerCase()}">${(currProject.priority || 'Medium').charAt(0).toUpperCase() + (currProject.priority || 'medium').slice(1)} Priority</span>
+                        <span class="badge" style="background:#EDE9FE;color:#5B21B6;">${currProject.category || 'General'}</span>
+                      </p>
+                      <p style="font-size:13px;color:#718096;margin-top:4px;">${currProject.description || currProject.purpose || ''}</p>
+                    </div>
+                    <div class="logo-area">
+                      <div class="company">Project Report</div>
+                      <div class="date">Generated: ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}</div>
+                    </div>
+                  </div>
+
+                  <div class="section">
+                    <div class="section-title">Project Overview</div>
+                    <div class="grid2" style="margin-bottom:12px;">
+                      <div class="info-box"><div class="label">Client</div><div class="value">${clientName}</div></div>
+                      <div class="info-box"><div class="label">Contact Person</div><div class="value">${currProject.contactPersonName || '—'}</div></div>
+                      <div class="info-box"><div class="label">Start Date</div><div class="value">${currProject.start ? new Date(currProject.start).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div></div>
+                      <div class="info-box"><div class="label">Deadline</div><div class="value">${(currProject.end || currProject.deadline) ? new Date(currProject.end || currProject.deadline).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div></div>
+                    </div>
+                    <div style="margin-bottom:8px;font-size:13px;font-weight:700;color:#4A5568;">Overall Progress — ${progressPct}%</div>
+                    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${progressPct}%"></div></div>
+                  </div>
+
+                  <div class="section">
+                    <div class="section-title">Budget Summary</div>
+                    <div class="grid4">
+                      <div class="stat-box"><div class="num">${currency}${budgetAmt.toLocaleString()}</div><div class="lbl">Total Budget</div></div>
+                      <div class="stat-box" style="background:#F0FFF4;border-color:#A7F3D0;"><div class="num" style="color:#26C281;">${currency}${Number(currProject.received || 0).toLocaleString()}</div><div class="lbl">Received</div></div>
+                      <div class="stat-box" style="background:#FFFBEB;border-color:#FDE68A;"><div class="num" style="color:#F59E0B;">${currency}${Number(currProject.billed || 0).toLocaleString()}</div><div class="lbl">Billed</div></div>
+                      <div class="stat-box" style="background:#FFF1F2;border-color:#FECDD3;"><div class="num" style="color:#FF6B6B;">${currency}${Number(currProject.pending || 0).toLocaleString()}</div><div class="lbl">Pending</div></div>
+                    </div>
+                  </div>
+
+                  <div class="section">
+                    <div class="section-title">Team Members (${(currProject.assignedTo || []).length})</div>
+                    <div>${(currProject.assignedTo || []).length > 0 ? (currProject.assignedTo || []).map(m => `<span class="team-chip">👤 ${m}</span>`).join('') : '<span style="color:#A0AEC0;font-size:13px;">No team members assigned</span>'}</div>
+                  </div>
+
+                  <div class="section">
+                    <div class="section-title">Milestones (${(currProject.milestones || []).length})</div>
+                    ${(currProject.milestones || []).length > 0 ? (currProject.milestones || []).map(m => `<div class="milestone-row"><span class="ms-name">🚩 ${m.name}</span><span class="ms-date">${m.date ? new Date(m.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</span></div>`).join('') : '<div style="color:#A0AEC0;font-size:13px;padding:10px 0;">No milestones defined</div>'}
+                  </div>
+
+                  ${currProject.description || currProject.purpose ? `
+                  <div class="section">
+                    <div class="section-title">Description</div>
+                    <div class="desc-box">${currProject.description || currProject.purpose}</div>
+                  </div>` : ''}
+
+                  <div class="footer">
+                    <span>Client: ${clientName} &nbsp;|&nbsp; Project: ${projName}</span>
+                    <span>Exported on ${new Date().toLocaleString()}</span>
+                  </div>
+                </body>
+                </html>
+              `);
+              printWindow.document.close();
+              printWindow.focus();
+              setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
             }}><i className="ti ti-download"></i> Export</button>
             <button className="mpd-btn mpd-btn-primary" onClick={() => onEdit && onEdit(currProject)} style={{ gap: 6 }}><i className="ti ti-edit"></i> Edit</button>
             <button className="mpd-btn mpd-btn-danger" style={{ gap: 6 }} onClick={onDelete || (() => window.confirm('Delete this project?'))}><i className="ti ti-trash"></i> Delete</button>
@@ -1261,7 +1371,25 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               <input type="text" value={newMilestoneName} onChange={e => setNewMilestoneName(e.target.value)} placeholder="Milestone name..." required style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none' }} />
             </div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <input type="date" value={newMilestoneDate} onChange={e => setNewMilestoneDate(e.target.value)} style={{ padding: '6px 8px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', flex: 1 }} />
+              <input
+                type="date"
+                value={newMilestoneDate}
+                onChange={e => setNewMilestoneDate(e.target.value)}
+                style={{
+                  padding: '6px 10px',
+                  borderRadius: 6,
+                  border: `1.5px solid ${P.border}`,
+                  fontSize: 12,
+                  outline: 'none',
+                  flex: 1,
+                  background: '#fff',
+                  color: newMilestoneDate ? P.textDark : '#A0AEC0',
+                  fontFamily: 'Nunito, sans-serif',
+                  cursor: 'pointer',
+                  minWidth: 140,
+                }}
+              />
+
               <button type="submit" className="mpd-btn mpd-btn-primary" style={{ padding: '6px 12px', fontSize: 11 }}>Add</button>
               <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMilestone(false)} style={{ padding: '6px 12px', fontSize: 11 }}>✕</button>
             </div>
@@ -2442,7 +2570,23 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Due Date</label>
-                    <input type="date" value={newTaskDue} onChange={e => setNewTaskDue(e.target.value)} style={{ width: '100%', padding: '9px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }} />
+                    <input
+                      type="date"
+                      value={newTaskDue}
+                      onChange={e => setNewTaskDue(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '9px',
+                        borderRadius: 8,
+                        border: `1.5px solid ${P.border}`,
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                        background: '#fff',
+                        color: newTaskDue ? P.textDark : '#A0AEC0',
+                        fontFamily: 'Nunito, sans-serif',
+                        cursor: 'pointer',
+                      }}
+                    />
                   </div>
                 </div>
 

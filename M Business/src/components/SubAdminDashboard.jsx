@@ -1462,7 +1462,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                         setProjects && setProjects(prev => prev.filter(proj => proj._id !== p._id));
 
-                        showToast("Delete Project deleted!");
+                        showToast(" Project deleted!");
 
                       } catch (err) {
 
@@ -1500,7 +1500,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 4 }}>
 
-        <button onClick={() => onCreateProject && onCreateProject()} style={{ background: "#00BCD4", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12, color: "#fff", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}>
+        <button onClick={() => onCreateProject && onCreateProject(activeClient)} style={{ background: "#00BCD4", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12, color: "#fff", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}>
 
           <i className="ti ti-plus" style={{ fontSize: 13 }} /> Add Project
 
@@ -1556,7 +1556,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                 setProjects && setProjects(prev => prev.filter(proj => proj._id !== p._id));
 
-                showToast("Delete Project deleted!");
+                showToast(" Project deleted!");
 
               } catch (err) {
 
@@ -4167,7 +4167,7 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
     setDeleteTarget(null);
 
-    showToast(" Delete Project deleted!");
+    showToast("  Project deleted!");
 
   };
 

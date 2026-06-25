@@ -1001,7 +1001,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
     try { await axios.delete(`${BASE_URL}/api/projects/${deleteTarget._id}`); } catch { }
     setProjects(prev => prev.filter(p => p._id !== deleteTarget._id));
     setDeleteTarget(null);
-    showToast("Delete Project deleted!");
+    showToast(" Project deleted!");
   };
 
   const doAssign = async () => {

@@ -52,7 +52,8 @@ const CSS = `
 .mpc-milestone-list { display:flex; flex-direction:column; gap:10px; }
 .mpc-milestone-row { display:grid; grid-template-columns:1fr auto auto; gap:12px; align-items:center; background:${P.bg}; border-radius:12px; padding:12px 14px; border:1.5px solid ${P.border}; }
 .mpc-milestone-row input { border:none; background:transparent; font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; color:${P.textDark}; outline:none; width:100%; padding:0; }
-.mpc-milestone-row input[type="date"] { font-size:13px; color:${P.textMid}; font-weight:600; }
+.mpc-milestone-row input[type="date"] { font-size:13px; color:${P.textMid}; font-weight:600; background:#fff; border:1.5px solid ${P.border}; border-radius:8px; padding:6px 10px; width:160px; cursor:pointer; }
+.mpc-milestone-row input[type="date"]:focus { border-color:${P.primary}; outline:none; }
 .mpc-remove-ms { color:${P.textLight}; cursor:pointer; font-size:18px; padding:4px; display:flex; align-items:center; transition:color .15s; }
 .mpc-remove-ms:hover { color:${P.red}; }
 
@@ -164,20 +165,19 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
     return { ...defaultPortalOpts, ...ps };
   });
 
-  // Auto-calculate pending
+  // Auto-calculate pending = billed - received
   useEffect(() => {
-    if (budget && received) {
-      const calc = Number(budget) - Number(received);
-      setPending(calc >= 0 ? String(calc) : '0');
-    }
-  }, [budget, received]);
+    const b = Number(billed) || 0;
+    const r = Number(received) || 0;
+    const calc = b - r;
+    setPending(calc >= 0 ? String(calc) : '0');
+  }, [billed, received]);
 
   // Calculate Progress Steps dynamically
-  const stepInfo = 1;
   let currentStep = 1;
   if (name && client) currentStep = 2;
-  if (currentStep === 2 && assigned.length > 0) currentStep = 3;
-  if (currentStep === 3 && budget) currentStep = 4;
+  if (name && client && (assigned.length > 0 || end)) currentStep = 3;
+  if (name && client && budget) currentStep = 4;
 
   const toggleMember = (empName) => {
     if (assigned.includes(empName)) {
@@ -285,7 +285,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
             <i className="ti ti-arrow-left" />
           </button>
         )}
-        <div style={{ fontSize: 22, fontWeight: 900, color: P.textDark }}>{editProject ? 'Edit Project' : 'Create New Project'}</div>
+        <div style={{ fontSize: 22, fontWeight: 900, color: P.textDark }}>{editProject ? 'Edit Project' : 'New Project'}</div>
       </div>
 
       <div className="mpc-create-layout">
@@ -576,7 +576,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
           {onBack && <button className="mpc-btn mpc-btn-outline" onClick={onBack}>Cancel</button>}
           <button className="mpc-btn mpc-btn-primary" onClick={handleCreate} disabled={loading} style={{ opacity: loading ? 0.7 : 1 }}>
             {loading ? <i className="ti ti-loader" style={{ animation: 'spin 1s linear infinite' }} /> : <i className="ti ti-rocket" />}
-            {loading ? (editProject ? 'Updating...' : 'Launching...') : (editProject ? 'Success Update Project' : 'Create & Launch Project')}
+            {loading ? (editProject ? 'Updating...' : 'Launching...') : (editProject ? 'Update Project' : 'New Project')}
           </button>
         </div>
       </div>

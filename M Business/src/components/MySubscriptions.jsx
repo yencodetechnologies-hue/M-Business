@@ -56,20 +56,25 @@ const InfoRow = ({ label, value, icon }) => {
 // ─── Plan Data ---------------------------------------------------------------
 const DEFAULT_PLANS = [
   {
-    name: "Trial", price: 0, icon: "Special", color: "var(--app-accent)", duration: "30 days", isTrial: true,
+    name: "Trial", price: 0, color: "var(--app-accent)", duration: "30 days", isTrial: true,
+    subtitle: "MONTHLY PLAN",
     features: ["30 Days Free Trial", "5 Projects", "5 Invoices", "Single business manage", "Managers: 1", "Clients: 5", "Employees: 20"],
     clientLimit: "5 Clients", employeeLimit: "20 Employees", managerLimit: "1 Manager manage",
-    btnLabel: "Start Free Trial"
+    btnLabel: "Start Free"
   },
   {
-    name: "Starter", price: 999, icon: "Start", color: "var(--app-accent)",
+    name: "Starter", price: 999, color: "var(--app-accent)", popular: true,
+    subtitle: "MONTHLY PLAN",
     features: ["5 Projects", "10 Invoices", "Single business manage", "Managers: 1", "Clients: 3", "Employees: 10", "Email Support"],
     clientLimit: "3 Client manage", employeeLimit: "10 Employee manage", managerLimit: "1 Manager manage",
+    btnLabel: "Upgrade"
   },
   {
-    name: "Professional", price: 2999, icon: "Launch", color: "var(--app-accent)", popular: true,
+    name: "Professional", price: 2999, color: "var(--app-accent)", popular: true,
+    subtitle: "MONTHLY PLAN",
     features: ["Unlimited Projects", "Unlimited Invoices", "Multiple business manage", "Managers: 3", "Clients: 10", "Employees: 50", "Priority Support"],
     clientLimit: "10 Client manage", employeeLimit: "50 Employee manage", managerLimit: "3 Manager manage",
+    btnLabel: "Upgrade"
   },
 ];
 
@@ -790,96 +795,75 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
   // ── No Subscription  Show Plans (Screenshot 2 Style) -------------------------
   if (!subscription) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: 32, padding: "4px 0", animation: "fadeIn 0.6s ease-out" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 32, padding: "4px 0" }}>
         {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "var(--app-sidebar)", color: "#fff", borderRadius: 12, padding: "14px 22px", fontSize: 14, fontWeight: 700, boxShadow: "0 8px 32px rgba(0,0,0,0.25)" }}>{toast}</div>}
 
-        <div style={{ textAlign: "center", marginBottom: 20 }}>
-          <h2 style={{ fontSize: 32, fontWeight: 800, color: T.text, margin: "0 0 10px", letterSpacing: "-0.5px" }}>Choose Your Plan</h2>
-          <p style={{ color: "var(--app-accent)", fontWeight: 600, fontSize: 15, margin: "0 0 4px" }}>Select the best plan for your business growth</p>
-          <div style={{ fontSize: 12, color: "rgba(var(--app-accent-rgb), 0.5)", fontWeight: 600, letterSpacing: 0.5 }}>Management Suite</div>
+        <div style={{ textAlign: "center", marginBottom: 8 }}>
+          <h2 style={{ fontSize: 34, fontWeight: 900, color: "#1e293b", margin: "0 0 10px" }}>Choose your Plan</h2>
+          <p style={{ color: "#64748b", fontSize: 15, margin: 0 }}>Select the best plan for your business growth.</p>
         </div>
 
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-          gap: 24,
-          maxWidth: 1200,
-          margin: "0 auto",
-          width: "100%"
-        }}>
-          {[...PLANS].map((plan, idx) => {
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(270px, 1fr))", gap: 24, maxWidth: 1100, margin: "0 auto", width: "100%" }}>
+          {PLANS.map((plan) => {
             const isProcessing = payLoading === plan.name;
             return (
-              <div
-                key={plan.name}
-                style={{
-                  background: "#fff",
-                  borderRadius: 24,
-                  padding: "40px 24px",
-                  border: plan.popular ? `2.5px solid var(--app-accent)` : `1px solid var(--app-border)`,
-                  boxShadow: plan.popular ? "0 20px 40px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)" : "0 10px 30px rgba(0,0,0,0.03)",
-                  position: "relative",
-                  display: "flex",
-                  flexDirection: "column",
-                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                  transform: plan.popular ? "scale(1.03)" : "scale(1)",
-                  zIndex: plan.popular ? 2 : 1
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.transform = plan.popular ? "scale(1.05)" : "scale(1.02)";
-                  e.currentTarget.style.boxShadow = "0 25px 50px rgba(0,0,0,0.08)";
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.transform = plan.popular ? "scale(1.03)" : "scale(1)";
-                  e.currentTarget.style.boxShadow = plan.popular ? "0 20px 40px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)" : "0 10px 30px rgba(0,0,0,0.03)";
-                }}
-              >
+              <div key={plan.name} style={{
+                background: "#fff",
+                borderRadius: 20,
+                padding: "36px 28px 28px",
+                border: plan.popular ? "2px solid #00BCD4" : "1.5px solid #e2e8f0",
+                boxShadow: plan.popular ? "0 8px 32px rgba(0,188,212,0.13)" : "0 4px 16px rgba(0,0,0,0.04)",
+                position: "relative",
+                display: "flex",
+                flexDirection: "column",
+              }}>
                 {plan.popular && (
                   <div style={{
-                    position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)",
-                    background: "var(--app-accent)", color: "#fff", padding: "6px 20px",
+                    position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)",
+                    background: "#00BCD4", color: "#fff", padding: "6px 22px",
                     borderRadius: 20, fontSize: 11, fontWeight: 900, textTransform: "uppercase",
-                    letterSpacing: 1, whiteSpace: "nowrap", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb),0.3)"
-                  }}>Most Popular</div>
+                    letterSpacing: 1, whiteSpace: "nowrap"
+                  }}>POPULAR</div>
                 )}
 
-                <div style={{ fontSize: 36, marginBottom: 20, textAlign: "left" }}>{plan.icon}</div>
-                <h3 style={{ fontSize: 24, fontWeight: 800, color: T.text, margin: "0 0 6px" }}>{plan.name}</h3>
-
-                <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 24 }}>
-                  <span style={{ fontSize: 42, fontWeight: 900, color: T.text, letterSpacing: "-1px" }}>
-                    {plan.price === null ? "Contact us" : `₹${plan.price.toLocaleString("en-IN")}`}
-                  </span>
-                  {plan.price !== null && <span style={{ fontSize: 14, color: T.muted, fontWeight: 700 }}>/ month</span>}
+                {/* Icon */}
+                <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#e0f7fa", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
+                  <span style={{ fontSize: 24 }}>🌱</span>
                 </div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: 14, flex: 1, marginBottom: 32 }}>
+                {/* Plan name */}
+                <h3 style={{ fontSize: 22, fontWeight: 800, color: "#1e293b", margin: "0 0 4px" }}>{plan.name}</h3>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", letterSpacing: 1, textTransform: "uppercase", marginBottom: 16 }}>{plan.subtitle || "MONTHLY PLAN"}</div>
+
+                {/* Price */}
+                <div style={{ display: "flex", alignItems: "baseline", gap: 2, marginBottom: 24 }}>
+                  <span style={{ fontSize: 40, fontWeight: 900, color: "#1e293b", letterSpacing: "-1px" }}>
+                    {plan.price === 0 ? "Free" : `Rs.${plan.price.toLocaleString("en-IN")}`}
+                  </span>
+                  {plan.price > 0 && <span style={{ fontSize: 14, color: "#94a3b8", fontWeight: 600 }}>/mo</span>}
+                </div>
+
+                {/* Features */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1, marginBottom: 28 }}>
                   {plan.features.map((f, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                      <div style={{ color: "#22C55E", fontSize: 16, marginTop: -2 }}>Yes</div>
-                      <span style={{ fontSize: 13, color: "var(--app-sidebar)", fontWeight: 500, lineHeight: 1.4 }}>{f}</span>
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{ color: "#00BCD4", fontSize: 15, flexShrink: 0 }}>✓</span>
+                      <span style={{ fontSize: 13.5, color: "#475569", fontWeight: 500 }}>{f}</span>
                     </div>
                   ))}
                 </div>
 
+                {/* Button */}
                 <button
                   onClick={() => startPayUPayment(plan)}
                   disabled={!!payLoading}
                   style={{
-                    width: "100%", padding: "14px", borderRadius: 12, fontSize: 14, fontWeight: 800,
-                    cursor: payLoading ? "wait" : "pointer", transition: "all 0.2s", fontFamily: "inherit",
-                    background: plan.name === "Enterprise" ? "#fff" : plan.popular ? "var(--app-accent)" : "rgba(var(--app-accent-rgb), 0.08)",
-                    border: plan.name === "Enterprise" ? "1.5px solid var(--app-accent)" : "none",
-                    color: plan.name === "Enterprise" ? "var(--app-accent)" : plan.popular ? "#fff" : "var(--app-accent)",
-                    boxShadow: plan.popular ? "0 8px 20px rgba(var(--app-accent-rgb), 0.3)" : "none"
-                  }}
-                  onMouseEnter={e => {
-                    if (plan.popular) e.currentTarget.style.boxShadow = "0 10px 25px rgba(var(--app-accent-rgb), 0.4)";
-                    else e.currentTarget.style.background = plan.name === "Enterprise" ? "rgba(var(--app-accent-rgb), 0.05)" : "rgba(var(--app-accent-rgb), 0.12)";
-                  }}
-                  onMouseLeave={e => {
-                    if (plan.popular) e.currentTarget.style.boxShadow = "0 8px 20px rgba(var(--app-accent-rgb), 0.3)";
-                    else e.currentTarget.style.background = plan.name === "Enterprise" ? "#fff" : "rgba(var(--app-accent-rgb), 0.08)";
+                    width: "100%", padding: "14px", borderRadius: 12, fontSize: 15, fontWeight: 800,
+                    cursor: payLoading ? "wait" : "pointer", fontFamily: "inherit", border: "none",
+                    background: plan.popular ? "#00BCD4" : "#f1f5f9",
+                    color: plan.popular ? "#fff" : "#1e293b",
+                    boxShadow: plan.popular ? "0 6px 18px rgba(0,188,212,0.3)" : "none",
+                    transition: "all 0.18s"
                   }}
                 >
                   {isProcessing ? "Processing..." : plan.btnLabel || "Get Started"}
@@ -889,8 +873,10 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
           })}
         </div>
 
-        <div style={{ textAlign: "center", marginTop: 20, color: T.muted, fontSize: 13, fontWeight: 600 }}>
-          Need a custom solution or have questions? <span style={{ color: "var(--app-accent)", cursor: "pointer", textDecoration: "underline" }}>Chat with our billing team</span> or call us at +91 98765 43210
+        <div style={{ textAlign: "center", marginTop: 8, color: "#94a3b8", fontSize: 13, fontWeight: 500 }}>
+          Need a custom solution or have questions?{" "}
+          <span style={{ color: "#00BCD4", cursor: "pointer", textDecoration: "underline" }}>Chat with our billing team</span>
+          {" "}or call us at +91 98765 43210
         </div>
       </div>
     );

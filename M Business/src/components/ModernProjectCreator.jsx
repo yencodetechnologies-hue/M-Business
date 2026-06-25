@@ -250,6 +250,8 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
         res = await axios.post(`${BASE_URL}/api/projects/add`, payload, { headers });
       }
 
+      setLoading(false); // ← reset loading BEFORE onSuccess so button is not stuck
+
       if (onSuccess) await onSuccess(res.data);
 
       // Fire-and-forget notifications (don't block on these)

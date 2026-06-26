@@ -230,7 +230,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                     { id: 'freelancer', icon: 'Job', label: 'Freelancer', sub: 'Consultant / Solo' }
                   ].map(t => (
                     <div key={t.id} onClick={() => setFormData({ ...formData, clientType: t.id })} style={{ border: `2px solid ${formData.clientType === t.id ? '#00BCD4' : '#E0E6EA'}`, borderRadius: 12, padding: '14px 12px', textAlign: 'center', cursor: 'pointer', background: formData.clientType === t.id ? '#E0F7FA' : '#fff', position: 'relative' }}>
-                      {formData.clientType === t.id && <div style={{ position: 'absolute', top: 8, right: 8, width: 18, height: 18, borderRadius: '50%', background: '#00BCD4', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>Yes</div>}
+
                       <span style={{ fontSize: 24, color: formData.clientType === t.id ? '#00BCD4' : '#94A3B0', display: 'block', marginBottom: 6 }}>{t.icon}</span>
                       <div style={{ fontSize: 13, fontWeight: 600, color: formData.clientType === t.id ? '#0097A7' : '#5A6A7A' }}>{t.label}</div>
                       <div style={{ fontSize: 11, color: '#94A3B0', marginTop: 2 }}>{t.sub}</div>

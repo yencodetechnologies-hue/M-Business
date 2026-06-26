@@ -91,6 +91,7 @@ const getStatusColor = (s) => ({ active: T.success, completed: T.success, paid: 
 // ─── Plan Picker Modal (Choose Your Plan) ------------------------------------
 function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onStartTrial, PLANS }) {
   const currentPlan = subscription?.planName;
+  const trialAlreadyUsed = subscription?.isTrial || subscription?.planName === 'Trial' || (subscription && subscription.billingCycle === 'trial');
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 99990, background: "linear-gradient(135deg,#e0f7fa 0%,#e8f5e9 50%,#e3f2fd 100%)", overflowY: "auto", display: "flex", flexDirection: "column" }}>
       <style>{`
@@ -165,7 +166,7 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
                 <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 11, marginBottom: 28 }}>
                   {plan.features.map((f, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 9 }}>
-                      <span style={{ color: "#00897b", fontSize: 15, flexShrink: 0, fontWeight: 700 }}>Yes</span>
+                      <span style={{ color: "#00897b", fontSize: 15, flexShrink: 0, fontWeight: 700 }}>✓</span>
                       <span style={{ fontSize: 13.5, color: "#475569", fontWeight: 500 }}>{f}</span>
                     </div>
                   ))}
@@ -174,8 +175,8 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
                 {/* Action Button */}
                 <button
                   className="pp-btn"
-                  disabled={(isCurrent && subscription?.status === "active") || !!payLoading}
-                  onClick={() => plan.isTrial ? onStartTrial() : onSelectPlan(plan)}
+                  disabled={(isCurrent && subscription?.status === "active") || !!payLoading || (plan.isTrial && trialAlreadyUsed)}
+                  onClick={() => plan.isTrial ? (trialAlreadyUsed ? null : onStartTrial()) : onSelectPlan(plan)}
                   style={{
                     width: "100%", padding: "14px", borderRadius: 12, fontSize: 15, fontWeight: 800,
                     fontFamily: "inherit", border: "none",
@@ -197,7 +198,7 @@ function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onSt
                     boxShadow: isPopular && !isCurrent ? "0 6px 18px rgba(0,137,123,0.3)" : "none"
                   }}
                 >
-                  {isProcessing ? "Processing..." : (isCurrent && subscription?.status === "active") ? "✓ Current Plan" : (isCurrent && subscription?.status !== "active") ? "Renew Plan" : plan.btnLabel || "Get Started"}
+                  {isProcessing ? "Processing..." : (isCurrent && subscription?.status === "active") ? "✓ Current Plan" : (isCurrent && subscription?.status !== "active") ? "Renew Plan" : (plan.isTrial && trialAlreadyUsed) ? "Trial Used" : plan.btnLabel || "Get Started"}
                 </button>
               </div>
             );
@@ -598,16 +599,19 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
   const startTrial = async (targetPkg = null) => {
     try {
       setPayLoading("Trial");
-      const payload = {
-        amount: plan.amount, // numeric, no trailing .00
-        productinfo: plan.name,
-        firstname: user.firstName,
-        email: user.email,
-        phone: user.phone || ''
-      };
-      const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
+      const res = await axios.post(`${BASE_URL}/api/subscriptions/start-trial`, {
+        userId: user._id || user.id,
+        userEmail: user.email,
+        userName: user.firstName || user.name || "User",
+        planName: targetPkg?.title || "Free Trial",
+        features: targetPkg?.features || ["30 Days Free Trial", "5 Projects", "5 Invoices", "Single business manage", "Managers: 1", "Clients: 5", "Employees: 20"],
+        clientLimit: targetPkg?.clientLimit || "5",
+        employeeLimit: targetPkg?.employeeLimit || "20",
+        managerLimit: targetPkg?.managerLimit || "1",
+        businessLimit: targetPkg?.businessLimit || "1"
+      });
       if (res.data.success) {
-        showToast(`Celebration 30-day free trial started${targetPkg ? ` with ${targetPkg.title}` : ""}!`);
+        showToast(`30-day free trial started successfully!`);
         await fetchData();
         if (onSubscriptionSuccess) onSubscriptionSuccess();
         else window.location.href = "/";
@@ -798,56 +802,58 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
       <div style={{ display: "flex", flexDirection: "column", gap: 32, padding: "4px 0" }}>
         {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "var(--app-sidebar)", color: "#fff", borderRadius: 12, padding: "14px 22px", fontSize: 14, fontWeight: 700, boxShadow: "0 8px 32px rgba(0,0,0,0.25)" }}>{toast}</div>}
 
-        <div style={{ textAlign: "center", marginBottom: 8 }}>
-          <h2 style={{ fontSize: 34, fontWeight: 900, color: "#1e293b", margin: "0 0 10px" }}>Choose your Plan</h2>
-          <p style={{ color: "#64748b", fontSize: 15, margin: 0 }}>Select the best plan for your business growth.</p>
+        <div style={{ textAlign: "center", marginBottom: 44 }}>
+          <h2 style={{ fontSize: 36, fontWeight: 900, color: "#00897b", margin: "0 0 10px", letterSpacing: "-0.5px" }}>Choose Your Plan</h2>
+          <p style={{ color: "#00796b", fontSize: 15, margin: "0 0 6px", fontWeight: 500 }}>Select the best plan for your business growth</p>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(270px, 1fr))", gap: 24, maxWidth: 1100, margin: "0 auto", width: "100%" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(270px, 1fr))", gap: 28, maxWidth: 1100, margin: "0 auto", width: "100%", alignItems: "stretch" }}>
           {PLANS.map((plan) => {
             const isProcessing = payLoading === plan.name;
+            const trialAlreadyUsed = plan.isTrial && subscription?.isTrial;
             return (
               <div key={plan.name} style={{
                 background: "#fff",
                 borderRadius: 20,
-                padding: "36px 28px 28px",
-                border: plan.popular ? "2px solid #00BCD4" : "1.5px solid #e2e8f0",
-                boxShadow: plan.popular ? "0 8px 32px rgba(0,188,212,0.13)" : "0 4px 16px rgba(0,0,0,0.04)",
+                padding: "36px 26px 28px",
+                border: plan.popular ? "2.5px solid #00897b" : "1.5px solid #e0f2f1",
+                boxShadow: plan.popular ? "0 16px 48px rgba(0,137,123,0.16)" : "0 6px 24px rgba(0,0,0,0.05)",
                 position: "relative",
                 display: "flex",
                 flexDirection: "column",
+                transform: plan.popular ? "scale(1.035)" : "scale(1)",
+                transition: "transform 0.22s, box-shadow 0.22s",
               }}>
                 {plan.popular && (
                   <div style={{
-                    position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)",
-                    background: "#00BCD4", color: "#fff", padding: "6px 22px",
-                    borderRadius: 20, fontSize: 11, fontWeight: 900, textTransform: "uppercase",
-                    letterSpacing: 1, whiteSpace: "nowrap"
-                  }}>POPULAR</div>
+                    position: "absolute", top: -1, right: -1,
+                    background: "#00897b", color: "#fff", padding: "7px 18px",
+                    borderRadius: "0 18px 0 14px", fontSize: 11, fontWeight: 900,
+                    textTransform: "uppercase", letterSpacing: 1
+                  }}>Most Popular</div>
                 )}
 
                 {/* Icon */}
-                <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#e0f7fa", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
-                  <span style={{ fontSize: 24 }}>🌱</span>
+                <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#e0f7fa", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
+                  <span style={{ fontSize: 28 }}>🌱</span>
                 </div>
 
                 {/* Plan name */}
-                <h3 style={{ fontSize: 22, fontWeight: 800, color: "#1e293b", margin: "0 0 4px" }}>{plan.name}</h3>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", letterSpacing: 1, textTransform: "uppercase", marginBottom: 16 }}>{plan.subtitle || "MONTHLY PLAN"}</div>
+                <h3 style={{ fontSize: 24, fontWeight: 900, color: plan.popular ? "#00897b" : "#1e293b", margin: "0 0 16px" }}>{plan.name}</h3>
 
                 {/* Price */}
-                <div style={{ display: "flex", alignItems: "baseline", gap: 2, marginBottom: 24 }}>
-                  <span style={{ fontSize: 40, fontWeight: 900, color: "#1e293b", letterSpacing: "-1px" }}>
-                    {plan.price === 0 ? "Free" : `Rs.${plan.price.toLocaleString("en-IN")}`}
+                <div style={{ display: "flex", alignItems: "baseline", gap: 3, marginBottom: 28 }}>
+                  <span style={{ fontSize: 42, fontWeight: 900, color: "#1e293b", letterSpacing: "-1px" }}>
+                    {plan.price === 0 ? "₹0" : `₹${plan.price.toLocaleString("en-IN")}`}
                   </span>
-                  {plan.price > 0 && <span style={{ fontSize: 14, color: "#94a3b8", fontWeight: 600 }}>/mo</span>}
+                  <span style={{ fontSize: 14, color: "#94a3b8", fontWeight: 600 }}> / month</span>
                 </div>
 
                 {/* Features */}
-                <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1, marginBottom: 28 }}>
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 11, marginBottom: 28 }}>
                   {plan.features.map((f, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <span style={{ color: "#00BCD4", fontSize: 15, flexShrink: 0 }}>✓</span>
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 9 }}>
+                      <span style={{ color: "#00897b", fontSize: 15, flexShrink: 0, fontWeight: 700 }}>✓</span>
                       <span style={{ fontSize: 13.5, color: "#475569", fontWeight: 500 }}>{f}</span>
                     </div>
                   ))}
@@ -855,27 +861,31 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
 
                 {/* Button */}
                 <button
-                  onClick={() => startPayUPayment(plan)}
-                  disabled={!!payLoading}
+                  onClick={() => trialAlreadyUsed ? null : startPayUPayment(plan)}
+                  disabled={!!payLoading || trialAlreadyUsed}
                   style={{
                     width: "100%", padding: "14px", borderRadius: 12, fontSize: 15, fontWeight: 800,
-                    cursor: payLoading ? "wait" : "pointer", fontFamily: "inherit", border: "none",
-                    background: plan.popular ? "#00BCD4" : "#f1f5f9",
-                    color: plan.popular ? "#fff" : "#1e293b",
-                    boxShadow: plan.popular ? "0 6px 18px rgba(0,188,212,0.3)" : "none",
+                    cursor: (payLoading || trialAlreadyUsed) ? "not-allowed" : "pointer",
+                    fontFamily: "inherit", border: "none",
+                    background: trialAlreadyUsed ? "#e0f2f1" : plan.popular ? "#00897b" : "#e0f2f1",
+                    color: trialAlreadyUsed ? "#80cbc4" : plan.popular ? "#fff" : "#00897b",
+                    boxShadow: plan.popular && !trialAlreadyUsed ? "0 6px 18px rgba(0,137,123,0.3)" : "none",
                     transition: "all 0.18s"
                   }}
                 >
-                  {isProcessing ? "Processing..." : plan.btnLabel || "Get Started"}
+                  {isProcessing ? "Processing..." : trialAlreadyUsed ? "Trial Used" : plan.btnLabel || "Get Started"}
                 </button>
               </div>
             );
           })}
         </div>
 
+        <div style={{ textAlign: "center", marginTop: 32, color: "#80cbc4", fontSize: 13, fontWeight: 500 }}>
+          Secure payment · Cancel anytime · 24/7 support
+        </div>
         <div style={{ textAlign: "center", marginTop: 8, color: "#94a3b8", fontSize: 13, fontWeight: 500 }}>
           Need a custom solution or have questions?{" "}
-          <span style={{ color: "#00BCD4", cursor: "pointer", textDecoration: "underline" }}>Chat with our billing team</span>
+          <span style={{ color: "#00897b", cursor: "pointer", textDecoration: "underline" }}>Chat with our billing team</span>
           {" "}or call us at +91 98765 43210
         </div>
       </div>

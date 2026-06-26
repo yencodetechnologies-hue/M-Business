@@ -2733,7 +2733,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
               </div>
             ) : (
               <div style={{ padding: "16px 18px" }}>
-                {displayGroups.length === 0 && (<div style={{ textAlign: "center", padding: 60 }}><div style={{ fontSize: 44, marginBottom: 10 }}>Document</div><div style={{ fontSize: 15, fontWeight: 700, color: P.text, marginBottom: 5 }}>No tasks found</div><div style={{ fontSize: 13, color: P.muted }}>Clear filters or add a new task</div></div>)}
+                {displayGroups.length === 0 && (<div style={{ textAlign: "center", padding: 60 }}><div style={{ fontSize: 44, marginBottom: 10 }}>📂</div><div style={{ fontSize: 15, fontWeight: 700, color: P.text, marginBottom: 5 }}>No tasks found</div><div style={{ fontSize: 13, color: P.muted }}>Clear filters or add a new task</div></div>)}
                 {displayGroups.map(g => (
                   <GroupBlock key={g._id || g.id} group={g} isVirtual={!!g.isVirtual}
                     onToggle={toggleGroup} onCheck={toggleCheck}

@@ -1731,6 +1731,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [active, setActive] = useState(() => localStorage.getItem("activeTab_dashboard") || "dashboard");
   useEffect(() => { localStorage.setItem("activeTab_dashboard", active); }, [active]);
   const [modal, setModal] = useState(null);
+  const [prefillClientName, setPrefillClientName] = useState("");
+
+  // Ensure np.client is synced when prefillClientName is set
+  useEffect(() => {
+    if (prefillClientName && modal === "project") {
+      setNp(prev => ({ ...prev, client: prefillClientName }));
+    }
+  }, [prefillClientName, modal]);
   const [showProfile, setShowProfile] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [companyLogo, setCompanyLogo] = useState(user?.logoUrl ? user.logoUrl : (fixedLogo || null));
@@ -2060,10 +2068,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           {/* ── Pages using new components ── */}
           {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onAddClient={() => setActive("addClient")} onCreateProject={(c) => {
+            const clientName = c.clientName || c.name || "";
+            setPrefillClientName(clientName);
             setNpError({});
             setNp({
               name: "",
-              client: c.clientName || c.name || "",
+              client: clientName,
               contactPersonName: c.contactPersonName || "",
               contactPersonNo: c.contactPersonNo || c.phone || "",
               contactEmail: c.email || "",
@@ -2308,31 +2318,39 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       </Mdl>}
 
       {/* ── Add Project Modal ── */}
-      {modal === "project" && <Mdl title="Create New Project" onClose={() => setModal(null)}>
+      {modal === "project" && <Mdl title="Create New Project" onClose={() => { setModal(null); setPrefillClientName(""); }}>
         <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
           <Fld label="Project Name *" value={np.name} onChange={v => { setNp({ ...np, name: v }); setNpError(p => ({ ...p, name: "" })); }} error={npError.name} />
           <div style={{ marginBottom: 14 }}>
             <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label>
-            <ClientDropdown
-              clients={clients}
-              value={np.client}
-              onChange={v => {
-                const sel = clients.find(c => (c.clientName || c.name) === v);
-                setNp({
-                  ...np,
-                  client: v,
-                  companyName: sel?.companyName || sel?.company || np.companyName,
-                  phone: sel?.phone || np.phone,
-                  address: sel?.address || np.address,
-                  contactPersonName: sel?.contactPersonName || np.contactPersonName,
-                  contactPersonNo: sel?.contactPersonNo || np.contactPersonNo,
-                  contactEmail: sel?.email || np.contactEmail,
-                });
-                setNpError(p => ({ ...p, client: "" }));
-              }}
-              error={npError.client}
-              onAddClient={() => { setModal("client"); setNcError({}); setShowClientPass(false); }}
-            />
+            {prefillClientName ? (
+              <div style={{ border: "1.5px solid var(--app-accent)", borderRadius: 10, padding: "10px 14px", fontSize: 13, background: "var(--app-bg)", display: "flex", alignItems: "center", gap: 8, minHeight: 42 }}>
+                <div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700 }}>{prefillClientName[0].toUpperCase()}</div>
+                <span style={{ fontWeight: 600, color: "var(--app-accent)" }}>{prefillClientName}</span>
+                <span style={{ marginLeft: "auto", fontSize: 10, background: "#f3e8ff", color: "var(--app-accent)", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>Auto-selected</span>
+              </div>
+            ) : (
+              <ClientDropdown
+                clients={clients}
+                value={np.client}
+                onChange={v => {
+                  const sel = clients.find(c => (c.clientName || c.name) === v);
+                  setNp({
+                    ...np,
+                    client: v,
+                    companyName: sel?.companyName || sel?.company || np.companyName,
+                    phone: sel?.phone || np.phone,
+                    address: sel?.address || np.address,
+                    contactPersonName: sel?.contactPersonName || np.contactPersonName,
+                    contactPersonNo: sel?.contactPersonNo || np.contactPersonNo,
+                    contactEmail: sel?.email || np.contactEmail,
+                  });
+                  setNpError(p => ({ ...p, client: "" }));
+                }}
+                error={npError.client}
+                onAddClient={() => { setModal("client"); setNcError({}); setShowClientPass(false); }}
+              />
+            )}
             {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {npError.client}</div>}
           </div>
           <Fld label="Purpose" value={np.purpose} onChange={v => setNp({ ...np, purpose: v })} />
@@ -2413,8 +2431,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         </div>
         <Fld label="Description" value={np.description} onChange={v => setNp({ ...np, description: v })} />
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
-          <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-          <button onClick={addProject} disabled={projSaveLoading} style={{ ...B("var(--app-muted)"), opacity: projSaveLoading ? 0.7 : 1 }}>{projSaveLoading ? "Saving..." : "Save Project "}</button>
+          <button onClick={() => { setModal(null); setPrefillClientName(""); }} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+          <button onClick={() => { addProject(); setPrefillClientName(""); }} disabled={projSaveLoading} style={{ ...B("var(--app-muted)"), opacity: projSaveLoading ? 0.7 : 1 }}>{projSaveLoading ? "Saving..." : "Save Project "}</button>
         </div>
       </Mdl>}
 

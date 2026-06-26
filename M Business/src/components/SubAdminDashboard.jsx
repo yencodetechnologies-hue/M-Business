@@ -12070,56 +12070,40 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
             {/* ── Add Project Modal ── */}
-
-            {modal === "project" && <Mdl title="Create New Project" onClose={() => setModal(null)}>
-
+            {modal === "project" && <Mdl title="Create New Project" onClose={() => { setModal(null); setPrefillClient(null); }}>
               <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-
                 <Fld label="Project Name *" value={np.name} onChange={v => { setNp({ ...np, name: v }); setNpError(p => ({ ...p, name: "" })); }} error={npError.name} />
-
                 <div style={{ marginBottom: 14 }}>
-
-                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label>
-                  <ClientDropdown
-                    clients={clients}
-                    value={np.client}
-                    onChange={v => {
-                      const sel = clients.find(c => (c.clientName || c.name) === v);
-                      setNp({
-                        ...np,
-                        client: v,
-                        companyName: sel?.companyName || sel?.company || "",
-                        phone: sel?.phone || "",
-                        address: sel?.address || "",
-                        contactPersonName: sel?.contactPersonName || "",
-                        contactPersonNo: sel?.contactPersonNo || sel?.phone || "",
-                        contactEmail: sel?.email || "",
-                      });
-                      setNpError(p => ({ ...p, client: "" }));
-                    }}
-
-                    error={npError.client}
-
-                    onAddClient={() => {
-
-                      const limit = getSubscriptionLimit("client");
-
-                      if (subscription && clients.length >= limit) {
-
-                        setLimitModal({ type: "client", limit });
-
-                        return;
-
-                      }
-
-                      setReturnToModal(modal); setModal("client"); setNcError({}); setShowClientPass(false);
-
-                    }}
-
-                  />
-
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CLIENT *</label>
+                  {prefillClient ? (
+                    <div style={{ border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "var(--app-text, #333)", background: "var(--app-bg)", fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 16 }}>👤</span>
+                      <span>{np.client}</span>
+                      <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--app-accent)", background: "rgba(124,58,237,0.08)", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>Auto-filled</span>
+                    </div>
+                  ) : (
+                    <ClientDropdown
+                      clients={clients}
+                      value={np.client}
+                      onChange={v => {
+                        const sel = clients.find(c => (c.clientName || c.name) === v);
+                        setNp({
+                          ...np,
+                          client: v,
+                          companyName: sel?.companyName || sel?.company || np.companyName,
+                          phone: sel?.phone || np.phone,
+                          address: sel?.address || np.address,
+                          contactPersonName: sel?.contactPersonName || np.contactPersonName,
+                          contactPersonNo: sel?.contactPersonNo || np.contactPersonNo,
+                          contactEmail: sel?.email || np.contactEmail,
+                        });
+                        setNpError(p => ({ ...p, client: "" }));
+                      }}
+                      error={npError.client}
+                      onAddClient={() => { setModal("client"); setNcError({}); setShowClientPass(false); }}
+                    />
+                  )}
                   {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {npError.client}</div>}
-
                 </div>
 
                 <Fld label="Contact Person Name" value={np.contactPersonName} onChange={v => setNp({ ...np, contactPersonName: v })} />

@@ -591,7 +591,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
               </div>
             ) : shown.length === 0 ? (
               <div style={{ textAlign: "center", padding: 40 }}>
-                <div style={{ fontSize: 40, marginBottom: 10 }}>Date</div>
+                <div style={{ fontSize: 18, marginBottom: 10 }}>📅</div>
                 <div style={{ fontSize: 14, fontWeight: 700, color: finalTheme.text || "var(--app-text)" }}>
                   {search || selectedDate ? "No events found" : "No events yet!"}
                 </div>
@@ -1012,5 +1012,3 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
     </div>
   );
 }
-
-

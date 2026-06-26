@@ -333,31 +333,59 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
               <div className="mpc-form-group">
                 <label>Client *</label>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  <select
-                    value={client}
-                    onChange={e => {
-                      const selectedName = e.target.value;
-                      if (selectedName === '__add_client__') {
-                        setShowAddClient(true);
-                        return;
-                      }
-                      setClient(selectedName);
-                      const sel = clients.find(c => (c.clientName || c.name) === selectedName);
-                      if (sel) {
-                        setContactPersonName(sel.contactPersonName || '');
-                        setContactPersonNo(sel.contactPersonNo || sel.phone || '');
-                        setContactEmail(sel.email || '');
-                        setCompanyName(sel.companyName || sel.company || '');
-                        setClientPhone(sel.phone || '');
-                        setClientAddress(sel.address || '');
-                      }
-                    }}
-                    style={{ flex: 1 }}
-                  >
-                    <option value="">Select client...</option>
-                    <option value="__add_client__" style={{ color: "var(--app-accent)", fontWeight: 400 }}>➕ Add New Client</option>
-                    {clients.map(c => <option key={c._id || c.id} value={c.clientName || c.name}>{c.clientName || c.name}</option>)}
-                  </select>
+                  {prefillClient ? (
+                    <div style={{
+                      flex: 1,
+                      padding: '11px 14px',
+                      border: '1.5px solid #00BCD4',
+                      borderRadius: 10,
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: '#0D2027',
+                      background: '#E0F7FA',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      minHeight: 44,
+                    }}>
+                      <div style={{
+                        width: 28, height: 28, borderRadius: '50%',
+                        background: 'linear-gradient(135deg,#00BCD4,#0097A7)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: '#fff', fontSize: 12, fontWeight: 800, flexShrink: 0
+                      }}>
+                        {client[0]?.toUpperCase() || '?'}
+                      </div>
+                      <span>{client}</span>
+
+                    </div>
+                  ) : (
+                    <select
+                      value={client}
+                      onChange={e => {
+                        const selectedName = e.target.value;
+                        if (selectedName === '__add_client__') {
+                          setShowAddClient(true);
+                          return;
+                        }
+                        setClient(selectedName);
+                        const sel = clients.find(c => (c.clientName || c.name) === selectedName);
+                        if (sel) {
+                          setContactPersonName(sel.contactPersonName || '');
+                          setContactPersonNo(sel.contactPersonNo || sel.phone || '');
+                          setContactEmail(sel.email || '');
+                          setCompanyName(sel.companyName || sel.company || '');
+                          setClientPhone(sel.phone || '');
+                          setClientAddress(sel.address || '');
+                        }
+                      }}
+                      style={{ flex: 1 }}
+                    >
+                      <option value="">Select client...</option>
+                      <option value="__add_client__" style={{ color: "var(--app-accent)", fontWeight: 400 }}>➕ Add New Client</option>
+                      {clients.map(c => <option key={c._id || c.id} value={c.clientName || c.name}>{c.clientName || c.name}</option>)}
+                    </select>
+                  )}
                 </div>
 
                 {/* Inline Add Client Modal */}

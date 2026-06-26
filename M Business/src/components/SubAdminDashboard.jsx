@@ -9240,7 +9240,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <>
 
-                  <button className="create-btn" onClick={() => { setNpError({}); setActive("create-project"); }}><i className="ti ti-plus"></i> New Project</button>
+                  <button className="create-btn" onClick={() => { setNpError({}); setJumpProject(null); setActive("create-project"); }}><i className="ti ti-plus"></i> New Project</button>
 
 
 

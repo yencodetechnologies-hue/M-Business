@@ -145,7 +145,7 @@ exports.initPayU = async (req, res) => {
     console.log('[PayU] hash generated successfully');
 
     // ── Callback URLs ───────────────────────────────────────────────────
-    const backendUrl = (process.env.BASE_URL || 'http://localhost:5008').replace(/\/$/, '');
+    const backendUrl = (process.env.BASE_URL || 'https://www.mbusiness.cloud/').replace(/\/$/, '');
     const surl = `${backendUrl}/api/payments/payu/success`;
     const furl = `${backendUrl}/api/payments/payu/failure`;
     const env = process.env.PAYU_ENV === 'prod' ? 'prod' : 'test';

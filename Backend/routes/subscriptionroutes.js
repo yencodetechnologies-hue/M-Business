@@ -77,7 +77,7 @@ router.post("/start-trial", async (req, res) => {
     const { userId, userEmail, userName } = req.body;
     if (!userId || !userEmail) return res.status(400).json({ error: "userId and userEmail required" });
 
-    // Check if already had a trial — block by userId AND email
+    // Check if already had a trial — block by userId OR email, active OR expired
     const existingTrial = await Subscription.findOne({
       $or: [
         { userId, isTrial: true },

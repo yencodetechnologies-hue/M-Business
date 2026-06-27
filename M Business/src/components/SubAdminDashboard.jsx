@@ -6038,8 +6038,7 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
         }}>
 
           {displayedPackages.map((p, idx) => {
-
-            const isPro = (p.title || "").toLowerCase().includes("pro") || (p.title || "").toLowerCase().includes("premium") || idx === 1;
+            const isPro = (p.title || "").toLowerCase().includes("starter") || (p.title || "").toLowerCase() === "popular";
 
             const features = Array.isArray(p.features) ? p.features : (p.features || "").split(/[\n,]/).map(f => f.trim()).filter(Boolean);
 
@@ -9332,7 +9331,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           <div className="content">
 
-            <EmployeeSubscriptionWarning user={user} trigger={subscription?.updatedAt || subscription?._id} onRenew={() => { setForceUpgradeTab(true); setActive("mysubscriptions"); }} />
+         <EmployeeSubscriptionWarning user={user} trigger={subscription?.updatedAt || subscription?._id} onRenew={() => { setForceUpgradeTab(true); setActive("mysubscriptions"); setTimeout(() => { const el = document.querySelector('.plan-card, .plans-grid, [class*="upgrade"]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 400); }} />
 
 
 

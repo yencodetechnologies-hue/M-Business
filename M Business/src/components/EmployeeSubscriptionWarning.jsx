@@ -39,7 +39,7 @@ export default function EmployeeSubscriptionWarning({ user, onRenew, trigger }) 
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 14, fontWeight: 800, color: "#f1f5f9", marginBottom: 4 }}>Access Restricted</div>
           <div style={{ fontSize: 13, color: "#cbd5e1", wordBreak: "break-word" }}>
-            {onRenew 
+            {onRenew
               ? "Your subscription has expired. Please renew your plan to restore access."
               : "Your company's subscription has expired. Please contact your administrator to restore access."}
           </div>
@@ -64,7 +64,7 @@ export default function EmployeeSubscriptionWarning({ user, onRenew, trigger }) 
           marginBottom: 16, display: "flex", alignItems: "center", gap: 12,
           flexWrap: "wrap"
         }}>
-          <div style={{ fontSize: 22 }}>Block</div>
+          <div style={{ fontSize: 22 }}>🚫</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: "#991b1b", marginBottom: 3 }}>Subscription Expired</div>
             <div style={{ fontSize: 13, color: "#7f1d1d", wordBreak: "break-word" }}>

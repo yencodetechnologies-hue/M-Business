@@ -1603,7 +1603,264 @@ export default function ClientDashboard({ user, setUser, portalMode = false }) {
       </div>
     );
   }
+  // ── OVERVIEW SECTION ─────────────────────────────────────────
+  function renderOverviewSection() {
+    const totalProjects = projects.length;
+    const activeProjects = projects.filter(p => {
+      const s = (p.status || '').toLowerCase();
+      return s === 'active' || s === 'in progress' || s === 'pending';
+    }).length;
+    const completedProjects = projects.filter(p => {
+      const s = (p.status || '').toLowerCase();
+      return s === 'completed' || s === 'done';
+    }).length;
 
+    // Overall progress = average of all project progress values
+    const overallProgress = totalProjects > 0
+      ? Math.round(projects.reduce((sum, p) => {
+        const s = (p.status || '').toLowerCase();
+        const pct = p.progress ?? (s === 'completed' || s === 'done' ? 100 : s === 'in progress' ? 55 : 20);
+        return sum + pct;
+      }, 0) / totalProjects)
+      : 0;
+
+    // Recent updates: project updates + notifications, newest first
+    const recentUpdates = [
+      ...projects.flatMap(p =>
+        (p.updates || []).map(u => ({
+          text: u.text || u.title || `Update on ${p.name}`,
+          date: u.date ? new Date(u.date) : null,
+          icon: 'ti-speakerphone',
+          color: C.teal,
+          bg: C.tealLight,
+          project: p.name,
+        }))
+      ),
+      ...notifs.map(n => ({
+        text: n.message || n.title || 'New notification',
+        date: n.createdAt ? new Date(n.createdAt) : null,
+        icon: 'ti-bell',
+        color: C.purple,
+        bg: C.purpleBg,
+        project: null,
+      })),
+      ...tasks
+        .filter(t => t.status === 'Done' || t.status === 'Completed')
+        .map(t => ({
+          text: `Task completed: ${t.title || t.name}`,
+          date: t.updatedAt ? new Date(t.updatedAt) : (t.createdAt ? new Date(t.createdAt) : null),
+          icon: 'ti-circle-check',
+          color: C.green,
+          bg: C.greenBg,
+          project: t.project || null,
+        })),
+    ]
+      .filter(u => u.date)
+      .sort((a, b) => b.date - a.date)
+      .slice(0, 5);
+
+    const fmt = (d) => d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+    const statCards = [
+      {
+        label: 'Total Projects',
+        value: totalProjects,
+        icon: 'ti-folder',
+        color: C.teal,
+        bg: C.tealLight,
+        sub: `${completedProjects} completed`,
+      },
+      {
+        label: 'Active Projects',
+        value: activeProjects,
+        icon: 'ti-player-play',
+        color: C.blue,
+        bg: C.blueBg,
+        sub: 'Currently running',
+      },
+      {
+        label: 'Completed',
+        value: completedProjects,
+        icon: 'ti-circle-check',
+        color: C.green,
+        bg: C.greenBg,
+        sub: `${totalProjects > 0 ? Math.round((completedProjects / totalProjects) * 100) : 0}% success rate`,
+      },
+      {
+        label: 'Overall Progress',
+        value: `${overallProgress}%`,
+        icon: 'ti-chart-line',
+        color: C.amber,
+        bg: C.amberBg,
+        sub: 'Across all projects',
+      },
+    ];
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+        {/* Stat Cards */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+          gap: 16,
+        }}>
+          {statCards.map((card, i) => (
+            <div key={i} style={{
+              background: C.surface,
+              border: `1.5px solid ${C.border}`,
+              borderRadius: 16,
+              padding: '20px 18px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 10,
+              boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+            }}>
+              <div style={{
+                width: 40, height: 40, borderRadius: 12,
+                background: card.bg, color: card.color,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 20,
+              }}>
+                <i className={`ti ${card.icon}`}></i>
+              </div>
+              <div style={{ fontSize: 28, fontWeight: 900, color: C.text, lineHeight: 1 }}>
+                {card.value}
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: C.text2 }}>{card.label}</div>
+                <div style={{ fontSize: 11, color: C.text3, marginTop: 2 }}>{card.sub}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Overall Progress Bar */}
+        <div style={{
+          background: C.surface,
+          border: `1.5px solid ${C.border}`,
+          borderRadius: 16,
+          padding: '20px 22px',
+          boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: C.text2 }}>Overall Project Progress</div>
+            <div style={{
+              fontSize: 13, fontWeight: 800, color: C.teal,
+              background: C.tealLight, padding: '3px 12px', borderRadius: 20,
+            }}>{overallProgress}%</div>
+          </div>
+          <div style={{ background: C.border, borderRadius: 8, height: 10, overflow: 'hidden', marginBottom: 18 }}>
+            <div style={{
+              width: `${overallProgress}%`, height: '100%',
+              background: `linear-gradient(90deg, ${C.teal}, ${C.teal2 || C.teal})`,
+              borderRadius: 8,
+              transition: 'width 0.6s ease',
+            }} />
+          </div>
+
+          {/* Per-project breakdown */}
+          {projects.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {projects.map((p, i) => {
+                const s = (p.status || '').toLowerCase();
+                const pct = p.progress ?? (s === 'completed' || s === 'done' ? 100 : s === 'in progress' ? 55 : 20);
+                const isComplete = pct === 100;
+                const barColor = isComplete ? C.green : pct > 60 ? C.teal : pct > 30 ? C.amber : C.red;
+                const statusLabel = p.status || 'Pending';
+                const statusColor = isComplete ? C.green : s === 'in progress' || s === 'active' ? C.teal : C.amber;
+                const deadline = p.end || p.deadline;
+                return (
+                  <div key={p._id || i}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{p.name}</span>
+                        <span style={{
+                          fontSize: 10, fontWeight: 700,
+                          background: `${statusColor}18`, color: statusColor,
+                          padding: '2px 8px', borderRadius: 20,
+                        }}>{statusLabel}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        {deadline && (
+                          <span style={{ fontSize: 11, color: C.text3 }}>
+                            Due {new Date(deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </span>
+                        )}
+                        <span style={{ fontSize: 13, fontWeight: 800, color: barColor }}>{pct}%</span>
+                      </div>
+                    </div>
+                    <div style={{ background: C.border, borderRadius: 6, height: 7, overflow: 'hidden' }}>
+                      <div style={{
+                        width: `${pct}%`, height: '100%',
+                        background: barColor, borderRadius: 6,
+                        transition: 'width 0.5s ease',
+                      }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', color: C.text3, fontSize: 13, padding: '12px 0' }}>
+              No projects assigned yet.
+            </div>
+          )}
+        </div>
+
+        {/* Recent Updates */}
+        <div style={{
+          background: C.surface,
+          border: `1.5px solid ${C.border}`,
+          borderRadius: 16,
+          padding: '20px 22px',
+          boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+        }}>
+          <div style={{ fontSize: 13, fontWeight: 800, color: C.text2, marginBottom: 16 }}>
+            Recent Updates
+          </div>
+          {recentUpdates.length === 0 ? (
+            <div style={{ textAlign: 'center', color: C.text3, fontSize: 13, padding: '16px 0' }}>
+              No recent updates yet.
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+              {recentUpdates.map((u, i) => (
+                <div key={i} style={{
+                  display: 'flex', gap: 14, alignItems: 'flex-start',
+                  paddingBottom: i < recentUpdates.length - 1 ? 14 : 0,
+                  marginBottom: i < recentUpdates.length - 1 ? 14 : 0,
+                  borderBottom: i < recentUpdates.length - 1 ? `1px solid ${C.border}` : 'none',
+                }}>
+                  <div style={{
+                    width: 34, height: 34, borderRadius: 10,
+                    background: u.bg, color: u.color,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 16, flexShrink: 0,
+                  }}>
+                    <i className={`ti ${u.icon}`}></i>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: C.text, lineHeight: 1.4 }}>{u.text}</div>
+                    {u.project && (
+                      <div style={{ fontSize: 11, color: u.color, fontWeight: 700, marginTop: 2 }}>
+                        {u.project}
+                      </div>
+                    )}
+                    <div style={{ fontSize: 11, color: C.text3, marginTop: 3, display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <i className="ti ti-clock" style={{ fontSize: 11 }}></i>
+                      {fmt(u.date)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+      </div>
+    );
+  }
   // Render Activity Feed helper
   function renderActivityFeed() {
     // Build from backend: project updates + notifications
@@ -1700,6 +1957,17 @@ export default function ClientDashboard({ user, setUser, portalMode = false }) {
 
         {active === "dashboard" && (
           <>
+            {/* Overview */}
+            <div>
+              <div className="sec-header">
+                <div className="sec-title">
+                  <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-layout-dashboard"></i></div>
+                  Overview
+                </div>
+              </div>
+              {renderOverviewSection()}
+            </div>
+
             {/* Timeline */}
             <div>
               <div className="sec-header">

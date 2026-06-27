@@ -9467,11 +9467,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                             <div style={{
 
-                              width: 8, height: 8, borderRadius: "50%",
+                              width: 20, height: 20, borderRadius: "50%",
+                              background: "#22c55e", boxShadow: "0 0 6px #22c55e80",
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              color: "#fff", fontSize: 12, fontWeight: 900, flexShrink: 0
 
-                              background: "#22c55e", boxShadow: "0 0 6px #22c55e80"
-
-                            }} />
+                            }}>✓</div>
 
                           )}
 
@@ -10612,7 +10613,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             )}
 
-            {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client) => { setClients(prev => [...prev, client]); setPendingNewClientId(client._id); setActive("clients"); }} user={user} />}
+            {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client) => { setClients(prev => [...prev, client]); setPendingNewClientId(client._id); setActive("clients"); }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || '#00BCD4'} />}
 
             {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
 

@@ -1957,10 +1957,75 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
   return (
-
     <div style={{ display: "flex", height: "100%", overflow: "hidden", background: "#F5FAFA" }}>
-
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
+
+      {/* ── LEFT CLIENT LIST ── */}
+      <div style={{ width: 260, minWidth: 260, borderRight: "1.5px solid #E0EEF0", display: "flex", flexDirection: "column", background: "#fff", overflow: "hidden" }}>
+
+        {/* Search + Add */}
+        <div style={{ padding: "14px 12px 8px", borderBottom: "1px solid #E0EEF0", flexShrink: 0 }}>
+          <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+            <div style={{ position: "relative", flex: 1 }}>
+              <i className="ti ti-search" style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "#A0B8BE" }} />
+              <input
+                type="text"
+                placeholder="Search clients..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                style={{ width: "100%", padding: "8px 10px 8px 30px", border: "1.5px solid #E0EEF0", borderRadius: 9, fontSize: 12, outline: "none", background: "#F5FAFA", color: "#1A2E35", boxSizing: "border-box" }}
+              />
+            </div>
+            <button
+              onClick={onAddClient}
+              style={{ background: "#00BCD4", border: "none", borderRadius: 9, width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}
+            >
+              <i className="ti ti-plus" style={{ color: "#fff", fontSize: 16 }} />
+            </button>
+          </div>
+
+          {/* Filter tabs */}
+          <div style={{ display: "flex", gap: 4 }}>
+            {["all", "active", "inactive"].map(f => (
+              <button
+                key={f}
+                onClick={() => setFilterMode(f)}
+                style={{ flex: 1, padding: "5px 4px", borderRadius: 7, border: "none", fontSize: 10, fontWeight: 700, cursor: "pointer", background: filterMode === f ? "#00BCD4" : "#F0FDFE", color: filterMode === f ? "#fff" : "#607D86", textTransform: "capitalize" }}
+              >
+                {f === "all" ? `All (${clients.length})` : f === "active" ? `Active (${clients.filter(c => (c.status || "Active").toLowerCase() === "active").length})` : `Inactive (${clients.filter(c => (c.status || "").toLowerCase() === "inactive").length})`}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Client List */}
+        <div style={{ flex: 1, overflowY: "auto" }}>
+          {isLoading ? (
+            <div style={{ padding: 20, textAlign: "center", color: "#A0B8BE", fontSize: 12 }}>Loading...</div>
+          ) : filtered.length === 0 ? (
+            <div style={{ padding: 30, textAlign: "center" }}>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>👥</div>
+              <div style={{ fontSize: 12, color: "#A0B8BE", fontWeight: 600 }}>No clients found</div>
+              <button onClick={onAddClient} style={{ marginTop: 12, background: "#00BCD4", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 11, color: "#fff", cursor: "pointer", fontWeight: 700 }}>+ Add Client</button>
+            </div>
+          ) : (
+            <>
+              {activeSection.length > 0 && (
+                <>
+                  <div style={{ padding: "8px 14px 4px", fontSize: 9, fontWeight: 800, color: "#A0B8BE", letterSpacing: 1, textTransform: "uppercase" }}>Active ({activeSection.length})</div>
+                  {activeSection.map(c => renderClientItem(c))}
+                </>
+              )}
+              {otherSection.length > 0 && (
+                <>
+                  <div style={{ padding: "8px 14px 4px", fontSize: 9, fontWeight: 800, color: "#A0B8BE", letterSpacing: 1, textTransform: "uppercase" }}>Others ({otherSection.length})</div>
+                  {otherSection.map(c => renderClientItem(c))}
+                </>
+              )}
+            </>
+          )}
+        </div>
+      </div>
 
 
 
@@ -5780,7 +5845,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
                           onClose();
                         }}
                       >
-<i className={`ti ti-${sub.icon?.includes('ti-') ? sub.icon.split('ti-')[1] : 'point'}`}></i> {sub.label}
+                        <i className={`ti ti-${sub.icon?.includes('ti-') ? sub.icon.split('ti-')[1] : 'point'}`}></i> {sub.label}
                       </div>
 
                     );
@@ -5805,7 +5870,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
                   onClose();
                 }}
               >
-<i className={`ti ti-${n.icon?.includes('ti-') ? n.icon.split('ti-')[1] : 'point'}`}></i> {n.label}
+                <i className={`ti ti-${n.icon?.includes('ti-') ? n.icon.split('ti-')[1] : 'point'}`}></i> {n.label}
               </div>
             );
 

@@ -5780,8 +5780,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
                           onClose();
                         }}
                       >
-                        <i className={`ti ti-${sub.icon?.includes('ti-') ? sub.icon.split('ti-')[1] : 'point'}`}></i> {sub.label}
-                        {on && <i className="ti ti-check" style={{ marginLeft: "auto", fontSize: 14, opacity: 0.9 }} />}
+<i className={`ti ti-${sub.icon?.includes('ti-') ? sub.icon.split('ti-')[1] : 'point'}`}></i> {sub.label}
                       </div>
 
                     );
@@ -5806,8 +5805,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
                   onClose();
                 }}
               >
-                <i className={`ti ti-${n.icon?.includes('ti-') ? n.icon.split('ti-')[1] : 'point'}`}></i> {n.label}
-                {on && <i className="ti ti-check" style={{ marginLeft: "auto", fontSize: 14, opacity: 0.9 }} />}
+<i className={`ti ti-${n.icon?.includes('ti-') ? n.icon.split('ti-')[1] : 'point'}`}></i> {n.label}
               </div>
             );
 

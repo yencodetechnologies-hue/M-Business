@@ -129,8 +129,8 @@ const CSS = `
 .mpd-tabs { display:flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; border-bottom:2px solid ${P.border}; margin-bottom:20px; }
 .mpd-tab-btn { flex-shrink:0; white-space:nowrap; padding:10px 18px; font-size:13px; font-weight:700; color:${P.textMid}; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .15s; background:transparent; border-top:none; border-left:none; border-right:none; font-family:'Nunito',sans-serif; }
 .mpd-tab-btn.mpd-active { color:${P.primary}; border-bottom-color:${P.primary}; }
-.mpd-tab-pane { display:none; }
-.mpd-tab-pane.mpd-active { display:block; animation:fadeUp .18s ease; }
+.mpd-tab-pane { display:none; overflow:visible; }
+.mpd-tab-pane.mpd-active { display:block; animation:fadeUp .18s ease; overflow:visible; }
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -993,6 +993,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   };
 
   return (
+    <>
     <div className="mpd-root">
       {/* CSS injected once via useEffect above */}
 
@@ -1508,7 +1509,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               </div>
             </div>
 
-            <div ref={tabContentRef} style={{ userSelect: 'none' }}>
+            <div ref={tabContentRef} style={{ userSelect: 'none', overflow: 'visible', minHeight: 0 }}>
               <div className={`mpd-tab-pane ${activeTab === 'activity' ? 'mpd-active' : ''}`}>
                 <div style={{ padding: '12px 16px', color: P.textLight, fontSize: 13 }}>
                   {(currProject.updates && currProject.updates.length > 0) ? (() => {
@@ -1681,17 +1682,24 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
               {/* ── PAYMENTS TAB ── */}
               <div className={`mpd-tab-pane ${activeTab === 'payments' ? 'mpd-active' : ''}`}>
-                <div style={{ padding: '18px 20px' }}>
+                <div style={{ padding: '18px 20px', overflow: 'visible' }}>
 
                   {/* STATS ROW */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 10, marginBottom: 20 }}>
-                    {[
-                      { lbl: 'Total Invoiced', val: `${currency}${(billed || 0).toLocaleString()}`, sub: 'Invoices raised', color: '#3B82F6', icon: 'ti-file-invoice' },
-                      { lbl: 'Received', val: `${currency}${(received || 0).toLocaleString()}`, sub: `${billed > 0 ? Math.round((received / billed) * 100) : 0}% collected`, color: '#22C55E', icon: 'ti-circle-check' },
-                      { lbl: 'Advance Paid', val: `${currency}${((currProject.advances || []).reduce((s, a) => s + (parseAmt(a.amount) || 0), 0) || 0).toLocaleString()}`, sub: 'Adjusted in invoice', color: '#8B5CF6', icon: 'ti-pig-money' },
-                      { lbl: 'Additional', val: `${currency}${((currProject.additionalCharges || []).reduce((s, a) => s + (parseAmt(a.amount) || 0), 0) || parseAmt(currProject.additionalChargesTotal) || 0).toLocaleString()}`, sub: 'Extra charges', color: '#F97316', icon: 'ti-circle-plus' },
-                      { lbl: 'Outstanding', val: `${currency}${(pending || 0).toLocaleString()}`, sub: 'Balance due', color: '#EF4444', icon: 'ti-alert-circle' },
-                    ].map(s => (
+                    {(() => {
+                      const liveAdvanceTotal = (currProject.advances || []).reduce((s, a) => s + parseAmt(a.amount), 0);
+                      const liveAdditionalTotal = (currProject.additionalCharges || []).reduce((s, a) => s + parseAmt(a.amount), 0);
+                      const liveBilled = mergedInvoices.reduce((s, inv) => s + parseAmt(inv.amount), 0);
+                      const liveReceived = (currProject.paymentsReceived || []).reduce((s, p) => s + parseAmt(p.amount), 0);
+                      const livePending = Math.max(0, liveBilled - liveReceived);
+                      return [
+                        { lbl: 'Total Invoiced', val: `${currency}${liveBilled.toLocaleString()}`, sub: `${mergedInvoices.length} invoice(s)`, color: '#3B82F6', icon: 'ti-file-invoice' },
+                        { lbl: 'Received', val: `${currency}${liveReceived.toLocaleString()}`, sub: `${liveBilled > 0 ? Math.round((liveReceived / liveBilled) * 100) : 0}% collected`, color: '#22C55E', icon: 'ti-circle-check' },
+                        { lbl: 'Advance Paid', val: `${currency}${liveAdvanceTotal.toLocaleString()}`, sub: `${(currProject.advances || []).length} advance(s)`, color: '#8B5CF6', icon: 'ti-pig-money' },
+                        { lbl: 'Additional', val: `${currency}${liveAdditionalTotal.toLocaleString()}`, sub: `${(currProject.additionalCharges || []).length} charge(s)`, color: '#F97316', icon: 'ti-circle-plus' },
+                        { lbl: 'Outstanding', val: `${currency}${livePending.toLocaleString()}`, sub: 'Balance due', color: '#EF4444', icon: 'ti-alert-circle' },
+                      ];
+                    })().map(s => (
                       <div key={s.lbl} style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 12, padding: '14px 16px', position: 'relative', overflow: 'hidden' }}>
                         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: s.color, borderRadius: '12px 12px 0 0' }}></div>
                         <i className={`ti ${s.icon}`} style={{ position: 'absolute', top: 14, right: 14, fontSize: 20, opacity: .13, color: s.color }}></i>
@@ -1726,45 +1734,24 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   </div>
 
                   {/* INVOICE TABLE */}
-                  <div data-paytab="inv" style={{ display: activePayTab === 'inv' ? 'block' : 'none', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden' }}>
+                  <div data-paytab="inv" style={{ display: activePayTab === 'inv' ? 'block' : 'none', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'visible', marginBottom: 20 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>
                         <i className="ti ti-file-invoice" style={{ color: '#00BCD4', fontSize: 15 }}></i> Invoices
-                        <span style={{ background: '#E0F7FA', color: '#0097A7', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{(currProject.invoices || []).length || 0}</span>
+                        <span style={{ background: '#E0F7FA', color: '#0097A7', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{mergedInvoices.length}</span>
                       </div>
                       <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                         {selectedPaymentItems.length > 0 && activePayTab === 'inv' && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <button onClick={() => { setTargetPortalClient(currProject.client); setShowSendPopup(true); }} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#22C55E', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                              <i className="ti ti-send" style={{ fontSize: 13 }}></i> Send ({selectedPaymentItems.length})
-                            </button>
-                          </div>
+                          <button onClick={() => { setTargetPortalClient(currProject.client); setShowSendPopup(true); }} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#22C55E', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                            <i className="ti ti-send" style={{ fontSize: 13 }}></i> Send ({selectedPaymentItems.length})
+                          </button>
                         )}
-                        {(() => {
-                          const btnMap = {
-                            inv: { label: 'New Invoice', modal: 'showNewInvoice', icon: 'ti-file-invoice' },
-                            adv: { label: 'New Advance', modal: 'showAdvance', icon: 'ti-pig-money' },
-                            add: { label: 'Additional Charge', modal: 'showAdditional', icon: 'ti-circle-plus' },
-                            mile: { label: 'New Milestone', modal: 'showMilestonePayment', icon: 'ti-flag' },
-                            pay: { label: 'Record Payment', modal: 'showPayment', icon: 'ti-credit-card' },
-                            exp: { label: 'Add Expense', modal: 'showExpense', icon: 'ti-receipt' },
-                          };
-                          const b = btnMap[activePayTab] || btnMap['inv'];
-                          return (
-                            <button
-                              onClick={() => {
-                                if (b.modal === 'showNewInvoice' && onNewInvoice) {
-                                  onNewInvoice(currProject);
-                                } else {
-                                  setPaymentModalsState(prev => ({ ...prev, [b.modal]: true }));
-                                }
-                              }}
-                              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}
-                            >
-                              <i className={`ti ${b.icon}`} style={{ fontSize: 13 }}></i> {b.label}
-                            </button>
-                          );
-                        })()}
+                        <button
+                          onClick={() => { if (onNewInvoice) { onNewInvoice(currProject); } else { setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true })); } }}
+                          style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}
+                        >
+                          <i className="ti ti-file-invoice" style={{ fontSize: 13 }}></i> New Invoice
+                        </button>
                       </div>
                     </div>
                     {/* Table Header */}
@@ -1787,25 +1774,20 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         const totalInvoiceAmt = (inv.amount || 0) + invTaxAmt;
                         return (
                           <div key={i} style={{ display: 'grid', gridTemplateColumns: '40px 1.2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 100px', gap: 8, padding: '0 18px', alignItems: 'center', minHeight: 56, borderBottom: '1px solid #E8EDF2', borderLeft: `3px solid ${(inv.status || '').toLowerCase() === 'paid' ? '#22C55E' : (inv.status || '').toLowerCase() === 'overdue' ? '#EF4444' : '#F59E0B'}` }}>
-                            {/* Checkbox */}
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                               <input type="checkbox" checked={selectedPaymentItems.includes(i)} onChange={e => {
                                 if (e.target.checked) setSelectedPaymentItems(prev => [...prev, i]);
                                 else setSelectedPaymentItems(prev => prev.filter(idx => idx !== i));
                               }} style={{ cursor: 'pointer' }} />
                             </div>
-                            {/* Invoice ID */}
                             <div style={{ fontSize: 12, fontWeight: 800, color: '#00BCD4', cursor: 'pointer' }}>{inv.invoiceNo || `INV-00${i + 1}`}</div>
-                            {/* Client */}
                             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                               <div style={{ width: 26, height: 26, borderRadius: '50%', background: 'linear-gradient(135deg,#00BCD4,#006E7F)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 11, fontWeight: 800, flexShrink: 0 }}>
                                 {(clientName || '?')[0].toUpperCase()}
                               </div>
                               <span style={{ fontSize: 12, fontWeight: 700, color: '#0D1B2A' }}>{clientName || '—'}</span>
                             </div>
-                            {/* Project */}
                             <div style={{ fontSize: 12, color: '#7B8FA1', fontWeight: 600 }}>{currProject?.name || '—'}</div>
-                            {/* Category */}
                             <div>
                               {(() => {
                                 const st = (inv.status || '').toLowerCase();
@@ -1814,200 +1796,61 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                 return <span style={{ background: '#EDE9FE', color: '#7C3AED', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>Milestone</span>;
                               })()}
                             </div>
-                            {/* Amount */}
                             <div>
                               <div style={{ fontSize: 14, fontWeight: 900, color: (inv.status || '').toLowerCase() === 'paid' ? '#15803D' : '#0D1B2A' }}>{currency}{totalInvoiceAmt.toLocaleString()}</div>
                               <div style={{ fontSize: 9, color: '#7B8FA1', fontWeight: 600 }}>{inv.taxType === 'inclusive' ? 'Incl. Tax' : 'Excl. Tax'}</div>
                             </div>
-                            {/* Issue Date */}
                             <div style={{ fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{(inv.issueDate || inv.date) ? new Date(inv.issueDate || inv.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
-                            {/* Due Date */}
-                            <div style={{ fontSize: 12, fontWeight: (inv.status || '').toLowerCase() === 'overdue' ? 800 : 700, color: (inv.status || '').toLowerCase() === 'overdue' ? '#EF4444' : '#2D3E50' }}>{(inv.dueDate || inv.inv?.dueDate) ? new Date(inv.dueDate || inv.inv?.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
-                            {/* Status — auto-computed from payments + due date */}
+                            <div style={{ fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{(inv.dueDate || inv.inv?.dueDate) ? new Date(inv.dueDate || inv.inv?.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
                             <div>
                               {(() => {
                                 const parseAmtLocal = (val) => { const n = Number(String(val || 0).replace(/[^0-9.-]+/g, '')); return isNaN(n) ? 0 : n; };
                                 const invoiceTotal = parseAmtLocal(inv.amount);
-                                const totalPaid = (currProject?.paymentsReceived || [])
-                                  .filter(p => p.linkedInvoice === inv.invoiceNo)
-                                  .reduce((sum, p) => sum + parseAmtLocal(p.amount), 0);
+                                const totalPaid = (currProject?.paymentsReceived || []).filter(p => p.linkedInvoice === inv.invoiceNo).reduce((sum, p) => sum + parseAmtLocal(p.amount), 0);
                                 const dueDate = inv.dueDate ? new Date(inv.dueDate) : null;
                                 const today = new Date(); today.setHours(0, 0, 0, 0);
                                 const isPastDue = dueDate && today > dueDate;
-
-                                const lastPayment = (currProject?.paymentsReceived || [])
-                                  .filter(p => p.linkedInvoice === inv.invoiceNo && p.paymentDate)
-                                  .sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate))[0];
-                                const lastPaymentDate = lastPayment ? new Date(lastPayment.paymentDate) : null;
-                                const wasPaidLate = dueDate && lastPaymentDate && lastPaymentDate > dueDate;
-
+                                const lastPayment = (currProject?.paymentsReceived || []).filter(p => p.linkedInvoice === inv.invoiceNo && p.paymentDate).sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate))[0];
+                                const wasPaidLate = dueDate && lastPayment && new Date(lastPayment.paymentDate) > dueDate;
                                 let autoStatus = inv.status || 'pending';
                                 if (invoiceTotal > 0) {
-                                  if (totalPaid >= invoiceTotal) {
-                                    // Fully paid
-                                    autoStatus = wasPaidLate ? 'Late Paid' : 'Paid';
-                                  } else if (totalPaid > 0) {
-                                    // Partial payment — always show Partially Paid, never Overdue
-                                    autoStatus = 'Partially Paid';
-                                  } else {
-                                    // No payment at all
-                                    if (isPastDue) autoStatus = 'Overdue';
-                                    else {
-                                      const cur = (inv.status || '').toLowerCase();
-                                      autoStatus = cur === 'sent' ? 'Sent' : cur === 'draft' ? 'Draft' : inv.status || 'Pending';
-                                    }
-                                  }
+                                  if (totalPaid >= invoiceTotal) { autoStatus = wasPaidLate ? 'Late Paid' : 'Paid'; }
+                                  else if (totalPaid > 0) { autoStatus = 'Partially Paid'; }
+                                  else if (isPastDue) { autoStatus = 'Overdue'; }
+                                  else { const cur = (inv.status || '').toLowerCase(); autoStatus = cur === 'sent' ? 'Sent' : cur === 'draft' ? 'Draft' : inv.status || 'Pending'; }
                                 }
-
                                 const stKey = autoStatus.toLowerCase().replace(/ /g, '_');
-                                const map = {
-                                  paid: { bg: '#DCFCE7', color: '#15803D' },
-                                  late_paid: { bg: '#D1FAE5', color: '#065F46' },
-                                  partially_paid: { bg: '#FEF9C3', color: '#854D0E' },
-                                  part_paid: { bg: '#FEF9C3', color: '#854D0E' },
-                                  overdue: { bg: '#FEE2E2', color: '#DC2626' },
-                                  sent: { bg: '#DBEAFE', color: '#1D4ED8' },
-                                  draft: { bg: '#F1F5F9', color: '#64748B' },
-                                  pending: { bg: '#FEF3C7', color: '#B45309' },
-                                };
+                                const map = { paid: { bg: '#DCFCE7', color: '#15803D' }, late_paid: { bg: '#D1FAE5', color: '#065F46' }, partially_paid: { bg: '#FEF9C3', color: '#854D0E' }, overdue: { bg: '#FEE2E2', color: '#DC2626' }, sent: { bg: '#DBEAFE', color: '#1D4ED8' }, draft: { bg: '#F1F5F9', color: '#64748B' }, pending: { bg: '#FEF3C7', color: '#B45309' } };
                                 const s = map[stKey] || map.pending;
                                 const remaining = invoiceTotal - totalPaid;
-
                                 return (
                                   <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                                    <span style={{ background: s.bg, color: s.color, borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800, display: 'inline-block', whiteSpace: 'nowrap' }}>
-                                      {autoStatus}
-                                    </span>
-                                    {totalPaid > 0 && remaining > 0 && (
-                                      <span style={{ fontSize: 9, color: '#7B8FA1', fontWeight: 700 }}>
-                                        {currency}{totalPaid.toLocaleString()} / {currency}{invoiceTotal.toLocaleString()}
-                                      </span>
-                                    )}
-                                    {totalPaid > 0 && remaining <= 0 && (
-                                      <span style={{ fontSize: 9, color: '#15803D', fontWeight: 700 }}>Fully paid</span>
-                                    )}
+                                    <span style={{ background: s.bg, color: s.color, borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800, display: 'inline-block', whiteSpace: 'nowrap' }}>{autoStatus}</span>
+                                    {totalPaid > 0 && remaining > 0 && <span style={{ fontSize: 9, color: '#7B8FA1', fontWeight: 700 }}>{currency}{totalPaid.toLocaleString()} / {currency}{invoiceTotal.toLocaleString()}</span>}
+                                    {totalPaid > 0 && remaining <= 0 && <span style={{ fontSize: 9, color: '#15803D', fontWeight: 700 }}>Fully paid</span>}
                                   </div>
                                 );
                               })()}
                             </div>
-
                             <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                              <div style={{ position: 'relative' }}>
-                                <button onClick={() => {
-                                  const fullGlobal = inv._source === 'global' ? projectInvoices.find(g => g.id === inv._globalId) : null;
-                                  if (inv._source === 'global' && onViewInvoice) {
-                                    onViewInvoice(fullGlobal || inv);
-                                  } else if (onViewInvoice) {
-                                    onViewInvoice({ ...inv, projectName: currProject.name, clientName, currency });
-                                  } else {
-                                    setPreviewInvoice(prev => prev?.invoiceNo === inv.invoiceNo ? null : { ...inv, projectName: currProject.name, clientName, currency });
-                                  }
-                                }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#00BCD4' }} title="View Invoice"><i className="ti ti-eye"></i></button>
-                              </div>
+                              <button onClick={() => {
+                                const fullGlobal = inv._source === 'global' ? projectInvoices.find(g => g.id === inv._globalId) : null;
+                                if (inv._source === 'global' && onViewInvoice) { onViewInvoice(fullGlobal || inv); }
+                                else if (onViewInvoice) { onViewInvoice({ ...inv, projectName: currProject.name, clientName, currency }); }
+                                else { setPreviewInvoice(prev => prev?.invoiceNo === inv.invoiceNo ? null : { ...inv, projectName: currProject.name, clientName, currency }); }
+                              }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#00BCD4' }} title="View"><i className="ti ti-eye"></i></button>
+                              <button onClick={() => {
+                                if (onNewInvoice) { onNewInvoice(currProject, { editData: { ...inv, client: inv.clientName || clientName, project: currProject.name }, editIndex: i, isEdit: true, projectId: currProject._id }); }
+                                else { setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: { ...inv }, editIndex: i })); }
+                              }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }} title="Edit"><i className="ti ti-edit"></i></button>
                               {inv._source === 'global' ? (
-                                <button onClick={async () => {
-                                  try {
-                                    const res = await axios.get(`${BASE_URL}/api/invoices`);
-                                    const all = res.data?.invoices || res.data || [];
-                                    const fullGlobal = all.find(g => g.id === inv._globalId || g._id === inv._globalId);
-                                    const rawInv = fullGlobal?.inv || {};
-                                    const editData = {
-                                      ...rawInv,
-                                      invoiceNo: rawInv.invoiceNo || fullGlobal?.invoiceNo || inv.invoiceNo,
-                                      client: rawInv.client || fullGlobal?.client || clientName,
-                                      project: rawInv.project || currProject.name,
-                                      date: rawInv.date || fullGlobal?.date || inv.issueDate,
-                                      dueDate: rawInv.dueDate || fullGlobal?.dueDate || inv.dueDate,
-                                      status: rawInv.status || fullGlobal?.status || inv.status,
-                                      items: rawInv.items?.length ? rawInv.items : [{ id: 1, description: rawInv.notes || inv.description || '', quantity: 1, rate: fullGlobal?.total || inv.amount || '' }],
-                                      notes: rawInv.notes || '',
-                                      terms: rawInv.terms || '',
-                                      companyName: rawInv.companyName || '',
-                                      companyEmail: rawInv.companyEmail || '',
-                                      companyPhone: rawInv.companyPhone || '',
-                                      companyAddress: rawInv.companyAddress || '',
-                                      bankName: rawInv.bankName || '',
-                                      accountNumber: rawInv.accountNumber || '',
-                                      ifscCode: rawInv.ifscCode || '',
-                                      upiId: rawInv.upiId || '',
-                                      currency: rawInv.currency || 'INR',
-                                      gstRate: rawInv.gstRate || 18,
-                                      amountPaid: rawInv.amountPaid || 0,
-                                      signature: rawInv.signature || '',
-                                      signatureType: rawInv.signatureType || 'text',
-                                      template: rawInv.template || 'Classic',
-                                      footerMessage: rawInv.footerMessage || '',
-                                    };
-                                    if (onNewInvoice) {
-                                      onNewInvoice(currProject, {
-                                        editData: editData,
-                                        invoiceNo: editData.invoiceNo || inv.invoiceNo,
-                                        client: editData.client || editData.clientName || clientName,
-                                        project: editData.project || currProject.name,
-                                        date: editData.date || editData.issueDate || inv.issueDate,
-                                        dueDate: editData.dueDate || inv.dueDate,
-                                        status: editData.status || inv.status,
-                                        items: editData.items || editData.lineItems || [{ id: 1, description: editData.description || inv.description || '', quantity: 1, rate: editData.amount || inv.amount || '' }],
-                                        notes: editData.notes || inv.notes || '',
-                                        terms: editData.terms || inv.terms || '',
-                                        companyName: editData.companyName || '',
-                                        companyEmail: editData.companyEmail || '',
-                                        companyPhone: editData.companyPhone || '',
-                                        companyAddress: editData.companyAddress || '',
-                                        bankName: editData.bankName || '',
-                                        accountNumber: editData.accountNumber || '',
-                                        ifscCode: editData.ifscCode || '',
-                                        upiId: editData.upiId || '',
-                                        currency: editData.currency || inv.currency || 'INR',
-                                        gstRate: editData.gstRate || 18,
-                                        amountPaid: editData.amountPaid || 0,
-                                        signature: editData.signature || '',
-                                        signatureType: editData.signatureType || 'text',
-                                        template: editData.template || 'Classic',
-                                        footerMessage: editData.footerMessage || '',
-                                        editIndex: i,
-                                        isEdit: true,
-                                        projectId: currProject._id,
-                                        globalInvoiceId: inv._globalId,
-                                      });
-                                    }
-                                  } catch (err) {
-                                    console.error('Failed to fetch invoice for edit:', err);
-                                  }
-                                }} title="Edit" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
-
-                              ) : (
-                                <button onClick={() => {
-                                  const payload = {
-                                    editData: { ...inv, client: inv.clientName || clientName, project: currProject.name },
-                                    editIndex: i,
-                                    isEdit: true,
-                                    projectId: currProject._id,
-                                  };
-                                  if (onNewInvoice) {
-                                    onNewInvoice(currProject, payload);
-                                  } else {
-                                    setPaymentModalsState(prev => ({
-                                      ...prev,
-                                      showNewInvoice: true,
-                                      showPayment: false,
-                                      showAdvance: false,
-                                      showMilestonePayment: false,
-                                      showAdditional: false,
-                                      showExpense: false,
-                                      editData: { ...inv },
-                                      editIndex: i,
-                                    }));
-                                  }
-                                }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }} title="Edit"><i className="ti ti-edit"></i></button>
-                              )}                           {inv._source === 'global' ? (
                                 <button onClick={async () => { if (confirm('Delete this invoice?')) { await axios.delete(`${BASE_URL}/api/invoices/${inv._globalId}`); loadLatest(); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }} title="Delete"><i className="ti ti-trash"></i></button>
                               ) : (
                                 <button onClick={() => handleDeleteRecord('invoices', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }} title="Delete"><i className="ti ti-trash"></i></button>
                               )}
                             </div>
                           </div>
-                        )
+                        );
                       })
                     ) : (
                       <div style={{ padding: '32px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
@@ -2021,910 +1864,942 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       </div>
                     )}
                   </div>
-
-                  {/* ADVANCE PAYMENTS PANEL */}
-                  <div style={{ display: activePayTab === 'adv' ? 'block' : 'none', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>
-                        <i className="ti ti-pig-money" style={{ color: '#8B5CF6', fontSize: 15 }}></i> Advance Payments
-                        <span style={{ background: '#EDE9FE', color: '#7C3AED', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{(currProject.advances || []).length}</span>
-                      </div>
-                      <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdvance: true }))} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                        <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Advance Payment
+                  {selectedPaymentItems.length > 0 && activePayTab === 'inv' && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <button onClick={() => { setTargetPortalClient(currProject.client); setShowSendPopup(true); }} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#22C55E', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                        <i className="ti ti-send" style={{ fontSize: 13 }}></i> Send ({selectedPaymentItems.length})
                       </button>
                     </div>
-                    {(currProject.advances || []).length > 0 ? (
-                      <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
-                          <thead><tr style={{ background: '#F8FAFC' }}>{['Advance #', 'Description', 'Amount', 'Date', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
-                          <tbody>
-                            {(currProject.advances || []).map((rec, i) => (
-                              <tr key={i} style={{ borderBottom: '1px solid #F1F5F9' }}>
-                                <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.advanceNo || `ADV-00${i + 1}`}</td>
-                                <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }}>{rec.description || '—'}</td>
-                                <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
-                                <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{rec.date ? new Date(rec.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
-                                <td style={{ padding: '12px 14px' }}><span style={{ background: rec.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: rec.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.status || 'Pending'}</span></td>
-                                <td style={{ padding: '12px 14px' }}>
-                                  <div style={{ display: 'flex', gap: 4 }}>
-                                    <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdvance: true, editData: rec, editIndex: i }))} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
-                                    <button onClick={() => handleDeleteRecord('advances', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
-                                  </div>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    ) : (
-                      <div style={{ padding: '32px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
-                        <i className="ti ti-pig-money" style={{ fontSize: 32, display: 'block', marginBottom: 10, opacity: .3, color: '#8B5CF6' }}></i>
-                        No advance payments recorded yet.
-                        <div style={{ marginTop: 12 }}><button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdvance: true }))} style={{ padding: '8px 18px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}><i className="ti ti-plus" style={{ marginRight: 6 }}></i>Add First Advance Payment</button></div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* ADDITIONAL CHARGES PANEL */}
-                  <div style={{ display: activePayTab === 'add' ? 'block' : 'none', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>
-                        <i className="ti ti-circle-plus" style={{ color: '#F97316', fontSize: 15 }}></i> Additional Charges
-                        <span style={{ background: '#FFEDD5', color: '#C2410C', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{(currProject.additionalCharges || []).length}</span>
-                      </div>
-                      <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdditional: true }))} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                        <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Add Additional Charge
+                  )}
+                  {(() => {
+                    const btnMap = {
+                      inv: { label: 'New Invoice', modal: 'showNewInvoice', icon: 'ti-file-invoice' },
+                      adv: { label: 'New Advance', modal: 'showAdvance', icon: 'ti-pig-money' },
+                      add: { label: 'Additional Charge', modal: 'showAdditional', icon: 'ti-circle-plus' },
+                      mile: { label: 'New Milestone', modal: 'showMilestonePayment', icon: 'ti-flag' },
+                      pay: { label: 'Record Payment', modal: 'showPayment', icon: 'ti-credit-card' },
+                      exp: { label: 'Add Expense', modal: 'showExpense', icon: 'ti-receipt' },
+                    };
+                    const b = btnMap[activePayTab] || btnMap['inv'];
+                    return (
+                      <button
+                        onClick={() => {
+                          if (b.modal === 'showNewInvoice' && onNewInvoice) {
+                            onNewInvoice(currProject);
+                          } else {
+                            setPaymentModalsState(prev => ({ ...prev, [b.modal]: true }));
+                          }
+                        }}
+                        style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}
+                      >
+                        <i className={`ti ${b.icon}`} style={{ fontSize: 13 }}></i> {b.label}
                       </button>
-                    </div>
-                    {(currProject.additionalCharges || []).length > 0 ? (
-                      <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
-                          <thead><tr style={{ background: '#F8FAFC' }}>{['Charge #', 'Description', 'Amount', 'Date', 'Category', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
-                          <tbody>
-                            {(currProject.additionalCharges || []).map((rec, i) => (
-                              <tr key={i} style={{ borderBottom: '1px solid #F1F5F9', borderLeft: `3px solid ${rec.status === 'Paid' ? '#22C55E' : '#F59E0B'}` }}>
-                                <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.chargeNo || `CHG-00${i + 1}`}</td>
-                                <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }}>{rec.description || '—'}</td>
-                                <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
-                                <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{rec.date ? new Date(rec.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
-                                <td style={{ padding: '12px 14px' }}><span style={{ background: '#FFEDD5', color: '#C2410C', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.category || 'Other'}</span></td>
-                                <td style={{ padding: '12px 14px' }}><span style={{ background: rec.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: rec.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.status || 'Pending'}</span></td>
-                                <td style={{ padding: '12px 14px' }}>
-                                  <div style={{ display: 'flex', gap: 4 }}>
-                                    <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdditional: true, editData: rec, editIndex: i }))} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
-                                    <button onClick={() => handleDeleteRecord('additionalCharges', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
-                                  </div>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    ) : (
-                      <div style={{ padding: '32px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
-                        <i className="ti ti-circle-plus" style={{ fontSize: 32, display: 'block', marginBottom: 10, opacity: .3, color: '#F97316' }}></i>
-                        No additional charges recorded yet.
-                        <div style={{ marginTop: 12 }}><button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdditional: true }))} style={{ padding: '8px 18px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}><i className="ti ti-plus" style={{ marginRight: 6 }}></i>Add First Additional Charge</button></div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* MILESTONE PAYMENTS PANEL */}
-                  <div style={{ display: activePayTab === 'mile' ? 'block' : 'none', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>
-                        <i className="ti ti-flag" style={{ color: '#F59E0B', fontSize: 15 }}></i> Milestone Payments
-                        <span style={{ background: '#FEF3C7', color: '#B45309', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{(currProject.milestonePayments || []).length}</span>
-                      </div>
-                      <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showMilestonePayment: true }))} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                        <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Add Milestone Payment
-                      </button>
-                    </div>
-                    {(currProject.milestonePayments || []).length > 0 ? (
-                      <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
-                          <thead><tr style={{ background: '#F8FAFC' }}>{['Milestone #', 'Name', 'Amount', 'Due Date', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
-                          <tbody>
-                            {(currProject.milestonePayments || []).map((rec, i) => (
-                              <tr key={i} style={{ borderBottom: '1px solid #F1F5F9' }}>
-                                <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.milestoneNo || `MIL-00${i + 1}`}</td>
-                                <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }}>{rec.name || rec.description || '—'}</td>
-                                <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
-                                <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{(rec.dueDate || rec.date) ? new Date(rec.dueDate || rec.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
-                                <td style={{ padding: '12px 14px' }}><span style={{ background: rec.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: rec.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.status || 'Pending'}</span></td>
-                                <td style={{ padding: '12px 14px' }}>
-                                  <div style={{ display: 'flex', gap: 4 }}>
-                                    <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showMilestonePayment: true, editData: rec, editIndex: i }))} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
-                                    <button onClick={() => handleDeleteRecord('milestonePayments', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
-                                  </div>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    ) : (
-                      <div style={{ padding: '32px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
-                        <i className="ti ti-flag" style={{ fontSize: 32, display: 'block', marginBottom: 10, opacity: .3, color: '#F59E0B' }}></i>
-                        No milestone payments recorded yet.
-                        <div style={{ marginTop: 12 }}><button onClick={() => setPaymentModalsState(prev => ({ ...prev, showMilestonePayment: true }))} style={{ padding: '8px 18px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}><i className="ti ti-plus" style={{ marginRight: 6 }}></i>Add First Milestone Payment</button></div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* PAYMENTS RECEIVED PANEL */}
-                  <div style={{ display: activePayTab === 'pay' ? 'block' : 'none', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>
-                        <i className="ti ti-credit-card" style={{ color: '#22C55E', fontSize: 15 }}></i> Payments Received
-                        <span style={{ background: '#DCFCE7', color: '#15803D', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{(currProject.paymentsReceived || []).length}</span>
-                      </div>
-                      <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showPayment: true }))} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                        <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Record Payment Received
-                      </button>
-                    </div>
-                    {(currProject.paymentsReceived || []).length > 0 ? (
-                      <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}>
-                          <thead><tr style={{ background: '#F8FAFC' }}>{['Payment #', 'Linked Invoice', 'Amount', 'Due Date', 'Payment Date', 'Mode', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
-                          <tbody>
-                            {(currProject.paymentsReceived || []).map((rec, i) => {
-                              const localInvDueDate = (currProject.invoices || []).find(inv => inv.invoiceNo === rec.linkedInvoice)?.dueDate;
-                              const globalInvDueDate = mergedInvoices.find(inv => inv.invoiceNo === rec.linkedInvoice)?.dueDate;
-                              const effectiveDueDate = rec.dueDate || localInvDueDate || globalInvDueDate || null;
-                              const isLate = effectiveDueDate && rec.paymentDate && new Date(rec.paymentDate) > new Date(effectiveDueDate);
-                              return (
-                                <tr key={i} style={{ borderBottom: '1px solid #F1F5F9' }}>
-                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.paymentNo || `PAY-00${i + 1}`}</td>
-                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#00BCD4' }}>{rec.linkedInvoice || '—'}</td>
-                                  <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
-                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: isLate ? '#EF4444' : '#2D3E50' }}>
-                                    {effectiveDueDate ? new Date(effectiveDueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
-                                    {isLate && <div style={{ fontSize: 9, fontWeight: 800, color: '#EF4444' }}>LATE</div>}
-                                  </td>
-                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{rec.paymentDate ? new Date(rec.paymentDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
-                                  <td style={{ padding: '12px 14px', fontSize: 11, fontWeight: 800, color: '#475569' }}>{rec.paymentMode || '—'}</td>
-                                  <td style={{ padding: '12px 14px' }}>
-                                    <div style={{ display: 'flex', gap: 4 }}>
-                                      <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showPayment: true, editData: rec, editIndex: i }))} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
-                                      <button onClick={() => handleDeleteRecord('paymentsReceived', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
-                                    </div>
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      </div>
-                    ) : (
-                      <div style={{ padding: '32px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
-                        <i className="ti ti-credit-card" style={{ fontSize: 32, display: 'block', marginBottom: 10, opacity: .3, color: '#22C55E' }}></i>
-                        No payments received yet.
-                        <div style={{ marginTop: 12 }}><button onClick={() => setPaymentModalsState(prev => ({ ...prev, showPayment: true }))} style={{ padding: '8px 18px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}><i className="ti ti-plus" style={{ marginRight: 6 }}></i>Record First Payment</button></div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* EXPENSES PANEL */}
-                  <div style={{ display: activePayTab === 'exp' ? 'block' : 'none', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>
-                        <i className="ti ti-receipt" style={{ color: '#6B7280', fontSize: 15 }}></i> Expenses
-                        <span style={{ background: '#F3F4F6', color: '#374151', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{(currProject.expenses || []).length}</span>
-                      </div>
-                      <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showExpense: true }))} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                        <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Add Expense
-                      </button>
-                    </div>
-                    {(currProject.expenses || []).length > 0 ? (
-                      <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
-                          <thead><tr style={{ background: '#F8FAFC' }}>{['Expense #', 'Description', 'Amount', 'Date', 'Category', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
-                          <tbody>
-                            {(currProject.expenses || []).map((rec, i) => (
-                              <tr key={i} style={{ borderBottom: '1px solid #F1F5F9', borderLeft: `3px solid ${rec.status === 'Paid' ? '#22C55E' : '#F59E0B'}` }}>
-                                <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.expenseNo || `EXP-00${i + 1}`}</td>
-                                <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }}>{rec.description || '—'}</td>
-                                <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
-                                <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{rec.date ? new Date(rec.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
-                                <td style={{ padding: '12px 14px' }}><span style={{ background: '#FFEDD5', color: '#C2410C', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.category || 'Other'}</span></td>
-                                <td style={{ padding: '12px 14px' }}><span style={{ background: rec.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: rec.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.status || 'Pending'}</span></td>
-                                <td style={{ padding: '12px 14px' }}>
-                                  <div style={{ display: 'flex', gap: 4 }}>
-                                    <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showExpense: true, editData: rec, editIndex: i }))} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
-                                    <button onClick={() => handleDeleteRecord('expenses', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
-                                  </div>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    ) : (
-                      <div style={{ padding: '32px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
-                        <i className="ti ti-receipt" style={{ fontSize: 32, display: 'block', marginBottom: 10, opacity: .3, color: '#6B7280' }}></i>
-                        No expenses recorded yet.
-                        <div style={{ marginTop: 12 }}><button onClick={() => setPaymentModalsState(prev => ({ ...prev, showExpense: true }))} style={{ padding: '8px 18px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}><i className="ti ti-plus" style={{ marginRight: 6 }}></i>Add First Expense</button></div>
-                      </div>
-                    )}
-                  </div>
-
-
-
+                    );
+                  })()}
                 </div>
               </div>
-
-            </div>{/* end tabContentRef wrapper */}
-          </div>
-        </div>
-
-        {/* RIGHT COL */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          {/* TEAM */}
-          <div className="mpd-card">
-            <div className="mpd-card-header">
-              <div className="mpd-card-title"><i className="ti ti-users"></i> Team</div>
-              {/* Add Team Members is a managerial action — hidden from employees */}
-              {user?.role !== 'employee' && (
-                <button className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMemberModal(true)} style={{ padding: '5px 10px', fontSize: 11 }}>
-                  <i className="ti ti-plus"></i> Add Team Members
-                </button>
-              )}
-            </div>
-            {assigned.length === 0 ? <div style={{ fontSize: 12, color: P.textLight }}>No team members assigned.</div> : null}
-            {assigned.map((a, i) => (
-              <div key={i} className="mpd-member-row" style={{ display: 'flex', alignItems: 'center' }}>
-                <div className="mpd-av mpd-av-sm" style={{ background: getAvatarColor(a) }}>{getInitials(a)}</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>{a}</div>
-                  <div style={{ fontSize: 11, color: P.textLight }}>
-                    {employees.find(e => (e.name || e.employeeName) === a)?.role || 'Member'}
-                  </div>
+              {/* Table Header */}
+              <div style={{ display: 'grid', gridTemplateColumns: '40px 1.2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 100px', gap: 8, padding: '8px 18px', background: '#FAFBFD', borderBottom: '1px solid #E8EDF2' }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <input type="checkbox" checked={mergedInvoices.length > 0 && selectedPaymentItems.length === mergedInvoices.length} onChange={e => {
+                    if (e.target.checked) setSelectedPaymentItems(mergedInvoices.map((_, idx) => idx));
+                    else setSelectedPaymentItems([]);
+                  }} style={{ cursor: 'pointer' }} />
                 </div>
-                {/* Removing a teammate is a managerial action — hidden from employees */}
-                {user?.role !== 'employee' && (
-                  <button onClick={async () => {
-                    if (!window.confirm('Remove ' + a + ' from team?')) return;
-
-                    // 1) Remove from project team
-                    const updated = (currProject.assignedTo || []).filter((_, idx) => idx !== i);
-                    await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated });
-
-                    // 2) Unassign from all tasks in this project that have this member
-                    try {
-                      const tasksRes = await axios.get(`${BASE_URL}/api/tasks`, {
-                        headers: { 'x-company-id': currProject.companyId || '' }
-                      });
-                      const allTasks = Array.isArray(tasksRes.data) ? tasksRes.data : [];
-                      const projectTasks = allTasks.filter(t =>
-                        (t.projectId === currProject._id || t.projectId?._id === currProject._id) &&
-                        t.assignTo && t.assignTo !== 'Unassigned' &&
-                        t.assignTo.split(', ').map(n => n.trim()).includes(a)
-                      );
-                      await Promise.all(projectTasks.map(t => {
-                        const names = t.assignTo.split(', ').map(n => n.trim()).filter(Boolean);
-                        const updatedNames = names.filter(n => n !== a);
-                        return axios.put(`${BASE_URL}/api/tasks/${t._id}`, {
-                          assignTo: updatedNames.length > 0 ? updatedNames.join(', ') : 'Unassigned'
-                        }, {
-                          headers: { 'x-company-id': currProject.companyId || '' }
-                        });
-                      }));
-                    } catch (e) {
-                      console.error('Failed to unassign tasks:', e);
-                    }
-
-                    loadLatest();
-                  }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 14, padding: '4px 6px' }} title="Remove">Delete</button>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* BUDGET */}
-          <div className="mpd-card">
-            <div className="mpd-card-header">
-              <div className="mpd-card-title"><i className="ti ti-wallet"></i> Budget</div>
-            </div>
-
-            {/* Budget Exceeded Warning Banner */}
-            {budgetExceeded && (
-              <div style={{
-                background: '#FEE2E2', border: '1px solid #FECACA', borderRadius: 8,
-                padding: '8px 12px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 7
-              }}>
-                <i className="ti ti-alert-triangle" style={{ color: '#DC2626', fontSize: 16 }}></i>
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 800, color: '#DC2626' }}>Budget Exceeded!</div>
-                  <div style={{ fontSize: 10, color: '#991B1B', fontWeight: 600 }}>
-                    Over by {currency}{overageAmt.toLocaleString()}
-                  </div>
-                </div>
-              </div>
-            )}
-            <div className="mpd-brow">
-              <span className="mpd-lbl">Total Budget
-                <span style={{ fontSize: 9, color: '#94A3B8', fontWeight: 600, marginLeft: 4 }}>(auto)</span>
-              </span>
-              <span className="mpd-val">{currency}{budgetAmt.toLocaleString()}</span>
-            </div>
-            {[['Billed', 'billed', billed, ''], ['Received', 'received', received, 'mpd-g']].map(([lbl, key, val, cls]) => (
-              <div key={key} className="mpd-brow">
-                <span className="mpd-lbl">{lbl}</span>
-                <span className={`mpd-val ${cls}`}>
-                  {currency}{val.toLocaleString()}
-                </span>
-              </div>
-            ))}
-            <div className="mpd-brow">
-              <span className="mpd-lbl">Pending</span>
-              <span className="mpd-val mpd-r">{currency}{pending.toLocaleString()}</span>
-            </div>
-            <div className="mpd-brow">
-              <span className="mpd-lbl">Spent (Expenses)</span>
-              <span className="mpd-val" style={{ color: budgetExceeded ? '#DC2626' : undefined, fontWeight: budgetExceeded ? 800 : 700 }}>
-                {currency}{spent.toLocaleString()}
-              </span>
-            </div>
-            {budgetAmt > 0 && (
-              <div className="mpd-brow">
-                <span className="mpd-lbl">Remaining Budget</span>
-                <span className="mpd-val" style={{ color: remaining < 0 ? '#DC2626' : '#7C3AED', fontWeight: 800 }}>
-                  {remaining < 0 ? `-${currency}${Math.abs(remaining).toLocaleString()}` : `${currency}${remaining.toLocaleString()}`}
-                </span>
-              </div>
-            )}
-            {budgetAmt > 0 && (
-              <div style={{ marginTop: 10 }}>
-                <div className="mpd-progress-bg">
-                  <div
-                    className="mpd-progress-fill"
-                    style={{
-                      width: `${Math.min(budgetUsedPct, 100)}%`,
-                      background: budgetExceeded ? '#EF4444' : budgetUsedPct > 80 ? '#F97316' : '#8B5CF6'
-                    }}
-                  ></div>
-                </div>
-                <div style={{ fontSize: 11, color: budgetExceeded ? '#DC2626' : P.textLight, marginTop: 4, fontWeight: budgetExceeded ? 800 : 600 }}>
-                  {budgetUsedPct}% used · {currency}{spent.toLocaleString()} of {currency}{budgetAmt.toLocaleString()}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* FILES */}
-          <div className="mpd-card">
-            <div className="mpd-card-header">
-              <div className="mpd-card-title"><i className="ti ti-paperclip"></i> Files</div>
-              <button className="mpd-btn mpd-btn-outline" onClick={() => setShowUploadModal(true)} style={{ padding: '5px 10px', fontSize: 11 }}>
-                <i className="ti ti-upload"></i> Upload
-              </button>
-            </div>
-
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileUpload}
-              style={{ display: 'none' }}
-              accept="image/*"
-            />
-
-            {(!currProject.files || currProject.files.length === 0) ? (
-              <div style={{ fontSize: 12, color: P.textLight, textAlign: 'center', padding: '10px 0' }}>No files attached.</div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {currProject.files.map((file) => (
-                  <div key={file._id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px', border: `1.5px solid ${P.border}`, borderRadius: 8 }}>
-                    <a href={file.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, fontWeight: 700, color: P.primary, textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180 }}>
-                      <i className="ti ti-file" style={{ marginRight: 6 }}></i>
-                      {file.name}
-                    </a>
-                    <button onClick={() => handleDeleteFile(file._id)} style={{ background: 'transparent', border: 'none', color: P.red, cursor: 'pointer', fontSize: 14 }}>
-                      ✕
-                    </button>
-                  </div>
+                {['Invoice ID', 'Client', 'Project', 'Category', 'Amount', 'Issue Date', 'Due Date', 'Status', 'Actions'].map(h => (
+                  <div key={h} style={{ fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px' }}>{h}</div>
                 ))}
               </div>
-            )}
-          </div>
+              {/* Rows */}
+              {
+                (mergedInvoices && mergedInvoices.length > 0) ? (
+                  mergedInvoices.map((invoiceRec, i) => {
+                    const inv = invoiceRec;
+                    const invTaxAmt = inv.taxType === 'inclusive' ? 0 : Math.round((inv.amount || 0) * (inv.taxPercent || 0) / 100);
+                    const totalInvoiceAmt = (inv.amount || 0) + invTaxAmt;
+                    return (
+                      <div key={i} style={{ display: 'grid', gridTemplateColumns: '40px 1.2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 100px', gap: 8, padding: '0 18px', alignItems: 'center', minHeight: 56, borderBottom: '1px solid #E8EDF2', borderLeft: `3px solid ${(inv.status || '').toLowerCase() === 'paid' ? '#22C55E' : (inv.status || '').toLowerCase() === 'overdue' ? '#EF4444' : '#F59E0B'}` }}>
+                        {/* Checkbox */}
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <input type="checkbox" checked={selectedPaymentItems.includes(i)} onChange={e => {
+                            if (e.target.checked) setSelectedPaymentItems(prev => [...prev, i]);
+                            else setSelectedPaymentItems(prev => prev.filter(idx => idx !== i));
+                          }} style={{ cursor: 'pointer' }} />
+                        </div>
+                        {/* Invoice ID */}
+                        <div style={{ fontSize: 12, fontWeight: 800, color: '#00BCD4', cursor: 'pointer' }}>{inv.invoiceNo || `INV-00${i + 1}`}</div>
+                        {/* Client */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div style={{ width: 26, height: 26, borderRadius: '50%', background: 'linear-gradient(135deg,#00BCD4,#006E7F)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 11, fontWeight: 800, flexShrink: 0 }}>
+                            {(clientName || '?')[0].toUpperCase()}
+                          </div>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: '#0D1B2A' }}>{clientName || '—'}</span>
+                        </div>
+                        {/* Project */}
+                        <div style={{ fontSize: 12, color: '#7B8FA1', fontWeight: 600 }}>{currProject?.name || '—'}</div>
+                        {/* Category */}
+                        <div>
+                          {(() => {
+                            const st = (inv.status || '').toLowerCase();
+                            if (st === 'paid' || st === 'part_paid') return <span style={{ background: '#E0F2FE', color: '#0369A1', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>Advance</span>;
+                            if (st === 'draft') return <span style={{ background: '#F1F5F9', color: '#64748B', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>Draft</span>;
+                            return <span style={{ background: '#EDE9FE', color: '#7C3AED', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>Milestone</span>;
+                          })()}
+                        </div>
+                        {/* Amount */}
+                        <div>
+                          <div style={{ fontSize: 14, fontWeight: 900, color: (inv.status || '').toLowerCase() === 'paid' ? '#15803D' : '#0D1B2A' }}>{currency}{totalInvoiceAmt.toLocaleString()}</div>
+                          <div style={{ fontSize: 9, color: '#7B8FA1', fontWeight: 600 }}>{inv.taxType === 'inclusive' ? 'Incl. Tax' : 'Excl. Tax'}</div>
+                        </div>
+                        {/* Issue Date */}
+                        <div style={{ fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{(inv.issueDate || inv.date) ? new Date(inv.issueDate || inv.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
+                        {/* Due Date */}
+                        <div style={{ fontSize: 12, fontWeight: (inv.status || '').toLowerCase() === 'overdue' ? 800 : 700, color: (inv.status || '').toLowerCase() === 'overdue' ? '#EF4444' : '#2D3E50' }}>{(inv.dueDate || inv.inv?.dueDate) ? new Date(inv.dueDate || inv.inv?.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
+                        {/* Status — auto-computed from payments + due date */}
+                        <div>
+                          {(() => {
+                            const parseAmtLocal = (val) => { const n = Number(String(val || 0).replace(/[^0-9.-]+/g, '')); return isNaN(n) ? 0 : n; };
+                            const invoiceTotal = parseAmtLocal(inv.amount);
+                            const totalPaid = (currProject?.paymentsReceived || [])
+                              .filter(p => p.linkedInvoice === inv.invoiceNo)
+                              .reduce((sum, p) => sum + parseAmtLocal(p.amount), 0);
+                            const dueDate = inv.dueDate ? new Date(inv.dueDate) : null;
+                            const today = new Date(); today.setHours(0, 0, 0, 0);
+                            const isPastDue = dueDate && today > dueDate;
 
-          {/* PORTAL LINK */}
-          <div className="mpd-card" style={{ background: `linear-gradient(135deg, ${P.primaryLight}, #fff)`, border: `1.5px solid ${P.primaryMid}` }}>
-            <div className="mpd-card-title" style={{ marginBottom: 12 }}><i className="ti ti-building"></i> Client Portal</div>
-            <div style={{ fontSize: 12, color: P.textMid, marginBottom: 16 }}>The client has access to their project portal with live progress, files, invoices and updates.</div>
-            <button className="mpd-btn mpd-btn-primary" onClick={() => setShowPortalPreview(true)} style={{ width: '100%', justifyContent: 'center' }}><i className="ti ti-external-link"></i> View Portal</button>
-          </div>
-        </div>
-      </div >
+                            const lastPayment = (currProject?.paymentsReceived || [])
+                              .filter(p => p.linkedInvoice === inv.invoiceNo && p.paymentDate)
+                              .sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate))[0];
+                            const lastPaymentDate = lastPayment ? new Date(lastPayment.paymentDate) : null;
+                            const wasPaidLate = dueDate && lastPaymentDate && lastPaymentDate > dueDate;
 
-      {/* Add Task Modal */}
-      {
-        showAddTaskModal && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 99995, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ background: '#fff', borderRadius: P.radius, width: 440, padding: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.15)', boxSizing: 'border-box', maxHeight: '90vh', overflowY: 'auto' }}>
-              <h3 style={{ margin: '0 0 16px', fontSize: 18, color: P.textDark }}>{editingTask ? 'Edit Task' : 'Add New Task'}</h3>
-              <form onSubmit={handleCreateTask}>
-                {/* Task Name */}
-                <div style={{ marginBottom: 12 }}>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Task Name *</label>
-                  <input type="text" value={newTaskTitle} onChange={e => setNewTaskTitle(e.target.value)} placeholder="Enter task title" required style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }} />
-                </div>
+                            let autoStatus = inv.status || 'pending';
+                            if (invoiceTotal > 0) {
+                              if (totalPaid >= invoiceTotal) {
+                                // Fully paid
+                                autoStatus = wasPaidLate ? 'Late Paid' : 'Paid';
+                              } else if (totalPaid > 0) {
+                                // Partial payment — always show Partially Paid, never Overdue
+                                autoStatus = 'Partially Paid';
+                              } else {
+                                // No payment at all
+                                if (isPastDue) autoStatus = 'Overdue';
+                                else {
+                                  const cur = (inv.status || '').toLowerCase();
+                                  autoStatus = cur === 'sent' ? 'Sent' : cur === 'draft' ? 'Draft' : inv.status || 'Pending';
+                                }
+                              }
+                            }
 
-                {/* Description */}
-                <div style={{ marginBottom: 12 }}>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Description</label>
-                  <textarea value={newTaskDesc} onChange={e => setNewTaskDesc(e.target.value)} placeholder="Enter details..." style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', resize: 'vertical', minHeight: 60, boxSizing: 'border-box' }} />
-                </div>
+                            const stKey = autoStatus.toLowerCase().replace(/ /g, '_');
+                            const map = {
+                              paid: { bg: '#DCFCE7', color: '#15803D' },
+                              late_paid: { bg: '#D1FAE5', color: '#065F46' },
+                              partially_paid: { bg: '#FEF9C3', color: '#854D0E' },
+                              part_paid: { bg: '#FEF9C3', color: '#854D0E' },
+                              overdue: { bg: '#FEE2E2', color: '#DC2626' },
+                              sent: { bg: '#DBEAFE', color: '#1D4ED8' },
+                              draft: { bg: '#F1F5F9', color: '#64748B' },
+                              pending: { bg: '#FEF3C7', color: '#B45309' },
+                            };
+                            const s = map[stKey] || map.pending;
+                            const remaining = invoiceTotal - totalPaid;
 
-                {/* Priority + Due Date */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
-                  <div>
-                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Priority</label>
-                    <select value={newTaskPriority} onChange={e => setNewTaskPriority(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
-                      <option value="low">Low</option>
-                      <option value="medium">Medium</option>
-                      <option value="high">High</option>
-                    </select>
+                            return (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                                <span style={{ background: s.bg, color: s.color, borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800, display: 'inline-block', whiteSpace: 'nowrap' }}>
+                                  {autoStatus}
+                                </span>
+                                {totalPaid > 0 && remaining > 0 && (
+                                  <span style={{ fontSize: 9, color: '#7B8FA1', fontWeight: 700 }}>
+                                    {currency}{totalPaid.toLocaleString()} / {currency}{invoiceTotal.toLocaleString()}
+                                  </span>
+                                )}
+                                {totalPaid > 0 && remaining <= 0 && (
+                                  <span style={{ fontSize: 9, color: '#15803D', fontWeight: 700 }}>Fully paid</span>
+                                )}
+                              </div>
+                            );
+                          })()}
+                        </div>
+
+                        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                          <div style={{ position: 'relative' }}>
+                            <button onClick={() => {
+                              const fullGlobal = inv._source === 'global' ? projectInvoices.find(g => g.id === inv._globalId) : null;
+                              if (inv._source === 'global' && onViewInvoice) {
+                                onViewInvoice(fullGlobal || inv);
+                              } else if (onViewInvoice) {
+                                onViewInvoice({ ...inv, projectName: currProject.name, clientName, currency });
+                              } else {
+                                setPreviewInvoice(prev => prev?.invoiceNo === inv.invoiceNo ? null : { ...inv, projectName: currProject.name, clientName, currency });
+                              }
+                            }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#00BCD4' }} title="View Invoice"><i className="ti ti-eye"></i></button>
+                          </div>
+                          {inv._source === 'global' ? (
+                            <button onClick={async () => {
+                              try {
+                                const res = await axios.get(`${BASE_URL}/api/invoices`);
+                                const all = res.data?.invoices || res.data || [];
+                                const fullGlobal = all.find(g => g.id === inv._globalId || g._id === inv._globalId);
+                                const rawInv = fullGlobal?.inv || {};
+                                const editData = {
+                                  ...rawInv,
+                                  invoiceNo: rawInv.invoiceNo || fullGlobal?.invoiceNo || inv.invoiceNo,
+                                  client: rawInv.client || fullGlobal?.client || clientName,
+                                  project: rawInv.project || currProject.name,
+                                  date: rawInv.date || fullGlobal?.date || inv.issueDate,
+                                  dueDate: rawInv.dueDate || fullGlobal?.dueDate || inv.dueDate,
+                                  status: rawInv.status || fullGlobal?.status || inv.status,
+                                  items: rawInv.items?.length ? rawInv.items : [{ id: 1, description: rawInv.notes || inv.description || '', quantity: 1, rate: fullGlobal?.total || inv.amount || '' }],
+                                  notes: rawInv.notes || '',
+                                  terms: rawInv.terms || '',
+                                  companyName: rawInv.companyName || '',
+                                  companyEmail: rawInv.companyEmail || '',
+                                  companyPhone: rawInv.companyPhone || '',
+                                  companyAddress: rawInv.companyAddress || '',
+                                  bankName: rawInv.bankName || '',
+                                  accountNumber: rawInv.accountNumber || '',
+                                  ifscCode: rawInv.ifscCode || '',
+                                  upiId: rawInv.upiId || '',
+                                  currency: rawInv.currency || 'INR',
+                                  gstRate: rawInv.gstRate || 18,
+                                  amountPaid: rawInv.amountPaid || 0,
+                                  signature: rawInv.signature || '',
+                                  signatureType: rawInv.signatureType || 'text',
+                                  template: rawInv.template || 'Classic',
+                                  footerMessage: rawInv.footerMessage || '',
+                                };
+                                if (onNewInvoice) {
+                                  onNewInvoice(currProject, {
+                                    editData: editData,
+                                    invoiceNo: editData.invoiceNo || inv.invoiceNo,
+                                    client: editData.client || editData.clientName || clientName,
+                                    project: editData.project || currProject.name,
+                                    date: editData.date || editData.issueDate || inv.issueDate,
+                                    dueDate: editData.dueDate || inv.dueDate,
+                                    status: editData.status || inv.status,
+                                    items: editData.items || editData.lineItems || [{ id: 1, description: editData.description || inv.description || '', quantity: 1, rate: editData.amount || inv.amount || '' }],
+                                    notes: editData.notes || inv.notes || '',
+                                    terms: editData.terms || inv.terms || '',
+                                    companyName: editData.companyName || '',
+                                    companyEmail: editData.companyEmail || '',
+                                    companyPhone: editData.companyPhone || '',
+                                    companyAddress: editData.companyAddress || '',
+                                    bankName: editData.bankName || '',
+                                    accountNumber: editData.accountNumber || '',
+                                    ifscCode: editData.ifscCode || '',
+                                    upiId: editData.upiId || '',
+                                    currency: editData.currency || inv.currency || 'INR',
+                                    gstRate: editData.gstRate || 18,
+                                    amountPaid: editData.amountPaid || 0,
+                                    signature: editData.signature || '',
+                                    signatureType: editData.signatureType || 'text',
+                                    template: editData.template || 'Classic',
+                                    footerMessage: editData.footerMessage || '',
+                                    editIndex: i,
+                                    isEdit: true,
+                                    projectId: currProject._id,
+                                    globalInvoiceId: inv._globalId,
+                                  });
+                                }
+                              } catch (err) {
+                                console.error('Failed to fetch invoice for edit:', err);
+                              }
+                            }} title="Edit" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+
+                          ) : (
+                            <button onClick={() => {
+                              const payload = {
+                                editData: { ...inv, client: inv.clientName || clientName, project: currProject.name },
+                                editIndex: i,
+                                isEdit: true,
+                                projectId: currProject._id,
+                              };
+                              if (onNewInvoice) {
+                                onNewInvoice(currProject, payload);
+                              } else {
+                                setPaymentModalsState(prev => ({
+                                  ...prev,
+                                  showNewInvoice: true,
+                                  showPayment: false,
+                                  showAdvance: false,
+                                  showMilestonePayment: false,
+                                  showAdditional: false,
+                                  showExpense: false,
+                                  editData: { ...inv },
+                                  editIndex: i,
+                                }));
+                              }
+                            }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }} title="Edit"><i className="ti ti-edit"></i></button>
+                          )}                           {inv._source === 'global' ? (
+                            <button onClick={async () => { if (confirm('Delete this invoice?')) { await axios.delete(`${BASE_URL}/api/invoices/${inv._globalId}`); loadLatest(); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }} title="Delete"><i className="ti ti-trash"></i></button>
+                          ) : (
+                            <button onClick={() => handleDeleteRecord('invoices', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }} title="Delete"><i className="ti ti-trash"></i></button>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })
+                ) : (
+                  <div style={{ padding: '32px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
+                    <i className="ti ti-file-invoice" style={{ fontSize: 32, display: 'block', marginBottom: 10, opacity: .3 }}></i>
+                    No invoices yet for this project.
+                    <div style={{ marginTop: 12 }}>
+                      <button onClick={() => { if (onNewInvoice) { onNewInvoice(currProject); } else { setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true })); } }} style={{ padding: '8px 18px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                        <i className="ti ti-plus" style={{ marginRight: 6 }}></i>Create First Invoice
+                      </button>
+                    </div>
                   </div>
-                  <div>
-                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Due Date</label>
-                    <input
-                      type="date"
-                      value={newTaskDue}
-                      onChange={e => setNewTaskDue(e.target.value)}
-                      style={{
-                        width: '100%',
-                        padding: '9px',
-                        borderRadius: 8,
-                        border: `1.5px solid ${P.border}`,
-                        outline: 'none',
-                        boxSizing: 'border-box',
-                        background: '#fff',
-                        color: newTaskDue ? P.textDark : '#A0AEC0',
-                        fontFamily: 'Nunito, sans-serif',
-                        cursor: 'pointer',
-                      }}
-                    />
-                  </div>
-                </div>
-
-                {/* Status + Milestone — ONE ROW, ONE STATUS only */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
-                  <div>
-                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Status</label>
-                    <select value={newTaskStatus} onChange={e => setNewTaskStatus(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
-                      <option value="Not Started">Not Started</option>
-                      <option value="In Progress">In Progress</option>
-                      <option value="Completed">Completed</option>
-                      <option value="On Hold">On Hold</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Link to Milestone</label>
-                    <select value={newTaskMilestone} onChange={e => setNewTaskMilestone(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
-                      <option value="">-- No Milestone --</option>
-                      {(currProject.milestones || []).map((m, i) => (
-                        <option key={i} value={m.name}>{m.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Assign To */}
-                <div style={{ marginBottom: 16 }}>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Assign To</label>
-                  <select
-                    value={Array.isArray(newTaskAssignTo) && newTaskAssignTo.length > 0 ? newTaskAssignTo[0] : ''}
-                    onChange={e => setNewTaskAssignTo(e.target.value ? [e.target.value] : [])}
-                    style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', fontSize: 13, color: P.textDark, background: '#fff', boxSizing: 'border-box' }}
-                  >
-                    <option value=''>-- Select Employee --</option>
-                    {(employees || []).map(emp => {
-                      const name = emp.name || emp.employeeName || '';
-                      if (!name) return null;
-                      return (
-                        <option key={emp._id} value={name}>{name}</option>
-                      );
-                    })}
-                  </select>
-                </div>
-
-                {/* Buttons */}
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-                  <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddTaskModal(false)}>Cancel</button>
-                  <button type="submit" className="mpd-btn mpd-btn-primary" disabled={addingTask}>{addingTask ? 'Adding...' : editingTask ? 'Update Task' : 'Add Task'}</button>
-                </div>
-              </form>
+                )
+              }
             </div>
-          </div>
-        )
-      }
 
-      {/* Add Member Modal */}
-      {
-        showAddMemberModal && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 99996, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ background: '#fff', borderRadius: P.radius, width: 380, padding: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
-              <h3 style={{ margin: '0 0 16px', fontSize: 16, color: P.textDark }}>Add Team Member</h3>
-              <select value={selectedNewMember} onChange={e => setSelectedNewMember(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none', marginBottom: 16 }}>
-                <option value="">-- Select Employee --</option>
-                {(employees || []).filter(emp => !assigned.includes(emp.name || emp.employeeName)).map(emp => (
-                  <option key={emp._id} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName} ({emp.role || 'Employee'})</option>
-                ))}
-              </select>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-                <button className="mpd-btn mpd-btn-outline" onClick={() => { setShowAddMemberModal(false); setSelectedNewMember(''); }}>Cancel</button>
-                <button className="mpd-btn mpd-btn-primary" disabled={!selectedNewMember} onClick={async () => {
-                  if (!selectedNewMember) return;
-                  const updated = [...(currProject.assignedTo || []), selectedNewMember];
-                  await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated });
-                  setShowAddMemberModal(false);
-                  setSelectedNewMember('');
-                  loadLatest();
-                }}>Add</button>
-              </div>
-            </div>
-          </div>
-        )
-      }
-
-      {/* Portal Live Preview Overlay */}
-      {
-        showPortalPreview && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: '#fff', overflowY: 'auto', padding: 20 }}>
-            <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: `1px solid ${P.border}`, paddingBottom: 12 }}>
-                <h2 style={{ margin: 0, fontSize: 20, color: P.textDark }}>Client Portal Live Preview</h2>
-                <button className="mpd-btn mpd-btn-danger" onClick={() => { setShowPortalPreview(false); onBack(); }}>
-                  <i className="ti ti-arrow-right"></i> {hideTopActions ? 'Next' : 'Exit Preview'}
+            {/* ADVANCE PAYMENTS PANEL */}
+            <div style={{ display: activePayTab === 'adv' ? 'block' : 'none', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>
+                  <i className="ti ti-pig-money" style={{ color: '#8B5CF6', fontSize: 15 }}></i> Advance Payments
+                  <span style={{ background: '#EDE9FE', color: '#7C3AED', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{(currProject.advances || []).length || 0}</span>
+                </div>
+                <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdvance: true }))} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  <i className="ti ti-plus" style={{ fontSize: 13 }}></i> New Advance Payment
                 </button>
               </div>
-              <ModernEmployeeProjectDetails
-                project={currProject}
-                tasks={currTasks}
-                user={{ role: 'client', name: currProject.client }}
-                onBack={() => setShowPortalPreview(false)}
-                onMessageTeam={() => { setShowPortalPreview(false); if (onMessageTeam) onMessageTeam(); }}
-              />
-            </div>
-          </div>
-        )
-      }
-
-      {/* Payment Modals */}
-      <ProjectPaymentModals
-        project={currProject}
-        modalsState={paymentModalsState}
-        setModalsState={setPaymentModalsState}
-        onSaveSuccess={loadLatest}
-      />
-
-      {/* Send to Client Popup */}
-      {
-        showSendPopup && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-            <div style={{ background: '#fff', width: '100%', maxWidth: 400, borderRadius: 16, boxShadow: '0 20px 40px rgba(0,0,0,0.2)', overflow: 'hidden' }}>
-              <div style={{ padding: '20px 24px', borderBottom: '1px solid #E8EDF2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ fontSize: 16, fontWeight: 900, color: '#0D1B2A' }}>Send to Client Portal</div>
-                <button onClick={() => setShowSendPopup(false)} style={{ background: 'none', border: 'none', fontSize: 20, color: '#7B8FA1', cursor: 'pointer' }}>✕</button>
-              </div>
-              <div style={{ padding: 24 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 8 }}>Select Client</div>
-                <select value={targetPortalClient} onChange={e => setTargetPortalClient(e.target.value)} style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #E8EDF2', fontSize: 13, color: '#1A2332', outline: 'none', background: '#FAFBFD' }}>
-                  <option value="">-- Select Client --</option>
-                  <option value={currProject.client}>{currProject.client || 'Project Client'}</option>
-                  {clients && clients.filter(c => (c.clientName || c.name) !== currProject.client).map(c => (
-                    <option key={c._id || c.clientName || c.name} value={c.clientName || c.name}>{c.clientName || c.name}</option>
-                  ))}
-                </select>
-                <div style={{ marginTop: 24, display: 'flex', gap: 10 }}>
-                  <button onClick={() => setShowSendPopup(false)} style={{ flex: 1, padding: '10px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>Cancel</button>
-                  <button onClick={() => handleSendSelectedToPortal(targetPortalClient)} disabled={!targetPortalClient} style={{ flex: 1, padding: '10px', background: '#22C55E', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: !targetPortalClient ? 'not-allowed' : 'pointer', opacity: !targetPortalClient ? 0.5 : 1 }}>Send ({selectedPaymentItems.length})</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )
-      }
-
-      {/* Invoice Preview Modal */}
-      {
-        previewInvoice && (() => {
-          const inv = previewInvoice;
-          const taxAmt = inv.taxType === 'inclusive'
-            ? Math.round((inv.amount || 0) - (inv.amount || 0) / (1 + (inv.taxPercent || 0) / 100))
-            : Math.round((inv.amount || 0) * (inv.taxPercent || 0) / 100);
-          const subtotal = inv.taxType === 'inclusive'
-            ? Math.round((inv.amount || 0) / (1 + (inv.taxPercent || 0) / 100))
-            : (inv.amount || 0);
-          const total = inv.taxType === 'inclusive' ? (inv.amount || 0) : (inv.amount || 0) + taxAmt;
-          const s = (inv.status || '').toLowerCase();
-          const statusColor = s === 'paid' ? '#22C55E' : s === 'overdue' ? '#EF4444' : s === 'sent' ? '#3B82F6' : s === 'pending' ? '#F59E0B' : '#94A3B8';
-          const statusBg = s === 'paid' ? '#DCFCE7' : s === 'overdue' ? '#FEE2E2' : s === 'sent' ? '#DBEAFE' : s === 'pending' ? '#FEF3C7' : '#F1F5F9';
-          return (
-            <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '30px 16px' }}>
-              <div style={{ background: '#fff', width: '100%', maxWidth: 640, borderRadius: 12, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'Arial,sans-serif', overflow: 'hidden' }}>
-                <div style={{ background: '#1A2332', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <i className="ti ti-file-invoice" style={{ color: '#00BCD4', fontSize: 18 }}></i>
-                    <span style={{ color: '#fff', fontWeight: 800, fontSize: 14 }}>Invoice Preview — {inv.invoiceNo}</span>
-                  </div>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button onClick={() => { setPreviewInvoice(null); setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo) })); }} style={{ padding: '6px 14px', background: '#fff', color: '#374151', border: '1px solid #E8EDF2', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>
-                      <i className="ti ti-edit"></i> Edit
-                    </button>
-                    <button onClick={() => { if (confirm('Delete this invoice?')) { handleDeleteRecord('invoices', (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo)); setPreviewInvoice(null); } }} style={{ padding: '6px 14px', background: '#FEE2E2', color: '#EF4444', border: '1px solid #FECACA', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>
-                      <i className="ti ti-trash"></i> Delete
-                    </button>
-                    <button onClick={() => window.print()} style={{ padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>
-                      <i className="ti ti-printer"></i> Print / PDF
-                    </button>
-                    <button onClick={() => setPreviewInvoice(null)} style={{ padding: '6px 14px', background: '#374151', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>✕</button>
-                  </div>
-                </div>
-                <div id="invoice-print-area" style={{ padding: '36px 40px', background: '#fff' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
-                    <div>
-                      {user?.logoUrl ? (
-                        <img src={user.logoUrl} alt="Logo" style={{ height: 70, borderRadius: 12, marginBottom: 12, objectFit: 'contain' }} />
-                      ) : (
-                        <div style={{ width: 60, height: 60, borderRadius: 12, background: 'linear-gradient(135deg,#00BCD4,#0097A7)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
-                          <span style={{ color: '#fff', fontWeight: 900, fontSize: 24 }}>{(user?.companyName || 'Y')[0].toUpperCase()}</span>
-                        </div>
-                      )}
-                      <div style={{ fontWeight: 900, fontSize: 20, color: '#0f1c2e', letterSpacing: '1px', textTransform: 'uppercase' }}>{user?.companyName || 'YOUR COMPANY'}</div>
-                      <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4, lineHeight: 1.7 }}>
-                        {user?.email}<br />{user?.phone}<br />{user?.address}
-                      </div>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: 32, fontWeight: 900, color: 'rgba(0,188,212,0.1)', letterSpacing: '-1px', marginBottom: 4 }}>INVOICE</div>
-                      <div style={{ fontSize: 16, fontWeight: 800, color: '#00BCD4' }}>{inv.invoiceNo}</div>
-                      <div style={{ display: 'flex', gap: 20, marginTop: 14, justifyContent: 'flex-end' }}>
-                        <div style={{ textAlign: 'right' }}>
-                          <div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 3 }}>Date</div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: '#0f1c2e' }}>{inv.issueDate ? new Date(inv.issueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 3 }}>Due Date</div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: '#ea580c' }}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div>
-                        </div>
-                      </div>
-                      {inv.status && inv.status.toLowerCase() !== 'draft' && (
-                        <div style={{ marginTop: 12, textAlign: 'right' }}>
-                          <span style={{ display: 'inline-block', padding: '4px 14px', borderRadius: 20, background: statusBg, color: statusColor, fontSize: 11, fontWeight: 800, border: `1.5px solid ${statusColor}`, letterSpacing: 1 }}>
-                            {inv.status.charAt(0).toUpperCase() + inv.status.slice(1).toLowerCase()}
-                          </span>
-                        </div>
-                      )}
-                      <div style={{ marginTop: 24 }}>
-                        <div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '2px', textAlign: 'right', marginBottom: 6 }}>Project</div>
-                        <div style={{ fontSize: 14, fontWeight: 800, color: '#0f1c2e', textAlign: 'right' }}>{inv.projectName || currProject.name}</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ borderBottom: '2px solid #E8EDF2', paddingBottom: 20, marginBottom: 20 }}>
-                    <div style={{ fontSize: 9, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: 10 }}>Bill To</div>
-                    <div style={{ fontWeight: 800, fontSize: 17, color: '#0f1c2e' }}>{inv.clientName || clientName}</div>
-                    <div style={{ fontSize: 13, color: '#00BCD4', fontWeight: 600, marginTop: 2 }}>{inv.clientName || clientName}</div>
-                  </div>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 20 }}>
-                    <thead>
-                      <tr style={{ background: '#f8fafc' }}>
-                        {['#', 'Description', 'Qty', 'Unit Rate', 'Tax Rate', 'Amount'].map(h => (
-                          <th key={h} style={{ padding: '9px 11px', textAlign: h === 'Amount' || h === 'Unit Rate' || h === 'Qty' || h === 'Tax Rate' ? 'right' : 'left', fontSize: 9, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1.5, borderBottom: '2px solid #E8EDF2' }}>{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
+              {(currProject.advances || []).length > 0 ? (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
+                    <thead><tr style={{ background: '#F8FAFC' }}>{['Advance #', 'Description', 'Amount', 'Date', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
                     <tbody>
-                      <tr style={{ borderBottom: '1px solid #E8EDF2' }}>
-                        <td style={{ padding: '12px 11px', fontSize: 12, color: '#64748b', fontWeight: 700 }}>01</td>
-                        <td style={{ padding: '12px 11px', fontSize: 13, color: '#0f1c2e', fontWeight: 600 }}>{inv.description || 'Service'}</td>
-                        <td style={{ padding: '12px 11px', fontSize: 13, color: '#374151', textAlign: 'right' }}>1</td>
-                        <td style={{ padding: '12px 11px', fontSize: 13, color: '#374151', textAlign: 'right' }}>{currency}{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                        <td style={{ padding: '12px 11px', fontSize: 13, color: '#6b7280', textAlign: 'right' }}>{inv.taxPercent || 0}%</td>
-                        <td style={{ padding: '12px 11px', fontSize: 14, color: '#0f1c2e', textAlign: 'right', fontWeight: 700 }}>{currency}{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                      </tr>
+                      {(currProject.advances || []).map((rec, i) => (
+                        <tr key={i} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                          <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.advanceNo || `ADV-00${i + 1}`}</td>
+                          <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }}>{rec.description || '—'}</td>
+                          <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
+                          <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{rec.date ? new Date(rec.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                          <td style={{ padding: '12px 14px' }}><span style={{ background: rec.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: rec.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.status || 'Pending'}</span></td>
+                          <td style={{ padding: '12px 14px' }}>
+                            <div style={{ display: 'flex', gap: 4 }}>
+                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdvance: true, editData: rec, editIndex: i }))} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+                              <button onClick={() => handleDeleteRecord('advances', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 24 }}>
-                    <div style={{ width: 200 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 10, borderBottom: '1px solid #E8EDF2' }}>
-                        <span style={{ color: '#64748b' }}>Subtotal</span><span style={{ fontWeight: 700 }}>{currency}{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 10, borderBottom: '1px solid #E8EDF2' }}>
-                        <span style={{ color: '#64748b' }}>GST / Tax</span><span style={{ fontWeight: 700 }}>{currency}{taxAmt.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 8px', background: '#0f1c2e', borderRadius: 6, marginTop: 4, color: '#fff' }}>
-                        <span style={{ fontSize: 10, fontWeight: 800 }}>Balance Due</span>
-                        <span style={{ fontSize: 12, fontWeight: 900 }}>{currency}{total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                      </div>
-                    </div>
-                  </div>
-                  {inv.notes && (
-                    <div style={{ borderTop: '1px solid #E8EDF2', paddingTop: 14 }}>
-                      <div style={{ fontSize: 8, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 2 }}>Notes</div>
-                      <div style={{ fontSize: 8, color: '#64748b', lineHeight: 1.5 }}>{inv.notes}</div>
-                    </div>
-                  )}
                 </div>
-
-                {/* ── Footer Status Bar ── */}
-                {/* ── Footer Status Bar ── */}
-                <div style={{ borderTop: '1px solid #E8EDF2', padding: '10px 40px', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{inv.invoiceNo}</div>
-                  <div style={{ position: 'relative' }}>
-                    {(() => {
-                      const st = (inv.status || '').toLowerCase();
-                      const cfg = st === 'paid'
-                        ? { label: 'Paid', bg: '#DCFCE7', color: '#15803D', icon: '' }
-                        : st === 'overdue'
-                          ? { label: 'Overdue', bg: '#FEE2E2', color: '#DC2626', icon: '' }
-                          : st === 'sent'
-                            ? { label: 'Sent', bg: '#DBEAFE', color: '#1D4ED8', icon: '' }
-                            : { label: 'Pending', bg: '#FEF3C7', color: '#B45309', icon: '' };
-                      return (
-                        <>
-                          <span
-                            onClick={() => setShowStatusDropdown(prev => !prev)}
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 14px', borderRadius: 20, background: cfg.bg, color: cfg.color, fontSize: 12, fontWeight: 800, border: `1.5px solid ${cfg.color}`, cursor: 'pointer', userSelect: 'none' }}
-                          >
-                            {cfg.icon} {cfg.label} <span style={{ fontSize: 10 }}>▼</span>
-                          </span>
-                          {showStatusDropdown && (
-                            <div style={{ position: 'absolute', bottom: 36, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: '#fff', border: '1px solid #E8EDF2', borderRadius: 10, boxShadow: '0 4px 20px rgba(0,0,0,0.15)', minWidth: 150, overflow: 'hidden' }}>
-                              {[
-                                { label: 'Pending', color: '#B45309', bg: '#FEF3C7', icon: '' },
-                                { label: 'Paid', color: '#15803D', bg: '#DCFCE7', icon: '' },
-                                { label: 'Overdue', color: '#DC2626', bg: '#FEE2E2', icon: '' },
-                                { label: 'Sent', color: '#1D4ED8', bg: '#DBEAFE', icon: '' },
-                              ].map(opt => (
-                                <div key={opt.label}
-                                  onClick={async () => {
-                                    const updatedInvoices = (currProject.invoices || []).map(x =>
-                                      x.invoiceNo === inv.invoiceNo ? { ...x, status: opt.label } : x
-                                    );
-                                    await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { invoices: updatedInvoices });
-                                    setShowStatusDropdown(false);
-                                    setPreviewInvoice(prev => ({ ...prev, status: opt.label }));
-                                    loadLatest();
-                                  }}
-                                  style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', cursor: 'pointer', background: st === opt.label.toLowerCase() ? opt.bg : '#fff', borderBottom: '1px solid #F3F4F6' }}
-                                  onMouseEnter={e => e.currentTarget.style.background = opt.bg}
-                                  onMouseLeave={e => e.currentTarget.style.background = st === opt.label.toLowerCase() ? opt.bg : '#fff'}
-                                >
-                                  <span>{opt.icon}</span>
-                                  <span style={{ fontSize: 13, fontWeight: 700, color: opt.color }}>{opt.label}</span>
-                                  {st === opt.label.toLowerCase() && <span style={{ marginLeft: 'auto', fontSize: 11 }}>Yes</span>}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </>
-                      );
-                    })()}
-                  </div>
-                  <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>Urban Cafe Billing Software</div>
+              ) : (
+                <div style={{ padding: '32px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
+                  <i className="ti ti-pig-money" style={{ fontSize: 32, display: 'block', marginBottom: 10, opacity: .3, color: '#8B5CF6' }}></i>
+                  No advance payments recorded yet.
+                  <div style={{ marginTop: 12 }}><button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdvance: true }))} style={{ padding: '8px 18px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}><i className="ti ti-plus" style={{ marginRight: 6 }}></i>Add First Advance Payment</button></div>
                 </div>
-
-              </div>
+              )}
             </div>
-          );
-        })()
-      }
 
-
-      {/* Upload File Modal */}
-      {
-        showUploadModal && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 99998, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-            <div style={{ background: '#fff', borderRadius: P.radius, width: '100%', maxWidth: 480, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', overflow: 'hidden' }}>
-              {/* Header */}
-              <div style={{ background: `linear-gradient(135deg,${P.primary},${P.primaryDark})`, padding: '16px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <i className="ti ti-upload" style={{ color: '#fff', fontSize: 18 }}></i>
-                  <span style={{ color: '#fff', fontWeight: 800, fontSize: 15 }}>Upload File</span>
+            {/* ADDITIONAL CHARGES PANEL */}
+            <div style={{ display: activePayTab === 'add' ? 'block' : 'none', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>
+                  <i className="ti ti-circle-plus" style={{ color: '#F97316', fontSize: 15 }}></i> Additional Charges
+                  <span style={{ background: '#FFEDD5', color: '#C2410C', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{(currProject.additionalCharges || []).length || 0}</span>
                 </div>
-                <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>✕</button>
+                <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdditional: true }))} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Add Additional Charge
+                </button>
               </div>
-
-              {/* Body */}
-              <div style={{ padding: '22px 24px', maxHeight: '80vh', overflowY: 'auto' }}>
-
-                {/* Drop Zone */}
-                <div onClick={() => document.getElementById('modal-file-input').click()}
-                  style={{ border: `2px dashed ${uploadFileObj ? P.primary : P.border}`, borderRadius: 10, padding: '22px 16px', textAlign: 'center', cursor: 'pointer', marginBottom: 16, background: uploadFileObj ? P.primaryLight : P.bg, transition: 'all .2s' }}>
-                  <i className={`ti ${uploadFileObj ? 'ti-file-check' : 'ti-cloud-upload'}`} style={{ fontSize: 28, color: uploadFileObj ? P.green : P.textLight, display: 'block', marginBottom: 6 }}></i>
-                  {uploadFileObj ? (
-                    <div>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>{uploadFileObj.name}</div>
-                      <div style={{ fontSize: 11, color: P.textLight, marginTop: 3 }}>{(uploadFileObj.size / 1024).toFixed(1)} KB · Click to change</div>
-                    </div>
-                  ) : (
-                    <div>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Click to browse or drag & drop</div>
-                      <div style={{ fontSize: 11, color: P.textLight, marginTop: 3 }}>Images, PDFs, Docs supported</div>
-                    </div>
-                  )}
-                </div>
-                <input id="modal-file-input" type="file" onChange={handleModalFileSelect} style={{ display: 'none' }} />
-
-                {/* Heading */}
-                <div style={{ marginBottom: 12 }}>
-                  <label style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', display: 'block', marginBottom: 5 }}>File Heading</label>
-                  <input type="text" value={uploadHeading} onChange={e => setUploadHeading(e.target.value)} placeholder="e.g. Design Mockup v2"
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', boxSizing: 'border-box' }} />
-                </div>
-
-                {/* Description */}
-                <div style={{ marginBottom: 16 }}>
-                  <label style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', display: 'block', marginBottom: 5 }}>Description</label>
-                  <textarea value={uploadDescription} onChange={e => setUploadDescription(e.target.value)} placeholder="Brief description of this file..." rows={2}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }} />
-                </div>
-
-                {/* Share With label */}
-                <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 10 }}>Share With</div>
-
-                {/* Client Portal Toggle */}
-                <div style={{ border: `1.5px solid ${uploadSendToClient ? P.primary : P.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 10, background: uploadSendToClient ? P.primaryLight : '#fff', transition: 'all .15s' }}>
-                  <div onClick={() => { const newVal = !uploadSendToClient; setUploadSendToClient(newVal); setUploadClientName(newVal ? (currProject.client || clientName || '') : ''); }} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-                    <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${uploadSendToClient ? P.primary : P.border}`, background: uploadSendToClient ? P.primary : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      {uploadSendToClient && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>Yes</span>}
-                    </div>
-                    <i className="ti ti-building" style={{ color: P.primary, fontSize: 16 }}></i>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Client Portal</span>
-                  </div>
-                  {uploadSendToClient && (
-                    <select value={uploadClientName} onChange={e => setUploadClientName(e.target.value)}
-                      style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.primary}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', background: '#fff', color: P.textDark, marginTop: 10 }}>
-                      <option value="">-- Select Client --</option>
-                      {currProject.client && <option value={currProject.client}>{currProject.client}</option>}
-                      {(clients || []).filter(c => (c.clientName || c.name) !== currProject.client).map(c => (
-                        <option key={c._id || c.clientName} value={c.clientName || c.name}>{c.clientName || c.name}</option>
+              {(currProject.additionalCharges || []).length > 0 ? (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
+                    <thead><tr style={{ background: '#F8FAFC' }}>{['Charge #', 'Description', 'Amount', 'Date', 'Category', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
+                    <tbody>
+                      {(currProject.additionalCharges || []).map((rec, i) => (
+                        <tr key={i} style={{ borderBottom: '1px solid #F1F5F9', borderLeft: `3px solid ${rec.status === 'Paid' ? '#22C55E' : '#F59E0B'}` }}>
+                          <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.chargeNo || `CHG-00${i + 1}`}</td>
+                          <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }}>{rec.description || '—'}</td>
+                          <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
+                          <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{rec.date ? new Date(rec.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                          <td style={{ padding: '12px 14px' }}><span style={{ background: '#FFEDD5', color: '#C2410C', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.category || 'Other'}</span></td>
+                          <td style={{ padding: '12px 14px' }}><span style={{ background: rec.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: rec.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.status || 'Pending'}</span></td>
+                          <td style={{ padding: '12px 14px' }}>
+                            <div style={{ display: 'flex', gap: 4 }}>
+                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdditional: true, editData: rec, editIndex: i }))} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+                              <button onClick={() => handleDeleteRecord('additionalCharges', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
+                            </div>
+                          </td>
+                        </tr>
                       ))}
-                    </select>
-                  )}
+                    </tbody>
+                  </table>
                 </div>
-
-                {/* Employee Portal Toggle */}
-                <div style={{ border: `1.5px solid ${uploadSendToEmployee ? P.purple : P.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 20, background: uploadSendToEmployee ? P.purpleLight : '#fff', transition: 'all .15s' }}>
-                  <div onClick={() => { setUploadSendToEmployee(!uploadSendToEmployee); setUploadEmployeeName(''); }} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-                    <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${uploadSendToEmployee ? P.purple : P.border}`, background: uploadSendToEmployee ? P.purple : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      {uploadSendToEmployee && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>Yes</span>}
-                    </div>
-                    <i className="ti ti-users" style={{ color: P.purple, fontSize: 16 }}></i>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Employee Portal</span>
-                  </div>
-                  {uploadSendToEmployee && (
-                    <select value={uploadEmployeeName} onChange={e => setUploadEmployeeName(e.target.value)}
-                      style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.purple}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', background: '#fff', color: P.textDark, marginTop: 10 }}>
-                      <option value="">-- Select Employee --</option>
-                      {(employees || []).map(emp => (
-                        <option key={emp._id} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName}{emp.role ? ` (${emp.role})` : ''}</option>
-                      ))}
-                    </select>
-                  )}
+              ) : (
+                <div style={{ padding: '32px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
+                  <i className="ti ti-circle-plus" style={{ fontSize: 32, display: 'block', marginBottom: 10, opacity: .3, color: '#F97316' }}></i>
+                  No additional charges recorded yet.
+                  <div style={{ marginTop: 12 }}><button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdditional: true }))} style={{ padding: '8px 18px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}><i className="ti ti-plus" style={{ marginRight: 6 }}></i>Add First Additional Charge</button></div>
                 </div>
+              )}
+            </div>
 
-                {/* Buttons */}
-                <div style={{ display: 'flex', gap: 10 }}>
-                  <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }}
-                    style={{ flex: 1, padding: '10px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-                    Cancel
-                  </button>
-                  <button onClick={handleModalUpload} disabled={!uploadFileObj || uploadingModal}
-                    style={{ flex: 2, padding: '10px', borderRadius: 10, border: 'none', background: (!uploadFileObj || uploadingModal) ? P.border : P.primary, color: (!uploadFileObj || uploadingModal) ? P.textLight : '#fff', fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 800, cursor: (!uploadFileObj || uploadingModal) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all .15s' }}>
-                    <i className="ti ti-upload" style={{ fontSize: 15 }}></i>
-                    {uploadingModal ? 'Uploading...' : 'Upload & Share'}
-                  </button>
+            {/* MILESTONE PAYMENTS PANEL */}
+            <div style={{ display: activePayTab === 'mile' ? 'block' : 'none', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>
+                  <i className="ti ti-flag" style={{ color: '#F59E0B', fontSize: 15 }}></i> Milestone Payments
+                  <span style={{ background: '#FEF3C7', color: '#B45309', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{(currProject.milestonePayments || []).length || 0}</span>
                 </div>
-
+                <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showMilestonePayment: true }))} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Add Milestone Payment
+                </button>
               </div>
+              {(currProject.milestonePayments || []).length > 0 ? (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
+                    <thead><tr style={{ background: '#F8FAFC' }}>{['Milestone #', 'Name', 'Amount', 'Due Date', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
+                    <tbody>
+                      {(currProject.milestonePayments || []).map((rec, i) => (
+                        <tr key={i} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                          <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.milestoneNo || `MIL-00${i + 1}`}</td>
+                          <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }}>{rec.name || rec.description || '—'}</td>
+                          <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
+                          <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{(rec.dueDate || rec.date) ? new Date(rec.dueDate || rec.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                          <td style={{ padding: '12px 14px' }}><span style={{ background: rec.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: rec.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.status || 'Pending'}</span></td>
+                          <td style={{ padding: '12px 14px' }}>
+                            <div style={{ display: 'flex', gap: 4 }}>
+                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showMilestonePayment: true, editData: rec, editIndex: i }))} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+                              <button onClick={() => handleDeleteRecord('milestonePayments', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div style={{ padding: '32px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
+                  <i className="ti ti-flag" style={{ fontSize: 32, display: 'block', marginBottom: 10, opacity: .3, color: '#F59E0B' }}></i>
+                  No milestone payments recorded yet.
+                  <div style={{ marginTop: 12 }}><button onClick={() => setPaymentModalsState(prev => ({ ...prev, showMilestonePayment: true }))} style={{ padding: '8px 18px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}><i className="ti ti-plus" style={{ marginRight: 6 }}></i>Add First Milestone Payment</button></div>
+                </div>
+              )}
+            </div>
+
+            {/* PAYMENTS RECEIVED PANEL */}
+            <div style={{ display: activePayTab === 'pay' ? 'block' : 'none', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>
+                  <i className="ti ti-credit-card" style={{ color: '#22C55E', fontSize: 15 }}></i> Payments Received
+                  <span style={{ background: '#DCFCE7', color: '#15803D', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{(currProject.paymentsReceived || []).length || 0}</span>
+                </div>
+                <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showPayment: true }))} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Record Payment Received
+                </button>
+              </div>
+              {(currProject.paymentsReceived || []).length > 0 ? (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}>
+                    <thead><tr style={{ background: '#F8FAFC' }}>{['Payment #', 'Linked Invoice', 'Amount', 'Due Date', 'Payment Date', 'Mode', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
+                    <tbody>
+                      {(currProject.paymentsReceived || []).map((rec, i) => {
+                        const localInvDueDate = (currProject.invoices || []).find(inv => inv.invoiceNo === rec.linkedInvoice)?.dueDate;
+                        const globalInvDueDate = mergedInvoices.find(inv => inv.invoiceNo === rec.linkedInvoice)?.dueDate;
+                        const effectiveDueDate = rec.dueDate || localInvDueDate || globalInvDueDate || null;
+                        const isLate = effectiveDueDate && rec.paymentDate && new Date(rec.paymentDate) > new Date(effectiveDueDate);
+                        return (
+                          <tr key={i} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                            <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.paymentNo || `PAY-00${i + 1}`}</td>
+                            <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#00BCD4' }}>{rec.linkedInvoice || '—'}</td>
+                            <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
+                            <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: isLate ? '#EF4444' : '#2D3E50' }}>
+                              {effectiveDueDate ? new Date(effectiveDueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                              {isLate && <div style={{ fontSize: 9, fontWeight: 800, color: '#EF4444' }}>LATE</div>}
+                            </td>
+                            <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{rec.paymentDate ? new Date(rec.paymentDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                            <td style={{ padding: '12px 14px', fontSize: 11, fontWeight: 800, color: '#475569' }}>{rec.paymentMode || '—'}</td>
+                            <td style={{ padding: '12px 14px' }}>
+                              <div style={{ display: 'flex', gap: 4 }}>
+                                <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showPayment: true, editData: rec, editIndex: i }))} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+                                <button onClick={() => handleDeleteRecord('paymentsReceived', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div style={{ padding: '32px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
+                  <i className="ti ti-credit-card" style={{ fontSize: 32, display: 'block', marginBottom: 10, opacity: .3, color: '#22C55E' }}></i>
+                  No payments received yet.
+                  <div style={{ marginTop: 12 }}><button onClick={() => setPaymentModalsState(prev => ({ ...prev, showPayment: true }))} style={{ padding: '8px 18px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}><i className="ti ti-plus" style={{ marginRight: 6 }}></i>Record First Payment</button></div>
+                </div>
+              )}
+            </div>
+
+            {/* EXPENSES PANEL */}
+            <div style={{ display: activePayTab === 'exp' ? 'block' : 'none', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>
+                  <i className="ti ti-receipt" style={{ color: '#6B7280', fontSize: 15 }}></i> Expenses
+                  <span style={{ background: '#F3F4F6', color: '#374151', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{(currProject.expenses || []).length || 0}</span>
+                </div>
+                <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showExpense: true }))} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Add Expense
+                </button>
+              </div>
+              {(currProject.expenses || []).length > 0 ? (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
+                    <thead><tr style={{ background: '#F8FAFC' }}>{['Expense #', 'Description', 'Amount', 'Date', 'Category', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
+                    <tbody>
+                      {(currProject.expenses || []).map((rec, i) => (
+                        <tr key={i} style={{ borderBottom: '1px solid #F1F5F9', borderLeft: `3px solid ${rec.status === 'Paid' ? '#22C55E' : '#F59E0B'}` }}>
+                          <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.expenseNo || `EXP-00${i + 1}`}</td>
+                          <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }}>{rec.description || '—'}</td>
+                          <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
+                          <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{rec.date ? new Date(rec.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                          <td style={{ padding: '12px 14px' }}><span style={{ background: '#FFEDD5', color: '#C2410C', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.category || 'Other'}</span></td>
+                          <td style={{ padding: '12px 14px' }}><span style={{ background: rec.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: rec.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.status || 'Pending'}</span></td>
+                          <td style={{ padding: '12px 14px' }}>
+                            <div style={{ display: 'flex', gap: 4 }}>
+                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showExpense: true, editData: rec, editIndex: i }))} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+                              <button onClick={() => handleDeleteRecord('expenses', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div style={{ padding: '32px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
+                  <i className="ti ti-receipt" style={{ fontSize: 32, display: 'block', marginBottom: 10, opacity: .3, color: '#6B7280' }}></i>
+                  No expenses recorded yet.
+                  <div style={{ marginTop: 12 }}><button onClick={() => setPaymentModalsState(prev => ({ ...prev, showExpense: true }))} style={{ padding: '8px 18px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}><i className="ti ti-plus" style={{ marginRight: 6 }}></i>Add First Expense</button></div>
+                </div>
+              )}
+
             </div>
           </div>
-        )
-      }
-    </div >
-  );
+        </div>{/* end tabContentRef wrapper */}
+      </div>
+
+      {/* TEAM SIDEBAR */}
+      <div className="mpd-card">
+        <div className="mpd-card-header">
+          <div className="mpd-card-title"><i className="ti ti-users"></i> Team</div>
+          <button className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMemberModal(true)} style={{ padding: '5px 10px', fontSize: 11 }}>
+            <i className="ti ti-plus"></i> Add
+          </button>
+        </div>
+        {assigned.length === 0 ? <div style={{ fontSize: 12, color: P.textLight }}>No team members assigned.</div> : null}
+        {assigned.map((a, i) => (
+          <div key={i} className="mpd-member-row" style={{ display: 'flex', alignItems: 'center' }}>
+            <div className="mpd-av mpd-av-sm" style={{ background: getAvatarColor(a) }}>{getInitials(a)}</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>{a}</div>
+              <div style={{ fontSize: 11, color: P.textLight }}>{employees.find(e => (e.name || e.employeeName) === a)?.role || 'Member'}</div>
+            </div>
+            {user?.role !== 'employee' && (
+              <button onClick={async () => {
+                if (!window.confirm('Remove ' + a + ' from team?')) return;
+                const updated = (currProject.assignedTo || []).filter((_, idx) => idx !== i);
+                await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated });
+                try {
+                  const tasksRes = await axios.get(`${BASE_URL}/api/tasks`, { headers: { 'x-company-id': currProject.companyId || '' } });
+                  const allTasks = Array.isArray(tasksRes.data) ? tasksRes.data : [];
+                  const projectTasks = allTasks.filter(t =>
+                    (t.projectId === currProject._id || t.projectId?._id === currProject._id) &&
+                    t.assignTo && t.assignTo !== 'Unassigned' &&
+                    t.assignTo.split(', ').map(n => n.trim()).includes(a)
+                  );
+                  await Promise.all(projectTasks.map(t => {
+                    const names = t.assignTo.split(', ').map(n => n.trim()).filter(Boolean);
+                    const updatedNames = names.filter(n => n !== a);
+                    return axios.put(`${BASE_URL}/api/tasks/${t._id}`, { assignTo: updatedNames.length > 0 ? updatedNames.join(', ') : 'Unassigned' }, { headers: { 'x-company-id': currProject.companyId || '' } });
+                  }));
+                } catch (e) { console.error('Failed to unassign tasks:', e); }
+                loadLatest();
+              }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 14, padding: '4px 6px' }} title="Remove">Delete</button>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* BUDGET */}
+      <div className="mpd-card">
+        <div className="mpd-card-header">
+          <div className="mpd-card-title"><i className="ti ti-wallet"></i> Budget</div>
+        </div>
+        {budgetExceeded && (
+          <div style={{ background: '#FEE2E2', border: '1px solid #FECACA', borderRadius: 8, padding: '8px 12px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 7 }}>
+            <i className="ti ti-alert-triangle" style={{ color: '#DC2626', fontSize: 16 }}></i>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 800, color: '#DC2626' }}>Budget Exceeded!</div>
+              <div style={{ fontSize: 10, color: '#991B1B', fontWeight: 600 }}>Over by {currency}{overageAmt.toLocaleString()}</div>
+            </div>
+          </div>
+        )}
+        <div className="mpd-brow">
+          <span className="mpd-lbl">Total Budget <span style={{ fontSize: 9, color: '#94A3B8', fontWeight: 600, marginLeft: 4 }}>(auto)</span></span>
+          <span className="mpd-val">{currency}{budgetAmt.toLocaleString()}</span>
+        </div>
+        {[['Billed', 'billed', billed, ''], ['Received', 'received', received, 'mpd-g']].map(([lbl, key, val, cls]) => (
+          <div key={key} className="mpd-brow">
+            <span className="mpd-lbl">{lbl}</span>
+            <span className={`mpd-val ${cls}`}>{currency}{val.toLocaleString()}</span>
+          </div>
+        ))}
+        <div className="mpd-brow">
+          <span className="mpd-lbl">Pending</span>
+          <span className="mpd-val mpd-r">{currency}{pending.toLocaleString()}</span>
+        </div>
+        <div className="mpd-brow">
+          <span className="mpd-lbl">Spent (Expenses)</span>
+          <span className="mpd-val" style={{ color: budgetExceeded ? '#DC2626' : undefined, fontWeight: budgetExceeded ? 800 : 700 }}>{currency}{spent.toLocaleString()}</span>
+        </div>
+        {budgetAmt > 0 && (
+          <div className="mpd-brow">
+            <span className="mpd-lbl">Remaining Budget</span>
+            <span className="mpd-val" style={{ color: remaining < 0 ? '#DC2626' : '#7C3AED', fontWeight: 800 }}>
+              {remaining < 0 ? `-${currency}${Math.abs(remaining).toLocaleString()}` : `${currency}${remaining.toLocaleString()}`}
+            </span>
+          </div>
+        )}
+        {budgetAmt > 0 && (
+          <div style={{ marginTop: 10 }}>
+            <div className="mpd-progress-bg">
+              <div className="mpd-progress-fill" style={{ width: `${Math.min(budgetUsedPct, 100)}%`, background: budgetExceeded ? '#EF4444' : budgetUsedPct > 80 ? '#F97316' : '#8B5CF6' }}></div>
+            </div>
+            <div style={{ fontSize: 11, color: budgetExceeded ? '#DC2626' : P.textLight, marginTop: 4, fontWeight: budgetExceeded ? 800 : 600 }}>
+              {budgetUsedPct}% used · {currency}{spent.toLocaleString()} of {currency}{budgetAmt.toLocaleString()}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* FILES */}
+      <div className="mpd-card">
+        <div className="mpd-card-header">
+          <div className="mpd-card-title"><i className="ti ti-paperclip"></i> Files</div>
+          <button className="mpd-btn mpd-btn-outline" onClick={() => setShowUploadModal(true)} style={{ padding: '5px 10px', fontSize: 11 }}>
+            <i className="ti ti-upload"></i> Upload
+          </button>
+        </div>
+        <input type="file" ref={fileInputRef} onChange={handleFileUpload} style={{ display: 'none' }} accept="image/*" />
+        {(!currProject.files || currProject.files.length === 0) ? (
+          <div style={{ fontSize: 12, color: P.textLight, textAlign: 'center', padding: '10px 0' }}>No files attached.</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {currProject.files.map((file) => (
+              <div key={file._id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px', border: `1.5px solid ${P.border}`, borderRadius: 8 }}>
+                <a href={file.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, fontWeight: 700, color: P.primary, textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180 }}>
+                  <i className="ti ti-file" style={{ marginRight: 6 }}></i>{file.name}
+                </a>
+                <button onClick={() => handleDeleteFile(file._id)} style={{ background: 'transparent', border: 'none', color: P.red, cursor: 'pointer', fontSize: 14 }}>✕</button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* PORTAL LINK */}
+      <div className="mpd-card" style={{ background: `linear-gradient(135deg, ${P.primaryLight}, #fff)`, border: `1.5px solid ${P.primaryMid}` }}>
+        <div className="mpd-card-title" style={{ marginBottom: 12 }}><i className="ti ti-building"></i> Client Portal</div>
+        <div style={{ fontSize: 12, color: P.textMid, marginBottom: 16 }}>The client has access to their project portal with live progress, files, invoices and updates.</div>
+        <button className="mpd-btn mpd-btn-primary" onClick={() => setShowPortalPreview(true)} style={{ width: '100%', justifyContent: 'center' }}><i className="ti ti-external-link"></i> View Portal</button>
+      </div>
+    </div>
+
+    {/* Add Task Modal */ }
+  {
+    showAddTaskModal && (
+      <div style={{ position: 'fixed', inset: 0, zIndex: 99995, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ background: '#fff', borderRadius: P.radius, width: 440, padding: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.15)', boxSizing: 'border-box', maxHeight: '90vh', overflowY: 'auto' }}>
+          <h3 style={{ margin: '0 0 16px', fontSize: 18, color: P.textDark }}>{editingTask ? 'Edit Task' : 'Add New Task'}</h3>
+          <form onSubmit={handleCreateTask}>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Task Name *</label>
+              <input type="text" value={newTaskTitle} onChange={e => setNewTaskTitle(e.target.value)} placeholder="Enter task title" required style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }} />
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Description</label>
+              <textarea value={newTaskDesc} onChange={e => setNewTaskDesc(e.target.value)} placeholder="Enter details..." style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', resize: 'vertical', minHeight: 60, boxSizing: 'border-box' }} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Priority</label>
+                <select value={newTaskPriority} onChange={e => setNewTaskPriority(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Due Date</label>
+                <input type="date" value={newTaskDue} onChange={e => setNewTaskDue(e.target.value)} style={{ width: '100%', padding: '9px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box', background: '#fff', color: newTaskDue ? P.textDark : '#A0AEC0', fontFamily: 'Nunito, sans-serif', cursor: 'pointer' }} />
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Status</label>
+                <select value={newTaskStatus} onChange={e => setNewTaskStatus(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
+                  <option value="Not Started">Not Started</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Completed">Completed</option>
+                  <option value="On Hold">On Hold</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Link to Milestone</label>
+                <select value={newTaskMilestone} onChange={e => setNewTaskMilestone(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
+                  <option value="">-- No Milestone --</option>
+                  {(currProject.milestones || []).map((m, i) => (<option key={i} value={m.name}>{m.name}</option>))}
+                </select>
+              </div>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Assign To</label>
+              <select value={Array.isArray(newTaskAssignTo) && newTaskAssignTo.length > 0 ? newTaskAssignTo[0] : ''} onChange={e => setNewTaskAssignTo(e.target.value ? [e.target.value] : [])} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', fontSize: 13, color: P.textDark, background: '#fff', boxSizing: 'border-box' }}>
+                <option value=''>-- Select Employee --</option>
+                {(employees || []).map(emp => { const name = emp.name || emp.employeeName || ''; if (!name) return null; return (<option key={emp._id} value={name}>{name}</option>); })}
+              </select>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+              <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddTaskModal(false)}>Cancel</button>
+              <button type="submit" className="mpd-btn mpd-btn-primary" disabled={addingTask}>{addingTask ? 'Adding...' : editingTask ? 'Update Task' : 'Add Task'}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )
+  }
+
+  {/* Add Member Modal */ }
+  {
+    showAddMemberModal && (
+      <div style={{ position: 'fixed', inset: 0, zIndex: 99996, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ background: '#fff', borderRadius: P.radius, width: 380, padding: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
+          <h3 style={{ margin: '0 0 16px', fontSize: 16, color: P.textDark }}>Add Team Member</h3>
+          <select value={selectedNewMember} onChange={e => setSelectedNewMember(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none', marginBottom: 16 }}>
+            <option value="">-- Select Employee --</option>
+            {(employees || []).filter(emp => !assigned.includes(emp.name || emp.employeeName)).map(emp => (
+              <option key={emp._id} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName} ({emp.role || 'Employee'})</option>
+            ))}
+          </select>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+            <button className="mpd-btn mpd-btn-outline" onClick={() => { setShowAddMemberModal(false); setSelectedNewMember(''); }}>Cancel</button>
+            <button className="mpd-btn mpd-btn-primary" disabled={!selectedNewMember} onClick={async () => {
+              if (!selectedNewMember) return;
+              const updated = [...(currProject.assignedTo || []), selectedNewMember];
+              await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated });
+              setShowAddMemberModal(false);
+              setSelectedNewMember('');
+              loadLatest();
+            }}>Add</button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  {/* Portal Live Preview Overlay */ }
+  {
+    showPortalPreview && (
+      <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: '#fff', overflowY: 'auto', padding: 20 }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: `1px solid ${P.border}`, paddingBottom: 12 }}>
+            <h2 style={{ margin: 0, fontSize: 20, color: P.textDark }}>Client Portal Live Preview</h2>
+            <button className="mpd-btn mpd-btn-danger" onClick={() => { setShowPortalPreview(false); onBack(); }}>
+              <i className="ti ti-arrow-right"></i> {hideTopActions ? 'Next' : 'Exit Preview'}
+            </button>
+          </div>
+          <ModernEmployeeProjectDetails project={currProject} tasks={currTasks} user={{ role: 'client', name: currProject.client }} onBack={() => setShowPortalPreview(false)} onMessageTeam={() => { setShowPortalPreview(false); if (onMessageTeam) onMessageTeam(); }} />
+        </div>
+      </div>
+    )
+  }
+
+  {/* Payment Modals */ }
+  <ProjectPaymentModals
+    project={currProject}
+    modalsState={paymentModalsState}
+    setModalsState={(newState) => { setPaymentModalsState(newState); }}
+    onSaveSuccess={() => { loadLatest(); if (onUpdate) onUpdate(); }}
+  />
+
+  {/* Send to Client Popup */ }
+  {
+    showSendPopup && (
+      <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+        <div style={{ background: '#fff', width: '100%', maxWidth: 400, borderRadius: 16, boxShadow: '0 20px 40px rgba(0,0,0,0.2)', overflow: 'hidden' }}>
+          <div style={{ padding: '20px 24px', borderBottom: '1px solid #E8EDF2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ fontSize: 16, fontWeight: 900, color: '#0D1B2A' }}>Send to Client Portal</div>
+            <button onClick={() => setShowSendPopup(false)} style={{ background: 'none', border: 'none', fontSize: 20, color: '#7B8FA1', cursor: 'pointer' }}>✕</button>
+          </div>
+          <div style={{ padding: 24 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 8 }}>Select Client</div>
+            <select value={targetPortalClient} onChange={e => setTargetPortalClient(e.target.value)} style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #E8EDF2', fontSize: 13, color: '#1A2332', outline: 'none', background: '#FAFBFD' }}>
+              <option value="">-- Select Client --</option>
+              <option value={currProject.client}>{currProject.client || 'Project Client'}</option>
+              {clients && clients.filter(c => (c.clientName || c.name) !== currProject.client).map(c => (
+                <option key={c._id || c.clientName || c.name} value={c.clientName || c.name}>{c.clientName || c.name}</option>
+              ))}
+            </select>
+            <div style={{ marginTop: 24, display: 'flex', gap: 10 }}>
+              <button onClick={() => setShowSendPopup(false)} style={{ flex: 1, padding: '10px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>Cancel</button>
+              <button onClick={() => handleSendSelectedToPortal(targetPortalClient)} disabled={!targetPortalClient} style={{ flex: 1, padding: '10px', background: '#22C55E', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: !targetPortalClient ? 'not-allowed' : 'pointer', opacity: !targetPortalClient ? 0.5 : 1 }}>Send ({selectedPaymentItems.length})</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  {/* Invoice Preview Modal */ }
+  {
+    previewInvoice && (() => {
+      const inv = previewInvoice;
+      const taxAmt = inv.taxType === 'inclusive' ? Math.round((inv.amount || 0) - (inv.amount || 0) / (1 + (inv.taxPercent || 0) / 100)) : Math.round((inv.amount || 0) * (inv.taxPercent || 0) / 100);
+      const subtotal = inv.taxType === 'inclusive' ? Math.round((inv.amount || 0) / (1 + (inv.taxPercent || 0) / 100)) : (inv.amount || 0);
+      const total = inv.taxType === 'inclusive' ? (inv.amount || 0) : (inv.amount || 0) + taxAmt;
+      const s = (inv.status || '').toLowerCase();
+      const statusColor = s === 'paid' ? '#22C55E' : s === 'overdue' ? '#EF4444' : s === 'sent' ? '#3B82F6' : s === 'pending' ? '#F59E0B' : '#94A3B8';
+      const statusBg = s === 'paid' ? '#DCFCE7' : s === 'overdue' ? '#FEE2E2' : s === 'sent' ? '#DBEAFE' : s === 'pending' ? '#FEF3C7' : '#F1F5F9';
+      return (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '30px 16px' }}>
+          <div style={{ background: '#fff', width: '100%', maxWidth: 640, borderRadius: 12, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'Arial,sans-serif', overflow: 'hidden' }}>
+            <div style={{ background: '#1A2332', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <i className="ti ti-file-invoice" style={{ color: '#00BCD4', fontSize: 18 }}></i>
+                <span style={{ color: '#fff', fontWeight: 800, fontSize: 14 }}>Invoice Preview — {inv.invoiceNo}</span>
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button onClick={() => { setPreviewInvoice(null); setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo) })); }} style={{ padding: '6px 14px', background: '#fff', color: '#374151', border: '1px solid #E8EDF2', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}><i className="ti ti-edit"></i> Edit</button>
+                <button onClick={() => { if (confirm('Delete this invoice?')) { handleDeleteRecord('invoices', (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo)); setPreviewInvoice(null); } }} style={{ padding: '6px 14px', background: '#FEE2E2', color: '#EF4444', border: '1px solid #FECACA', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}><i className="ti ti-trash"></i> Delete</button>
+                <button onClick={() => window.print()} style={{ padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}><i className="ti ti-printer"></i> Print / PDF</button>
+                <button onClick={() => setPreviewInvoice(null)} style={{ padding: '6px 14px', background: '#374151', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>✕</button>
+              </div>
+            </div>
+            <div id="invoice-print-area" style={{ padding: '36px 40px', background: '#fff' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
+                <div>
+                  {user?.logoUrl ? (<img src={user.logoUrl} alt="Logo" style={{ height: 70, borderRadius: 12, marginBottom: 12, objectFit: 'contain' }} />) : (<div style={{ width: 60, height: 60, borderRadius: 12, background: 'linear-gradient(135deg,#00BCD4,#0097A7)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}><span style={{ color: '#fff', fontWeight: 900, fontSize: 24 }}>{(user?.companyName || 'Y')[0].toUpperCase()}</span></div>)}
+                  <div style={{ fontWeight: 900, fontSize: 20, color: '#0f1c2e', letterSpacing: '1px', textTransform: 'uppercase' }}>{user?.companyName || 'YOUR COMPANY'}</div>
+                  <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4, lineHeight: 1.7 }}>{user?.email}<br />{user?.phone}<br />{user?.address}</div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: 32, fontWeight: 900, color: 'rgba(0,188,212,0.1)', letterSpacing: '-1px', marginBottom: 4 }}>INVOICE</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: '#00BCD4' }}>{inv.invoiceNo}</div>
+                  <div style={{ display: 'flex', gap: 20, marginTop: 14, justifyContent: 'flex-end' }}>
+                    <div style={{ textAlign: 'right' }}><div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 3 }}>Date</div><div style={{ fontSize: 12, fontWeight: 700, color: '#0f1c2e' }}>{inv.issueDate ? new Date(inv.issueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div></div>
+                    <div style={{ textAlign: 'right' }}><div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 3 }}>Due Date</div><div style={{ fontSize: 12, fontWeight: 700, color: '#ea580c' }}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div></div>
+                  </div>
+                  {inv.status && inv.status.toLowerCase() !== 'draft' && (<div style={{ marginTop: 12, textAlign: 'right' }}><span style={{ display: 'inline-block', padding: '4px 14px', borderRadius: 20, background: statusBg, color: statusColor, fontSize: 11, fontWeight: 800, border: `1.5px solid ${statusColor}`, letterSpacing: 1 }}>{inv.status.charAt(0).toUpperCase() + inv.status.slice(1).toLowerCase()}</span></div>)}
+                  <div style={{ marginTop: 24 }}><div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '2px', textAlign: 'right', marginBottom: 6 }}>Project</div><div style={{ fontSize: 14, fontWeight: 800, color: '#0f1c2e', textAlign: 'right' }}>{inv.projectName || currProject.name}</div></div>
+                </div>
+              </div>
+              <div style={{ borderBottom: '2px solid #E8EDF2', paddingBottom: 20, marginBottom: 20 }}>
+                <div style={{ fontSize: 9, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: 10 }}>Bill To</div>
+                <div style={{ fontWeight: 800, fontSize: 17, color: '#0f1c2e' }}>{inv.clientName || clientName}</div>
+                <div style={{ fontSize: 13, color: '#00BCD4', fontWeight: 600, marginTop: 2 }}>{inv.clientName || clientName}</div>
+              </div>
+              <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 20 }}>
+                <thead><tr style={{ background: '#f8fafc' }}>{['#', 'Description', 'Qty', 'Unit Rate', 'Tax Rate', 'Amount'].map(h => (<th key={h} style={{ padding: '9px 11px', textAlign: h === 'Amount' || h === 'Unit Rate' || h === 'Qty' || h === 'Tax Rate' ? 'right' : 'left', fontSize: 9, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1.5, borderBottom: '2px solid #E8EDF2' }}>{h}</th>))}</tr></thead>
+                <tbody><tr style={{ borderBottom: '1px solid #E8EDF2' }}><td style={{ padding: '12px 11px', fontSize: 12, color: '#64748b', fontWeight: 700 }}>01</td><td style={{ padding: '12px 11px', fontSize: 13, color: '#0f1c2e', fontWeight: 600 }}>{inv.description || 'Service'}</td><td style={{ padding: '12px 11px', fontSize: 13, color: '#374151', textAlign: 'right' }}>1</td><td style={{ padding: '12px 11px', fontSize: 13, color: '#374151', textAlign: 'right' }}>{currency}{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td><td style={{ padding: '12px 11px', fontSize: 13, color: '#6b7280', textAlign: 'right' }}>{inv.taxPercent || 0}%</td><td style={{ padding: '12px 11px', fontSize: 14, color: '#0f1c2e', textAlign: 'right', fontWeight: 700 }}>{currency}{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td></tr></tbody>
+              </table>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 24 }}>
+                <div style={{ width: 200 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 10, borderBottom: '1px solid #E8EDF2' }}><span style={{ color: '#64748b' }}>Subtotal</span><span style={{ fontWeight: 700 }}>{currency}{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 10, borderBottom: '1px solid #E8EDF2' }}><span style={{ color: '#64748b' }}>GST / Tax</span><span style={{ fontWeight: 700 }}>{currency}{taxAmt.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 8px', background: '#0f1c2e', borderRadius: 6, marginTop: 4, color: '#fff' }}><span style={{ fontSize: 10, fontWeight: 800 }}>Balance Due</span><span style={{ fontSize: 12, fontWeight: 900 }}>{currency}{total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>
+                </div>
+              </div>
+              {inv.notes && (<div style={{ borderTop: '1px solid #E8EDF2', paddingTop: 14 }}><div style={{ fontSize: 8, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 2 }}>Notes</div><div style={{ fontSize: 8, color: '#64748b', lineHeight: 1.5 }}>{inv.notes}</div></div>)}
+            </div>
+            <div style={{ borderTop: '1px solid #E8EDF2', padding: '10px 40px', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{inv.invoiceNo}</div>
+              <div style={{ position: 'relative' }}>
+                {(() => {
+                  const st = (inv.status || '').toLowerCase();
+                  const cfg = st === 'paid' ? { label: 'Paid', bg: '#DCFCE7', color: '#15803D', icon: '' } : st === 'overdue' ? { label: 'Overdue', bg: '#FEE2E2', color: '#DC2626', icon: '' } : st === 'sent' ? { label: 'Sent', bg: '#DBEAFE', color: '#1D4ED8', icon: '' } : { label: 'Pending', bg: '#FEF3C7', color: '#B45309', icon: '' };
+                  return (
+                    <>
+                      <span onClick={() => setShowStatusDropdown(prev => !prev)} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 14px', borderRadius: 20, background: cfg.bg, color: cfg.color, fontSize: 12, fontWeight: 800, border: `1.5px solid ${cfg.color}`, cursor: 'pointer', userSelect: 'none' }}>{cfg.icon} {cfg.label} <span style={{ fontSize: 10 }}>▼</span></span>
+                      {showStatusDropdown && (
+                        <div style={{ position: 'absolute', bottom: 36, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: '#fff', border: '1px solid #E8EDF2', borderRadius: 10, boxShadow: '0 4px 20px rgba(0,0,0,0.15)', minWidth: 150, overflow: 'hidden' }}>
+                          {[{ label: 'Pending', color: '#B45309', bg: '#FEF3C7', icon: '' }, { label: 'Paid', color: '#15803D', bg: '#DCFCE7', icon: '' }, { label: 'Overdue', color: '#DC2626', bg: '#FEE2E2', icon: '' }, { label: 'Sent', color: '#1D4ED8', bg: '#DBEAFE', icon: '' }].map(opt => (
+                            <div key={opt.label} onClick={async () => { const updatedInvoices = (currProject.invoices || []).map(x => x.invoiceNo === inv.invoiceNo ? { ...x, status: opt.label } : x); await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { invoices: updatedInvoices }); setShowStatusDropdown(false); setPreviewInvoice(prev => ({ ...prev, status: opt.label })); loadLatest(); }} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', cursor: 'pointer', background: st === opt.label.toLowerCase() ? opt.bg : '#fff', borderBottom: '1px solid #F3F4F6' }} onMouseEnter={e => e.currentTarget.style.background = opt.bg} onMouseLeave={e => e.currentTarget.style.background = st === opt.label.toLowerCase() ? opt.bg : '#fff'}>
+                              <span>{opt.icon}</span>
+                              <span style={{ fontSize: 13, fontWeight: 700, color: opt.color }}>{opt.label}</span>
+                              {st === opt.label.toLowerCase() && <span style={{ marginLeft: 'auto', fontSize: 11 }}>Yes</span>}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+              <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>Urban Cafe Billing Software</div>
+            </div>
+          </div>
+        </div>
+      );
+    })()
+  }
+
+  {/* Upload File Modal */ }
+  {
+    showUploadModal && (
+      <div style={{ position: 'fixed', inset: 0, zIndex: 99998, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+        <div style={{ background: '#fff', borderRadius: P.radius, width: '100%', maxWidth: 480, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', overflow: 'hidden' }}>
+          <div style={{ background: `linear-gradient(135deg,${P.primary},${P.primaryDark})`, padding: '16px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><i className="ti ti-upload" style={{ color: '#fff', fontSize: 18 }}></i><span style={{ color: '#fff', fontWeight: 800, fontSize: 15 }}>Upload File</span></div>
+            <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>✕</button>
+          </div>
+          <div style={{ padding: '22px 24px', maxHeight: '80vh', overflowY: 'auto' }}>
+            <div onClick={() => document.getElementById('modal-file-input').click()} style={{ border: `2px dashed ${uploadFileObj ? P.primary : P.border}`, borderRadius: 10, padding: '22px 16px', textAlign: 'center', cursor: 'pointer', marginBottom: 16, background: uploadFileObj ? P.primaryLight : P.bg, transition: 'all .2s' }}>
+              <i className={`ti ${uploadFileObj ? 'ti-file-check' : 'ti-cloud-upload'}`} style={{ fontSize: 28, color: uploadFileObj ? P.green : P.textLight, display: 'block', marginBottom: 6 }}></i>
+              {uploadFileObj ? (<div><div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>{uploadFileObj.name}</div><div style={{ fontSize: 11, color: P.textLight, marginTop: 3 }}>{(uploadFileObj.size / 1024).toFixed(1)} KB · Click to change</div></div>) : (<div><div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Click to browse or drag & drop</div><div style={{ fontSize: 11, color: P.textLight, marginTop: 3 }}>Images, PDFs, Docs supported</div></div>)}
+            </div>
+            <input id="modal-file-input" type="file" onChange={handleModalFileSelect} style={{ display: 'none' }} />
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', display: 'block', marginBottom: 5 }}>File Heading</label>
+              <input type="text" value={uploadHeading} onChange={e => setUploadHeading(e.target.value)} placeholder="e.g. Design Mockup v2" style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', boxSizing: 'border-box' }} />
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', display: 'block', marginBottom: 5 }}>Description</label>
+              <textarea value={uploadDescription} onChange={e => setUploadDescription(e.target.value)} placeholder="Brief description of this file..." rows={2} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }} />
+            </div>
+            <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 10 }}>Share With</div>
+            <div style={{ border: `1.5px solid ${uploadSendToClient ? P.primary : P.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 10, background: uploadSendToClient ? P.primaryLight : '#fff', transition: 'all .15s' }}>
+              <div onClick={() => { const newVal = !uploadSendToClient; setUploadSendToClient(newVal); setUploadClientName(newVal ? (currProject.client || clientName || '') : ''); }} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${uploadSendToClient ? P.primary : P.border}`, background: uploadSendToClient ? P.primary : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{uploadSendToClient && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>Yes</span>}</div>
+                <i className="ti ti-building" style={{ color: P.primary, fontSize: 16 }}></i>
+                <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Client Portal</span>
+              </div>
+              {uploadSendToClient && (<select value={uploadClientName} onChange={e => setUploadClientName(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.primary}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', background: '#fff', color: P.textDark, marginTop: 10 }}><option value="">-- Select Client --</option>{currProject.client && <option value={currProject.client}>{currProject.client}</option>}{(clients || []).filter(c => (c.clientName || c.name) !== currProject.client).map(c => (<option key={c._id || c.clientName} value={c.clientName || c.name}>{c.clientName || c.name}</option>))}</select>)}
+            </div>
+            <div style={{ border: `1.5px solid ${uploadSendToEmployee ? P.purple : P.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 20, background: uploadSendToEmployee ? P.purpleLight : '#fff', transition: 'all .15s' }}>
+              <div onClick={() => { setUploadSendToEmployee(!uploadSendToEmployee); setUploadEmployeeName(''); }} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${uploadSendToEmployee ? P.purple : P.border}`, background: uploadSendToEmployee ? P.purple : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{uploadSendToEmployee && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>Yes</span>}</div>
+                <i className="ti ti-users" style={{ color: P.purple, fontSize: 16 }}></i>
+                <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Employee Portal</span>
+              </div>
+              {uploadSendToEmployee && (<select value={uploadEmployeeName} onChange={e => setUploadEmployeeName(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.purple}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', background: '#fff', color: P.textDark, marginTop: 10 }}><option value="">-- Select Employee --</option>{(employees || []).map(emp => (<option key={emp._id} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName}{emp.role ? ` (${emp.role})` : ''}</option>))}</select>)}
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }} style={{ flex: 1, padding: '10px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
+              <button onClick={handleModalUpload} disabled={!uploadFileObj || uploadingModal} style={{ flex: 2, padding: '10px', borderRadius: 10, border: 'none', background: (!uploadFileObj || uploadingModal) ? P.border : P.primary, color: (!uploadFileObj || uploadingModal) ? P.textLight : '#fff', fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 800, cursor: (!uploadFileObj || uploadingModal) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all .15s' }}><i className="ti ti-upload" style={{ fontSize: 15 }}></i>{uploadingModal ? 'Uploading...' : 'Upload & Share'}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+    </>
+  )
 }

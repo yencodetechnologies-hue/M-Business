@@ -1298,7 +1298,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
     if (!activeClient) return null;
 
-    const cProjs = clientProjects.slice(0, 3);
+    const cProjs = clientProjects.slice(0, 5);
 
     return (
 
@@ -2375,7 +2375,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             <button onClick={() => { setViewClientModal(false); openEdit(activeClient); }} style={{ padding: "9px 18px", background: "#00BCD4", border: "none", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
 
-            <button onClick={() => setViewClientModal(false)} style={{ padding: "9px 18px", background: "#F5FAFA", border: "1px solid #E0EEF0", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit" }}>✕</button>
+            <button onClick={() => setViewClientModal(false)} style={{ padding: "9px 18px", background: "#F5FAFA", border: "1px solid #E0EEF0", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
 
           </div>
 
@@ -4064,7 +4064,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
 
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
 
 // PROJECTS PAGE
 
@@ -10454,17 +10454,21 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   setJumpProject(null);
                   setActive(returnTo);
                 }}
-                onSuccess={(newProj) => {
+                onSuccess={async (newProj) => {
 
                   const saved = newProj?.project || newProj;
 
-                  fetchProjects();
+                  await fetchProjects();
 
-                  setJumpProject(saved);
-
-                  setFromEditProject(false);
-
-                  setActive("project-details");
+                  if (sidebarOverride === "clients") {
+                    setSidebarOverride(null);
+                    setJumpProject(null);
+                    setActive("clients");
+                  } else {
+                    setJumpProject(saved);
+                    setFromEditProject(false);
+                    setActive("project-details");
+                  }
 
                 }}
 
@@ -10631,7 +10635,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 setSidebarOverride("clients");
 
-                // Save the active client ID so we return to the same client
                 const activeC = proj?._id
                   ? clients.find(c => c._id === proj._id)
                   : clients.find(c => (c.clientName || c.name) === proj?.client);

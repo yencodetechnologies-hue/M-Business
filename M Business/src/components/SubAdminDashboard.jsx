@@ -930,13 +930,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 
           {onAddClient && <div onClick={() => { setOpen(false); setSearch(""); onAddClient(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,var(--app-border),var(--app-bg))", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Client</div></div></div>}
 
-          <div style={{ maxHeight: 180, overflowY: "auto" }}>
 
-            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No clients found</div>
-
-              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-border)" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-border)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
-
-          </div>
 
         </div>
 
@@ -954,7 +948,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 
 
 
-function ClientsPage({ clients, setClients, projects = [], setProjects, onAddClient, onViewProject, triggerCrop, onCreateProject, user, activeClientIdForReturn, onActiveClientIdRestored, newClientId, onNewClientShown, isFetching }) {
+function ClientsPage({ clients, setClients, projects = [], setProjects, onAddClient, onViewProject, triggerCrop, onCreateProject, user, activeClientIdForReturn, onActiveClientIdRestored, newClientId, onNewClientShown, isFetching, invoices = [] }) {
 
   const mainScrollRef = useRef(null);
 
@@ -962,7 +956,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
   const [filterMode, setFilterMode] = useState("all");
 
-  const [activeClientId, setActiveClientId] = useState(null);
+  const [activeClientId, setActiveClientId] = useState(() => clients?.[0]?._id || null);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -1029,6 +1023,8 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
         const still = filtered.find(c => c._id === activeClientId);
         if (!still) setActiveClientId(filtered[0]._id);
       }
+    } else if (!search && filterMode === "all") {
+      setActiveClientId(null);
     }
   }, [clients, search, filterMode]);
 
@@ -1324,7 +1320,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
 
-<span onClick={() => setViewClientModal(true)} style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer" }}>View</span>
+              <span onClick={() => setViewClientModal(true)} style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer" }}>View</span>
 
               <span onClick={() => openEdit(activeClient)} style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer" }}>Edit</span>
 
@@ -1967,74 +1963,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
 
-
-      {/* ── CLIENT LIST ── */}
-
-      <div style={{ width: 300, minWidth: 300, background: "#fff", borderRight: "1.5px solid #E0EEF0", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-
-        <div style={{ padding: "14px 16px 10px", borderBottom: "1px solid #E0EEF0", flexShrink: 0 }}>
-
-          <div style={{ position: "relative", marginBottom: 10 }}>
-
-            <i className="ti ti-search" style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#A0B8BE", fontSize: 14 }} />
-
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search clients…" style={{ width: "100%", padding: "8px 12px 8px 32px", background: "#F5FAFA", border: "1.5px solid #E0EEF0", borderRadius: 9, fontSize: 12, color: "#1A2E35", fontFamily: "inherit", outline: "none" }} onFocus={e => e.target.style.borderColor = "#00BCD4"} onBlur={e => e.target.style.borderColor = "#E0EEF0"} />
-
-          </div>
-
-          <div style={{ display: "flex", gap: 4, overflowX: "auto" }}>
-
-            {["all", "active", "pending", "inactive"].map(f => (
-
-              <button key={f} onClick={() => setFilterMode(f)} style={{ padding: "5px 11px", borderRadius: 20, fontSize: 10, fontWeight: 700, cursor: "pointer", border: "1.5px solid", borderColor: filterMode === f ? "#00BCD4" : "#E0EEF0", background: filterMode === f ? "#00BCD4" : "none", color: filterMode === f ? "#fff" : "#607D86", fontFamily: "inherit", whiteSpace: "nowrap", transition: "all .15s", flexShrink: 0 }}>{f.charAt(0).toUpperCase() + f.slice(1)}</button>
-
-            ))}
-
-          </div>
-
-        </div>
-
-        <div style={{ flex: 1, overflowY: "auto" }}>
-
-          {activeSection.length > 0 && (
-
-            <>
-
-              <div style={{ fontSize: 9, fontWeight: 700, color: "#A0B8BE", textTransform: "uppercase", letterSpacing: .8, padding: "10px 16px 4px" }}>Active Clients ({activeSection.length})</div>
-
-              {activeSection.map(c => renderClientItem(c))}
-
-            </>
-
-          )}
-
-          {otherSection.length > 0 && (
-
-            <>
-
-              <div style={{ fontSize: 9, fontWeight: 700, color: "#A0B8BE", textTransform: "uppercase", letterSpacing: .8, padding: "10px 16px 4px" }}>Other</div>
-
-              {otherSection.map(c => renderClientItem(c))}
-
-            </>
-
-          )}
-
-          {filtered.length === 0 && <div style={{ padding: 32, textAlign: "center", color: "#A0B8BE", fontSize: 12, fontWeight: 600 }}>No clients found</div>}
-
-        </div>
-
-        <div style={{ padding: "10px 16px", borderTop: "1px solid #E0EEF0", flexShrink: 0 }}>
-
-          <button onClick={onAddClient} style={{ width: "100%", padding: "9px", background: "#00BCD4", border: "none", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-
-            <i className="ti ti-plus" style={{ fontSize: 14 }} />Add Client
-
-          </button>
-
-        </div>
-
-      </div>
+   
 
 
 
@@ -2171,11 +2100,8 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
               {[
 
                 { val: cRevenue ? "Rs." + Number(cRevenue).toLocaleString("en-IN") : "Rs.0", label: "Total Revenue", color: "#00BCD4" },
-
                 { val: clientProjects.length, label: "Projects" },
-
-                { val: (activeClient?.invoiceCount || 0), label: "Invoices" },
-
+                { val: invoices.filter(inv => (inv.clientId === activeClient?._id) || (inv.clientName === (activeClient?.clientName || activeClient?.name))).length, label: "Invoices" },
                 { val: (activeClient?.documents?.length || 0), label: "Documents" },
 
               ].map((s, i, arr) => (
@@ -2235,8 +2161,22 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
           </div>
 
         </div>
-
-      ) : null}
+      ) : (
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--app-bg)", minWidth: 0 }}>
+          <div style={{ textAlign: "center", padding: 40 }}>
+            <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(var(--app-accent-rgb), 0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px" }}>
+              <i className="ti ti-users" style={{ color: "var(--app-accent)", fontSize: 32 }} />
+            </div>
+            <div style={{ fontSize: 16, fontWeight: 800, color: "var(--app-text)", marginBottom: 8 }}></div>
+            <div style={{ fontSize: 13, color: "var(--app-muted)", marginBottom: 24, lineHeight: 1.6 }}>
+              Add your first client to get started.
+            </div>
+            <button onClick={onAddClient} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 22px", background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+              <i className="ti ti-plus" style={{ fontSize: 14 }} /> Add Client
+            </button>
+          </div>
+        </div>
+      )}
 
 
 
@@ -9895,87 +9835,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                 </div>
 
-                                <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
 
-                                  <thead>
-
-                                    <tr>
-
-                                      <th style={{ padding: "12px 0", fontSize: 11, color: "rgba(15,28,46,0.4)", fontWeight: 800, borderBottom: "1px solid rgba(0,0,0,0.05)" }}>CLIENT</th>
-
-                                      <th style={{ padding: "12px 0", fontSize: 11, color: "rgba(15,28,46,0.4)", fontWeight: 800, borderBottom: "1px solid rgba(0,0,0,0.05)" }}>STATUS</th>
-
-                                      <th style={{ padding: "12px 0", fontSize: 11, color: "rgba(15,28,46,0.4)", fontWeight: 800, borderBottom: "1px solid rgba(0,0,0,0.05)" }}>PROJECTS</th>
-
-                                      <th style={{ padding: "12px 0", fontSize: 11, color: "rgba(15,28,46,0.4)", fontWeight: 800, borderBottom: "1px solid rgba(0,0,0,0.05)" }}>REVENUE</th>
-
-                                      <th style={{ padding: "12px 0", fontSize: 11, color: "rgba(15,28,46,0.4)", fontWeight: 800, borderBottom: "1px solid rgba(0,0,0,0.05)" }}>LAST CONTACT</th>
-
-                                    </tr>
-
-                                  </thead>
-
-                                  <tbody>
-
-                                    {clients.slice(0, 4).map(c => (
-
-                                      <tr key={c._id} style={{ borderBottom: "1px solid rgba(0,0,0,0.03)" }}>
-
-                                        <td style={{ padding: "16px 0", display: "flex", alignItems: "center", gap: 12 }}>
-
-                                          <div style={{ width: 34, height: 34, borderRadius: 8, background: "#00BCD4", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>
-
-                                            {(c.clientName || c.name || "C")[0].toUpperCase()}
-
-                                          </div>
-
-                                          <div>
-
-                                            <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{c.clientName || c.name}</div>
-
-                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{c.email || "No email"}</div>
-
-                                          </div>
-
-                                        </td>
-
-                                        <td style={{ padding: "16px 0" }}>
-
-                                          <span style={{ background: "#dcfce7", color: "#166534", padding: "4px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
-
-                                            {c.status || "Active"}
-
-                                          </span>
-
-                                        </td>
-
-                                        <td style={{ padding: "16px 0", fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>
-
-                                          {projects.filter(p => p.clientId === c._id).length || 1}
-
-                                        </td>
-
-                                        <td style={{ padding: "16px 0", fontSize: 13, fontWeight: 800, color: "#0f1c2e" }}>
-
-                                          {formatShortCurrency(invoices.filter(i => i.clientId === c._id).reduce((sum, i) => sum + (Number(i.grandTotal) || 0), 0) || 50000)}
-
-                                        </td>
-
-                                        <td style={{ padding: "16px 0", fontSize: 12, color: "rgba(15,28,46,0.6)" }}>
-
-                                          Today
-
-                                        </td>
-
-                                      </tr>
-
-                                    ))}
-
-                                    {clients.length === 0 && <tr><td colSpan="5" style={{ padding: "20px 0", textAlign: "center", color: "rgba(15,28,46,0.5)", fontSize: 13 }}>No clients found.</td></tr>}
-
-                                  </tbody>
-
-                                </table>
 
                               </div>
 
@@ -10710,7 +10570,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client) => { setClients(prev => [...prev, client]); setPendingNewClientId(client._id); setActive("clients"); }} user={user} />}
 
-            {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
+            {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 
@@ -10906,41 +10766,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             {validActive === "messaging" && <MessagingPage user={user} />}
 
             {validActive === "settings" && (
-
               <SettingsPage
-
                 user={user}
-
-                THEME={T}
-
                 appTheme={appTheme}
-
                 setAppTheme={setAppTheme}
-
                 themes={THEMES}
-
                 customColor={customColor}
-
                 setCustomColor={setCustomColor}
-
                 onLogoChange={onLogoChange}
-
                 triggerCrop={triggerCrop}
-
-                onProfileUpdate={(updates) => {
-
-                  const updated = { ...user, ...updates };
-
-                  setUser(updated);
-
-                  try { localStorage.setItem("user", JSON.stringify(updated)); } catch { }
-
-                }}
-
+                onProfileUpdate={(updatedUser) => setUser(updatedUser)}
+                THEME={currentTheme}
               />
-
             )}
-
 
 
             {validActive === "accounts" && <AccountsPage onBack={() => setActive("dashboard")} THEME={currentTheme} initialTab="overview" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}

@@ -26,7 +26,7 @@ export default function AuditorLogin({ onLogin }) {
 .left-panel::before{content:"";position:absolute;top:-100px;right:-100px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.15) 0%,transparent 70%);}
 .left-panel::after{content:"";position:absolute;bottom:-80px;left:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(0,188,212,.1) 0%,transparent 70%);}
 .brand{display:flex;align-items:center;gap:12px;margin-bottom:56px;}
-.brand-icon{width:44px;height:44px;background:linear-gradient(135deg,#00BCD4,#0097A7);border-radius:12px;display:flex;align-items:center;justify-content:center;}
+.brand-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--app-accent),#0097A7);border-radius:12px;display:flex;align-items:center;justify-content:center;}
 .brand-icon i{font-size:22px;color:#fff;}
 .brand-name{font-size:22px;font-weight:900;color:#fff;}
 .brand-name span{color:#00BCD4;}

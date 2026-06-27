@@ -727,14 +727,96 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
   // ── Plan Picker (Choose Your Plan overlay) ------------------------------------
   if (showPlanPicker) {
     return (
-      <PlanPickerModal
-        subscription={subscription}
-        payLoading={payLoading}
-        onClose={() => { setShowPlanPicker(false); if (onTabChange) onTabChange(); }}
-        onSelectPlan={(plan) => { setShowPlanPicker(false); startPayUPayment(plan); }}
-        onStartTrial={() => startTrial()}
-        PLANS={PLANS}
-      />
+      <div style={{ position: "fixed", inset: 0, zIndex: 99990, background: "#f8fafc", overflowY: "auto", padding: "48px 20px 60px" }}>
+        <button onClick={() => { setShowPlanPicker(false); if (onTabChange) onTabChange(); }} style={{ position: "fixed", top: 18, right: 22, zIndex: 100000, background: "#f1f5f9", border: "none", color: "#1e293b", width: 38, height: 38, borderRadius: "50%", fontSize: 20, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>✕</button>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 32, maxWidth: 1100, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 8 }}>
+            <h2 style={{ fontSize: 34, fontWeight: 900, color: "#1e293b", margin: "0 0 10px" }}>Choose your Plan</h2>
+            <p style={{ color: "#64748b", fontSize: 15, margin: 0 }}>Select the best plan for your business growth.</p>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(270px, 1fr))", gap: 24, width: "100%" }}>
+            {PLANS.map((plan) => {
+              const isCurrent = plan.name === subscription?.planName;
+              const isProcessing = payLoading === plan.name;
+              return (
+                <div key={plan.name} style={{
+                  background: "#fff",
+                  borderRadius: 20,
+                  padding: "36px 28px 28px",
+                  border: plan.popular ? "2px solid var(--app-accent)" : "1.5px solid #e2e8f0",
+                  boxShadow: plan.popular ? "0 8px 32px rgba(var(--app-accent-rgb,0,188,212),0.13)" : "0 4px 16px rgba(0,0,0,0.04)",
+                  position: "relative",
+                  display: "flex",
+                  flexDirection: "column",
+                }}>
+                  {plan.popular && (
+                    <div style={{
+                      position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)",
+                      background: "var(--app-accent)", color: "#fff", padding: "6px 22px",
+                      borderRadius: 20, fontSize: 11, fontWeight: 900, textTransform: "uppercase",
+                      letterSpacing: 1, whiteSpace: "nowrap"
+                    }}>POPULAR</div>
+                  )}
+                  {isCurrent && (
+                    <div style={{
+                      position: "absolute", top: -1, right: -1,
+                      background: "#26a69a", color: "#fff", padding: "7px 18px",
+                      borderRadius: "0 18px 0 14px", fontSize: 11, fontWeight: 900, textTransform: "uppercase",
+                      letterSpacing: 1
+                    }}>Current Plan</div>
+                  )}
+
+                  <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#e0f7fa", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
+                    <span style={{ fontSize: 24 }}>🌱</span>
+                  </div>
+
+                  <h3 style={{ fontSize: 22, fontWeight: 800, color: "#1e293b", margin: "0 0 4px" }}>{plan.name}</h3>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", letterSpacing: 1, textTransform: "uppercase", marginBottom: 16 }}>{plan.subtitle || "MONTHLY PLAN"}</div>
+
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 2, marginBottom: 24 }}>
+                    <span style={{ fontSize: 40, fontWeight: 900, color: "#1e293b", letterSpacing: "-1px" }}>
+                      {plan.price === 0 ? "Free" : `Rs.${plan.price.toLocaleString("en-IN")}`}
+                    </span>
+                    {plan.price > 0 && <span style={{ fontSize: 14, color: "#94a3b8", fontWeight: 600 }}>/mo</span>}
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1, marginBottom: 28 }}>
+                    {plan.features.map((f, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <span style={{ color: "var(--app-accent)", fontSize: 15, flexShrink: 0 }}>✓</span>
+                        <span style={{ fontSize: 13.5, color: "#475569", fontWeight: 500 }}>{f}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => plan.isTrial ? startTrial() : startPayUPayment(plan)}
+                    disabled={isCurrent || !!payLoading}
+                    style={{
+                      width: "100%", padding: "14px", borderRadius: 12, fontSize: 15, fontWeight: 800,
+                      cursor: (isCurrent || payLoading) ? "not-allowed" : "pointer", fontFamily: "inherit", border: "none",
+                      background: isCurrent ? "#f1f5f9" : plan.popular ? "var(--app-accent)" : "#f1f5f9",
+                      color: isCurrent ? "#94a3b8" : plan.popular ? "#fff" : "#1e293b",
+                      boxShadow: plan.popular && !isCurrent ? "0 6px 18px rgba(var(--app-accent-rgb,0,188,212),0.3)" : "none",
+                      transition: "all 0.18s"
+                    }}
+                  >
+                    {isCurrent ? "Current Plan" : isProcessing ? "Processing..." : plan.btnLabel || "Get Started"}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+
+          <div style={{ textAlign: "center", color: "#94a3b8", fontSize: 13, fontWeight: 500 }}>
+            Need a custom solution or have questions?{" "}
+            <span style={{ color: "var(--app-accent)", cursor: "pointer", textDecoration: "underline" }}>Chat with our billing team</span>
+            {" "}or call us at +91 98765 43210
+          </div>
+        </div>
+      </div>
     );
   }
   // ── Success UI ---------------------------------------------------------------

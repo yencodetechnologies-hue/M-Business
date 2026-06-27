@@ -94,6 +94,9 @@ exports.initPayU = async (req, res) => {
       { userId, status: "pending" },
       { status: "cancelled", updatedAt: new Date() }
     );
+if (!plan) {
+      return res.status(400).json({ error: 'Missing plan details in request' });
+    }
 
     // Create a pending subscription first
     const pendingSub = new Subscription({

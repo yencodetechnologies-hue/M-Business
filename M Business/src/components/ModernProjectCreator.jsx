@@ -159,7 +159,8 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   };
 
   const [milestones, setMilestones] = useState(() => normalizeMilestones(editProject?.milestones));
-
+  const [showAddEmployee, setShowAddEmployee] = useState(false);
+  const [selectedEmpToAdd, setSelectedEmpToAdd] = useState('');
   const [portalOpts, setPortalOpts] = useState(() => {
     const ps = editProject?.portalSettings || editProject?.portalOpts;
     if (!ps || typeof ps !== 'object') return { ...defaultPortalOpts };
@@ -448,25 +449,115 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
 
           {/* SECTION 3: TEAM */}
           <div className="mpc-section-card">
-            <div className="mpc-section-heading"><i className="ti ti-users" /> Assign Team Members</div>
-            <div className="mpc-team-selector">
-              {employees.length === 0 ? <div style={{ fontSize: 13, color: P.textLight, fontStyle: 'italic' }}>No employees available</div> : null}
-              {employees.map(emp => {
-                const empName = emp.name || emp.employeeName || "Unknown";
-                const isSel = assigned.includes(empName);
-                const role = emp.department || emp.role || "Staff";
-                return (
-                  <div key={emp._id || emp.id} className={`mpc-team-row ${isSel ? 'selected' : ''}`} onClick={() => toggleMember(empName)}>
-                    <div className="mpc-av" style={{ background: getAvatarColor(empName) }}>{getInitials(empName)}</div>
-                    <div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: P.textDark }}>{empName}</div>
-                      <div style={{ fontSize: 12, color: P.textLight, fontWeight: 600 }}>{emp.email}</div>
-                    </div>
-                    <span className="mpc-role-badge">{role}</span>
-                  </div>
-                );
-              })}
+            <div className="mpc-section-heading" style={{ justifyContent: 'space-between' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <i className="ti ti-users" /> Assign Team Members
+              </span>
+              <button
+                className="mpc-btn mpc-btn-primary"
+                style={{ fontSize: 12, padding: '6px 14px' }}
+                onClick={() => { setShowAddEmployee(true); setSelectedEmpToAdd(''); }}
+              >
+                Add Team Member
+              </button>
             </div>
+
+            {/* Already assigned members list */}
+            <div className="mpc-team-selector">
+
+              {employees
+                .filter(emp => assigned.includes(emp.name || emp.employeeName || ''))
+                .map(emp => {
+                  const empName = emp.name || emp.employeeName || 'Unknown';
+                  const role = emp.department || emp.role || 'Staff';
+                  return (
+                    <div key={emp._id || emp.id} className="mpc-team-row selected">
+                      <div className="mpc-av" style={{ background: getAvatarColor(empName) }}>{getInitials(empName)}</div>
+                      <div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: P.textDark }}>{empName}</div>
+                        <div style={{ fontSize: 12, color: P.textLight, fontWeight: 600 }}>{emp.email}</div>
+                      </div>
+                      <span className="mpc-role-badge">{role}</span>
+                      <button
+                        onClick={() => setAssigned(prev => prev.filter(n => n !== empName))}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 16, marginLeft: 6, padding: '2px 4px', lineHeight: 1 }}
+                        title="Remove"
+                      >
+                        <i className="ti ti-x" />
+                      </button>
+                    </div>
+                  );
+                })}
+            </div>
+
+            {/* POPUP MODAL */}
+            {showAddEmployee && (
+              <div
+                style={{
+                  position: 'fixed', inset: 0,
+                  background: 'rgba(0,0,0,0.45)',
+                  zIndex: 9999,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}
+                onClick={() => setShowAddEmployee(false)}
+              >
+                <div
+                  style={{
+                    background: '#fff', borderRadius: 16,
+                    padding: '28px 28px 22px', width: '100%', maxWidth: 420,
+                    boxShadow: '0 20px 60px rgba(0,0,0,0.2)'
+                  }}
+                  onClick={e => e.stopPropagation()}
+                >
+                  <div style={{ fontSize: 18, fontWeight: 800, color: P.textDark, marginBottom: 20 }}>
+                    Add Team Member
+                  </div>
+
+                  <select
+                    value={selectedEmpToAdd}
+                    onChange={e => setSelectedEmpToAdd(e.target.value)}
+                    style={{
+                      width: '100%', padding: '11px 14px',
+                      border: '1.5px solid #E2E8F0', borderRadius: 10,
+                      fontSize: 14, fontFamily: 'Nunito,sans-serif',
+                      color: selectedEmpToAdd ? P.textDark : P.textLight,
+                      background: '#F0F4F8', outline: 'none', marginBottom: 24,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <option value="">-- Select Employee --</option>
+                    {employees
+                      .filter(emp => !assigned.includes(emp.name || emp.employeeName || ''))
+                      .map(emp => (
+                        <option key={emp._id || emp.id} value={emp.name || emp.employeeName}>
+                          {emp.name || emp.employeeName}{emp.department ? ` (${emp.department})` : ''}
+                        </option>
+                      ))
+                    }
+                  </select>
+
+                  <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+                    <button
+                      className="mpc-btn mpc-btn-outline"
+                      onClick={() => { setShowAddEmployee(false); setSelectedEmpToAdd(''); }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="mpc-btn mpc-btn-primary"
+                      onClick={() => {
+                        if (!selectedEmpToAdd) return;
+                        setAssigned(prev => [...prev, selectedEmpToAdd]);
+                        setSelectedEmpToAdd('');
+                        setShowAddEmployee(false);
+                      }}
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* SECTION 4: BUDGET */}

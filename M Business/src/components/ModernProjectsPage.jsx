@@ -528,11 +528,9 @@ export default function ModernProjectsPage({ user }) {
               <div style={{ color: '#718096', fontSize: 13, fontWeight: 600 }}>Loading projects…</div>
               <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
             </div>
-          )}
-
-          {/* Grid */}
+          )}{/* Grid */}
           {!loading && (
-            <div className="m-projects-grid">
+            <div className="m-projects-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
               {filtered.map((p, idx) => {
                 const { label: statusLabel, cls } = normStatus(p.status);
                 const pt = tasksForProject(p);
@@ -661,18 +659,62 @@ export default function ModernProjectsPage({ user }) {
                 );
               })}
 
-              {/* Add new card */}
-              <div className="m-add-project-card" onClick={openCreate}>
-                <div className="m-add-icon"><i className="ti ti-plus"></i></div>
-                <div className="m-add-text">Add New Project</div>
-                <div className="m-add-sub">Click to create a new project</div>
+              {/* ── ADD PROJECT CARD ── */}
+              <div
+                onClick={openCreate}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '100%',
+                  minHeight: 320,
+                  border: '2.5px dashed #00BCD4',
+                  borderRadius: 16,
+                  background: '#fff',
+                  cursor: 'pointer',
+                  transition: 'all 0.22s',
+                  gap: 14,
+                  boxShadow: '0 2px 12px rgba(0,188,212,0.07)',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = '#E0F7FA';
+                  e.currentTarget.style.transform = 'translateY(-4px)';
+                  e.currentTarget.style.boxShadow = '0 10px 32px rgba(0,188,212,0.18)';
+                  e.currentTarget.style.borderColor = '#0097A7';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = '#fff';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,188,212,0.07)';
+                  e.currentTarget.style.borderColor = '#00BCD4';
+                }}
+              >
+                {/* Big plus circle */}
+                <div style={{
+                  width: 72, height: 72, borderRadius: '50%',
+                  background: 'linear-gradient(135deg,#00BCD4,#0097A7)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 8px 24px rgba(0,188,212,0.38)',
+                  fontSize: 36, color: '#fff',
+                  fontWeight: 900,
+                  lineHeight: 1,
+                }}>
+                  +
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 900, color: '#0097A7', marginTop: 4 }}>
+                  Add New Project
+                </div>
+                <div style={{ fontSize: 12, color: '#94A3B8', fontWeight: 600 }}>
+                  Click to create a new project
+                </div>
               </div>
 
               {/* Empty state */}
               {filtered.length === 0 && !loading && (
                 <div style={{ gridColumn: '1/-1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 60, gap: 12, color: '#718096' }}>
                   <i className="ti ti-layout-kanban" style={{ fontSize: 48, color: '#B2EBF2' }}></i>
-
+                  <div style={{ fontSize: 14, fontWeight: 700 }}>No projects found</div>
                   <button className="m-create-btn" onClick={openCreate} style={{ marginTop: 8 }}><i className="ti ti-plus"></i> New Project</button>
                 </div>
               )}
@@ -706,22 +748,87 @@ export default function ModernProjectsPage({ user }) {
 }
 
 // ─── Project Form Modal ----------------------------------------
+// ─── Project Form Modal (Right Side Drawer) ----------------------------------------
 function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit }) {
   const f = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
-  return (
-    <div style={OVERLAY}>
-      <div style={{ ...MODAL, maxWidth: 560 }}>
-        <div style={MODAL_HDR}>
-          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800 }}><i className="ti ti-briefcase" style={{ marginRight: 8, color: '#00BCD4' }}></i>{isEdit ? 'Edit Project' : 'New Project'}</h3>
-          <button onClick={onClose} style={CLOSE_BTN}><i className="ti ti-x"></i></button>
-        </div>
-        <form onSubmit={onSave} style={{ padding: '20px 24px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+  const [memberInput, setMemberInput] = useState('');
 
-            <div style={{ gridColumn: '1/-1' }}>
-              <label style={LBL}>Project Name *</label>
-              <input style={INP} required value={form.name} onChange={e => f('name', e.target.value)} placeholder="e.g. M Business v2" />
+  const teamMembers = form.assignedTo
+    ? form.assignedTo.split(',').map(s => s.trim()).filter(Boolean)
+    : [];
+
+  function addMember() {
+    const name = memberInput.trim();
+    if (!name) return;
+    if (teamMembers.includes(name)) { setMemberInput(''); return; }
+    f('assignedTo', [...teamMembers, name].join(', '));
+    setMemberInput('');
+  }
+
+  function removeMember(name) {
+    f('assignedTo', teamMembers.filter(m => m !== name).join(', '));
+  }
+
+  const AV_COLORS = ['#00BCD4', '#8B5CF6', '#F59E0B', '#26C281', '#EC4899', '#3B82F6'];
+  const avColor = (name) => AV_COLORS[(name?.charCodeAt(0) || 0) % AV_COLORS.length];
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        onClick={onClose}
+        style={{
+          position: 'fixed', inset: 0,
+          background: 'rgba(0,0,0,0.35)',
+          zIndex: 9998,
+        }}
+      />
+      {/* Right Drawer */}
+      <div style={{
+        position: 'fixed', top: 0, right: 0, bottom: 0,
+        width: '100%', maxWidth: 520,
+        background: '#fff',
+        zIndex: 9999,
+        display: 'flex', flexDirection: 'column',
+        boxShadow: '-8px 0 40px rgba(0,0,0,0.15)',
+        fontFamily: 'Nunito, sans-serif',
+        animation: 'slideInRight 0.25s ease',
+      }}>
+        <style>{`@keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }`}</style>
+
+        {/* Header */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '20px 24px', borderBottom: '1.5px solid #E2E8F0',
+          background: 'linear-gradient(135deg,#00BCD4,#0097A7)',
+        }}>
+          <div>
+            <div style={{ fontSize: 17, fontWeight: 900, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <i className="ti ti-briefcase"></i>
+              {isEdit ? 'Edit Project' : 'New Project'}
             </div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)', marginTop: 2 }}>
+              {isEdit ? 'Update project details' : 'Fill in project details below'}
+            </div>
+          </div>
+          <button onClick={onClose} style={{
+            background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: 10,
+            width: 36, height: 36, cursor: 'pointer', fontSize: 18, color: '#fff',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}><i className="ti ti-x"></i></button>
+        </div>
+
+        {/* Scrollable Body */}
+        <form onSubmit={onSave} style={{ flex: 1, overflowY: 'auto', padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+          {/* Project Name */}
+          <div>
+            <label style={LBL}>Project Name *</label>
+            <input style={INP} required value={form.name} onChange={e => f('name', e.target.value)} placeholder="e.g. M Business v2" />
+          </div>
+
+          {/* Client + Category */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <div>
               <label style={LBL}>Client / Company *</label>
               <input style={INP} required value={form.client} onChange={e => f('client', e.target.value)} placeholder="e.g. YENCODE" />
@@ -730,10 +837,16 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit }) {
               <label style={LBL}>Category / Purpose</label>
               <input style={INP} value={form.purpose} onChange={e => f('purpose', e.target.value)} placeholder="e.g. Web Development" />
             </div>
-            <div style={{ gridColumn: '1/-1' }}>
-              <label style={LBL}>Description</label>
-              <textarea style={{ ...INP, height: 72, resize: 'vertical' }} value={form.description} onChange={e => f('description', e.target.value)} placeholder="Brief project description…" />
-            </div>
+          </div>
+
+          {/* Description */}
+          <div>
+            <label style={LBL}>Description</label>
+            <textarea style={{ ...INP, height: 72, resize: 'vertical' }} value={form.description} onChange={e => f('description', e.target.value)} placeholder="Brief project description…" />
+          </div>
+
+          {/* Dates */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <div>
               <label style={LBL}>Start Date</label>
               <input style={INP} type="date" value={form.start} onChange={e => f('start', e.target.value)} />
@@ -742,6 +855,10 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit }) {
               <label style={LBL}>Deadline</label>
               <input style={INP} type="date" value={form.end} onChange={e => f('end', e.target.value)} />
             </div>
+          </div>
+
+          {/* Budget + Progress */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <div>
               <label style={LBL}>Budget (₹)</label>
               <input style={INP} type="number" min="0" value={form.budget} onChange={e => f('budget', e.target.value)} placeholder="e.g. 500000" />
@@ -750,6 +867,10 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit }) {
               <label style={LBL}>Progress (%)</label>
               <input style={INP} type="number" min="0" max="100" value={form.progress} onChange={e => f('progress', e.target.value)} />
             </div>
+          </div>
+
+          {/* Status + Priority */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <div>
               <label style={LBL}>Status</label>
               <select style={INP} value={form.status} onChange={e => f('status', e.target.value)}>
@@ -769,32 +890,110 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit }) {
                 <option value="low">Low</option>
               </select>
             </div>
-            <div style={{ gridColumn: '1/-1' }}>
-              <label style={LBL}>Assigned To (comma-separated)</label>
-              <input style={INP} value={form.assignedTo} onChange={e => f('assignedTo', e.target.value)} placeholder="e.g. Prabhu R, Yuvan S" />
+          </div>
+
+          {/* ── ASSIGN TEAM MEMBERS ── */}
+          <div style={{ background: '#F0F9FF', border: '1.5px solid #B2EBF2', borderRadius: 12, padding: 16 }}>
+            <label style={{ ...LBL, color: '#0097A7', marginBottom: 10 }}>
+              <i className="ti ti-users" style={{ marginRight: 5 }}></i> ASSIGN TEAM MEMBERS
+            </label>
+
+            {/* Add member input */}
+            <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+              <input
+                style={{ ...INP, flex: 1, background: '#fff' }}
+                value={memberInput}
+                onChange={e => setMemberInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addMember(); } }}
+                placeholder="Type name & press Enter or Add…"
+              />
+              <button
+                type="button"
+                onClick={addMember}
+                style={{
+                  padding: '0 16px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                  background: '#00BCD4', color: '#fff', fontFamily: 'Nunito,sans-serif',
+                  fontSize: 13, fontWeight: 800, whiteSpace: 'nowrap',
+                  display: 'flex', alignItems: 'center', gap: 5,
+                }}
+              >
+                <i className="ti ti-plus"></i> Add
+              </button>
             </div>
+
+            {/* Member chips */}
+            {teamMembers.length === 0 ? (
+              <div style={{ fontSize: 12, color: '#94A3B8', textAlign: 'center', padding: '8px 0' }}>
+                No team members assigned yet
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {teamMembers.map((name, i) => (
+                  <div key={i} style={{
+                    display: 'flex', alignItems: 'center', gap: 7,
+                    background: '#fff', border: '1.5px solid #B2EBF2',
+                    borderRadius: 20, padding: '5px 10px 5px 6px',
+                    boxShadow: '0 1px 4px rgba(0,188,212,0.08)',
+                  }}>
+                    <div style={{
+                      width: 24, height: 24, borderRadius: '50%',
+                      background: avColor(name), color: '#fff',
+                      fontSize: 9, fontWeight: 800,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      {name.charAt(0).toUpperCase()}
+                    </div>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#1A2332' }}>{name}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeMember(name)}
+                      style={{
+                        background: '#FEE2E2', border: 'none', borderRadius: '50%',
+                        width: 18, height: 18, cursor: 'pointer', color: '#DC2626',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 10, padding: 0,
+                      }}
+                    ><i className="ti ti-x"></i></button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Manager + Contact */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <div>
               <label style={LBL}>Manager</label>
               <input style={INP} value={form.manager} onChange={e => f('manager', e.target.value)} placeholder="Manager name" />
             </div>
             <div>
-              <label style={LBL}>Contact Person Name</label>
+              <label style={LBL}>Contact Person</label>
               <input style={INP} value={form.contactPersonName} onChange={e => f('contactPersonName', e.target.value)} placeholder="e.g. Ravi Kumar" />
             </div>
-            <div style={{ gridColumn: '1/-1' }}>
-              <label style={LBL}>Contact Person Phone No</label>
-              <input style={INP} value={form.contactPersonNo} onChange={e => f('contactPersonNo', e.target.value)} placeholder="e.g. +91 98765 43210" />
-            </div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 20 }}>
+
+          <div>
+            <label style={LBL}>Contact Phone</label>
+            <input style={INP} value={form.contactPersonNo} onChange={e => f('contactPersonNo', e.target.value)} placeholder="e.g. +91 98765 43210" />
+          </div>
+
+          {/* Footer Buttons */}
+          <div style={{
+            display: 'flex', justifyContent: 'flex-end', gap: 10,
+            marginTop: 8, paddingTop: 16, borderTop: '1.5px solid #E2E8F0',
+            position: 'sticky', bottom: 0, background: '#fff',
+          }}>
             <button type="button" onClick={onClose} style={BTN_OUTLINE}>Cancel</button>
             <button type="submit" disabled={saving} style={BTN_PRIMARY}>
-              {saving ? <><i className="ti ti-loader-2" style={{ animation: 'spin 0.8s linear infinite', display: 'inline-block', marginRight: 6 }}></i>Saving…</> : <><i className="ti ti-check"></i> {isEdit ? 'Update' : 'Create'} Project</>}
+              {saving
+                ? <><i className="ti ti-loader-2" style={{ animation: 'spin 0.8s linear infinite', display: 'inline-block', marginRight: 6 }}></i>Saving…</>
+                : <><i className="ti ti-check"></i> {isEdit ? 'Update' : 'Create'} Project</>
+              }
             </button>
           </div>
         </form>
       </div>
-    </div>
+    </>
   );
 }
 

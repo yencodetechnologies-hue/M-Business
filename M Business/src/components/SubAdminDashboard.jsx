@@ -4291,6 +4291,11 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
         onEdit={(p) => openEdit(p)}
 
         onDelete={(p) => setDeleteTarget(p)}
+
+        onAddProject={() => {
+          setJumpProject(null);
+          if (setActive) setActive("create-project");
+        }}
         onNewInvoice={(p, editInv, editIdx) => {
           if (!p) return;
           if (setInvoicePrefill) setInvoicePrefill({ client: p.client || "", project: p.name || "", _t: Date.now(), ...(editInv ? { editData: editInv, editIndex: editIdx, projectId: p._id } : {}) });

@@ -1,4 +1,9 @@
 /* ModernProjectsPage.css */
+.m-add-project-card:hover {
+  border-color: #0097A7 !important;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(0, 188, 212, 0.18);
+}
 
 .modern-app {
   --teal: var(--teal);
@@ -561,6 +566,42 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
+}
+
+.m-projects-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 20px !important;
+}
+
+.m-project-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 188, 212, 0.08);
+  overflow: hidden;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+  padding: 16px;
+}
+
+.m-add-card-hover {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 260px !important;
+  border: 2.5px dashed #00BCD4 !important;
+  border-radius: 16px !important;
+  background: linear-gradient(135deg, #E0F7FA 0%, #F0FDFF 100%) !important;
+  cursor: pointer !important;
+  gap: 12px !important;
+  transition: all 0.2s !important;
+}
+
+.m-add-card-hover:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 8px 28px rgba(0, 188, 212, 0.25) !important;
+  border-color: #0097A7 !important;
 }
 
 @media (max-width: 1100px) {

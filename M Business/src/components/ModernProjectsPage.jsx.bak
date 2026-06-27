@@ -232,7 +232,7 @@ export default function ModernProjectsPage() {
           </div>
 
           {/* PROJECTS GRID */}
-          <div className="m-projects-grid">
+          <div className="m-projects-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
 
             {filteredProjects.map(p => (
               <div key={p.id} className={`m-project-card c-${p.color}`}>

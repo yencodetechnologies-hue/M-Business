@@ -229,6 +229,7 @@ export default function ModernProjectsView({
   onDelete,
   onAssign,
   onNewInvoice,
+  onAddProject,
   searchQuery = '',
 }) {
   const [search, setSearch] = useState(searchQuery);
@@ -395,7 +396,7 @@ export default function ModernProjectsView({
       {/* ── Project Cards ── */}
       {displayed.length === 0 ? (
         <div className="mpv-empty">
-
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#718096' }}>No projects found</div>
         </div>
       ) : (
         <div className={`mpv-grid${view === 'list' ? ' list' : ''}`}>
@@ -576,6 +577,48 @@ export default function ModernProjectsView({
               </div>
             );
           })}
+          {/* ── ADD PROJECT CARD — always last ── */}
+          {view !== 'list' && (
+            <div
+              onClick={() => onAddProject ? onAddProject() : null}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: 320,
+                border: '2.5px dashed #00BCD4',
+                borderRadius: 14,
+                background: '#ffffff',
+                cursor: 'pointer',
+                transition: 'all 0.22s',
+                gap: 14,
+                boxShadow: '0 2px 12px rgba(0,188,212,0.07)',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = '#E0F7FA';
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = '0 10px 32px rgba(0,188,212,0.2)';
+                e.currentTarget.style.borderColor = '#0097A7';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = '#ffffff';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,188,212,0.07)';
+                e.currentTarget.style.borderColor = '#00BCD4';
+              }}
+            >
+              <div style={{
+                width: 72, height: 72, borderRadius: '50%',
+                background: 'linear-gradient(135deg,#00BCD4,#0097A7)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 8px 24px rgba(0,188,212,0.35)',
+                fontSize: 38, color: '#fff', fontWeight: 900, lineHeight: 1,
+              }}>+</div>
+              <div style={{ fontSize: 15, fontWeight: 900, color: '#0097A7' }}>Add New Project</div>
+              <div style={{ fontSize: 12, color: '#94A3B8', fontWeight: 600 }}>Click to create a new project</div>
+            </div>
+          )}
         </div>
       )}
 

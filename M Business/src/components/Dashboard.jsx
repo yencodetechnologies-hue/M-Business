@@ -483,7 +483,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
                 <div style={{ width: 72, height: 72, borderRadius: 14, background: '#fff', border: '2px dashed #E0E6EA', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                   {editForm.logoUrl ? <img src={editForm.logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : <span style={{ fontSize: 30 }}>Company</span>}
                 </div>
-                <label style={{ position: 'absolute', bottom: 0, right: 0, background: '#00BCD4', width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid #fff' }}>
+                <label style={{ position: 'absolute', bottom: 0, right: 0, background: accentColor, width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid #fff' }}>
                   <span style={{ fontSize: 12 }}></span>
                   <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const file = e.target.files[0]; if (file) { const r = new FileReader(); r.onloadend = () => setEditForm(p => ({ ...p, logoUrl: r.result })); r.readAsDataURL(file); } }} />
                 </label>
@@ -498,8 +498,8 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
               {[{ val: 'b2b', icon: '🏢', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: '👤', label: 'B2C', sub: 'Individual' }, { val: 'freelancer', icon: '💼', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
                 <div key={t.val} onClick={() => setEditForm(p => ({ ...p, clientType: t.val }))}
-                  style={{ border: `2px solid ${editForm.clientType === t.val ? '#00BCD4' : '#E0E6EA'}`, borderRadius: 10, padding: '10px 8px', textAlign: 'center', cursor: 'pointer', background: editForm.clientType === t.val ? '#E0F7FA' : '#F4F6F8', position: 'relative' }}>
-                  {editForm.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: '#00BCD4', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
+                  style={{ border: `2px solid ${editForm.clientType === t.val ? accentColor : '#E0E6EA'}`, borderRadius: 10, padding: '10px 8px', textAlign: 'center', cursor: 'pointer', background: editForm.clientType === t.val ? accentLight : '#F4F6F8', position: 'relative' }}>
+                  {editForm.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: accentColor, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
                   <div style={{ fontSize: 20, marginBottom: 3 }}>{t.icon}</div>
                   <div style={{ fontSize: 12, fontWeight: 700, color: editForm.clientType === t.val ? '#007B8A' : '#1A2332' }}>{t.label}</div>
                   <div style={{ fontSize: 10, color: '#94A3B0' }}>{t.sub}</div>
@@ -2180,7 +2180,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   <div style={{ width: 72, height: 72, borderRadius: 14, background: '#fff', border: '2px dashed #E0E6EA', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                     {nc.logoUrl ? <img src={nc.logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : <span style={{ fontSize: 30 }}>Company</span>}
                   </div>
-                  <label style={{ position: 'absolute', bottom: 0, right: 0, background: '#00BCD4', width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid #fff' }}>
+                  <label style={{ position: 'absolute', bottom: 0, right: 0, background: accentColor, width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid #fff' }}>
                     <span style={{ fontSize: 12 }}></span>
                     <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const file = e.target.files[0]; if (file) { const r = new FileReader(); r.onloadend = () => setNc(p => ({ ...p, logoUrl: r.result })); r.readAsDataURL(file); } }} />
                   </label>
@@ -2196,7 +2196,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 {[{ val: 'b2b', icon: '🏢', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: '👤', label: 'B2C', sub: 'Individual person' }, { val: 'freelancer', icon: '💼', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
                   <div key={t.val} onClick={() => setNc(p => ({ ...p, clientType: t.val }))}
                     style={{ border: `2px solid ${nc.clientType === t.val ? '#00BCD4' : '#E0E6EA'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? '#E0F7FA' : '#F4F6F8', transition: 'all .15s', position: 'relative' }}>
-                    {nc.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: '#00BCD4', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
+                    {nc.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: accentColor, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
                     <div style={{ fontSize: 22, marginBottom: 4 }}>{t.icon}</div>
                     <div style={{ fontSize: 12, fontWeight: 700, color: nc.clientType === t.val ? '#007B8A' : '#1A2332' }}>{t.label}</div>
                     <div style={{ fontSize: 10, color: '#94A3B0', marginTop: 2 }}>{t.sub}</div>

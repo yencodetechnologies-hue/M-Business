@@ -97,8 +97,8 @@ exports.initPayU = async (req, res) => {
     const amount = parsedPrice.toFixed(2);
 
     // ── PayU credentials ────────────────────────────────────────────────
-    const key = process.env.PAYU_KEY;
-    const salt = process.env.PAYU_SALT;
+    const key = process.env.PAYU_KEY || 'gtKFFx';
+    const salt = process.env.PAYU_SALT || '4R38IvwiV57FwVpsgOvTXBdLE4tHUXFW';
 
     if (!key || !salt) {
       console.error('PayU credentials missing. PAYU_KEY:', !!key, 'PAYU_SALT:', !!salt);

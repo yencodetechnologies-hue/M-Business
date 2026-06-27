@@ -76,61 +76,83 @@ exports.getPaymentMethods = async (req, res) => {
 exports.initPayU = async (req, res) => {
   try {
     const { userId, userEmail, userName, userPhone, plan } = req.body;
-    const key = process.env.PAYU_KEY;
-    const salt = process.env.PAYU_SALT;
-    if (!key || !salt) {
-      return res.status(500).json({ error: 'PayU credentials not configured' });
-    }
-    // Generate transaction id
-    const txnid = `txn_${Date.now()}`;
-    // Determine amount and product info from plan
-    const amount = plan && plan.price ? plan.price.toString() : '';
-    const productinfo = plan && plan.name ? plan.name : 'Subscription';
-    const firstname = userName || '';
-    const email = userEmail || '';
-    const phone = userPhone || '9999999999';
-    // Cancel any existing pending subscriptions for this user before creating a new one
-    await Subscription.updateMany(
-      { userId, status: "pending" },
-      { status: "cancelled", updatedAt: new Date() }
-    );
-if (!plan) {
-      return res.status(400).json({ error: 'Missing plan details in request' });
+
+    // ── Validate incoming data ──────────────────────────────────────────
+    if (!userId) return res.status(400).json({ error: 'userId is required' });
+    if (!userEmail) return res.status(400).json({ error: 'userEmail is required' });
+    if (!plan) return res.status(400).json({ error: 'plan is required' });
+
+    // Support both 'name' (DEFAULT_PLANS) and 'title' (DB packages)
+    const planName = plan.name || plan.title || 'Subscription';
+
+    // Support both number and string price, and both 'price' and 'monthlyPrice'
+    const rawPrice = plan.price ?? plan.monthlyPrice ?? 0;
+    const parsedPrice = parseFloat(String(rawPrice).replace(/[^0-9.]/g, '')) || 0;
+
+    if (parsedPrice <= 0) {
+      return res.status(400).json({ error: 'Plan price must be greater than 0' });
     }
 
-    // Create a pending subscription first
+    // Format amount to exactly 2 decimal places — PayU requires this
+    const amount = parsedPrice.toFixed(2);
+
+    // ── PayU credentials ────────────────────────────────────────────────
+    const key = process.env.PAYU_KEY;
+    const salt = process.env.PAYU_SALT;
+
+    if (!key || !salt) {
+      console.error('PayU credentials missing. PAYU_KEY:', !!key, 'PAYU_SALT:', !!salt);
+      return res.status(500).json({ error: 'PayU credentials not configured on server. Add PAYU_KEY and PAYU_SALT to your .env file.' });
+    }
+
+    const txnid = `txn_${Date.now()}`;
+    const productinfo = planName;
+    const firstname = (userName || '').trim() || 'User';
+    const email = (userEmail || '').trim();
+    const phone = (userPhone || '9999999999').replace(/\D/g, '').slice(0, 10) || '9999999999';
+
+    // ── Cancel existing pending subscriptions ───────────────────────────
+    await Subscription.updateMany(
+      { userId, status: 'pending' },
+      { status: 'cancelled', updatedAt: new Date() }
+    );
+
+    // ── Create pending subscription ─────────────────────────────────────
     const pendingSub = new Subscription({
       userId,
-      userEmail,
-      userName,
-      planName: plan.name || 'Subscription',
-      planPrice: plan.price || 0,
-      billingCycle: "monthly",
-      status: "pending",
+      userEmail: email,
+      userName: firstname,
+      planName: planName,
+      planPrice: parsedPrice,
+      billingCycle: 'monthly',
+      status: 'pending',
       clientLimit: plan.clientLimit || '',
       employeeLimit: plan.employeeLimit || '',
       managerLimit: plan.managerLimit || '',
       businessLimit: plan.businessLimit || '',
-      features: plan.features || []
+      features: Array.isArray(plan.features) ? plan.features : []
     });
     await pendingSub.save();
 
-    // Use udf1 to store the subscriptionId so PayU returns it in callbacks
+    // ── Build PayU hash ─────────────────────────────────────────────────
+    // Format: key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5||||||salt
     const udf1 = pendingSub._id.toString();
     const udf2 = '', udf3 = '', udf4 = '', udf5 = '';
-    // Build hash string as per PayU specification
     const hashString = `${key}|${txnid}|${amount}|${productinfo}|${firstname}|${email}|${udf1}|${udf2}|${udf3}|${udf4}|${udf5}||||||${salt}`;
-    console.log('PayU hashString:', hashString);
     const hash = crypto.createHash('sha512').update(hashString).digest('hex');
-    console.log('PayU hash:', hash);
-    // Success and failure URLs — PayU POSTs to backend, backend redirects to frontend
-    const backendUrl = process.env.BASE_URL || 'http://localhost:5008';
+
+    console.log('[PayU] txnid:', txnid, '| amount:', amount, '| plan:', planName);
+    console.log('[PayU] hash generated successfully');
+
+    // ── Callback URLs ───────────────────────────────────────────────────
+    const backendUrl = (process.env.BASE_URL || 'http://localhost:5008').replace(/\/$/, '');
     const surl = `${backendUrl}/api/payments/payu/success`;
     const furl = `${backendUrl}/api/payments/payu/failure`;
     const env = process.env.PAYU_ENV === 'prod' ? 'prod' : 'test';
-    console.log('PayU surl:', surl, '| furl:', furl);
-    // Respond with all required fields for frontend form submission
-    res.json({
+
+    console.log('[PayU] env:', env, '| surl:', surl);
+
+    return res.json({
       success: true,
       key,
       txnid,
@@ -145,8 +167,9 @@ if (!plan) {
       furl,
       env
     });
+
   } catch (error) {
-    console.error('initPayU error:', error);
-    res.status(500).json({ error: error.message });
+    console.error('[PayU] initPayU error:', error.message, error.stack);
+    return res.status(500).json({ error: error.message });
   }
 };

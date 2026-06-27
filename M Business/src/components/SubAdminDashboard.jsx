@@ -926,7 +926,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 
         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)", zIndex: 999, overflow: "hidden" }}>
 
-          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>Search</span><input autoFocus placeholder="Search client..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
+          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}></span><input autoFocus placeholder="Search client..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
 
           {onAddClient && <div onClick={() => { setOpen(false); setSearch(""); onAddClient(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,var(--app-border),var(--app-bg))", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Client</div></div></div>}
 
@@ -1963,7 +1963,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
 
-   
+
 
 
 
@@ -2015,7 +2015,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                         <div style={{ padding: "6px 12px 4px", fontSize: 9, fontWeight: 700, color: "#A0B8BE", textTransform: "uppercase", letterSpacing: .7, background: "#F8FAFB", borderBottom: "1px solid #E0EEF0" }}>Set Client Status</div>
 
-                        {["Active", "Pending", "Inactive"].map(s => {
+                        {["Active", "Inactive"].map(s => {
 
                           const sc = getStatusCfg(s);
 
@@ -2042,15 +2042,6 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                     )}
 
                   </div>
-
-                  <button
-                    onClick={() => setViewClientModal(true)}
-                    style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "none", border: "1.5px solid #E0EEF0", borderRadius: 20, fontSize: 11, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#00BCD4"; e.currentTarget.style.color = "#00BCD4"; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}
-                  >
-                    <i className="ti ti-eye" style={{ fontSize: 12 }} />View
-                  </button>
                   <button
                     onClick={() => {
                       const portalUrl = `${window.location.origin}/client-portal/${activeClient._id}`;
@@ -2062,12 +2053,17 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                   >
                     <i className="ti ti-world" style={{ fontSize: 12 }} />Portal
                   </button>
-
-                  <button onClick={() => openEdit(activeClient)} style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "none", border: "1.5px solid #E0EEF0", borderRadius: 20, fontSize: 11, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#00BCD4"; e.currentTarget.style.color = "#00BCD4"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}>
-
-                    <i className="ti ti-edit" style={{ fontSize: 12 }} />Edit
-
+                  <button
+                    onClick={() => setViewClientModal(true)}
+                    style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "none", border: "1.5px solid #E0EEF0", borderRadius: 20, fontSize: 11, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#00BCD4"; e.currentTarget.style.color = "#00BCD4"; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}
+                  >
+                    <i className="ti ti-eye" style={{ fontSize: 12 }} />View
                   </button>
+
+
+
 
                 </div>
 
@@ -4662,7 +4658,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
 
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
 
-          <div style={{ position: "relative" }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>Search</span><input placeholder="Search…" value={tsSearch} onChange={e => setTsSearch(e.target.value)} style={{ padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", width: 240, color: T.text }} /></div>
+          <div style={{ position: "relative" }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>Search</span><input placeholder="Search…" value={tsSearch} onChange={e => setTsSearch(e.target.value)} style={{ padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", width: 240, color: T.text }} /></div>
 
           {["All", "In Progress", "Pending", "Completed", "On Hold"].map(f => (<button key={f} onClick={() => setTsFilter(f)} style={{ padding: "7px 13px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: tsFilter === f ? "var(--app-accent)" : "var(--app-border)", background: tsFilter === f ? "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)" : "#fff", color: tsFilter === f ? "var(--app-accent)" : "var(--app-muted)" }}>{f}</button>))}
 
@@ -5026,7 +5022,7 @@ function InterviewPage({ companyId, companyName }) {
 
       <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
 
-        {[{ t: "Total", v: counts.total, i: "🎯", c: "var(--app-accent)" }, { t: "Pending", v: counts.pending, i: "⏳", c: "#F59E0B" }, { t: "Hired", v: counts.hired, i: "Yes", c: "#22C55E" }, { t: "Rejected", v: counts.rejected, i: "❌", c: "#EF4444" }].map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${c},${c}88)` }} /><div style={{ width: 36, height: 36, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 26, fontWeight: 800, color: c }}>{v}</div></div>))}
+        {[{ t: "Total", v: counts.total, i: "🎯", c: "var(--app-accent)" }, { t: "Pending", v: counts.pending, i: "⏳", c: "#F59E0B" }, { t: "Hired", v: counts.hired, i: "✅", c: "#22C55E" }, { t: "Rejected", v: counts.rejected, i: "❌", c: "#EF4444" }].map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${c},${c}88)` }} /><div style={{ width: 36, height: 36, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 26, fontWeight: 800, color: c }}>{v}</div></div>))}
 
       </div>
 
@@ -5036,7 +5032,7 @@ function InterviewPage({ companyId, companyName }) {
 
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
 
-          <div style={{ position: "relative", flex: 1, minWidth: 200 }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>Search</span><input placeholder="Search name, role, email, mobile..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", color: "var(--app-sidebar)", boxSizing: "border-box" }} /></div>
+          <div style={{ position: "relative", flex: 1, minWidth: 200 }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}></span><input placeholder="Search name, role, email, mobile..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", color: "var(--app-sidebar)", boxSizing: "border-box" }} /></div>
 
           {["all", "pending", "hired", "rejected"].map(f => (<button key={f} onClick={() => setFilter(f)} style={{ padding: "7px 14px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-border)", background: filter === f ? `${f === "all" ? "var(--app-accent)" : sC(f)}15` : "#fff", color: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-muted)", transition: "all 0.15s" }}>{f === "all" ? "🎯 All" : f === "pending" ? "⏳ Pending" : f === "hired" ? "Yes Hired" : "❌ Rejected"}</button>))}
 
@@ -5775,27 +5771,17 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
                     const on = active === sub.key;
 
                     return (
-
                       <div
-
                         key={sub.key}
-
                         className={`nav-item ${on ? 'active' : ''}`}
-
                         onClick={() => {
-
                           if (sub.key === "tasks") setSelectedProjectForTasks(null);
-
                           setActive(sub.key);
-
                           onClose();
-
                         }}
-
                       >
-
                         <i className={`ti ti-${sub.icon?.includes('ti-') ? sub.icon.split('ti-')[1] : 'point'}`}></i> {sub.label}
-
+                        {on && <i className="ti ti-check" style={{ marginLeft: "auto", fontSize: 14, opacity: 0.9 }} />}
                       </div>
 
                     );
@@ -5811,29 +5797,18 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
             const on = active === n.key;
 
             return (
-
               <div
-
                 key={n.key}
-
                 className={`nav-item ${on ? 'active' : ''}`}
-
                 onClick={() => {
-
                   if (n.key === "tasks") setSelectedProjectForTasks(null);
-
                   setActive(n.key);
-
                   onClose();
-
                 }}
-
               >
-
                 <i className={`ti ti-${n.icon?.includes('ti-') ? n.icon.split('ti-')[1] : 'point'}`}></i> {n.label}
-
+                {on && <i className="ti ti-check" style={{ marginLeft: "auto", fontSize: 14, opacity: 0.9 }} />}
               </div>
-
             );
 
           })}
@@ -11115,7 +11090,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   >
 
-                    <span style={{ fontSize: 14 }}>👤</span>
+                    <span style={{ fontSize: 14 }}>👤</span>Profile
 
                   </button>
 

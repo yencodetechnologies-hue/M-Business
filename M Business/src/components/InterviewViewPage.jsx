@@ -293,7 +293,7 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
         {/* Filters */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
           <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
-            <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>Search</span>
+
             <input placeholder="Search name, role, email, mobile..." value={search} onChange={e => setSearch(e.target.value)}
               style={{ width: "100%", padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", color: "var(--app-text)", boxSizing: "border-box" }} />
           </div>

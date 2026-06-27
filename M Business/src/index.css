@@ -27,9 +27,9 @@
   --radius: 16px;
 
   --app-primary: #0f172a;
-  --app-sidebar: #00BCD4;
-  --app-accent: #00BCD4;
-  --app-accent-rgb: 0, 188, 212;
+  --app-sidebar: #7c3aed;
+  --app-accent: #7c3aed;
+  --app-accent-rgb: 124, 58, 237;
   --app-accent2: var(--teal2);
   --app-bg: #F5FAFA;
   --app-card: #FFFFFF;

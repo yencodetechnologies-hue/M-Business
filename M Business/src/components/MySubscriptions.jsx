@@ -415,9 +415,6 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
           console.log("Activation call:", e.message);
         }
 
-        // Mark upgrade as successful so alert never shows again
-        markUpgradeSuccess();
-
         await fetchData();
         if (onSubscriptionSuccess) onSubscriptionSuccess();
         showToast("Payment Successful! Your plan is active.");
@@ -640,6 +637,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
         userId,
         userEmail,
         userName,
+        userPhone: user?.phone || "9999999999",
         plan
       });
 
@@ -716,8 +714,6 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
         if (res2.data.success) activated = true;
       }
       setMockGatewayPlan(null);
-      markUpgradeSuccess();
-      setShowRenewAlert(false);
       setPaymentSuccessData({ name: plan.name, price: plan.price });
       if (activated) { await fetchData(); if (onSubscriptionSuccess) onSubscriptionSuccess(); }
     } catch (err) {
@@ -775,8 +771,6 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
           {/* Login to Dashboard button */}
           <button
             onClick={() => {
-              markUpgradeSuccess();
-              setShowRenewAlert(false);
               setPaymentSuccessData(null);
               if (onSubscriptionSuccess) onSubscriptionSuccess();
               else window.location.href = "/";
@@ -888,8 +882,6 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
 
   // ── Has Subscription ---------------------------------------------------------
   const daysLeft = getDaysLeft(subscription.endDate);
-  const usageRemaining = Math.max(0, (subscription.usageLimit || 999) - (subscription.usageCount || 0));
-  const usagePct = Math.min(100, Math.round(((subscription.usageCount || 0) / (subscription.usageLimit || 999)) * 100));
 
   // Expired > 60 days  Contact administrator
   const daysSinceExpiry = subscription.endDate

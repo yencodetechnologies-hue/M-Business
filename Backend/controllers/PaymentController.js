@@ -75,7 +75,7 @@ exports.getPaymentMethods = async (req, res) => {
 
 exports.initPayU = async (req, res) => {
   try {
-    const { userId, userEmail, userName, plan } = req.body;
+    const { userId, userEmail, userName, userPhone, plan } = req.body;
     const key = process.env.PAYU_KEY;
     const salt = process.env.PAYU_SALT;
     if (!key || !salt) {
@@ -88,7 +88,7 @@ exports.initPayU = async (req, res) => {
     const productinfo = plan && plan.name ? plan.name : 'Subscription';
     const firstname = userName || '';
     const email = userEmail || '';
-    const phone = '';
+    const phone = userPhone || '9999999999';
     // Cancel any existing pending subscriptions for this user before creating a new one
     await Subscription.updateMany(
       { userId, status: "pending" },

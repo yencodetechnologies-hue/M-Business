@@ -1324,9 +1324,9 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
 
-              <span onClick={() => setViewClientModal(true)} style={{ fontSize: 11, color: "#00BCD4", fontWeight: 700, cursor: "pointer" }}>View</span>
+<span onClick={() => setViewClientModal(true)} style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer" }}>View</span>
 
-              <span onClick={() => openEdit(activeClient)} style={{ fontSize: 11, color: "#00BCD4", fontWeight: 700, cursor: "pointer" }}>Edit</span>
+              <span onClick={() => openEdit(activeClient)} style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer" }}>Edit</span>
 
             </div>
 
@@ -1389,7 +1389,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
               <button onClick={() => onCreateProject && onCreateProject(activeClient)} style={{ background: "#00BCD4", border: "none", borderRadius: 7, padding: "4px 10px", fontSize: 11, color: "#fff", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
                 <i className="ti ti-plus" style={{ fontSize: 11 }} /> Add Project
               </button>
-              <span onClick={() => setActiveTab("projects")} style={{ fontSize: 11, color: "#00BCD4", fontWeight: 700, cursor: "pointer" }}>View all</span>
+              <span onClick={() => setActiveTab("projects")} style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer" }}>View all</span>
             </div>
 
 
@@ -1435,8 +1435,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
 
                     <div style={{ textAlign: "right", marginRight: 8 }}>
-
-                      <div style={{ fontSize: 12, fontWeight: 800, color: "#00BCD4" }}>{pct}%</div>
+                      <div style={{ fontSize: 12, fontWeight: 800, color: "var(--app-accent)" }}>{pct}%</div>
 
                       <div style={{ width: 60, height: 4, background: "#E0EEF0", borderRadius: 2, overflow: "hidden", marginTop: 4 }}>
 
@@ -2129,8 +2128,8 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                       window.open(portalUrl, "_blank");
                     }}
                     style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "#E0F7FA", border: "1.5px solid #00BCD4", borderRadius: 20, fontSize: 11, fontWeight: 700, color: "#00BCD4", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "#00BCD4"; e.currentTarget.style.color = "#fff"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "#E0F7FA"; e.currentTarget.style.color = "#00BCD4"; }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "var(--app-accent)"; e.currentTarget.style.color = "#fff"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(var(--app-accent-rgb),0.1)"; e.currentTarget.style.color = "var(--app-accent)"; }}
                   >
                     <i className="ti ti-world" style={{ fontSize: 12 }} />Portal
                   </button>
@@ -2597,7 +2596,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
     return (
       <div style={{ padding: "0 0 32px" }}>
         <div
-          style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18, cursor: "pointer", color: "#00BCD4", fontWeight: 700 }}
+          style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18, cursor: "pointer", color: "var(--app-accent)", fontWeight: 700 }}
           onClick={() => { setViewEmpProject(null); }}
         >
           <i className="ti ti-arrow-left" style={{ fontSize: 18 }}></i> Back to Employee
@@ -3840,7 +3839,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
               <div style={{ background: "#f0f9ff", borderRadius: 12, padding: 14, border: "1px solid #bae6fd", textAlign: "center" }}>
 
-                <div style={{ fontSize: 11, color: "#0284c7", fontWeight: 700, marginBottom: 4 }}>QUOTATIONS</div>
+                <div style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, marginBottom: 4 }}>QUOTATIONS</div>
 
                 <div style={{ fontSize: 22, fontWeight: 800, color: "#0ea5e9" }}>{relatedQuotations.length}</div>
 
@@ -6538,14 +6537,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [pendingNewClientId, setPendingNewClientId] = useState(null);
 
   const [active, setActive] = useState(() => {
+    const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    if (params && params.get("payment")) return "mysubscriptions";
 
     const saved = localStorage.getItem("activeTab_subadmin") || "dashboard";
-
-
     if (["project-details", "create-project", "edit-project"].includes(saved)) return "projects";
-
     return saved;
-
   });
 
   useEffect(() => {
@@ -9102,7 +9099,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
                     <div style={{ maxHeight: 420, overflowY: 'auto', padding: '12px 16px' }}>
                       <div style={{ fontSize: 11, fontWeight: 800, color: '#718096', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 10 }}>
-                        <i className="ti ti-user-x" style={{ marginRight: 5, color: '#00BCD4' }}></i> Leave Requests
+                        <i className="ti ti-user-x" style={{ marginRight: 5, color: 'var(--app-accent)' }}></i> Leave Requests
                       </div>
                       {pendingLeaves.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '20px 0', color: '#A0AEC0', fontSize: 13 }}>
@@ -10135,11 +10132,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
 
-                                    <i className="ti ti-folder" style={{ color: "#00BCD4" }}></i> Active Projects
+                                    <i className="ti ti-folder" style={{ color: "var(--app-accent)" }}></i> Active Projects
 
                                   </div>
 
-                                  <div onClick={() => setActive("projects")} style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
+                                  <div onClick={() => setActive("projects")} style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)", cursor: "pointer" }}>
 
                                     View All
 
@@ -10151,7 +10148,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   {projects.filter(p => p.status === "Active" || p.status === "Pending").slice(0, 5).map((p, idx) => {
 
-                                    const colors = ["#00BCD4", "#7c3aed", "#2563eb", "#16a34a", "#dc2626"];
+                                    const colors = ["var(--app-accent)", "var(--app-accent)", "var(--app-accent)", "var(--app-accent)", "var(--app-accent)"];
 
                                     const bColor = colors[idx % colors.length];
 
@@ -10161,7 +10158,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                     const badgeText = "IN PROGRESS";
 
-                                    const badgeColor = "#00BCD4";
+                                    const badgeColor = "var(--app-accent)";
 
 
 
@@ -10229,7 +10226,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
 
-                                    <i className="ti ti-user-x" style={{ color: "#00BCD4" }}></i> Leave Requests
+                                    <i className="ti ti-user-x" style={{ color: "var(--app-accent)" }}></i> Leave Requests
 
                                     <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length} PENDING</span>
 
@@ -11280,7 +11277,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   >
 
-                    <span style={{ fontSize: 14 }}>👤</span> Profile
+                    <span style={{ fontSize: 14 }}>👤</span>
 
                   </button>
 

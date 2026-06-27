@@ -20,12 +20,12 @@ router.post('/payu/success', async (req, res) => {
   try {
     const { txnid, status, amount, productinfo, firstname, email, mihpayid, udf1 } = req.body;
     console.log('PayU success callback:', req.body);
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://www.mbusiness.cloud';
     // Redirect to frontend with success params (udf1 holds subscriptionId)
     res.redirect(`${frontendUrl}/?payment=success&plan=${encodeURIComponent(productinfo)}&txnid=${txnid}&mihpayid=${mihpayid || ''}&subId=${udf1 || ''}`);
   } catch (err) {
     console.error('PayU success handler error:', err);
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://www.mbusiness.cloud';
     res.redirect(`${frontendUrl}/?payment=success`);
   }
 });
@@ -35,11 +35,11 @@ router.post('/payu/failure', async (req, res) => {
   try {
     const { txnid, status, productinfo } = req.body;
     console.log('PayU failure callback:', req.body);
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://www.mbusiness.cloud';
     res.redirect(`${frontendUrl}/?payment=failed&plan=${encodeURIComponent(productinfo || '')}&txnid=${txnid || ''}`);
   } catch (err) {
     console.error('PayU failure handler error:', err);
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://www.mbusiness.cloud';
     res.redirect(`${frontendUrl}/?payment=failed`);
   }
 });
@@ -58,7 +58,7 @@ router.get("/methods", PaymentController.getPaymentMethods);
 router.get("/all", async (req, res) => {
   try {
     const { page = 1, limit = 20, status, userId, type } = req.query;
-    
+
     const filter = {};
     if (status) filter.status = status;
     if (userId) filter.userId = userId;
@@ -89,7 +89,7 @@ router.get("/:paymentId", async (req, res) => {
   try {
     const { paymentId } = req.params;
     const payment = await PaymentHistory.findById(paymentId);
-    
+
     if (!payment) {
       return res.status(404).json({ error: "Payment not found" });
     }
@@ -108,8 +108,8 @@ router.put("/:paymentId/status", async (req, res) => {
 
     const payment = await PaymentHistory.findByIdAndUpdate(
       paymentId,
-      { 
-        status, 
+      {
+        status,
         notes: notes || `Status updated to ${status}`,
         updatedAt: new Date()
       },
@@ -134,11 +134,11 @@ router.put("/:paymentId/status", async (req, res) => {
 router.post("/webhook/razorpay", async (req, res) => {
   try {
     const event = req.body;
-    
+
     // Verify webhook signature (in production)
     // const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
     // const signature = req.headers['x-razorpay-signature'];
-    
+
     switch (event.event) {
       case 'payment.captured':
         await PaymentController.verifyPayment({
@@ -150,7 +150,7 @@ router.post("/webhook/razorpay", async (req, res) => {
           }
         });
         break;
-        
+
       case 'payment.failed':
         await PaymentController.handlePaymentFailure({
           body: {
@@ -160,11 +160,11 @@ router.post("/webhook/razorpay", async (req, res) => {
           }
         });
         break;
-        
+
       default:
         console.log(`Unhandled event: ${event.event}`);
     }
-    
+
     res.json({ received: true });
   } catch (error) {
     console.error('Webhook error:', error);

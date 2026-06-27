@@ -853,110 +853,117 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                 Cancel
               </button>
               <button onClick={handleAddLeave} disabled={leaveSaving}
-                style={{ flex: 1, padding: '11px', background: 'linear-gradient(135deg,#00BCD4,#0097A7)', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#fff', cursor: leaveSaving ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: leaveSaving ? 0.7 : 1 }}>
+                style={{
+                  flex: 1, padding: '11px', background: 'linear-gradient(135deg,var(--app-accent),#0097A7)', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#fff', cursor: leaveSaving ? 'not - allowed' : 'pointer', fontFamily: 'inherit', opacity: leaveSaving ? 0.7 : 1
+                }}>
                 {leaveSaving ? 'Saving...' : '+ Add Leave'}
               </button>
             </div>
           </div>
         </div>
-      )}
+      )
+      }
 
       {/* ADD TASK MODAL */}
-      {showAddTaskModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(15,28,46,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(4px)" }}>
-          <div style={{ background: "#fff", borderRadius: 16, padding: "28px 32px", width: 450, boxShadow: "0 24px 80px rgba(0,0,0,0.18)", border: "1px solid var(--border)", fontFamily: "'Nunito', sans-serif" }}>
-            <div style={{ display: "flex", justifySpaceBetween: "space-between", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <div style={{ fontSize: 18, fontWeight: 900, color: "var(--text)" }}>Assign New Task</div>
-              <button onClick={() => setShowAddTaskModal(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: "var(--text-muted)" }}><i className="ti ti-x"></i></button>
-            </div>
-            <form onSubmit={handleAddTaskSubmit}>
-              <div style={{ marginBottom: 16 }}>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Task Title</label>
-                <input
-                  type="text"
-                  value={newTaskTitle}
-                  onChange={e => setNewTaskTitle(e.target.value)}
-                  required
-                  placeholder="e.g. Design Landing Page Layout"
-                  style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700 }}
-                />
+      {
+        showAddTaskModal && (
+          <div style={{ position: "fixed", inset: 0, background: "rgba(15,28,46,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(4px)" }}>
+            <div style={{ background: "#fff", borderRadius: 16, padding: "28px 32px", width: 450, boxShadow: "0 24px 80px rgba(0,0,0,0.18)", border: "1px solid var(--border)", fontFamily: "'Nunito', sans-serif" }}>
+              <div style={{ display: "flex", justifySpaceBetween: "space-between", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                <div style={{ fontSize: 18, fontWeight: 900, color: "var(--text)" }}>Assign New Task</div>
+                <button onClick={() => setShowAddTaskModal(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: "var(--text-muted)" }}><i className="ti ti-x"></i></button>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
-                <div>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Priority</label>
-                  <select
-                    value={newTaskPriority}
-                    onChange={e => setNewTaskPriority(e.target.value)}
-                    style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700, background: "#fff" }}
-                  >
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="High">High</option>
-                  </select>
-                </div>
-                <div>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Due Date</label>
+              <form onSubmit={handleAddTaskSubmit}>
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Task Title</label>
                   <input
-                    type="date"
-                    value={newTaskDueDate}
-                    onChange={e => setNewTaskDueDate(e.target.value)}
+                    type="text"
+                    value={newTaskTitle}
+                    onChange={e => setNewTaskTitle(e.target.value)}
+                    required
+                    placeholder="e.g. Design Landing Page Layout"
                     style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700 }}
                   />
                 </div>
-              </div>
-              <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-                <button type="button" onClick={() => setShowAddTaskModal(false)} style={{ background: "#f1f5f9", color: "var(--text-muted)", border: "none", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
-                <button type="submit" style={{ background: "var(--teal)", color: "#fff", border: "none", padding: "10px 20px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Assign Task</button>
-              </div>
-            </form>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Priority</label>
+                    <select
+                      value={newTaskPriority}
+                      onChange={e => setNewTaskPriority(e.target.value)}
+                      style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700, background: "#fff" }}
+                    >
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="High">High</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Due Date</label>
+                    <input
+                      type="date"
+                      value={newTaskDueDate}
+                      onChange={e => setNewTaskDueDate(e.target.value)}
+                      style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700 }}
+                    />
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+                  <button type="button" onClick={() => setShowAddTaskModal(false)} style={{ background: "#f1f5f9", color: "var(--text-muted)", border: "none", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
+                  <button type="submit" style={{ background: "var(--teal)", color: "#fff", border: "none", padding: "10px 20px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Assign Task</button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* REQUEST DOCUMENT MODAL */}
-      {showRequestDocModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(15,28,46,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(4px)" }}>
-          <div style={{ background: "#fff", borderRadius: 16, padding: "28px 32px", width: 450, boxShadow: "0 24px 80px rgba(0,0,0,0.18)", border: "1px solid var(--border)", fontFamily: "'Nunito', sans-serif" }}>
-            <div style={{ display: "flex", justifySpaceBetween: "space-between", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <div style={{ fontSize: 18, fontWeight: 900, color: "var(--text)" }}>Request Document</div>
-              <button onClick={() => setShowRequestDocModal(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: "var(--text-muted)" }}><i className="ti ti-x"></i></button>
+      {
+        showRequestDocModal && (
+          <div style={{ position: "fixed", inset: 0, background: "rgba(15,28,46,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(4px)" }}>
+            <div style={{ background: "#fff", borderRadius: 16, padding: "28px 32px", width: 450, boxShadow: "0 24px 80px rgba(0,0,0,0.18)", border: "1px solid var(--border)", fontFamily: "'Nunito', sans-serif" }}>
+              <div style={{ display: "flex", justifySpaceBetween: "space-between", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                <div style={{ fontSize: 18, fontWeight: 900, color: "var(--text)" }}>Request Document</div>
+                <button onClick={() => setShowRequestDocModal(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: "var(--text-muted)" }}><i className="ti ti-x"></i></button>
+              </div>
+              <form onSubmit={handleRequestDocSubmit}>
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Document Name</label>
+                  <input
+                    type="text"
+                    value={newDocName}
+                    onChange={e => setNewDocName(e.target.value)}
+                    required
+                    placeholder="e.g. Aadhar Card"
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700 }}
+                  />
+                </div>
+                <div style={{ marginBottom: 20 }}>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Document Type</label>
+                  <select
+                    value={newDocType}
+                    onChange={e => setNewDocType(e.target.value)}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700, background: "#fff" }}
+                  >
+                    <option value="Offer Letter">Offer Letter</option>
+                    <option value="ID Proof">ID Proof</option>
+                    <option value="Contract">Contract</option>
+                    <option value="Degree Certificate">Degree Certificate</option>
+                    <option value="Resume/CV">Resume/CV</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+                  <button type="button" onClick={() => setShowRequestDocModal(false)} style={{ background: "#f1f5f9", color: "var(--text-muted)", border: "none", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
+                  <button type="submit" style={{ background: "var(--teal)", color: "#fff", border: "none", padding: "10px 20px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Request Document</button>
+                </div>
+              </form>
             </div>
-            <form onSubmit={handleRequestDocSubmit}>
-              <div style={{ marginBottom: 16 }}>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Document Name</label>
-                <input
-                  type="text"
-                  value={newDocName}
-                  onChange={e => setNewDocName(e.target.value)}
-                  required
-                  placeholder="e.g. Aadhar Card"
-                  style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700 }}
-                />
-              </div>
-              <div style={{ marginBottom: 20 }}>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Document Type</label>
-                <select
-                  value={newDocType}
-                  onChange={e => setNewDocType(e.target.value)}
-                  style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700, background: "#fff" }}
-                >
-                  <option value="Offer Letter">Offer Letter</option>
-                  <option value="ID Proof">ID Proof</option>
-                  <option value="Contract">Contract</option>
-                  <option value="Degree Certificate">Degree Certificate</option>
-                  <option value="Resume/CV">Resume/CV</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-              <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-                <button type="button" onClick={() => setShowRequestDocModal(false)} style={{ background: "#f1f5f9", color: "var(--text-muted)", border: "none", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
-                <button type="submit" style={{ background: "var(--teal)", color: "#fff", border: "none", padding: "10px 20px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Request Document</button>
-              </div>
-            </form>
           </div>
-        </div>
-      )}
+        )
+      }
 
-    </div>
+    </div >
   );
 }

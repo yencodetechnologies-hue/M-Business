@@ -145,7 +145,7 @@ const res = await fetch(`/api/tasks?person=${encodeURIComponent(user.name)}`, {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
         <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
-          <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "rgba(0,188,212,0.08)", color: "#00BCD4" }}><i className="ti ti-users"></i></div>
+          <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "rgba(var(--app-accent-rgb,0,188,212),0.08)", color: "var(--app-accent)" }}><i className="ti ti-users"></i></div>
           <div><div style={{ fontSize: 24, fontWeight: 900, color: "var(--text)", lineHeight: 1 }}>{employees.length}</div><div style={{ fontSize: 11, color: "var(--text-soft)", marginTop: 3, fontWeight: 600 }}>Total Employees</div></div>
         </div>
         <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
@@ -188,7 +188,7 @@ const res = await fetch(`/api/tasks?person=${encodeURIComponent(user.name)}`, {
       <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: "1px solid var(--border)" }}>
           <div style={{ fontSize: 14, fontWeight: 900, color: "var(--text)" }}>All Employees</div>
-          <div style={{ background: "rgba(0,188,212,0.08)", color: "#00BCD4", fontSize: 11, fontWeight: 800, padding: "3px 12px", borderRadius: 20 }}>{filtered.length} employees</div>
+          <div style={{ background: "rgba(var(--app-accent-rgb,0,188,212),0.08)", color: "var(--app-accent)", fontSize: 11, fontWeight: 800, padding: "3px 12px", borderRadius: 20 }}>{filtered.length} employees</div>
         </div>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700 }}>
@@ -236,7 +236,7 @@ const res = await fetch(`/api/tasks?person=${encodeURIComponent(user.name)}`, {
                     </td>
                     <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
                       <div style={{ display: "flex", gap: 6 }}>
-                        <button onClick={(ev) => { ev.stopPropagation(); setViewEmp(e); loadEmpDocs(e); }} style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "rgba(0,188,212,0.08)", color: "#00BCD4" }}><i className="ti ti-eye"></i></button>
+                        <button onClick={(ev) => { ev.stopPropagation(); setViewEmp(e); loadEmpDocs(e); }} style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "rgba(var(--app-accent-rgb,0,188,212),0.08)", color: "var(--app-accent)" }}><i className="ti ti-eye"></i></button>
                         <button onClick={(ev) => { ev.stopPropagation(); openEdit(e); }} style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "#dbeafe", color: "#2563eb" }}><i className="ti ti-pencil"></i></button>
                         <button onClick={(ev) => { ev.stopPropagation(); setDeleteTarget(e); }} style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "#fee2e2", color: "#dc2626" }}><i className="ti ti-trash"></i></button>
                       </div>

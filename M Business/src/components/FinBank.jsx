@@ -83,7 +83,7 @@ export default function FinBank() {
   const toast = (msg) => alert(msg);
 
   const colors = [
-    { bg: 'linear-gradient(135deg,#00BCD4,#0097A7)', badge: '#00BCD4' },
+    { bg: "linear-gradient(135deg,var(--app-accent),#0097A7)", badge: '#00BCD4' },
     { bg: 'linear-gradient(135deg,#8B5CF6,#7C3AED)', badge: '#8B5CF6' },
     { bg: 'linear-gradient(135deg,#F59E0B,#D97706)', badge: '#F59E0B' },
     { bg: 'linear-gradient(135deg,#10B981,#059669)', badge: '#10B981' }

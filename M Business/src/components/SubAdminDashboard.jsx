@@ -2886,7 +2886,7 @@ ${onboardingLink}`;
 
         <div onClick={() => setStatusFilter("All Status")} style={{ background: statusFilter === "All Status" ? "#E0F7FA" : "#fff", border: `1px solid ${statusFilter === "All Status" ? "#00BCD4" : "var(--border)"}`, borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
 
-          <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "rgba(0,188,212,0.08)", color: "#00BCD4" }}><i className="ti ti-users"></i></div>
+          <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "rgba(var(--app-accent-rgb,0,188,212),0.08)", color: "var(--app-accent)" }}><i className="ti ti-users"></i></div>
 
           <div><div style={{ fontSize: 24, fontWeight: 900, color: "var(--text)", lineHeight: 1 }}>{employees.length}</div><div style={{ fontSize: 11, color: "var(--text-soft)", marginTop: 3, fontWeight: 600 }}>Total Employees</div></div>
 
@@ -2972,7 +2972,7 @@ ${onboardingLink}`;
 
           <div style={{ fontSize: 14, fontWeight: 900, color: "var(--text)" }}>All Employees</div>
 
-          <div style={{ background: "rgba(0,188,212,0.08)", color: "#00BCD4", fontSize: 11, fontWeight: 800, padding: "3px 12px", borderRadius: 20 }}>{filtered.length} employees</div>
+          <div style={{ background: "rgba(var(--app-accent-rgb,0,188,212),0.08)", color: "var(--app-accent)", fontSize: 11, fontWeight: 800, padding: "3px 12px", borderRadius: 20 }}>{filtered.length} employees</div>
 
         </div>
 
@@ -3068,7 +3068,7 @@ ${onboardingLink}`;
 
                       <div style={{ display: "flex", gap: 6 }}>
 
-                        <button onClick={(ev) => { ev.stopPropagation(); setViewEmp(e); loadEmpDocs(e); }} style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "rgba(0,188,212,0.08)", color: "#00BCD4" }}><i className="ti ti-eye"></i></button>
+                        <button onClick={(ev) => { ev.stopPropagation(); setViewEmp(e); loadEmpDocs(e); }} style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "rgba(var(--app-accent-rgb,0,188,212),0.08)", color: "var(--app-accent)" }}><i className="ti ti-eye"></i></button>
 
                         <button onClick={(ev) => { ev.stopPropagation(); openEdit(e); }} style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "#dbeafe", color: "#2563eb" }}><i className="ti ti-pencil"></i></button>
 
@@ -9817,13 +9817,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                     <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(15,28,46,0.8)" }}>
 
-                                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#00BCD4" }}></div> Revenue
+                                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--app-accent)" }}></div> Revenue
 
                                     </div>
 
                                     <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(15,28,46,0.8)" }}>
 
-                                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(0,188,212,0.2)" }}></div> Expenses
+                                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(var(--app-accent-rgb,0,188,212),0.2)" }}></div> Expenses
 
                                     </div>
 
@@ -9839,9 +9839,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                     <div key={i} style={{ flex: 1, display: "flex", gap: 4, height: "100%", alignItems: "flex-end", padding: "0 4px" }}>
 
-                                      <div style={{ flex: 1, background: "#00BCD4", height: `${h}%`, borderRadius: "4px 4px 0 0" }}></div>
+                                      <div style={{ flex: 1, background: "var(--app-accent)", height: `${h}%`, borderRadius: "4px 4px 0 0" }}></div>
 
-                                      <div style={{ flex: 1, background: "rgba(0,188,212,0.2)", height: `${h * 0.4}%`, borderRadius: "4px 4px 0 0" }}></div>
+                                      <div style={{ flex: 1, background: "rgba(var(--app-accent-rgb,0,188,212),0.2)", height: `${h * 0.4}%`, borderRadius: "4px 4px 0 0" }}></div>
 
                                     </div>
 

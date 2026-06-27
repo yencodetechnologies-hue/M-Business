@@ -678,7 +678,8 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
       }
     } catch (err) {
       console.error("PayU init error:", err);
-      showToast("Error Could not initialize payment. Please try again.");
+      const msg = err.response?.data?.error || "Could not initialize payment. Please try again.";
+      showToast("Error: " + msg);
       setPayLoading(null);
       payuInFlight.current = false; // Release the guard on error
     }

@@ -1984,7 +1984,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
             </div>
             <button
               onClick={onAddClient}
-              style={{ background: "#00BCD4", border: "none", borderRadius: 9, width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}
+              style={{ background: "var(--app-accent)", border: "none", borderRadius: 9, width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}
             >
               <i className="ti ti-plus" style={{ color: "#fff", fontSize: 16 }} />
             </button>
@@ -1996,7 +1996,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
               <button
                 key={f}
                 onClick={() => setFilterMode(f)}
-                style={{ flex: 1, padding: "5px 4px", borderRadius: 7, border: "none", fontSize: 10, fontWeight: 700, cursor: "pointer", background: filterMode === f ? "#00BCD4" : "#F0FDFE", color: filterMode === f ? "#fff" : "#607D86", textTransform: "capitalize" }}
+                style={{ flex: 1, padding: "5px 4px", borderRadius: 7, border: "none", fontSize: 10, fontWeight: 700, cursor: "pointer", background: filterMode === f ? "var(--app-accent)" : "#F0FDFE", color: filterMode === f ? "#fff" : "#607D86", textTransform: "capitalize" }}
               >
                 {f === "all" ? `All (${clients.length})` : f === "active" ? `Active (${clients.filter(c => (c.status || "Active").toLowerCase() === "active").length})` : `Inactive (${clients.filter(c => (c.status || "").toLowerCase() === "inactive").length})`}
               </button>
@@ -2012,7 +2012,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
             <div style={{ padding: 30, textAlign: "center" }}>
               <div style={{ fontSize: 28, marginBottom: 8 }}>👥</div>
               <div style={{ fontSize: 12, color: "#A0B8BE", fontWeight: 600 }}>No clients found</div>
-              <button onClick={onAddClient} style={{ marginTop: 12, background: "#00BCD4", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 11, color: "#fff", cursor: "pointer", fontWeight: 700 }}>+ Add Client</button>
+              <button onClick={onAddClient} style={{ marginTop: 12, background: "var(--app-accent)", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 11, color: "#fff", cursor: "pointer", fontWeight: 700 }}>+ Add Client</button>
             </div>
           ) : (
             <>

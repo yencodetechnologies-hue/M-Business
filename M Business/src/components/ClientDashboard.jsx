@@ -358,7 +358,11 @@ export default function ClientDashboard({ user, setUser, portalMode = false }) {
         companyId: decoded.companyId || "",
         role: "client",
       };
-      if (!user && setUser) {
+      const alreadyCorrectClient =
+        user &&
+        user.role === "client" &&
+        String(user._id || user.id) === String(decoded.clientId);
+      if (!alreadyCorrectClient && setUser) {
         setUser(autoUser);
       }
       // Clean token from URL so refresh doesn't re-trigger

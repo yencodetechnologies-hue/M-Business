@@ -1814,32 +1814,38 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
     if (!c) return null;
     const portalUrl = `/client-portal/${c._id}`;
 
-    const handleOpenPortal = () => {
-      // Build the portal URL with client token for auto-login
+    // Build a token once and reuse it everywhere — token grants auto-login
+    // so the client doesn't need to manually sign in, and it's what makes
+    // the data (projects/tasks/invoices/etc.) actually load on their side.
+    const buildPortalTokenUrl = () => {
       const clientToken = btoa(JSON.stringify({
         clientId: c._id,
         email: c.email,
         name: c.clientName || c.name,
         companyName: c.companyName || c.company || "",
+        companyId: c.companyId || user?.companyId || user?._id || user?.id || "",
         exp: Date.now() + 24 * 60 * 60 * 1000 // 24 hour expiry
       }));
-      const portalWithToken = `${window.location.origin}/client-portal/${c._id}?token=${clientToken}`;
-      window.open(portalWithToken, "_blank");
+      return `${window.location.origin}/client-portal/${c._id}?token=${clientToken}`;
+    };
+
+    const handleOpenPortal = () => {
+      window.open(buildPortalTokenUrl(), "_blank");
     };
 
     const handleCopyLink = () => {
-      navigator.clipboard.writeText(portalUrl);
+      navigator.clipboard.writeText(buildPortalTokenUrl());
       showToast("📋 Portal link copied!");
     };
 
     const handleShareWhatsApp = () => {
-      const text = `Hi ${c.clientName || c.name},\n\nYou can access your client portal here:\n${portalUrl}\n\nLogin with your registered email and password.`;
+      const text = `Hi ${c.clientName || c.name},\n\nYou can access your client portal here:\n${buildPortalTokenUrl()}`;
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
     };
 
     const handleSendEmail = () => {
       const subject = `Your Client Portal Access - ${c.clientName || c.name}`;
-      const body = `Hi ${c.clientName || c.name},\n\nYou can access your client portal here:\n${portalUrl}\n\nLogin with your registered email and password.\n\nBest regards`;
+      const body = `Hi ${c.clientName || c.name},\n\nYou can access your client portal here:\n${buildPortalTokenUrl()}\n\nBest regards`;
       window.open(`mailto:${c.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
     };
 

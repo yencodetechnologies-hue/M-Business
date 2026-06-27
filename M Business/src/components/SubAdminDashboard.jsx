@@ -7434,7 +7434,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  // Redirect to packages ONLY ONCE if no subscription found and currently on dashboard
+  // Redirect to mysubscriptions ONLY ONCE if no subscription found and currently on dashboard
 
   const hasRedirected = useRef(false);
 
@@ -7444,7 +7444,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       hasRedirected.current = true;
 
-      setActive("packages");
+      setForceUpgradeTab(true);
+      setActive("mysubscriptions");
 
     }
 
@@ -9331,7 +9332,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           <div className="content">
 
-         <EmployeeSubscriptionWarning user={user} trigger={subscription?.updatedAt || subscription?._id} onRenew={() => { setForceUpgradeTab(true); setActive("mysubscriptions"); setTimeout(() => { const el = document.querySelector('.plan-card, .plans-grid, [class*="upgrade"]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 400); }} />
+            <EmployeeSubscriptionWarning user={user} trigger={subscription?.updatedAt || subscription?._id} onRenew={() => { setForceUpgradeTab(true); setActive("mysubscriptions"); setTimeout(() => { const el = document.querySelector('.plan-card, .plans-grid, [class*="upgrade"]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 400); }} />
 
 
 

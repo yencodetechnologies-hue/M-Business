@@ -9,6 +9,7 @@ const Employee = require("../models/EmployeeModel");// Added new Employee model
 const Subscription = require("../models/SubscriptionModel");
 const DeletedClient = require("../models/DeletedClientModel"); // Blacklist
 const { sendOTPEmail, sendTrialWelcome } = require("../config/email");
+const jwt = require("jsonwebtoken");
 
 // ── GET /api/auth/login (Health Check) ───────────────────────────────────────
 router.get("/login", (req, res) => {
@@ -141,20 +142,9 @@ router.post("/login", async (req, res) => {
     const role = (user.role || "user").toLowerCase().trim();
 
     if (role === "subadmin" && user.isVerified === false) {
-      console.log(`Resending OTP for unverified user: ${user.email}`);
-      const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
-      user.otp = newOtp;
-      user.otpExpires = new Date(Date.now() + 10 * 60000);
+      user.isVerified = true;
       await user.save();
-
-      const emailRes = await sendOTPEmail(user.email, newOtp, 'verification');
-      if (!emailRes.success) {
-        return res.status(500).json({ msg: "Account exists but failed to send verification email. Please contact support." });
-      }
-
-      return res.status(400).json({ msg: "Please verify your email. A new OTP has been sent.", requiresOTP: true, email: user.email });
     }
-
     res.json({
       user: {
         id: user._id,
@@ -206,22 +196,13 @@ router.post("/signup", async (req, res) => {
       const newEmployee = new Employee({ name, email, password: hashed, role: "employee", phone });
       await newEmployee.save();
     } else if (selectedRole === "subadmin") {
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      const otpExpires = new Date(Date.now() + 10 * 60000); // 10 minutes
-      const newUser = new User({ name, email, password: hashed, role: "subadmin", phone, companyName: companyName || "", isVerified: false, otp, otpExpires });
+      const newUser = new User({ name, email, password: hashed, role: "subadmin", phone, companyName: companyName || "", isVerified: true });
       await newUser.save();
-      // Auto Free Trial creation removed so subadmins are forced to pick a plan
 
-      console.log(`Sending signup OTP to ${email}: ${otp}`);
-      const emailResult = await sendOTPEmail(email, otp, 'verification');
+      const token = jwt.sign({ id: newUser._id, role: newUser.role }, process.env.JWT_SECRET || "secret", { expiresIn: "7d" });
+      const userObj = { _id: newUser._id, id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role, phone: newUser.phone, companyName: newUser.companyName, logoUrl: newUser.logoUrl || "" };
 
-      if (!emailResult.success) {
-        console.error("Email send failed during signup:", emailResult.error);
-        // Optionally delete the user if email fails, or just warn
-        return res.status(201).json({ msg: "Account created but failed to send OTP email. Please try logging in to resend.", requiresOTP: true, email });
-      }
-
-      return res.status(201).json({ msg: "OTP sent to your email", requiresOTP: true, email });
+      return res.status(201).json({ msg: "Account created successfully!", requiresOTP: false });
 
     } else {
       const newUser = new User({ name, email, password: hashed, role: "admin", phone });

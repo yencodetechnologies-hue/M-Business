@@ -109,20 +109,10 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
         payload.companyType = regData.companyType;
         payload.employeeCount = regData.employeeCount;
       }
-      const res = await axios.post(`${BASE_URL}/api/auth/signup`, payload, { timeout: 15000 });
-      if (res.data.requiresOTP) {
-        setSuccess("OTP sent to your email!");
-        setVerifyEmail(res.data.email);
-        setTab("otp");
-      } else {
-        setSuccess("Account created!");
-        const userData = res.data.user;
-        if (userData) {
-          const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
-          localStorage.setItem("user", JSON.stringify(userWithLogo));
-          setUser(userWithLogo);
-        } else { setTab("login"); }
-      }
+      await axios.post(`${BASE_URL}/api/auth/signup`, payload, { timeout: 15000 });
+      setSuccess("Account created successfully! Please login.");
+      setRegData({ name: "", email: "", phone: "", password: "", confirm: "", role: "Subadmin", companyName: "", companyType: "IT", employeeCount: "0-10" });
+      setTimeout(() => switchTab("login"), 1500);
     } catch (e) {
       if (e.code === "ECONNABORTED") setError("Server slow. Please try again.");
       else setError(e.response?.data?.msg || e.response?.data?.message || "Registration failed.");

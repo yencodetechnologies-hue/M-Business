@@ -70,7 +70,7 @@ const DEFAULT_PLANS = [
     btnLabel: "Upgrade"
   },
   {
-    name: "Professional", price: 2999, color: "var(--app-accent)", popular: true,
+    name: "Professional", price: 2999, color: "var(--app-accent)", popular: false,
     subtitle: "MONTHLY PLAN",
     features: ["Unlimited Projects", "Unlimited Invoices", "Multiple business manage", "Managers: 3", "Clients: 10", "Employees: 50", "Priority Support"],
     clientLimit: "10 Client manage", employeeLimit: "50 Employee manage", managerLimit: "3 Manager manage",
@@ -417,17 +417,14 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
 
         // Mark upgrade as successful so alert never shows again
         markUpgradeSuccess();
-        setShowRenewAlert(false);
 
         await fetchData();
         if (onSubscriptionSuccess) onSubscriptionSuccess();
-        setPaymentSuccessData({ name: planName || "Subscription" });
-        showToast("Celebration Payment Successful! Your plan is active.");
+        showToast("Payment Successful! Your plan is active.");
 
       } else if (paymentStatus === "failed" || paymentStatus === "cancelled") {
-        showToast("Error Payment was not completed. Please try again.");
+        showToast("Payment was not completed. Please try again.");
         await fetchData();
-        setShowPlanPicker(true);
       }
     };
 
@@ -589,16 +586,13 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
   // ── Success Redirect Timer ──
   useEffect(() => {
     if (paymentSuccessData) {
-      const timer = setTimeout(() => {
-        if (onSubscriptionSuccess) onSubscriptionSuccess();
-        else window.location.href = "/";
-      }, 3000);
-      return () => clearTimeout(timer);
+      if (onSubscriptionSuccess) onSubscriptionSuccess();
+      else window.location.href = "/";
     }
   }, [paymentSuccessData, onSubscriptionSuccess]);
 
   // ── Start Free Trial --------------------------------------------------------
-const startTrial = async (targetPkg = null) => {
+  const startTrial = async (targetPkg = null) => {
     try {
       setPayLoading("Trial");
       const res = await axios.post(`${BASE_URL}/api/subscriptions/start-trial`, {
@@ -618,8 +612,14 @@ const startTrial = async (targetPkg = null) => {
         else window.location.href = "/";
       }
     } catch (err) {
-      const msg = err.response?.data?.error || "Failed to start trial";
-      showToast("Error " + msg);
+      const msg = err.response?.data?.error || err.response?.data?.message || "Failed to start trial";
+      if (msg.includes("already used") || msg.includes("Trial already")) {
+        showToast("You have already used your free trial. Please choose a paid plan.");
+        setShowPlanPicker(false);
+        await fetchData();
+      } else {
+        showToast("Error: " + msg);
+      }
     } finally {
       setPayLoading(null);
     }
@@ -628,7 +628,7 @@ const startTrial = async (targetPkg = null) => {
   // ── Initiate PayU Payment ---------------------------------------------
   const startPayUPayment = async (plan) => {
     if (plan.isTrial) { startTrial(plan); return; }
-    if (!plan.price) { window.open(`mailto:billing@${(user?.companyName || "business").toLowerCase().replace(/\s+/g, "")}.com`); return; }
+    if (!plan.price) { showToast("Please contact support to upgrade."); return; }
 
     // Prevent duplicate API calls from rapid clicking
     if (payuInFlight.current || payLoading) return;
@@ -994,7 +994,7 @@ const startTrial = async (targetPkg = null) => {
             <div style={{ zIndex: 1, textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", justifyContent: "center" }}>
               <div style={{ fontSize: 42, fontWeight: 900, marginBottom: 4, letterSpacing: "-1px" }}>₹{subscription.planPrice?.toLocaleString("en-IN") || "0"}</div>
               <div style={{ fontSize: 13, color: "rgba(255,255,255,0.8)", fontWeight: 600, marginBottom: 24 }}>per {subscription.billingCycle || "month"}</div>
-              <button onClick={() => handleTabChange("upgrade")} style={{ background: "#fff", color: "var(--teal)", border: "none", padding: "12px 24px", borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, transition: "all 0.2s" }}>
+              <button onClick={() => { handleTabChange("upgrade"); setTimeout(() => { const el = document.getElementById("upgrade-plans-section"); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); }, 300); }} style={{ background: "#fff", color: "var(--teal)", border: "none", padding: "12px 24px", borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, transition: "all 0.2s" }}>
                 <i className="ti ti-arrow-up"></i> Upgrade Now
               </button>
               {daysLeft !== null && (
@@ -1055,7 +1055,7 @@ const startTrial = async (targetPkg = null) => {
             })}
           </div>
           {activeTab === "upgrade" && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(270px, 1fr))", gap: 24, maxWidth: 1100, margin: "10px auto 0", width: "100%" }}>
+            <div id="upgrade-plans-section" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(270px, 1fr))", gap: 24, maxWidth: 1100, margin: "10px auto 0", width: "100%" }}>
               {PLANS.map(plan => {
                 const isCurrent = plan.name === subscription.planName;
                 const isProcessing = payLoading === plan.name;

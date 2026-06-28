@@ -4076,19 +4076,21 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
 
   const projectsWithProgress = (projects || []).map(p => {
-
-    let pct = p.progress || 0;
-
-    const s = (p.status || "").toLowerCase();
-
-    if (s === "completed" || s === "done") {
-
-      pct = 100;
-
+    const s = (p.status || '').toLowerCase();
+    if (s === 'completed' || s === 'done') {
+      return { ...p, progress: 100 };
     }
-
-    return { ...p, progress: pct };
-
+    // Auto-calculate from tasks if any exist for this project
+    const projTasks = (tasks || []).filter(t => {
+      const tid = t.projectId?._id || t.projectId || t.project;
+      return tid === (p._id || p.id);
+    });
+    if (projTasks.length > 0) {
+      const completed = projTasks.filter(t => (t.status || '').toLowerCase() === 'completed').length;
+      return { ...p, progress: Math.round((completed / projTasks.length) * 100) };
+    }
+    // Fallback to manually stored progress
+    return { ...p, progress: p.progress || 0 };
   });
 
 
@@ -6964,21 +6966,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const [projects, setProjects] = useState([]);
 
-  const projectsWithProgress = (projects || []).map(p => {
-
-    let pct = p.progress || 0;
-
-    const s = (p.status || "").toLowerCase();
-
-    if (s === "completed" || s === "done") {
-
-      pct = 100;
-
-    }
-
-    return { ...p, progress: pct };
-
-  });
+  // projectsWithProgress is computed below after tasks state is declared
 
   const [projLoading, setProjLoading] = useState(false);
 
@@ -7001,6 +6989,24 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [showMgrPass, setShowMgrPass] = useState(false);
 
   const [tasks, setTasks] = useState([]);
+
+  const projectsWithProgress = (projects || []).map(p => {
+    const s = (p.status || '').toLowerCase();
+    if (s === 'completed' || s === 'done') {
+      return { ...p, progress: 100 };
+    }
+    // Auto-calculate from tasks if any exist for this project
+    const projTasks = (tasks || []).filter(t => {
+      const tid = t.projectId?._id || t.projectId || t.project;
+      return tid === (p._id || p.id);
+    });
+    if (projTasks.length > 0) {
+      const completed = projTasks.filter(t => (t.status || '').toLowerCase() === 'completed').length;
+      return { ...p, progress: Math.round((completed / projTasks.length) * 100) };
+    }
+    // Fallback to manually stored progress
+    return { ...p, progress: p.progress || 0 };
+  });
 
   const fetchPackages = async () => {
 

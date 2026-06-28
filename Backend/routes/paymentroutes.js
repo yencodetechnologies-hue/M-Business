@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const PaymentController = require("../controllers/PaymentController");
-const PaymentHistory = require("../models/PaymentHistoryModel");
+const  = require("../controllers/PaymentController");
+const PPaymentControlleraymentHistory = require("../models/PaymentHistoryModel");
 
 // Payment Order Creation
 router.post("/create-order", PaymentController.createPaymentOrder);

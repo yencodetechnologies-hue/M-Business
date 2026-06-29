@@ -4095,20 +4095,31 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
     if (s === 'completed' || s === 'done') {
       return { ...p, progress: 100 };
     }
-    // Auto-calculate from tasks if any exist for this project
     const projTasks = (tasks || []).filter(t => {
       const tid = t.projectId?._id || t.projectId || t.project;
       return tid === (p._id || p.id);
     });
+
+    // Milestone-based progress — same rule as the Project Details page:
+    // a milestone counts as done if manually marked done, OR if all its tasks are completed.
+    const milestonesArr = p.milestones || [];
+    if (milestonesArr.length > 0) {
+      const doneMilestones = milestonesArr.filter(m => {
+        const mTasks = projTasks.filter(t => t.milestone === m.name && !t.isDeleted);
+        const allTasksCompleted = mTasks.length > 0 && mTasks.every(t => (t.status || '').toLowerCase() === 'done' || (t.status || '').toLowerCase() === 'completed');
+        return m.done === true || allTasksCompleted;
+      }).length;
+      return { ...p, progress: Math.round((doneMilestones / milestonesArr.length) * 100) };
+    }
+
+    // No milestones defined — fall back to task completion ratio
     if (projTasks.length > 0) {
-      const completed = projTasks.filter(t => (t.status || '').toLowerCase() === 'completed').length;
+      const completed = projTasks.filter(t => (t.status || '').toLowerCase() === 'completed' || (t.status || '').toLowerCase() === 'done').length;
       return { ...p, progress: Math.round((completed / projTasks.length) * 100) };
     }
     // Fallback to manually stored progress
     return { ...p, progress: p.progress || 0 };
   });
-
-
 
   const [viewTasksProj, setViewTasksProj] = useState(null);
 
@@ -7011,19 +7022,31 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     if (s === 'completed' || s === 'done') {
       return { ...p, progress: 100 };
     }
-    // Auto-calculate from tasks if any exist for this project
     const projTasks = (tasks || []).filter(t => {
       const tid = t.projectId?._id || t.projectId || t.project;
       return tid === (p._id || p.id);
     });
+
+    // Milestone-based progress — same rule as the Project Details page:
+    // a milestone counts as done if manually marked done, OR if all its tasks are completed.
+    const milestonesArr = p.milestones || [];
+    if (milestonesArr.length > 0) {
+      const doneMilestones = milestonesArr.filter(m => {
+        const mTasks = projTasks.filter(t => t.milestone === m.name && !t.isDeleted);
+        const allTasksCompleted = mTasks.length > 0 && mTasks.every(t => (t.status || '').toLowerCase() === 'done' || (t.status || '').toLowerCase() === 'completed');
+        return m.done === true || allTasksCompleted;
+      }).length;
+      return { ...p, progress: Math.round((doneMilestones / milestonesArr.length) * 100) };
+    }
+
+    // No milestones defined — fall back to task completion ratio
     if (projTasks.length > 0) {
-      const completed = projTasks.filter(t => (t.status || '').toLowerCase() === 'completed').length;
+      const completed = projTasks.filter(t => (t.status || '').toLowerCase() === 'completed' || (t.status || '').toLowerCase() === 'done').length;
       return { ...p, progress: Math.round((completed / projTasks.length) * 100) };
     }
     // Fallback to manually stored progress
     return { ...p, progress: p.progress || 0 };
   });
-
   const fetchPackages = async () => {
 
     try {

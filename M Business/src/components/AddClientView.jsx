@@ -9,8 +9,12 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
   const isEdit = !!editData;
   const today = new Date().toISOString().split('T')[0];
 
-  const [customCats, setCustomCats] = useState([]);
-  const [customSources, setCustomSources] = useState([]);
+  const [customCats, setCustomCats] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('mb_customCategories') || '[]'); } catch { return []; }
+  });
+  const [customSources, setCustomSources] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('mb_customSources') || '[]'); } catch { return []; }
+  });
 
   const [formData, setFormData] = useState({
     clientType: editData?.clientType || 'b2b',

@@ -536,7 +536,11 @@ export default function ModernProjectsPage({ user }) {
                 const pt = tasksForProject(p);
                 const doneTasks = pt.filter(t => ['done', 'completed'].includes((t.status || '').toLowerCase())).length;
                 const milestonesArr = p.milestones || [];
-                const doneMilestones = milestonesArr.filter(m => m.done === true).length;
+                const doneMilestones = milestonesArr.filter(m => {
+                  const mTasks = pt.filter(t => t.milestone === m.name && !t.isDeleted);
+                  const allTasksCompleted = mTasks.length > 0 && mTasks.every(t => t.status === 'done' || t.status === 'completed');
+                  return m.done === true || allTasksCompleted;
+                }).length;
                 const pct = milestonesArr.length > 0
                   ? Math.round((doneMilestones / milestonesArr.length) * 100)
                   : Math.min(100, Math.max(0, p.progress || 0));

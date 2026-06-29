@@ -399,8 +399,8 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
 
       // Clean up URL immediately to prevent re-triggering
       window.history.replaceState({}, document.title, window.location.pathname);
+
       if (paymentStatus === "success") {
-        const planName = params.get("plan");
         const subId = params.get("subId");
         const txnid = params.get("txnid");
 
@@ -416,8 +416,9 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
         }
 
         await fetchData();
-        if (onSubscriptionSuccess) onSubscriptionSuccess();
         showToast("Payment Successful! Your plan is active.");
+        // Notify parent AFTER activation — parent already shows dashboard
+        if (onSubscriptionSuccess) onSubscriptionSuccess();
 
       } else if (paymentStatus === "failed" || paymentStatus === "cancelled") {
         showToast("Payment was not completed. Please try again.");
@@ -425,6 +426,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
       }
     };
 
+    // Run immediately on mount — works even if MySubscriptions is not the active tab
     checkPaymentStatus();
   }, []);
 

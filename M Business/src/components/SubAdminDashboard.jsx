@@ -7446,11 +7446,30 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   useEffect(() => {
     if (!subLoading && subscription === null && !hasRedirected.current) {
       hasRedirected.current = true;
-      setForceUpgradeTab(false); // show plan selection, not upgrade tab
+      setForceUpgradeTab(false);
       setActive("mysubscriptions");
     }
   }, [subscription, subLoading]);
 
+  // Process PayU payment silently on dashboard load — no need to show subscriptions page
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("payment") !== "success") return;
+    const subId = params.get("subId");
+    const txnid = params.get("txnid");
+    window.history.replaceState({}, document.title, window.location.pathname);
+    const activateAndRefresh = async () => {
+      try {
+        if (subId) {
+          await axios.post(`${BASE_URL}/api/subscriptions/activate-pending`, {
+            subscriptionId: subId, txnid
+          });
+        }
+      } catch (e) { console.log("PayU activation:", e.message); }
+      await fetchSubscription();
+    };
+    activateAndRefresh();
+  }, []);
 
 
   const fetchTasks = async () => {
@@ -11017,7 +11036,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={async () => { await fetchSubscription(); setForceUpgradeTab(false); setActive("dashboard"); }} initialTab={forceUpgradeTab || enforceMySubscriptions ? "upgrade" : "overview"} preloadedSubscription={subscription} onTabChange={() => setForceUpgradeTab(false)} packagesList={packages} />}
+            {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} initialTab={forceUpgradeTab || enforceMySubscriptions ? "upgrade" : "overview"} preloadedSubscription={subscription} onTabChange={() => setForceUpgradeTab(false)} packagesList={packages} />}
 
             {validActive === "reports" && <ReportsPage THEME={currentTheme} clients={clients} projects={projects} employees={employees} managers={managers} income={income} expenses={expenses} />}
 

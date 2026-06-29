@@ -360,6 +360,7 @@ export default function ClientDashboard({ user, setUser, portalMode = false }) {
         companyName: decoded.companyName || "",
         companyId: decoded.companyId || "",
         role: "client",
+        agencyName: decoded.agencyName || "",
       };
       const alreadyCorrectClient =
         user &&
@@ -1081,22 +1082,25 @@ export default function ClientDashboard({ user, setUser, portalMode = false }) {
       <div className="cp-root">
         <style>{CSS}</style>
         {renderTopNav()}
-        <div style={{ maxWidth: 900, margin: "24px auto", padding: "0 24px" }}>
-
-          <SettingsPage
-            user={user}
-            THEME={{
-              bg: C.bg, surface: C.surface, card: C.surface, cardHov: C.surface2, border: C.border, borderHov: C.border2,
-              grad: "linear-gradient(135deg, " + C.teal3 + ", " + C.teal + ")", gradSoft: "rgba(0, 188, 212, 0.08)",
-              gradText: "linear-gradient(135deg, " + C.teal3 + ", " + C.teal + ")", pink: C.teal, purple: C.teal3,
-              violet: C.teal2, text: C.text, muted: C.text2, dim: C.text3, green: C.green, amber: C.amber, red: C.red, blue: C.blue
-            }}
-            onProfileUpdate={(updates) => {
-              const updated = { ...user, ...updates };
-              if (setUser) setUser(updated);
-              localStorage.setItem("user", JSON.stringify(updated));
-            }}
-          />
+        <div style={{ maxWidth: 600, margin: "40px auto", padding: "0 24px" }}>
+          <div style={{ background: "#fff", borderRadius: 16, border: "1.5px solid #E0EEF0", padding: "32px" }}>
+            <div style={{ fontSize: 18, fontWeight: 800, color: "#0D2027", marginBottom: 20 }}>Account Settings</div>
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#96B0B8", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>Name</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "#0D2027", padding: "10px 14px", background: "#F3F8F9", borderRadius: 9, border: "1px solid #DFF0F2" }}>{user?.clientName || user?.name || "—"}</div>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#96B0B8", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>Email</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "#0D2027", padding: "10px 14px", background: "#F3F8F9", borderRadius: 9, border: "1px solid #DFF0F2" }}>{user?.email || "—"}</div>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#96B0B8", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>Company</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "#0D2027", padding: "10px 14px", background: "#F3F8F9", borderRadius: 9, border: "1px solid #DFF0F2" }}>{user?.companyName || user?.company || "—"}</div>
+            </div>
+            <button onClick={handleLogout} style={{ marginTop: 8, padding: "10px 20px", background: "#FEF2F2", border: "1.5px solid #FECACA", borderRadius: 9, color: "#EF4444", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+              <i className="ti ti-logout" style={{ marginRight: 6 }}></i>Sign Out
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -1111,7 +1115,7 @@ export default function ClientDashboard({ user, setUser, portalMode = false }) {
       <nav className="topnav">
         <div className="topnav-inner">
           <div className="tn-brand">
-            <div className="tn-logo">YT</div>
+            <div className="tn-logo">{agencyName.substring(0, 2).toUpperCase()}</div>
             <div>
               <div className="tn-company">{agencyName}</div>
               <div className="tn-powered">Client Portal</div>

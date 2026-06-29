@@ -948,7 +948,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 
 
 
-function ClientsPage({ clients, setClients, projects = [], setProjects, onAddClient, onViewProject, triggerCrop, onCreateProject, user, activeClientIdForReturn, onActiveClientIdRestored, newClientId, onNewClientShown, isFetching, invoices = [] }) {
+function ClientsPage({ clients, setClients, projects = [], setProjects, onAddClient, onViewProject, triggerCrop, onCreateProject, user, activeClientIdForReturn, onActiveClientIdRestored, newClientId, onNewClientShown, isFetching, invoices = [], tasks = [] }) {
 
   const mainScrollRef = useRef(null);
 
@@ -1402,7 +1402,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             ) : cProjs.map((p, i) => {
 
-              const projTasks = allTasks ? allTasks.filter(t => !t.isDeleted && (t.projectId === p._id || t.projectId?._id === p._id || t.project === p.name)) : [];
+              const projTasks = tasks.filter(t => !t.isDeleted && (t.projectId === p._id || (t.projectId && t.projectId._id === p._id) || t.project === p.name));
               const doneProjTasks = projTasks.filter(t => t.status === 'done' || t.status === 'completed').length;
               const milestones = p.milestones || [];
               const doneMilestones = milestones.filter(m => m.done === true).length;
@@ -10638,7 +10638,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client) => { setClients(prev => [...prev, client]); setPendingNewClientId(client._id); setActive("clients"); }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || '#00BCD4'} />}
 
-            {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
+            {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 

@@ -334,26 +334,26 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   useAssets();
   const [active, setActive] = useState(() => localStorage.getItem("activeTab_client") || "dashboard");
 
-  // Portal mode: decode token immediately and use local client user — never use subadmin prop
-  const [portalUser, setPortalUser] = useState(null);
-
   const portalClientId = portalMode
     ? window.location.pathname.split("/client-portal/")[1]?.split("?")[0] || ""
     : "";
 
-  // Decode token on mount in portal mode — sets local portalUser immediately
-  useEffect(() => {
-    if (!portalMode) return;
+  // Decode token SYNCHRONOUSLY on first render so clientName is correct immediately
+  // This prevents subadmin data from ever loading in portal mode
+  const [portalUser, setPortalUser] = useState(() => {
+    if (!portalMode) return null;
     try {
       const params = new URLSearchParams(window.location.search);
       const token = params.get("token");
-      if (!token) return;
+      if (!token) return null;
       const decoded = JSON.parse(atob(token));
-      if (decoded.exp && Date.now() > decoded.exp) return;
+      if (decoded.exp && Date.now() > decoded.exp) return null;
       if (decoded.agencyName) {
         localStorage.setItem("portalAgencyName", decoded.agencyName);
       }
-      const autoUser = {
+      // Clean token from URL immediately
+      window.history.replaceState({}, document.title, window.location.pathname);
+      return {
         _id: decoded.clientId,
         id: decoded.clientId,
         clientName: decoded.name || decoded.clientName || "",
@@ -364,14 +364,19 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         role: "client",
         agencyName: decoded.agencyName || "",
       };
-      setPortalUser(autoUser);
-      if (setUser) setUser(autoUser);
-      // Clean token from URL so refresh doesn't re-trigger
-      window.history.replaceState({}, document.title, window.location.pathname);
     } catch (e) {
       console.warn("Portal token decode failed:", e);
+      return null;
     }
-  }, [portalMode]);
+  });
+
+  // Sync portalUser to parent setUser once on mount
+
+  useEffect(() => {
+    if (portalMode && portalUser && setUser) {
+      setUser(portalUser);
+    }
+  }, [portalMode, portalUser]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // In portal mode always use the locally decoded client user, never the subadmin prop
   const user = portalMode ? portalUser : userProp;
@@ -510,7 +515,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     // Auto-refresh every 30s — new files will show immediately
     const interval = setInterval(fetchAll, 30000);
     return () => clearInterval(interval);
-  }, [user, clientName]);
+  }, [user?._id, clientName]);
 
   // Manual refresh function
   const handleRefresh = async () => {

@@ -1822,12 +1822,14 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
     // so the client doesn't need to manually sign in, and it's what makes
     // the data (projects/tasks/invoices/etc.) actually load on their side.
     const buildPortalTokenUrl = () => {
+      // Always use the subadmin's companyId — this is what projects are stored under
+      const subadminCompanyId = user?.companyId || user?._id || user?.id || "";
       const clientToken = btoa(JSON.stringify({
         clientId: c._id,
         email: c.email,
         name: c.clientName || c.name,
         companyName: c.companyName || c.company || "",
-        companyId: c.companyId || user?.companyId || user?._id || user?.id || "",
+        companyId: subadminCompanyId,
         agencyName: user?.companyName || user?.name || "",
         exp: Date.now() + 24 * 60 * 60 * 1000 // 24 hour expiry
       }));
@@ -12056,6 +12058,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         setNp({
                           ...np,
                           client: v,
+                          clientId: sel?._id || sel?.id || "",
                           companyName: sel?.companyName || sel?.company || np.companyName,
                           phone: sel?.phone || np.phone,
                           address: sel?.address || np.address,

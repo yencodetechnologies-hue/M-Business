@@ -25,10 +25,11 @@ router.get("/client/:clientName", async (req, res) => {
     const name = decodeURIComponent(req.params.clientName).trim();
     const companyName = req.query.company ? decodeURIComponent(req.query.company).trim() : "";
 
-    // If clientId is provided, use STRICT clientId match — prevents old name-matched data
+    // If clientId is provided, try strict clientId match first
     if (clientId) {
-      const projects = await Project.find({ companyId, clientId }).sort({ createdAt: -1 });
-      return res.json(projects);
+      const byId = await Project.find({ companyId, clientId }).sort({ createdAt: -1 });
+      if (byId.length > 0) return res.json(byId);
+      // Fall through to name-based match for projects created before clientId was saved
     }
 
     // Legacy fallback: name-based match for projects created before clientId existed
@@ -37,8 +38,13 @@ router.get("/client/:clientName", async (req, res) => {
     const safeCompany = escapeRegExp(companyName);
 
     const conditions = [];
+    // Exact name match
     if (safeName) conditions.push({ client: { $regex: new RegExp(`^\\s*${safeName}\\s*$`, "i") } });
+    // Company name match
     if (safeCompany) conditions.push({ client: { $regex: new RegExp(`^\\s*${safeCompany}\\s*$`, "i") } });
+    // Partial name match (catches variations)
+    if (safeName) conditions.push({ client: { $regex: new RegExp(safeName, "i") } });
+    if (safeCompany) conditions.push({ client: { $regex: new RegExp(safeCompany, "i") } });
 
     const filter = conditions.length > 0
       ? { companyId, $or: conditions }

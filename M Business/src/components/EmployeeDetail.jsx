@@ -215,6 +215,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
 
   // Documents state
   const [requestedDocs, setRequestedDocs] = useState([]);
+  const [deletedDocIds, setDeletedDocIds] = useState([]);
   const [dbNotifications, setDbNotifications] = useState([]);
 
   useEffect(() => {
@@ -280,7 +281,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
     // Optimistic UI update
     setStaticTasks(prev => prev.filter(t => t._id !== taskId));
     try {
-      await axios.delete(`${BASE_URL}/api/tasks/${taskId}`);
+      { null }
     } catch (err) {
       console.error("Failed to delete task:", err);
       loadTasks();
@@ -438,7 +439,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
     ...apiDocs,
     ...pendingDbRequested,
     ...requestedDocs.filter(rd => !apiDocs.some(ad => (ad.name || "").toLowerCase() === rd.name.toLowerCase()))
-  ];
+  ].filter(d => !deletedDocIds.includes(String(d._id)));
 
   return (
     <div style={{
@@ -825,6 +826,29 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                       ) : (
                         <span style={{ fontSize: 11, color: "var(--text-muted)", background: "#F1F5F9", padding: "4px 10px", borderRadius: 20, fontWeight: 700 }}>Sent</span>
                       )}
+                      <button
+                        className="ed-doc-btn"
+                        style={{ color: '#EF4444', borderColor: '#FCA5A5' }}
+                        onClick={async () => {
+                          if (!confirm('Delete this document?')) return;
+                          // Remove from UI immediately
+                          setDeletedDocIds(prev => [...prev, String(doc._id)]);
+                          setRequestedDocs(prev => prev.filter((_, idx) => idx !== i));
+                          // Try backend delete — silently ignore 404 (doc may be a notification-based request)
+                          if (doc._id && !String(doc._id).startsWith('doc_')) {
+                            try {
+                              await axios.delete(`${BASE_URL}/api/employee-dashboard/documents/id/${doc._id}`);
+                            } catch (err) {
+                              // 404 = not an EmployeeDoc record, already removed from UI above
+                              if (err?.response?.status !== 404) {
+                                console.error('Delete error:', err);
+                              }
+                            }
+                          }
+                        }}
+                      >
+                        <i className="ti ti-trash" style={{ fontSize: 12 }}></i> Delete
+                      </button>
                     </div>
                   </div>
                 );

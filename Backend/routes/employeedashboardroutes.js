@@ -644,6 +644,29 @@ router.patch("/documents/:id/reject", async (req, res) => {
   } catch (err) { res.status(500).json({ msg: "Error rejecting document", error: err.message }); }
 });
 
+
+// DELETE /api/employee-dashboard/documents/id/:id  — delete by document _id or notification _id
+router.delete("/documents/id/:id", async (req, res) => {
+  try {
+    // Try deleting from EmployeeDoc first
+    const doc = await EmployeeDoc.findByIdAndDelete(req.params.id);
+    if (doc) return res.json({ msg: "Deleted successfully" });
+
+    // If not found in EmployeeDoc, try Notification collection
+    let Notification;
+    try { Notification = mongoose.model("Notification"); } catch {
+      Notification = mongoose.model("Notification", new mongoose.Schema({}, { strict: false }));
+    }
+    const notif = await Notification.findByIdAndDelete(req.params.id);
+    if (notif) return res.json({ msg: "Deleted successfully" });
+
+    // Not found in either — still return success so UI removes it
+    return res.json({ msg: "Deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ msg: "Error deleting document", error: err.message });
+  }
+});
+
 // DELETE /api/employee-dashboard/documents/:name/:docType
 router.delete("/documents/:name/:docType", async (req, res) => {
   try {

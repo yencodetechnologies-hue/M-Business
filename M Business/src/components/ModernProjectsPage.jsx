@@ -131,7 +131,7 @@ export default function ModernProjectsPage({ user }) {
     }
   }, []);
 
-  useEffect(() => { fetchAll(); }, [fetchAll]);
+  useEffect(() => { fetchAll(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Auto-select project from URL param -----------------------
   useEffect(() => {
@@ -364,6 +364,7 @@ export default function ModernProjectsPage({ user }) {
               tasks={tasksForProject(selectedProject)}
               onUpdate={fetchAll}
               fetchProjects={fetchAll}
+              fetchTasks={fetchAll}
               onEdit={() => openEdit(selectedProject)}
               onDelete={() => setDeleteTarget(selectedProject)}
               onLogTime={(e) => openLogTime(selectedProject, e)}
@@ -541,9 +542,7 @@ export default function ModernProjectsPage({ user }) {
                   const allTasksCompleted = mTasks.length > 0 && mTasks.every(t => t.status === 'done' || t.status === 'completed');
                   return m.done === true || allTasksCompleted;
                 }).length;
-                const pct = milestonesArr.length > 0
-                  ? Math.round((doneMilestones / milestonesArr.length) * 100)
-                  : Math.min(100, Math.max(0, p.progress || 0));
+                const pct = Math.min(100, Math.max(0, p.progress || 0));
                 const team = Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []);
                 const deadline = p.end || p.deadline;
                 const days = daysLeft(deadline);

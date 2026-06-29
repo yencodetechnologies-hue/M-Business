@@ -230,6 +230,7 @@ export default function ModernProjectsView({
   onAssign,
   onNewInvoice,
   onAddProject,
+  onUpdate,
   searchQuery = '',
 }) {
   const [search, setSearch] = useState(searchQuery);

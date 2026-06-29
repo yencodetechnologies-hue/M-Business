@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import React from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
@@ -406,6 +406,9 @@ export default function AdminDashboard({ user, setUser }) {
     };
   };
 
+  const stableProjects = useMemo(() => projects, [projects]);
+  const stableTasks = useMemo(() => tasks, [tasks]);
+
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: THEME.bg, fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: THEME.text }}>
       <style>{`
@@ -546,7 +549,7 @@ export default function AdminDashboard({ user, setUser }) {
           )}
           {active === "employees" && <EmployeesPage THEME={THEME} employees={employees} setEmployees={setEmployees} />}
           {active === "managers" && <ManagersPage THEME={THEME} managers={managers} setManagers={setManagers} />}
-          {active === "projects" && <ProjectsPage THEME={THEME} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} fetchTasks={fetchTasks} />}
+          {active === "projects" && <ProjectsPage THEME={THEME} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} fetchTasks={fetchTasks} fetchProjects={fetchProjects} />}
           {active === "quotations" && <QuotationCreatorModern THEME={THEME} clients={clients} projects={projects} />}
           {active === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "M Business"} />}
 
@@ -1842,7 +1845,7 @@ function ManagersPage({ THEME, managers, setManagers }) {
 }
 
 // ── Projects Page ──
-function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees, fetchTasks }) {
+function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees, fetchTasks, fetchProjects }) {
   const [search, setSearch] = useState("");
   const [viewTasksProj, setViewTasksProj] = useState(null);
   const [editProj, setEditProj] = useState(null);
@@ -1966,6 +1969,7 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
         searchQuery={search}
         onViewTasks={(p) => setViewTasksProj(p)}
         onEdit={(p) => { setJumpProject(p); setActive("project-details"); }}
+        onUpdate={fetchProjects}
       />
 
       {/* ── Edit Project Modal ── */}

@@ -1402,7 +1402,15 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             ) : cProjs.map((p, i) => {
 
-              const pct = p.progress || 0;
+              const projTasks = allTasks ? allTasks.filter(t => !t.isDeleted && (t.projectId === p._id || t.projectId?._id === p._id || t.project === p.name)) : [];
+              const doneProjTasks = projTasks.filter(t => t.status === 'done' || t.status === 'completed').length;
+              const milestones = p.milestones || [];
+              const doneMilestones = milestones.filter(m => m.done === true).length;
+              const pct = milestones.length > 0
+                ? Math.round((doneMilestones / milestones.length) * 100)
+                : projTasks.length > 0
+                  ? Math.round((doneProjTasks / projTasks.length) * 100)
+                  : (p.progress || 0);
 
               return (
 

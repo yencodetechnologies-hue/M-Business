@@ -590,7 +590,19 @@ export default function ModernProjectsPage({ user }) {
 
                     <div style={{ display: 'flex', gap: 16, marginBottom: 8, flexWrap: 'wrap' }}>
                       {p.start && <span style={{ fontSize: 11, color: '#718096', display: 'flex', alignItems: 'center', gap: 4 }}><i className="ti ti-calendar-event" style={{ fontSize: 12 }}></i> Start: <strong style={{ color: '#4A5568' }}>{new Date(p.start).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</strong></span>}
-                      {p.budget && <span style={{ fontSize: 11, color: '#718096', display: 'flex', alignItems: 'center', gap: 4 }}><i className="ti ti-wallet" style={{ fontSize: 12 }}></i> Budget: <strong style={{ color: '#4A5568' }}>{p.currency || '₹'}{Number(p.budget).toLocaleString()}</strong></span>}
+                      {(() => {
+                        const parseAmt = (val) => { if (!val) return 0; const n = Number(String(val).replace(/[^0-9.-]+/g, '')); return isNaN(n) ? 0 : n; };
+                        const billedLocal = (p.invoices || []).reduce((sum, inv) => { const a = parseAmt(inv.amount); const t = inv.taxType === 'inclusive' ? 0 : Math.round(a * (parseAmt(inv.taxPercent) / 100)); return sum + a + t; }, 0);
+                        const autoAdditional = (p.additionalCharges || []).reduce((sum, a) => sum + parseAmt(a.amount), 0);
+                        const autoMilestone = (p.milestonePayments || []).reduce((sum, m) => sum + parseAmt(m.amount), 0);
+                        const autoBudget = billedLocal + autoAdditional + autoMilestone;
+                        const displayBudget = Math.max(autoBudget, Number(p.budget) || 0);
+                        return displayBudget > 0 ? (
+                          <span style={{ fontSize: 11, color: '#718096', display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <i className="ti ti-wallet" style={{ fontSize: 12 }}></i> Budget: <strong style={{ color: '#4A5568' }}>{p.currency || '₹'}{displayBudget.toLocaleString()}</strong>
+                          </span>
+                        ) : null;
+                      })()}
                     </div>
 
                     <div className="m-pc-progress-label">

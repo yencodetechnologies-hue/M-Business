@@ -131,8 +131,53 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
       const companyId = emp.companyId || "";
       const headers = {};
       if (companyId) headers['x-company-id'] = companyId;
+
+      // Fetch tasks directly assigned to this employee
       const res = await axios.get(`${BASE_URL}/api/employee-dashboard/tasks/${encodeURIComponent(emp.name)}`, { headers });
-      const mapped = (res.data || []).map(t => {
+      const directTasks = res.data || [];
+
+      // Also fetch ALL tasks for projects where this employee is a team member
+      const empName = (emp.name || '').toLowerCase().trim();
+      const empId = emp._id || emp.employeeId || '';
+      const teamProjects = (projects || []).filter(p => {
+        const assigned = p.assignedTo || p.team || '';
+        if (Array.isArray(assigned)) {
+          return assigned.some(a =>
+            (typeof a === 'string' && (a.toLowerCase().includes(empName) || a === empId)) ||
+            (a?._id && a._id === empId) ||
+            (a?.name && a.name.toLowerCase().includes(empName))
+          );
+        }
+        if (typeof assigned === 'string') {
+          return assigned.toLowerCase().includes(empName) || assigned.includes(empId);
+        }
+        return false;
+      });
+
+      // Fetch all tasks and filter to team projects
+      let teamProjectTasks = [];
+      if (teamProjects.length > 0) {
+        try {
+          const allTasksRes = await axios.get(`${BASE_URL}/api/tasks`, { headers });
+          const allTasks = Array.isArray(allTasksRes.data) ? allTasksRes.data : [];
+          const teamProjectIds = teamProjects.map(p => String(p._id));
+          teamProjectTasks = allTasks.filter(t => {
+            const tProjId = t.projectId && typeof t.projectId === 'object' ? String(t.projectId._id) : String(t.projectId || '');
+            return teamProjectIds.includes(tProjId) && !t.isDeleted;
+          });
+        } catch (e) {
+          console.error("Failed to load team project tasks:", e);
+        }
+      }
+
+      // Merge: direct tasks + team project tasks (deduplicate by _id)
+      const allIds = new Set(directTasks.map(t => String(t._id)));
+      const merged = [
+        ...directTasks,
+        ...teamProjectTasks.filter(t => !allIds.has(String(t._id)))
+      ];
+
+      const mapTask = t => {
         const rawStatus = (t.status || '').toLowerCase();
         const isDone = t.checked || t.completed || t.done || rawStatus === 'completed' || rawStatus === 'done';
         const displayStatus = isDone ? 'Completed'
@@ -150,8 +195,9 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
           dueDate: t.date || t.dueDate || "",
           projectName: t.projectId?.name || t.project || ""
         };
-      });
-      setStaticTasks(mapped);
+      };
+
+      setStaticTasks(merged.map(mapTask));
     } catch (err) {
       console.error("Failed to load employee tasks:", err);
     } finally {

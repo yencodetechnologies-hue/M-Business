@@ -2641,7 +2641,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
             setViewEmpProject(null);
             setActive("edit-project");
           }}
-          onUpdate={() => { }}
+          onUpdate={() => fetchProjects()}
           fetchProjects={() => { }}
           fetchTasks={() => { }}
           onMessageTeam={() => { setViewEmpProject(null); setActive("messaging"); }}
@@ -10677,7 +10677,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 }}
 
-                onUpdate={fetchTasks}
+                onUpdate={async () => { await fetchProjects(); await fetchTasks(); }}
 
                 fetchTasks={fetchTasks}
 

@@ -79,7 +79,16 @@ const NAV = [
 
 export default function AdminDashboard({ user, setUser }) {
   const [active, setActive] = useState(() => localStorage.getItem("activeTab_admin") || "dashboard");
-  useEffect(() => { localStorage.setItem("activeTab_admin", active); }, [active]);
+  useEffect(() => {
+    localStorage.setItem("activeTab_admin", active);
+  }, [active]);
+
+  useEffect(() => {
+    if (active !== "projects") return;
+    axios.get(BASE_URL + "/api/projects")
+      .then(res => { if (Array.isArray(res.data)) setProjects(res.data); })
+      .catch(e => console.error(e));
+  }, [active]);
   const [subadmins, setSubadmins] = useState([]);
   const [clients, setClients] = useState(() => { try { const c = localStorage.getItem("cached_clients"); return c ? JSON.parse(c) : []; } catch { return []; } });
   const [projects, setProjects] = useState([]);
@@ -524,7 +533,7 @@ export default function AdminDashboard({ user, setUser }) {
               employees={[]}
               user={user}
               clients={clients}
-              onUpdate={() => { }}
+              onUpdate={() => fetchProjects()}
               onNewInvoice={(proj, prefill) => {
                 setJumpInvoicePrefill(prefill || { client: proj?.client || '', project: proj?.name || '' });
                 setActive("invoices");
@@ -549,6 +558,7 @@ export default function AdminDashboard({ user, setUser }) {
           )}
           {active === "employees" && <EmployeesPage THEME={THEME} employees={employees} setEmployees={setEmployees} />}
           {active === "managers" && <ManagersPage THEME={THEME} managers={managers} setManagers={setManagers} />}
+          {active === "projects" && (() => { fetchProjects(); return null; })()}
           {active === "projects" && <ProjectsPage THEME={THEME} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} fetchTasks={fetchTasks} fetchProjects={fetchProjects} />}
           {active === "quotations" && <QuotationCreatorModern THEME={THEME} clients={clients} projects={projects} />}
           {active === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "M Business"} />}
@@ -1851,8 +1861,20 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
   const [editProj, setEditProj] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [saving, setSaving] = useState(false);
+  const [localProjects, setLocalProjects] = useState(projects || []);
 
-  const projectsWithProgress = (projects || []).map(p => {
+  useEffect(() => {
+    axios.get(BASE_URL + "/api/projects")
+      .then(res => {
+        if (Array.isArray(res.data)) {
+          setLocalProjects(res.data);
+          if (setProjects) setProjects(res.data);
+        }
+      })
+      .catch(e => console.error(e));
+  }, []);
+
+  const projectsWithProgress = (localProjects || []).map(p => {
     let pct = p.progress || 0;
     const s = (p.status || "").toLowerCase();
     if (s === "completed" || s === "done") {

@@ -7440,13 +7440,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  // Redirect to mysubscriptions ONLY ONCE if no subscription found and currently on dashboard
+  // Redirect to mysubscriptions ONLY if no subscription AND free trial has expired
 
   const hasRedirected = useRef(false);
 
   useEffect(() => {
 
-    if (!subLoading && subscription === null && active === "dashboard" && !hasRedirected.current) {
+    if (!subLoading && subscription === null && active === "dashboard" && !hasRedirected.current && !isInFreeTrial()) {
 
       hasRedirected.current = true;
 
@@ -7641,11 +7641,30 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
+  // ── FREE TRIAL ──────────────────────────────────────────────────────────────
+  const FREE_TRIAL_DAYS = 30;
+  const FREE_TRIAL_LIMITS = { client: 5, employee: 10, manager: 2 };
+
+  const getTrialDaysRemaining = () => {
+    const created = user?.createdAt;
+    if (!created) return 0;
+    const diffMs = new Date(created).getTime() + FREE_TRIAL_DAYS * 86400000 - Date.now();
+    return Math.max(0, Math.ceil(diffMs / 86400000));
+  };
+
+  const isInFreeTrial = () => !subscription && getTrialDaysRemaining() > 0;
+  // ────────────────────────────────────────────────────────────────────────────
+
   const getSubStatus = () => {
 
     // While subscription data is still loading, never block
 
-    if (!subscription) return { blocked: false, alert: false, status: "loading" };
+    if (!subscription) {
+      // Free trial — never block
+      if (isInFreeTrial()) return { blocked: false, alert: false, status: "trial", trialDays: getTrialDaysRemaining() };
+      // No subscription and trial expired
+      return { blocked: true, alert: false, status: "no_subscription" };
+    }
 
 
 
@@ -7777,8 +7796,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-    // 4. Default fallback
+    // 4. Free trial limits
+    if (isInFreeTrial()) {
+      return FREE_TRIAL_LIMITS[type] ?? 5;
+    }
 
+    // 5. Default fallback
     return 10;
 
   };
@@ -8090,9 +8113,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
         } else {
 
-          alert("❌ No Active Subscription: You do not have an active subscription package. Please contact your administrator to assign a package.");
-
-          return;
+          // No subscription — allow if still in free trial
+          if (!isInFreeTrial()) {
+            setForceUpgradeTab(true);
+            setActive("mysubscriptions");
+            return;
+          }
 
         }
 
@@ -8264,9 +8290,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
         } else {
 
-          alert("❌ No Active Subscription: You do not have an active subscription package. Please contact your administrator to assign a package.");
-
-          return;
+          // No subscription — allow if still in free trial
+          if (!isInFreeTrial()) {
+            setForceUpgradeTab(true);
+            setActive("mysubscriptions");
+            return;
+          }
 
         }
 
@@ -8482,9 +8511,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
         } else {
 
-          alert("❌ No Active Subscription: You do not have an active subscription package. Please contact your administrator to assign a package.");
-
-          return;
+          // No subscription — allow if still in free trial
+          if (!isInFreeTrial()) {
+            setForceUpgradeTab(true);
+            setActive("mysubscriptions");
+            return;
+          }
 
         }
 
@@ -9337,6 +9369,18 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           <div className="content">
 
+            {isInFreeTrial() && (
+              <div style={{ background: 'linear-gradient(90deg,#00BCD4,#0097A7)', color: '#fff', padding: '10px 20px', borderRadius: 10, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
+                <span><i className="ti ti-gift" style={{ marginRight: 8 }}></i>Free Trial Active — {getTrialDaysRemaining()} day{getTrialDaysRemaining() !== 1 ? 's' : ''} remaining (up to {FREE_TRIAL_LIMITS.client} clients, {FREE_TRIAL_LIMITS.employee} employees, {FREE_TRIAL_LIMITS.manager} managers)</span>
+                <button onClick={() => { setForceUpgradeTab(true); setActive('mysubscriptions'); }} style={{ background: '#fff', color: '#0097A7', border: 'none', borderRadius: 8, padding: '5px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>Upgrade Now</button>
+              </div>
+            )}
+            {!isInFreeTrial() && !subscription && (
+              <div style={{ background: '#FEE2E2', color: '#DC2626', padding: '10px 20px', borderRadius: 10, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
+                <span><i className="ti ti-alert-circle" style={{ marginRight: 8 }}></i>Your free trial has expired. Upgrade to continue adding data.</span>
+                <button onClick={() => { setForceUpgradeTab(true); setActive('mysubscriptions'); }} style={{ background: '#DC2626', color: '#fff', border: 'none', borderRadius: 8, padding: '5px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>Upgrade Now</button>
+              </div>
+            )}
             <EmployeeSubscriptionWarning user={user} trigger={subscription?.updatedAt || subscription?._id} onRenew={() => { setForceUpgradeTab(true); setActive("mysubscriptions"); setTimeout(() => { const el = document.querySelector('.plan-card, .plans-grid, [class*="upgrade"]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 400); }} />
 
 

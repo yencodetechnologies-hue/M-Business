@@ -698,7 +698,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
           {onBack && <button className="mpc-btn mpc-btn-outline" onClick={onBack}>Cancel</button>}
           <button className="mpc-btn mpc-btn-primary" onClick={handleCreate} disabled={loading} style={{ opacity: loading ? 0.7 : 1 }}>
             {loading ? <i className="ti ti-loader" style={{ animation: 'spin 1s linear infinite' }} /> : <i className="ti ti-rocket" />}
-            {loading ? (editProject ? 'Updating...' : 'Launching...') : (editProject ? 'Update Project' : 'New Project')}
+            {loading ? (editProject ? 'Updating...' : 'Launching...') : (editProject ? 'Update Project' : 'Save Project')}
           </button>
         </div>
       </div>

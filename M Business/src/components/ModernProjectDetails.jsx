@@ -1769,8 +1769,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     })()}
                   </div>
                 </div>
-                {/* Table Header - only show if invoices exist */}
-                {mergedInvoices.length > 0 && <div style={{ display: 'grid', gridTemplateColumns: '40px 1.2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 100px', gap: 8, padding: '8px 18px', background: '#FAFBFD', borderBottom: '1px solid #E8EDF2' }}>
+                {/* Table Header */}
+                <div style={{ display: 'grid', gridTemplateColumns: '40px 1.2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 100px', gap: 8, padding: '8px 18px', background: '#FAFBFD', borderBottom: '1px solid #E8EDF2' }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <input type="checkbox" checked={mergedInvoices.length > 0 && selectedPaymentItems.length === mergedInvoices.length} onChange={e => {
                       if (e.target.checked) setSelectedPaymentItems(mergedInvoices.map((_, idx) => idx));
@@ -1780,7 +1780,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   {['Invoice ID', 'Client', 'Project', 'Category', 'Amount', 'Issue Date', 'Due Date', 'Status', 'Actions'].map(h => (
                     <div key={h} style={{ fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px' }}>{h}</div>
                   ))}
-                </div>}
+                </div>
                 {/* Rows */}
                 {
                   (mergedInvoices && mergedInvoices.length > 0) ? (
@@ -2037,7 +2037,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         {(currProject.advances || []).map((rec, i) => (
                           <tr key={i} style={{ borderBottom: '1px solid #F1F5F9' }}>
                             <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.advanceNo || `ADV-00${i + 1}`}</td>
-                            <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }}>{rec.description || '—'}</td>
+                            <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151', maxWidth: 220, wordBreak: 'break-word', whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>{rec.description || '—'}</td>
                             <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
                             <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{rec.date ? new Date(rec.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
                             <td style={{ padding: '12px 14px' }}><span style={{ background: rec.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: rec.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.status || 'Pending'}</span></td>
@@ -2074,7 +2074,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         {(currProject.additionalCharges || []).map((rec, i) => (
                           <tr key={i} style={{ borderBottom: '1px solid #F1F5F9', borderLeft: `3px solid ${rec.status === 'Paid' ? '#22C55E' : '#F59E0B'}` }}>
                             <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.chargeNo || `CHG-00${i + 1}`}</td>
-                            <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }}>{rec.description || '—'}</td>
+                            <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151', maxWidth: 220, wordBreak: 'break-word', whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>{rec.description || '—'}</td>
                             <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
                             <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{rec.date ? new Date(rec.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
                             <td style={{ padding: '12px 14px' }}><span style={{ background: '#FFEDD5', color: '#C2410C', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.category || 'Other'}</span></td>
@@ -2112,7 +2112,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         {(currProject.milestonePayments || []).map((rec, i) => (
                           <tr key={i} style={{ borderBottom: '1px solid #F1F5F9' }}>
                             <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.milestoneNo || `MIL-00${i + 1}`}</td>
-                            <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }}>{rec.name || rec.description || '—'}</td>
+                            <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151', maxWidth: 220, wordBreak: 'break-word', whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>{rec.name || rec.description || '—'}</td>
                             <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
                             <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{(rec.dueDate || rec.date) ? new Date(rec.dueDate || rec.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
                             <td style={{ padding: '12px 14px' }}><span style={{ background: rec.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: rec.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.status || 'Pending'}</span></td>
@@ -2204,7 +2204,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         {(currProject.expenses || []).map((rec, i) => (
                           <tr key={i} style={{ borderBottom: '1px solid #F1F5F9', borderLeft: `3px solid ${rec.status === 'Paid' ? '#22C55E' : '#F59E0B'}` }}>
                             <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.expenseNo || `EXP-00${i + 1}`}</td>
-                            <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }}>{rec.description || '—'}</td>
+                            <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151', maxWidth: 220, wordBreak: 'break-word', whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>{rec.description || '—'}</td>
                             <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
                             <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{rec.date ? new Date(rec.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
                             <td style={{ padding: '12px 14px' }}><span style={{ background: '#FFEDD5', color: '#C2410C', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.category || 'Other'}</span></td>

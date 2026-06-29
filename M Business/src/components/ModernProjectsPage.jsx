@@ -68,7 +68,7 @@ export default function ModernProjectsPage({ user }) {
   const { projectId } = useParams();
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
-  const [clients, setClients] = useState([]);
+  const [clients, setClients] = useState(() => { try { const c = localStorage.getItem("cached_clients"); return c ? JSON.parse(c) : []; } catch { return []; } });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 

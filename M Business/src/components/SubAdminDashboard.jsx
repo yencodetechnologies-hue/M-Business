@@ -1011,11 +1011,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
   useEffect(() => {
-    if (isFetching !== undefined) {
-      setIsLoading(isFetching);
-    } else if (clients !== undefined) {
-      setIsLoading(false);
-    }
+    setIsLoading(false);
     if (filtered.length > 0) {
       if (!activeClientId) {
         setActiveClientId(filtered[0]._id);
@@ -1832,6 +1828,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
         name: c.clientName || c.name,
         companyName: c.companyName || c.company || "",
         companyId: c.companyId || user?.companyId || user?._id || user?.id || "",
+        agencyName: user?.companyName || user?.name || "",
         exp: Date.now() + 24 * 60 * 60 * 1000 // 24 hour expiry
       }));
       return `${window.location.origin}/client-portal/${c._id}?token=${clientToken}`;
@@ -2235,6 +2232,14 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
           </div>
 
+        </div>
+      ) : isLoading ? (
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--app-bg)", minWidth: 0 }}>
+          <div style={{ textAlign: "center", padding: 40 }}>
+            <div style={{ width: 48, height: 48, border: "4px solid #E0EEF0", borderTop: "4px solid #00BCD4", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
+            <div style={{ fontSize: 13, color: "#A0B8BE", fontWeight: 600 }}>Loading clients...</div>
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+          </div>
         </div>
       ) : (
         <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--app-bg)", minWidth: 0 }}>
@@ -6930,7 +6935,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  const [clients, setClients] = useState([]);
+  const [clients, setClients] = useState(() => { try { const c = localStorage.getItem("cached_clients"); return c ? JSON.parse(c) : []; } catch { return []; } });
+
 
   const todayStr = new Date().toISOString().split("T")[0];
 
@@ -7830,8 +7836,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   };
 
 
-
-  const fetchClients = async () => { try { const res = await axios.get(BASE_URL + "/api/clients"); setClients(res.data); } catch (e) { console.log(e); } };
+  const fetchClients = async () => { try { const res = await axios.get(BASE_URL + "/api/clients"); setClients(res.data); try { localStorage.setItem("cached_clients", JSON.stringify(res.data)); } catch { } } catch (e) { console.log(e); } };
 
   const fetchEmployees = async () => { try { const res = await axios.get(BASE_URL + "/api/employees"); setEmployees(res.data); } catch (e) { console.log(e); } };
 
@@ -10638,7 +10643,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client) => { setClients(prev => [...prev, client]); setPendingNewClientId(client._id); setActive("clients"); }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || '#00BCD4'} />}
 
-            {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
+            {validActive === "clients" && <ClientsPage key={clients.length > 0 ? "loaded" : "empty"} clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 

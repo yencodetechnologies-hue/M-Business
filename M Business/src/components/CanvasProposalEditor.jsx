@@ -374,7 +374,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
   const [proposalData, setProposalData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [clients, setClients] = useState([]);
+  const [clients, setClients] = useState(() => { try { const c = localStorage.getItem("cached_clients"); return c ? JSON.parse(c) : []; } catch { return []; } });
   const [selectedClient, setSelectedClient] = useState("");
   const [proposalTitle, setProposalTitle] = useState("");
   const canvasRef = useRef();

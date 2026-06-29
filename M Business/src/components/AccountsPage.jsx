@@ -767,7 +767,7 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
 export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({ title: "", client: "", amount: "", category: "Project Payment", status: "Received" });
-  const [clients, setClients] = useState([]);
+  const [clients, setClients] = useState(() => { try { const c = localStorage.getItem("cached_clients"); return c ? JSON.parse(c) : []; } catch { return []; } });
   const [toast, setToast] = useState("");
   const [viewItem, setViewItem] = useState(null);
   const [editItem, setEditItem] = useState(null);

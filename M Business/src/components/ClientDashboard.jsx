@@ -160,7 +160,7 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
         <button onClick={() => printProposal(proposal)} style={{ background: "#f0fdfe", border: "1.5px solid #e0eef0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#00BCD4", display: "flex", alignItems: "center", gap: 6 }}>
           <i className="ti ti-printer"></i> Print / PDF
         </button>
-        <button onClick={() => shareProposalAsPDF(proposal, "YENCODE Technologies", null)} style={{ background: "#00BCD4", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#fff", display: "flex", alignItems: "center", gap: 6 }}>
+        <button onClick={() => shareProposalAsPDF(proposal, agencyName, null)} style={{ background: "#00BCD4", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#fff", display: "flex", alignItems: "center", gap: 6 }}>
           <i className="ti ti-share"></i> Share PDF
         </button>
       </div>
@@ -348,6 +348,9 @@ export default function ClientDashboard({ user, setUser, portalMode = false }) {
       if (!token) return;
       const decoded = JSON.parse(atob(token));
       if (decoded.exp && Date.now() > decoded.exp) return;
+      if (decoded.agencyName) {
+        localStorage.setItem("portalAgencyName", decoded.agencyName);
+      }
       const autoUser = {
         _id: decoded.clientId,
         id: decoded.clientId,
@@ -395,9 +398,9 @@ export default function ClientDashboard({ user, setUser, portalMode = false }) {
 
   // Local Chat Mockups
   const [chatMessages, setChatMessages] = useState([
-    { sender: "Prabhu · YENCODE", msg: "Hi! The final review designs have been uploaded. Please check and let us know your feedback.", time: "9:05 AM", mine: false },
+    { sender: `Support · ${localStorage.getItem("portalAgencyName") || "Our Company"}`, msg: "Hi! The final review designs have been uploaded. Please check and let us know your feedback.", time: "9:05 AM", mine: false },
     { sender: "You", msg: "Looks great! I'll review and get back by EOD. Can we schedule a call too?", time: "9:22 AM", mine: true },
-    { sender: "Prabhu · YENCODE", msg: "Absolutely! I've added a meeting slot for tomorrow 11 AM. Check the schedule section below.", time: "9:30 AM", mine: false },
+    { sender: `Support · ${localStorage.getItem("portalAgencyName") || "Our Company"}`, msg: "Absolutely! I've added a meeting slot for tomorrow 11 AM. Check the schedule section below.", time: "9:30 AM", mine: false },
     { sender: "You", msg: "Perfect. Also please send the updated invoice when ready.", time: "9:45 AM", mine: true }
   ]);
   const [chatText, setChatText] = useState("");
@@ -431,6 +434,7 @@ export default function ClientDashboard({ user, setUser, portalMode = false }) {
   const [paymentProcessing, setPaymentProcessing] = useState(false);
 
   const clientName = user?.clientName || user?.name || "Client";
+  const agencyName = localStorage.getItem("portalAgencyName") || user?.agencyName || "Our Company";
   // Fallback to clientName if client company is not in user object
   // In the backend, a company name of type "Urban Cafe" will be saved in project.client
   const clientCompany = user?.companyName || user?.company || user?.clientCompany || user?.organization || "";
@@ -538,7 +542,7 @@ export default function ClientDashboard({ user, setUser, portalMode = false }) {
     // Simulate auto-reply
     setTimeout(() => {
       setChatMessages(prev => [...prev, {
-        sender: "Prabhu · YENCODE",
+        sender: `Support · ${localStorage.getItem("portalAgencyName") || agencyName}`,
         msg: "Received! Let me check this with the development team and get back to you shortly.",
         time: new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
         mine: false
@@ -1109,7 +1113,7 @@ export default function ClientDashboard({ user, setUser, portalMode = false }) {
           <div className="tn-brand">
             <div className="tn-logo">YT</div>
             <div>
-              <div className="tn-company">YENCODE Technologies</div>
+              <div className="tn-company">{agencyName}</div>
               <div className="tn-powered">Client Portal</div>
             </div>
           </div>
@@ -1932,7 +1936,7 @@ export default function ClientDashboard({ user, setUser, portalMode = false }) {
       <div className="contact-card">
         <div className="cc-label">Your Account Manager</div>
         <div className="cc-name">{managerName}</div>
-        <div className="cc-role">{proj?.managerRole || 'Project Lead, YENCODE'}</div>
+        <div className="cc-role">{proj?.managerRole || `Project Lead, ${agencyName}`}</div>
         <div className="cc-contacts">
           {managerEmail && <div className="cc-contact-row"><i className="ti ti-mail"></i> {managerEmail}</div>}
           {managerPhone && <div className="cc-contact-row"><i className="ti ti-phone"></i> {managerPhone}</div>}
@@ -2193,7 +2197,7 @@ export default function ClientDashboard({ user, setUser, portalMode = false }) {
                             <i className="ti ti-printer" style={{ fontSize: 13 }}></i> PDF
                           </button>
                           <button
-                            onClick={() => shareProposalAsPDF(prop, "YENCODE Technologies", null)}
+                            onClick={() => shareProposalAsPDF(prop, agencyName, null)}
                             style={{ background: C.surface2, color: C.text2, borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 700, border: "1.5px solid " + C.border, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
                             <i className="ti ti-share" style={{ fontSize: 13 }}></i> Share
                           </button>

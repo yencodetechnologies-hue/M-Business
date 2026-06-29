@@ -535,8 +535,10 @@ export default function ModernProjectsPage({ user }) {
                 const { label: statusLabel, cls } = normStatus(p.status);
                 const pt = tasksForProject(p);
                 const doneTasks = pt.filter(t => ['done', 'completed'].includes((t.status || '').toLowerCase())).length;
-                const pct = pt.length > 0
-                  ? Math.round((doneTasks / pt.length) * 100)
+                const milestonesArr = p.milestones || [];
+                const doneMilestones = milestonesArr.filter(m => m.done === true).length;
+                const pct = milestonesArr.length > 0
+                  ? Math.round((doneMilestones / milestonesArr.length) * 100)
                   : Math.min(100, Math.max(0, p.progress || 0));
                 const team = Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []);
                 const deadline = p.end || p.deadline;

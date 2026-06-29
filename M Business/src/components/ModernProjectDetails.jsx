@@ -551,7 +551,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const totalMilestones = milestonesArr.length;
   const progressPct = totalMilestones > 0
     ? Math.round((doneMilestones / totalMilestones) * 100)
-    : (currProject.progress || 0);
+    : 0;
 
   const parseAmt = (val) => {
     if (val === undefined || val === null) return 0;
@@ -646,10 +646,18 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         return { ...m, done: allDone };
       });
 
+      // Recalculate progress from updated milestones so card stays in sync
+      const doneMCount = updatedMilestones.filter(m => m.done === true).length;
+      const totalMCount = updatedMilestones.length;
+      const newProgressPct = totalMCount > 0
+        ? Math.round((doneMCount / totalMCount) * 100)
+        : 0;
+
       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
         completedTasks: doneT,
         tasks: totalT,
-        milestones: updatedMilestones, // persists auto-updated milestone completion
+        milestones: updatedMilestones,
+        progress: newProgressPct,
       });
 
       loadLatest();

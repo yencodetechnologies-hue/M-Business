@@ -1769,8 +1769,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     })()}
                   </div>
                 </div>
-                {/* Table Header */}
-                <div style={{ display: 'grid', gridTemplateColumns: '40px 1.2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 100px', gap: 8, padding: '8px 18px', background: '#FAFBFD', borderBottom: '1px solid #E8EDF2' }}>
+                {/* Table Header - only show if invoices exist */}
+                {mergedInvoices.length > 0 && <div style={{ display: 'grid', gridTemplateColumns: '40px 1.2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 100px', gap: 8, padding: '8px 18px', background: '#FAFBFD', borderBottom: '1px solid #E8EDF2' }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <input type="checkbox" checked={mergedInvoices.length > 0 && selectedPaymentItems.length === mergedInvoices.length} onChange={e => {
                       if (e.target.checked) setSelectedPaymentItems(mergedInvoices.map((_, idx) => idx));
@@ -1780,7 +1780,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   {['Invoice ID', 'Client', 'Project', 'Category', 'Amount', 'Issue Date', 'Due Date', 'Status', 'Actions'].map(h => (
                     <div key={h} style={{ fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px' }}>{h}</div>
                   ))}
-                </div>
+                </div>}
                 {/* Rows */}
                 {
                   (mergedInvoices && mergedInvoices.length > 0) ? (
@@ -2012,22 +2012,14 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         </div>
                       )
                     })
-                  ) : (
-                    <div style={{ padding: '32px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
-                      <i className="ti ti-file-invoice" style={{ fontSize: 32, display: 'block', marginBottom: 10, opacity: .3 }}></i>
-                      No invoices yet for this project.
-                      <div style={{ marginTop: 12 }}>
-                        <button onClick={() => { if (onNewInvoice) { onNewInvoice(currProject); } else { setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true })); } }} style={{ padding: '8px 18px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                          <i className="ti ti-plus" style={{ marginRight: 6 }}></i>Create First Invoice
-                        </button>
-                      </div>
-                    </div>
-                  )
+                  ) : null
                 }
               </div>
 
+
+
               {/* ADVANCE PAYMENTS PANEL */}
-              <div style={{ display: 'block', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
+              {(currProject.advances || []).length > 0 && <div style={{ display: 'block', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>
                     <i className="ti ti-pig-money" style={{ color: '#8B5CF6', fontSize: 15 }}></i> Advance Payments
@@ -2060,17 +2052,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       </tbody>
                     </table>
                   </div>
-                ) : (
-                  <div style={{ padding: '32px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
-                    <i className="ti ti-pig-money" style={{ fontSize: 32, display: 'block', marginBottom: 10, opacity: .3, color: '#8B5CF6' }}></i>
-                    No advance payments recorded yet.
-                    <div style={{ marginTop: 12 }}><button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdvance: true }))} style={{ padding: '8px 18px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}><i className="ti ti-plus" style={{ marginRight: 6 }}></i>Add First Advance Payment</button></div>
-                  </div>
-                )}
-              </div>
+                ) : null}
+              </div>}
 
               {/* ADDITIONAL CHARGES PANEL */}
-              <div style={{ display: 'block', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
+              {(currProject.additionalCharges || []).length > 0 && <div style={{ display: 'block', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>
                     <i className="ti ti-circle-plus" style={{ color: '#F97316', fontSize: 15 }}></i> Additional Charges
@@ -2104,17 +2090,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       </tbody>
                     </table>
                   </div>
-                ) : (
-                  <div style={{ padding: '32px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
-                    <i className="ti ti-circle-plus" style={{ fontSize: 32, display: 'block', marginBottom: 10, opacity: .3, color: '#F97316' }}></i>
-                    No additional charges recorded yet.
-                    <div style={{ marginTop: 12 }}><button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdditional: true }))} style={{ padding: '8px 18px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}><i className="ti ti-plus" style={{ marginRight: 6 }}></i>Add First Additional Charge</button></div>
-                  </div>
-                )}
-              </div>
+                ) : null}
+              </div>}
 
               {/* MILESTONE PAYMENTS PANEL */}
-              <div style={{ display: 'block', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
+              {(currProject.milestonePayments || []).length > 0 && <div style={{ display: 'block', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>
                     <i className="ti ti-flag" style={{ color: '#F59E0B', fontSize: 15 }}></i> Milestone Payments
@@ -2148,16 +2128,14 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     </table>
                   </div>
                 ) : (
-                  <div style={{ padding: '32px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
-                    <i className="ti ti-flag" style={{ fontSize: 32, display: 'block', marginBottom: 10, opacity: .3, color: '#F59E0B' }}></i>
+                  <div style={{ padding: '16px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
                     No milestone payments recorded yet.
-                    <div style={{ marginTop: 12 }}><button onClick={() => setPaymentModalsState(prev => ({ ...prev, showMilestonePayment: true }))} style={{ padding: '8px 18px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}><i className="ti ti-plus" style={{ marginRight: 6 }}></i>Add First Milestone Payment</button></div>
                   </div>
                 )}
-              </div>
+              </div>}
 
               {/* PAYMENTS RECEIVED PANEL */}
-              <div style={{ display: 'block', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
+              {(currProject.paymentsReceived || []).length > 0 && <div style={{ display: 'block', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>
                     <i className="ti ti-credit-card" style={{ color: '#22C55E', fontSize: 15 }}></i> Payments Received
@@ -2201,16 +2179,14 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     </table>
                   </div>
                 ) : (
-                  <div style={{ padding: '32px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
-                    <i className="ti ti-credit-card" style={{ fontSize: 32, display: 'block', marginBottom: 10, opacity: .3, color: '#22C55E' }}></i>
+                  <div style={{ padding: '16px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
                     No payments received yet.
-                    <div style={{ marginTop: 12 }}><button onClick={() => setPaymentModalsState(prev => ({ ...prev, showPayment: true }))} style={{ padding: '8px 18px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}><i className="ti ti-plus" style={{ marginRight: 6 }}></i>Record First Payment</button></div>
                   </div>
                 )}
-              </div>
+              }</div>}
 
               {/* EXPENSES PANEL */}
-              <div style={{ display: 'block', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
+              {(currProject.expenses || []).length > 0 && <div style={{ display: 'block', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>
                     <i className="ti ti-receipt" style={{ color: '#6B7280', fontSize: 15 }}></i> Expenses
@@ -2244,15 +2220,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       </tbody>
                     </table>
                   </div>
-                ) : (
-                  <div style={{ padding: '32px 20px', textAlign: 'center', color: '#7B8FA1', fontSize: 13 }}>
-                    <i className="ti ti-receipt" style={{ fontSize: 32, display: 'block', marginBottom: 10, opacity: .3, color: '#6B7280' }}></i>
-                    No expenses recorded yet.
-                    <div style={{ marginTop: 12 }}><button onClick={() => setPaymentModalsState(prev => ({ ...prev, showExpense: true }))} style={{ padding: '8px 18px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}><i className="ti ti-plus" style={{ marginRight: 6 }}></i>Add First Expense</button></div>
-                  </div>
-                )}
+                ) : null}
+              </div>}
 
-              </div>
             </div>
           </div>{/* end tabContentRef wrapper */}
         </div>

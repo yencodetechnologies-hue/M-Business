@@ -7440,22 +7440,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  // Redirect to mysubscriptions ONLY if no subscription AND free trial has expired
-
+  // Redirect to mysubscriptions if no plan selected yet (new user) OR trial expired
   const hasRedirected = useRef(false);
 
   useEffect(() => {
-
-    if (!subLoading && subscription === null && active === "dashboard" && !hasRedirected.current && !isInFreeTrial()) {
-
+    if (!subLoading && subscription === null && !hasRedirected.current) {
       hasRedirected.current = true;
-
-      setForceUpgradeTab(true);
+      setForceUpgradeTab(false); // show plan selection, not upgrade tab
       setActive("mysubscriptions");
-
     }
-
-  }, [subscription, subLoading, active]);
+  }, [subscription, subLoading]);
 
 
 
@@ -8796,9 +8790,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   // (b) subadmin and no active subscription (blocked)
 
-  let enforceMySubscriptions = false;
-
-  // Subadmin subscription blocking logic removed as requested
+  // Block sidebar until user selects a plan (free trial OR paid)
+  // New users: no subscription AND not in free trial = must pick a plan first
+  // hasSelectedPlan = they have either activated free trial OR have a paid subscription
+  const hasSelectedPlan = subscription !== null || isInFreeTrial();
+  let enforceMySubscriptions = !subLoading && !hasSelectedPlan;
 
   const rawNavItems = getNavForRole(user?.role);
 
@@ -9377,7 +9373,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             )}
             {!isInFreeTrial() && !subscription && (
               <div style={{ background: '#FEE2E2', color: '#DC2626', padding: '10px 20px', borderRadius: 10, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
-                <span><i className="ti ti-alert-circle" style={{ marginRight: 8 }}></i>Your free trial has expired. Upgrade to continue adding data.</span>
+                <span><i className="ti ti-alert-circle" style={{ marginRight: 8 }}></i>Choose a subscription plan to continue.</span>
                 <button onClick={() => { setForceUpgradeTab(true); setActive('mysubscriptions'); }} style={{ background: '#DC2626', color: '#fff', border: 'none', borderRadius: 8, padding: '5px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>Upgrade Now</button>
               </div>
             )}
@@ -11021,7 +11017,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} initialTab={forceUpgradeTab || enforceMySubscriptions ? "upgrade" : "overview"} preloadedSubscription={subscription} onTabChange={() => setForceUpgradeTab(false)} packagesList={packages} />}
+            {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={async () => { await fetchSubscription(); setForceUpgradeTab(false); setActive("dashboard"); }} initialTab={forceUpgradeTab || enforceMySubscriptions ? "upgrade" : "overview"} preloadedSubscription={subscription} onTabChange={() => setForceUpgradeTab(false)} packagesList={packages} />}
 
             {validActive === "reports" && <ReportsPage THEME={currentTheme} clients={clients} projects={projects} employees={employees} managers={managers} income={income} expenses={expenses} />}
 

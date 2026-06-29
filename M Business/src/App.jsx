@@ -30,15 +30,27 @@ export default function App() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        return {
-          ...parsed,
-          role: (parsed.role || "").toLowerCase().trim(),
-        };
+        return { ...parsed, role: (parsed.role || "").toLowerCase().trim() };
       } catch {
         localStorage.removeItem("user");
-        return null;
       }
     }
+    // After PayU redirect, session may be lost — restore from accounts list using uid param
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('payment') === 'success') {
+        const uid = params.get('uid');
+        const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
+        const match = uid
+          ? accounts.find(a => String(a._id || a.id) === String(uid))
+          : accounts[0];
+        if (match) {
+          const normalized = { ...match, role: (match.role || '').toLowerCase().trim() };
+          localStorage.setItem('user', JSON.stringify(normalized));
+          return normalized;
+        }
+      }
+    } catch (e) { /* ignore */ }
     return null;
   });
 
@@ -132,15 +144,7 @@ export default function App() {
 
           <Route
             path="/client-portal/:clientId"
-            element={<ClientDashboard user={user} setUser={handleSetUser} portalMode={true} />}
-          />
-          <Route
-            path="/client-portal/:clientId"
-            element={<ClientDashboard user={user} setUser={handleSetUser} portalMode={true} />}
-          />
-          <Route
-            path="/client-portal/:clientId"
-            element={<ClientDashboard user={user} setUser={handleSetUser} portalMode={true} />}
+            element={<ClientDashboard user={null} setUser={handleSetUser} portalMode={true} />}
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

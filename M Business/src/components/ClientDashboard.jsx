@@ -330,16 +330,18 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
     </div>
   );
 }
-export default function ClientDashboard({ user, setUser, portalMode = false }) {
+export default function ClientDashboard({ user: userProp, setUser, portalMode = false }) {
   useAssets();
   const [active, setActive] = useState(() => localStorage.getItem("activeTab_client") || "dashboard");
 
-  // Portal mode: read clientId from URL and auto-load that client's data
+  // Portal mode: decode token immediately and use local client user — never use subadmin prop
+  const [portalUser, setPortalUser] = useState(null);
+
   const portalClientId = portalMode
     ? window.location.pathname.split("/client-portal/")[1]?.split("?")[0] || ""
     : "";
 
-  // Auto-login from token when SubAdmin clicks "Open Portal"
+  // Decode token on mount in portal mode — sets local portalUser immediately
   useEffect(() => {
     if (!portalMode) return;
     try {
@@ -362,20 +364,17 @@ export default function ClientDashboard({ user, setUser, portalMode = false }) {
         role: "client",
         agencyName: decoded.agencyName || "",
       };
-      const alreadyCorrectClient =
-        user &&
-        user.role === "client" &&
-        String(user._id || user.id) === String(decoded.clientId);
-      if (!alreadyCorrectClient && setUser) {
-        setUser(autoUser);
-      }
+      setPortalUser(autoUser);
+      if (setUser) setUser(autoUser);
       // Clean token from URL so refresh doesn't re-trigger
-      const cleanUrl = window.location.pathname;
-      window.history.replaceState({}, document.title, cleanUrl);
+      window.history.replaceState({}, document.title, window.location.pathname);
     } catch (e) {
       console.warn("Portal token decode failed:", e);
     }
   }, [portalMode]);
+
+  // In portal mode always use the locally decoded client user, never the subadmin prop
+  const user = portalMode ? portalUser : userProp;
 
   const [selectedClientProject, setSelectedClientProject] = useState(null);
   useEffect(() => { localStorage.setItem("activeTab_client", active); if (active !== "projects") setSelectedClientProject(null); }, [active]);

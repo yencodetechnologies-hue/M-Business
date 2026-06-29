@@ -142,8 +142,7 @@ router.post("/start-trial", async (req, res) => {
       paymentDate: new Date(),
       planName: "Free Trial",
       planDuration: "trial",
-      businessLimit: req.body.businessLimit || "1 Business manage",
-      paymentMethod: "free_trial"
+      businessLimit: req.body.businessLimit || "1 Business manage"
     });
     await trialPayment.save();
 

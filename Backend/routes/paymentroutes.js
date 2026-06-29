@@ -20,8 +20,18 @@ router.post('/payu/success', async (req, res) => {
     const { txnid, status, amount, productinfo, firstname, email, mihpayid, udf1 } = req.body;
     console.log('PayU success callback:', req.body);
     const frontendUrl = process.env.FRONTEND_URL || 'https://www.mbusiness.cloud';
-    // Redirect to frontend with success params (udf1 holds subscriptionId)
-    res.redirect(`${frontendUrl}/?payment=success&plan=${encodeURIComponent(productinfo)}&txnid=${txnid}&mihpayid=${mihpayid || ''}&subId=${udf1 || ''}`);
+
+    // Find userId from the pending subscription (udf1 = subscriptionId)
+    let userId = '';
+    if (udf1) {
+      try {
+        const Subscription = require('../models/SubscriptionModel');
+        const sub = await Subscription.findById(udf1);
+        if (sub) userId = sub.userId || '';
+      } catch (e) { console.log('Could not fetch sub for userId:', e.message); }
+    }
+
+    res.redirect(`${frontendUrl}/?payment=success&plan=${encodeURIComponent(productinfo)}&txnid=${txnid}&mihpayid=${mihpayid || ''}&subId=${udf1 || ''}&uid=${userId}`);
   } catch (err) {
     console.error('PayU success handler error:', err);
     const frontendUrl = process.env.FRONTEND_URL || 'https://www.mbusiness.cloud';

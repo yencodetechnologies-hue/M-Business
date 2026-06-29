@@ -56,19 +56,24 @@ router.post("/add", checkResourceLimit('client'), addClient);
 router.put("/:id", async (req, res) => {
   try {
     const updateData = { ...req.body };
+
     if (updateData.password && updateData.password.trim() !== "") {
+      // Only hash if a new password was actually provided
       const bcrypt = require("bcryptjs");
       updateData.password = await bcrypt.hash(updateData.password, 10);
     } else {
+      // No password change — remove it from update entirely so existing hash is preserved
       delete updateData.password;
     }
-    const client = await Client.findByIdAndUpdate(
-      req.params.id,
-      { $set: updateData },
-      { returnDocument: "after" }
+
+    // Use updateOne instead of findByIdAndUpdate to avoid fetching the full doc
+    const result = await Client.updateOne(
+      { _id: req.params.id },
+      { $set: updateData }
     );
-    if (!client) return res.status(404).json({ msg: "Client not found" });
-    res.json({ client });
+    if (result.matchedCount === 0) return res.status(404).json({ msg: "Client not found" });
+
+    res.json({ success: true });
   } catch (err) {
     res.status(500).json({ msg: "Server error", error: err.message });
   }

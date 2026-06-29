@@ -161,12 +161,18 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
       };
 
       if (isEdit) {
-        const res = await axios.put(`${BASE_URL}/api/clients/${editData._id}`, payload, {
-          headers: { Authorization: `Bearer ${user?.token || ""}` }
-        });
-        toast.success('Client updated successfully!');
-        if (onClientUpdated) onClientUpdated({ ...editData, ...payload, ...res.data?.client });
+        // Optimistic update — update UI immediately without waiting for server
+        if (onClientUpdated) onClientUpdated({ ...editData, ...payload });
         onBack();
+        toast.success('Client updated successfully!');
+
+        // Fire the request in background — no await
+        axios.put(`${BASE_URL}/api/clients/${editData._id}`, payload, {
+          headers: { Authorization: `Bearer ${user?.token || ""}` }
+        }).catch(err => {
+          toast.error('Failed to save changes. Please try again.');
+          console.error('Client update failed:', err);
+        });
       } else {
         const res = await axios.post(`${BASE_URL}/api/clients/add`, payload, {
           headers: { Authorization: `Bearer ${user?.token || ""}` }

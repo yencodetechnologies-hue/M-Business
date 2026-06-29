@@ -465,7 +465,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             headers: { 'x-company-id': user.companyId || "" }
           }),
           axios.get(`${BASE_URL}/api/notifications/${user._id || user.id}`),
-          axios.get(`${BASE_URL}/api/documents?companyId=${user.companyId || ""}&client=${encodeURIComponent(clientName)}&sendTo=client`).catch(() => ({ data: [] })),
+          axios.get(`${BASE_URL}/api/documents?companyId=${user.companyId || ""}&client=${encodeURIComponent(clientName)}&sendTo=client&clientId=${encodeURIComponent(myClientId)}`).catch(() => ({ data: [] })),
           axios.get(`${BASE_URL}/api/meetings?client=${encodeURIComponent(clientName)}`).catch(() => ({ data: [] })),
           axios.get(`${BASE_URL}/api/proposals/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}&clientId=${encodeURIComponent(user._id || user.id || "")}`, {
             headers: { 'x-company-id': user.companyId || "" }
@@ -525,7 +525,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}`, {
           headers: { 'x-company-id': user?.companyId || "" }
         }),
-        axios.get(`${BASE_URL}/api/documents?companyId=${user?.companyId || ""}&client=${encodeURIComponent(clientName)}&sendTo=client`).catch(() => ({ data: [] })),
+        axios.get(`${BASE_URL}/api/documents?companyId=${user?.companyId || ""}&client=${encodeURIComponent(clientName)}&sendTo=client&clientId=${encodeURIComponent(myClientId)}`).catch(() => ({ data: [] })),
       ]);
       setProjects(projRes.data || []);
       setDocs(docRes.data || []);
@@ -681,7 +681,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
   const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
     .filter(f => {
-      if (!f.sentToClient || f.sentToClient === null || f.sentToClient === "") return false;
+      // If sentToClient is not set at all, show the file (it belongs to this client's project)
+      if (!f.sentToClient || f.sentToClient === null || f.sentToClient === "") return true;
       const sc = (f.sentToClient || "").toLowerCase().trim();
       const cn = (clientName || "").toLowerCase().trim();
       // Show when saved generically as "client", or if client name matches
@@ -737,12 +738,13 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const totalOverdue = finalInvoicesList.filter(i => i.status === "overdue").reduce((sum, i) => sum + (i.total - i.amountPaid), 0);
   const totalInvoiced = totalPaid + totalPending + totalOverdue;
 
-  // Active project calculation
-  const activeProjName = projects[0]?.name || "";
-  const activeProjProgress = projects[0]?.progress ?? 0;
-  const activeProjDesc = projects[0]?.description || "";
-  const activeProjDeadline = projects[0]?.deadline || projects[0]?.end || "";
-  const activeProjStatus = projects[0]?.status || "";
+  // Active project calculation — prefer explicitly Active status
+  const activeProj = projects.find(p => (p.status || "").toLowerCase() === "active") || projects[0];
+  const activeProjName = activeProj?.name || "";
+  const activeProjProgress = activeProj?.progress ?? 0;
+  const activeProjDesc = activeProj?.description || "";
+  const activeProjDeadline = activeProj?.deadline || activeProj?.end || "";
+  const activeProjStatus = activeProj?.status || "";
 
   // Styles Injection
   const CSS = `
@@ -1192,19 +1194,19 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             <div className="hero-title">{activeProjName}</div>
             <div className="hero-sub">{activeProjDesc}</div>
             <div className="hero-stats">
-              <div className="hs-item">
+              <div className="hs-item" onClick={() => setActive('projects')} style={{ cursor: 'pointer', opacity: 1 }}>
                 <div className="hs-val">{activeProjProgress}%</div>
                 <div className="hs-label">Complete</div>
               </div>
-              <div className="hs-item">
+              <div className="hs-item" onClick={() => setActive('timeline')} style={{ cursor: 'pointer' }}>
                 <div className="hs-val">{activeProjDeadline ? Math.max(0, Math.ceil((new Date(activeProjDeadline) - Date.now()) / (1000 * 60 * 60 * 24))) : '—'}</div>
                 <div className="hs-label">Days Left</div>
               </div>
-              <div className="hs-item">
+              <div className="hs-item" onClick={() => setActive('payments')} style={{ cursor: 'pointer' }}>
                 <div className="hs-val">{pendingAmountFormatted}</div>
                 <div className="hs-label">Pending</div>
               </div>
-              <div className="hs-item">
+              <div className="hs-item" onClick={() => setActive('files')} style={{ cursor: 'pointer' }}>
                 <div className="hs-val">{allFiles.length}</div>
                 <div className="hs-label">Files Shared</div>
               </div>
@@ -1631,22 +1633,25 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     const overallProgress = totalProjects > 0
       ? Math.round(projects.reduce((sum, p) => {
         const s = (p.status || '').toLowerCase();
-        const pct = p.progress ?? (s === 'completed' || s === 'done' ? 100 : s === 'in progress' ? 55 : 20);
+        const pct = p.progress ?? 0;
         return sum + pct;
       }, 0) / totalProjects)
       : 0;
 
     // Recent updates: project updates + notifications, newest first
+    // Only show updates explicitly sent to 'client'
     const recentUpdates = [
       ...projects.flatMap(p =>
-        (p.updates || []).map(u => ({
-          text: u.text || u.title || `Update on ${p.name}`,
-          date: u.date ? new Date(u.date) : null,
-          icon: 'ti-speakerphone',
-          color: C.teal,
-          bg: C.tealLight,
-          project: p.name,
-        }))
+        (p.updates || [])
+          .filter(u => !u.visibleTo || u.visibleTo.includes('client'))
+          .map(u => ({
+            text: u.text || u.title || `Update on ${p.name}`,
+            date: u.date ? new Date(u.date) : null,
+            icon: 'ti-speakerphone',
+            color: C.teal,
+            bg: C.tealLight,
+            project: p.name,
+          }))
       ),
       ...notifs.map(n => ({
         text: n.message || n.title || 'New notification',
@@ -1718,7 +1723,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           gap: 16,
         }}>
           {statCards.map((card, i) => (
-            <div key={i} style={{
+            <div key={i} onClick={() => setActive('projects')} style={{
               background: C.surface,
               border: `1.5px solid ${C.border}`,
               borderRadius: 16,
@@ -1727,7 +1732,12 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               flexDirection: 'column',
               gap: 10,
               boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
-            }}>
+              cursor: 'pointer',
+              transition: 'all .2s',
+            }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = C.teal; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,188,212,.12)'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.04)'; }}
+            >
               <div style={{
                 width: 40, height: 40, borderRadius: 12,
                 background: card.bg, color: card.color,
@@ -1748,13 +1758,18 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         </div>
 
         {/* Overall Progress Bar */}
-        <div style={{
+        <div onClick={() => setActive('projects')} style={{
           background: C.surface,
           border: `1.5px solid ${C.border}`,
           borderRadius: 16,
           padding: '20px 22px',
           boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
-        }}>
+          cursor: 'pointer',
+          transition: 'all .2s',
+        }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = C.teal; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,188,212,.12)'; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.04)'; }}
+        >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
             <div style={{ fontSize: 13, fontWeight: 800, color: C.text2 }}>Overall Project Progress</div>
             <div style={{
@@ -1776,7 +1791,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {projects.map((p, i) => {
                 const s = (p.status || '').toLowerCase();
-                const pct = p.progress ?? (s === 'completed' || s === 'done' ? 100 : s === 'in progress' ? 55 : 20);
+                const pct = p.progress ?? 0;
                 const isComplete = pct === 100;
                 const barColor = isComplete ? C.green : pct > 60 ? C.teal : pct > 30 ? C.amber : C.red;
                 const statusLabel = p.status || 'Pending';
@@ -1828,8 +1843,11 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           padding: '20px 22px',
           boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
         }}>
-          <div style={{ fontSize: 13, fontWeight: 800, color: C.text2, marginBottom: 16 }}>
-            Recent Updates
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: C.text2 }}>Recent Updates</div>
+            <div onClick={() => setActive('timeline')} style={{ fontSize: 11, fontWeight: 700, color: C.teal, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+              View All <i className="ti ti-arrow-right" style={{ fontSize: 12 }}></i>
+            </div>
           </div>
           {recentUpdates.length === 0 ? (
             <div style={{ textAlign: 'center', color: C.text3, fontSize: 13, padding: '16px 0' }}>
@@ -1838,12 +1856,18 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {recentUpdates.map((u, i) => (
-                <div key={i} style={{
+                <div key={i} onClick={() => setActive('timeline')} style={{
                   display: 'flex', gap: 14, alignItems: 'flex-start',
                   paddingBottom: i < recentUpdates.length - 1 ? 14 : 0,
                   marginBottom: i < recentUpdates.length - 1 ? 14 : 0,
                   borderBottom: i < recentUpdates.length - 1 ? `1px solid ${C.border}` : 'none',
-                }}>
+                  cursor: 'pointer',
+                  borderRadius: 10,
+                  transition: 'background .15s',
+                }}
+                  onMouseEnter={e => e.currentTarget.style.background = C.tealLight}
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                >
                   <div style={{
                     width: 34, height: 34, borderRadius: 10,
                     background: u.bg, color: u.color,
@@ -1877,12 +1901,14 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   function renderActivityFeed() {
     // Build from backend: project updates + notifications
     const proj = projects[0];
-    const projUpdates = (proj?.updates || []).slice(0, 3).map((upd, i) => ({
-      id: 'upd-' + i,
-      title: upd.text || upd.title || 'Project update posted',
-      time: upd.date ? new Date(upd.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
-      icon: 'ti-speakerphone'
-    }));
+    const projUpdates = (proj?.updates || [])
+      .filter(upd => !upd.visibleTo || upd.visibleTo.includes('client'))
+      .slice(0, 3).map((upd, i) => ({
+        id: 'upd-' + i,
+        title: upd.text || upd.title || 'Project update posted',
+        time: upd.date ? new Date(upd.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
+        icon: 'ti-speakerphone'
+      }));
     const notifItems = notifs.slice(0, 3).map((n, i) => ({
       id: 'notif-' + i,
       title: n.message || n.title || 'Notification',
@@ -1898,7 +1924,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           <div style={{ fontSize: 12, color: C.text3, textAlign: 'center', padding: '12px 0' }}>No recent activity.</div>
         ) : (
           feedItems.map((item) => (
-            <div key={item.id} className="af-item">
+            <div key={item.id} className="af-item" onClick={() => setActive('timeline')} style={{ cursor: 'pointer' }}>
               <div className="af-dot-col">
                 <div className="af-dot"><i className={`ti ${item.icon}`}></i></div>
                 <div className="af-line"></div>
@@ -1982,10 +2008,12 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
             {/* Timeline */}
             <div>
-              <div className="sec-header">
-                <div className="sec-title">
-                  <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-calendar-stats"></i></div>
-                  Project Timeline
+              <div className="sec-header"><div className="sec-title" onClick={() => setActive('timeline')} style={{ cursor: 'pointer' }}>
+                <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-calendar-stats"></i></div>
+                Project Timeline
+              </div>
+                <div className="sec-action" onClick={() => setActive('timeline')}>
+                  <i className="ti ti-arrow-right" style={{ fontSize: 13 }}></i> View Full
                 </div>
               </div>
               <div className="two-col">
@@ -2000,7 +2028,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             {/* Files & Documents */}
             <div>
               <div className="sec-header">
-                <div className="sec-title">
+                <div className="sec-title" onClick={() => setActive('files')} style={{ cursor: 'pointer' }}>
                   <div className="sec-title-icon" style={{ background: C.blueBg, color: C.blue }}><i className="ti ti-files"></i></div>
                   Files & Documents
                 </div>
@@ -2049,9 +2077,12 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               {/* Invoices */}
               <div>
                 <div className="sec-header">
-                  <div className="sec-title">
+                  <div className="sec-title" onClick={() => setActive('payments')} style={{ cursor: 'pointer' }}>
                     <div className="sec-title-icon" style={{ background: C.greenBg, color: C.green }}><i className="ti ti-receipt-2"></i></div>
                     Invoices & Payments
+                  </div>
+                  <div className="sec-action" onClick={() => setActive('payments')}>
+                    <i className="ti ti-arrow-right" style={{ fontSize: 13 }}></i> View All
                   </div>
                 </div>
                 {renderInvoicesComponent()}

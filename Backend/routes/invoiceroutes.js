@@ -138,27 +138,29 @@ router.get("/client/:clientName", async (req, res) => {
     const companyId = req.headers['x-company-id'] || req.companyId || "";
     const name = decodeURIComponent(req.params.clientName).trim();
     const companyName = req.query.company ? decodeURIComponent(req.query.company).trim() : "";
+    const clientId = req.query.clientId ? String(req.query.clientId).trim() : "";
 
     const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const safeName = escapeRegExp(name);
     const safeCompany = escapeRegExp(companyName);
 
-    const conditions = [];
-    if (safeName) {
-      conditions.push({ client: { $regex: new RegExp(safeName, "i") } });
-    }
-    if (safeCompany) {
-      conditions.push({ client: { $regex: new RegExp(safeCompany, "i") } });
-    }
-
     // If no companyId, return empty — prevents deleted client's old invoices showing
     if (!companyId) return res.json([]);
 
-    // Always filter strictly by companyId
-    const companyFilter = { companyId };
-    let filter = conditions.length > 0
-      ? { ...companyFilter, $or: conditions }
-      : companyFilter;
+    let filter;
+    if (clientId) {
+      // Strict match: only invoices explicitly assigned to this client account
+      filter = { companyId, clientId };
+    } else {
+      // Legacy fallback: name-based match for invoices before clientId existed
+      const conditions = [];
+      if (safeName) conditions.push({ client: { $regex: new RegExp(safeName, "i") } });
+      if (safeCompany) conditions.push({ client: { $regex: new RegExp(safeCompany, "i") } });
+      filter = conditions.length > 0
+        ? { companyId, $or: conditions }
+        : { companyId };
+    }
+
     const invoices = await Invoice.find(filter).sort({ createdAt: -1 }).lean();
 
     const normalised = await Promise.all(invoices.map(async (doc) => {
@@ -215,6 +217,7 @@ router.get("/client/:clientName", async (req, res) => {
         template: doc.template || "Classic",
       };
     }));
+
     res.json(normalised);
   } catch (err) {
     res.status(500).json({ msg: err.message });
@@ -368,6 +371,7 @@ router.post("/", async (req, res) => {
       signatureType: inv.signatureType || "text",
       template: inv.template || "Classic",
       companyId: req.companyId || "",
+      clientId: inv.clientId || "",
     };
 
     // Upsert — same invoiceNo won't create duplicate

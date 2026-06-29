@@ -31,15 +31,32 @@ router.get("/client/:clientName", async (req, res) => {
     const safeName = escapeRegExp(name);
     const safeCompany = escapeRegExp(companyName);
 
-    // 1. Find all projects belonging to this client
-    const projectConditions = [];
-    if (safeName) projectConditions.push({ client: { $regex: new RegExp(`^\\s*${safeName}\\s*$`, "i") } });
-    if (safeCompany) projectConditions.push({ client: { $regex: new RegExp(`^\\s*${safeCompany}\\s*$`, "i") } });
     const companyId = req.companyId || "";
+    const clientId = req.query.clientId ? String(req.query.clientId).trim() : "";
+
     // If no companyId, return empty — prevents deleted client's old tasks showing
     if (!companyId) return res.json([]);
-    const projectBaseFilter = { companyId };
-    const projects = await Project.find(projectConditions.length ? { ...projectBaseFilter, $or: projectConditions } : projectBaseFilter);
+
+    // 1. Find all projects belonging to this client
+    let projects;
+    if (clientId) {
+      // Strict match first
+      projects = await Project.find({ companyId, clientId });
+      if (projects.length === 0) {
+        // Legacy fallback for projects saved before clientId existed
+        const projectConditions = [];
+        if (safeName) projectConditions.push({ client: { $regex: new RegExp(`^\\s*${safeName}\\s*$`, "i") } });
+        if (safeCompany) projectConditions.push({ client: { $regex: new RegExp(`^\\s*${safeCompany}\\s*$`, "i") } });
+        if (projectConditions.length) {
+          projects = await Project.find({ companyId, $or: projectConditions });
+        }
+      }
+    } else {
+      const projectConditions = [];
+      if (safeName) projectConditions.push({ client: { $regex: new RegExp(`^\\s*${safeName}\\s*$`, "i") } });
+      if (safeCompany) projectConditions.push({ client: { $regex: new RegExp(`^\\s*${safeCompany}\\s*$`, "i") } });
+      projects = await Project.find(projectConditions.length ? { companyId, $or: projectConditions } : { companyId });
+    }
     const projectIds = projects.map(p => p._id);
 
     // Build a lookup: projectId string -> project name

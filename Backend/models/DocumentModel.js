@@ -8,6 +8,7 @@ const DocumentSchema = new mongoose.Schema({
     htmlContent: { type: String, required: true },
     senderCompany: { type: String },
     companyId: { type: String, required: true },
+    clientId: { type: String, default: "" },
     dateSent: { type: Date, default: Date.now }
 });
 

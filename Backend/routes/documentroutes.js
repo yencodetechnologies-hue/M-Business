@@ -6,8 +6,8 @@ const Notification = require('../models/NotificationModel');
 // Send a new document (from subadmin to client/employee)
 router.post('/', async (req, res) => {
     try {
-        const { docType, sendTo, client, recipientEmail, htmlContent, senderCompany, companyId } = req.body;
-        
+        const { docType, sendTo, client, recipientEmail, htmlContent, senderCompany, companyId, clientId } = req.body;
+
         if (!companyId || !client || !htmlContent) {
             return res.status(400).json({ msg: "companyId, client name, and htmlContent are required." });
         }
@@ -19,9 +19,10 @@ router.post('/', async (req, res) => {
             recipientEmail,
             htmlContent,
             senderCompany,
-            companyId
+            companyId,
+            clientId: clientId || ""
         });
-        
+
         const savedDoc = await newDoc.save();
 
         res.status(201).json(savedDoc);
@@ -37,12 +38,16 @@ router.get('/', async (req, res) => {
         if (!companyId && !sendTo && !client) {
             return res.status(400).json({ msg: "Company ID or specific filter required" });
         }
-        
+
         let query = {};
         if (companyId) query.companyId = companyId;
-        
-        // If a client name is provided, filter by it (case-insensitive)
-        if (client) {
+
+        // Strict clientId match if provided (portal requests always send this)
+        const clientId = req.query.clientId || "";
+        if (clientId) {
+            query.clientId = clientId;
+        } else if (client) {
+            // Legacy fallback: name match for documents saved before clientId existed
             query.client = new RegExp(`^${client}$`, 'i');
         }
 
@@ -51,8 +56,7 @@ router.get('/', async (req, res) => {
             query.sendTo = sendTo;
         }
 
-        const documents = await Document.find(query).sort({ dateSent: -1 });
-        res.json(documents);
+        const documents = await Document.find(query).sort({ dateSent: -1 }); res.json(documents);
     } catch (err) {
         res.status(500).json({ msg: err.message });
     }

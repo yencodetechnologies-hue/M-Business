@@ -737,11 +737,16 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     if (!updateText.trim()) return;
     setPostingUpdate(true);
     try {
+      const visibleTo = [];
+      if (sendToTeam) visibleTo.push('team');
+      if (sendToClient) visibleTo.push('client');
+
       const newUpdate = {
         text: updateText.trim(),
         date: new Date().toISOString(),
         author: 'Admin',
-        type: updateType
+        type: updateType,
+        visibleTo: visibleTo.length > 0 ? visibleTo : ['team']
       };
 
       const updatedUpdates = [newUpdate, ...(currProject.updates || [])];
@@ -1637,7 +1642,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               }}
                               style={{ padding: '9px 22px', borderRadius: 10, background: P.primary, color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: 13, fontWeight: 800, cursor: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 'not-allowed' : 'pointer', opacity: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,188,212,.25)', transition: 'all .15s' }}>
                               <i className="ti ti-send" style={{ fontSize: 15 }} />
-                              {postingUpdate ? 'Sending...' : 'Send to Team & Client'}
+                              {postingUpdate ? 'Sending...' : `Send to ${sendToTeam && sendToClient ? 'Team & Client' : sendToTeam ? 'Team' : 'Client Portal'}`}
                             </button>
                           </div>
                         </div>

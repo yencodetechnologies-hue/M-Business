@@ -48,26 +48,30 @@ router.get("/client/:clientName", async (req, res) => {
     const safeName = escapeRegExp(name);
     const safeCompany = escapeRegExp(companyName);
 
-    const conditions = [];
-    if (safeName) {
-      conditions.push({ "qt.client": { $regex: new RegExp(safeName, "i") } });
-      conditions.push({ client: { $regex: new RegExp(safeName, "i") } });
-    }
-    if (safeCompany) {
-      conditions.push({ "qt.client": { $regex: new RegExp(safeCompany, "i") } });
-      conditions.push({ client: { $regex: new RegExp(safeCompany, "i") } });
-    }
+    const clientId = req.query.clientId ? String(req.query.clientId).trim() : "";
 
     // If no companyId, return empty — prevents deleted client's old invoices showing
     if (!companyId) return res.json([]);
 
-    // Always filter strictly by companyId
-    const companyFilter = { companyId };
-    let filter = conditions.length > 0
-      ? { ...companyFilter, $or: conditions }
-      : companyFilter;
-    // Clients only see quotations explicitly sent to them
-    filter.status = "sent";
+    let filter;
+    if (clientId) {
+      // Strict match: only quotations explicitly sent to this client account
+      filter = { companyId, clientId, status: "sent" };
+    } else {
+      // Legacy fallback: name-based match for quotations before clientId existed
+      const conditions = [];
+      if (safeName) {
+        conditions.push({ "qt.client": { $regex: new RegExp(safeName, "i") } });
+        conditions.push({ client: { $regex: new RegExp(safeName, "i") } });
+      }
+      if (safeCompany) {
+        conditions.push({ "qt.client": { $regex: new RegExp(safeCompany, "i") } });
+        conditions.push({ client: { $regex: new RegExp(safeCompany, "i") } });
+      }
+      filter = conditions.length > 0
+        ? { companyId, $or: conditions, status: "sent" }
+        : { companyId, status: "sent" };
+    }
     const docs = await Quotation.find(filter).sort({ createdAt: -1 }).lean();
 
     const quotations = docs.map((doc) => {

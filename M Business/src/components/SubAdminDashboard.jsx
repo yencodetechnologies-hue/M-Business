@@ -10126,7 +10126,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   </div>
 
-                                  <div onClick={() => setActive("projects")} style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)", cursor: "pointer" }}>
+                                  <div onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)", cursor: "pointer" }}>
 
                                     View All
 
@@ -10344,7 +10344,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   </div>
 
-                                  <div onClick={() => setActive("tasks")} style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
+                                  <div onClick={() => { setSidebarOverride("dashboard"); setActive("tasks"); }} style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
 
                                     All Tasks
 

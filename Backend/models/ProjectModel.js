@@ -41,7 +41,8 @@ const projectSchema = new mongoose.Schema({
       title: { type: String, default: "" },
       type: { type: String, default: "general" },
       date: { type: Date, default: Date.now },
-      author: { type: String, default: "System" }
+      author: { type: String, default: "System" },
+      visibleTo: { type: [String], default: ["team", "client"] }
     }],
     default: []
   },

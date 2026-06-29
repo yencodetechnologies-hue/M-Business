@@ -5959,7 +5959,7 @@ const DEFAULT_PLANS = [
 
     title: "Starter", price: 999, icon: "🌱",
 
-    features: ["5 Projects", "10 Invoices", "Single business manage", "Managers: 1", "Clients: 3", "Employees: 10", "Email Support"]
+    features: ["5 Projects", "10 Invoices", "Single business manage", "Managers: 50", "Clients: 50", "Employees: 50", "Email Support"]
 
   },
 
@@ -5967,7 +5967,7 @@ const DEFAULT_PLANS = [
 
     title: "Professional", price: 2999, icon: "🌱", type: "pro",
 
-    features: ["Unlimited Projects", "Unlimited Invoices", "Multiple business manage", "Managers: 3", "Clients: 10", "Employees: 50", "Priority Support"]
+    features: ["Unlimited Projects", "Unlimited Invoices", "Multiple business manage", "Managers: Unlimited", "Clients: Unlimited", "Employees: Unlimited", "Priority Support"]
 
   }
 

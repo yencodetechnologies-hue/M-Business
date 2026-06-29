@@ -14,8 +14,10 @@ const parseLimit = (limitStr) => {
   return 10;
 };
 
+// Returns { limit, hasValue } so callers can tell "no limit configured"
+// apart from "limit legitimately parses to 10".
 const getSubscriptionLimit = (type, sub) => {
-  if (!sub) return 10;
+  if (!sub) return { limit: 10, hasValue: false };
   const map = {
     client: sub.clientLimit,
     employee: sub.employeeLimit,
@@ -31,7 +33,8 @@ const getSubscriptionLimit = (type, sub) => {
       if (feat.toLowerCase().includes("unlimited")) val = "Infinity";
     }
   }
-  return parseLimit(val);
+  const hasValue = val !== undefined && val !== null && String(val).trim() !== "";
+  return { limit: parseLimit(val), hasValue };
 };
 
 
@@ -125,24 +128,28 @@ const checkResourceLimit = (resourceType) => async (req, res, next) => {
     if (!companyId) return next();
     if (req.user?.role === 'admin') return next();
 
-    // Fetch most recent subscription (active OR expired — to read the package limits)
-    // Expired subscription still has the correct limits set by admin
+    // Fetch most recent ACTIVE subscription — this is the source of truth after an upgrade
     const subscription = await Subscription.findOne({
       $or: [{ userId: companyId }, { companyId: companyId }],
       status: { $in: ["active", "grace_period", "trial", "pending", "expired"] }
     }).sort({ createdAt: -1 });
 
-    // Direct limit on User profile (latest manual or package limit)
-    const subadmin = await User.findById(companyId);
-    const uLimit = resourceType === "client" ? subadmin?.clientLimit
-                 : resourceType === "employee" ? subadmin?.employeeLimit
-                 : subadmin?.managerLimit;
+    // 🔧 FIX: Prefer the subscription's limit (always current after upgrade).
+    // Only fall back to the User profile's manually-set limit if the
+    // subscription itself has NO value set for this resource — not just
+    // because its parsed limit happens to equal 10.
+    const { limit: subLimit, hasValue: subHasValue } = getSubscriptionLimit(resourceType, subscription);
+    let limit = subLimit;
 
-    let limit;
-    if (uLimit !== undefined && uLimit !== null && String(uLimit).trim() !== "" && String(uLimit) !== "0") {
-      limit = parseLimit(uLimit);
-    } else {
-      limit = getSubscriptionLimit(resourceType, subscription);
+    if (!subHasValue) {
+      // subscription truly had no usable value — check for an admin-set manual override on the User
+      const subadmin = await User.findById(companyId);
+      const uLimit = resourceType === "client" ? subadmin?.clientLimit
+        : resourceType === "employee" ? subadmin?.employeeLimit
+          : subadmin?.managerLimit;
+      if (uLimit !== undefined && uLimit !== null && String(uLimit).trim() !== "" && String(uLimit) !== "0") {
+        limit = parseLimit(uLimit);
+      }
     }
 
     let currentCount = 0;

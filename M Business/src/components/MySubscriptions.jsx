@@ -56,24 +56,24 @@ const InfoRow = ({ label, value, icon }) => {
 // ─── Plan Data ---------------------------------------------------------------
 const DEFAULT_PLANS = [
   {
-    name: "Trial", price: 0, color: "var(--app-accent)", duration: "30 days", isTrial: true,
+    name: "Trial", price: 0, color: "var(--app-accent)", duration: 30, isTrial: true,
     subtitle: "MONTHLY PLAN",
     features: ["30 Days Free Trial", "5 Projects", "5 Invoices", "Single business manage", "Managers: 1", "Clients: 5", "Employees: 20"],
     clientLimit: "5 Clients", employeeLimit: "20 Employees", managerLimit: "1 Manager manage",
     btnLabel: "Start Free"
   },
   {
-    name: "Starter", price: 999, color: "var(--app-accent)", popular: true,
+    name: "Starter", price: 999, color: "var(--app-accent)", popular: true, duration: 30,
     subtitle: "MONTHLY PLAN",
-    features: ["5 Projects", "10 Invoices", "Single business manage", "Managers: 1", "Clients: 3", "Employees: 10", "Email Support"],
-    clientLimit: "3 Client manage", employeeLimit: "10 Employee manage", managerLimit: "1 Manager manage",
+    features: ["5 Projects", "10 Invoices", "Single business manage", "Managers: 50", "Clients: 50", "Employees: 50", "Email Support"],
+    clientLimit: "50 Clients", employeeLimit: "50 Employees", managerLimit: "50 Managers",
     btnLabel: "Upgrade"
   },
   {
-    name: "Professional", price: 2999, color: "var(--app-accent)", popular: false,
+    name: "Professional", price: 2999, color: "var(--app-accent)", popular: false, duration: 30,
     subtitle: "MONTHLY PLAN",
-    features: ["Unlimited Projects", "Unlimited Invoices", "Multiple business manage", "Managers: 3", "Clients: 10", "Employees: 50", "Priority Support"],
-    clientLimit: "10 Client manage", employeeLimit: "50 Employee manage", managerLimit: "3 Manager manage",
+    features: ["Unlimited Projects", "Unlimited Invoices", "Multiple business manage", "Managers: Unlimited", "Clients: Unlimited", "Employees: Unlimited", "Priority Support"],
+    clientLimit: "Unlimited", employeeLimit: "Unlimited", managerLimit: "Unlimited",
     btnLabel: "Upgrade"
   },
 ];
@@ -687,24 +687,37 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
     }
   };
 
-  // ── Complete mock payment  activate subscription -------------------------
+  // ── Complete mock payment → activate subscription -------------------------
   const completeMockPayment = async (plan) => {
     try {
       setPayLoading(plan.name);
-      // Try PayU init first, fallback to direct subscription activation
+      const startDate = new Date();
+      const endDate = new Date();
+      endDate.setDate(endDate.getDate() + (plan.duration || 30));
+
       let activated = false;
       try {
         const res = await axios.post(`${BASE_URL}/api/subscriptions/create`, {
-          userId, userEmail, userName,
+          userId,
+          companyId: userId,
+          userEmail, userName,
           planName: plan.name,
           planPrice: plan.price,
           billingCycle: "monthly",
           paymentMethod: "card",
-          duration: plan.duration || 30
+          status: "active",
+          isFullyPaid: true,
+          startDate,
+          endDate,
+          nextBillingDate: endDate,
+          features: plan.features,
+          clientLimit: plan.clientLimit,
+          employeeLimit: plan.employeeLimit,
+          managerLimit: plan.managerLimit,
+          businessLimit: plan.businessLimit
         });
         if (res.data.success) activated = true;
       } catch (e) {
-        // fallback: start-trial style
         const res2 = await axios.post(`${BASE_URL}/api/subscriptions/start-trial`, {
           userId, userEmail, userName,
           planName: plan.name,
@@ -716,11 +729,16 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
         });
         if (res2.data.success) activated = true;
       }
-      setMockGatewayPlan(null);
-      setPaymentSuccessData({ name: plan.name, price: plan.price });
-      if (activated) { await fetchData(); if (onSubscriptionSuccess) onSubscriptionSuccess(); }
+
+      setMockGatewayOpen(null);
+      if (activated) {
+        setPaymentSuccessData({ name: plan.name, price: plan.price });
+      } else {
+        showToast("Could not activate plan. Please try again.");
+      }
     } catch (err) {
-      showToast("Error " + (err.response?.data?.error || err.message || "Payment failed"));
+      console.error("Mock payment error:", err);
+      showToast("Error activating plan. Please try again.");
     } finally {
       setPayLoading(null);
     }

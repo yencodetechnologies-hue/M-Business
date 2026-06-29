@@ -9996,8 +9996,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                     { icon: "ti-wallet", color: "#2563eb", bg: "rgba(37,99,235,0.1)", label: "Accounts", sub: "Income/Exp", act: "accounts" },
 
-                                    { icon: "ti-shield-check", color: "#7c3aed", bg: "rgba(124,58,237,0.1)", label: "Auditor", sub: "Audit Trail", act: "dashboard" },
-                                    { icon: "whatsapp", color: "#25D366", bg: "rgba(37,211,102,0.12)", label: "WhatsApp", sub: "Open Chat", act: "__whatsapp__" }
+
+
                                   ].map((q, i) => (
                                     <div key={i} onClick={() => setActive(q.act)} style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderRadius: 12, border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s" }}>
                                       <div style={{ width: 34, height: 34, borderRadius: 10, background: q.bg, color: q.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>

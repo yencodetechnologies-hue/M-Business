@@ -290,9 +290,23 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
     // Client can see all tasks
     if (user?.role === 'client') return true;
 
-    // Regular employee login: only their own tasks
+    // Regular employee login: show all project tasks if they are a team member (in assignedTo),
+    // otherwise only show tasks directly assigned to them
     const myName = (user?.name || '').toLowerCase().trim();
     const myId = user?._id || user?.id || '';
+
+    // Check if this employee is a team member of the project
+    const projectAssignedTo = Array.isArray(project.assignedTo)
+      ? project.assignedTo
+      : (project.assignedTo ? [project.assignedTo] : []);
+    const isTeamMember = projectAssignedTo.some(a =>
+      (a || '').toLowerCase().trim() === myName || a === myId
+    );
+
+    // Team members see ALL project tasks and milestones
+    if (isTeamMember) return true;
+
+    // Non-team-member employees only see tasks directly assigned to them
     const assignToNames = (t.assignTo || '').toLowerCase().split(',').map(n => n.trim());
     return assignToNames.includes(myName) ||
       (t.assignTo === myId) ||

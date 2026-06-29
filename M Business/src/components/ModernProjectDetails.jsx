@@ -113,14 +113,14 @@ const CSS = `
 .mpd-task-row:last-child { border-bottom:none; }
 .mpd-task-row:hover { background:${P.bg}; margin:0 -6px; padding:11px 6px; border-radius:8px; }
 .mpd-task-chk { width:20px; height:20px; border-radius:6px; border:2px solid ${P.border}; flex-shrink:0; display:flex; align-items:center; justify-content:center; cursor:pointer; }
-.mpd-task-chk.mpd-done { background:${P.green}; border-color:${P.green}; }
+.mpd-task-chk.mpd-done { background:${P.red}; border-color:${P.red}; }
 .mpd-task-chk.mpd-done::after { content:''; width:9px; height:6px; border-left:2px solid #fff; border-bottom:2px solid #fff; transform:rotate(-45deg) translate(1px,-1px); display:block; }
 .mpd-task-prio { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
 .mpd-task-prio.mpd-h { background:${P.red}; }
 .mpd-task-prio.mpd-m { background:${P.orange}; }
 .mpd-task-prio.mpd-l { background:${P.green}; }
 .mpd-task-name { flex:1; font-size:13px; font-weight:700; color:${P.textDark}; }
-.mpd-task-name.mpd-done { text-decoration:line-through; color:${P.textLight}; }
+.mpd-task-chk.mpd-done { background:${P.red}; border-color:${P.red}; }
 .mpd-task-assign { font-size:11px; color:${P.textLight}; font-weight:600; }
 .mpd-task-due { font-size:11px; font-weight:700; color:${P.textLight}; }
 .mpd-task-due.mpd-late { color:${P.red}; }
@@ -1237,8 +1237,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                             const taskDone = t.status === 'done' || t.status === 'completed';
                             return (
                               <div key={t._id} title={t.title} style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <div style={{ width: 10, height: 10, borderRadius: '50%', background: taskDone ? P.green : P.primary, border: '2px solid #fff', zIndex: 2 }}></div>
-                                <div style={{ position: 'absolute', top: 14, fontSize: 9, color: taskDone ? P.green : P.textDark, whiteSpace: 'nowrap', fontWeight: 700, maxWidth: 60, overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'center' }}>
+                                <div style={{ width: 10, height: 10, borderRadius: '50%', background: taskDone ? P.red : P.primary, border: '2px solid #fff', zIndex: 2 }}></div>
+                                <div style={{ position: 'absolute', top: 14, fontSize: 9, color: taskDone ? P.red : P.textDark, whiteSpace: 'nowrap', fontWeight: 700, maxWidth: 60, overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'center' }}>
                                   {t.title}
                                 </div>
                               </div>

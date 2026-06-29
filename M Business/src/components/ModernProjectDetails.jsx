@@ -1739,38 +1739,38 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       {/* Rows */}
 
                     </div>
-                    {selectedPaymentItems.length > 0 && activePayTab === 'inv' && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
+                      {selectedPaymentItems.length > 0 && activePayTab === 'inv' && (
                         <button onClick={() => { setTargetPortalClient(currProject.client); setShowSendPopup(true); }} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#22C55E', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
                           <i className="ti ti-send" style={{ fontSize: 13 }}></i> Send ({selectedPaymentItems.length})
                         </button>
-                      </div>
-                    )}
-                    {(() => {
-                      const btnMap = {
-                        inv: { label: 'New Invoice', modal: 'showNewInvoice', icon: 'ti-file-invoice' },
-                        adv: { label: 'New Advance', modal: 'showAdvance', icon: 'ti-pig-money' },
-                        add: { label: 'Additional Charge', modal: 'showAdditional', icon: 'ti-circle-plus' },
-                        mile: { label: 'New Milestone', modal: 'showMilestonePayment', icon: 'ti-flag' },
-                        pay: { label: 'Record Payment', modal: 'showPayment', icon: 'ti-credit-card' },
-                        exp: { label: 'Add Expense', modal: 'showExpense', icon: 'ti-receipt' },
-                      };
-                      const b = btnMap[activePayTab] || btnMap['inv'];
-                      return (
-                        <button
-                          onClick={() => {
-                            if (b.modal === 'showNewInvoice' && onNewInvoice) {
-                              onNewInvoice(currProject);
-                            } else {
-                              setPaymentModalsState(prev => ({ ...prev, [b.modal]: true }));
-                            }
-                          }}
-                          style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}
-                        >
-                          <i className={`ti ${b.icon}`} style={{ fontSize: 13 }}></i> {b.label}
-                        </button>
-                      );
-                    })()}
+                      )}
+                      {(() => {
+                        const btnMap = {
+                          inv: { label: 'New Invoice', modal: 'showNewInvoice', icon: 'ti-file-invoice' },
+                          adv: { label: 'New Advance', modal: 'showAdvance', icon: 'ti-pig-money' },
+                          add: { label: 'Additional Charge', modal: 'showAdditional', icon: 'ti-circle-plus' },
+                          mile: { label: 'New Milestone', modal: 'showMilestonePayment', icon: 'ti-flag' },
+                          pay: { label: 'Record Payment', modal: 'showPayment', icon: 'ti-credit-card' },
+                          exp: { label: 'Add Expense', modal: 'showExpense', icon: 'ti-receipt' },
+                        };
+                        const b = btnMap[activePayTab] || btnMap['inv'];
+                        return (
+                          <button
+                            onClick={() => {
+                              if (b.modal === 'showNewInvoice' && onNewInvoice) {
+                                onNewInvoice(currProject);
+                              } else {
+                                setPaymentModalsState(prev => ({ ...prev, [b.modal]: true }));
+                              }
+                            }}
+                            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}
+                          >
+                            <i className={`ti ${b.icon}`} style={{ fontSize: 13 }}></i> {b.label}
+                          </button>
+                        );
+                      })()}
+                    </div>
                   </div>
                 </div>
                 {activeTab === 'payments' && <>

@@ -35,7 +35,7 @@ app.use(cors({
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-allowedHeaders: ["Content-Type", "Authorization", "x-company-id", "company-id", "x-user-name", "x-user-role", "Accept"]
+  allowedHeaders: ["Content-Type", "Authorization", "x-company-id", "company-id", "x-user-name", "x-user-role", "Accept"]
 }));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
@@ -86,6 +86,7 @@ const incomeRoutes = require("./routes/incomeroutes");
 const notificationRoutes = require("./routes/notificationroutes");
 const configRoutes = require("./routes/configroutes");
 const documentRoutes = require("./routes/documentroutes");
+const approvalRoutes = require("./routes/approvalroutes");
 const bankRoutes = require("./routes/bankroutes");
 const financeRoutes = require("./routes/financeroutes");
 app.use("/api/finance", financeRoutes);
@@ -132,6 +133,7 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/config", configRoutes);
 app.use("/api/documents", documentRoutes);
+app.use("/api/approvals", approvalRoutes);
 app.use("/api/banks", bankRoutes);
 app.use("/api/audit-notes", auditRoutes);
 

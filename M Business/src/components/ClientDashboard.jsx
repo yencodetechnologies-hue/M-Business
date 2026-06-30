@@ -454,7 +454,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         const myClientId = portalMode
           ? (portalClientId || user._id || user.id || "")
           : (user._id || user.id || "");
-        const [projRes, taskRes, invRes, notifRes, docRes, meetRes, propRes, quotRes] = await Promise.all([
+        const [projRes, taskRes, invRes, notifRes, docRes, meetRes, propRes, quotRes, approvalRes] = await Promise.all([
           axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}&clientId=${encodeURIComponent(myClientId)}`, {
             headers: { 'x-company-id': user.companyId || "" }
           }),
@@ -470,7 +470,10 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           axios.get(`${BASE_URL}/api/proposals/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}&clientId=${encodeURIComponent(user._id || user.id || "")}`, {
             headers: { 'x-company-id': user.companyId || "" }
           }).catch(() => ({ data: [] })),
-          axios.get(`${BASE_URL}/api/quotations/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}`, {
+          axios.get(`${BASE_URL}/api/quotations/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}&clientId=${encodeURIComponent(myClientId)}`, {
+            headers: { 'x-company-id': user.companyId || "" }
+          }).catch(() => ({ data: [] })),
+          axios.get(`${BASE_URL}/api/approvals/client/${encodeURIComponent(myClientId)}`, {
             headers: { 'x-company-id': user.companyId || "" }
           }).catch(() => ({ data: [] }))
         ]);
@@ -492,6 +495,14 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           return qClient === cn;
         });
         setQuotations(filteredQuots);
+        setApprovals(Array.isArray(approvalRes.data) ? approvalRes.data.map(a => ({
+          id: a._id,
+          title: a.title,
+          desc: a.desc,
+          icon: a.icon,
+          approveLabel: a.approveLabel,
+          rejectLabel: a.rejectLabel,
+        })) : []);
 
         const allProps = propRes.data || [];
         const filtered = allProps.filter(p => {
@@ -575,9 +586,17 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     }, 1000);
   };
 
-  const handleApproval = (id, type) => {
-    setApprovals(approvals.filter(a => a.id !== id));
-    alert(type === "approve" ? "Approved successfully!" : "Rejected/Request Changes sent.");
+  const handleApproval = async (id, type) => {
+    try {
+      await axios.patch(`${BASE_URL}/api/approvals/${id}/respond`, {
+        status: type === "approve" ? "approved" : "rejected",
+      });
+      setApprovals(prev => prev.filter(a => a.id !== id));
+      alert(type === "approve" ? "Approved successfully!" : "Rejected/Request Changes sent.");
+    } catch (err) {
+      console.error("Failed to respond to approval:", err);
+      alert("Something went wrong. Please try again.");
+    }
   };
 
   // Payment execution

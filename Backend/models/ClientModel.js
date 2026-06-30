@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const ClientSchema = new mongoose.Schema({
   clientName: { type: String, required: true },
@@ -37,6 +38,15 @@ const ClientSchema = new mongoose.Schema({
   internalNotes: { type: String, default: "" },
 }, { timestamps: true });
 
-ClientSchema.index({ email: 1 }, { unique: true });
+ClientSchema.index({ email: 1, companyId: 1 }, { unique: true });
+
+// Safety net: if a client is ever saved with no password (blank or missing),
+// automatically assign the hashed default password "123456" instead of
+// leaving it blank, so the client can always log in.
+ClientSchema.pre("save", async function () {
+  if (!this.password || !this.password.trim()) {
+    this.password = await bcrypt.hash("123456", 10);
+  }
+});
 
 module.exports = mongoose.model("Client", ClientSchema);

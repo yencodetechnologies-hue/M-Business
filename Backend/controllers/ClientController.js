@@ -104,6 +104,7 @@ exports.addClient = async (req, res) => {
     });
 
   } catch (error) {
+    console.error("Add client error:", error);
     if (error.code === 11000) {
       return res.status(400).json({ message: "A client with this email already exists in your account" });
     }

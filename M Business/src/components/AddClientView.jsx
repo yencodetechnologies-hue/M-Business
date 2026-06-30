@@ -9,36 +9,12 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
   const isEdit = !!editData;
   const today = new Date().toISOString().split('T')[0];
 
-  const [customCats, setCustomCats] = useState([]);
-  const [customSources, setCustomSources] = useState([]);
-
-  // Load saved custom categories/sources from backend (shared across all users)
-  useEffect(() => {
-    const cid = user?._id || user?.id;
-    if (!cid) return;
-    axios.get(`${BASE_URL}/api/config/${cid}`).then(res => {
-      if (Array.isArray(res.data?.customClientCategories)) setCustomCats(res.data.customClientCategories);
-      if (Array.isArray(res.data?.customClientSources)) setCustomSources(res.data.customClientSources);
-    }).catch(() => { });
-  }, [user]);
-
-  function saveCustomCategory(cat) {
-    setCustomCats(prev => {
-      const updated = Array.from(new Set([...prev, cat]));
-      const cid = user?._id || user?.id;
-      if (cid) axios.post(`${BASE_URL}/api/config/${cid}`, { customClientCategories: updated }).catch(() => { });
-      return updated;
-    });
-  }
-
-  function saveCustomSource(src) {
-    setCustomSources(prev => {
-      const updated = Array.from(new Set([...prev, src]));
-      const cid = user?._id || user?.id;
-      if (cid) axios.post(`${BASE_URL}/api/config/${cid}`, { customClientSources: updated }).catch(() => { });
-      return updated;
-    });
-  }
+  const [customCats, setCustomCats] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('mb_customCategories') || '[]'); } catch { return []; }
+  });
+  const [customSources, setCustomSources] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('mb_customSources') || '[]'); } catch { return []; }
+  });
 
   const [formData, setFormData] = useState({
     clientType: editData?.clientType || 'b2b',
@@ -162,7 +138,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
         email: formData.email,
         phone: formData.phone,
         address: formData.address,
-        password: formData.password,
+        password: formData.password || "123456",
         status: formData.status,
         contactPersonName: formData.contactPersonName,
         contactPersonNo: formData.contactPersonNo,
@@ -313,8 +289,8 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                   <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Client source</label>
                   {customInputMode.source ? (
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <input name="source" value={formData.source} onChange={handleChange} placeholder="Type custom source..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.source) { saveCustomSource(formData.source); } setCustomInputMode(prev => ({ ...prev, source: false })); } }} />
-                      <button type="button" onClick={() => { if (formData.source) { saveCustomSource(formData.source); } setCustomInputMode(prev => ({ ...prev, source: false })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</button>
+                      <input name="source" value={formData.source} onChange={handleChange} placeholder="Type custom source..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.source) { setCustomSources(prev => Array.from(new Set([...prev, formData.source]))); } setCustomInputMode(prev => ({ ...prev, source: false })); } }} />
+                      <button type="button" onClick={() => { if (formData.source) { setCustomSources(prev => Array.from(new Set([...prev, formData.source]))); } setCustomInputMode(prev => ({ ...prev, source: false })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</button>
                     </div>
                   ) : (
                     <select name="source" value={formData.source} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>

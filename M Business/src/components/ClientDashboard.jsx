@@ -2083,7 +2083,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             </div>
             {proposals.length === 0 ? (
               <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 16, padding: "48px 24px", textAlign: "center" }}>
-                <div style={{ fontSize: 36, marginBottom: 12 }}>Document</div>
+                <div style={{ fontSize: 36, marginBottom: 12 }}>📂</div>
                 <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 6 }}>No Proposals Yet</div>
                 <div style={{ fontSize: 13, color: C.text3 }}>Project proposals sent to you will appear here.</div>
               </div>

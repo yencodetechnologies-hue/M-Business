@@ -46,7 +46,8 @@ exports.addClient = async (req, res) => {
 
     const normalizedEmail = email.toLowerCase().trim();
     // Deleted clients are allowed to re-register as a completely fresh account
-    const hashedPassword = password ? await bcrypt.hash(password, 10) : "";
+    // Default password is "123456" if the subadmin leaves the password field blank
+    const hashedPassword = await bcrypt.hash(password && password.trim() ? password : "123456", 10);
 
     const newClient = new Client({
       clientName,

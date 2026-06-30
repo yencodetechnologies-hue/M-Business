@@ -1835,64 +1835,6 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           )}
         </div>
 
-        {/* Recent Updates */}
-        <div style={{
-          background: C.surface,
-          border: `1.5px solid ${C.border}`,
-          borderRadius: 16,
-          padding: '20px 22px',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 800, color: C.text2 }}>Recent Updates</div>
-            <div onClick={() => setActive('timeline')} style={{ fontSize: 11, fontWeight: 700, color: C.teal, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-              View All <i className="ti ti-arrow-right" style={{ fontSize: 12 }}></i>
-            </div>
-          </div>
-          {recentUpdates.length === 0 ? (
-            <div style={{ textAlign: 'center', color: C.text3, fontSize: 13, padding: '16px 0' }}>
-              No recent updates yet.
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-              {recentUpdates.map((u, i) => (
-                <div key={i} onClick={() => setActive('timeline')} style={{
-                  display: 'flex', gap: 14, alignItems: 'flex-start',
-                  paddingBottom: i < recentUpdates.length - 1 ? 14 : 0,
-                  marginBottom: i < recentUpdates.length - 1 ? 14 : 0,
-                  borderBottom: i < recentUpdates.length - 1 ? `1px solid ${C.border}` : 'none',
-                  cursor: 'pointer',
-                  borderRadius: 10,
-                  transition: 'background .15s',
-                }}
-                  onMouseEnter={e => e.currentTarget.style.background = C.tealLight}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                >
-                  <div style={{
-                    width: 34, height: 34, borderRadius: 10,
-                    background: u.bg, color: u.color,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 16, flexShrink: 0,
-                  }}>
-                    <i className={`ti ${u.icon}`}></i>
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: C.text, lineHeight: 1.4 }}>{u.text}</div>
-                    {u.project && (
-                      <div style={{ fontSize: 11, color: u.color, fontWeight: 700, marginTop: 2 }}>
-                        {u.project}
-                      </div>
-                    )}
-                    <div style={{ fontSize: 11, color: C.text3, marginTop: 3, display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <i className="ti ti-clock" style={{ fontSize: 11 }}></i>
-                      {fmt(u.date)}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
 
       </div>
     );

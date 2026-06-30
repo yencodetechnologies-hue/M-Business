@@ -230,7 +230,6 @@ export default function ModernProjectsView({
   onAssign,
   onNewInvoice,
   onAddProject,
-  onUpdate,
   searchQuery = '',
 }) {
   const [search, setSearch] = useState(searchQuery);
@@ -266,21 +265,16 @@ export default function ModernProjectsView({
   // KPI counts
   const counts = useMemo(() => {
     const all = projects.length;
-    let active = 0, hold = 0, completed = 0, overdue = 0;
-    const budgetByCurrency = {};
+    let active = 0, hold = 0, completed = 0, overdue = 0, totalBudget = 0;
     projects.forEach(p => {
       const { cls } = normaliseStatus(p.status);
       if (cls === 'active') active++;
       else if (cls === 'hold') hold++;
       else if (cls === 'completed') completed++;
       else if (cls === 'overdue') overdue++;
-      const cur = p.currency || '₹';
-      const amt = Number(p.budget) || 0;
-      if (amt > 0) {
-        budgetByCurrency[cur] = (budgetByCurrency[cur] || 0) + amt;
-      }
+      totalBudget += Number(p.budget) || 0;
     });
-    return { all, active, hold, completed, overdue, budgetByCurrency };
+    return { all, active, hold, completed, overdue, totalBudget };
   }, [projects]);
 
   // Filter + Sort
@@ -316,7 +310,7 @@ export default function ModernProjectsView({
     { key: 'hold', label: 'On Hold', count: counts.hold, icon: 'ti-player-pause', iconBg: P.orangeLight, iconColor: P.orange },
     { key: 'completed', label: 'Completed', count: counts.completed, icon: 'ti-circle-check', iconBg: '#DBEAFE', iconColor: '#2563EB' },
     { key: 'overdue', label: 'Overdue', count: counts.overdue, icon: 'ti-alert-triangle', iconBg: P.redLight, iconColor: P.red },
-    { key: 'budget', label: 'Overall Value', count: counts.budgetByCurrency, icon: 'ti-currency-rupee', iconBg: P.purpleLight, iconColor: P.purple, isCurrency: true },
+    { key: 'budget', label: 'Overall Value', count: counts.totalBudget, icon: 'ti-currency-rupee', iconBg: P.purpleLight, iconColor: P.purple, isCurrency: true },
   ];
 
   return (
@@ -324,34 +318,40 @@ export default function ModernProjectsView({
       {/* CSS injected once via useEffect above */}
 
       {/* ── KPI Cards ── */}
-      <div className="mpv-kpi-grid">
-        {KPI_ITEMS.map(k => (
-          <div
-            key={k.key}
-            className={`mpv-kpi${statusFilter === k.key ? ' active' : ''}`}
-            onClick={() => k.key !== 'budget' && setStatus(k.key)}
-            style={{ cursor: k.key === 'budget' ? 'default' : 'pointer' }}
-          >
-            <div className="mpv-kpi-icon" style={{ background: k.iconBg }}>
-              <i className={`ti ${k.icon}`} style={{ color: k.iconColor }} />
-            </div>
-            <div>
-              <div className="mpv-kpi-num" style={{ fontSize: k.isCurrency ? 11 : undefined }}>
-                {k.isCurrency
-                  ? Object.entries(k.count || {}).map(([cur, amt]) => {
-                    const formatted = amt >= 10000000
-                      ? (amt / 10000000).toFixed(1) + 'Cr'
-                      : amt >= 100000
-                        ? (amt / 100000).toFixed(1) + 'L'
-                        : amt.toLocaleString('en-IN');
-                    return `${cur}${formatted}`;
-                  }).join(' | ') || '—'
-                  : k.count}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          {onAddProject && (
+            <button className="create-btn" onClick={onAddProject} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <i className="ti ti-plus"></i> New Project
+            </button>
+          )}
+        </div>
+        <div className="mpv-kpi-grid">
+          {KPI_ITEMS.map(k => (
+            <div
+              key={k.key}
+              className={`mpv-kpi${statusFilter === k.key ? ' active' : ''}`}
+              onClick={() => k.key !== 'budget' && setStatus(k.key)}
+              style={{ cursor: k.key === 'budget' ? 'default' : 'pointer' }}
+            >
+              <div className="mpv-kpi-icon" style={{ background: k.iconBg }}>
+                <i className={`ti ${k.icon}`} style={{ color: k.iconColor }} />
               </div>
-              <div className="mpv-kpi-lbl">{k.label}</div>
+              <div>
+                <div className="mpv-kpi-num" style={{ fontSize: k.isCurrency && k.count >= 100000 ? 13 : undefined }}>
+                  {k.isCurrency
+                    ? `₹${k.count >= 10000000
+                      ? (k.count / 10000000).toFixed(1) + 'Cr'
+                      : k.count >= 100000
+                        ? (k.count / 100000).toFixed(1) + 'L'
+                        : k.count.toLocaleString('en-IN')}`
+                    : k.count}
+                </div>
+                <div className="mpv-kpi-lbl">{k.label}</div>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* ── Toolbar ── */}
@@ -568,6 +568,7 @@ export default function ModernProjectsView({
                     {/* Budget */}
                     {p.budget && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4, fontSize: 11, color: '#059669', fontWeight: 700 }}>
+                        <i className="ti ti-currency-rupee" style={{ fontSize: 12 }} />
                         Budget: {p.currency || '₹'}{Number(p.budget).toLocaleString('en-IN')}
                       </div>
                     )}

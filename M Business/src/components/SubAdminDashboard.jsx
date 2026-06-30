@@ -9305,17 +9305,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
               )}
 
-              {validActive === "projects" && (
-
-                <>
-
-                  <button className="create-btn" onClick={() => { setNpError({}); setJumpProject(null); setActive("create-project"); }}><i className="ti ti-plus"></i> New Project</button>
-
-
-
-                </>
-
-              )}
+              {/* New Project button moved above Overall Value card */}
 
               {validActive === "managers" && (
 

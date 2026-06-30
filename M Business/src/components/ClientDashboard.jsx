@@ -730,7 +730,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     raw: d
   }));
 
-  const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
+  const allFilesBase = [...docCards, ...(projects.flatMap(p => p.files || []))
     .filter(f => {
       // If sentToClient is not set at all, show the file (it belongs to this client's project)
       if (!f.sentToClient || f.sentToClient === null || f.sentToClient === "") return true;
@@ -771,8 +771,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         description: f.description || ''
       };
     })];
-  const filteredFiles = fileFilter === "All" ? allFiles : allFiles.filter(f => f.type === fileFilter);
 
+
+  // Invoices variables
   // Invoices variables
   const dbInvoices = invoices.map(inv => ({
     id: inv.id || inv._id,
@@ -787,6 +788,19 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
   const finalInvoicesList = dbInvoices;
 
+  const invoiceFileCards = finalInvoicesList.map(inv => ({
+    name: `${inv.invoiceNo || "Invoice"}.pdf`,
+    meta: `₹${inv.total.toLocaleString("en-IN")} · ${inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}`,
+    date: inv.status === "paid" ? inv.date : inv.dueDate,
+    type: "Invoices",
+    icon: "ti-file-invoice",
+    bg: C.greenBg,
+    col: C.green,
+    invoiceRef: inv,
+  }));
+
+  const allFiles = [...allFilesBase, ...invoiceFileCards];
+  const filteredFiles = fileFilter === "All" ? allFiles : allFiles.filter(f => f.type === fileFilter);
   const totalPaid = finalInvoicesList.filter(i => i.status === "paid").reduce((sum, i) => sum + i.total, 0);
   const totalPending = finalInvoicesList.filter(i => i.status === "pending" || i.status === "unpaid" || i.status === "sent").reduce((sum, i) => sum + (i.total - i.amountPaid), 0);
   const totalOverdue = finalInvoicesList.filter(i => i.status === "overdue").reduce((sum, i) => sum + (i.total - i.amountPaid), 0);

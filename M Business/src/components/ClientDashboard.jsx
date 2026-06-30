@@ -586,17 +586,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     }, 1000);
   };
 
-  const handleApproval = async (id, type) => {
-    try {
-      await axios.patch(`${BASE_URL}/api/approvals/${id}/respond`, {
-        status: type === "approve" ? "approved" : "rejected",
-      });
-      setApprovals(prev => prev.filter(a => a.id !== id));
-      alert(type === "approve" ? "Approved successfully!" : "Rejected/Request Changes sent.");
-    } catch (err) {
-      console.error("Failed to respond to approval:", err);
-      alert("Something went wrong. Please try again.");
-    }
+  const handleApproval = (id, type) => {
+    setApprovals(approvals.filter(a => a.id !== id));
+    alert(type === "approve" ? "Approved successfully!" : "Rejected/Request Changes sent.");
   };
 
   // Payment execution
@@ -1367,9 +1359,15 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         {/* Milestone Steps */}
         <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", padding: 22, marginBottom: 14 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: C.text2, marginBottom: 18 }}>Milestone Progress</div>
-          <div className="steps-grid" style={{ gridTemplateColumns: `repeat(${Math.max(milestones.length, 1)}, 1fr)` }}>
-            {stepNodes}
-          </div>
+          {milestones.length > 0 ? (
+            <div className="steps-grid" style={{ gridTemplateColumns: `repeat(${milestones.length}, 1fr)` }}>
+              {stepNodes}
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', color: C.text3, fontSize: 13, padding: '12px 0' }}>
+              No milestones defined for this project yet.
+            </div>
+          )}
         </div>
 
         {/* Gantt Chart */}

@@ -460,10 +460,7 @@ export default function ModernProjectsPage({ user }) {
               <div className="m-page-title">Projects</div>
               <div className="m-page-sub">Manage and track all your projects</div>
             </div>
-            <div className="m-header-actions">
-              <button className="m-filter-btn" onClick={fetchAll}><i className="ti ti-refresh" style={{ fontSize: '14px' }}></i> Refresh</button>
-              <button className="m-create-btn" onClick={() => { setInvoicePrefill(null); setShowInvoiceCreator(true); }}><i className="ti ti-plus" style={{ fontSize: '15px' }}></i> New Invoice</button>
-            </div>
+
           </div>
 
           {/* Error */}

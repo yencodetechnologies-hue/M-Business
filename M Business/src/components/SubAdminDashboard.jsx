@@ -4283,14 +4283,6 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
         </div>
 
-        <button className="create-btn" onClick={() => {
-          if (setInvoicePrefill) setInvoicePrefill({ client: "", project: "", _t: Date.now() });
-          if (setJumpInvoice) setJumpInvoice(null);
-          if (setPrevActiveBeforeInvoice) setPrevActiveBeforeInvoice(active);
-          if (setActive) setActive("invoices");
-        }}>
-          <i className="ti ti-plus"></i> New Invoice
-        </button>
 
       </div>
 

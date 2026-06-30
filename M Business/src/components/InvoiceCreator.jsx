@@ -412,7 +412,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         setStep("form");
         setInternalNav(false);
       } else {
-        // New invoice
+        // New invoice        
         setInv({ ...blank, invoiceNo: generateInvoiceNo(), client: newInvoicePrefill.client || "", project: newInvoicePrefill.project || "" });
         setItems([{ id: 1, description: "", quantity: 1, rate: "" }]);
         setEditingId(null);

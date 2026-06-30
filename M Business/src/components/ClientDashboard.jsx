@@ -1743,7 +1743,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
         {viewApprovalApp && (
           <div className="modal-overlay" onClick={() => setViewApprovalApp(null)}>
-            <div className="modal-card" onClick={e => e.stopPropagation()}>
+            <div className="modal-card" onClick={e => e.stopPropagation()} style={{ maxWidth: 520 }}>
               <div className="modal-header">
                 <span className="modal-title">{viewApprovalApp.title}</span>
                 <button className="modal-close" onClick={() => setViewApprovalApp(null)}>&times;</button>
@@ -1751,11 +1751,36 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               <div className="modal-body">
                 <div style={{ fontSize: 13, color: C.text2, lineHeight: 1.6 }}>{viewApprovalApp.desc || "No additional details provided."}</div>
                 {viewApprovalApp.senderName && <div style={{ fontSize: 12, color: C.text3 }}>Requested by {viewApprovalApp.senderName}</div>}
-                {viewApprovalApp.fileUrl && (
-                  <a href={viewApprovalApp.fileUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 6, padding: '8px 12px', background: C.tealLighter, color: C.teal, borderRadius: 8, fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>
-                    <i className="ti ti-paperclip"></i> {viewApprovalApp.fileName || "View attached file"}
-                  </a>
-                )}
+
+                {viewApprovalApp.fileUrl && (() => {
+                  const fname = (viewApprovalApp.fileName || viewApprovalApp.fileUrl || "").toLowerCase();
+                  const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/.test(fname);
+                  return (
+                    <div style={{ marginTop: 10, border: "1.5px solid " + C.border, borderRadius: 12, overflow: "hidden", background: C.surface2 }}>
+                      {isImage ? (
+                        <img
+                          src={viewApprovalApp.fileUrl}
+                          alt={viewApprovalApp.fileName || "Attached file"}
+                          style={{ width: "100%", maxHeight: 360, objectFit: "contain", display: "block", background: "#000" }}
+                        />
+                      ) : (
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 16px", gap: 8 }}>
+                          <i className="ti ti-file-text" style={{ fontSize: 36, color: C.teal }}></i>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{viewApprovalApp.fileName || "Attached file"}</div>
+                          <div style={{ fontSize: 11, color: C.text3 }}>Preview not available for this file type</div>
+                        </div>
+                      )}
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", borderTop: "1px solid " + C.border }}>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: C.text2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 280 }}>
+                          <i className="ti ti-paperclip" style={{ marginRight: 5 }}></i>{viewApprovalApp.fileName || "Attached file"}
+                        </span>
+                        <a href={viewApprovalApp.fileUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, fontWeight: 700, color: C.teal, textDecoration: "none", whiteSpace: "nowrap" }}>
+                          Open <i className="ti ti-external-link" style={{ marginLeft: 3 }}></i>
+                        </a>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           </div>

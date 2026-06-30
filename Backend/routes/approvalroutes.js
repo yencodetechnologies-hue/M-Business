@@ -131,4 +131,15 @@ router.get("/", async (req, res) => {
     }
 });
 
+// ── DELETE an approval request ──────────────────────────────────────────
+router.delete("/:id", async (req, res) => {
+    try {
+        const doc = await Approval.findByIdAndDelete(req.params.id);
+        if (!doc) return res.status(404).json({ msg: "Approval not found" });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ msg: err.message });
+    }
+});
+
 module.exports = router;

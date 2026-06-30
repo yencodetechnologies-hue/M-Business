@@ -204,6 +204,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [approvalForm, setApprovalForm] = useState({ recipientType: 'client', teamMemberId: '', clientId: '', title: '', desc: '', icon: 'ti-file-text', approveLabel: 'Approve', rejectLabel: 'Reject' });
   const [uploadApprovalStep, setUploadApprovalStep] = useState(false);
   const [sendingFileApproval, setSendingFileApproval] = useState(false);
+  const [postUpdateOnUpload, setPostUpdateOnUpload] = useState(false);
   const [submittingApproval, setSubmittingApproval] = useState(false);
   const [projectApprovals, setProjectApprovals] = useState([]);
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -1059,29 +1060,49 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   };
 
   const handleModalUpload = async () => {
-    if (!uploadFileObj) return;
     setUploadingModal(true);
-    const formData = new FormData();
-    formData.append("file", uploadFileObj);
     try {
-      const res = await axios.post(`${BASE_URL}/api/upload`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      const uploadedUrl = res.data.url;
-      const newFileObj = {
-        name: uploadHeading || uploadFileObj.name,
-        description: uploadDescription,
-        url: uploadedUrl,
-        size: uploadFileObj.size,
-        type: uploadFileObj.type,
-        uploadedAt: new Date().toISOString(),
-        sentToClient: uploadSendToClient ? (uploadClientName || currProject.client || clientName || 'client') : null,
-        sentToEmployee: uploadSendToEmployee ? uploadEmployeeName : null,
-      };
-      const updatedFiles = [...(currProject.files || []), newFileObj];
-      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
-        files: updatedFiles
-      });
+      let updatedFiles = currProject.files || [];
+      if (uploadFileObj) {
+        const formData = new FormData();
+        formData.append("file", uploadFileObj);
+        const res = await axios.post(`${BASE_URL}/api/upload`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        const uploadedUrl = res.data.url;
+        const newFileObj = {
+          name: uploadHeading || uploadFileObj.name,
+          description: uploadDescription,
+          url: uploadedUrl,
+          size: uploadFileObj.size,
+          type: uploadFileObj.type,
+          uploadedAt: new Date().toISOString(),
+          sentToClient: uploadSendToClient ? (uploadClientName || currProject.client || clientName || 'client') : null,
+          sentToEmployee: uploadSendToEmployee ? uploadEmployeeName : null,
+        };
+        updatedFiles = [...updatedFiles, newFileObj];
+      }
+
+      const payload = { files: updatedFiles };
+
+      // If this modal was opened from the "Send to Team & Client" composer button,
+      // also post the update entry now (with the optional attached file noted).
+      if (postUpdateOnUpload) {
+        const visibleTo = [];
+        if (uploadSendToEmployee) visibleTo.push('team');
+        if (uploadSendToClient) visibleTo.push('client');
+        const title = uploadHeading.trim() || uploadDescription.trim().slice(0, 60) || 'Update';
+        const body = uploadDescription.trim() ? `${uploadHeading.trim() ? uploadHeading + ': ' : ''}${uploadDescription}`.trim() : uploadHeading.trim();
+        const newUpdate = {
+          text: body, title, date: new Date().toISOString(), author: 'Admin',
+          type: updateType, visibleTo: visibleTo.length > 0 ? visibleTo : ['team'],
+          fileName: uploadFileObj ? uploadFileObj.name : '',
+        };
+        payload.updates = [newUpdate, ...(currProject.updates || [])];
+      }
+
+      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, payload);
+
       setShowUploadModal(false);
       setUploadFileObj(null);
       setUploadHeading('');
@@ -1090,11 +1111,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       setUploadSendToEmployee(false);
       setUploadClientName('');
       setUploadEmployeeName('');
+      setPostUpdateOnUpload(false);
+      if (postUpdateOnUpload) { setUpdateText(''); setUpdateTitle(''); setUpdateType('progress'); setComposerOpen(false); }
       loadLatest();
       if (onUpdate) onUpdate();
     } catch (err) {
       console.error("Upload error:", err.response?.data || err.message || err);
-      alert("Failed to upload file: " + (err.response?.data?.msg || err.message || "Unknown error"));
+      alert("Failed to save: " + (err.response?.data?.msg || err.message || "Unknown error"));
     } finally {
       setUploadingModal(false);
     }
@@ -1889,17 +1912,14 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   await submitApprovalRequest();
                                   return;
                                 }
-                                setPostingUpdate(true);
-                                try {
-                                  const title = updateTitle.trim() || updateText.trim().slice(0, 60);
-                                  const body = updateText.trim() ? `${updateTitle.trim() ? updateTitle + ': ' : ''}${updateText}`.trim() : updateTitle.trim();
-                                  const newUpdate = { text: body, title: title, date: new Date().toISOString(), author: 'Admin', type: updateType };
-                                  const updatedUpdates = [newUpdate, ...(currProject.updates || [])];
-                                  await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { updates: updatedUpdates });
-                                  setUpdateText(''); setUpdateTitle(''); setUpdateType('progress'); setComposerOpen(false);
-                                  loadLatest(); if (onUpdate) onUpdate();
-                                } catch (err) { console.error(err); alert('Failed to post update'); }
-                                finally { setPostingUpdate(false); }
+                                // Open the upload popup so the user can optionally attach a file before this posts.
+                                setUploadHeading(updateTitle.trim());
+                                setUploadDescription(updateText.trim());
+                                setUploadSendToClient(sendToClient);
+                                setUploadSendToEmployee(sendToTeam);
+                                setUploadClientName(sendToClient ? (currProject.client || clientName || '') : '');
+                                setPostUpdateOnUpload(true);
+                                setShowUploadModal(true);
                               }}
                               style={{ padding: '9px 22px', borderRadius: 10, background: P.primary, color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: 13, fontWeight: 800, cursor: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 'not-allowed' : 'pointer', opacity: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,188,212,.25)', transition: 'all .15s' }}>
                               <i className="ti ti-send" style={{ fontSize: 15 }} />
@@ -2633,10 +2653,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       {
         showUploadModal && (
           <div style={{ position: 'fixed', inset: 0, zIndex: 99998, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-            <div style={{ background: '#fff', borderRadius: P.radius, width: '100%', maxWidth: 480, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', overflow: 'hidden' }}>
+            <div style={{ background: '#fff', borderRadius: P.radius, width: '100%', maxWidth: 540, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', overflow: 'hidden' }}>
               <div style={{ background: `linear-gradient(135deg,${P.primary},${P.primaryDark})`, padding: '16px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><i className="ti ti-upload" style={{ color: '#fff', fontSize: 18 }}></i><span style={{ color: '#fff', fontWeight: 800, fontSize: 15 }}>Upload File</span></div>
-                <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); setUploadApprovalStep(false); }} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>✕</button>
+                <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); setUploadApprovalStep(false); setPostUpdateOnUpload(false); }} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>✕</button>
               </div>
               <div style={{ padding: '22px 24px', maxHeight: '80vh', overflowY: 'auto' }}>
                 <div onClick={() => document.getElementById('modal-file-input').click()} style={{ border: `2px dashed ${uploadFileObj ? P.primary : P.border}`, borderRadius: 10, padding: '22px 16px', textAlign: 'center', cursor: 'pointer', marginBottom: 16, background: uploadFileObj ? P.primaryLight : P.bg, transition: 'all .2s' }}>
@@ -2719,10 +2739,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     </div>
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', gap: 10 }}>
-                    <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }} style={{ flex: 1, padding: '10px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Draft</button>
-                    <button onClick={handleModalUpload} disabled={!uploadFileObj || uploadingModal} style={{ flex: 1.4, padding: '10px', borderRadius: 10, border: 'none', background: (!uploadFileObj || uploadingModal) ? P.border : P.primary, color: (!uploadFileObj || uploadingModal) ? P.textLight : '#fff', fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 800, cursor: (!uploadFileObj || uploadingModal) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all .15s' }}><i className="ti ti-upload" style={{ fontSize: 15 }}></i>{uploadingModal ? 'Uploading...' : 'Upload & Share'}</button>
-                    <button onClick={() => setUploadApprovalStep(true)} disabled={!uploadFileObj} style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', background: !uploadFileObj ? P.border : P.purple, color: !uploadFileObj ? P.textLight : '#fff', fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 800, cursor: !uploadFileObj ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}><i className="ti ti-send" style={{ fontSize: 15 }}></i>Send</button>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }} style={{ flex: '1 1 80px', padding: '10px 8px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Draft</button>
+                    <button onClick={handleModalUpload} disabled={uploadingModal} style={{ flex: '1.4 1 130px', padding: '10px 6px', borderRadius: 10, border: 'none', background: uploadingModal ? P.border : P.primary, color: uploadingModal ? P.textLight : '#fff', fontFamily: 'Nunito,sans-serif', fontSize: 12.5, fontWeight: 800, cursor: uploadingModal ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'all .15s', whiteSpace: 'nowrap' }}><i className="ti ti-upload" style={{ fontSize: 14 }}></i>{uploadingModal ? 'Uploading...' : postUpdateOnUpload ? 'Post Update' : 'Upload & Share'}</button>
+                    <button onClick={() => setUploadApprovalStep(true)} disabled={!uploadFileObj} style={{ flex: '1 1 90px', padding: '10px 8px', borderRadius: 10, border: 'none', background: !uploadFileObj ? P.border : P.purple, color: !uploadFileObj ? P.textLight : '#fff', fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 800, cursor: !uploadFileObj ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, whiteSpace: 'nowrap' }}><i className="ti ti-send" style={{ fontSize: 14 }}></i>Send</button>
                   </div>
                 )}
               </div>

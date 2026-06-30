@@ -2108,7 +2108,33 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         <div className="mpd-card" style={{ background: `linear-gradient(135deg, ${P.primaryLight}, #fff)`, border: `1.5px solid ${P.primaryMid}` }}>
           <div className="mpd-card-title" style={{ marginBottom: 12 }}><i className="ti ti-building"></i> Client Portal</div>
           <div style={{ fontSize: 12, color: P.textMid, marginBottom: 16 }}>The client has access to their project portal with live progress, files, invoices and updates.</div>
-          <button className="mpd-btn mpd-btn-primary" onClick={() => setShowPortalPreview(true)} style={{ width: '100%', justifyContent: 'center' }}><i className="ti ti-external-link"></i> View Portal</button>
+          <button className="mpd-btn mpd-btn-primary" onClick={async () => {
+            try {
+              const res = await axios.get(`${BASE_URL}/api/clients`, { headers: { 'x-company-id': currProject?.companyId || '' } });
+              const clientList = Array.isArray(res.data) ? res.data : [];
+              const matched = clientList.find(c =>
+                (c.clientName || c.name || '').toLowerCase().trim() === (currProject?.client || '').toLowerCase().trim()
+              );
+              if (!matched) {
+                alert('Could not find this client\'s account. Make sure the client is added under Clients.');
+                return;
+              }
+              const subadminCompanyId = user?.companyId || user?._id || user?.id || currProject?.companyId || '';
+              const clientToken = btoa(JSON.stringify({
+                clientId: matched._id,
+                email: matched.email,
+                name: matched.clientName || matched.name,
+                companyName: matched.companyName || matched.company || '',
+                companyId: subadminCompanyId,
+                agencyName: user?.companyName || user?.name || '',
+                exp: Date.now() + 24 * 60 * 60 * 1000
+              }));
+              window.open(`${window.location.origin}/client-portal/${matched._id}?token=${clientToken}`, '_blank');
+            } catch (err) {
+              console.error('Failed to open client portal:', err);
+              alert('Failed to open client portal. Please try again.');
+            }
+          }} style={{ width: '100%', justifyContent: 'center' }}><i className="ti ti-external-link"></i> View Portal</button>
         </div>
       </div>
 

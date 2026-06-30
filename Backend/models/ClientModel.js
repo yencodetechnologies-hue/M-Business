@@ -37,6 +37,6 @@ const ClientSchema = new mongoose.Schema({
   internalNotes: { type: String, default: "" },
 }, { timestamps: true });
 
-ClientSchema.index({ email: 1, companyId: 1 }, { unique: true });
+ClientSchema.index({ email: 1 }, { unique: true });
 
 module.exports = mongoose.model("Client", ClientSchema);

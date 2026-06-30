@@ -1827,7 +1827,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     const errors = {};
     if (!nc.name.trim()) errors.name = "Name is required";
     if (!nc.email.trim()) errors.email = "Email is required";
-    if (!nc.password.trim()) errors.password = "Password is required";
+    // 🔧 FIX: password is now optional — defaults to "123456" if left blank
+    // if (!nc.password.trim()) errors.password = "Password is required";
     if (Object.keys(errors).length > 0) { setNcError(errors); return; }
     try {
       setSaveLoading(true);
@@ -1837,7 +1838,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         email: nc.email,
         phone: nc.phone,
         address: nc.address,
-        password: nc.password,
+        // 🔧 FIX: send "123456" explicitly when the admin leaves the field blank
+        password: nc.password.trim() ? nc.password : "123456",
         status: nc.status,
         contactPersonName: nc.contactPersonName,
         contactPersonNo: nc.contactPersonNo,
@@ -1861,7 +1863,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       };
       const res = await axios.post(BASE_URL + "/api/clients/add", payload);
       setClients(prev => [res.data.client, ...prev]);
-      setClientSuccessData({ email: nc.email, password: nc.password, name: nc.name });
+      setClientSuccessData({ email: nc.email, password: nc.password.trim() ? nc.password : "123456", name: nc.name });
       setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", gstNumber: "", logoUrl: "" });
       setNcError({});
     } catch (err) {

@@ -87,10 +87,13 @@ router.post("/login", async (req, res) => {
     console.log("User collection result:", user ? `Found: ${user.role}` : "Not found");
 
     if (!user) {
-      user = await Client.findOne({ email: normalizedLoginEmail });
-      console.log("Client collection result:", user ? "Found" : "Not found");
+      // 🔧 FIX: the same email can exist under multiple companies (unique index is
+      // {email, companyId}). Without filtering, findOne() can return a stale/unrelated
+      // record from a different company whose password doesn't match what was just set.
+      // Pick the most recently created matching client instead of an arbitrary one.
+      user = await Client.findOne({ email: normalizedLoginEmail }).sort({ createdAt: -1 });
+      console.log("Client collection result:", user ? `Found (companyId: ${user.companyId})` : "Not found");
     }
-
     if (!user) {
       user = await Manager.findOne({ email: normalizedLoginEmail });
       console.log("Manager collection result:", user ? "Found" : "Not found");

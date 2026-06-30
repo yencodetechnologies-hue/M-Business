@@ -618,16 +618,32 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     }, 1000);
   };
 
-  const handleApproval = async (id, type) => {
-    const status = type === "approve" ? "approved" : "rejected";
-    // Optimistically remove from view
+  const [rejectModalApp, setRejectModalApp] = useState(null);
+  const [rejectReasonText, setRejectReasonText] = useState("");
+  const [viewApprovalApp, setViewApprovalApp] = useState(null);
+
+  const handleApprove = async (id) => {
     setApprovals(prev => prev.filter(a => a.id !== id));
     try {
-      await axios.patch(`${BASE_URL}/api/approvals/${id}/respond`, { status });
-      alert(type === "approve" ? "Approved successfully!" : "Rejected/Request Changes sent.");
+      await axios.patch(`${BASE_URL}/api/approvals/${id}/respond`, { status: "approved" });
     } catch (err) {
-      console.error("Failed to update approval status", err);
+      console.error("Failed to approve", err);
       alert("Something went wrong saving your response. Please try again.");
+    }
+  };
+
+  const submitRejection = async () => {
+    if (!rejectReasonText.trim()) { alert("Please enter a reason for rejecting."); return; }
+    const id = rejectModalApp.id;
+    setApprovals(prev => prev.filter(a => a.id !== id));
+    setRejectModalApp(null);
+    try {
+      await axios.patch(`${BASE_URL}/api/approvals/${id}/respond`, { status: "rejected", rejectReason: rejectReasonText.trim() });
+    } catch (err) {
+      console.error("Failed to reject", err);
+      alert("Something went wrong saving your response. Please try again.");
+    } finally {
+      setRejectReasonText("");
     }
   };
 
@@ -1704,17 +1720,19 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         <div style={{ padding: "14px 18px", borderBottom: "1px solid " + C.border, fontSize: 12, fontWeight: 800, color: C.text2, background: C.surface2 }}>Pending Approvals</div>
         <div>
           {approvals.map((app) => (
-            <div key={app.id} className="approval-item">
+            <div key={app.id} className="approval-item" style={{ flexWrap: 'wrap' }}>
               <div className="ai-icon"><i className={`ti ${app.icon}`}></i></div>
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, minWidth: 160 }}>
                 <div className="ai-title">{app.title}</div>
                 <div className="ai-desc">{app.desc}</div>
+                {app.senderName && <div style={{ fontSize: 10, color: C.text3, marginTop: 2 }}>From {app.senderName}</div>}
               </div>
               <div className="ai-actions">
-                <button className="ai-btn approve" onClick={() => handleApproval(app.id, "approve")}>
+                <button className="ai-btn" onClick={() => setViewApprovalApp(app)}>View</button>
+                <button className="ai-btn approve" onClick={() => handleApprove(app.id)}>
                   <i className="ti ti-check" style={{ fontSize: 12 }}></i> {app.approveLabel || "Approve"}
                 </button>
-                <button className="ai-btn reject" onClick={() => handleApproval(app.id, "reject")}>{app.rejectLabel || "Reject"}</button>
+                <button className="ai-btn reject" onClick={() => { setRejectModalApp(app); setRejectReasonText(""); }}>{app.rejectLabel || "Reject"}</button>
               </div>
             </div>
           ))}
@@ -1722,6 +1740,50 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             <div style={{ padding: 24, textAlign: "center", color: C.text3, fontSize: 12 }}>No pending approvals. All caught up!</div>
           )}
         </div>
+
+        {viewApprovalApp && (
+          <div className="modal-overlay" onClick={() => setViewApprovalApp(null)}>
+            <div className="modal-card" onClick={e => e.stopPropagation()}>
+              <div className="modal-header">
+                <span className="modal-title">{viewApprovalApp.title}</span>
+                <button className="modal-close" onClick={() => setViewApprovalApp(null)}>&times;</button>
+              </div>
+              <div className="modal-body">
+                <div style={{ fontSize: 13, color: C.text2, lineHeight: 1.6 }}>{viewApprovalApp.desc || "No additional details provided."}</div>
+                {viewApprovalApp.senderName && <div style={{ fontSize: 12, color: C.text3 }}>Requested by {viewApprovalApp.senderName}</div>}
+                {viewApprovalApp.fileUrl && (
+                  <a href={viewApprovalApp.fileUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 6, padding: '8px 12px', background: C.tealLighter, color: C.teal, borderRadius: 8, fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>
+                    <i className="ti ti-paperclip"></i> {viewApprovalApp.fileName || "View attached file"}
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {rejectModalApp && (
+          <div className="modal-overlay" onClick={() => setRejectModalApp(null)}>
+            <div className="modal-card" onClick={e => e.stopPropagation()}>
+              <div className="modal-header">
+                <span className="modal-title">Reject "{rejectModalApp.title}"</span>
+                <button className="modal-close" onClick={() => setRejectModalApp(null)}>&times;</button>
+              </div>
+              <div className="modal-body">
+                <div style={{ fontSize: 12, fontWeight: 700, color: C.text2 }}>Reason for rejection *</div>
+                <textarea
+                  value={rejectReasonText}
+                  onChange={e => setRejectReasonText(e.target.value)}
+                  rows={4}
+                  placeholder="Please explain what needs to change..."
+                  style={{ width: "100%", padding: "10px 12px", borderRadius: 9, border: "1.5px solid " + C.border, fontSize: 13, outline: "none", resize: "none", boxSizing: "border-box" }}
+                />
+                <button onClick={submitRejection} style={{ width: "100%", padding: "11px", background: C.red, color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                  Submit Rejection
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

@@ -201,7 +201,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   const [composerOpen, setComposerOpen] = useState(false);
   const [showApprovalModal, setShowApprovalModal] = useState(false);
-  const [approvalForm, setApprovalForm] = useState({ recipientType: 'client', teamMemberId: '', title: '', desc: '', icon: 'ti-file-text', approveLabel: 'Approve', rejectLabel: 'Reject' });
+  const [approvalForm, setApprovalForm] = useState({ recipientType: 'client', teamMemberId: '', clientId: '', title: '', desc: '', icon: 'ti-file-text', approveLabel: 'Approve', rejectLabel: 'Reject' });
+  const [uploadApprovalStep, setUploadApprovalStep] = useState(false);
+  const [sendingFileApproval, setSendingFileApproval] = useState(false);
   const [submittingApproval, setSubmittingApproval] = useState(false);
   const [projectApprovals, setProjectApprovals] = useState([]);
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -515,37 +517,59 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     || clients?.find(c => (c.clientName || c.name || "").toLowerCase().trim() === clientName.toLowerCase().trim())?._id
     || "";
 
+  useEffect(() => {
+    if (!approvalForm.clientId && resolvedClientId) {
+      setApprovalForm(f => ({ ...f, clientId: resolvedClientId }));
+    }
+  }, [resolvedClientId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const loadProjectApprovals = async () => {
+    try {
+      const approvalCompanyId = user?.companyId || user?.company || user?._id || user?.id || currProject.companyId || '';
+      const res = await axios.get(`${BASE_URL}/api/approvals/project/${currProject._id}`, {
+        headers: { 'x-company-id': approvalCompanyId }
+      });
+      setProjectApprovals(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error("Failed to load project approvals", err);
+    }
+  };
+
+  useEffect(() => { if (currProject?._id) loadProjectApprovals(); }, [currProject?._id]);
+
   const submitApprovalRequest = async () => {
-    if (!approvalForm.title.trim()) { alert("Please enter a title for this approval request."); return; }
+    const title = updateTitle.trim() || updateText.trim().slice(0, 60);
+    if (!title) { alert("Please enter an update title for this approval request."); return; }
     const isTeam = approvalForm.recipientType === 'team';
     if (isTeam && !approvalForm.teamMemberId) { alert("Please select a team member to send this to."); return; }
-    if (!isTeam && !resolvedClientId) { alert("Could not determine which client this project belongs to. Please make sure the project has a linked client."); return; }
+    if (!isTeam && !approvalForm.clientId) { alert("Please select a client to send this to."); return; }
     const approvalCompanyId = user?.companyId || user?.company || user?._id || user?.id || currProject.companyId || '';
-    setSubmittingApproval(true);
+    setPostingUpdate(true);
     try {
       await axios.post(`${BASE_URL}/api/approvals`, {
         companyId: approvalCompanyId,
-        clientId: isTeam ? '' : resolvedClientId,
+        clientId: isTeam ? '' : approvalForm.clientId,
         recipientType: approvalForm.recipientType,
         teamMemberId: isTeam ? approvalForm.teamMemberId : '',
         senderName: user?.name || user?.clientName || 'Admin',
-        title: approvalForm.title.trim(),
-        desc: approvalForm.desc.trim(),
-        icon: approvalForm.icon,
-        approveLabel: approvalForm.approveLabel || 'Approve',
-        rejectLabel: approvalForm.rejectLabel || 'Reject',
+        title,
+        desc: updateText.trim(),
+        icon: 'ti-file-text',
+        approveLabel: 'Approve',
+        rejectLabel: 'Reject',
         sourceType: 'project',
         projectId: currProject._id || '',
       });
       alert(`Approval request sent to ${isTeam ? 'the team member' : 'the client'}!`);
-      setShowApprovalModal(false);
-      setApprovalForm({ recipientType: 'client', teamMemberId: '', title: '', desc: '', icon: 'ti-file-text', approveLabel: 'Approve', rejectLabel: 'Reject' });
+      setUpdateText(''); setUpdateTitle(''); setUpdateType('progress');
+      setApprovalForm(f => ({ ...f, teamMemberId: '' }));
+      setComposerOpen(false);
       loadProjectApprovals();
     } catch (err) {
       console.error("Failed to create approval request", err);
       alert(err.response?.data?.msg || "Failed to send approval request. Please try again.");
     } finally {
-      setSubmittingApproval(false);
+      setPostingUpdate(false);
     }
   };
   const category = currProject.category || currProject.purpose || "General";
@@ -986,6 +1010,54 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     if (file) setUploadFileObj(file);
   };
 
+  const handleSendFileForApproval = async () => {
+    if (!uploadFileObj) return;
+    const isTeam = approvalForm.recipientType === 'team';
+    if (isTeam && !approvalForm.teamMemberId) { alert("Please select a team member to send this to."); return; }
+    if (!isTeam && !approvalForm.clientId) { alert("Please select a client to send this to."); return; }
+    setSendingFileApproval(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", uploadFileObj);
+      const uploadRes = await axios.post(`${BASE_URL}/api/upload`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      const uploadedUrl = uploadRes.data.url;
+      const approvalCompanyId = user?.companyId || user?.company || user?._id || user?.id || currProject.companyId || '';
+
+      await axios.post(`${BASE_URL}/api/approvals`, {
+        companyId: approvalCompanyId,
+        clientId: isTeam ? '' : approvalForm.clientId,
+        recipientType: approvalForm.recipientType,
+        teamMemberId: isTeam ? approvalForm.teamMemberId : '',
+        senderName: user?.name || user?.clientName || 'Admin',
+        title: uploadHeading.trim() || uploadFileObj.name,
+        desc: uploadDescription.trim(),
+        icon: 'ti-file-text',
+        approveLabel: 'Approve',
+        rejectLabel: 'Reject',
+        sourceType: 'project',
+        projectId: currProject._id || '',
+        fileUrl: uploadedUrl,
+        fileName: uploadFileObj.name,
+      });
+
+      alert(`File sent for approval to ${isTeam ? 'the team member' : 'the client'}!`);
+      setShowUploadModal(false);
+      setUploadFileObj(null);
+      setUploadHeading('');
+      setUploadDescription('');
+      setUploadApprovalStep(false);
+      setApprovalForm(f => ({ ...f, teamMemberId: '' }));
+      loadProjectApprovals();
+    } catch (err) {
+      console.error("Failed to send file for approval", err);
+      alert(err.response?.data?.msg || "Failed to send file for approval. Please try again.");
+    } finally {
+      setSendingFileApproval(false);
+    }
+  };
+
   const handleModalUpload = async () => {
     if (!uploadFileObj) return;
     setUploadingModal(true);
@@ -1196,6 +1268,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         </div>
 
 
+
         {/* PROGRESS */}
         <div className="mpd-prog-card">
           <div className="mpd-prog-item">
@@ -1212,6 +1285,36 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <div className="mpd-prog-sub">{currency}{spent.toLocaleString()} of {currency}{budgetAmt.toLocaleString()}</div>
           </div>
         </div>
+
+        {projectApprovals.length > 0 && (
+          <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 14, padding: 18, marginBottom: 20 }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: '#111827', marginBottom: 12 }}>Approval Requests</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {projectApprovals.map(a => {
+                const statusColor = a.status === 'approved' ? '#15803D' : a.status === 'rejected' ? '#DC2626' : '#B45309';
+                const statusBg = a.status === 'approved' ? '#DCFCE7' : a.status === 'rejected' ? '#FEE2E2' : '#FEF3C7';
+                return (
+                  <div key={a._id} style={{ padding: '12px 14px', border: '1px solid #F3F4F6', borderRadius: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{a.title}</div>
+                      <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>
+                        Sent to {a.recipientType === 'team' ? 'Team' : 'Client'} {a.senderName ? `by ${a.senderName}` : ''}
+                      </div>
+                      {a.status === 'rejected' && a.rejectReason && (
+                        <div style={{ marginTop: 6, fontSize: 12, color: '#DC2626', background: '#FEF2F2', padding: '6px 10px', borderRadius: 8 }}>
+                          <strong>Rejection reason:</strong> {a.rejectReason}
+                        </div>
+                      )}
+                    </div>
+                    <span style={{ background: statusBg, color: statusColor, borderRadius: 20, padding: '4px 12px', fontSize: 11, fontWeight: 800, flexShrink: 0 }}>
+                      {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* KPIs */}
         <div className="mpd-kpi-row">
@@ -1599,16 +1702,79 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         {/* SEND TO */}
                         <div style={{ marginBottom: 14 }}>
                           <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Send To</div>
-                          <div style={{ display: 'flex', gap: 10 }}>
-                            <div onClick={() => setSendToTeam(!sendToTeam)} style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: `2px solid ${sendToTeam ? P.primary : P.border}`, background: sendToTeam ? P.primaryLight : '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: sendToTeam ? P.primaryDark : P.textMid, transition: 'all .15s' }}>
-                              <i className="ti ti-users" style={{ fontSize: 16 }} />
-                              Team ({assigned.length} members)
+                          {updateType === 'approval' ? (
+                            <>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                <div
+                                  onClick={() => setApprovalForm(f => ({ ...f, recipientType: 'client' }))}
+                                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', borderRadius: 12, border: `1.5px solid ${P.border}`, background: '#fff', cursor: 'pointer', transition: 'all .15s' }}
+                                >
+                                  <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${approvalForm.recipientType === 'client' ? P.primary : '#CBD5E1'}`, background: approvalForm.recipientType === 'client' ? P.primary : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all .15s' }}>
+                                    {approvalForm.recipientType === 'client' && <i className="ti ti-check" style={{ color: '#fff', fontSize: 13, fontWeight: 900 }}></i>}
+                                  </div>
+                                  <i className="ti ti-building" style={{ color: P.primary, fontSize: 18 }} />
+                                  <span style={{ fontSize: 14, fontWeight: 700, color: P.textDark }}>Send to Client Portal</span>
+                                </div>
+                                <div
+                                  onClick={() => setApprovalForm(f => ({ ...f, recipientType: 'team' }))}
+                                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', borderRadius: 12, border: `1.5px solid ${P.border}`, background: '#fff', cursor: 'pointer', transition: 'all .15s' }}
+                                >
+                                  <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${approvalForm.recipientType === 'team' ? P.purple : '#CBD5E1'}`, background: approvalForm.recipientType === 'team' ? P.purple : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all .15s' }}>
+                                    {approvalForm.recipientType === 'team' && <i className="ti ti-check" style={{ color: '#fff', fontSize: 13, fontWeight: 900 }}></i>}
+                                  </div>
+                                  <i className="ti ti-users" style={{ color: P.purple, fontSize: 18 }} />
+                                  <span style={{ fontSize: 14, fontWeight: 700, color: P.textDark }}>Send to Employee Portal</span>
+                                </div>
+                              </div>
+                              {approvalForm.recipientType === 'team' && (
+                                <select
+                                  value={approvalForm.teamMemberId}
+                                  onChange={e => setApprovalForm(f => ({ ...f, teamMemberId: e.target.value }))}
+                                  style={{ width: '100%', marginTop: 10, padding: '10px 12px', borderRadius: 9, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none', boxSizing: 'border-box', background: '#fff', fontFamily: 'inherit' }}
+                                >
+                                  <option value="">-- Select team member --</option>
+                                  {(employees || []).map(emp => (
+                                    <option key={emp._id} value={emp._id}>{emp.name || emp.employeeName}</option>
+                                  ))}
+                                </select>
+                              )}
+                              {approvalForm.recipientType === 'client' && (
+                                <select
+                                  value={approvalForm.clientId}
+                                  onChange={e => setApprovalForm(f => ({ ...f, clientId: e.target.value }))}
+                                  style={{ width: '100%', marginTop: 10, padding: '10px 12px', borderRadius: 9, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none', boxSizing: 'border-box', background: '#fff', fontFamily: 'inherit' }}
+                                >
+                                  <option value="">-- Select client --</option>
+                                  {(clients || []).map(c => (
+                                    <option key={c._id} value={c._id}>{c.clientName || c.name}</option>
+                                  ))}
+                                </select>
+                              )}
+                            </>
+                          ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                              <div
+                                onClick={() => setSendToClient(!sendToClient)}
+                                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', borderRadius: 12, border: `1.5px solid ${P.border}`, background: '#fff', cursor: 'pointer', transition: 'all .15s' }}
+                              >
+                                <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${sendToClient ? P.primary : '#CBD5E1'}`, background: sendToClient ? P.primary : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all .15s' }}>
+                                  {sendToClient && <i className="ti ti-check" style={{ color: '#fff', fontSize: 13, fontWeight: 900 }}></i>}
+                                </div>
+                                <i className="ti ti-building" style={{ color: P.primary, fontSize: 18 }} />
+                                <span style={{ fontSize: 14, fontWeight: 700, color: P.textDark }}>Send to Client Portal</span>
+                              </div>
+                              <div
+                                onClick={() => setSendToTeam(!sendToTeam)}
+                                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', borderRadius: 12, border: `1.5px solid ${P.border}`, background: '#fff', cursor: 'pointer', transition: 'all .15s' }}
+                              >
+                                <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${sendToTeam ? P.purple : '#CBD5E1'}`, background: sendToTeam ? P.purple : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all .15s' }}>
+                                  {sendToTeam && <i className="ti ti-check" style={{ color: '#fff', fontSize: 13, fontWeight: 900 }}></i>}
+                                </div>
+                                <i className="ti ti-users" style={{ color: P.purple, fontSize: 18 }} />
+                                <span style={{ fontSize: 14, fontWeight: 700, color: P.textDark }}>Send to Employee Portal</span>
+                              </div>
                             </div>
-                            <div onClick={() => setSendToClient(!sendToClient)} style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: `2px solid ${sendToClient ? P.primary : P.border}`, background: sendToClient ? P.primaryLight : '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: sendToClient ? P.primaryDark : P.textMid, transition: 'all .15s' }}>
-                              <i className="ti ti-building" style={{ fontSize: 16 }} />
-                              Client Portal — {clientName}
-                            </div>
-                          </div>
+                          )}
                         </div>
 
                         {/* UPDATE TYPE CHIPS */}
@@ -1621,6 +1787,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               { key: 'blocker', label: 'Blocker', icon: 'ti-alert-triangle' },
                               { key: 'general', label: 'General', icon: 'ti-speakerphone' },
                               { key: 'delivery', label: 'Delivery', icon: 'ti-package' },
+                              { key: 'approval', label: 'Approval Request', icon: 'ti-clipboard-check' },
                             ].map(({ key, label, icon }) => (
                               <button key={key} onClick={() => setUpdateType(key)} style={{ padding: '6px 14px', borderRadius: 20, border: `2px solid ${updateType === key ? P.primary : P.border}`, background: updateType === key ? P.primary : '#fff', color: updateType === key ? '#fff' : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all .15s' }}>
                                 <i className={`ti ${icon}`} style={{ fontSize: 13 }} />
@@ -1652,8 +1819,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           />
                         </div>
 
-                        {/* ATTACHMENTS ROW + SEND BUTTON */}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                        {/* ATTACHMENTS ROW + RECIPIENT (approval mode) + SEND BUTTON */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
                           <div style={{ display: 'flex', gap: 10 }}>
                             <button onClick={triggerFileUpload} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
                               <i className="ti ti-photo" style={{ fontSize: 15 }} /> Image
@@ -1666,6 +1833,51 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                             </button>
                             <span style={{ fontSize: 11, color: P.textLight, alignSelf: 'center' }}>Drag &amp; drop supported</span>
                           </div>
+
+                          {updateType === 'approval' && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <div style={{ display: 'flex', borderRadius: 9, border: `1.5px solid ${P.border}`, overflow: 'hidden' }}>
+                                <button
+                                  type="button"
+                                  onClick={() => setApprovalForm(f => ({ ...f, recipientType: 'client' }))}
+                                  style={{ padding: '8px 14px', border: 'none', cursor: 'pointer', background: approvalForm.recipientType === 'client' ? P.primary : '#fff', color: approvalForm.recipientType === 'client' ? '#fff' : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 800 }}
+                                >
+                                  Client
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setApprovalForm(f => ({ ...f, recipientType: 'team' }))}
+                                  style={{ padding: '8px 14px', border: 'none', cursor: 'pointer', background: approvalForm.recipientType === 'team' ? P.primary : '#fff', color: approvalForm.recipientType === 'team' ? '#fff' : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 800 }}
+                                >
+                                  Team
+                                </button>
+                              </div>
+                              {approvalForm.recipientType === 'client' ? (
+                                <select
+                                  value={approvalForm.clientId}
+                                  onChange={e => setApprovalForm(f => ({ ...f, clientId: e.target.value }))}
+                                  style={{ padding: '8px 10px', borderRadius: 9, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', background: '#fff', fontFamily: 'inherit', minWidth: 160 }}
+                                >
+                                  <option value="">-- Select client --</option>
+                                  {(clients || []).map(c => (
+                                    <option key={c._id} value={c._id}>{c.clientName || c.name}</option>
+                                  ))}
+                                </select>
+                              ) : (
+                                <select
+                                  value={approvalForm.teamMemberId}
+                                  onChange={e => setApprovalForm(f => ({ ...f, teamMemberId: e.target.value }))}
+                                  style={{ padding: '8px 10px', borderRadius: 9, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', background: '#fff', fontFamily: 'inherit', minWidth: 160 }}
+                                >
+                                  <option value="">-- Select team member --</option>
+                                  {(employees || []).map(emp => (
+                                    <option key={emp._id} value={emp._id}>{emp.name || emp.employeeName}</option>
+                                  ))}
+                                </select>
+                              )}
+                            </div>
+                          )}
+
                           <div style={{ display: 'flex', gap: 10 }}>
                             <button onClick={() => setComposerOpen(false)} style={{ padding: '9px 18px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'inherit', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Draft</button>
                             <button
@@ -1673,6 +1885,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               onClick={async () => {
                                 const hasContent = updateTitle.trim() || updateText.trim();
                                 if (!hasContent) return;
+                                if (updateType === 'approval') {
+                                  await submitApprovalRequest();
+                                  return;
+                                }
                                 setPostingUpdate(true);
                                 try {
                                   const title = updateTitle.trim() || updateText.trim().slice(0, 60);
@@ -1687,7 +1903,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               }}
                               style={{ padding: '9px 22px', borderRadius: 10, background: P.primary, color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: 13, fontWeight: 800, cursor: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 'not-allowed' : 'pointer', opacity: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,188,212,.25)', transition: 'all .15s' }}>
                               <i className="ti ti-send" style={{ fontSize: 15 }} />
-                              {postingUpdate ? 'Sending...' : `Send to ${sendToTeam && sendToClient ? 'Team & Client' : sendToTeam ? 'Team' : 'Client Portal'}`}
+                              {postingUpdate ? 'Sending...' : updateType === 'approval' ? `Send Approval Request to ${approvalForm.recipientType === 'team' ? 'Team Member' : 'Client'}` : `Send to ${sendToTeam && sendToClient ? 'Team & Client' : sendToTeam ? 'Team' : 'Client Portal'}`}
                             </button>
                           </div>
                         </div>
@@ -2420,7 +2636,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <div style={{ background: '#fff', borderRadius: P.radius, width: '100%', maxWidth: 480, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', overflow: 'hidden' }}>
               <div style={{ background: `linear-gradient(135deg,${P.primary},${P.primaryDark})`, padding: '16px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><i className="ti ti-upload" style={{ color: '#fff', fontSize: 18 }}></i><span style={{ color: '#fff', fontWeight: 800, fontSize: 15 }}>Upload File</span></div>
-                <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>✕</button>
+                <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); setUploadApprovalStep(false); }} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>✕</button>
               </div>
               <div style={{ padding: '22px 24px', maxHeight: '80vh', overflowY: 'auto' }}>
                 <div onClick={() => document.getElementById('modal-file-input').click()} style={{ border: `2px dashed ${uploadFileObj ? P.primary : P.border}`, borderRadius: 10, padding: '22px 16px', textAlign: 'center', cursor: 'pointer', marginBottom: 16, background: uploadFileObj ? P.primaryLight : P.bg, transition: 'all .2s' }}>
@@ -2453,10 +2669,62 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   </div>
                   {uploadSendToEmployee && (<select value={uploadEmployeeName} onChange={e => setUploadEmployeeName(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.purple}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', background: '#fff', color: P.textDark, marginTop: 10 }}><option value="">-- Select Employee --</option>{(employees || []).map(emp => (<option key={emp._id} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName}{emp.role ? ` (${emp.role})` : ''}</option>))}</select>)}
                 </div>
-                <div style={{ display: 'flex', gap: 10 }}>
-                  <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }} style={{ flex: 1, padding: '10px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
-                  <button onClick={handleModalUpload} disabled={!uploadFileObj || uploadingModal} style={{ flex: 2, padding: '10px', borderRadius: 10, border: 'none', background: (!uploadFileObj || uploadingModal) ? P.border : P.primary, color: (!uploadFileObj || uploadingModal) ? P.textLight : '#fff', fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 800, cursor: (!uploadFileObj || uploadingModal) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all .15s' }}><i className="ti ti-upload" style={{ fontSize: 15 }}></i>{uploadingModal ? 'Uploading...' : 'Upload & Share'}</button>
-                </div>
+                {uploadApprovalStep ? (
+                  <div style={{ borderTop: `1.5px solid ${P.border}`, paddingTop: 16 }}>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: P.textDark, marginBottom: 10 }}>Send "{uploadHeading.trim() || uploadFileObj?.name}" for Approval</div>
+                    <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+                      <button
+                        type="button"
+                        onClick={() => setApprovalForm(f => ({ ...f, recipientType: 'client' }))}
+                        style={{ flex: 1, padding: '9px 12px', borderRadius: 9, border: `1.5px solid ${approvalForm.recipientType === 'client' ? P.primary : P.border}`, background: approvalForm.recipientType === 'client' ? P.primaryLight : '#fff', color: approvalForm.recipientType === 'client' ? P.primaryDark : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}
+                      >
+                        Client
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setApprovalForm(f => ({ ...f, recipientType: 'team' }))}
+                        style={{ flex: 1, padding: '9px 12px', borderRadius: 9, border: `1.5px solid ${approvalForm.recipientType === 'team' ? P.primary : P.border}`, background: approvalForm.recipientType === 'team' ? P.primaryLight : '#fff', color: approvalForm.recipientType === 'team' ? P.primaryDark : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}
+                      >
+                        Team
+                      </button>
+                    </div>
+                    {approvalForm.recipientType === 'client' ? (
+                      <select
+                        value={approvalForm.clientId}
+                        onChange={e => setApprovalForm(f => ({ ...f, clientId: e.target.value }))}
+                        style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none', boxSizing: 'border-box', background: '#fff', fontFamily: 'inherit', marginBottom: 14 }}
+                      >
+                        <option value="">-- Select client --</option>
+                        {(clients || []).map(c => (
+                          <option key={c._id} value={c._id}>{c.clientName || c.name}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <select
+                        value={approvalForm.teamMemberId}
+                        onChange={e => setApprovalForm(f => ({ ...f, teamMemberId: e.target.value }))}
+                        style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none', boxSizing: 'border-box', background: '#fff', fontFamily: 'inherit', marginBottom: 14 }}
+                      >
+                        <option value="">-- Select team member --</option>
+                        {(employees || []).map(emp => (
+                          <option key={emp._id} value={emp._id}>{emp.name || emp.employeeName}</option>
+                        ))}
+                      </select>
+                    )}
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <button onClick={() => setUploadApprovalStep(false)} style={{ flex: 1, padding: '10px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Back</button>
+                      <button onClick={handleSendFileForApproval} disabled={sendingFileApproval} style={{ flex: 2, padding: '10px', borderRadius: 10, border: 'none', background: sendingFileApproval ? P.border : P.primary, color: sendingFileApproval ? P.textLight : '#fff', fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 800, cursor: sendingFileApproval ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                        <i className="ti ti-send" style={{ fontSize: 15 }}></i>{sendingFileApproval ? 'Sending...' : 'Send for Approval'}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }} style={{ flex: 1, padding: '10px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Draft</button>
+                    <button onClick={handleModalUpload} disabled={!uploadFileObj || uploadingModal} style={{ flex: 1.4, padding: '10px', borderRadius: 10, border: 'none', background: (!uploadFileObj || uploadingModal) ? P.border : P.primary, color: (!uploadFileObj || uploadingModal) ? P.textLight : '#fff', fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 800, cursor: (!uploadFileObj || uploadingModal) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all .15s' }}><i className="ti ti-upload" style={{ fontSize: 15 }}></i>{uploadingModal ? 'Uploading...' : 'Upload & Share'}</button>
+                    <button onClick={() => setUploadApprovalStep(true)} disabled={!uploadFileObj} style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', background: !uploadFileObj ? P.border : P.purple, color: !uploadFileObj ? P.textLight : '#fff', fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 800, cursor: !uploadFileObj ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}><i className="ti ti-send" style={{ fontSize: 15 }}></i>Send</button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

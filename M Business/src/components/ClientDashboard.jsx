@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import SettingsPage from "./SettingsPage";
-import ModernEmployeeProjectDetails from "./ModernEmployeeProjectDetails";
+import ModernProjectDetails from "./ModernProjectDetails";
 import { PROPOSAL_PREVIEW_CSS } from "./ProposalPreviewStyles";
 import { printProposal, shareProposalAsPDF } from "./proposalPrintUtils";
 // ── Teal Theme Colors --------------------      ----------------------
@@ -401,17 +401,11 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   // File filter
   const [fileFilter, setFileFilter] = useState("All");
 
-  // Local Chat Mockups
-  const [chatMessages, setChatMessages] = useState([
-    { sender: `Support · ${localStorage.getItem("portalAgencyName") || "Our Company"}`, msg: "Hi! The final review designs have been uploaded. Please check and let us know your feedback.", time: "9:05 AM", mine: false },
-    { sender: "You", msg: "Looks great! I'll review and get back by EOD. Can we schedule a call too?", time: "9:22 AM", mine: true },
-    { sender: `Support · ${localStorage.getItem("portalAgencyName") || "Our Company"}`, msg: "Absolutely! I've added a meeting slot for tomorrow 11 AM. Check the schedule section below.", time: "9:30 AM", mine: false },
-    { sender: "You", msg: "Perfect. Also please send the updated invoice when ready.", time: "9:45 AM", mine: true }
-  ]);
+  // Real chat — populated from backend
+  const [chatMessages, setChatMessages] = useState([]);
   const [chatText, setChatText] = useState("");
 
-  // Feedback Mock
-  const [feedbackRating, setFeedbackRating] = useState(4);
+  const [feedbackRating, setFeedbackRating] = useState(0);
   const [feedbackText, setFeedbackText] = useState("");
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
@@ -454,7 +448,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         const myClientId = portalMode
           ? (portalClientId || user._id || user.id || "")
           : (user._id || user.id || "");
-        const [projRes, taskRes, invRes, notifRes, docRes, meetRes, propRes, quotRes, approvalRes] = await Promise.all([
+        const [projRes, taskRes, invRes, notifRes, docRes, meetRes, propRes, quotRes, approvalRes, msgRes] = await Promise.all([
           axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}&clientId=${encodeURIComponent(myClientId)}`, {
             headers: { 'x-company-id': user.companyId || "" }
           }),
@@ -475,7 +469,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           }).catch(() => ({ data: [] })),
           axios.get(`${BASE_URL}/api/approvals/client/${encodeURIComponent(myClientId)}`, {
             headers: { 'x-company-id': user.companyId || "" }
-          }).catch(() => ({ data: [] }))
+          }).catch(() => ({ data: [] })),
+          axios.get(`${BASE_URL}/api/messages?companyId=${encodeURIComponent(user.companyId || "")}`).catch(() => ({ data: [] }))
         ]);
 
         setProjects(projRes.data || []);
@@ -503,6 +498,21 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           approveLabel: a.approveLabel,
           rejectLabel: a.rejectLabel,
         })) : []);
+
+        // Real chat thread between this client and the agency (company owner)
+        const allMsgs = Array.isArray(msgRes.data) ? msgRes.data : [];
+        const myIdStr = String(myClientId);
+        const threadMsgs = allMsgs
+          .filter(m => String(m.senderId) === myIdStr || String(m.receiverId) === myIdStr)
+          .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+          .map(m => ({
+            id: m._id,
+            sender: String(m.senderId) === myIdStr ? "You" : m.senderName,
+            msg: m.content,
+            time: new Date(m.createdAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+            mine: String(m.senderId) === myIdStr,
+          }));
+        setChatMessages(threadMsgs);
 
         const allProps = propRes.data || [];
         const filtered = allProps.filter(p => {
@@ -532,8 +542,11 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const handleRefresh = async () => {
     setRefreshing(true);
     try {
+      const myClientId = portalMode
+        ? (portalClientId || user?._id || user?.id || "")
+        : (user?._id || user?.id || "");
       const [projRes, docRes] = await Promise.all([
-        axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}`, {
+        axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}&clientId=${encodeURIComponent(myClientId)}`, {
           headers: { 'x-company-id': user?.companyId || "" }
         }),
         axios.get(`${BASE_URL}/api/documents?companyId=${user?.companyId || ""}&client=${encodeURIComponent(clientName)}&sendTo=client&clientId=${encodeURIComponent(myClientId)}`).catch(() => ({ data: [] })),
@@ -549,21 +562,40 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     window.location.href = "/";
   };
 
-  const handleSendMessage = () => {
-    if (!chatText.trim()) return;
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-    setChatMessages([...chatMessages, { sender: "You", msg: chatText, time: timeStr, mine: true }]);
+  const handleSendMessage = async () => {
+    if (!chatText.trim() || !user) return;
+    const content = chatText.trim();
     setChatText("");
-    // Simulate auto-reply
-    setTimeout(() => {
-      setChatMessages(prev => [...prev, {
-        sender: `Support · ${localStorage.getItem("portalAgencyName") || agencyName}`,
-        msg: "Received! Let me check this with the development team and get back to you shortly.",
-        time: new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
-        mine: false
-      }]);
-    }, 1500);
+    const myClientId = portalMode
+      ? (portalClientId || user._id || user.id || "")
+      : (user._id || user.id || "");
+    const optimistic = {
+      id: "temp-" + Date.now(),
+      sender: "You",
+      msg: content,
+      time: new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+      mine: true,
+    };
+    setChatMessages(prev => [...prev, optimistic]);
+    try {
+      const res = await axios.post(`${BASE_URL}/api/messages`, {
+        senderId: myClientId,
+        senderName: clientName,
+        receiverId: user.companyId || "",
+        receiverName: agencyName,
+        content,
+        companyId: user.companyId || "",
+      });
+      setChatMessages(prev => prev.map(m => m.id === optimistic.id ? {
+        id: res.data._id,
+        sender: "You",
+        msg: res.data.content,
+        time: new Date(res.data.createdAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+        mine: true,
+      } : m));
+    } catch (err) {
+      console.error("Failed to send message", err);
+    }
   };
 
   const submitFeedback = async (e) => {
@@ -715,6 +747,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         icon = 'ti-file-zip'; bg = C.amberBg || '#fef3c7'; col = C.amber || '#d97706'; fileType = 'Documents';
       } else if (mime.includes('video') || /\.(mp4|mov|avi|mkv)$/.test(fname)) {
         icon = 'ti-video'; bg = C.purpleBg || '#f3e8ff'; col = C.purple || '#7c3aed'; fileType = 'Designs';
+      }
+      if (/invoice/i.test(fname)) {
+        fileType = 'Invoices';
       }
       return {
         name: f.name || f.heading || 'File',
@@ -1369,9 +1404,15 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         {/* Milestone Steps */}
         <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", padding: 22, marginBottom: 14 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: C.text2, marginBottom: 18 }}>Milestone Progress</div>
-          <div className="steps-grid" style={{ gridTemplateColumns: `repeat(${Math.max(milestones.length, 1)}, 1fr)` }}>
-            {stepNodes}
-          </div>
+          {milestones.length > 0 ? (
+            <div className="steps-grid" style={{ gridTemplateColumns: `repeat(${milestones.length}, 1fr)` }}>
+              {stepNodes}
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', color: C.text3, fontSize: 13, padding: '12px 0' }}>
+              No milestones defined for this project yet.
+            </div>
+          )}
         </div>
 
         {/* Gantt Chart */}
@@ -2375,17 +2416,22 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         )}
 
         {active === "projects" && selectedClientProject && (
-          <ModernEmployeeProjectDetails
+          <ModernProjectDetails
             project={{
               ...selectedClientProject,
               contactEmail: selectedClientProject.contactEmail || user?.email || "",
               contactPersonName: selectedClientProject.contactPersonName || "",
               contactPersonNo: selectedClientProject.contactPersonNo || user?.phone || "",
             }}
-            tasks={tasks}
+            tasks={tasks.filter(t =>
+              String(t.projectId || t.project) === String(selectedClientProject._id || selectedClientProject.id)
+            )}
             user={user}
             onBack={() => setSelectedClientProject(null)}
             onMessageTeam={() => setActive("messages")}
+            hideTopActions={true}
+            fetchProjects={() => { }}
+            fetchTasks={() => { }}
           />
         )}
       </div>

@@ -66,12 +66,42 @@ router.put("/:id", async (req, res) => {
       delete updateData.password;
     }
 
-    // Use updateOne instead of findByIdAndUpdate to avoid fetching the full doc
+    // Fetch the existing client BEFORE updating so we know the old name/company
+    // text that legacy Project.client (text-based) links may still be using.
+    const existingClient = await Client.findById(req.params.id).lean();
+    if (!existingClient) return res.status(404).json({ msg: "Client not found" });
+
     const result = await Client.updateOne(
       { _id: req.params.id },
       { $set: updateData }
     );
     if (result.matchedCount === 0) return res.status(404).json({ msg: "Client not found" });
+
+    // ── Keep this client's projects linked even though their display name/company changed ──
+    // Find any project still tied to this client by the OLD name text (and not yet
+    // carrying a clientId), then attach clientId and refresh the display name so the
+    // link survives future edits, instead of relying on fragile text matching.
+    try {
+      const oldName = (existingClient.clientName || existingClient.name || "").trim();
+      const oldCompany = (existingClient.companyName || existingClient.company || "").trim();
+      const newName = (updateData.clientName || oldName || "").trim();
+
+      const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const orMatchers = [];
+      if (oldName) orMatchers.push({ client: { $regex: new RegExp(`^\\s*${escapeRegExp(oldName)}\\s*$`, "i") } });
+      if (oldCompany) orMatchers.push({ client: { $regex: new RegExp(`^\\s*${escapeRegExp(oldCompany)}\\s*$`, "i") } });
+      orMatchers.push({ clientId: existingClient._id });
+
+      if (orMatchers.length > 0) {
+        await Project.updateMany(
+          { companyId: existingClient.companyId || "", $or: orMatchers },
+          { $set: { clientId: existingClient._id, client: newName } }
+        );
+      }
+    } catch (cascadeErr) {
+      // Non-fatal — the client update itself already succeeded.
+      console.error("Project cascade-link after client edit failed:", cascadeErr.message);
+    }
 
     res.json({ success: true });
   } catch (err) {

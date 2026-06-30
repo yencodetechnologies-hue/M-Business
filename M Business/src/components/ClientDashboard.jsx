@@ -1755,13 +1755,20 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 {viewApprovalApp.fileUrl && (() => {
                   const fname = (viewApprovalApp.fileName || viewApprovalApp.fileUrl || "").toLowerCase();
                   const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/.test(fname);
+                  const isPdf = /\.pdf$/.test(fname);
                   return (
                     <div style={{ marginTop: 10, border: "1.5px solid " + C.border, borderRadius: 12, overflow: "hidden", background: C.surface2 }}>
                       {isImage ? (
                         <img
                           src={viewApprovalApp.fileUrl}
                           alt={viewApprovalApp.fileName || "Attached file"}
-                          style={{ width: "100%", maxHeight: 360, objectFit: "contain", display: "block", background: "#000" }}
+                          style={{ width: "100%", maxHeight: 420, objectFit: "contain", display: "block", background: "#000" }}
+                        />
+                      ) : isPdf ? (
+                        <iframe
+                          src={viewApprovalApp.fileUrl}
+                          title={viewApprovalApp.fileName || "Attached PDF"}
+                          style={{ width: "100%", height: 420, border: "none", display: "block" }}
                         />
                       ) : (
                         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 16px", gap: 8 }}>

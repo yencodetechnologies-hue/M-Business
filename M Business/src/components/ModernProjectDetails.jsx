@@ -204,6 +204,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [submittingApproval, setSubmittingApproval] = useState(false);
   const [projectApprovals, setProjectApprovals] = useState([]);
   const [viewProjectApproval, setViewProjectApproval] = useState(null);
+  const [previewProjectFile, setPreviewProjectFile] = useState(null);
   const [portalLinkUrl, setPortalLinkUrl] = useState('');
   const [loadingPortalLink, setLoadingPortalLink] = useState(false);
   const [uploadSendForApproval, setUploadSendForApproval] = useState(false);
@@ -2403,9 +2404,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {currProject.files.map((file) => (
                   <div key={file._id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px', border: `1.5px solid ${P.border}`, borderRadius: 8 }}>
-                    <a href={file.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, fontWeight: 700, color: P.primary, textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180 }}>
+                    <button
+                      onClick={() => setPreviewProjectFile(file)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: P.primary, textAlign: 'left', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180, padding: 0 }}
+                    >
                       <i className="ti ti-file" style={{ marginRight: 6 }}></i>{file.name}
-                    </a>
+                    </button>
                     <button onClick={() => handleDeleteFile(file._id)} style={{ background: 'transparent', border: 'none', color: P.red, cursor: 'pointer', fontSize: 14 }}>✕</button>
                   </div>
                 ))}
@@ -2443,8 +2447,42 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         </div>
       </div>
 
-      {/* Add Task Modal */}
-      {
+      {previewProjectFile && (() => {
+        const fname = (previewProjectFile.name || previewProjectFile.url || '').toLowerCase();
+        const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/.test(fname) || (previewProjectFile.type || '').startsWith('image/');
+        const isPdf = /\.pdf$/.test(fname) || (previewProjectFile.type || '').includes('pdf');
+        return (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99997, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setPreviewProjectFile(null)}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: P.radius, width: '100%', maxWidth: isPdf ? 900 : 640, maxHeight: '90vh', boxShadow: '0 8px 32px rgba(0,0,0,0.25)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ background: `linear-gradient(135deg,${P.primary},${P.primaryDark})`, padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+                <span style={{ color: '#fff', fontWeight: 800, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{previewProjectFile.name}</span>
+                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                  <a href={previewProjectFile.url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <i className="ti ti-external-link"></i> Open
+                  </a>
+                  <button onClick={() => setPreviewProjectFile(null)} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer' }}>✕</button>
+                </div>
+              </div>
+              <div style={{ flex: 1, overflow: 'auto', background: P.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200 }}>
+                {isImage ? (
+                  <img src={previewProjectFile.url} alt={previewProjectFile.name} style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain', display: 'block' }} />
+                ) : isPdf ? (
+                  <iframe src={previewProjectFile.url} title={previewProjectFile.name} style={{ width: '100%', height: '80vh', border: 'none' }} />
+                ) : (
+                  <div style={{ padding: 40, textAlign: 'center' }}>
+                    <i className="ti ti-file-text" style={{ fontSize: 40, color: P.primary }}></i>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark, marginTop: 10 }}>Preview not available for this file type</div>
+                    <div style={{ fontSize: 12, color: P.textLight, marginTop: 4 }}>Use "Open" above to view it in a new tab.</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()
+      }
+
+      {/* Add Task Modal */} {
         showAddTaskModal && (
           <div style={{ position: 'fixed', inset: 0, zIndex: 99995, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ background: '#fff', borderRadius: P.radius, width: 440, padding: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.15)', boxSizing: 'border-box', maxHeight: '90vh', overflowY: 'auto' }}>

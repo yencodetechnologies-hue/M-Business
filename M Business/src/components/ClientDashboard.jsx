@@ -618,9 +618,17 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     }, 1000);
   };
 
-  const handleApproval = (id, type) => {
-    setApprovals(approvals.filter(a => a.id !== id));
-    alert(type === "approve" ? "Approved successfully!" : "Rejected/Request Changes sent.");
+  const handleApproval = async (id, type) => {
+    const status = type === "approve" ? "approved" : "rejected";
+    // Optimistically remove from view
+    setApprovals(prev => prev.filter(a => a.id !== id));
+    try {
+      await axios.patch(`${BASE_URL}/api/approvals/${id}/respond`, { status });
+      alert(type === "approve" ? "Approved successfully!" : "Rejected/Request Changes sent.");
+    } catch (err) {
+      console.error("Failed to update approval status", err);
+      alert("Something went wrong saving your response. Please try again.");
+    }
   };
 
   // Payment execution
@@ -1575,18 +1583,24 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     return (
       <div className="messages-panel">
         <div className="msg-list">
-          {chatMessages.map((msg, idx) => (
-            <div key={idx} className={`msg-row ${msg.mine ? "mine" : ""}`}>
-              <div className="msg-av" style={{ background: msg.mine ? "linear-gradient(135deg, " + C.amber + ", #D97706)" : "linear-gradient(135deg, " + C.teal + ", " + C.teal3 + ")" }}>
-                {msg.mine ? initials : "P"}
-              </div>
-              <div className="msg-body">
-                {!msg.mine && <div className="msg-name">{msg.sender}</div>}
-                <div className={`msg-bubble ${msg.mine ? "mine" : "them"}`}>{msg.msg}</div>
-                <div className="msg-time">{msg.time}</div>
-              </div>
+          {chatMessages.length === 0 ? (
+            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: C.text3, fontSize: 12, textAlign: "center", padding: "20px" }}>
+              No messages yet. Say hello to start the conversation.
             </div>
-          ))}
+          ) : (
+            chatMessages.map((msg, idx) => (
+              <div key={msg.id || idx} className={`msg-row ${msg.mine ? "mine" : ""}`}>
+                <div className="msg-av" style={{ background: msg.mine ? "linear-gradient(135deg, " + C.amber + ", #D97706)" : "linear-gradient(135deg, " + C.teal + ", " + C.teal3 + ")" }}>
+                  {msg.mine ? initials : "P"}
+                </div>
+                <div className="msg-body">
+                  {!msg.mine && <div className="msg-name">{msg.sender}</div>}
+                  <div className={`msg-bubble ${msg.mine ? "mine" : "them"}`}>{msg.msg}</div>
+                  <div className="msg-time">{msg.time}</div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
         <div className="msg-input-row">
           <div className="msg-attach" onClick={() => alert("Attachment handler opened.")}><i className="ti ti-paperclip"></i></div>
@@ -2063,7 +2077,13 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 Project Timeline & Gantt Detail
               </div>
             </div>
-            {renderTimelineComponent()}
+            <div className="two-col">
+              {renderTimelineComponent()}
+              <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                {renderApprovalsComponent()}
+                {renderCalendarComponent()}
+              </div>
+            </div>
           </div>
         )}
 

@@ -200,6 +200,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [activePayTab, setActivePayTab] = useState('inv');
 
   const [composerOpen, setComposerOpen] = useState(false);
+  const [showApprovalModal, setShowApprovalModal] = useState(false);
+  const [approvalForm, setApprovalForm] = useState({ title: '', desc: '', icon: 'ti-file-text', approveLabel: 'Approve', rejectLabel: 'Reject' });
+  const [submittingApproval, setSubmittingApproval] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadFileObj, setUploadFileObj] = useState(null);
   const [uploadHeading, setUploadHeading] = useState('');
@@ -505,6 +508,39 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   // Derived Project Data
   const projName = currProject.name || "Unnamed Project";
   const clientName = currProject.client || currProject.clientName || "Unknown Client";
+
+  // Resolve the actual client _id this project belongs to, for sending approval requests.
+  const resolvedClientId = currProject.clientId
+    || clients?.find(c => (c.clientName || c.name || "").toLowerCase().trim() === clientName.toLowerCase().trim())?._id
+    || "";
+
+  const submitApprovalRequest = async () => {
+    if (!approvalForm.title.trim()) { alert("Please enter a title for this approval request."); return; }
+    if (!resolvedClientId) { alert("Could not determine which client this project belongs to. Please make sure the project has a linked client."); return; }
+    const approvalCompanyId = user?.companyId || user?.company || user?._id || user?.id || currProject.companyId || '';
+    setSubmittingApproval(true);
+    try {
+      await axios.post(`${BASE_URL}/api/approvals`, {
+        companyId: approvalCompanyId,
+        clientId: resolvedClientId,
+        title: approvalForm.title.trim(),
+        desc: approvalForm.desc.trim(),
+        icon: approvalForm.icon,
+        approveLabel: approvalForm.approveLabel || 'Approve',
+        rejectLabel: approvalForm.rejectLabel || 'Reject',
+        sourceType: 'project',
+        projectId: currProject._id || '',
+      });
+      alert("Approval request sent to the client!");
+      setShowApprovalModal(false);
+      setApprovalForm({ title: '', desc: '', icon: 'ti-file-text', approveLabel: 'Approve', rejectLabel: 'Reject' });
+    } catch (err) {
+      console.error("Failed to create approval request", err);
+      alert("Failed to send approval request. Please try again.");
+    } finally {
+      setSubmittingApproval(false);
+    }
+  };
   const category = currProject.category || currProject.purpose || "General";
   const priority = currProject.priority || "medium";
   const status = (currProject.status || "Active").toLowerCase();
@@ -1155,9 +1191,85 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               }}>
                 <i className="ti ti-speakerphone"></i> Post Update
               </button>
+              <button className="mpd-btn mpd-btn-outline" onClick={() => setShowApprovalModal(true)}>
+                <i className="ti ti-clipboard-check"></i> Request Approval
+              </button>
             </div>
           </div>
         </div>
+
+        {showApprovalModal && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setShowApprovalModal(false)}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 460, boxShadow: '0 10px 40px rgba(0,0,0,0.2)', overflow: 'hidden' }}>
+              <div style={{ padding: '18px 22px', borderBottom: '1px solid #E5E7EB', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ fontSize: 16, fontWeight: 800, color: '#111827' }}>Request Client Approval</div>
+                <button onClick={() => setShowApprovalModal(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#9CA3AF' }}>✕</button>
+              </div>
+              <div style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#6B7280', marginBottom: 6 }}>Title *</div>
+                  <input
+                    value={approvalForm.title}
+                    onChange={e => setApprovalForm(f => ({ ...f, title: e.target.value }))}
+                    placeholder="e.g. Homepage Design v3"
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid #E5E7EB', fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#6B7280', marginBottom: 6 }}>Description</div>
+                  <textarea
+                    value={approvalForm.desc}
+                    onChange={e => setApprovalForm(f => ({ ...f, desc: e.target.value }))}
+                    placeholder="e.g. Final colour palette for website"
+                    rows={3}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid #E5E7EB', fontSize: 13, outline: 'none', resize: 'none', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#6B7280', marginBottom: 6 }}>Approve button label</div>
+                    <input
+                      value={approvalForm.approveLabel}
+                      onChange={e => setApprovalForm(f => ({ ...f, approveLabel: e.target.value }))}
+                      style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid #E5E7EB', fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#6B7280', marginBottom: 6 }}>Reject button label</div>
+                    <input
+                      value={approvalForm.rejectLabel}
+                      onChange={e => setApprovalForm(f => ({ ...f, rejectLabel: e.target.value }))}
+                      style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid #E5E7EB', fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#6B7280', marginBottom: 6 }}>Icon</div>
+                  <select
+                    value={approvalForm.icon}
+                    onChange={e => setApprovalForm(f => ({ ...f, icon: e.target.value }))}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid #E5E7EB', fontSize: 13, outline: 'none', boxSizing: 'border-box', background: '#fff' }}
+                  >
+                    <option value="ti-file-text">Document</option>
+                    <option value="ti-photo">Design / Image</option>
+                    <option value="ti-palette">Color / Branding</option>
+                    <option value="ti-file-invoice">Invoice / Contract</option>
+                    <option value="ti-checklist">Checklist</option>
+                  </select>
+                </div>
+                <div style={{ fontSize: 11, color: '#9CA3AF' }}>This will be sent to <strong>{clientName}</strong> and appear on their Overview and Timeline pages.</div>
+                <button
+                  onClick={submitApprovalRequest}
+                  disabled={submittingApproval}
+                  className="mpd-btn mpd-btn-primary"
+                  style={{ width: '100%', justifyContent: 'center', padding: '12px', fontSize: 13 }}
+                >
+                  {submittingApproval ? 'Sending...' : 'Send Approval Request'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* PROGRESS */}
         <div className="mpd-prog-card">

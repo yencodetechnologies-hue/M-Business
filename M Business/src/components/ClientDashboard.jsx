@@ -794,7 +794,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
   // Styles Injection
   const CSS = `
-    .cp-root {
+  .cp-root {
       --teal: #00BCD4;
       --teal2: #00ACC1;
       --teal3: #006E7F;
@@ -825,7 +825,6 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      overflow-x: hidden;
       margin: 0;
       padding: 0;
       box-sizing: border-box;
@@ -883,7 +882,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .hero-status-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
 
     /* ── PAGE BODY ── */
-    .cp-root .page-body { max-width: 1200px; margin: 0 auto; padding: 28px 24px 60px; display: flex; flex-direction: column; gap: 28px; }
+    .cp-root .page-body { max-width: 1200px; margin: 0 auto; padding: 28px 24px 60px; display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+    .cp-root .page-body > * { min-width: 0; overflow-x: auto; }
 
     /* ── SECTION HEADERS ── */
     .cp-root .sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
@@ -1120,15 +1120,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       .cp-root .files-grid { grid-template-columns: 1fr; }
     }
   `;
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', height: '100vh', background: '#F0FDFE', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16, fontFamily: 'Nunito, sans-serif' }}>
-        <div style={{ width: 48, height: 48, border: '4px solid #E0EEF0', borderTop: '4px solid #00BCD4', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-        <div style={{ fontSize: 14, fontWeight: 700, color: '#607D86' }}>Loading your portal...</div>
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      </div>
-    );
-  }
+
 
   // Settings Component Render Wrapper
   if (active === "settings") {
@@ -2414,7 +2406,6 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             )}
           </div>
         )}
-
         {active === "projects" && selectedClientProject && (
           <ModernProjectDetails
             project={{
@@ -2429,9 +2420,28 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             user={user}
             onBack={() => setSelectedClientProject(null)}
             onMessageTeam={() => setActive("messages")}
-            hideTopActions={true}
-            fetchProjects={() => { }}
-            fetchTasks={() => { }}
+            fetchProjects={async () => {
+              try {
+                const myClientId = portalMode
+                  ? (portalClientId || user?._id || user?.id || "")
+                  : (user?._id || user?.id || "");
+                const res = await axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}&clientId=${encodeURIComponent(myClientId)}`, {
+                  headers: { 'x-company-id': user?.companyId || "" }
+                });
+                setProjects(res.data || []);
+              } catch (e) { console.error(e); }
+            }}
+            fetchTasks={async () => {
+              try {
+                const myClientId = portalMode
+                  ? (portalClientId || user?._id || user?.id || "")
+                  : (user?._id || user?.id || "");
+                const res = await axios.get(`${BASE_URL}/api/tasks/client/${encodeURIComponent(clientName)}?clientId=${encodeURIComponent(myClientId)}`, {
+                  headers: { 'x-company-id': user?.companyId || "" }
+                });
+                setTasks(res.data || []);
+              } catch (e) { console.error(e); }
+            }}
           />
         )}
       </div>

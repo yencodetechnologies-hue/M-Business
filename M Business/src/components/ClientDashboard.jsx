@@ -1285,21 +1285,42 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
     const ganttRows = milestones.map((m, idx) => {
       const mDate = m.date ? new Date(m.date) : null;
-      const colIdx = mDate ? monthIndex(mDate) : -1;
-      const daysInCol = mDate ? new Date(mDate.getFullYear(), mDate.getMonth() + 1, 0).getDate() : 30;
-      const barLeft = mDate ? ((mDate.getDate() - 1) / daysInCol) * 100 : 0;
-      const barWidth = 30; // fixed width pill
-      const barColor = m.done ? C.teal : (colIdx === todayColIdx ? C.amber : '#CBD5E1');
+      // Determine the start of this milestone's bar: previous milestone's date, or project start
+      const prevMilestone = idx > 0 ? milestones[idx - 1] : null;
+      const barStart = prevMilestone?.date ? new Date(prevMilestone.date) : (proj?.start ? new Date(proj.start) : mDate);
+      const barEnd = mDate || today;
+      const startColIdx = barStart ? monthIndex(barStart) : -1;
+      const endColIdx = barEnd ? monthIndex(barEnd) : -1;
+      const barColor = m.done ? C.teal : (endColIdx === todayColIdx || (startColIdx <= todayColIdx && endColIdx >= todayColIdx) ? C.amber : '#CBD5E1');
       const textColor = m.done ? '#fff' : C.text2;
+      const labelText = m.done ? `${m.name} ✓` : (endColIdx === todayColIdx ? 'In Review' : 'Planned');
 
       return (
         <div key={idx} className="tl-row">
           <div>
             <div className="tl-task-name">{m.name}</div>
-            <div className="tl-task-sub">{m.done ? 'Yes Done' : 'Pending'}</div>
+            <div className="tl-task-sub">{m.done ? 'Done' : 'Pending'}</div>
           </div>
           {ganttMonths.map((gm, gi) => {
             const isToday = gi === todayColIdx;
+            // Does this milestone's bar touch this column?
+            const inRange = startColIdx !== -1 && endColIdx !== -1 && gi >= startColIdx && gi <= endColIdx;
+            let segLeft = 0, segWidth = 100;
+            if (inRange) {
+              if (gi === startColIdx && startColIdx === endColIdx) {
+                // Single-month bar: from start day to end day
+                const daysInCol = new Date(gm.year, gm.month + 1, 0).getDate();
+                segLeft = ((barStart.getDate() - 1) / daysInCol) * 100;
+                segWidth = ((barEnd.getDate() - barStart.getDate() + 1) / daysInCol) * 100;
+              } else if (gi === startColIdx) {
+                const daysInCol = new Date(gm.year, gm.month + 1, 0).getDate();
+                segLeft = ((barStart.getDate() - 1) / daysInCol) * 100;
+                segWidth = 100 - segLeft;
+              } else if (gi === endColIdx) {
+                const daysInCol = new Date(gm.year, gm.month + 1, 0).getDate();
+                segWidth = (barEnd.getDate() / daysInCol) * 100;
+              }
+            }
             return (
               <div key={gi} className="tl-grid-cell" style={{ position: 'relative' }}>
                 {isToday && (
@@ -1308,10 +1329,10 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     <div className="today-line" style={{ left: `${todayPct}%` }}></div>
                   </>
                 )}
-                {gi === colIdx && mDate && (
+                {inRange && (
                   <div className="tl-bar-wrap">
-                    <div className="tl-bar" style={{ width: `${barWidth}%`, left: `${barLeft}%`, background: barColor, color: textColor }}>
-                      {m.done ? 'Yes' : ''}
+                    <div className="tl-bar" style={{ width: `${segWidth}%`, left: `${segLeft}%`, background: barColor, color: textColor }}>
+                      {gi === startColIdx ? labelText : ''}
                     </div>
                   </div>
                 )}
@@ -1605,8 +1626,10 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 <div className="ai-desc">{app.desc}</div>
               </div>
               <div className="ai-actions">
-                <button className="ai-btn reject" onClick={() => handleApproval(app.id, "reject")}>Reject</button>
-                <button className="ai-btn approve" onClick={() => handleApproval(app.id, "approve")}>Approve</button>
+                <button className="ai-btn approve" onClick={() => handleApproval(app.id, "approve")}>
+                  <i className="ti ti-check" style={{ fontSize: 12 }}></i> {app.approveLabel || "Approve"}
+                </button>
+                <button className="ai-btn reject" onClick={() => handleApproval(app.id, "reject")}>{app.rejectLabel || "Reject"}</button>
               </div>
             </div>
           ))}

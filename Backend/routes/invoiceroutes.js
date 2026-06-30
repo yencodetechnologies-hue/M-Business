@@ -1,6 +1,7 @@
 // routes/invoiceRoutes.js  ← FLAT SCHEMA VERSION (matches your InvoiceModels.js)
 const express = require("express");
 const router = express.Router();
+const Notification = require("../models/NotificationModel");
 const Invoice = require("../models/InvoiceModels");
 const Income = require("../models/IncomeModel");
 
@@ -147,21 +148,22 @@ router.get("/client/:clientName", async (req, res) => {
     // If no companyId, return empty — prevents deleted client's old invoices showing
     if (!companyId) return res.json([]);
 
-    let filter;
+    let invoices = [];
     if (clientId) {
-      // Strict match: only invoices explicitly assigned to this client account
-      filter = { companyId, clientId };
-    } else {
-      // Legacy fallback: name-based match for invoices before clientId existed
+      // Strict match first: invoices explicitly assigned to this client account
+      invoices = await Invoice.find({ companyId, clientId }).sort({ createdAt: -1 }).lean();
+    }
+    if (invoices.length === 0) {
+      // Legacy fallback: name-based match for invoices saved before clientId existed,
+      // or when no strict-match invoices were found
       const conditions = [];
       if (safeName) conditions.push({ client: { $regex: new RegExp(safeName, "i") } });
       if (safeCompany) conditions.push({ client: { $regex: new RegExp(safeCompany, "i") } });
-      filter = conditions.length > 0
+      const fallbackFilter = conditions.length > 0
         ? { companyId, $or: conditions }
-        : { companyId };
+        : { companyId, _id: null }; // no name to match on — return nothing rather than all invoices
+      invoices = await Invoice.find(fallbackFilter).sort({ createdAt: -1 }).lean();
     }
-
-    const invoices = await Invoice.find(filter).sort({ createdAt: -1 }).lean();
 
     const normalised = await Promise.all(invoices.map(async (doc) => {
       let subtotal = 0;
@@ -429,6 +431,22 @@ router.post("/", async (req, res) => {
         },
         { upsert: true, returnDocument: "after" }
       );
+    }
+
+    // Notify the client when the invoice is sent (not a draft)
+    if (savedInvoice.status !== "draft" && savedInvoice.clientId) {
+      try {
+        await new Notification({
+          userId: savedInvoice.clientId,
+          type: "invoice",
+          icon: "ti-receipt-2",
+          text: `New invoice ${savedInvoice.invoiceNo} has been sent to you`,
+          link: "payments",
+          companyId: savedInvoice.companyId || "",
+        }).save();
+      } catch (notifErr) {
+        console.error("Failed to create invoice notification:", notifErr.message);
+      }
     }
 
     return res.json({ success: true, invoice: savedInvoice });

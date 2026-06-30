@@ -25,6 +25,22 @@ router.post('/', async (req, res) => {
 
         const savedDoc = await newDoc.save();
 
+        // Notify the client when a document/file is shared with them
+        if (sendTo === "client" && clientId) {
+            try {
+                await new Notification({
+                    userId: clientId,
+                    type: "document",
+                    icon: "ti-files",
+                    text: `A new document has been shared with you`,
+                    link: "files",
+                    companyId: companyId || "",
+                }).save();
+            } catch (notifErr) {
+                console.error("Failed to create document notification:", notifErr.message);
+            }
+        }
+
         res.status(201).json(savedDoc);
     } catch (err) {
         res.status(500).json({ msg: err.message });

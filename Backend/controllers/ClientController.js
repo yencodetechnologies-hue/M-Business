@@ -52,7 +52,7 @@ exports.addClient = async (req, res) => {
     const newClient = new Client({
       clientName,
       companyName,
-      email,
+      email: normalizedEmail,
       phone,
       contactPersonName,
       contactPersonNo,

@@ -1,16 +1,26 @@
 // One-time script: run with `node backfillClientPasswords.js`
-// Sets password to "123456" for any client whose password field is empty/missing.
 require("dotenv").config();
+
+const dns = require("dns");
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const Client = require("./models/ClientModel");
 
 async function run() {
-    await mongoose.connect(process.env.MONGO_URI);
+    await mongoose.connect(process.env.MONGO_URI, {
+        serverSelectionTimeoutMS: 30000,
+    });
+
     console.log("Connected to MongoDB");
 
     const clients = await Client.find({
-        $or: [{ password: "" }, { password: { $exists: false } }, { password: null }]
+        $or: [
+            { password: "" },
+            { password: { $exists: false } },
+            { password: null }
+        ]
     });
 
     console.log(`Found ${clients.length} client(s) with no password set.`);

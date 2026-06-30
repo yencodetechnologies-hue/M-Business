@@ -80,18 +80,19 @@ router.post("/login", async (req, res) => {
     }
 
     let user = null;
+    const normalizedLoginEmail = (email || "").toLowerCase().trim();
 
     // Check User collection
-    user = await User.findOne({ email });
+    user = await User.findOne({ email: normalizedLoginEmail });
     console.log("User collection result:", user ? `Found: ${user.role}` : "Not found");
 
     if (!user) {
-      user = await Client.findOne({ email });
+      user = await Client.findOne({ email: normalizedLoginEmail });
       console.log("Client collection result:", user ? "Found" : "Not found");
     }
 
     if (!user) {
-      user = await Manager.findOne({ email });
+      user = await Manager.findOne({ email: normalizedLoginEmail });
       console.log("Manager collection result:", user ? "Found" : "Not found");
     }
 

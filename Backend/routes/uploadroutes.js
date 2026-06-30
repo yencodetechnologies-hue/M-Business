@@ -9,17 +9,31 @@ const Media = require("../models/MediaModel");
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 const storage = multer.memoryStorage();
-const upload  = multer({
+const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // Increased to 10MB
+  limits: { fileSize: 25 * 1024 * 1024 }, // 25MB to allow larger docs/zips
   fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith("image/")) cb(null, true);
-    else cb(new Error("Only image files allowed"), false);
+    const allowedMimes = [
+      "image/", "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+      "application/vnd.ms-powerpoint",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
+      "text/plain", "text/csv", "text/html",
+      "application/zip", "application/x-zip-compressed",
+      "application/x-rar-compressed", "application/vnd.rar",
+      "video/", "audio/",
+    ];
+    const isAllowed = allowedMimes.some(prefix => file.mimetype.startsWith(prefix));
+    if (isAllowed) cb(null, true);
+    else cb(new Error(`File type not allowed: ${file.mimetype}`), false);
   },
 });
 
@@ -52,11 +66,11 @@ router.post("/", upload.single("file"), async (req, res) => {
 
       try {
         const newMedia = new Media({
-          url:       result.secure_url,
+          url: result.secure_url,
           public_id: result.public_id,
-          name:      req.file.originalname,
-          size:      req.file.size,
-          type:      req.file.mimetype,
+          name: req.file.originalname,
+          size: req.file.size,
+          type: req.file.mimetype,
         });
         await newMedia.save();
         res.json(newMedia);
@@ -74,20 +88,20 @@ router.post("/logo", upload.single("file"), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ msg: "No file uploaded" });
   }
-const uploadStream = cloudinary.uploader.upload_stream(
-  {
-    folder: "mbusiness/logos",
-    resource_type: "auto",        
-    format: "png",
-  },
-  (error, result) => {
-    if (error) {
-      console.error("❌ Cloudinary error:", error);
-      return res.status(500).json({ msg: "Cloudinary upload failed", error });
+  const uploadStream = cloudinary.uploader.upload_stream(
+    {
+      folder: "mbusiness/logos",
+      resource_type: "auto",
+      format: "png",
+    },
+    (error, result) => {
+      if (error) {
+        console.error("❌ Cloudinary error:", error);
+        return res.status(500).json({ msg: "Cloudinary upload failed", error });
+      }
+      return res.json({ logoUrl: result.secure_url });
     }
-    return res.json({ logoUrl: result.secure_url });
-  }
-);
+  );
   streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
 });
 

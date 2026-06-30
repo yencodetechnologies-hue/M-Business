@@ -875,7 +875,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .tl-grid-cell { height: 28px; border-left: 1px dashed var(--border); position: relative; }
     .cp-root .tl-grid-cell:last-child { border-right: 1px dashed var(--border); }
     .cp-root .tl-bar-wrap { position: relative; height: 22px; margin: 3px 0; }
-    .cp-root .tl-bar { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 8px; font-size: 10px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; position: absolute; }
+.cp-root .tl-bar { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 8px; font-size: 10px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; position: absolute; }
+.cp-root .tl-bar-fill { position: absolute; top: 0; left: 0; bottom: 0; background: rgba(255,255,255,0.35); border-radius: 6px 0 0 6px; z-index: 1; }
+.cp-root .tl-bar-label { position: relative; z-index: 2; }
     .cp-root .today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--red); z-index: 5; pointer-events: none; }
     .cp-root .today-label { position: absolute; top: -18px; transform: translateX(-50%); font-size: 9px; font-weight: 800; color: var(--red); background: var(--red-bg); padding: 1px 6px; border-radius: 20px; white-space: nowrap; }
 
@@ -1272,16 +1274,14 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     );
 
     // ── Gantt Chart -----------------------------------------------
-    // Compute month range from project startend
     const pStart = proj?.start ? new Date(proj.start) : new Date(today.getFullYear(), today.getMonth() - 1, 1);
     const pEnd = (proj?.end || proj?.deadline) ? new Date(proj.end || proj.deadline) : new Date(today.getFullYear(), today.getMonth() + 2, 0);
-    // Build 6 month labels centered around today
+
     const ganttMonths = [];
     for (let i = -1; i <= 4; i++) {
       const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
       ganttMonths.push({ label: d.toLocaleString('en-IN', { month: 'short' }), year: d.getFullYear(), month: d.getMonth() });
     }
-    const totalSpan = ganttMonths.length; // 6 columns
 
     function monthIndex(date) {
       if (!date) return -1;
@@ -1289,22 +1289,35 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       return ganttMonths.findIndex(m => m.month === d.getMonth() && m.year === d.getFullYear());
     }
 
-    // Today line: which column + percentage within that column
     const todayColIdx = ganttMonths.findIndex(m => m.month === today.getMonth() && m.year === today.getFullYear());
     const daysInTodayMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
     const todayPct = (today.getDate() / daysInTodayMonth) * 100;
 
+    // Fallback: if a milestone has no explicit date, spread it evenly across the project span
+    // so a duration bar can still be drawn instead of collapsing to a single point.
+    const fallbackSpanMs = Math.max(pEnd.getTime() - pStart.getTime(), 1);
+    const resolvedDates = milestones.map((m, idx) => {
+      if (m.date) return new Date(m.date);
+      const frac = (idx + 1) / Math.max(milestones.length, 1);
+      return new Date(pStart.getTime() + fallbackSpanMs * frac);
+    });
+
     const ganttRows = milestones.map((m, idx) => {
-      const mDate = m.date ? new Date(m.date) : null;
-      // Determine the start of this milestone's bar: previous milestone's date, or project start
       const prevMilestone = idx > 0 ? milestones[idx - 1] : null;
-      const barStart = prevMilestone?.date ? new Date(prevMilestone.date) : (proj?.start ? new Date(proj.start) : mDate);
-      const barEnd = mDate || today;
-      const startColIdx = barStart ? monthIndex(barStart) : -1;
-      const endColIdx = barEnd ? monthIndex(barEnd) : -1;
-      const barColor = m.done ? C.teal : (endColIdx === todayColIdx || (startColIdx <= todayColIdx && endColIdx >= todayColIdx) ? C.amber : '#CBD5E1');
+      const barStart = prevMilestone ? (prevMilestone.date ? new Date(prevMilestone.date) : resolvedDates[idx - 1]) : pStart;
+      const barEnd = resolvedDates[idx];
+      const startColIdx = monthIndex(barStart);
+      const endColIdx = monthIndex(barEnd);
+      const isTodayInRange = startColIdx !== -1 && endColIdx !== -1 && todayColIdx >= startColIdx && todayColIdx <= endColIdx;
+      const barColor = m.done ? C.teal : (isTodayInRange ? C.amber : '#CBD5E1');
       const textColor = m.done ? '#fff' : C.text2;
-      const labelText = m.done ? `${m.name} ✓` : (endColIdx === todayColIdx ? 'In Review' : 'Planned');
+      const labelText = m.done ? `${m.name} ✓` : (isTodayInRange ? 'In Review' : 'Planned');
+
+      // Progress: explicit m.progress wins; else done=100, in-progress=time-elapsed within range, pending=0
+      let progressPct = typeof m.progress === 'number' ? m.progress
+        : m.done ? 100
+          : isTodayInRange ? Math.min(100, Math.max(0, ((today - barStart) / (barEnd - barStart || 1)) * 100))
+            : 0;
 
       return (
         <div key={idx} className="tl-row">
@@ -1314,36 +1327,33 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           </div>
           {ganttMonths.map((gm, gi) => {
             const isToday = gi === todayColIdx;
-            // Does this milestone's bar touch this column?
             const inRange = startColIdx !== -1 && endColIdx !== -1 && gi >= startColIdx && gi <= endColIdx;
             let segLeft = 0, segWidth = 100;
             if (inRange) {
+              const daysInCol = new Date(gm.year, gm.month + 1, 0).getDate();
               if (gi === startColIdx && startColIdx === endColIdx) {
-                // Single-month bar: from start day to end day
-                const daysInCol = new Date(gm.year, gm.month + 1, 0).getDate();
                 segLeft = ((barStart.getDate() - 1) / daysInCol) * 100;
                 segWidth = ((barEnd.getDate() - barStart.getDate() + 1) / daysInCol) * 100;
               } else if (gi === startColIdx) {
-                const daysInCol = new Date(gm.year, gm.month + 1, 0).getDate();
                 segLeft = ((barStart.getDate() - 1) / daysInCol) * 100;
                 segWidth = 100 - segLeft;
               } else if (gi === endColIdx) {
-                const daysInCol = new Date(gm.year, gm.month + 1, 0).getDate();
                 segWidth = (barEnd.getDate() / daysInCol) * 100;
               }
+              segWidth = Math.max(segWidth, 6); // guarantee a visible sliver even for very short spans
             }
             return (
               <div key={gi} className="tl-grid-cell" style={{ position: 'relative' }}>
                 {isToday && (
-                  <>
-                    <div className="today-label">TODAY</div>
-                    <div className="today-line" style={{ left: `${todayPct}%` }}></div>
-                  </>
+                  <div className="today-line" style={{ left: `${todayPct}%` }}></div>
                 )}
                 {inRange && (
                   <div className="tl-bar-wrap">
                     <div className="tl-bar" style={{ width: `${segWidth}%`, left: `${segLeft}%`, background: barColor, color: textColor }}>
-                      {gi === startColIdx ? labelText : ''}
+                      {gi === startColIdx && (
+                        <div className="tl-bar-fill" style={{ width: `${progressPct}%` }}></div>
+                      )}
+                      <span className="tl-bar-label">{gi === startColIdx ? labelText : ''}</span>
                     </div>
                   </div>
                 )}
@@ -1359,15 +1369,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         {/* Milestone Steps */}
         <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", padding: 22, marginBottom: 14 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: C.text2, marginBottom: 18 }}>Milestone Progress</div>
-          {milestones.length > 0 ? (
-            <div className="steps-grid" style={{ gridTemplateColumns: `repeat(${milestones.length}, 1fr)` }}>
-              {stepNodes}
-            </div>
-          ) : (
-            <div style={{ textAlign: 'center', color: C.text3, fontSize: 13, padding: '12px 0' }}>
-              No milestones defined for this project yet.
-            </div>
-          )}
+          <div className="steps-grid" style={{ gridTemplateColumns: `repeat(${Math.max(milestones.length, 1)}, 1fr)` }}>
+            {stepNodes}
+          </div>
         </div>
 
         {/* Gantt Chart */}
@@ -1388,8 +1392,11 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               <div className="tl-months">
                 <div className="tl-month"></div>
                 {ganttMonths.map((gm, gi) => (
-                  <div key={gi} className="tl-month" style={gi === todayColIdx ? { color: C.teal, fontWeight: 800 } : {}}>
-                    {gm.label} {gi === todayColIdx ? '' : ''}
+                  <div key={gi} className="tl-month" style={{ position: 'relative', ...(gi === todayColIdx ? { color: C.teal, fontWeight: 800 } : {}) }}>
+                    {gm.label}
+                    {gi === todayColIdx && (
+                      <div className="today-label" style={{ position: 'absolute', top: -18, left: `${todayPct}%`, transform: 'translateX(-50%)' }}>TODAY</div>
+                    )}
                   </div>
                 ))}
               </div>

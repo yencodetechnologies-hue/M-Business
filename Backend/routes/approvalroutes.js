@@ -132,6 +132,7 @@ router.get("/", async (req, res) => {
 });
 
 // ── DELETE an approval request ──────────────────────────────────────────
+
 router.delete("/:id", async (req, res) => {
     try {
         const doc = await Approval.findByIdAndDelete(req.params.id);

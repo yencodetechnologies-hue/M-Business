@@ -203,6 +203,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [approvalForm, setApprovalForm] = useState({ recipientType: 'client', teamMemberId: '', clientId: '', title: '', desc: '', icon: 'ti-file-text', approveLabel: 'Approve', rejectLabel: 'Reject' });
   const [submittingApproval, setSubmittingApproval] = useState(false);
   const [projectApprovals, setProjectApprovals] = useState([]);
+  const [viewProjectApproval, setViewProjectApproval] = useState(null);
+  const [portalLinkUrl, setPortalLinkUrl] = useState('');
+  const [loadingPortalLink, setLoadingPortalLink] = useState(false);
   const [uploadSendForApproval, setUploadSendForApproval] = useState(false);
   const [sendingFileApproval, setSendingFileApproval] = useState(false);
   const [postUpdateOnUpload, setPostUpdateOnUpload] = useState(false);
@@ -533,8 +536,19 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       console.error("Failed to load project approvals", err);
     }
   };
-
   useEffect(() => { if (currProject?._id) loadProjectApprovals(); }, [currProject?._id]);
+
+  const handleDeleteApproval = async (approvalId) => {
+    if (!confirm("Delete this approval request? This cannot be undone.")) return;
+    try {
+      await axios.delete(`${BASE_URL}/api/approvals/${approvalId}`);
+      setProjectApprovals(prev => prev.filter(a => a._id !== approvalId));
+      if (viewProjectApproval?._id === approvalId) setViewProjectApproval(null);
+    } catch (err) {
+      console.error("Failed to delete approval", err);
+      alert("Failed to delete approval. Please try again.");
+    }
+  };
 
   const submitApprovalRequest = async () => {
     const title = updateTitle.trim() || updateText.trim().slice(0, 60);
@@ -1130,6 +1144,62 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     window.open(url, "_blank");
   };
 
+  const generatePortalLink = async () => {
+    if (portalLinkUrl) return portalLinkUrl;
+    setLoadingPortalLink(true);
+    try {
+      const res = await axios.get(`${BASE_URL}/api/clients`, { headers: { 'x-company-id': currProject?.companyId || '' } });
+      const clientList = Array.isArray(res.data) ? res.data : [];
+      const matched = clientList.find(c =>
+        (c.clientName || c.name || '').toLowerCase().trim() === (currProject?.client || '').toLowerCase().trim()
+      );
+      if (!matched) {
+        alert('Could not find this client\'s account. Make sure the client is added under Clients.');
+        return '';
+      }
+      const subadminCompanyId = user?.companyId || user?._id || user?.id || currProject?.companyId || '';
+      const clientToken = btoa(JSON.stringify({
+        clientId: matched._id,
+        email: matched.email,
+        name: matched.clientName || matched.name,
+        companyName: matched.companyName || matched.company || '',
+        companyId: subadminCompanyId,
+        agencyName: user?.companyName || user?.name || '',
+        exp: Date.now() + 24 * 60 * 60 * 1000
+      }));
+      const link = `${window.location.origin}/client-portal/${matched._id}?token=${clientToken}`;
+      setPortalLinkUrl(link);
+      return link;
+    } catch (err) {
+      console.error('Failed to generate portal link:', err);
+      alert('Failed to generate client portal link. Please try again.');
+      return '';
+    } finally {
+      setLoadingPortalLink(false);
+    }
+  };
+
+  useEffect(() => { if (currProject?._id) generatePortalLink(); }, [currProject?._id, currProject?.client]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const copyPortalLink = async () => {
+    const link = portalLinkUrl || await generatePortalLink();
+    if (!link) return;
+    navigator.clipboard.writeText(link);
+    alert('Portal link copied to clipboard!');
+  };
+
+  const sharePortalLinkViaWhatsApp = async () => {
+    const link = portalLinkUrl || await generatePortalLink();
+    if (!link) return;
+    window.open(`https://wa.me/?text=${encodeURIComponent(`Here's your client portal link: ${link}`)}`, '_blank');
+  };
+
+  const sharePortalLinkViaEmail = async () => {
+    const link = portalLinkUrl || await generatePortalLink();
+    if (!link) return;
+    window.open(`mailto:?subject=${encodeURIComponent('Your Client Portal Link')}&body=${encodeURIComponent(`Here's your client portal link: ${link}`)}`, '_blank');
+  };
+
   return (
     <>
       <div className="mpd-root">
@@ -1309,8 +1379,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 const statusColor = a.status === 'approved' ? '#15803D' : a.status === 'rejected' ? '#DC2626' : '#B45309';
                 const statusBg = a.status === 'approved' ? '#DCFCE7' : a.status === 'rejected' ? '#FEE2E2' : '#FEF3C7';
                 return (
-                  <div key={a._id} style={{ padding: '12px 14px', border: '1px solid #F3F4F6', borderRadius: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-                    <div style={{ flex: 1, minWidth: 0 }}>
+                  <div key={a._id} style={{ padding: '12px 14px', border: '1px solid #F3F4F6', borderRadius: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
+                    <div style={{ flex: 1, minWidth: 160 }}>
                       <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{a.title}</div>
                       <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>
                         Sent to {a.recipientType === 'team' ? 'Team' : 'Client'} {a.senderName ? `by ${a.senderName}` : ''}
@@ -1321,12 +1391,70 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         </div>
                       )}
                     </div>
-                    <span style={{ background: statusBg, color: statusColor, borderRadius: 20, padding: '4px 12px', fontSize: 11, fontWeight: 800, flexShrink: 0 }}>
-                      {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                      <span style={{ background: statusBg, color: statusColor, borderRadius: 20, padding: '4px 12px', fontSize: 11, fontWeight: 800 }}>
+                        {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
+                      </span>
+                      <button onClick={() => setViewProjectApproval(a)} style={{ padding: '5px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#fff', color: P.primary, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>View</button>
+                      <button onClick={() => handleDeleteApproval(a._id)} style={{ padding: '5px 12px', borderRadius: 8, border: '1.5px solid #FCA5A5', background: P.redLight, color: P.red, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Delete</button>
+                    </div>
                   </div>
                 );
               })}
+            </div>
+          </div>
+        )}
+
+        {viewProjectApproval && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99998, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={() => setViewProjectApproval(null)}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: P.radius, width: '100%', maxWidth: 520, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', overflow: 'hidden' }}>
+              <div style={{ background: `linear-gradient(135deg,${P.primary},${P.primaryDark})`, padding: '16px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ color: '#fff', fontWeight: 800, fontSize: 15 }}>{viewProjectApproval.title}</span>
+                <button onClick={() => setViewProjectApproval(null)} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>✕</button>
+              </div>
+              <div style={{ padding: '22px 24px' }}>
+                <div style={{ fontSize: 13, color: P.textMid, lineHeight: 1.6 }}>{viewProjectApproval.desc || "No additional details provided."}</div>
+                <div style={{ fontSize: 12, color: P.textLight, marginTop: 8 }}>
+                  Sent to {viewProjectApproval.recipientType === 'team' ? 'Team' : 'Client'}{viewProjectApproval.senderName ? ` by ${viewProjectApproval.senderName}` : ''}
+                </div>
+
+                {viewProjectApproval.fileUrl && (() => {
+                  const fname = (viewProjectApproval.fileName || viewProjectApproval.fileUrl || '').toLowerCase();
+                  const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/.test(fname);
+                  return (
+                    <div style={{ marginTop: 14, border: `1.5px solid ${P.border}`, borderRadius: 12, overflow: 'hidden', background: P.bg }}>
+                      {isImage ? (
+                        <img src={viewProjectApproval.fileUrl} alt={viewProjectApproval.fileName || 'Attached file'} style={{ width: '100%', maxHeight: 360, objectFit: 'contain', display: 'block', background: '#000' }} />
+                      ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', gap: 8 }}>
+                          <i className="ti ti-file-text" style={{ fontSize: 36, color: P.primary }}></i>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>{viewProjectApproval.fileName || 'Attached file'}</div>
+                          <div style={{ fontSize: 11, color: P.textLight }}>Preview not available for this file type</div>
+                        </div>
+                      )}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', borderTop: `1px solid ${P.border}` }}>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: P.textMid, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 280 }}>
+                          <i className="ti ti-paperclip" style={{ marginRight: 5 }}></i>{viewProjectApproval.fileName || 'Attached file'}
+                        </span>
+                        <a href={viewProjectApproval.fileUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, fontWeight: 700, color: P.primary, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                          Open <i className="ti ti-external-link" style={{ marginLeft: 3 }}></i>
+                        </a>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {viewProjectApproval.status === 'rejected' && viewProjectApproval.rejectReason && (
+                  <div style={{ marginTop: 14, fontSize: 12, color: P.red, background: P.redLight, padding: '8px 12px', borderRadius: 8 }}>
+                    <strong>Rejection reason:</strong> {viewProjectApproval.rejectReason}
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
+                  <button onClick={() => setViewProjectApproval(null)} style={{ flex: 1, padding: '10px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Close</button>
+                  <button onClick={() => handleDeleteApproval(viewProjectApproval._id)} style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', background: P.red, color: '#fff', fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>Delete</button>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -2258,62 +2386,60 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           )}
         </div>
 
-        {/* FILES */}
-        <div className="mpd-card">
-          <div className="mpd-card-header">
-            <div className="mpd-card-title"><i className="ti ti-paperclip"></i> Files</div>
-            <button className="mpd-btn mpd-btn-outline" onClick={() => setShowUploadModal(true)} style={{ padding: '5px 10px', fontSize: 11 }}>
-              <i className="ti ti-upload"></i> Upload
-            </button>
-          </div>
-          <input type="file" ref={fileInputRef} onChange={handleFileUpload} style={{ display: 'none' }} accept="image/*" />
-          {(!currProject.files || currProject.files.length === 0) ? (
-            <div style={{ fontSize: 12, color: P.textLight, textAlign: 'center', padding: '10px 0' }}>No files attached.</div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {currProject.files.map((file) => (
-                <div key={file._id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px', border: `1.5px solid ${P.border}`, borderRadius: 8 }}>
-                  <a href={file.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, fontWeight: 700, color: P.primary, textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180 }}>
-                    <i className="ti ti-file" style={{ marginRight: 6 }}></i>{file.name}
-                  </a>
-                  <button onClick={() => handleDeleteFile(file._id)} style={{ background: 'transparent', border: 'none', color: P.red, cursor: 'pointer', fontSize: 14 }}>✕</button>
-                </div>
-              ))}
+        {/* FILES + PORTAL LINK — side by side */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
+          {/* FILES */}
+          <div className="mpd-card" style={{ marginBottom: 0 }}>
+            <div className="mpd-card-header">
+              <div className="mpd-card-title"><i className="ti ti-paperclip"></i> Files</div>
+              <button className="mpd-btn mpd-btn-outline" onClick={() => setShowUploadModal(true)} style={{ padding: '5px 10px', fontSize: 11 }}>
+                <i className="ti ti-upload"></i> Upload
+              </button>
             </div>
-          )}
-        </div>
+            <input type="file" ref={fileInputRef} onChange={handleFileUpload} style={{ display: 'none' }} accept="image/*" />
+            {(!currProject.files || currProject.files.length === 0) ? (
+              <div style={{ fontSize: 12, color: P.textLight, textAlign: 'center', padding: '10px 0' }}>No files attached.</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {currProject.files.map((file) => (
+                  <div key={file._id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px', border: `1.5px solid ${P.border}`, borderRadius: 8 }}>
+                    <a href={file.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, fontWeight: 700, color: P.primary, textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180 }}>
+                      <i className="ti ti-file" style={{ marginRight: 6 }}></i>{file.name}
+                    </a>
+                    <button onClick={() => handleDeleteFile(file._id)} style={{ background: 'transparent', border: 'none', color: P.red, cursor: 'pointer', fontSize: 14 }}>✕</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
-        {/* PORTAL LINK */}
-        <div className="mpd-card" style={{ background: `linear-gradient(135deg, ${P.primaryLight}, #fff)`, border: `1.5px solid ${P.primaryMid}` }}>
-          <div className="mpd-card-title" style={{ marginBottom: 12 }}><i className="ti ti-building"></i> Client Portal</div>
-          <div style={{ fontSize: 12, color: P.textMid, marginBottom: 16 }}>The client has access to their project portal with live progress, files, invoices and updates.</div>
-          <button className="mpd-btn mpd-btn-primary" onClick={async () => {
-            try {
-              const res = await axios.get(`${BASE_URL}/api/clients`, { headers: { 'x-company-id': currProject?.companyId || '' } });
-              const clientList = Array.isArray(res.data) ? res.data : [];
-              const matched = clientList.find(c =>
-                (c.clientName || c.name || '').toLowerCase().trim() === (currProject?.client || '').toLowerCase().trim()
-              );
-              if (!matched) {
-                alert('Could not find this client\'s account. Make sure the client is added under Clients.');
-                return;
-              }
-              const subadminCompanyId = user?.companyId || user?._id || user?.id || currProject?.companyId || '';
-              const clientToken = btoa(JSON.stringify({
-                clientId: matched._id,
-                email: matched.email,
-                name: matched.clientName || matched.name,
-                companyName: matched.companyName || matched.company || '',
-                companyId: subadminCompanyId,
-                agencyName: user?.companyName || user?.name || '',
-                exp: Date.now() + 24 * 60 * 60 * 1000
-              }));
-              window.open(`${window.location.origin}/client-portal/${matched._id}?token=${clientToken}`, '_blank');
-            } catch (err) {
-              console.error('Failed to open client portal:', err);
-              alert('Failed to open client portal. Please try again.');
-            }
-          }} style={{ width: '100%', justifyContent: 'center' }}><i className="ti ti-external-link"></i> View Portal</button>
+          {/* PORTAL LINK */}
+          <div style={{ background: `linear-gradient(135deg, #004D5E, ${P.primary})`, borderRadius: P.radius, padding: 22, color: '#fff' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 800, marginBottom: 14 }}>
+              <i className="ti ti-world" style={{ fontSize: 16 }}></i> Client Portal
+            </div>
+            <div style={{ fontSize: 12, opacity: 0.85, marginBottom: 6 }}>{clientName}</div>
+            <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: 9, padding: '9px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 16 }}>
+              <span style={{ fontSize: 11, fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {loadingPortalLink ? 'Generating link...' : (portalLinkUrl ? `/client-portal/${portalLinkUrl.split('/client-portal/')[1]?.split('?')[0]}` : 'Link not generated')}
+              </span>
+              <button onClick={copyPortalLink} style={{ flexShrink: 0, padding: '4px 10px', borderRadius: 6, border: 'none', background: 'rgba(255,255,255,0.25)', color: '#fff', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Copy</button>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <button onClick={async () => { const link = portalLinkUrl || await generatePortalLink(); if (link) window.open(link, '_blank'); }} style={{ padding: '10px', borderRadius: 9, border: 'none', background: '#fff', color: P.primaryDark, fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <i className="ti ti-external-link"></i> Open Portal
+              </button>
+              <button onClick={copyPortalLink} style={{ padding: '10px', borderRadius: 9, border: '1.5px solid rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <i className="ti ti-copy"></i> Copy Link
+              </button>
+              <button onClick={sharePortalLinkViaWhatsApp} style={{ padding: '10px', borderRadius: 9, border: 'none', background: '#25D366', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <i className="ti ti-brand-whatsapp"></i> WhatsApp
+              </button>
+              <button onClick={sharePortalLinkViaEmail} style={{ padding: '10px', borderRadius: 9, border: '1.5px solid rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <i className="ti ti-mail"></i> Email Link
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 

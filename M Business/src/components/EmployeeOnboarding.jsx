@@ -2,17 +2,36 @@ import React, { useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 
+/* ------------------------------------------------------------------
+   Color system
+   - Primary identity: violet (reads var(--app-accent) if your app
+     defines it, otherwise falls back to this palette).
+   - Each section gets its own accent tint so the form reads as
+     organized sections rather than one long block.
+------------------------------------------------------------------- */
 const T = {
-  primary: "var(--app-primary, #0f172a)",
-  accent: "var(--app-accent, var(--app-accent, #00BCD4))",
-  accentRgb: "var(--app-accent-rgb, 0,188,212)",
-  text: "var(--app-text, #1e293b)",
-  muted: "var(--app-muted, #64748b)",
-  border: "var(--app-border, #e2e8f0)",
-  bg: "var(--app-bg, #f8fafc)",
-  bgSoft: "var(--teal-lighter, #F0FDFE)",
-  bgSoft2: "var(--teal-light, var(--teal-light, #E0F7FA))",
-  card: "#ffffff"
+  accent: "var(--app-accent, #6D28D9)",
+  accent2: "var(--app-accent2, #4C1D95)",
+  accentRgb: "var(--app-accent-rgb, 109,40,217)",
+  text: "var(--app-text, #1E1B2E)",
+  muted: "var(--app-muted, #6B6478)",
+  border: "var(--app-border, #E6E1F2)",
+  bg: "var(--app-bg, #F8F6FC)",
+  bgSoft: "#F5F0FF",
+  bgSoft2: "#EDE4FC",
+  card: "#ffffff",
+  danger: "#DC2626",
+  dangerBg: "#FEF2F2",
+  success: "#16A34A",
+  successBg: "#F0FDF4",
+};
+
+/* Per-section colors — used for the little icon badge, the heading,
+   and the focus ring of inputs inside that section. */
+const SECTIONS = {
+  personal: { fg: "#6D28D9", bg: "#F5F0FF", ring: "rgba(109,40,217,0.12)" },
+  bank: { fg: "#0F766E", bg: "#F0FDFA", ring: "rgba(15,118,110,0.12)" },
+  docs: { fg: "#B45309", bg: "#FFFBEB", ring: "rgba(180,83,9,0.12)" },
 };
 
 export default function EmployeeOnboarding() {
@@ -134,58 +153,65 @@ export default function EmployeeOnboarding() {
 
   if (success) {
     return (
-      <div style={{ minHeight: "100vh", background: `linear-gradient(135deg, ${T.bgSoft} 0%, ${T.bgSoft2} 100%)`, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-        <div style={{ maxWidth: 450, width: "100%", background: T.card, padding: 40, borderRadius: 24, boxShadow: "0 20px 50px rgba(0,0,0,0.1)", textAlign: "center" }}>
-          <div style={{ width: 80, height: 80, background: "#dcfce7", color: "#22c55e", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, margin: "0 auto 24px" }}>
+      <div style={{ minHeight: "100vh", background: `radial-gradient(circle at 20% 10%, ${T.bgSoft} 0%, ${T.bg} 55%, ${T.bgSoft2} 100%)`, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <div style={{ maxWidth: 450, width: "100%", background: T.card, padding: 40, borderRadius: 24, boxShadow: `0 24px 60px -20px rgba(${T.accentRgb},0.25)`, textAlign: "center", border: `1px solid ${T.border}` }}>
+          <div style={{ width: 80, height: 80, background: T.successBg, color: T.success, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 34, margin: "0 auto 24px", border: `2px solid #DCFCE7` }}>
             <i className="ti ti-check"></i>
           </div>
           <h2 style={{ fontSize: 24, fontWeight: 800, color: T.text, marginBottom: 12 }}>Registration Successful!</h2>
-          <p style={{ color: T.muted, lineHeight: 1.6, marginBottom: 24 }}>Thank you for joining <strong>{companyName}</strong>. Your details have been submitted for approval. You will receive an email once your account is activated.</p>
-          <div style={{ fontSize: 13, color: T.muted }}>Redirecting you to dashboard...</div>
+          <p style={{ color: T.muted, lineHeight: 1.6, marginBottom: 24 }}>Thank you for joining <strong style={{ color: T.accent }}>{companyName}</strong>. Your details have been submitted for approval. You will receive an email once your account is activated.</p>
+          <div style={{ fontSize: 13, color: T.muted, fontWeight: 600 }}>Redirecting you to dashboard...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: `linear-gradient(135deg, ${T.bgSoft} 0%, ${T.bgSoft2} 100%)`, padding: "40px 20px", display: "flex", justifyContent: "center" }}>
+    <div style={{ minHeight: "100vh", background: `radial-gradient(circle at 15% 0%, ${T.bgSoft} 0%, ${T.bg} 45%, ${T.bgSoft2} 100%)`, padding: "40px 20px", display: "flex", justifyContent: "center" }}>
       <div style={{ maxWidth: 650, width: "100%" }}>
         <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <h1 style={{ fontSize: 32, fontWeight: 900, color: T.text, margin: "0 0 8px" }}>Employee Onboarding</h1>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: T.bgSoft, color: T.accent, fontSize: 11, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", padding: "6px 14px", borderRadius: 20, marginBottom: 14, border: `1px solid ${T.border}` }}>
+            <i className="ti ti-user-plus"></i> New hire registration
+          </div>
+          <h1 style={{ fontSize: 32, fontWeight: 900, color: T.text, margin: "0 0 8px", letterSpacing: "-0.02em" }}>Employee Onboarding</h1>
           <p style={{ color: T.muted, fontWeight: 500 }}>Welcome to <span style={{ color: T.accent, fontWeight: 700 }}>{companyName}</span>. Please fill in your details to join the team.</p>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ background: T.card, padding: 32, borderRadius: 24, boxShadow: "0 20px 50px rgba(0,0,0,0.08)", border: "1px solid rgba(255,255,255,0.8)" }}>
-          {err.submit && <div style={{ background: "#fef2f2", color: "#ef4444", padding: "12px 16px", borderRadius: 10, fontSize: 14, fontWeight: 600, marginBottom: 20, border: "1px solid #fee2e2" }}>Warning {err.submit}</div>}
+        <form onSubmit={handleSubmit} style={{ background: T.card, padding: 32, borderRadius: 24, boxShadow: `0 24px 60px -24px rgba(${T.accentRgb},0.2)`, border: `1px solid ${T.border}` }}>
+          {err.submit && (
+            <div style={{ display: "flex", alignItems: "center", gap: 8, background: T.dangerBg, color: T.danger, padding: "12px 16px", borderRadius: 10, fontSize: 14, fontWeight: 600, marginBottom: 20, border: "1px solid #FECACA" }}>
+              <i className="ti ti-alert-circle"></i> {err.submit}
+            </div>
+          )}
 
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
-            <div style={{ position: "relative", width: "100%", maxWidth: 220 }}>
-              <div style={{ width: "100%", aspectRatio: "1 / 1", borderRadius: 16, background: T.bg, border: `2px dashed ${T.border}`, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", boxSizing: "border-box" }}>
+            <div style={{ position: "relative", width: "100%", maxWidth: 200 }}>
+              <div style={{ width: "100%", aspectRatio: "1 / 1", borderRadius: 16, background: `linear-gradient(135deg, ${SECTIONS.personal.bg}, ${T.bgSoft2})`, border: `2px dashed ${SECTIONS.personal.fg}55`, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", boxSizing: "border-box" }}>
                 {form.photo ? (
                   <img src={form.photo} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }} />
                 ) : (
-                  <i className="ti ti-user" style={{ fontSize: 44, color: T.border }}></i>
+                  <i className="ti ti-user" style={{ fontSize: 44, color: SECTIONS.personal.fg, opacity: 0.5 }}></i>
                 )}
               </div>
-              <label style={{ position: "absolute", bottom: 8, right: 8, background: T.accent, width: 36, height: 36, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "3px solid #fff", boxShadow: `0 4px 10px rgba(${T.accentRgb},0.35)` }}>
+              <label style={{ position: "absolute", bottom: 8, right: 8, background: `linear-gradient(135deg, ${T.accent}, ${T.accent2})`, width: 36, height: 36, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "3px solid #fff", boxShadow: `0 4px 10px rgba(${T.accentRgb},0.4)` }}>
                 <i className="ti ti-camera" style={{ fontSize: 16, color: "#fff" }}></i>
                 <input type="file" accept="image/*" style={{ display: "none" }} onChange={handlePhotoChange} />
               </label>
             </div>
           </div>
 
-          <div style={{ fontSize: 12, fontWeight: 800, color: T.muted, letterSpacing: 1, marginBottom: 16, borderBottom: `1px solid ${T.border}`, paddingBottom: 8 }}>PERSONAL INFORMATION</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: 24 }}>
-            <Input label="Full Name" value={form.name} onChange={v => handleChange("name", v)} error={err.name} placeholder="John Doe" />
-
-            <Input label="Email Address" value={form.email} onChange={v => handleChange("email", v)} error={err.email} type="email" placeholder="john@company.com" />
-            <Input label="Phone Number" value={form.phone} onChange={v => handleChange("phone", v)} error={err.phone} placeholder="+91 98765 43210" />
+          <SectionHeader icon="ti-id-badge-2" label="Personal Information" section={SECTIONS.personal} />
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: 28 }}>
+            <Input label="Full Name" value={form.name} onChange={v => handleChange("name", v)} error={err.name} placeholder="John Doe" section={SECTIONS.personal} />
+            <Input label="Email Address" value={form.email} onChange={v => handleChange("email", v)} error={err.email} type="email" placeholder="john@company.com" section={SECTIONS.personal} />
+            <Input label="Phone Number" value={form.phone} onChange={v => handleChange("phone", v)} error={err.phone} placeholder="+91 98765 43210" section={SECTIONS.personal} />
             <Input
               label="Date of Birth"
               value={form.dateOfBirth}
               onChange={v => handleChange("dateOfBirth", v)}
               type="date"
               placeholder=""
+              section={SECTIONS.personal}
             />
             <Input
               label="Joining Date"
@@ -193,91 +219,56 @@ export default function EmployeeOnboarding() {
               onChange={v => handleChange("joiningDate", v)}
               type="date"
               placeholder=""
+              section={SECTIONS.personal}
             />
 
-            <div style={{ marginBottom: 4 }}>
-              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: T.muted, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
-                Marital Status *
-              </label>
-              <select
-                value={form.maritalStatus}
-                onChange={e => handleChange("maritalStatus", e.target.value)}
-                style={{
-                  width: "100%",
-                  height: 46,
-                  padding: "0px 14px",
-                  boxSizing: "border-box",
-                  borderRadius: 12,
-                  border: `1.5px solid ${T.border}`,
-                  fontSize: 14,
-                  color: T.text,
-                  outline: "none",
-                  background: T.bg,
-                  cursor: "pointer"
-                }}
-              >
-                <option value="Unmarried">Unmarried</option>
-                <option value="Married">Married</option>
-              </select>
-            </div>
+            <SelectField
+              label="Marital Status"
+              value={form.maritalStatus}
+              onChange={v => handleChange("maritalStatus", v)}
+              options={[["Unmarried", "Unmarried"], ["Married", "Married"]]}
+              section={SECTIONS.personal}
+            />
 
-            <div style={{ marginBottom: 4 }}>
-              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: T.accent, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
-                Role *
-              </label>
-              <select
-                value={form.role}
-                onChange={e => handleChange("role", e.target.value)}
-                style={{
-                  width: "100%",
-                  height: 46,
-                  padding: "0px 14px",
-                  boxSizing: "border-box",
-                  borderRadius: 12,
-                  border: `1.5px solid ${T.border}`,
-                  fontSize: 14,
-                  color: T.text,
-                  outline: "none",
-                  background: T.bg,
-                  cursor: "pointer"
-                }}
-              >
-                <option value="Employee">Employee</option>
-                <option value="Manager">Manager</option>
-                <option value="Admin">Admin</option>
-              </select>
-            </div>
+            <SelectField
+              label="Role"
+              value={form.role}
+              onChange={v => handleChange("role", v)}
+              options={[["Employee", "Employee"], ["Manager", "Manager"], ["Admin", "Admin"]]}
+              section={SECTIONS.personal}
+            />
 
             <div style={{ position: "relative" }}>
-              <Input label="Password" value={form.password} onChange={v => handleChange("password", v)} error={err.password} type={showPass ? "text" : "password"} placeholder="Set your password" />
+              <Input label="Password" value={form.password} onChange={v => handleChange("password", v)} error={err.password} type={showPass ? "text" : "password"} placeholder="Set your password" section={SECTIONS.personal} />
               <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 12, top: 36, background: "none", border: "none", cursor: "pointer", fontSize: 16, color: T.muted }}>
-                {showPass ? "hide" : "show"}
+                <i className={`ti ${showPass ? "ti-eye-off" : "ti-eye"}`}></i>
               </button>
             </div>
           </div>
 
-          <div style={{ fontSize: 12, fontWeight: 800, color: T.muted, letterSpacing: 1, marginBottom: 16, borderBottom: `1px solid ${T.border}`, paddingBottom: 8, marginTop: 32 }}>BANK ACCOUNT DETAILS</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: 32 }}>
-            <Input label="Bank Name" value={form.bankName} onChange={v => handleChange("bankName", v)} error={err.bankName} placeholder="e.g. HDFC Bank" />
-            <Input label="IFSC Code" value={form.ifscCode} onChange={v => handleChange("ifscCode", v)} error={err.ifscCode} placeholder="HDFC0001234" />
+          <SectionHeader icon="ti-building-bank" label="Bank Account Details" section={SECTIONS.bank} />
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: 28 }}>
+            <Input label="Bank Name" value={form.bankName} onChange={v => handleChange("bankName", v)} error={err.bankName} placeholder="e.g. HDFC Bank" section={SECTIONS.bank} />
+            <Input label="IFSC Code" value={form.ifscCode} onChange={v => handleChange("ifscCode", v.toUpperCase())} error={err.ifscCode} placeholder="HDFC0001234" section={SECTIONS.bank} />
             <div style={{ gridColumn: "1 / -1" }}>
-              <Input label="Account Number" value={form.accountNumber} onChange={v => handleChange("accountNumber", v)} error={err.accountNumber} placeholder="123456789012" />
+              <Input label="Account Number" value={form.accountNumber} onChange={v => handleChange("accountNumber", v)} error={err.accountNumber} placeholder="123456789012" section={SECTIONS.bank} />
             </div>
           </div>
 
-          <div style={{ fontSize: 12, fontWeight: 800, color: T.muted, letterSpacing: 1, marginBottom: 16, borderBottom: `1px solid ${T.border}`, paddingBottom: 8, marginTop: 32 }}>DOCUMENTS</div>
+          <SectionHeader icon="ti-files" label="Documents" section={SECTIONS.docs} />
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32 }}>
-            <DocInput label="Aadhaar Card" icon="ti-id-badge-2" file={docs.aadhaar} onChange={f => handleFileChange("aadhaar", f)} />
-            <DocInput label="PAN Card" icon="ti-credit-card" file={docs.pan} onChange={f => handleFileChange("pan", f)} />
-            <DocInput label="Bank Passbook" icon="ti-building-bank" file={docs.passbook} onChange={f => handleFileChange("passbook", f)} />
+            <DocInput label="Aadhaar Card" icon="ti-id-badge-2" file={docs.aadhaar} onChange={f => handleFileChange("aadhaar", f)} section={SECTIONS.docs} />
+            <DocInput label="PAN Card" icon="ti-credit-card" file={docs.pan} onChange={f => handleFileChange("pan", f)} section={SECTIONS.docs} />
+            <DocInput label="Bank Passbook" icon="ti-building-bank" file={docs.passbook} onChange={f => handleFileChange("passbook", f)} section={SECTIONS.docs} />
           </div>
+
           <div style={{ display: "flex", justifyContent: "center" }}>
             <button
               type="submit"
               disabled={loading}
               style={{
-                width: "50%",
-                background: `linear-gradient(135deg, ${T.accent}, var(--app-accent2, var(--app-accent2, #00ACC1)))`,
+                width: "60%",
+                background: `linear-gradient(135deg, ${T.accent}, ${T.accent2})`,
                 color: "#fff",
                 border: "none",
                 borderRadius: 14,
@@ -285,7 +276,7 @@ export default function EmployeeOnboarding() {
                 fontWeight: 800,
                 fontSize: 16,
                 cursor: loading ? "not-allowed" : "pointer",
-                boxShadow: `0 10px 25px rgba(${T.accentRgb},0.3)`,
+                boxShadow: `0 12px 28px -8px rgba(${T.accentRgb},0.5)`,
                 transition: "all 0.3s ease",
                 display: "flex",
                 alignItems: "center",
@@ -299,9 +290,13 @@ export default function EmployeeOnboarding() {
                   <span>Submitting...</span>
                 </>
               ) : (
-                <span>Complete Registration </span>
+                <>
+                  <i className="ti ti-send"></i>
+                  <span>Complete Registration</span>
+                </>
               )}
-            </button></div>
+            </button>
+          </div>
         </form>
 
         <p style={{ textAlign: "center", marginTop: 24, fontSize: 13, color: T.muted }}>
@@ -317,45 +312,94 @@ export default function EmployeeOnboarding() {
   );
 }
 
-function Input({ label, value, onChange, error, type = "text", placeholder }) {
+function SectionHeader({ icon, label, section }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, paddingBottom: 10, borderBottom: `1px solid ${T.border}` }}>
+      <div style={{ width: 28, height: 28, borderRadius: 8, background: section.bg, color: section.fg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>
+        <i className={`ti ${icon}`}></i>
+      </div>
+      <div style={{ fontSize: 12, fontWeight: 800, color: section.fg, letterSpacing: 1, textTransform: "uppercase" }}>{label}</div>
+    </div>
+  );
+}
+
+function Input({ label, value, onChange, error, type = "text", placeholder, section }) {
+  const fg = section ? section.fg : T.accent;
+  const ring = section ? section.ring : `rgba(${T.accentRgb},0.1)`;
   return (
     <div style={{ marginBottom: 4 }}>
-      <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--app-muted, #475569)", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>{label} *</label>
+      <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: T.muted, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>{label} *</label>
       <input
         type={type}
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
+        onFocus={e => { e.target.style.borderColor = fg; e.target.style.boxShadow = `0 0 0 3px ${ring}`; e.target.style.background = "#fff"; }}
+        onBlur={e => { e.target.style.borderColor = error ? T.danger : T.border; e.target.style.boxShadow = "none"; e.target.style.background = T.bg; }}
         style={{
           width: "100%",
           height: 46,
           padding: "0px 14px",
           boxSizing: "border-box", display: "block",
           borderRadius: 12,
-          border: `1.5px solid ${error ? "#ef4444" : "var(--app-border, #e2e8f0)"}`,
+          border: `1.5px solid ${error ? T.danger : T.border}`,
           fontSize: 14,
-          color: "var(--app-text, #1e293b)",
+          color: T.text,
           outline: "none",
-          transition: "all 0.2s",
-          background: "var(--app-bg, #f8fafc)"
+          transition: "all 0.15s",
+          background: T.bg
         }}
       />
-      {error && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4, fontWeight: 500 }}>Warning {error}</div>}
+      {error && <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: T.danger, marginTop: 4, fontWeight: 600 }}><i className="ti ti-alert-circle" style={{ fontSize: 12 }}></i>{error}</div>}
     </div>
   );
 }
 
-function DocInput({ label, icon, file, onChange }) {
+function SelectField({ label, value, onChange, options, section }) {
+  const fg = section ? section.fg : T.accent;
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: "var(--app-bg, #f8fafc)", borderRadius: 12, border: "1.5px solid var(--app-border, #e2e8f0)" }}>
-      <div style={{ width: 36, height: 36, borderRadius: 10, background: "var(--teal-light, var(--teal-light, #E0F7FA))", border: "1px solid var(--teal-light, #b2ebf2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: "var(--app-accent, var(--app-accent, #00BCD4))" }}>
+    <div style={{ marginBottom: 4 }}>
+      <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: T.muted, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
+        {label} *
+      </label>
+      <select
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        style={{
+          width: "100%",
+          height: 46,
+          padding: "0px 14px",
+          boxSizing: "border-box",
+          borderRadius: 12,
+          border: `1.5px solid ${T.border}`,
+          fontSize: 14,
+          color: T.text,
+          outline: "none",
+          background: T.bg,
+          cursor: "pointer"
+        }}
+        onFocus={e => { e.target.style.borderColor = fg; }}
+        onBlur={e => { e.target.style.borderColor = T.border; }}
+      >
+        {options.map(([val, lbl]) => <option key={val} value={val}>{lbl}</option>)}
+      </select>
+    </div>
+  );
+}
+
+function DocInput({ label, icon, file, onChange, section }) {
+  const fg = section ? section.fg : T.accent;
+  const bg = section ? section.bg : T.bgSoft;
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: T.bg, borderRadius: 12, border: `1.5px solid ${T.border}` }}>
+      <div style={{ width: 36, height: 36, borderRadius: 10, background: bg, border: `1px solid ${fg}33`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: fg }}>
         <i className={`ti ${icon}`}></i>
       </div>
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-text, #1e293b)" }}>{label}</div>
-        <div style={{ fontSize: 11, color: file ? "var(--app-accent, var(--app-accent, #00BCD4))" : "var(--app-muted, #94a3b8)", fontWeight: 600 }}>{file ? file.name : ""}</div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>{label}</div>
+        <div style={{ fontSize: 11, color: file ? fg : T.muted, fontWeight: 600 }}>{file ? file.name : "No file selected"}</div>
       </div>
-      <label style={{ background: file ? "#dcfce7" : "var(--app-accent, var(--app-accent, #00BCD4))", color: file ? "#166534" : "#fff", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", border: "none" }}>
+      <label style={{ background: file ? T.successBg : fg, color: file ? T.success : "#fff", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", border: file ? `1px solid #BBF7D0` : "none" }}>
         {file ? "Change" : "Upload"}
         <input type="file" style={{ display: "none" }} onChange={e => onChange(e.target.files[0])} />
       </label>

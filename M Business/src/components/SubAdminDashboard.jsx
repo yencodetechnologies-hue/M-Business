@@ -6820,8 +6820,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  const t = appTheme === "custom" ? generateThemeFromColor(customColor) : (THEMES[appTheme] || THEMES.teal);
-
+  const currentTheme = appTheme === "custom" ? generateThemeFromColor(customColor) : (THEMES[appTheme] || THEMES.teal);
 
 
   const headerLogoRef = useRef();
@@ -9951,29 +9950,45 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
                               {/* Recent Clients Table */}
-
+                              {/* Recent Clients Table */}
                               <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-
                                   <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
-
-                                    <i className="ti ti-users" style={{ color: "#0097A7" }}></i> Recent Clients
-
+                                    <i className="ti ti-users" style={{ color: "var(--app-accent)" }}></i> Recent Clients
                                   </div>
-
-                                  <div onClick={() => setActive("clients")} style={{ fontSize: 13, fontWeight: 700, color: "#0097A7", cursor: "pointer" }}>
-
+                                  <div onClick={() => setActive("clients")} style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)", cursor: "pointer" }}>
                                     View All
-
                                   </div>
-
                                 </div>
 
-
-
+                                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                                  {[...clients].slice(-5).reverse().map((c, idx, arr) => {
+                                    const name = c.clientName || c.name || "—";
+                                    const initials = name.slice(0, 2).toUpperCase();
+                                    const status = c.status || "Active";
+                                    const statusColor = status.toLowerCase() === "active" ? "#16a34a" : "#94a3b8";
+                                    return (
+                                      <div key={c._id || idx} onClick={() => setActive("clients")} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 16, borderBottom: idx === arr.length - 1 ? "none" : "1px solid rgba(0,0,0,0.04)", cursor: "pointer" }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                          <div style={{ width: 34, height: 34, borderRadius: 10, background: "var(--teal-light, #E0F7FA)", color: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, flexShrink: 0 }}>
+                                            {initials}
+                                          </div>
+                                          <div>
+                                            <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{name}</div>
+                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{c.email || c.companyName || c.company || "No contact info"}</div>
+                                          </div>
+                                        </div>
+                                        <span style={{ fontSize: 10, fontWeight: 800, padding: "3px 10px", borderRadius: 20, background: `${statusColor}15`, color: statusColor, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                                          {status}
+                                        </span>
+                                      </div>
+                                    );
+                                  })}
+                                  {clients.length === 0 && (
+                                    <div style={{ textAlign: "center", padding: "24px 0", color: "rgba(15,28,46,0.4)", fontSize: 13 }}>No clients yet</div>
+                                  )}
+                                </div>
                               </div>
-
 
 
                             </div>

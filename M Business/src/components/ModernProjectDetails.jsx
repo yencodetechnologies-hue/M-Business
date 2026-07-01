@@ -457,12 +457,22 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     }
   }, []);
 
-  // Load fresh data once on mount and when project _id changes
+  // Load fresh data once on mount and when project _id changes.
+  //
+  // IMPORTANT: currProject is synced to the incoming `project` prop THE
+  // INSTANT it changes — before the network refetch below even starts.
+  // Without this line, if this component stays mounted while switching from
+  // one project to another, currProject kept showing the PREVIOUS project's
+  // data (including its client name) for a brief moment while loadLatest()
+  // was still loading. That stale window was the actual cause of "Open
+  // Portal" opening the wrong client right after switching projects.
   const mountedId = useRef(null);
   useEffect(() => {
     if (project?._id && project._id !== mountedId.current) {
       mountedId.current = project._id;
-      loadLatest();
+      setCurrProject(project);   // sync immediately, no waiting
+      setPortalLinkUrl('');      // discard any portal link cached for the old project
+      loadLatest();              // then refresh with the latest server data
     }
   }, [project?._id]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -1264,9 +1274,24 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     try {
       const res = await axios.get(`${BASE_URL}/api/clients`, { headers: { 'x-company-id': currProject?.companyId || '' } });
       const clientList = Array.isArray(res.data) ? res.data : [];
-      const matched = clientList.find(c =>
-        (c.clientName || c.name || '').toLowerCase().trim() === (currProject?.client || '').toLowerCase().trim()
-      );
+
+      // Prefer matching by ID (stored on the project) — this is unambiguous.
+      // Fall back to name matching only when no clientId is saved on the project.
+      const storedClientId = currProject?.clientId || resolvedClientId || '';
+      let matched = storedClientId
+        ? clientList.find(c => String(c._id) === String(storedClientId))
+        : null;
+
+      // Name-based fallback (handles older projects that only saved the name)
+      if (!matched) {
+        const target = (currProject?.client || '').toLowerCase().trim();
+        matched = target
+          ? clientList.find(c =>
+            (c.clientName || c.name || '').toLowerCase().trim() === target
+          )
+          : null;
+      }
+
       if (!matched) {
         alert('Could not find this client\'s account. Make sure the client is added under Clients.');
         return '';
@@ -1283,6 +1308,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       }));
       const link = `${window.location.origin}/client-portal/${matched._id}?token=${clientToken}`;
       setPortalLinkUrl(link);
+      lastPortalProjectId.current = forProjectId; // cache the project this link belongs to
       return link;
     } catch (err) {
       console.error('Failed to generate portal link:', err);
@@ -1640,7 +1666,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   });
 
                   const isActive = !isDone && idx === firstNotDone;
-                  const circleColor = isDone ? P.red : isActive ? 'var(--teal-light, var(--teal-light, #E0F7FA))' : '#fff';
+                  const circleColor = isDone ? P.red : isActive ? '#E0F7FA' : '#fff';
                   const circleBorder = isDone ? P.red : isActive ? P.primary : P.border;
                   const textColor = isDone ? P.red : isActive ? P.primary : P.textLight;
                   const statusLabel = isDone ? 'Done' : isActive ? 'Active' : 'Pending';
@@ -1665,7 +1691,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         style={{ width: 36, height: 36, borderRadius: '50%', background: circleColor, border: `2.5px solid ${circleBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: isDone ? '#fff' : isActive ? P.primary : P.textLight, cursor: 'pointer', boxShadow: isActive ? `0 0 0 4px ${P.primaryLight}` : 'none', transition: 'all .2s', position: 'relative', zIndex: 1 }}>
                         {isDone ? <span style={{ color: '#fff', fontSize: 14 }}>Yes</span> : idx + 1}
                       </div>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: P.textDark, textAlign: 'center', maxWidth: 80, wordBreak: 'break-word', position: 'relative', zIndex: 1 }}>{m.name}</div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: P.textDark, textAlign: 'center', maxWidth: 80, minHeight: 28, lineHeight: 1.35, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', wordBreak: 'break-word', position: 'relative', zIndex: 1 }}>{m.name}</div>
                       {m.date && <div style={{ fontSize: 10, color: P.textLight, textAlign: 'center', position: 'relative', zIndex: 1 }}>{new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</div>}
                       <div style={{ fontSize: 10, fontWeight: 700, color: textColor, position: 'relative', zIndex: 1 }}>{statusLabel}</div>
                       <div style={{ display: 'flex', gap: 8, position: 'relative', zIndex: 1 }}>

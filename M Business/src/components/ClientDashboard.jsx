@@ -409,7 +409,6 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       return null;
     }
   });
-
   // Portal mode is intentionally isolated: it must NEVER call the shared
   // setUser/localStorage("user") — that key is also used by the Subadmin's
   // own session. Writing to it here would silently log the Subadmin out

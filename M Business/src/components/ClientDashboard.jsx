@@ -673,6 +673,24 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const [rejectReasonText, setRejectReasonText] = useState("");
   const [viewApprovalApp, setViewApprovalApp] = useState(null);
 
+  // Portal mode has no real login form — the client's "session" is just the
+  // decoded token from the link. Once they sign out (or the token is
+  // missing/expired), don't fall through to the normal dashboard render
+  // with an empty/undefined user — show a clear, dead-end screen instead.
+  if (portalMode && !portalUser) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F3F8F9", fontFamily: "inherit", padding: 24, textAlign: "center" }}>
+        <div style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 16, padding: "40px 32px", maxWidth: 420 }}>
+          <div style={{ fontSize: 40, marginBottom: 16 }}>🔒</div>
+          <div style={{ fontSize: 18, fontWeight: 800, color: "#0D2027", marginBottom: 8 }}>You've been signed out</div>
+          <div style={{ fontSize: 13, color: "#6B8790", lineHeight: 1.6 }}>
+            This portal session has ended. Please ask your agency to share a fresh portal link to access this page again.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const handleApprove = async (id) => {
     setApprovals(prev => prev.filter(a => a.id !== id));
     try {

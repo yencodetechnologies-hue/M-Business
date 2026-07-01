@@ -2119,11 +2119,11 @@ export default function EmployeeDashboard({ user, setUser }) {
                     <div style={{ fontSize: 13, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{resolvedUser?.name || "Employee"}</div>
                     <div style={{ fontSize: 11, color: T.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{resolvedUser?.email}</div>
                   </div>
-                  <span style={{ fontSize: 12, color: T.success }}>Yes</span>
+
                 </div>
               </div>
               {[
-                { icon: "Profile", label: "Profile", action: () => { setProfileDropdownOpen(false); setPage("myprofile"); } },
+                { icon: "👤", label: "Profile", action: () => { setProfileDropdownOpen(false); setPage("myprofile"); } },
                 ...(subscription?.businessLimit === "Multiple business manage" ? [{ icon: "Add", label: "Add account", action: () => { setProfileDropdownOpen(false); setAccountAuthOpen(true); } }] : []),
                 { icon: "", label: "Logout", action: () => { setProfileDropdownOpen(false); handleLogout(); }, danger: true },
               ].map((item, idx) => (

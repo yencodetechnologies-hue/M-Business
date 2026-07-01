@@ -19,9 +19,9 @@ router.get('/', async (req, res) => {
 // Send a message
 router.post('/', async (req, res) => {
     try {
-        const { senderId, senderName, receiverId, receiverName, content, companyId } = req.body;
+        const { senderId, senderName, receiverId, receiverName, content, attachmentUrl, attachmentName, companyId } = req.body;
         const newMessage = new Message({
-            senderId, senderName, receiverId, receiverName, content, companyId
+            senderId, senderName, receiverId, receiverName, content, attachmentUrl, attachmentName, companyId
         });
         const savedMessage = await newMessage.save();
 

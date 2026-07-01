@@ -6,6 +6,8 @@ const MessageSchema = new mongoose.Schema({
     receiverId: { type: mongoose.Schema.Types.ObjectId, required: true },
     receiverName: { type: String, required: true },
     content: { type: String, required: true },
+    attachmentUrl: { type: String, default: "" },
+    attachmentName: { type: String, default: "" },
     companyId: { type: String, required: true },
     isRead: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now }

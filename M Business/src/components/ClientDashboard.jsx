@@ -568,9 +568,10 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     window.location.href = "/";
   };
 
-  const handleSendMessage = async () => {
-    if (!chatText.trim() || !user) return;
-    const content = chatText.trim();
+  const handleSendMessage = async (attachment = null) => {
+    if (!chatText.trim() && !attachment) return;
+    if (!user) return;
+    const content = chatText.trim() || (attachment ? `Sent a file: ${attachment.name}` : "");
     setChatText("");
     const myClientId = portalMode
       ? (portalClientId || user._id || user.id || "")
@@ -579,6 +580,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       id: "temp-" + Date.now(),
       sender: "You",
       msg: content,
+      attachmentUrl: attachment?.url || "",
+      attachmentName: attachment?.name || "",
       time: new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
       mine: true,
     };
@@ -590,18 +593,43 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         receiverId: user.companyId || "",
         receiverName: agencyName,
         content,
+        attachmentUrl: attachment?.url || "",
+        attachmentName: attachment?.name || "",
         companyId: user.companyId || "",
       });
       setChatMessages(prev => prev.map(m => m.id === optimistic.id ? {
         id: res.data._id,
         sender: "You",
         msg: res.data.content,
+        attachmentUrl: res.data.attachmentUrl || "",
+        attachmentName: res.data.attachmentName || "",
         time: new Date(res.data.createdAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
         mine: true,
       } : m));
     } catch (err) {
       console.error("Failed to send message", err);
     }
+  };
+
+  const [attachUploading, setAttachUploading] = useState(false);
+
+  const handleAttachFile = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !user) return;
+    setAttachUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await axios.post(`${BASE_URL}/api/upload`, fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      await handleSendMessage({ url: res.data.url, name: res.data.name || file.name });
+    } catch (err) {
+      console.error("Failed to upload attachment", err);
+      alert("Failed to upload file. Please try again.");
+    }
+    setAttachUploading(false);
   };
 
   const submitFeedback = async (e) => {
@@ -1631,7 +1659,14 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 </div>
                 <div className="msg-body">
                   {!msg.mine && <div className="msg-name">{msg.sender}</div>}
-                  <div className={`msg-bubble ${msg.mine ? "mine" : "them"}`}>{msg.msg}</div>
+                  <div className={`msg-bubble ${msg.mine ? "mine" : "them"}`}>
+                    {msg.msg}
+                    {msg.attachmentUrl && (
+                      <a href={msg.attachmentUrl} target="_blank" rel="noreferrer" style={{ display: "flex", alignItems: "center", gap: 6, marginTop: msg.msg ? 8 : 0, fontSize: 12, fontWeight: 700, color: "inherit", textDecoration: "underline" }}>
+                        <i className="ti ti-paperclip"></i> {msg.attachmentName || "Attachment"}
+                      </a>
+                    )}
+                  </div>
                   <div className="msg-time">{msg.time}</div>
                 </div>
               </div>
@@ -1639,9 +1674,12 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           )}
         </div>
         <div className="msg-input-row">
-          <div className="msg-attach" onClick={() => alert("Attachment handler opened.")}><i className="ti ti-paperclip"></i></div>
+          <label className="msg-attach" style={{ opacity: attachUploading ? 0.5 : 1, pointerEvents: attachUploading ? "none" : "auto" }}>
+            <i className={attachUploading ? "ti ti-loader-2" : "ti ti-paperclip"}></i>
+            <input type="file" style={{ display: "none" }} onChange={handleAttachFile} />
+          </label>
           <input className="msg-inp" type="text" placeholder="Type a message…" value={chatText} onChange={(e) => setChatText(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSendMessage()} />
-          <button className="msg-send" onClick={handleSendMessage}><i className="ti ti-send"></i></button>
+          <button className="msg-send" onClick={() => handleSendMessage()}><i className="ti ti-send"></i></button>
         </div>
       </div>
     );

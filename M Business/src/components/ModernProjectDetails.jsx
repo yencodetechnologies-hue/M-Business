@@ -207,6 +207,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [previewProjectFile, setPreviewProjectFile] = useState(null);
   const [portalLinkUrl, setPortalLinkUrl] = useState('');
   const [loadingPortalLink, setLoadingPortalLink] = useState(false);
+  const lastPortalProjectId = useRef(null);
   const [uploadSendForApproval, setUploadSendForApproval] = useState(false);
   const [sendingFileApproval, setSendingFileApproval] = useState(false);
   const [postUpdateOnUpload, setPostUpdateOnUpload] = useState(false);
@@ -1205,8 +1206,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     window.open(url, "_blank");
   };
 
-  const generatePortalLink = async () => {
-    if (portalLinkUrl) return portalLinkUrl;
+  const generatePortalLink = async (forProjectId = currProject?._id) => {
+    // Only reuse the cached link if it was generated for THIS same project.
+    if (portalLinkUrl && forProjectId === lastPortalProjectId.current) return portalLinkUrl;
     setLoadingPortalLink(true);
     try {
       const res = await axios.get(`${BASE_URL}/api/clients`, { headers: { 'x-company-id': currProject?.companyId || '' } });
@@ -1240,7 +1242,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     }
   };
 
-  useEffect(() => { if (currProject?._id) generatePortalLink(); }, [currProject?._id, currProject?.client]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    // Clear any cached link from a previously viewed project/client first,
+    // so generatePortalLink() below is forced to build a fresh one.
+    setPortalLinkUrl('');
+    if (currProject?._id) generatePortalLink();
+  }, [currProject?._id, currProject?.client]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const copyPortalLink = async () => {
     const link = portalLinkUrl || await generatePortalLink();

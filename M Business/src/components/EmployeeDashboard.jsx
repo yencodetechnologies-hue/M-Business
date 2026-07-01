@@ -699,11 +699,11 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
   const TC = { teal: " var(--app-accent, var(--app-accent, #00BCD4))", bg: "#f0f4f8", card: "#fff", border: "#e5eaf0", text: "#0f1c2e", textMid: "#4a5568", textSoft: "#94a3b8", green: "#16a34a", amber: "#d97706", red: "#dc2626", blue: "#2563eb" };
 
   const docItems = [
-    { name: "Offer Letter", meta: "Jan 2024 · PDF", icon: "Document", color: "#6366F1" },
-    { name: "Aadhaar Card", meta: "ID Proof · PDF", icon: "ID Card", color: "#0ea5e9" },
-    { name: "Contract", meta: "Signed · PDF", icon: "Document", color: "#f59e0b" },
-    { name: "Degree Cert", meta: "Education · PDF", icon: "Education", color: "#8b5cf6" },
-    { name: "Resume", meta: "Latest · PDF", icon: "Edit", color: "#ef4444" },
+    { name: "Offer Letter", meta: "Jan 2024 · PDF", icon: "📄", color: "#6366F1" },
+    { name: "Aadhaar Card", meta: "ID Proof · PDF", icon: "🪪", color: "#0ea5e9" },
+    { name: "Contract", meta: "Signed · PDF", icon: "📄", color: "#f59e0b" },
+    { name: "Degree Cert", meta: "Education · PDF", icon: "🎓", color: "#8b5cf6" },
+    { name: "Resume", meta: "Latest · PDF", icon: "📝", color: "#ef4444" },
   ];
 
   const cardStyle = { background: TC.card, borderRadius: 16, border: `1px solid ${TC.border}`, overflow: "hidden" };
@@ -738,10 +738,10 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
       {/* Quick Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
         {[
-          { icon: "Date", val: presentDays, lbl: "Days Present", bg: "#e0f7fa", ic: TC.teal },
-          { icon: "Job", val: activeProj, lbl: "Active Projects", bg: "#dcfce7", ic: TC.green },
-          { icon: "Checked", val: pendingTasks, lbl: "Tasks Pending", bg: "#fef3c7", ic: TC.amber },
-          { icon: "", val: leaveTotal - leaveUsed, lbl: "Leave Days Left", bg: "#dbeafe", ic: TC.blue },
+          { icon: "📅", val: presentDays, lbl: "Days Present", bg: "#e0f7fa", ic: TC.teal },
+          { icon: "💼", val: activeProj, lbl: "Active Projects", bg: "#dcfce7", ic: TC.green },
+          { icon: "✅", val: pendingTasks, lbl: "Tasks Pending", bg: "#fef3c7", ic: TC.amber },
+          { icon: "🌴", val: leaveTotal - leaveUsed, lbl: "Leave Days Left", bg: "#dbeafe", ic: TC.blue },
         ].map((s, i) => (
           <div key={i} style={{ ...cardStyle, padding: "16px 18px", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: 10, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{s.icon}</div>

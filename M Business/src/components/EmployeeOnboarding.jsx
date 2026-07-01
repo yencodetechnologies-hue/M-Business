@@ -1,24 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 
 /* ------------------------------------------------------------------
-   Color system
-   - Primary identity: violet (reads var(--app-accent) if your app
-     defines it, otherwise falls back to this palette).
-   - Each section gets its own accent tint so the form reads as
-     organized sections rather than one long block.
+  Color system
+  - Primary identity: violet (reads var(--app-accent) if your app
+    defines it, otherwise falls back to this palette).
+  - Each section gets its own accent tint so the form reads as
+    organized sections rather than one long block.
+------------------------------------------------------------------- */
+/* ------------------------------------------------------------------
+  Color system — single teal theme, no mixed colors
 ------------------------------------------------------------------- */
 const T = {
-  accent: "var(--app-accent, #6D28D9)",
-  accent2: "var(--app-accent2, #4C1D95)",
-  accentRgb: "var(--app-accent-rgb, 109,40,217)",
-  text: "var(--app-text, #1E1B2E)",
-  muted: "var(--app-muted, #6B6478)",
-  border: "var(--app-border, #E6E1F2)",
-  bg: "var(--app-bg, #F8F6FC)",
-  bgSoft: "#F5F0FF",
-  bgSoft2: "#EDE4FC",
+  accent: "#0D9488",       // teal
+  accent2: "#0D9488",      // same teal → solid button, no gradient mixing
+  accentRgb: "13,148,136", // rgb of #0D9488, used for shadows/rings
+  text: "#1E1B2E",
+  muted: "#6B6478",
+  border: "#E2E8F0",
+  bg: "#F0FDFA",
+  bgSoft: "#CCFBF1",
+  bgSoft2: "#99F6E4",
   card: "#ffffff",
   danger: "#DC2626",
   dangerBg: "#FEF2F2",
@@ -26,12 +29,11 @@ const T = {
   successBg: "#F0FDF4",
 };
 
-/* Per-section colors — used for the little icon badge, the heading,
-   and the focus ring of inputs inside that section. */
+/* All sections use the same teal — no more purple/amber/green mix */
 const SECTIONS = {
-  personal: { fg: "#6D28D9", bg: "#F5F0FF", ring: "rgba(109,40,217,0.12)" },
-  bank: { fg: "#0F766E", bg: "#F0FDFA", ring: "rgba(15,118,110,0.12)" },
-  docs: { fg: "#B45309", bg: "#FFFBEB", ring: "rgba(180,83,9,0.12)" },
+  personal: { fg: "#0D9488", bg: "#CCFBF1", ring: "rgba(13,148,136,0.12)" },
+  bank: { fg: "#0D9488", bg: "#CCFBF1", ring: "rgba(13,148,136,0.12)" },
+  docs: { fg: "#0D9488", bg: "#CCFBF1", ring: "rgba(13,148,136,0.12)" },
 };
 
 export default function EmployeeOnboarding() {
@@ -58,6 +60,9 @@ export default function EmployeeOnboarding() {
   });
   const [err, setErr] = useState({});
   const [loading, setLoading] = useState(false);
+  const fieldRefs = useRef({});
+  // Order matches top-to-bottom position in the form
+  const FIELD_ORDER = ["name", "email", "phone", "password", "bankName", "ifscCode", "accountNumber"];
   const [success, setSuccess] = useState(false);
   const [showPass, setShowPass] = useState(false);
 
@@ -92,12 +97,21 @@ export default function EmployeeOnboarding() {
     if (!form.phone.trim()) errors.phone = "Phone is required";
     if (!form.password.trim()) errors.password = "Password is required";
     if (!form.bankName.trim()) errors.bankName = "Bank name is required";
-    if (!form.accountNumber.trim()) errors.accountNumber = "Account number is required";
     if (!form.ifscCode.trim()) errors.ifscCode = "IFSC code is required";
+    if (!form.accountNumber.trim()) errors.accountNumber = "Account number is required";
 
     if (Object.keys(errors).length > 0) {
       setErr(errors);
-      return;
+
+      // Find the first missing field, in the order it appears on the page
+      const firstErrorField = FIELD_ORDER.find(f => errors[f]);
+      const el = fieldRefs.current[firstErrorField];
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        // Focus after the smooth scroll has had time to land
+        setTimeout(() => el.focus(), 350);
+      }
+      return; // form is not submitted until this block is empty
     }
 
     try {
@@ -202,9 +216,9 @@ export default function EmployeeOnboarding() {
 
           <SectionHeader icon="ti-id-badge-2" label="Personal Information" section={SECTIONS.personal} />
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: 28 }}>
-            <Input label="Full Name" value={form.name} onChange={v => handleChange("name", v)} error={err.name} placeholder="John Doe" section={SECTIONS.personal} />
-            <Input label="Email Address" value={form.email} onChange={v => handleChange("email", v)} error={err.email} type="email" placeholder="john@company.com" section={SECTIONS.personal} />
-            <Input label="Phone Number" value={form.phone} onChange={v => handleChange("phone", v)} error={err.phone} placeholder="+91 98765 43210" section={SECTIONS.personal} />
+            <Input label="Full Name" value={form.name} onChange={v => handleChange("name", v)} error={err.name} placeholder="John Doe" section={SECTIONS.personal} inputRef={el => (fieldRefs.current.name = el)} />
+            <Input label="Email Address" value={form.email} onChange={v => handleChange("email", v)} error={err.email} type="email" placeholder="john@company.com" section={SECTIONS.personal} inputRef={el => (fieldRefs.current.email = el)} />
+            <Input label="Phone Number" value={form.phone} onChange={v => handleChange("phone", v)} error={err.phone} placeholder="+91 98765 43210" section={SECTIONS.personal} inputRef={el => (fieldRefs.current.phone = el)} />
             <Input
               label="Date of Birth"
               value={form.dateOfBirth}
@@ -239,7 +253,7 @@ export default function EmployeeOnboarding() {
             />
 
             <div style={{ position: "relative" }}>
-              <Input label="Password" value={form.password} onChange={v => handleChange("password", v)} error={err.password} type={showPass ? "text" : "password"} placeholder="Set your password" section={SECTIONS.personal} />
+              <Input label="Password" value={form.password} onChange={v => handleChange("password", v)} error={err.password} type={showPass ? "text" : "password"} placeholder="Set your password" section={SECTIONS.personal} inputRef={el => (fieldRefs.current.password = el)} />
               <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 12, top: 36, background: "none", border: "none", cursor: "pointer", fontSize: 16, color: T.muted }}>
                 <i className={`ti ${showPass ? "ti-eye-off" : "ti-eye"}`}></i>
               </button>
@@ -248,10 +262,10 @@ export default function EmployeeOnboarding() {
 
           <SectionHeader icon="ti-building-bank" label="Bank Account Details" section={SECTIONS.bank} />
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: 28 }}>
-            <Input label="Bank Name" value={form.bankName} onChange={v => handleChange("bankName", v)} error={err.bankName} placeholder="e.g. HDFC Bank" section={SECTIONS.bank} />
-            <Input label="IFSC Code" value={form.ifscCode} onChange={v => handleChange("ifscCode", v.toUpperCase())} error={err.ifscCode} placeholder="HDFC0001234" section={SECTIONS.bank} />
+            <Input label="Bank Name" value={form.bankName} onChange={v => handleChange("bankName", v)} error={err.bankName} placeholder="e.g. HDFC Bank" section={SECTIONS.bank} inputRef={el => (fieldRefs.current.bankName = el)} />
+            <Input label="IFSC Code" value={form.ifscCode} onChange={v => handleChange("ifscCode", v.toUpperCase())} error={err.ifscCode} placeholder="HDFC0001234" section={SECTIONS.bank} inputRef={el => (fieldRefs.current.ifscCode = el)} />
             <div style={{ gridColumn: "1 / -1" }}>
-              <Input label="Account Number" value={form.accountNumber} onChange={v => handleChange("accountNumber", v)} error={err.accountNumber} placeholder="123456789012" section={SECTIONS.bank} />
+              <Input label="Account Number" value={form.accountNumber} onChange={v => handleChange("accountNumber", v)} error={err.accountNumber} placeholder="123456789012" section={SECTIONS.bank} inputRef={el => (fieldRefs.current.accountNumber = el)} />
             </div>
           </div>
 
@@ -305,9 +319,9 @@ export default function EmployeeOnboarding() {
       </div>
 
       <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-      `}</style>
+          @keyframes spin { to { transform: rotate(360deg); } }
+          @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        `}</style>
     </div>
   );
 }
@@ -323,19 +337,20 @@ function SectionHeader({ icon, label, section }) {
   );
 }
 
-function Input({ label, value, onChange, error, type = "text", placeholder, section }) {
+function Input({ label, value, onChange, error, type = "text", placeholder, section, inputRef }) {
   const fg = section ? section.fg : T.accent;
   const ring = section ? section.ring : `rgba(${T.accentRgb},0.1)`;
   return (
     <div style={{ marginBottom: 4 }}>
-      <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: T.muted, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>{label} *</label>
+      <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: error ? T.danger : T.muted, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>{label} *</label>
       <input
+        ref={inputRef}
         type={type}
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
         onFocus={e => { e.target.style.borderColor = fg; e.target.style.boxShadow = `0 0 0 3px ${ring}`; e.target.style.background = "#fff"; }}
-        onBlur={e => { e.target.style.borderColor = error ? T.danger : T.border; e.target.style.boxShadow = "none"; e.target.style.background = T.bg; }}
+        onBlur={e => { e.target.style.borderColor = error ? T.danger : T.border; e.target.style.boxShadow = "none"; e.target.style.background = error ? T.dangerBg : T.bg; }}
         style={{
           width: "100%",
           height: 46,
@@ -347,7 +362,7 @@ function Input({ label, value, onChange, error, type = "text", placeholder, sect
           color: T.text,
           outline: "none",
           transition: "all 0.15s",
-          background: T.bg
+          background: error ? T.dangerBg : T.bg
         }}
       />
       {error && <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: T.danger, marginTop: 4, fontWeight: 600 }}><i className="ti ti-alert-circle" style={{ fontSize: 12 }}></i>{error}</div>}

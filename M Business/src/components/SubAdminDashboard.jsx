@@ -1821,38 +1821,36 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
     // Build a token once and reuse it everywhere — token grants auto-login
     // so the client doesn't need to manually sign in, and it's what makes
     // the data (projects/tasks/invoices/etc.) actually load on their side.
-    const buildPortalTokenUrl = () => {
-      // Always use the subadmin's companyId — this is what projects are stored under
+    const buildPortalTokenUrl = async () => {
       const subadminCompanyId = user?.companyId || user?._id || user?.id || "";
-      const clientToken = btoa(JSON.stringify({
-        clientId: c._id,
-        email: c.email,
-        name: c.clientName || c.name,
-        companyName: c.companyName || c.company || "",
+      const res = await axios.post(`${BASE_URL}/api/clients/${c._id}/portal-token`, {
         companyId: subadminCompanyId,
         agencyName: user?.companyName || user?.name || "",
-        exp: Date.now() + 24 * 60 * 60 * 1000 // 24 hour expiry
-      }));
-      return `${window.location.origin}/client-portal/${c._id}?token=${clientToken}`;
+      });
+      return `${window.location.origin}/client-portal/${c._id}?token=${res.data.token}`;
     };
 
-    const handleOpenPortal = () => {
-      window.open(buildPortalTokenUrl(), "_blank");
+    const handleOpenPortal = async () => {
+      const url = await buildPortalTokenUrl();
+      window.open(url, "_blank");
     };
 
-    const handleCopyLink = () => {
-      navigator.clipboard.writeText(buildPortalTokenUrl());
+    const handleCopyLink = async () => {
+      const url = await buildPortalTokenUrl();
+      navigator.clipboard.writeText(url);
       showToast("📋 Portal link copied!");
     };
 
-    const handleShareWhatsApp = () => {
-      const text = `Hi ${c.clientName || c.name},\n\nYou can access your client portal here:\n${buildPortalTokenUrl()}`;
+    const handleShareWhatsApp = async () => {
+      const url = await buildPortalTokenUrl();
+      const text = `Hi ${c.clientName || c.name},\n\nYou can access your client portal here:\n${url}`;
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
     };
 
-    const handleSendEmail = () => {
+    const handleSendEmail = async () => {
+      const url = await buildPortalTokenUrl();
       const subject = `Your Client Portal Access - ${c.clientName || c.name}`;
-      const body = `Hi ${c.clientName || c.name},\n\nYou can access your client portal here:\n${buildPortalTokenUrl()}\n\nBest regards`;
+      const body = `Hi ${c.clientName || c.name},\n\nYou can access your client portal here:\n${url}\n\nBest regards`;
       window.open(`mailto:${c.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
     };
 
@@ -10617,6 +10615,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             {validActive === "project-details" && jumpProject && (
 
               <ModernProjectDetails
+
+                key={jumpProject._id || jumpProject.id}
 
                 project={jumpProject}
 

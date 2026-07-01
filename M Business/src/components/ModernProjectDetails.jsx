@@ -1268,35 +1268,43 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   };
 
   const generatePortalLink = async (forProjectId = currProject?._id) => {
-    // Only reuse the cached link if it was generated for THIS same project.
-    if (portalLinkUrl && forProjectId === lastPortalProjectId.current) return portalLinkUrl;
+    // Snapshot the project identifiers at the moment this function is called.
+    // This prevents stale closure values from a previously viewed project being used.
+    const snapshotClientId = currProject?.clientId || resolvedClientId || '';
+    const snapshotClientName = (currProject?.client || '').toLowerCase().trim();
+    const snapshotCompanyId = currProject?.companyId || '';
+    const snapshotProjectId = currProject?._id;
+
+    // Only reuse the cached link if it was generated for THIS exact project.
+    if (portalLinkUrl && forProjectId && forProjectId === lastPortalProjectId.current) {
+      return portalLinkUrl;
+    }
+
     setLoadingPortalLink(true);
     try {
-      const res = await axios.get(`${BASE_URL}/api/clients`, { headers: { 'x-company-id': currProject?.companyId || '' } });
+      const res = await axios.get(`${BASE_URL}/api/clients`, {
+        headers: { 'x-company-id': snapshotCompanyId }
+      });
       const clientList = Array.isArray(res.data) ? res.data : [];
 
-      // Prefer matching by ID (stored on the project) â€” this is unambiguous.
-      // Fall back to name matching only when no clientId is saved on the project.
-      const storedClientId = currProject?.clientId || resolvedClientId || '';
-      let matched = storedClientId
-        ? clientList.find(c => String(c._id) === String(storedClientId))
+      // Step 1: Match by stored clientId (most reliable — direct ID match)
+      let matched = snapshotClientId
+        ? clientList.find(c => String(c._id) === String(snapshotClientId))
         : null;
 
-      // Name-based fallback (handles older projects that only saved the name)
-      if (!matched) {
-        const target = (currProject?.client || '').toLowerCase().trim();
-        matched = target
-          ? clientList.find(c =>
-            (c.clientName || c.name || '').toLowerCase().trim() === target
-          )
-          : null;
+      // Step 2: Name-based fallback for older projects that only saved client name
+      if (!matched && snapshotClientName) {
+        matched = clientList.find(c =>
+          (c.clientName || c.name || '').toLowerCase().trim() === snapshotClientName
+        );
       }
 
       if (!matched) {
         alert('Could not find this client\'s account. Make sure the client is added under Clients.');
         return '';
       }
-      const subadminCompanyId = user?.companyId || user?._id || user?.id || currProject?.companyId || '';
+
+      const subadminCompanyId = user?.companyId || user?._id || user?.id || snapshotCompanyId || '';
       const clientToken = btoa(JSON.stringify({
         clientId: matched._id,
         email: matched.email,
@@ -1306,9 +1314,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         agencyName: user?.companyName || user?.name || '',
         exp: Date.now() + 24 * 60 * 60 * 1000
       }));
+
       const link = `${window.location.origin}/client-portal/${matched._id}?token=${clientToken}`;
       setPortalLinkUrl(link);
-      lastPortalProjectId.current = forProjectId; // cache the project this link belongs to
+      lastPortalProjectId.current = snapshotProjectId;
       return link;
     } catch (err) {
       console.error('Failed to generate portal link:', err);
@@ -1323,11 +1332,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     // Clients viewing their own portal never see the Client Portal panel
     // (see the render guard below), so don't even generate a link for them.
     if (user?.role === 'client') return;
-    // Clear any cached link from a previously viewed project/client first,
-    // so generatePortalLink() below is forced to build a fresh one.
+    // Always invalidate and regenerate the portal link when the project or its client changes.
     setPortalLinkUrl('');
+    lastPortalProjectId.current = null;
     if (currProject?._id) generatePortalLink();
-  }, [currProject?._id, currProject?.client, user?.role]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currProject?._id, currProject?.client, currProject?.clientId, user?.role]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const copyPortalLink = async () => {
     const link = portalLinkUrl || await generatePortalLink();

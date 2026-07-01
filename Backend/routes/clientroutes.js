@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const jwt = require("jsonwebtoken");
 const Client = require("../models/ClientModel");
 const DeletedClient = require("../models/DeletedClientModel");
 const { addClient } = require("../controllers/ClientController");
@@ -10,7 +11,7 @@ const Task = require("../models/TaskModels");
 const Quotation = require("../models/QuotationModel");
 const Proposal = require("../models/ProposalModel");
 const Document = require("../models/DocumentModel");
-
+const verifyClientPortal = require("../middleware/verifyClientPortal");
 router.get("/projects/:name", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.name);
@@ -26,10 +27,37 @@ router.get("/projects/:name", async (req, res) => {
   }
 });
 
-router.get("/my-projects/:clientName", async (req, res) => {
+// Issue a signed, non-forgeable portal token for a specific client.
+router.post("/:clientId/portal-token", async (req, res) => {
   try {
-    const companyId = req.companyId || "NONE";
-    const name = decodeURIComponent(req.params.clientName).trim();
+    const client = await Client.findById(req.params.clientId);
+    if (!client) return res.status(404).json({ msg: "Client not found" });
+
+    const token = jwt.sign(
+      {
+        clientId: client._id.toString(),
+        email: client.email,
+        name: client.clientName || client.name,
+        companyName: client.companyName || client.company || "",
+        companyId: req.body.companyId || client.companyId || "",
+        agencyName: req.body.agencyName || "",
+        projectId: req.body.projectId || "",
+        role: "client",
+      },
+      process.env.JWT_SECRET || "secret",
+      { expiresIn: "24h" }
+    );
+
+    res.json({ token });
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+});
+
+router.get("/my-projects", verifyClientPortal, async (req, res) => {
+  try {
+    const companyId = req.portalClient.companyId || "NONE";
+    const name = req.portalClient.name.trim();
     const projects = await Project.find({
       client: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") },
       companyId

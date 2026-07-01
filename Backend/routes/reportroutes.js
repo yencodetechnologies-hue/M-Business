@@ -4,20 +4,20 @@ const router = express.Router();
 
 // Import all relevant models to build reports dynamically
 let Client, Employee, Project, Invoice, Manager;
-try { Client   = require("../models/Client");   } catch(e) {}
-try { Employee = require("../models/Employee"); } catch(e) {}
-try { Project  = require("../models/Project");  } catch(e) {}
-try { Invoice  = require("../models/Invoice");  } catch(e) {}
-try { Manager  = require("../models/Manager");  } catch(e) {}
+try { Client = require("../models/ClientModel"); } catch (e) { }
+try { Employee = require("../models/EmployeeModel"); } catch (e) { }
+try { Project = require("../models/ProjectModel"); } catch (e) { }
+try { Invoice = require("../models/InvoiceModels"); } catch (e) { }
+try { Manager = require("../models/ManagerModel"); } catch (e) { }
 
 // GET /api/reports — auto-generated summary report from DB
 router.get("/", async (req, res) => {
   try {
     const [clients, employees, projects, managers] = await Promise.all([
-      Client   ? Client.find()   : [],
+      Client ? Client.find() : [],
       Employee ? Employee.find() : [],
-      Project  ? Project.find()  : [],
-      Manager  ? Manager.find()  : [],
+      Project ? Project.find() : [],
+      Manager ? Manager.find() : [],
     ]);
 
     // --- Monthly Revenue (from projects with budget, current month) ---
@@ -27,11 +27,11 @@ router.get("/", async (req, res) => {
       .toISOString().slice(0, 7);
     const thisQ = `Q${Math.ceil((now.getMonth() + 1) / 3)} ${now.getFullYear()}`;
 
-    const projThisMonth  = projects.filter(p => (p.createdAt||"").toString().slice(0,7) === thisMonth);
-    const projLastMonth  = projects.filter(p => (p.createdAt||"").toString().slice(0,7) === lastMonth);
-    const projCompleted  = projects.filter(p => p.status === "Completed");
+    const projThisMonth = projects.filter(p => (p.createdAt || "").toString().slice(0, 7) === thisMonth);
+    const projLastMonth = projects.filter(p => (p.createdAt || "").toString().slice(0, 7) === lastMonth);
+    const projCompleted = projects.filter(p => p.status === "Completed");
     const projInProgress = projects.filter(p => p.status === "In Progress");
-    const projPending    = projects.filter(p => p.status === "Pending");
+    const projPending = projects.filter(p => p.status === "Pending");
 
     // Sum budgets (strip ₹ commas etc.)
     const sumBudget = (arr) =>

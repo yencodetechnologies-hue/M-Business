@@ -20,8 +20,8 @@ function StatCard({ THEME, icon, label, value, color, sub }) {
       <div style={{
         width: 40, height: 40, borderRadius: 11, background: `${color}15`,
         display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 19, marginBottom: 10
-      }}>{icon}</div>
+        fontSize: 19, marginBottom: 10, color
+      }}><i className={`ti ${icon}`}></i></div>
       <div style={{
         fontSize: 10, color: THEME.muted, fontWeight: 800,
         letterSpacing: 1, marginBottom: 4, textTransform: "uppercase"
@@ -51,8 +51,8 @@ function ReportCard({ THEME, r, idx, RPT_COLORS }) {
         <div style={{
           width: 44, height: 44, borderRadius: 12, background: `${color}15`,
           display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 20, flexShrink: 0
-        }}>{icon}</div>
+          fontSize: 20, flexShrink: 0, color
+        }}><i className={`ti ${icon}`}></i></div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 10, color: THEME.muted, fontWeight: 800, letterSpacing: 0.8, textTransform: "uppercase" }}>
             {r.id}
@@ -94,8 +94,8 @@ function ReportCard({ THEME, r, idx, RPT_COLORS }) {
         {[
           { k: "Total", v: r.total, c: THEME.accent },
           { k: "Revenue", v: r.revenue, c: color },
-          { k: "Done Success", v: r.done, c: "#22C55E" },
-          { k: "Pending Pending", v: r.pending, c: "#f59e0b" },
+          { k: "Done", v: r.done, c: "#22C55E" },
+          { k: "Pending", v: r.pending, c: "#f59e0b" },
         ].map(({ k, v, c }) => (
           <div key={k} style={{
             background: THEME.surface, borderRadius: 14,
@@ -116,7 +116,7 @@ function ReportCard({ THEME, r, idx, RPT_COLORS }) {
   );
 }
 
-const RPT_ICONS = { "Monthly Revenue": "Cost", "Project Summary": "Folder", "Client Activity": "Team", "Team Overview": "‍Job", "Finance Overview": "" };
+const RPT_ICONS = { "Monthly Revenue": "ti-currency-rupee", "Project Summary": "ti-folder", "Client Activity": "ti-users", "Team Overview": "ti-briefcase", "Finance Overview": "ti-report-money" };
 
 // ── MAIN COMPONENT -------------------------------------------
 export default function ReportsPage({ THEME, clients = [], projects = [], employees = [], managers = [], income = [], expenses = [] }) {
@@ -205,10 +205,10 @@ export default function ReportsPage({ THEME, clients = [], projects = [], employ
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');`}</style>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 20, marginBottom: 32 }}>
-        <StatCard THEME={THEME} icon="Cost" label="Total Revenue" value="₹12.4L" color="#10b981" sub="+14% from last month" />
-        <StatCard THEME={THEME} icon="Folder" label="Active Projects" value={projects.length} color={THEME.accent} sub="Across 8 categories" />
-        <StatCard THEME={THEME} icon="Team" label="Total Clients" value={clients.length} color="#f59e0b" sub="Active partnerships" />
-        <StatCard THEME={THEME} icon="Partnership" label="Team Size" value={employees.length + managers.length} color="#6366f1" sub="Talented professionals" />
+        <StatCard THEME={THEME} icon="ti-currency-rupee" label="Total Revenue" value="₹12.4L" color="#10b981" sub="+14% from last month" />
+        <StatCard THEME={THEME} icon="ti-folder" label="Active Projects" value={projects.length} color={THEME.accent} sub="Across 8 categories" />
+        <StatCard THEME={THEME} icon="ti-users" label="Total Clients" value={clients.length} color="#f59e0b" sub="Active partnerships" />
+        <StatCard THEME={THEME} icon="ti-users-group" label="Team Size" value={employees.length + managers.length} color="#6366f1" sub="Talented professionals" />
       </div>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
@@ -216,7 +216,7 @@ export default function ReportsPage({ THEME, clients = [], projects = [], employ
           <h2 style={{ margin: 0, fontSize: 24, fontWeight: 900, letterSpacing: "-0.5px" }}>Available Reports</h2>
           <p style={{ margin: "4px 0 0", color: THEME.muted, fontSize: 14, fontWeight: 600 }}>Real-time business insights and analytics</p>
         </div>
-        <button onClick={fetchReports} style={{ background: THEME.accent, color: "#fff", border: "none", borderRadius: 12, padding: "12px 24px", fontWeight: 800, fontSize: 14, cursor: "pointer", boxShadow: "0 4px 12px rgba(99,102,241,0.2)" }}>Sync Refresh Reports</button>
+        <button onClick={fetchReports} style={{ background: THEME.accent, color: "#fff", border: "none", borderRadius: 12, padding: "12px 24px", fontWeight: 800, fontSize: 14, cursor: "pointer", boxShadow: "0 4px 12px rgba(99,102,241,0.2)", display: "flex", alignItems: "center", gap: 8 }}><i className="ti ti-refresh"></i> Refresh Reports</button>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))", gap: 24 }}>
@@ -257,14 +257,14 @@ export default function ReportsPage({ THEME, clients = [], projects = [], employ
               }}
               onMouseEnter={e => e.currentTarget.style.background = "#f1f5f9"}
               onMouseLeave={e => e.currentTarget.style.background = "var(--app-bg)"}
-            >CloseDetails Close</button>
+            ><i className="ti ti-x" style={{ marginRight: 6 }}></i>Close</button>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: 30 }}>
             {/* Income Table */}
             <div style={{ background: THEME.surface, borderRadius: 16, padding: 20, border: `1.5px solid ${THEME.border}` }}>
               <h4 style={{ fontSize: 15, fontWeight: 800, color: "#16a34a", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ width: 32, height: 32, borderRadius: 10, background: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center" }}>Import</span>
+                <span style={{ width: 32, height: 32, borderRadius: 10, background: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center", color: "#16a34a" }}><i className="ti ti-trending-up"></i></span>
                 Recent Income
               </h4>
               <div style={{ overflowX: "auto" }}>
@@ -292,7 +292,7 @@ export default function ReportsPage({ THEME, clients = [], projects = [], employ
             {/* Expense Table */}
             <div style={{ background: THEME.surface, borderRadius: 16, padding: 20, border: `1.5px solid ${THEME.border}` }}>
               <h4 style={{ fontSize: 15, fontWeight: 800, color: "#dc2626", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ width: 32, height: 32, borderRadius: 10, background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center" }}>Export</span>
+                <span style={{ width: 32, height: 32, borderRadius: 10, background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", color: "#dc2626" }}><i className="ti ti-trending-down"></i></span>
                 Recent Expenses
               </h4>
               <div style={{ overflowX: "auto" }}>
@@ -326,8 +326,8 @@ export default function ReportsPage({ THEME, clients = [], projects = [], employ
           background: "var(--app-card)", borderRadius: 16, padding: 22,
           boxShadow: "0 10px 30px rgba(0,0,0,0.05)", border: "1.5px solid rgba(0,0,0,0.1)"
         }}>
-          <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "var(--app-text)" }}>
-            Document Summary Table
+          <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "var(--app-text)", display: "flex", alignItems: "center", gap: 8 }}>
+            <i className="ti ti-table" style={{ color: "var(--app-accent)" }}></i> Summary Table
           </h3>
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
@@ -355,7 +355,7 @@ export default function ReportsPage({ THEME, clients = [], projects = [], employ
                       onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                       <td style={{ padding: "12px 14px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <span style={{ fontSize: 16 }}>{RPT_ICONS[r.type] || "Metrics"}</span>
+                          <span style={{ fontSize: 16, color: "var(--app-accent)" }}><i className={`ti ${RPT_ICONS[r.type] || "ti-chart-bar"}`}></i></span>
                           <span style={{ fontWeight: 700, color: "var(--app-text)" }}>{r.type}</span>
                         </div>
                       </td>

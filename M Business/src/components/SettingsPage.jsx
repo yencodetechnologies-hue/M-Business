@@ -39,7 +39,7 @@ const CSS = `
 .form-textarea:focus{border-color:var(--app-accent, var(--app-accent, var(--app-accent, #00BCD4)));background:#fff;box-shadow:0 0 0 3px rgba(var(--app-accent-rgb,0,188,212),.08)}
 .form-hint{font-size:10px;color:var(--app-muted,#607D86);margin-top:5px;font-weight:600}
 .avatar-upload{display:flex;align-items:center;gap:18px;margin-bottom:22px}
-.avatar-big{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--app-accent, var(--app-accent, var(--app-accent, #00BCD4))),#006E7F);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;flex-shrink:0;border:3px solid rgba(var(--app-accent-rgb,0,188,212),.2);position:relative}
+.avatar-big{width:72px;height:72px;border-radius:16px;background:linear-gradient(135deg,var(--app-accent, #00BCD4),#006E7F);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;flex-shrink:0;border:3px solid rgba(var(--app-accent-rgb,0,188,212),.2);position:relative;overflow:hidden}
 .avatar-edit{position:absolute;bottom:0;right:0;width:22px;height:22px;border-radius:50%;background:var(--app-accent, var(--app-accent, var(--app-accent, #00BCD4)));border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;cursor:pointer}
 .avatar-upload-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(var(--app-accent-rgb,0,188,212),.1);border:1.5px solid var(--app-accent, var(--app-accent, var(--app-accent, #00BCD4)));border-radius:9px;font-size:12px;font-weight:700;color:var(--app-accent, var(--app-accent, var(--app-accent, #00BCD4)));cursor:pointer;font-family:inherit;transition:all .15s}
 .avatar-upload-btn:hover{background:var(--app-accent, var(--app-accent, var(--app-accent, #00BCD4)));color:#fff}
@@ -301,7 +301,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
               <div className="ss-body">
                 <div className="avatar-upload">
                   <div className="avatar-big">
-                    {avatarUrl ? <img src={avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} /> : (profile.name?.[0] || user?.name?.[0] || 'U').toUpperCase()}
+                    {avatarUrl ? <img src={avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} /> : (profile.name?.[0] || user?.name?.[0] || 'U').toUpperCase()}
                     <div className="avatar-edit" onClick={() => fileInputRef.current?.click()}><i className="ti ti-camera" /></div>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

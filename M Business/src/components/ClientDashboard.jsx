@@ -376,6 +376,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           companyId: decoded.companyId || "",
           role: "client",
           agencyName: decoded.agencyName || "",
+          portalProjectId: decoded.projectId || "",
           exp: decoded.exp || (Date.now() + 24 * 60 * 60 * 1000),
         };
 
@@ -929,7 +930,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const totalInvoiced = totalPaid + totalPending + totalOverdue;
 
   // Active project calculation — prefer explicitly Active status
-  const activeProj = projects.find(p => (p.status || "").toLowerCase() === "active") || projects[0];
+  const portalProjectId = portalUser?.portalProjectId || "";
+  const targetProject = portalProjectId ? projects.find(p => p._id === portalProjectId) : null;
+  const activeProj = targetProject || projects.find(p => (p.status || "").toLowerCase() === "active") || projects[0];
   const activeProjName = activeProj?.name || "";
   const activeProjProgress = activeProj?.progress ?? 0;
   const activeProjDesc = activeProj?.description || "";
@@ -1417,7 +1420,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
   // Render Gantt Timeline helper
   function renderTimelineComponent() {
-    const proj = projects[0];
+    const proj = targetProject || projects[0];
     const milestones = proj?.milestones || [];
     const today = new Date();
 
@@ -2083,7 +2086,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   // Render Activity Feed helper
   function renderActivityFeed() {
     // Build from backend: project updates + notifications
-    const proj = projects[0];
+    const proj = targetProject || projects[0];
     const projUpdates = (proj?.updates || [])
       .filter(upd => !upd.visibleTo || upd.visibleTo.includes('client'))
       .slice(0, 3).map((upd, i) => ({
@@ -2145,7 +2148,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
   // Render Contact Card helper
   function renderContactCard() {
-    const proj = projects[0];
+    const proj = targetProject || projects[0];
     const managerName = proj?.manager || proj?.contactPersonName || 'Project Manager';
     const managerPhone = proj?.contactPersonNo || proj?.managerPhone || '';
     const managerEmail = proj?.managerEmail || proj?.contactEmail || '';

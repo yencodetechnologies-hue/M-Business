@@ -497,6 +497,12 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           icon: a.icon,
           approveLabel: a.approveLabel,
           rejectLabel: a.rejectLabel,
+          senderName: a.senderName,
+          status: a.status,
+          rejectReason: a.rejectReason,
+          fileUrl: a.fileUrl,
+          fileName: a.fileName,
+          recipientType: a.recipientType,
         })) : []);
 
         // Real chat thread between this client and the agency (company owner)

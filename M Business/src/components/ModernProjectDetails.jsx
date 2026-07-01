@@ -1095,6 +1095,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         updatedFiles = [...updatedFiles, newFileObj];
       }
       const payload = { files: updatedFiles };
+      let newUploadedUrl = '';
+      if (uploadFileObj && updatedFiles.length > (currProject.files || []).length) {
+        newUploadedUrl = updatedFiles[updatedFiles.length - 1].url;
+      }
       if (postUpdateOnUpload) {
         const visibleTo = [];
         if (uploadSendToEmployee) visibleTo.push('team');
@@ -1103,6 +1107,54 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         const body = uploadDescription.trim() ? `${uploadHeading.trim() ? uploadHeading + ': ' : ''}${uploadDescription}`.trim() : uploadHeading.trim();
         const newUpdate = { text: body, title, date: new Date().toISOString(), author: 'Admin', type: updateType, visibleTo: visibleTo.length > 0 ? visibleTo : ['team'], fileName: uploadFileObj ? uploadFileObj.name : '' };
         payload.updates = [newUpdate, ...(currProject.updates || [])];
+
+        // Also create an actionable approval for the client and/or team so they
+        // can View / Approve / Reject this update directly from Pending Approvals.
+        try {
+          const approvalCompanyId = user?.companyId || user?.company || user?._id || user?.id || currProject.companyId || '';
+          const approvalPromises = [];
+          if (uploadSendToClient && resolvedClientId) {
+            approvalPromises.push(axios.post(`${BASE_URL}/api/approvals`, {
+              companyId: approvalCompanyId,
+              clientId: resolvedClientId,
+              recipientType: 'client',
+              senderName: user?.name || user?.clientName || 'Admin',
+              title,
+              desc: body,
+              icon: 'ti-speakerphone',
+              approveLabel: 'Approve',
+              rejectLabel: 'Reject',
+              sourceType: 'project',
+              projectId: currProject._id || '',
+              fileUrl: newUploadedUrl,
+              fileName: uploadFileObj ? uploadFileObj.name : '',
+            }));
+          }
+          if (uploadSendToEmployee && assigned.length > 0) {
+            const teamMember = (employees || []).find(emp => (emp.name || emp.employeeName) === assigned[0]);
+            if (teamMember?._id) {
+              approvalPromises.push(axios.post(`${BASE_URL}/api/approvals`, {
+                companyId: approvalCompanyId,
+                teamMemberId: teamMember._id,
+                recipientType: 'team',
+                senderName: user?.name || user?.clientName || 'Admin',
+                title,
+                desc: body,
+                icon: 'ti-speakerphone',
+                approveLabel: 'Approve',
+                rejectLabel: 'Reject',
+                sourceType: 'project',
+                projectId: currProject._id || '',
+                fileUrl: newUploadedUrl,
+                fileName: uploadFileObj ? uploadFileObj.name : '',
+              }));
+            }
+          }
+          await Promise.all(approvalPromises);
+          loadProjectApprovals();
+        } catch (approvalErr) {
+          console.error('Failed to create approval entry for update:', approvalErr);
+        }
       }
       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, payload);
       setShowUploadModal(false);

@@ -200,7 +200,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [activePayTab, setActivePayTab] = useState('inv');
   const [composerOpen, setComposerOpen] = useState(false);
   const [showApprovalModal, setShowApprovalModal] = useState(false);
-  const [approvalForm, setApprovalForm] = useState({ recipientType: 'client', teamMemberId: '', clientId: '', title: '', desc: '', icon: 'ti-file-text', approveLabel: 'Approve', rejectLabel: 'Reject' });
+  const [approvalForm, setApprovalForm] = useState({ recipientType: 'client', teamMemberId: '', clientId: '', title: '', desc: '', icon: 'ti-file-text', approveLabel: 'Approve', rejectLabel: 'Review' });
   const [submittingApproval, setSubmittingApproval] = useState(false);
   const [projectApprovals, setProjectApprovals] = useState([]);
   const [viewProjectApproval, setViewProjectApproval] = useState(null);
@@ -575,7 +575,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         desc: updateText.trim(),
         icon: 'ti-file-text',
         approveLabel: 'Approve',
-        rejectLabel: 'Reject',
+        rejectLabel: 'Review',
         sourceType: 'project',
         projectId: currProject._id || '',
       });
@@ -616,7 +616,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         desc: uploadDescription.trim(),
         icon: 'ti-file-text',
         approveLabel: 'Approve',
-        rejectLabel: 'Reject',
+        rejectLabel: 'Review',
         sourceType: 'project',
         projectId: currProject._id || '',
         fileUrl: uploadedUrl,
@@ -1131,7 +1131,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               desc: body,
               icon: 'ti-speakerphone',
               approveLabel: 'Approve',
-              rejectLabel: 'Reject',
+              rejectLabel: 'Review',
               sourceType: 'project',
               projectId: currProject._id || '',
               fileUrl: newUploadedUrl,
@@ -1150,7 +1150,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 desc: body,
                 icon: 'ti-speakerphone',
                 approveLabel: 'Approve',
-                rejectLabel: 'Reject',
+                rejectLabel: 'Review',
                 sourceType: 'project',
                 projectId: currProject._id || '',
                 fileUrl: newUploadedUrl,

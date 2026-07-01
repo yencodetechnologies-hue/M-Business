@@ -562,8 +562,15 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     } catch (e) { console.error(e); }
     setRefreshing(false);
   };
-
   const handleLogout = () => {
+    if (portalMode) {
+      // Client Portal tab is fully isolated: never touch the shared "user"
+      // key (that's the Subadmin's own session) and never navigate away
+      // to "/" — that route belongs to the Subadmin app, not the portal.
+      setPortalUser(null);
+      window.location.reload(); // reloads this same portal URL only
+      return;
+    }
     localStorage.removeItem("user");
     window.location.href = "/";
   };

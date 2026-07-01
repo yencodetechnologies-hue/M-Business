@@ -370,13 +370,13 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     }
   });
 
-  // Sync portalUser to parent setUser once on mount
-
-  useEffect(() => {
-    if (portalMode && portalUser && setUser) {
-      setUser(portalUser);
-    }
-  }, [portalMode, portalUser]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Portal mode is intentionally isolated: it must NEVER call the shared
+  // setUser/localStorage("user") — that key is also used by the Subadmin's
+  // own session. Writing to it here would silently log the Subadmin out
+  // of their own tab (and any other open tab) the moment this portal loads,
+  // since localStorage is shared across tabs on the same origin.
+  // portalUser is used directly and locally below (`const user = portalMode
+  // ? portalUser : userProp`) — no syncing to the parent is needed or safe.
 
   // In portal mode always use the locally decoded client user, never the subadmin prop
   const user = portalMode ? portalUser : userProp;

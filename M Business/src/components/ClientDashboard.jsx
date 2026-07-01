@@ -332,7 +332,9 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
 }
 export default function ClientDashboard({ user: userProp, setUser, portalMode = false }) {
   useAssets();
-  const [active, setActive] = useState(() => localStorage.getItem("activeTab_client") || "dashboard");
+  const [active, setActive] = useState(() =>
+    portalMode ? "dashboard" : (localStorage.getItem("activeTab_client") || "dashboard")
+  );
 
   const portalClientId = portalMode
     ? window.location.pathname.split("/client-portal/")[1]?.split("?")[0] || ""
@@ -382,7 +384,13 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const user = portalMode ? portalUser : userProp;
 
   const [selectedClientProject, setSelectedClientProject] = useState(null);
-  useEffect(() => { localStorage.setItem("activeTab_client", active); if (active !== "projects") setSelectedClientProject(null); }, [active]);
+  useEffect(() => {
+    // Skip localStorage in portal mode — we must not touch the shared client-session key
+    if (!portalMode) {
+      localStorage.setItem("activeTab_client", active);
+    }
+    if (active !== "projects") setSelectedClientProject(null);
+  }, [active, portalMode]);
 
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);

@@ -144,7 +144,7 @@ export default function App() {
 
           <Route
             path="/client-portal/:clientId"
-            element={<ClientDashboard user={null} setUser={handleSetUser} portalMode={true} />}
+            element={<ClientDashboard user={null} setUser={null} portalMode={true} />}
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -86,6 +86,7 @@ try { EmployeeDoc = mongoose.model("EmployeeDoc"); } catch {
   EmployeeDoc = mongoose.model("EmployeeDoc", new mongoose.Schema({
     employeeName: { type: String, required: true },
     employeeId: { type: mongoose.Schema.Types.ObjectId, ref: "Employee", default: null },
+    companyId: { type: String, default: "" },        // ← ADD THIS LINE
     docType: { type: String, enum: ["aadhaar", "pan", "passbook", "itr"], required: true },
     url: { type: String, required: true },
     fileName: { type: String, default: "" },
@@ -561,13 +562,15 @@ router.post("/documents/upload", docUpload.single("file"), async (req, res) => {
     if (!req.file || !employeeName || !docType)
       return res.status(400).json({ msg: "File, employee name and doc type required" });
 
-    const url = req.file.path; // Cloudinary URL is returned in req.file.path
+    const url = req.file.path;
     const emp = await Employee.findOne({ name: { $regex: new RegExp(employeeName, "i") } });
+    const companyId = req.headers['x-company-id'] || emp?.companyId || "";   // ← ADD THIS LINE
 
     const doc = await EmployeeDoc.findOneAndUpdate(
       { employeeName: { $regex: new RegExp(`^${employeeName}$`, "i") }, docType },
       {
         employeeName, employeeId: emp?._id || null,
+        companyId,                                                          // ← ADD THIS LINE
         docType, url,
         fileName: req.file.originalname,
         fileSize: req.file.size,

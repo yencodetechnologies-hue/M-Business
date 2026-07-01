@@ -806,7 +806,8 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
             <div className="ed-docs-list">
               {docsToShow.map((doc, i) => {
                 const ds = getDocStyle(doc);
-                const docName = doc.name || doc.documentName || doc.fileName || "Document";
+                const docTypeLabels = { aadhaar: "Aadhaar Card", pan: "PAN Card", passbook: "Bank Passbook", itr: "ITR Document" };
+                const docName = docTypeLabels[doc.docType] || doc.name || doc.documentName || doc.fileName || "Document";
                 const docMeta = doc.type || doc.documentType || doc.category || "";
                 const uploadDate = doc.uploadedAt || doc.createdAt;
                 const metaStr = [uploadDate ? new Date(uploadDate).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }) : "", docMeta, "PDF"].filter(Boolean).join(' · ');
@@ -821,7 +822,19 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                       {doc.url && doc.url !== "#" ? (
                         <>
                           <button className="ed-doc-btn view" onClick={() => window.open(doc.url, '_blank')}><i className="ti ti-eye" style={{ fontSize: 12 }}></i> View</button>
-                          <button className="ed-doc-btn download" onClick={() => { const a = document.createElement('a'); a.href = doc.url; a.download = docName; a.click(); }}><i className="ti ti-download" style={{ fontSize: 12 }}></i> Download</button>
+                          <button className="ed-doc-btn download" onClick={() => {
+                            const forceDownloadUrl = doc.url.includes('/upload/')
+                              ? doc.url.replace('/upload/', `/upload/fl_attachment:${encodeURIComponent(docName)}/`)
+                              : doc.url;
+                            const a = document.createElement('a');
+                            a.href = forceDownloadUrl;
+                            a.download = docName;
+                            a.target = '_blank';
+                            a.rel = 'noopener noreferrer';
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                          }}><i className="ti ti-download" style={{ fontSize: 12 }}></i> Download</button>
                         </>
                       ) : (
                         <span style={{ fontSize: 11, color: "var(--text-muted)", background: "#F1F5F9", padding: "4px 10px", borderRadius: 20, fontWeight: 700 }}>Sent</span>

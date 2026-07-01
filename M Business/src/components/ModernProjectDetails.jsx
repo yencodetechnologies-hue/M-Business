@@ -323,6 +323,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [newMilestoneName, setNewMilestoneName] = useState('');
   const [newMilestoneDate, setNewMilestoneDate] = useState('');
   const [showAddMilestone, setShowAddMilestone] = useState(false);
+  const [editingMilestoneIdx, setEditingMilestoneIdx] = useState(null);
+  const [editMilestoneName, setEditMilestoneName] = useState('');
+  const [editMilestoneDate, setEditMilestoneDate] = useState('');
   const [milestoneView, setMilestoneView] = useState('timeline'); // 'timeline' | 'list'
   const [dragMilestoneIdx, setDragMilestoneIdx] = useState(null);
   const [dragOverMilestoneIdx, setDragOverMilestoneIdx] = useState(null);
@@ -997,6 +1000,54 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     }
   };
 
+  const handleEditMilestone = (idx) => {
+    const m = (currProject.milestones || [])[idx];
+    if (!m) return;
+    setEditingMilestoneIdx(idx);
+    setEditMilestoneName(m.name || '');
+    setEditMilestoneDate(m.date || '');
+  };
+
+  const handleUpdateMilestone = async (e) => {
+    e.preventDefault();
+    if (!editMilestoneName.trim() || editingMilestoneIdx === null) return;
+    try {
+      const oldName = (currProject.milestones || [])[editingMilestoneIdx]?.name;
+      const trimmedNewName = editMilestoneName.trim();
+
+      const updatedMilestones = (currProject.milestones || []).map((m, idx) =>
+        idx === editingMilestoneIdx
+          ? { ...m, name: trimmedNewName, date: editMilestoneDate || '' }
+          : m
+      );
+
+      // If the name changed, keep any tasks linked to this milestone pointing at the new name
+      if (oldName && oldName !== trimmedNewName) {
+        const linkedTasks = currTasks.filter(t =>
+          t.milestone === oldName && !t.isDeleted &&
+          (String(t.projectId?._id || t.projectId) === String(currProject._id) || t.project === currProject.name)
+        );
+        await Promise.all(linkedTasks.map(t =>
+          axios.put(`${BASE_URL}/api/tasks/${t._id}`, { milestone: trimmedNewName })
+        ));
+      }
+
+      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
+        milestones: updatedMilestones
+      });
+
+      setEditingMilestoneIdx(null);
+      setEditMilestoneName('');
+      setEditMilestoneDate('');
+      loadLatest();
+      if (onUpdate) onUpdate();
+      if (fetchTasks) fetchTasks();
+    } catch (err) {
+      console.error("Failed to update milestone:", err);
+      alert("Failed to update milestone.");
+    }
+  };
+
   const handleMilestoneDragStart = (idx) => {
     setDragMilestoneIdx(idx);
   };
@@ -1617,27 +1668,30 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       <div style={{ fontSize: 11, fontWeight: 700, color: P.textDark, textAlign: 'center', maxWidth: 80, wordBreak: 'break-word', position: 'relative', zIndex: 1 }}>{m.name}</div>
                       {m.date && <div style={{ fontSize: 10, color: P.textLight, textAlign: 'center', position: 'relative', zIndex: 1 }}>{new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</div>}
                       <div style={{ fontSize: 10, fontWeight: 700, color: textColor, position: 'relative', zIndex: 1 }}>{statusLabel}</div>
-                      <button onClick={async e => {
-                        e.stopPropagation();
-                        if (!confirm('Delete milestone? This will also delete all tasks linked to this milestone.')) return;
-                        try {
-                          // Delete all tasks linked to this milestone
-                          const linkedTasks = currTasks.filter(tk => tk.milestone === m.name && !tk.isDeleted && (String(tk.projectId?._id || tk.projectId) === String(currProject._id) || tk.project === currProject.name));
-                          await Promise.all(linkedTasks.map(tk =>
-                            axios.delete(`${BASE_URL}/api/tasks/${tk._id}`).catch(() =>
-                              axios.put(`${BASE_URL}/api/tasks/${tk._id}`, { isDeleted: true })
-                            )
-                          ));
-                          // Remove milestone from project
-                          const ms = (currProject.milestones || []).filter((_, i) => i !== idx);
-                          const doneM = ms.filter(x => x.done).length;
-                          const newProgress = ms.length > 0 ? Math.round((doneM / ms.length) * 100) : 0;
-                          await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms, progress: newProgress });
-                          loadLatest();
-                          if (onUpdate) onUpdate();
-                          if (fetchTasks) fetchTasks();
-                        } catch (err) { console.error('Failed to delete milestone:', err); }
-                      }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 11, padding: 0, position: 'relative', zIndex: 1 }}>Delete</button>
+                      <div style={{ display: 'flex', gap: 8, position: 'relative', zIndex: 1 }}>
+                        <button onClick={e => { e.stopPropagation(); handleEditMilestone(idx); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.primary, fontSize: 11, padding: 0 }}>Edit</button>
+                        <button onClick={async e => {
+                          e.stopPropagation();
+                          if (!confirm('Delete milestone? This will also delete all tasks linked to this milestone.')) return;
+                          try {
+                            // Delete all tasks linked to this milestone
+                            const linkedTasks = currTasks.filter(tk => tk.milestone === m.name && !tk.isDeleted && (String(tk.projectId?._id || tk.projectId) === String(currProject._id) || tk.project === currProject.name));
+                            await Promise.all(linkedTasks.map(tk =>
+                              axios.delete(`${BASE_URL}/api/tasks/${tk._id}`).catch(() =>
+                                axios.put(`${BASE_URL}/api/tasks/${tk._id}`, { isDeleted: true })
+                              )
+                            ));
+                            // Remove milestone from project
+                            const ms = (currProject.milestones || []).filter((_, i) => i !== idx);
+                            const doneM = ms.filter(x => x.done).length;
+                            const newProgress = ms.length > 0 ? Math.round((doneM / ms.length) * 100) : 0;
+                            await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms, progress: newProgress });
+                            loadLatest();
+                            if (onUpdate) onUpdate();
+                            if (fetchTasks) fetchTasks();
+                          } catch (err) { console.error('Failed to delete milestone:', err); }
+                        }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 11, padding: 0 }}>Delete</button>
+                      </div>
                     </div>
                   );
                 })}
@@ -1675,32 +1729,54 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       </div>
                     </div>
                     <span style={{ fontSize: 11, fontWeight: 700, color: statusColor, padding: '3px 10px', borderRadius: 6, background: statusBg, flexShrink: 0 }}>{statusLabel}</span>
-                    <button onClick={async e => {
-                      e.stopPropagation();
-                      if (!confirm('Delete milestone? This will also delete all tasks linked to this milestone.')) return;
-                      try {
-                        // Delete all tasks linked to this milestone
-                        const linkedTasks = currTasks.filter(tk => tk.milestone === m.name && !tk.isDeleted && (String(tk.projectId?._id || tk.projectId) === String(currProject._id) || tk.project === currProject.name));
-                        await Promise.all(linkedTasks.map(tk =>
-                          axios.delete(`${BASE_URL}/api/tasks/${tk._id}`).catch(() =>
-                            axios.put(`${BASE_URL}/api/tasks/${tk._id}`, { isDeleted: true })
-                          )
-                        ));
-                        // Remove milestone from project
-                        const ms = (currProject.milestones || []).filter((_, i) => i !== idx);
-                        const doneM = ms.filter(x => x.done).length;
-                        const newProgress = ms.length > 0 ? Math.round((doneM / ms.length) * 100) : 0;
-                        await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms, progress: newProgress });
-                        loadLatest();
-                        if (onUpdate) onUpdate();
-                        if (fetchTasks) fetchTasks();
-                      } catch (err) { console.error('Failed to delete milestone:', err); }
-                    }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 13, padding: 0, flexShrink: 0 }}>Delete</button>
+                    <div style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
+                      <button onClick={e => { e.stopPropagation(); handleEditMilestone(idx); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.primary, fontSize: 13, padding: 0 }}>Edit</button>
+                      <button onClick={async e => {
+                        e.stopPropagation();
+                        if (!confirm('Delete milestone? This will also delete all tasks linked to this milestone.')) return;
+                        try {
+                          // Delete all tasks linked to this milestone
+                          const linkedTasks = currTasks.filter(tk => tk.milestone === m.name && !tk.isDeleted && (String(tk.projectId?._id || tk.projectId) === String(currProject._id) || tk.project === currProject.name));
+                          await Promise.all(linkedTasks.map(tk =>
+                            axios.delete(`${BASE_URL}/api/tasks/${tk._id}`).catch(() =>
+                              axios.put(`${BASE_URL}/api/tasks/${tk._id}`, { isDeleted: true })
+                            )
+                          ));
+                          // Remove milestone from project
+                          const ms = (currProject.milestones || []).filter((_, i) => i !== idx);
+                          const doneM = ms.filter(x => x.done).length;
+                          const newProgress = ms.length > 0 ? Math.round((doneM / ms.length) * 100) : 0;
+                          await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms, progress: newProgress });
+                          loadLatest();
+                          if (onUpdate) onUpdate();
+                          if (fetchTasks) fetchTasks();
+                        } catch (err) { console.error('Failed to delete milestone:', err); }
+                      }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 13, padding: 0 }}>Delete</button>
+                    </div>
                   </div>
                 );
               })}
             </div>
           )}
+          {editingMilestoneIdx !== null && (
+            <form onSubmit={handleUpdateMilestone} style={{ background: P.primaryLight, padding: 14, borderRadius: 10, marginTop: 12, border: `1.5px solid ${P.primary}` }}>
+              <div style={{ fontSize: 11, fontWeight: 800, color: P.primaryDark, textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 8 }}>Editing Milestone</div>
+              <div style={{ marginBottom: 8 }}>
+                <input type="text" value={editMilestoneName} onChange={e => setEditMilestoneName(e.target.value)} placeholder="Milestone name..." required style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input
+                  type="date"
+                  value={editMilestoneDate}
+                  onChange={e => setEditMilestoneDate(e.target.value)}
+                  style={{ padding: '6px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', flex: 1, background: '#fff', color: editMilestoneDate ? P.textDark : '#A0AEC0', fontFamily: 'Nunito, sans-serif', cursor: 'pointer', minWidth: 140 }}
+                />
+                <button type="submit" className="mpd-btn mpd-btn-primary" style={{ padding: '6px 12px', fontSize: 11 }}>Save</button>
+                <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setEditingMilestoneIdx(null)} style={{ padding: '6px 12px', fontSize: 11 }}>✕</button>
+              </div>
+            </form>
+          )}
+
           {showAddMilestone && (
             <form onSubmit={handleAddMilestone} style={{ background: P.bg, padding: 14, borderRadius: 10, marginTop: 12 }}>
               <div style={{ marginBottom: 8 }}>

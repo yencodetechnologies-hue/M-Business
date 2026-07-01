@@ -340,32 +340,70 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     ? window.location.pathname.split("/client-portal/")[1]?.split("?")[0] || ""
     : "";
 
-  // Decode token SYNCHRONOUSLY on first render so clientName is correct immediately
-  // This prevents subadmin data from ever loading in portal mode
+  // Decode token SYNCHRONOUSLY on first render so clientName is correct immediately.
+  // This prevents subadmin data from ever loading in portal mode.
+  //
+  // The token is stripped from the URL right after decoding (for security), so a
+  // page refresh has nothing left to read from the address bar. To survive a
+  // refresh WITHOUT re-showing a fake "signed out" screen, the decoded session is
+  // also saved to sessionStorage — scoped to THIS client's id (taken from the URL
+  // path, which does survive refresh) — and restored from there when no token is
+  // present. Because the key includes the client id, a session for one client can
+  // never be accidentally read while viewing a different client's portal link.
   const [portalUser, setPortalUser] = useState(() => {
     if (!portalMode) return null;
+    const pathClientId = window.location.pathname.split("/client-portal/")[1]?.split("?")[0] || "";
+    const sessionKey = pathClientId ? `portalSession_${pathClientId}` : null;
+
     try {
       const params = new URLSearchParams(window.location.search);
       const token = params.get("token");
-      if (!token) return null;
-      const decoded = JSON.parse(atob(token));
-      if (decoded.exp && Date.now() > decoded.exp) return null;
-      if (decoded.agencyName) {
-        localStorage.setItem("portalAgencyName", decoded.agencyName);
+
+      if (token) {
+        const decoded = JSON.parse(atob(token));
+        if (decoded.exp && Date.now() > decoded.exp) return null;
+        if (decoded.agencyName) {
+          localStorage.setItem("portalAgencyName", decoded.agencyName);
+        }
+
+        const sessionUser = {
+          _id: decoded.clientId,
+          id: decoded.clientId,
+          clientName: decoded.name || decoded.clientName || "",
+          name: decoded.name || decoded.clientName || "",
+          email: decoded.email || "",
+          companyName: decoded.companyName || "",
+          companyId: decoded.companyId || "",
+          role: "client",
+          agencyName: decoded.agencyName || "",
+          exp: decoded.exp || (Date.now() + 24 * 60 * 60 * 1000),
+        };
+
+        // Persist so refreshing THIS SAME portal link keeps the client signed in.
+        if (sessionKey) {
+          try { sessionStorage.setItem(sessionKey, JSON.stringify(sessionUser)); } catch (e) { }
+        }
+
+        // Clean token from URL immediately (keeps it out of browser history)
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return sessionUser;
       }
-      // Clean token from URL immediately
-      window.history.replaceState({}, document.title, window.location.pathname);
-      return {
-        _id: decoded.clientId,
-        id: decoded.clientId,
-        clientName: decoded.name || decoded.clientName || "",
-        name: decoded.name || decoded.clientName || "",
-        email: decoded.email || "",
-        companyName: decoded.companyName || "",
-        companyId: decoded.companyId || "",
-        role: "client",
-        agencyName: decoded.agencyName || "",
-      };
+
+      // No token in the URL — likely a refresh. Try restoring the saved session,
+      // but ONLY if it belongs to the client id in the current URL path.
+      if (sessionKey) {
+        const saved = sessionStorage.getItem(sessionKey);
+        if (saved) {
+          const parsedSaved = JSON.parse(saved);
+          const notExpired = !parsedSaved.exp || Date.now() <= parsedSaved.exp;
+          if (parsedSaved._id === pathClientId && notExpired) {
+            return parsedSaved;
+          }
+          // Expired, or somehow mismatched — don't let a stale/wrong session through.
+          sessionStorage.removeItem(sessionKey);
+        }
+      }
+      return null;
     } catch (e) {
       console.warn("Portal token decode failed:", e);
       return null;

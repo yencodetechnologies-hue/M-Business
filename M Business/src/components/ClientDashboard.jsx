@@ -523,6 +523,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             id: m._id,
             sender: String(m.senderId) === myIdStr ? "You" : m.senderName,
             msg: m.content,
+            attachmentUrl: m.attachmentUrl || "",
+            attachmentName: m.attachmentName || "",
             time: new Date(m.createdAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
             mine: String(m.senderId) === myIdStr,
           }));

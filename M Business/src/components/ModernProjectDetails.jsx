@@ -517,7 +517,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const clientName = currProject.client || currProject.clientName || "Unknown Client";
 
   const resolvedClientId = currProject.clientId
-    || clients?.find(c => (c.clientName || c.name || "").toLowerCase().trim() === clientName.toLowerCase().trim())?._id
+    || clients?.find(c => {
+      const cName = (c.clientName || c.name || "").toLowerCase().trim();
+      const cUser = (c.username || c.email || "").toLowerCase().trim();
+      const target = clientName.toLowerCase().trim();
+      return cName === target || cUser === target;
+    })?._id
     || "";
 
   useEffect(() => {
@@ -1113,6 +1118,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         try {
           const approvalCompanyId = user?.companyId || user?.company || user?._id || user?.id || currProject.companyId || '';
           const approvalPromises = [];
+          if (uploadSendToClient && !resolvedClientId) {
+            console.warn('No matching client record found for "' + clientName + '" — approval was NOT created for the client. Link this project to a proper client record.');
+          }
           if (uploadSendToClient && resolvedClientId) {
             approvalPromises.push(axios.post(`${BASE_URL}/api/approvals`, {
               companyId: approvalCompanyId,

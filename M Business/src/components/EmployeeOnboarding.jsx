@@ -3,8 +3,8 @@ import axios from "axios";
 import { BASE_URL } from "../config";
 
 const T = {
-  primary: "var(--app-primary, #7c3aed)",
-  accent: "var(--app-accent, #7c3aed)",
+  primary: "var(--app-primary, #00BCD4)",
+  accent: "var(--app-accent, #00BCD4)",
   text: "var(--app-text, #1e293b)",
   muted: "var(--app-muted, #64748b)",
   border: "var(--app-border, #e2e8f0)",
@@ -132,7 +132,7 @@ export default function EmployeeOnboarding() {
 
   if (success) {
     return (
-      <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #F0FDFE 0%, #E0F7FA 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
         <div style={{ maxWidth: 450, width: "100%", background: "#fff", padding: 40, borderRadius: 24, boxShadow: "0 20px 50px rgba(0,0,0,0.1)", textAlign: "center" }}>
           <div style={{ width: 80, height: 80, background: "#dcfce7", color: "#22c55e", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, margin: "0 auto 24px" }}>Yes</div>
           <h2 style={{ fontSize: 24, fontWeight: 800, color: "#1e293b", marginBottom: 12 }}>Registration Successful!</h2>
@@ -146,27 +146,27 @@ export default function EmployeeOnboarding() {
 
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)", padding: "40px 20px", display: "flex", justifyContent: "center" }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #F0FDFE 0%, #E0F7FA 100%)", padding: "40px 20px", display: "flex", justifyContent: "center" }}>
       <div style={{ maxWidth: 650, width: "100%" }}>
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <h1 style={{ fontSize: 32, fontWeight: 900, color: "#1e293b", margin: "0 0 8px" }}>Employee Onboarding</h1>
-          <p style={{ color: "#64748b", fontWeight: 500 }}>Welcome to <span style={{ color: "#7c3aed", fontWeight: 700 }}>{companyName}</span>. Please fill in your details to join the team.</p>
+          <p style={{ color: "#64748b", fontWeight: 500 }}>Welcome to <span style={{ color: "#00BCD4", fontWeight: 700 }}>{companyName}</span>. Please fill in your details to join the team.</p>
         </div>
 
         <form onSubmit={handleSubmit} style={{ background: "#fff", padding: 32, borderRadius: 24, boxShadow: "0 20px 50px rgba(0,0,0,0.08)", border: "1px solid rgba(255,255,255,0.8)" }}>
           {err.submit && <div style={{ background: "#fef2f2", color: "#ef4444", padding: "12px 16px", borderRadius: 10, fontSize: 14, fontWeight: 600, marginBottom: 20, border: "1px solid #fee2e2" }}>Warning {err.submit}</div>}
 
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
-            <div style={{ position: "relative" }}>
-              <div style={{ width: 120, height: 120, borderRadius: "50%", background: "#f1f5f9", border: "2px dashed #cbd5e1", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+            <div style={{ position: "relative", width: "100%", maxWidth: 220 }}>
+              <div style={{ width: "100%", aspectRatio: "1 / 1", borderRadius: 16, background: "#f1f5f9", border: "2px dashed #cbd5e1", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", boxSizing: "border-box" }}>
                 {form.photo ? (
-                  <img src={form.photo} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  <img src={form.photo} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }} />
                 ) : (
-                  <span style={{ fontSize: 40 }}>Profile</span>
+                  <i className="ti ti-user" style={{ fontSize: 44, color: T.border }}></i>
                 )}
               </div>
-              <label style={{ position: "absolute", bottom: 0, right: 0, background: "#7c3aed", width: 36, height: 36, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "3px solid #fff", boxShadow: "0 4px 10px rgba(0,0,0,0.15)" }}>
-                <span style={{ fontSize: 18, color: "#fff" }}></span>
+              <label style={{ position: "absolute", bottom: 8, right: 8, background: "#00BCD4", width: 36, height: 36, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "3px solid #fff", boxShadow: "0 4px 10px rgba(0,0,0,0.15)" }}>
+                <i className="ti ti-camera" style={{ fontSize: 16, color: "#fff" }}></i>
                 <input type="file" accept="image/*" style={{ display: "none" }} onChange={handlePhotoChange} />
               </label>
             </div>
@@ -222,7 +222,7 @@ export default function EmployeeOnboarding() {
 
             {/* Role - Select */}
             <div style={{ marginBottom: 4 }}>
-              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#7c3aed", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#00BCD4", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
                 Role *
               </label>
               <select
@@ -267,9 +267,9 @@ export default function EmployeeOnboarding() {
 
           <div style={{ fontSize: 12, fontWeight: 800, color: "#94a3b8", letterSpacing: 1, marginBottom: 16, borderBottom: "1px solid #f1f5f9", paddingBottom: 8, marginTop: 32 }}>DOCUMENTS</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32 }}>
-            <DocInput label="Aadhaar Card" icon="ID Card" file={docs.aadhaar} onChange={f => handleFileChange("aadhaar", f)} />
-            <DocInput label="PAN Card" icon="" file={docs.pan} onChange={f => handleFileChange("pan", f)} />
-            <DocInput label="Bank Passbook" icon="Bank" file={docs.passbook} onChange={f => handleFileChange("passbook", f)} />
+            <DocInput label="Aadhaar Card" icon="ti-id-badge-2" file={docs.aadhaar} onChange={f => handleFileChange("aadhaar", f)} />
+            <DocInput label="PAN Card" icon="ti-credit-card" file={docs.pan} onChange={f => handleFileChange("pan", f)} />
+            <DocInput label="Bank Passbook" icon="ti-building-bank" file={docs.passbook} onChange={f => handleFileChange("passbook", f)} />
           </div>
           <div style={{ display: "flex", justifyContent: "center" }}>
             <button
@@ -277,7 +277,7 @@ export default function EmployeeOnboarding() {
               disabled={loading}
               style={{
                 width: "50%",
-                background: "linear-gradient(135deg, #7c3aed, #6d28d9)",
+                background: "linear-gradient(135deg, #00BCD4, #00ACC1)",
                 color: "#fff",
                 border: "none",
                 borderRadius: 14,
@@ -306,7 +306,7 @@ export default function EmployeeOnboarding() {
         </form>
 
         <p style={{ textAlign: "center", marginTop: 24, fontSize: 13, color: "#64748b" }}>
-          Already have an account? <a href="/" style={{ color: "#7c3aed", fontWeight: 700, textDecoration: "none" }}>Login here</a>
+          Already have an account? <a href="/" style={{ color: "#00BCD4", fontWeight: 700, textDecoration: "none" }}>Login here</a>
         </p>
       </div>
 
@@ -349,12 +349,14 @@ function Input({ label, value, onChange, error, type = "text", placeholder }) {
 function DocInput({ label, icon, file, onChange }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: "#f8fafc", borderRadius: 12, border: "1.5px solid #e2e8f0" }}>
-      <div style={{ width: 36, height: 36, borderRadius: 10, background: "#fff", border: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{icon}</div>
+      <div style={{ width: 36, height: 36, borderRadius: 10, background: "#E0F7FA", border: "1px solid #b2ebf2", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: "#00ACC1" }}>
+        <i className={`ti ${icon}`}></i>
+      </div>
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: "#1e293b" }}>{label}</div>
-        <div style={{ fontSize: 11, color: file ? "#7c3aed" : "#94a3b8", fontWeight: 600 }}>{file ? file.name : ""}</div>
+        <div style={{ fontSize: 11, color: file ? "#00BCD4" : "#94a3b8", fontWeight: 600 }}>{file ? file.name : ""}</div>
       </div>
-      <label style={{ background: file ? "#dcfce7" : "#7c3aed", color: file ? "#166534" : "#fff", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", border: "none" }}>
+      <label style={{ background: file ? "#dcfce7" : "#00BCD4", color: file ? "#166534" : "#fff", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", border: "none" }}>
         {file ? "Change" : "Upload"}
         <input type="file" style={{ display: "none" }} onChange={e => onChange(e.target.files[0])} />
       </label>

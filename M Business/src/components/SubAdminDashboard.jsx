@@ -6756,7 +6756,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-    const t = appTheme === "custom" ? generateThemeFromColor(customColor) : (THEMES[appTheme] || THEMES.purple);
+    const t = appTheme === "custom" ? generateThemeFromColor(customColor) : (THEMES[appTheme] || THEMES.teal);
 
     if (!t) return;
 
@@ -6820,7 +6820,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  const currentTheme = appTheme === "custom" ? generateThemeFromColor(customColor) : (THEMES[appTheme] || THEMES.purple);
+  const t = appTheme === "custom" ? generateThemeFromColor(customColor) : (THEMES[appTheme] || THEMES.teal);
 
 
 

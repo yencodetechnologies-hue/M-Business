@@ -10,10 +10,10 @@ import { BASE_URL } from "../config";
 const BASE = `${BASE_URL}/api/employee-dashboard`;
 
 export const DOC_TYPES = [
-  { key: "aadhaar", label: "Aadhaar Card", icon: "ID Card", desc: "Government issued identity card", color: "#f97316", accept: "image/*,application/pdf", maxMB: 5 },
-  { key: "pan", label: "PAN Card", icon: "", desc: "Permanent Account Number card", color: "var(--app-accent)", accept: "image/*,application/pdf", maxMB: 5 },
-  { key: "passbook", label: "Bank Passbook", icon: "Bank", desc: "First page of bank passbook", color: "#10b981", accept: "image/*,application/pdf", maxMB: 10 },
-  { key: "itr", label: "ITR", icon: "Document", desc: "Income Tax Return document", color: "var(--app-muted)", accept: "image/*,application/pdf", maxMB: 10 },
+  { key: "aadhaar", label: "Aadhaar Card", icon: "ti-id-badge-2", desc: "Government issued identity card", color: "#f97316", accept: "image/*,application/pdf", maxMB: 5 },
+  { key: "pan", label: "PAN Card", icon: "ti-credit-card", desc: "Permanent Account Number card", color: "var(--app-accent)", accept: "image/*,application/pdf", maxMB: 5 },
+  { key: "passbook", label: "Bank Passbook", icon: "ti-building-bank", desc: "First page of bank passbook", color: "#10b981", accept: "image/*,application/pdf", maxMB: 10 },
+  { key: "itr", label: "ITR", icon: "ti-file-text", desc: "Income Tax Return document", color: "var(--app-muted)", accept: "image/*,application/pdf", maxMB: 10 },
 ];
 
 const fmtSize = (bytes) => {
@@ -96,7 +96,7 @@ function DocCard({ doc, empName, onUploaded, notify }) {
     <div style={{ background: "#fff", borderRadius: 14, border: `1.5px solid ${hasDoc ? doc.color + "40" : "#f1f5f9"}`, overflow: "hidden", transition: "box-shadow 0.2s", boxShadow: hasDoc ? `0 2px 16px ${doc.color}18` : "none" }}>
       {/* Header */}
       <div style={{ padding: "12px 14px", background: hasDoc ? `${doc.color}08` : "#f8fafc", borderBottom: `1px solid ${hasDoc ? doc.color + "20" : "#f1f5f9"}`, display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{ width: 36, height: 36, borderRadius: 10, background: `${doc.color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{doc.icon}</div>
+        <div style={{ width: 36, height: 36, borderRadius: 10, background: `${doc.color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0, color: doc.color }}><i className={`ti ${doc.icon}`}></i></div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 13, fontWeight: 800, color: "#0f172a" }}>{doc.label}</div>
           <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 1 }}>{doc.desc}</div>
@@ -387,7 +387,7 @@ export function SubAdminDocumentsPage({ employees = [] }) {
                 return (
                   <div key={dt.key} style={{ border: `1.5px solid ${hasDoc ? dt.color + "35" : "#f1f5f9"}`, borderRadius: 12, padding: "12px 14px", background: hasDoc ? `${dt.color}04` : "#f8fafc" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: hasDoc ? 10 : 0 }}>
-                      <span style={{ fontSize: 18 }}>{dt.icon}</span>
+                      <span style={{ fontSize: 18, color: dt.color }}><i className={`ti ${dt.icon}`}></i></span>
                       <div style={{ flex: 1, fontWeight: 700, fontSize: 13, color: "var(--app-text)" }}>{dt.label}</div>
                       {hasDoc
                         ? <span style={{ background: `${dt.color}15`, border: `1px solid ${dt.color}30`, borderRadius: 20, padding: "3px 10px", fontSize: 10, fontWeight: 700, color: dt.color }}>Yes Uploaded</span>

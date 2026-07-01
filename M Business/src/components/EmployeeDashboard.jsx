@@ -19,27 +19,28 @@ const BASE = "/api/employee-dashboard";
 // ── DESIGN TOKENS --------------------------------------------
 const T = {
   // ── BACKGROUNDS ------------------------------------------
-  bg: "#f5f0ff",                    // soft lavender page bg
-  surface: "#ffffff",               // white cards
-  sidebar: "linear-gradient(180deg, #e8a0d0 0%, #c084e8 40%, #9b6fd4 70%, #7c5cbf 100%)",  // pinkpurple gradient
+  bg: "var(--app-bg, #f8fafc)",
+  surface: "#ffffff",
+  sidebar: "linear-gradient(180deg, var(--app-accent, #00BCD4) 0%, var(--app-accent2, #00ACC1) 100%)",
   sidebarActive: "rgba(255,255,255,0.22)",
   sidebarText: "rgba(255,255,255,0.65)",
   sidebarTextActive: "#ffffff",
 
   // ── BORDERS ----------------------------------------------
-  border: "#ece5f8",
-  borderDark: "#d4c4f0",
+  border: "var(--app-border, #e2e8f0)",
+  borderDark: "var(--app-border, #cbd5e1)",
 
   // ── TEXT -------------------------------------------------
-  text: "#2d1b69",                  // deep purple text
-  textMuted: "#7c6b9e",
-  textFaint: "#b8aad4",
+  text: "var(--app-text, #1e293b)",
+  textMuted: "var(--app-muted, #64748b)",
+  textFaint: "var(--app-muted, #94a3b8)",
 
   // ── ACCENT -----------------------------------------------
-  accent: "#9b6fd4",                // main purple
-  accentLight: "#f0e8ff",
+  accent: "var(--app-accent, #00BCD4)",
+  accentLight: "var(--teal-light, #E0F7FA)",
+  accentRgb: "var(--app-accent-rgb, 0,188,212)",
 
-  // ── STATUS (unchanged) -----------------------------------
+  // ── STATUS (semantic — intentionally not tied to theme) ---
   success: "#16a34a",
   successBg: "#f0fdf4",
   successBorder: "#bbf7d0",
@@ -57,9 +58,9 @@ const T = {
   radius: "14px",
   radiusSm: "9px",
   radiusLg: "20px",
-  shadow: "0 1px 4px rgba(155,111,212,0.08), 0 1px 2px rgba(155,111,212,0.05)",
-  shadowMd: "0 4px 16px rgba(155,111,212,0.14)",
-  shadowLg: "0 12px 32px rgba(155,111,212,0.18)",
+  shadow: "0 1px 4px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+  shadowMd: "0 4px 16px rgba(var(--app-accent-rgb, 0,188,212),0.14)",
+  shadowLg: "0 12px 32px rgba(var(--app-accent-rgb, 0,188,212),0.18)",
 };
 
 const sc = (s) => ({
@@ -83,14 +84,14 @@ const scBg = (s) => ({
 }[(s || "").toLowerCase()] || T.accentLight);
 
 const NAV = [
-  { key: "dashboard", icon: "+", label: "Dashboard" },
-  { key: "projects", icon: "◈", label: "My Projects" },
-  { key: "tasks", icon: "◉", label: "Active Tasks" },
-  { key: "calendar", icon: "◷", label: "Calendar" },
-  { key: "messaging", icon: "Mail", label: "Messages" },
-  { key: "documents", icon: "Document", label: "Documents" },
-  { key: "reports", icon: "▦", label: "Reports" },
-  { key: "settings", icon: "◌", label: "Settings" },
+  { key: "dashboard", icon: "ti-layout-dashboard", label: "Dashboard" },
+  { key: "projects", icon: "ti-briefcase", label: "My Projects" },
+  { key: "tasks", icon: "ti-checklist", label: "Active Tasks" },
+  { key: "calendar", icon: "ti-calendar", label: "Calendar" },
+  { key: "messaging", icon: "ti-mail", label: "Messages" },
+  { key: "documents", icon: "ti-folder", label: "Documents" },
+  { key: "reports", icon: "ti-chart-bar", label: "Reports" },
+  { key: "settings", icon: "ti-settings", label: "Settings" },
 ];
 
 const PERMISSION_TYPES = [
@@ -237,7 +238,7 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems })
                 style={{ width: "100%", display: "flex", alignItems: "center", gap: 11, padding: "10px 12px", background: on ? "rgba(255,255,255,0.1)" : "transparent", border: on ? "1px solid rgba(255,255,255,0.12)" : "1px solid transparent", borderRadius: 10, color: "#ffffff", fontWeight: on ? 900 : 700, fontSize: 13, cursor: "pointer", marginBottom: 3, textAlign: "left", fontFamily: "inherit", transition: "all 0.18s" }}
                 onMouseEnter={e => { if (!on) { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "#ffffff"; } }}
                 onMouseLeave={e => { if (!on) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#ffffff"; } }}>
-                <span style={{ fontSize: 15, opacity: on ? 1 : 0.5, minWidth: 18, textAlign: "center" }}>{n.icon}</span>
+                <span style={{ fontSize: 15, opacity: on ? 1 : 0.5, minWidth: 18, textAlign: "center" }}><i className={`ti ${n.icon}`}></i></span>
                 <span style={{ flex: 1 }}>{n.label}</span>
                 {on && <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#fff", opacity: 0.7 }} />}
               </button>
@@ -290,7 +291,7 @@ function DocumentsCard({ docStatus, onOpenProfile }) {
               style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", padding: "10px 12px", borderRadius: T.radiusSm, background: hasDoc ? "#fafafa" : T.bg, border: `1px solid ${hasDoc ? T.border : T.border}`, transition: "all 0.18s" }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = T.accent; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = T.border; }}>
-              <div style={{ width: 36, height: 36, borderRadius: 9, background: T.accentLight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0, border: `1px solid ${T.border}` }}>{dt.icon}</div>
+              <div style={{ width: 36, height: 36, borderRadius: 9, background: T.accentLight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0, border: `1px solid ${T.border}`, color: T.accent }}><i className={`ti ${dt.icon}`}></i></div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: T.text }}>{dt.label}</div>
                 {hasDoc && doc.uploadedAt
@@ -495,47 +496,116 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
   const today = todayStr();
   const todayAtt = attendance.find(a => a.date === today);
   const presentDays = attendance.filter(a => a.status === "present").length;
+  const absentDays = attendance.filter(a => a.status === "absent").length;
+  const leaveDays = attendance.filter(a => a.status === "leave").length;
+  const totalMarked = presentDays + absentDays + leaveDays;
+  const attRate = totalMarked > 0 ? Math.round((presentDays / totalMarked) * 100) : 0;
+  const leaveTotal = 18;
+  const leaveLeft = Math.max(leaveTotal - leaveDays, 0);
   const pendingTasks = tasks.filter(t => !["done", "completed"].includes((t.status || "").toLowerCase())).length;
   const activeProjectsCount = projects.filter(p => !["done", "completed"].includes((p.status || "").toLowerCase())).length;
   const latestSalary = salary[0];
+  const initials = name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+  const greetHour = new Date().getHours();
+  const greeting = greetHour < 12 ? "Good morning" : greetHour < 17 ? "Good afternoon" : "Good evening";
+  const recentLeave = attendance.filter(a => a.status === "leave" || a.status === "absent").slice(0, 3);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {/* Welcome */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14, marginBottom: 4 }}>
-        <div>
-          <h1 style={{ fontSize: 28, fontWeight: 900, color: T.text, margin: 0, letterSpacing: "-0.8px" }}>Good day, {name.split(' ')[0]}! </h1>
-          <p style={{ fontSize: 13, color: T.textMuted, marginTop: 5, fontWeight: 500 }}>Here's your workspace overview for today.</p>
+
+      {/* ── GREETING HERO ── */}
+      <div style={{
+        background: T.sidebar, borderRadius: T.radiusLg, padding: "26px 30px",
+        display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap",
+        boxShadow: T.shadowLg, position: "relative", overflow: "hidden"
+      }}>
+        <div style={{ width: 62, height: 62, borderRadius: "50%", background: "#fff", color: T.accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 900, border: "3px solid rgba(255,255,255,0.4)", flexShrink: 0, zIndex: 1 }}>{initials}</div>
+        <div style={{ flex: 1, minWidth: 220, zIndex: 1 }}>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.75)", fontWeight: 600, marginBottom: 3 }}>{greeting}</div>
+          <div style={{ fontSize: 21, fontWeight: 900, color: "#fff", marginBottom: 3 }}>{name} 👋</div>
+          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.8)" }}>{user?.role || "Employee"} · {user?.department || user?.dept || "—"}</div>
         </div>
-        {!todayAtt ? (
-          <div style={{ background: T.dangerBg, border: `1px solid ${T.dangerBorder}`, borderRadius: T.radius, padding: "11px 18px", display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ fontSize: 16 }}>Alarm</span>
-            <span style={{ fontSize: 13, color: T.danger, fontWeight: 700 }}>Attendance not marked</span>
-            <button onClick={() => setPage("attendance")} style={{ background: T.accent, border: "none", borderRadius: T.radiusSm, padding: "7px 14px", color: "#fff", fontSize: 12, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>Mark Now</button>
+        <div style={{ textAlign: "right", zIndex: 1 }}>
+          {!todayAtt ? (
+            <button onClick={() => setPage("attendance")} style={{ background: "#fff", color: T.accent, border: "none", borderRadius: 99, padding: "8px 16px", fontSize: 12, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>
+              Mark Today's Attendance
+            </button>
+          ) : (
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 99, padding: "5px 14px", fontSize: 11, fontWeight: 800, color: "#fff" }}>
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }} />
+              Today: {todayAtt.status.toUpperCase()}
+            </div>
+          )}
+          <div style={{ marginTop: 8 }}>
+            <button onClick={() => setPage("attendance")} style={{ background: "none", border: "1px solid rgba(255,255,255,0.4)", borderRadius: 99, padding: "7px 14px", fontSize: 11, fontWeight: 800, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
+              Apply Leave
+            </button>
           </div>
-        ) : (
-          <div style={{ background: T.successBg, border: `1px solid ${T.successBorder}`, borderRadius: T.radius, padding: "11px 18px", fontSize: 13, color: T.success, fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ width: 8, height: 8, borderRadius: "50%", background: T.success }} />
-            Today: {todayAtt.status.toUpperCase()}
-          </div>
-        )}
+        </div>
       </div>
 
-      {/* Stat cards — first is dark */}
+      {/* ── QUICK STATS ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 14 }} className="stat-grid">
-        <StatCard icon="◈" label="Active Projects" value={activeProjectsCount} sub="Assigned to you" color={T.accent} onClick={() => setPage("projects")} dark />
-        <StatCard icon="Document" label="Proposals" value={proposals.length} sub="Assigned to you" color={T.accent} onClick={() => setPage("proposals")} />
+        <StatCard icon="◈" label="Active Projects" value={activeProjectsCount} sub="Assigned to you" color={T.accent} onClick={() => setPage("projects")} />
         <StatCard icon="◉" label="Pending Tasks" value={pendingTasks} sub="Need attention" color={T.accent} onClick={() => setPage("tasks")} />
         <StatCard icon="◷" label="Present Days" value={presentDays} sub="This month" color={T.accent} onClick={() => setPage("attendance")} />
-        <StatCard icon="◆" label="Last Payment" value={latestSalary ? fmt(latestSalary.net, latestSalary.currency) : "—"} sub={latestSalary?.month || "No records"} color={T.accent} onClick={() => setPage("salary")} />
+        <StatCard icon="◆" label="Leave Days Left" value={leaveLeft} sub={`of ${leaveTotal} days`} color={T.accent} onClick={() => setPage("attendance")} />
       </div>
 
-      {/* Projects + Tasks */}
-      <div style={{ display: "grid", gridTemplateColumns: "3fr 2fr", gap: 16 }} className="two-col">
+      {/* ── PROFILE + ATTENDANCE ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }} className="two-col">
+        <Card title="My Profile" action={
+          <button onClick={onOpenProfile} style={{ background: "none", border: "none", color: T.textMuted, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
+        }>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            <div><div style={{ fontSize: 10, fontWeight: 900, color: T.textFaint, letterSpacing: 1, textTransform: "uppercase" }}>Full Name</div><div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginTop: 3 }}>{name}</div></div>
+            <div><div style={{ fontSize: 10, fontWeight: 900, color: T.textFaint, letterSpacing: 1, textTransform: "uppercase" }}>Employee ID</div><div style={{ fontSize: 13, fontWeight: 700, color: T.accent, marginTop: 3 }}>{user?.employeeId || user?.emp_id || "—"}</div></div>
+            <div><div style={{ fontSize: 10, fontWeight: 900, color: T.textFaint, letterSpacing: 1, textTransform: "uppercase" }}>Role</div><div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginTop: 3 }}>{user?.role || "—"}</div></div>
+            <div><div style={{ fontSize: 10, fontWeight: 900, color: T.textFaint, letterSpacing: 1, textTransform: "uppercase" }}>Department</div><div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginTop: 3 }}>{user?.department || user?.dept || "—"}</div></div>
+            <div><div style={{ fontSize: 10, fontWeight: 900, color: T.textFaint, letterSpacing: 1, textTransform: "uppercase" }}>Email</div><div style={{ fontSize: 12, fontWeight: 700, color: T.text, marginTop: 3, wordBreak: "break-all" }}>{user?.email || "—"}</div></div>
+            <div><div style={{ fontSize: 10, fontWeight: 900, color: T.textFaint, letterSpacing: 1, textTransform: "uppercase" }}>Phone</div><div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginTop: 3 }}>{user?.phone || "—"}</div></div>
+          </div>
+        </Card>
+
+        <Card title="Attendance & Leave" action={<span style={{ fontSize: 11, color: T.textMuted }}>This Month</span>}>
+          <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+            <div style={{ flex: 1, background: T.bg, border: `1px solid ${T.border}`, borderRadius: 10, padding: "10px 6px", textAlign: "center" }}>
+              <div style={{ fontSize: 18, fontWeight: 900, color: T.success }}>{presentDays}</div>
+              <div style={{ fontSize: 10, color: T.textMuted, fontWeight: 700, marginTop: 2 }}>Present</div>
+            </div>
+            <div style={{ flex: 1, background: T.bg, border: `1px solid ${T.border}`, borderRadius: 10, padding: "10px 6px", textAlign: "center" }}>
+              <div style={{ fontSize: 18, fontWeight: 900, color: T.danger }}>{absentDays}</div>
+              <div style={{ fontSize: 10, color: T.textMuted, fontWeight: 700, marginTop: 2 }}>Absent</div>
+            </div>
+            <div style={{ flex: 1, background: T.bg, border: `1px solid ${T.border}`, borderRadius: 10, padding: "10px 6px", textAlign: "center" }}>
+              <div style={{ fontSize: 18, fontWeight: 900, color: T.warning }}>{leaveDays}</div>
+              <div style={{ fontSize: 10, color: T.textMuted, fontWeight: 700, marginTop: 2 }}>Leave</div>
+            </div>
+          </div>
+          <div style={{ marginBottom: 6 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 5 }}>
+              <span>Attendance Rate</span><span>{attRate}%</span>
+            </div>
+            <ProgressBar pct={attRate} />
+          </div>
+          {recentLeave.length > 0 && (
+            <div style={{ marginTop: 14 }}>
+              <div style={{ fontSize: 11, fontWeight: 900, color: T.textMuted, letterSpacing: 0.5, textTransform: "uppercase", marginBottom: 8 }}>Recent Leave / Absence</div>
+              {recentLeave.map((a, i) => (
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 0", borderTop: i > 0 ? `1px solid ${T.border}` : "none" }}>
+                  <span style={{ fontSize: 12, color: T.text }}>{a.date}</span>
+                  <Badge label={a.status} />
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+      </div>
+
+      {/* ── PROJECTS + TASKS + DOCUMENTS ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 16 }} className="three-col">
         <Card title="My Projects" action={
-          <button onClick={() => setPage("projects")} style={{ background: "none", border: "none", color: T.textMuted, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4 }}>
-            View all <span style={{ fontSize: 14 }}></span>
-          </button>
+          <button onClick={() => setPage("projects")} style={{ background: "none", border: "none", color: T.textMuted, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>View all</button>
         }>
           {projects.filter(p => !["done", "completed"].includes((p.status || "").toLowerCase())).slice(0, 4).map((p, i, arr) => (
             <div key={p._id || i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: i < arr.length - 1 ? `1px solid ${T.border}` : "none" }}>
@@ -568,7 +638,6 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
                   })()}
                 </div>
               </div>
-              <Badge label={p.status || "active"} />
             </div>
           ))}
           {projects.filter(p => !["done", "completed"].includes((p.status || "").toLowerCase())).length === 0 && (
@@ -576,20 +645,17 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
           )}
         </Card>
 
-        <Card title="Active Tasks" action={
-          <button onClick={() => setPage("tasks")} style={{ background: "none", border: "none", color: T.textMuted, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>View all </button>
+        <Card title="My Tasks" action={
+          <button onClick={() => setPage("tasks")} style={{ background: "none", border: "none", color: T.textMuted, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>View all</button>
         }>
           {tasks.filter(t => !["done", "completed"].includes((t.status || "").toLowerCase())).slice(0, 5).map((t, i, arr) => {
-            const isDone = ["done", "completed"].includes((t.status || "").toLowerCase());
             const projectName = t.projectId?.name || t.project || "—";
             const dueDate = t.date || t.dueDate || "—";
             return (
               <div key={t._id || i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "9px 0", borderBottom: i < arr.length - 1 ? `1px solid ${T.border}` : "none" }}>
-                <div style={{ width: 16, height: 16, borderRadius: 4, border: `1.5px solid ${isDone ? T.success : T.borderDark}`, background: isDone ? T.success : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>
-                  {isDone && <span style={{ color: "#fff", fontSize: 9, fontWeight: 900 }}>Yes</span>}
-                </div>
+                <div style={{ width: 16, height: 16, borderRadius: 4, border: `1.5px solid ${T.borderDark}`, flexShrink: 0, marginTop: 2 }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: isDone ? T.textFaint : T.text, textDecoration: isDone ? "line-through" : "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.title}</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.title}</div>
                   <div style={{ fontSize: 10, color: T.textFaint, marginTop: 2 }}>{projectName} · {dueDate}</div>
                 </div>
                 <Badge label={t.priority || "medium"} />
@@ -600,36 +666,8 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
             <div style={{ textAlign: "center", padding: "28px", color: T.textFaint, fontSize: 13 }}>No active tasks</div>
           )}
         </Card>
-      </div>
 
-      {/* Documents + Attendance */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 16 }} className="two-col">
         <DocumentsCard docStatus={docStatus} onOpenProfile={onOpenProfile} />
-        <Card title="This Month Attendance">
-          <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
-            {Array.from({ length: 31 }, (_, i) => {
-              const day = String(i + 1).padStart(2, "0");
-              const month = new Date().toISOString().slice(0, 7);
-              const date = `${month}-${day}`;
-              const rec = attendance.find(a => a.date === date);
-              const isToday = date === todayStr();
-              const bg = rec ? sc(rec.status) : T.bg;
-              const tc = rec ? "#fff" : T.textFaint;
-              return (
-                <div key={i} style={{ width: 30, height: 30, borderRadius: 7, background: bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: tc, border: isToday ? `2px solid ${T.accent}` : `1px solid ${rec ? "transparent" : T.border}` }}>
-                  {i + 1}
-                </div>
-              );
-            })}
-          </div>
-          <div style={{ display: "flex", gap: 14, marginTop: 14, flexWrap: "wrap" }}>
-            {[[T.success, "Present"], [T.danger, "Absent"], ["#b45309", "Leave"], [T.bg, "Not marked"]].map(([c, l]) => (
-              <div key={l} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: T.textMuted }}>
-                <div style={{ width: 9, height: 9, borderRadius: 3, background: c, border: `1px solid ${T.border}` }} />{l}
-              </div>
-            ))}
-          </div>
-        </Card>
       </div>
     </div>
   );
@@ -2030,7 +2068,7 @@ export default function EmployeeDashboard({ user, setUser }) {
                   style={{ background: T.bg, border: `1px solid ${T.border}`, borderRadius: 10, width: 38, height: 38, fontSize: 16, cursor: "pointer", color: T.text, position: "relative", display: "flex", alignItems: "center", justifyContent: "center", transition: "border-color 0.15s" }}
                   onMouseEnter={e => e.currentTarget.style.borderColor = T.accent}
                   onMouseLeave={e => e.currentTarget.style.borderColor = T.border}>
-                  Alert
+                  <i className="ti ti-bell"></i>
                   {unreadCount > 0 && <span style={{ position: "absolute", top: -3, right: -3, background: T.danger, color: "#fff", borderRadius: "50%", width: 16, height: 16, fontSize: 9, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #fff" }}>{unreadCount}</span>}
                 </button>
                 {notifDropdownOpen && <NotifDropdown />}
@@ -2060,7 +2098,7 @@ export default function EmployeeDashboard({ user, setUser }) {
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ position: "relative" }} data-notif-anchor="true">
                 <button onClick={() => setNotifDropdownOpen(!notifDropdownOpen)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: T.text, position: "relative" }}>
-                  Alert
+                  <i className="ti ti-bell"></i>
                   {unreadCount > 0 && <span style={{ position: "absolute", top: -2, right: -2, background: T.danger, color: "#fff", borderRadius: "50%", width: 15, height: 15, fontSize: 9, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center" }}>{unreadCount}</span>}
                 </button>
                 {notifDropdownOpen && <NotifDropdown />}

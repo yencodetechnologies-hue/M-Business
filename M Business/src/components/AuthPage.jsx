@@ -226,9 +226,9 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
           min-height: 500px;
           border-radius: 22px;
           border: 2px solid  var(--app-accent, var(--app-accent, #00BCD4));
-          box-shadow:
-            0 0 0 1px rgba(116,41,204,0.12),
-            0 0 60px rgba(116,41,204,0.28),
+-webkit-box-shadow:
+            0 0 0 1px rgba(var(--app-accent-rgb, 0,188,212),0.12),
+            0 0 60px rgba(var(--app-accent-rgb, 0,188,212),0.28),
             0 24px 80px rgba(0,0,0,0.5);
           display: flex;
           overflow: visible;
@@ -505,7 +505,7 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
             <div style={{ maxWidth: 380, margin: "0 auto", width: "100%" }}>
               <h2 style={{ color: "#fff", fontSize: 24, fontWeight: 800, margin: "0 0 12px", textAlign: "center" }}>Verify OTP</h2>
               <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 24, textAlign: "center" }}>
-                6-digit OTP sent to <strong style={{ color: "#c084fc" }}>{verifyEmail}</strong>
+                6-digit OTP sent to <strong style={{ color: "var(--app-accent, #00BCD4)" }}>{verifyEmail}</strong>
               </p>
               {success && <Alert type="success" msg={success} />}
               {error && <Alert type="error" msg={error} />}

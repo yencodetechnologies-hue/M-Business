@@ -4,7 +4,7 @@
 import re
 
 new_effect = """
-    const t = appTheme === "custom" ? generateThemeFromColor(customColor) : (THEMES[appTheme] || THEMES.purple);
+    const t = appTheme === "custom" ? generateThemeFromColor(customColor) : (THEMES[appTheme] || THEMES.teal);
     if (!t) return;
     document.documentElement.style.setProperty("--app-sidebar", t.sidebar);
     document.documentElement.style.setProperty("--app-accent", t.accent);
@@ -17,8 +17,10 @@ new_effect = """
     // Override template hardcoded colors to match theme
     document.documentElement.style.setProperty("--teal", t.accent);
     document.documentElement.style.setProperty("--teal2", t.dot);
-    document.documentElement.style.setProperty("--teal-light", gba(, 0.1));
-    document.documentElement.style.setProperty("--teal-lighter", gba(, 0.04));
+    document.documentElement.style.setProperty("--teal-light", 
+gba(, 0.1));
+    document.documentElement.style.setProperty("--teal-lighter", 
+gba(, 0.04));
 
     localStorage.setItem("appTheme", appTheme);
 """

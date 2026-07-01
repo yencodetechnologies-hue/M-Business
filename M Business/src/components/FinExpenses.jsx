@@ -138,7 +138,7 @@ export default function FinExpenses({ expenses: propExpenses, setExpenses: propS
             <div style={{ fontSize: 12, color: '#718096', marginTop: 4 }}>{expenses.length} records</div>
           </div>
           {byCategory.map(c => (
-            <div key={c.name} style={{ background: '#fff', borderRadius: 14, padding: '18px 20px', boxShadow: '0 2px 12px rgba(0,188,212,.08)', borderLeft: '4px solid  var(--app-accent, #00BCD4)' }}>
+            <div key={c.name} style={{ background: '#fff', borderRadius: 14, padding: '18px 20px', boxShadow: '0 2px 12px rgba(0,188,212,.08)', borderLeft: '4px solid  var(--app-accent, var(--app-accent, #00BCD4))' }}>
               <div style={{ fontSize: 11, fontWeight: 800, color: '#718096', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 }}>{c.name}</div>
               <div style={{ fontSize: 24, fontWeight: 900, color: '#1A2332' }}>{fmt(c.total)}</div>
               <div style={{ fontSize: 12, color: '#718096', marginTop: 4 }}>{total > 0 ? Math.round(c.total / total * 100) : 0}% of expenses</div>

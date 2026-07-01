@@ -194,11 +194,11 @@ export default function InvoiceViewer() {
         };
       case "Classic":
         return {
-          primaryColor: " var(--app-accent, #00BCD4)",
+          primaryColor: " var(--app-accent, var(--app-accent, #00BCD4))",
           primaryBg: "var(--teal-light, #E0F7FA)",
-          logoColor: "linear-gradient(135deg,  var(--app-accent, #00BCD4), #006E7F)",
+          logoColor: "linear-gradient(135deg,  var(--app-accent, var(--app-accent, #00BCD4)), #006E7F)",
           borderStyle: "1px solid #E0EEF0",
-          headerUnderline: "3px solid  var(--app-accent, #00BCD4)",
+          headerUnderline: "3px solid  var(--app-accent, var(--app-accent, #00BCD4))",
           fontFamily: "'Nunito', sans-serif"
         };
       case "Modern":

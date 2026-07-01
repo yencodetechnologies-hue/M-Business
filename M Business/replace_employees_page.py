@@ -96,7 +96,7 @@ const res = await fetch(`/api/tasks?person=${encodeURIComponent(user.name)}`, {
   if (viewEmpProject) {
     return (
       <div style={{ padding: "0 0 32px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18, cursor: "pointer", color: " var(--app-accent, #00BCD4)", fontWeight: 700 }}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #00BCD4))", fontWeight: 700 }}
           onClick={() => setViewEmpProject(null)}>
           <i className="ti ti-arrow-left" style={{ fontSize: 18 }}></i> Back to Employee
         </div>
@@ -165,7 +165,7 @@ const res = await fetch(`/api/tasks?person=${encodeURIComponent(user.name)}`, {
       <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
         <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
           <i className="ti ti-search" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--text-soft)", fontSize: 16 }}></i>
-          <input type="text" placeholder="Search by name, email, role..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "10px 12px 10px 38px", background: "#fff", border: "1.5px solid var(--border)", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text)", outline: "none", transition: "border-color 0.2s" }} onFocus={e => e.target.style.borderColor = " var(--app-accent, #00BCD4)"} onBlur={e => e.target.style.borderColor = "var(--border)"} />
+          <input type="text" placeholder="Search by name, email, role..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "10px 12px 10px 38px", background: "#fff", border: "1.5px solid var(--border)", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text)", outline: "none", transition: "border-color 0.2s" }} onFocus={e => e.target.style.borderColor = " var(--app-accent, var(--app-accent, #00BCD4))"} onBlur={e => e.target.style.borderColor = "var(--border)"} />
         </div>
         <select value={deptFilter} onChange={e => setDeptFilter(e.target.value)} style={{ padding: "10px 32px 10px 12px", background: "#fff", border: "1.5px solid var(--border)", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text-mid)", outline: "none", cursor: "pointer", WebkitAppearance: "none", backgroundImage: "url(\\\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\\\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
           <option>All Departments</option>
@@ -211,7 +211,7 @@ const res = await fetch(`/api/tasks?person=${encodeURIComponent(user.name)}`, {
                 else { badgeStyle.background = "#fee2e2"; badgeStyle.color = "#dc2626"; }
                 const dotStyle = { width: 5, height: 5, borderRadius: "50%", background: "currentColor" };
                 
-                const avColors = ["linear-gradient(135deg, var(--app-accent, #00BCD4),#0097a7)", "linear-gradient(135deg,#7c3aed,#5b21b6)", "linear-gradient(135deg,#d97706,#b45309)", "linear-gradient(135deg,#16a34a,#15803d)", "linear-gradient(135deg,#dc2626,#991b1b)", "linear-gradient(135deg,#ec4899,#be185d)"];
+                const avColors = ["linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097a7)", "linear-gradient(135deg,#7c3aed,#5b21b6)", "linear-gradient(135deg,#d97706,#b45309)", "linear-gradient(135deg,#16a34a,#15803d)", "linear-gradient(135deg,#dc2626,#991b1b)", "linear-gradient(135deg,#ec4899,#be185d)"];
                 const avBg = avColors[i % avColors.length];
                 
                 return (
@@ -273,7 +273,7 @@ const res = await fetch(`/api/tasks?person=${encodeURIComponent(user.name)}`, {
             </div>
             <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
               <button onClick={() => setEditEmp(null)} style={{ background: "#f1f5f9", color: "var(--text-mid)", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
-              <button onClick={saveEdit} style={{ background: " var(--app-accent, #00BCD4)", color: "#fff", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>{saving ? "Saving..." : "Save Changes"}</button>
+              <button onClick={saveEdit} style={{ background: " var(--app-accent, var(--app-accent, #00BCD4))", color: "#fff", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>{saving ? "Saving..." : "Save Changes"}</button>
             </div>
           </div>
         </div>

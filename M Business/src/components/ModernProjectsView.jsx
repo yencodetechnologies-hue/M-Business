@@ -2,9 +2,9 @@ import React, { useState, useMemo } from 'react';
 
 // ── Colour palette (matches M Business design system) ----------
 const P = {
-  primary: ' var(--app-accent, #00BCD4)',
+  primary: ' var(--app-accent, var(--app-accent, #00BCD4))',
   primaryDark: '#0097A7',
-  primaryLight: 'var(--teal-light, #E0F7FA)',
+  primaryLight: 'var(--teal-light, var(--teal-light, #E0F7FA))',
   primaryMid: '#B2EBF2',
   textDark: '#1A2332',
   textMid: '#4A5568',
@@ -23,7 +23,7 @@ const P = {
 };
 
 // Avatar colour palette
-const AV_COLORS = [' var(--app-accent, #00BCD4)', '#8B5CF6', '#F59E0B', '#26C281', '#EC4899', '#3B82F6', '#EF4444', '#10B981'];
+const AV_COLORS = [' var(--app-accent, var(--app-accent, #00BCD4))', '#8B5CF6', '#F59E0B', '#26C281', '#EC4899', '#3B82F6', '#EF4444', '#10B981'];
 
 function getAvColor(name, idx) {
   if (!name) return AV_COLORS[idx % AV_COLORS.length];
@@ -596,7 +596,7 @@ export default function ModernProjectsView({
                 alignItems: 'center',
                 justifyContent: 'center',
                 minHeight: 320,
-                border: '2.5px dashed  var(--app-accent, #00BCD4)',
+                border: '2.5px dashed  var(--app-accent, var(--app-accent, #00BCD4))',
                 borderRadius: 14,
                 background: '#ffffff',
                 cursor: 'pointer',
@@ -605,7 +605,7 @@ export default function ModernProjectsView({
                 boxShadow: '0 2px 12px rgba(0,188,212,0.07)',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.background = 'var(--teal-light, #E0F7FA)';
+                e.currentTarget.style.background = 'var(--teal-light, var(--teal-light, #E0F7FA))';
                 e.currentTarget.style.transform = 'translateY(-4px)';
                 e.currentTarget.style.boxShadow = '0 10px 32px rgba(0,188,212,0.2)';
                 e.currentTarget.style.borderColor = '#0097A7';
@@ -614,12 +614,12 @@ export default function ModernProjectsView({
                 e.currentTarget.style.background = '#ffffff';
                 e.currentTarget.style.transform = 'translateY(0)';
                 e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,188,212,0.07)';
-                e.currentTarget.style.borderColor = ' var(--app-accent, #00BCD4)';
+                e.currentTarget.style.borderColor = ' var(--app-accent, var(--app-accent, #00BCD4))';
               }}
             >
               <div style={{
                 width: 72, height: 72, borderRadius: '50%',
-                background: 'linear-gradient(135deg, var(--app-accent, #00BCD4),#0097A7)',
+                background: 'linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097A7)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 boxShadow: '0 8px 24px rgba(0,188,212,0.35)',
                 fontSize: 38, color: '#fff', fontWeight: 900, lineHeight: 1,

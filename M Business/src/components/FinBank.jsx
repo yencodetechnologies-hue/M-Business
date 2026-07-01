@@ -83,7 +83,7 @@ export default function FinBank() {
   const toast = (msg) => alert(msg);
 
   const colors = [
-    { bg: "linear-gradient(135deg,var(--app-accent),#0097A7)", badge: ' var(--app-accent, #00BCD4)' },
+    { bg: "linear-gradient(135deg,var(--app-accent),#0097A7)", badge: ' var(--app-accent, var(--app-accent, #00BCD4))' },
     { bg: 'linear-gradient(135deg,#8B5CF6,#7C3AED)', badge: '#8B5CF6' },
     { bg: 'linear-gradient(135deg,#F59E0B,#D97706)', badge: '#F59E0B' },
     { bg: 'linear-gradient(135deg,#10B981,#059669)', badge: '#10B981' }
@@ -94,7 +94,7 @@ export default function FinBank() {
       <style>{`
 /* ── M Business Finance Design System ── */
 :root {
-  --primary: var(--app-accent, #00BCD4); --primary-dark:#0097A7; --primary-light:var(--teal-light, #E0F7FA); --primary-mid:#B2EBF2;
+  --primary: var(--app-accent, var(--app-accent, #00BCD4)); --primary-dark:#0097A7; --primary-light:var(--teal-light, var(--teal-light, #E0F7FA)); --primary-mid:#B2EBF2;
   --text-dark:#1A2332; --text-mid:#4A5568; --text-light:#718096;
   --bg:#F0F4F8; --white:#FFFFFF; --border:#E2E8F0;
   --green:#26C281; --green-light:#D1FAE5; --green-dark:#065F46;

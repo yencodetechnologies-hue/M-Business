@@ -266,8 +266,8 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
   const CSS = `
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
     :root{
-      --teal: var(--app-accent, #00BCD4);--teal2:#00ACC1;--teal3:#26D0CE;--teal4:#006E7F;
-      --teal-light:var(--teal-light, #E0F7FA);--teal-lighter:var(--teal-lighter, #F0FDFE);
+      --teal: var(--app-accent, var(--app-accent, #00BCD4));--teal2:var(--app-accent2, #00ACC1);--teal3:#26D0CE;--teal4:#006E7F;
+      --teal-light:var(--teal-light, var(--teal-light, #E0F7FA));--teal-lighter:var(--teal-lighter, #F0FDFE);
       --bg:#F5FAFA;--surface:#FFFFFF;--surface2:#F8FAFB;--border:#E0EEF0;--border2:#C5DDE0;
       --text:#1A2E35;--text2:#607D86;--text3:#A0B8BE;
       --green:#26C281;--green-bg:#E8FAF3;

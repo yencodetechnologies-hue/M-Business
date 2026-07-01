@@ -15,10 +15,10 @@ const C = {
   text: "#0D2027",
   text2: "#4E6B75",
   text3: "#96B0B8",
-  teal: " var(--app-accent, #00BCD4)",
-  teal2: "#00ACC1",
+  teal: " var(--app-accent, var(--app-accent, #00BCD4))",
+  teal2: "var(--app-accent2, #00ACC1)",
   teal3: "#006E7F",
-  tealLight: "var(--teal-light, #E0F7FA)",
+  tealLight: "var(--teal-light, var(--teal-light, #E0F7FA))",
   tealLighter: "var(--teal-lighter, #F0FDFE)",
   tealMid: "rgba(0,188,212,.12)",
   green: "#1DB87A",
@@ -145,7 +145,7 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
     <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.6)", display: "flex", flexDirection: "column" }}>
       {/* Top bar */}
       <div style={{ background: "#fff", borderBottom: "1px solid #e0eef0", padding: "12px 24px", display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
-        <button onClick={onClose} style={{ background: "#f0fdfe", border: "1.5px solid #e0eef0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: " var(--app-accent, #00BCD4)", display: "flex", alignItems: "center", gap: 6 }}>
+        <button onClick={onClose} style={{ background: "#f0fdfe", border: "1.5px solid #e0eef0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #00BCD4))", display: "flex", alignItems: "center", gap: 6 }}>
           <i className="ti ti-arrow-left"></i> Back
         </button>
         <div style={{ flex: 1 }}>
@@ -157,10 +157,10 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
         <span style={{ background: st === "approved" ? "#DCFCE7" : st === "rejected" ? "#FEE2E2" : "#EFF4FF", color: st === "approved" ? "#15803D" : st === "rejected" ? "#DC2626" : "#2563EB", borderRadius: 20, padding: "4px 14px", fontSize: 11, fontWeight: 800 }}>
           {st.charAt(0).toUpperCase() + st.slice(1)}
         </span>
-        <button onClick={() => printProposal(proposal)} style={{ background: "#f0fdfe", border: "1.5px solid #e0eef0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: " var(--app-accent, #00BCD4)", display: "flex", alignItems: "center", gap: 6 }}>
+        <button onClick={() => printProposal(proposal)} style={{ background: "#f0fdfe", border: "1.5px solid #e0eef0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #00BCD4))", display: "flex", alignItems: "center", gap: 6 }}>
           <i className="ti ti-printer"></i> Print / PDF
         </button>
-        <button onClick={() => shareProposalAsPDF(proposal, agencyName, null)} style={{ background: " var(--app-accent, #00BCD4)", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#fff", display: "flex", alignItems: "center", gap: 6 }}>
+        <button onClick={() => shareProposalAsPDF(proposal, agencyName, null)} style={{ background: " var(--app-accent, var(--app-accent, #00BCD4))", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#fff", display: "flex", alignItems: "center", gap: 6 }}>
           <i className="ti ti-share"></i> Share PDF
         </button>
       </div>
@@ -186,10 +186,10 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
                   {prop.sentAt ? new Date(prop.sentAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) : ""}
                 </div>
               </div>
-              <div style={{ borderTop: "2px solid  var(--app-accent, #00BCD4)", marginBottom: 24 }}></div>
+              <div style={{ borderTop: "2px solid  var(--app-accent, var(--app-accent, #00BCD4))", marginBottom: 24 }}></div>
               {prop.slides.map((slide, si) => (
                 <div key={si} style={{ marginBottom: 20, padding: "16px 20px", background: "#f5fafa", borderRadius: 10, border: "1px solid #e0eef0" }}>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: " var(--app-accent, #00BCD4)", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>{slide.type}</div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: " var(--app-accent, var(--app-accent, #00BCD4))", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>{slide.type}</div>
                   {slide.heading && <div style={{ fontSize: 16, fontWeight: 700, color: "#0D2027", marginBottom: 4 }}>{slide.heading}</div>}
                   {slide.title && <div style={{ fontSize: 16, fontWeight: 700, color: "#0D2027", marginBottom: 4 }}>{slide.title}</div>}
                   {slide.body && <div style={{ fontSize: 13, color: "#4E6B75", lineHeight: 1.7 }}>{slide.body}</div>}
@@ -202,7 +202,7 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
                       <span>{row.item}</span><span style={{ fontWeight: 700 }}>{row.cost}</span>
                     </div>
                   ))}
-                  {slide.total && <div style={{ fontSize: 14, fontWeight: 800, color: " var(--app-accent, #00BCD4)", marginTop: 8 }}>Total: {slide.total}</div>}
+                  {slide.total && <div style={{ fontSize: 14, fontWeight: 800, color: " var(--app-accent, var(--app-accent, #00BCD4))", marginTop: 8 }}>Total: {slide.total}</div>}
                   {slide.phases && slide.phases.map((ph, pi) => (
                     <div key={pi} style={{ fontSize: 13, color: "#4E6B75", padding: "3px 0" }}>Phase {pi + 1}: {ph.label} — {ph.dur}</div>
                   ))}
@@ -259,9 +259,9 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
 
           {/* Signature box — show only if not yet signed */}
           {!prop.clientSignature && !saved && (
-            <div style={{ background: "#fff", borderRadius: 14, border: "2px solid  var(--app-accent, #00BCD4)", padding: "24px 28px", boxShadow: "0 4px 20px rgba(0,188,212,0.1)" }}>
+            <div style={{ background: "#fff", borderRadius: 14, border: "2px solid  var(--app-accent, var(--app-accent, #00BCD4))", padding: "24px 28px", boxShadow: "0 4px 20px rgba(0,188,212,0.1)" }}>
               <div style={{ fontSize: 15, fontWeight: 800, color: "#0D2027", marginBottom: 4 }}>
-                <i className="ti ti-writing" style={{ color: " var(--app-accent, #00BCD4)", marginRight: 8 }}></i>
+                <i className="ti ti-writing" style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))", marginRight: 8 }}></i>
                 Awaiting Client Signature
               </div>
               <div style={{ fontSize: 12, color: "#96B0B8", marginBottom: 18 }}>
@@ -271,7 +271,7 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
               {/* Tabs */}
               <div style={{ display: "flex", gap: 4, background: "#f5fafa", borderRadius: 10, padding: 4, marginBottom: 16, width: "fit-content" }}>
                 {["draw", "type"].map(mode => (
-                  <button key={mode} onClick={() => setSigMode(mode)} style={{ padding: "6px 16px", borderRadius: 8, border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer", background: sigMode === mode ? " var(--app-accent, #00BCD4)" : "transparent", color: sigMode === mode ? "#fff" : "#607D86" }}>
+                  <button key={mode} onClick={() => setSigMode(mode)} style={{ padding: "6px 16px", borderRadius: 8, border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer", background: sigMode === mode ? " var(--app-accent, var(--app-accent, #00BCD4))" : "transparent", color: sigMode === mode ? "#fff" : "#607D86" }}>
                     {mode === "draw" ? "Draw" : "Type"}
                   </button>
                 ))}
@@ -306,7 +306,7 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
               <button
                 onClick={saveSignature}
                 disabled={saving}
-                style={{ width: "100%", padding: "13px", background: saving ? "#96B0B8" : " var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 800, cursor: saving ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: "0 4px 14px rgba(0,188,212,0.3)" }}>
+                style={{ width: "100%", padding: "13px", background: saving ? "#96B0B8" : " var(--app-accent, var(--app-accent, #00BCD4))", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 800, cursor: saving ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: "0 4px 14px rgba(0,188,212,0.3)" }}>
                 <i className="ti ti-writing" style={{ fontSize: 16 }}></i>
                 {saving ? "Saving Signature..." : "Sign & Accept Proposal"}
               </button>
@@ -839,10 +839,10 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   // Styles Injection
   const CSS = `
   .cp-root {
-      --teal:  var(--app-accent, #00BCD4);
-      --teal2var(--app-accent2, #00ACC1);
+      --teal:  var(--app-accent, var(--app-accent, #00BCD4));
+      --teal2var(--app-accent2, var(--app-accent2, #00ACC1));
       --teal3: #006E7F;
-      --teal-light: var(--teal-light, #E0F7FA);
+      --teal-light: var(--teal-light, var(--teal-light, #E0F7FA));
       --teal-lighter: var(--teal-lighter, #F0FDFE);
       --bg: #F3F8F9;
       --surface: #FFFFFF;
@@ -1218,7 +1218,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             <button className={`tn-item ${active === "files" ? "active" : ""}`} onClick={() => setActive("files")}>Files</button>
             <button className={`tn-item ${active === "proposals" ? "active" : ""}`} onClick={() => setActive("proposals")}>
               Proposals {proposals.filter(p => p.status === "sent" || p.status === "pending").length > 0 && (
-                <span style={{ background: " var(--app-accent, #00BCD4)", color: "#fff", borderRadius: 20, fontSize: 10, fontWeight: 800, padding: "1px 6px", marginLeft: 4 }}>
+                <span style={{ background: " var(--app-accent, var(--app-accent, #00BCD4))", color: "#fff", borderRadius: 20, fontSize: 10, fontWeight: 800, padding: "1px 6px", marginLeft: 4 }}>
                   {proposals.filter(p => p.status === "sent" || p.status === "pending").length}
                 </span>
               )}
@@ -1226,7 +1226,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             <button className={`tn-item ${active === "payments" ? "active" : ""}`} onClick={() => setActive("payments")}>Invoices</button>
             <button className={`tn-item ${active === "quotations" ? "active" : ""}`} onClick={() => setActive("quotations")}>
               Quotations {quotations.length > 0 && (
-                <span style={{ background: " var(--app-accent, #00BCD4)", color: "#fff", borderRadius: 20, fontSize: 10, fontWeight: 800, padding: "1px 6px", marginLeft: 4 }}>
+                <span style={{ background: " var(--app-accent, var(--app-accent, #00BCD4))", color: "#fff", borderRadius: 20, fontSize: 10, fontWeight: 800, padding: "1px 6px", marginLeft: 4 }}>
                   {quotations.length}
                 </span>
               )}

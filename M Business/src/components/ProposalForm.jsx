@@ -198,8 +198,8 @@ export default function ProposalForm({ onBack, onSave, initialData, clients }) {
       <style>{`
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --teal: var(--app-accent, #00BCD4);--teal2:#00ACC1;--teal3:#26D0CE;--teal4:#006E7F;
-  --teal-light:var(--teal-light, #E0F7FA);--teal-lighter:var(--teal-lighter, #F0FDFE);
+  --teal: var(--app-accent, var(--app-accent, #00BCD4));--teal2:var(--app-accent2, #00ACC1);--teal3:#26D0CE;--teal4:#006E7F;
+  --teal-light:var(--teal-light, var(--teal-light, #E0F7FA));--teal-lighter:var(--teal-lighter, #F0FDFE);
   --bg:#F5FAFA;--surface:#FFFFFF;--surface2:#F8FAFB;--border:#E0EEF0;--border2:#C5DDE0;
   --text:#1A2E35;--text2:#607D86;--text3:#A0B8BE;
   --green:#26C281;--green-bg:#E8FAF3;
@@ -207,7 +207,7 @@ export default function ProposalForm({ onBack, onSave, initialData, clients }) {
   --red:#F05C5C;--red-bg:#FEF2F2;
   --purple:#7C5CFC;--purple-bg:#EEE9FF;
   --blue:#2563EB;--blue-bg:#EFF4FF;
-  --sidebar-grad:linear-gradient(180deg,#26D0CE 0%, var(--app-accent, #00BCD4) 35%,#00ACC1 65%,#006E7F 100%);
+  --sidebar-grad:linear-gradient(180deg,#26D0CE 0%, var(--app-accent, var(--app-accent, #00BCD4)) 35%,var(--app-accent2, #00ACC1) 65%,#006E7F 100%);
   --font:'Nunito',sans-serif;--radius:14px;
 }
 html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(--text)}

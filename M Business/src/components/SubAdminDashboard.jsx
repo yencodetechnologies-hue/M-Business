@@ -1214,7 +1214,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
   const getAvatarColor = (c, idx = 0) => {
 
-    const colors = ["#F5A623", "#26C281", "#7C5CFC", "#2563EB", "#F05C5C", " var(--app-accent, #00BCD4)", "#E91E63"];
+    const colors = ["#F5A623", "#26C281", "#7C5CFC", "#2563EB", "#F05C5C", " var(--app-accent, var(--app-accent, #00BCD4))", "#E91E63"];
 
     const key = c._id || c.email || "";
 
@@ -1256,7 +1256,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
     return (
 
-      <div key={c._id} onClick={() => { setActiveClientId(c._id); setActiveTab("overview"); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 16px", cursor: "pointer", transition: "all .15s", borderBottom: "1px solid rgba(224,238,240,.5)", position: "relative", background: isActive ? "var(--teal-lighter, #F0FDFE)" : "transparent", borderRight: isActive ? "3px solid  var(--app-accent, #00BCD4)" : "3px solid transparent" }} onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = "var(--teal-lighter, #F0FDFE)"; }} onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}>
+      <div key={c._id} onClick={() => { setActiveClientId(c._id); setActiveTab("overview"); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 16px", cursor: "pointer", transition: "all .15s", borderBottom: "1px solid rgba(224,238,240,.5)", position: "relative", background: isActive ? "var(--teal-lighter, #F0FDFE)" : "transparent", borderRight: isActive ? "3px solid  var(--app-accent, var(--app-accent, #00BCD4))" : "3px solid transparent" }} onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = "var(--teal-lighter, #F0FDFE)"; }} onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}>
 
         <div style={{ width: 40, height: 40, borderRadius: "50%", background: `linear-gradient(135deg,${color},${color}bb)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: "#fff", flexShrink: 0, position: "relative" }}>
 
@@ -1308,7 +1308,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             <span style={{ fontSize: 12, fontWeight: 800, color: "#1A2E35", display: "flex", alignItems: "center", gap: 8 }}>
 
-              <div style={{ width: 26, height: 26, borderRadius: 7, background: "var(--teal-light, #E0F7FA)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: " var(--app-accent, #00BCD4)" }}><i className="ti ti-user-circle" /></div>
+              <div style={{ width: 26, height: 26, borderRadius: 7, background: "var(--teal-light, var(--teal-light, #E0F7FA))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: " var(--app-accent, var(--app-accent, #00BCD4))" }}><i className="ti ti-user-circle" /></div>
 
               Contact Information
 
@@ -1328,15 +1328,15 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             {[
 
-              { icon: "ti-mail", label: "Email Address", val: activeClient.email, bg: "var(--teal-light, #E0F7FA)", col: " var(--app-accent, #00BCD4)" },
+              { icon: "ti-mail", label: "Email Address", val: activeClient.email, bg: "var(--teal-light, var(--teal-light, #E0F7FA))", col: " var(--app-accent, var(--app-accent, #00BCD4))" },
 
-              { icon: "ti-user", label: "Contact Person Name", val: activeClient.contactPersonName || "—", bg: "var(--teal-light, #E0F7FA)", col: " var(--app-accent, #00BCD4)" },
+              { icon: "ti-user", label: "Contact Person Name", val: activeClient.contactPersonName || "—", bg: "var(--teal-light, var(--teal-light, #E0F7FA))", col: " var(--app-accent, var(--app-accent, #00BCD4))" },
 
-              { icon: "ti-user", label: "Contact Person No", val: activeClient.contactPersonNo || "—", bg: "var(--teal-light, #E0F7FA)", col: " var(--app-accent, #00BCD4)" },
+              { icon: "ti-user", label: "Contact Person No", val: activeClient.contactPersonNo || "—", bg: "var(--teal-light, var(--teal-light, #E0F7FA))", col: " var(--app-accent, var(--app-accent, #00BCD4))" },
 
               { icon: "ti-briefcase", label: "Category", val: activeClient.category || activeClient.industry || "—", bg: "#F3E8FF", col: "#7C5CFC" },
 
-              { icon: "ti-phone", label: "Office Phone", val: activeClient.phone || "—", bg: "var(--teal-light, #E0F7FA)", col: " var(--app-accent, #00BCD4)" },
+              { icon: "ti-phone", label: "Office Phone", val: activeClient.phone || "—", bg: "var(--teal-light, var(--teal-light, #E0F7FA))", col: " var(--app-accent, var(--app-accent, #00BCD4))" },
 
               { icon: "ti-building-bank", label: "Company Tax / GST", val: activeClient.gstNumber || "—", bg: "#EFF4FF", col: "#2563EB" },
 
@@ -1378,7 +1378,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             </span>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <button onClick={() => onCreateProject && onCreateProject(activeClient)} style={{ background: " var(--app-accent, #00BCD4)", border: "none", borderRadius: 7, padding: "4px 10px", fontSize: 11, color: "#fff", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
+              <button onClick={() => onCreateProject && onCreateProject(activeClient)} style={{ background: " var(--app-accent, var(--app-accent, #00BCD4))", border: "none", borderRadius: 7, padding: "4px 10px", fontSize: 11, color: "#fff", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
                 <i className="ti ti-plus" style={{ fontSize: 11 }} /> Add Project
               </button>
               <span onClick={() => setActiveTab("projects")} style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer" }}>View all</span>
@@ -1412,7 +1412,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 0", borderBottom: i < cProjs.length - 1 ? "1px solid #E0EEF0" : "none" }}>
 
-                  <div style={{ width: 4, height: 36, borderRadius: 2, background: " var(--app-accent, #00BCD4)", flexShrink: 0 }} />
+                  <div style={{ width: 4, height: 36, borderRadius: 2, background: " var(--app-accent, var(--app-accent, #00BCD4))", flexShrink: 0 }} />
 
                   <div style={{ flex: 1, minWidth: 0 }}>
 
@@ -1439,7 +1439,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                       <div style={{ width: 60, height: 4, background: "#E0EEF0", borderRadius: 2, overflow: "hidden", marginTop: 4 }}>
 
-                        <div style={{ height: "100%", borderRadius: 2, background: "linear-gradient(90deg, var(--app-accent, #00BCD4),#26D0CE)", width: `${pct}%` }} />
+                        <div style={{ height: "100%", borderRadius: 2, background: "linear-gradient(90deg, var(--app-accent, var(--app-accent, #00BCD4)),#26D0CE)", width: `${pct}%` }} />
 
                       </div>
 
@@ -1447,7 +1447,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                     <button onClick={() => onCreateProject && onCreateProject(p, true)} style={{ background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 6, padding: "4px 8px", fontSize: 10, color: "#F59E0B", cursor: "pointer", fontWeight: 700 }}>Edit</button>
 
-                    <button onClick={() => onViewProject && onViewProject(p)} style={{ background: "var(--teal-light, #E0F7FA)", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 10, color: " var(--app-accent, #00BCD4)", cursor: "pointer", fontWeight: 700 }}>View </button>
+                    <button onClick={() => onViewProject && onViewProject(p)} style={{ background: "var(--teal-light, var(--teal-light, #E0F7FA))", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 10, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer", fontWeight: 700 }}>View </button>
 
                     <button onClick={async (e) => {
 
@@ -1499,7 +1499,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 4 }}>
 
-        <button onClick={() => onCreateProject && onCreateProject(activeClient)} style={{ background: " var(--app-accent, #00BCD4)", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12, color: "#fff", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}>
+        <button onClick={() => onCreateProject && onCreateProject(activeClient)} style={{ background: " var(--app-accent, var(--app-accent, #00BCD4))", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12, color: "#fff", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}>
 
           <i className="ti ti-plus" style={{ fontSize: 13 }} /> Add Project
 
@@ -1515,7 +1515,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
         <div key={i} style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 12, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14 }}>
 
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: "var(--teal-light, #E0F7FA)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>📁</div>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: "var(--teal-light, var(--teal-light, #E0F7FA))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>📁</div>
 
           <div style={{ flex: 1 }}>
 
@@ -1539,7 +1539,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#E8FAF3", color: "#26C281" }}>{p.status || "Active"}</span>
 
-            {onViewProject && <button onClick={() => onViewProject(p)} style={{ background: "var(--teal-light, #E0F7FA)", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: " var(--app-accent, #00BCD4)", cursor: "pointer", fontWeight: 700 }}>View </button>}
+            {onViewProject && <button onClick={() => onViewProject(p)} style={{ background: "var(--teal-light, var(--teal-light, #E0F7FA))", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer", fontWeight: 700 }}>View </button>}
 
             <button onClick={() => onCreateProject && onCreateProject(p, true)} style={{ background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#F59E0B", cursor: "pointer", fontWeight: 700 }}>Edit</button>
 
@@ -1693,7 +1693,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
           <label style={{
 
-            background: " var(--app-accent, #00BCD4)", border: "none", borderRadius: 8,
+            background: " var(--app-accent, var(--app-accent, #00BCD4))", border: "none", borderRadius: 8,
 
             padding: "7px 14px", fontSize: 12, color: "#fff", cursor: "pointer",
 
@@ -1779,7 +1779,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
     const activity = [
 
-      { icon: "ti-user-plus", bg: "var(--teal-light, #E0F7FA)", color: " var(--app-accent, #00BCD4)", title: `<b>${activeClient?.clientName || activeClient?.name}</b> added as client`, time: activeClient?.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—" },
+      { icon: "ti-user-plus", bg: "var(--teal-light, var(--teal-light, #E0F7FA))", color: " var(--app-accent, var(--app-accent, #00BCD4))", title: `<b>${activeClient?.clientName || activeClient?.name}</b> added as client`, time: activeClient?.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—" },
 
       ...clientProjects.map(p => ({ icon: "ti-briefcase", bg: "#EFF4FF", color: "#2563EB", title: `Project <b>${p.name}</b> created`, time: p.createdAt ? new Date(p.createdAt).toLocaleDateString("en-IN") : "—" })),
 
@@ -1859,7 +1859,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
     return (
       <div>
         {/* Portal Hero Card */}
-        <div style={{ background: "linear-gradient(135deg,#004D5E, var(--app-accent, #00BCD4))", borderRadius: 14, padding: 20, color: "#fff", marginBottom: 16 }}>
+        <div style={{ background: "linear-gradient(135deg,#004D5E, var(--app-accent, var(--app-accent, #00BCD4)))", borderRadius: 14, padding: 20, color: "#fff", marginBottom: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
               🌐
@@ -1913,7 +1913,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
         {/* Portal Stats */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 16 }}>
           {[
-            { val: clientProjects.length, label: "Projects", icon: "ti-briefcase", color: " var(--app-accent, #00BCD4)" },
+            { val: clientProjects.length, label: "Projects", icon: "ti-briefcase", color: " var(--app-accent, var(--app-accent, #00BCD4))" },
             { val: clientProjects.filter(p => (p.status || "").toLowerCase() === "completed").length, label: "Completed", icon: "ti-check", color: "#26C281" },
             { val: c.status || "Active", label: "Status", icon: "ti-toggle-right", color: "#F5A623" }
           ].map((s, i) => (
@@ -2125,7 +2125,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                       const portalUrl = `${window.location.origin}/client-portal/${activeClient._id}`;
                       window.open(portalUrl, "_blank");
                     }}
-                    style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "var(--teal-light, #E0F7FA)", border: "1.5px solid  var(--app-accent, #00BCD4)", borderRadius: 20, fontSize: 11, fontWeight: 700, color: " var(--app-accent, #00BCD4)", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }}
+                    style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "var(--teal-light, var(--teal-light, #E0F7FA))", border: "1.5px solid  var(--app-accent, var(--app-accent, #00BCD4))", borderRadius: 20, fontSize: 11, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }}
                     onMouseEnter={e => { e.currentTarget.style.background = "var(--app-accent)"; e.currentTarget.style.color = "#fff"; }}
                     onMouseLeave={e => { e.currentTarget.style.background = "rgba(var(--app-accent-rgb),0.1)"; e.currentTarget.style.color = "var(--app-accent)"; }}
                   >
@@ -2134,7 +2134,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                   <button
                     onClick={() => setViewClientModal(true)}
                     style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "none", border: "1.5px solid #E0EEF0", borderRadius: 20, fontSize: 11, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = " var(--app-accent, #00BCD4)"; e.currentTarget.style.color = " var(--app-accent, #00BCD4)"; }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = " var(--app-accent, var(--app-accent, #00BCD4))"; e.currentTarget.style.color = " var(--app-accent, var(--app-accent, #00BCD4))"; }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}
                   >
                     <i className="ti ti-eye" style={{ fontSize: 12 }} />View
@@ -2147,7 +2147,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                 <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
 
-                  {activeClient.address && <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "var(--teal-light, #E0F7FA)", color: " var(--app-accent, #00BCD4)" }}><i className="ti ti-map-pin" style={{ fontSize: 10, marginRight: 2 }} />{activeClient.address}</span>}
+                  {activeClient.address && <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "var(--teal-light, var(--teal-light, #E0F7FA))", color: " var(--app-accent, var(--app-accent, #00BCD4))" }}><i className="ti ti-map-pin" style={{ fontSize: 10, marginRight: 2 }} />{activeClient.address}</span>}
 
                   <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#F8FAFB", color: "#A0B8BE" }}><i className="ti ti-clock" style={{ fontSize: 10, marginRight: 2 }} />Joined {activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—"}</span>
 
@@ -2157,7 +2157,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               <div style={{ display: "flex", gap: 6, flexShrink: 0, flexWrap: "wrap" }}>
 
-                <button onClick={() => openEdit(activeClient)} style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E0EEF0", background: "#F5FAFA", color: "#607D86" }} onMouseEnter={e => { e.currentTarget.style.borderColor = " var(--app-accent, #00BCD4)"; e.currentTarget.style.color = " var(--app-accent, #00BCD4)"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}><i className="ti ti-edit" style={{ fontSize: 13 }} />Edit</button>
+                <button onClick={() => openEdit(activeClient)} style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E0EEF0", background: "#F5FAFA", color: "#607D86" }} onMouseEnter={e => { e.currentTarget.style.borderColor = " var(--app-accent, var(--app-accent, #00BCD4))"; e.currentTarget.style.color = " var(--app-accent, var(--app-accent, #00BCD4))"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}><i className="ti ti-edit" style={{ fontSize: 13 }} />Edit</button>
 
                 <button onClick={() => setDeleteTarget(activeClient)} style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E0EEF0", background: "#F5FAFA", color: "#607D86" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#F05C5C"; e.currentTarget.style.color = "#F05C5C"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}><i className="ti ti-trash" style={{ fontSize: 13 }} />Delete</button>
 
@@ -2173,7 +2173,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               {[
 
-                { val: cRevenue ? "Rs." + Number(cRevenue).toLocaleString("en-IN") : "Rs.0", label: "Total Revenue", color: " var(--app-accent, #00BCD4)" },
+                { val: cRevenue ? "Rs." + Number(cRevenue).toLocaleString("en-IN") : "Rs.0", label: "Total Revenue", color: " var(--app-accent, var(--app-accent, #00BCD4))" },
                 { val: clientProjects.length, label: "Projects" },
                 { val: invoices.filter(inv => (inv.clientId === activeClient?._id) || (inv.clientName === (activeClient?.clientName || activeClient?.name))).length, label: "Invoices" },
                 { val: (activeClient?.documents?.length || 0), label: "Documents" },
@@ -2214,7 +2214,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             ].map(tab => (
 
-              <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{ padding: "12px 16px", fontSize: 12, fontWeight: 700, color: activeTab === tab.key ? " var(--app-accent, #00BCD4)" : "#607D86", cursor: "pointer", border: "none", background: "none", fontFamily: "inherit", borderBottom: `2.5px solid ${activeTab === tab.key ? " var(--app-accent, #00BCD4)" : "transparent"}`, transition: "all .15s", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 5 }}>
+              <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{ padding: "12px 16px", fontSize: 12, fontWeight: 700, color: activeTab === tab.key ? " var(--app-accent, var(--app-accent, #00BCD4))" : "#607D86", cursor: "pointer", border: "none", background: "none", fontFamily: "inherit", borderBottom: `2.5px solid ${activeTab === tab.key ? " var(--app-accent, var(--app-accent, #00BCD4))" : "transparent"}`, transition: "all .15s", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 5 }}>
 
                 <i className={`ti ${tab.icon}`} style={{ fontSize: 14 }} />{tab.label}
 
@@ -2238,7 +2238,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       ) : isLoading ? (
         <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--app-bg)", minWidth: 0 }}>
           <div style={{ textAlign: "center", padding: 40 }}>
-            <div style={{ width: 48, height: 48, border: "4px solid #E0EEF0", borderTop: "4px solid  var(--app-accent, #00BCD4)", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
+            <div style={{ width: 48, height: 48, border: "4px solid #E0EEF0", borderTop: "4px solid  var(--app-accent, var(--app-accent, #00BCD4))", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
             <div style={{ fontSize: 13, color: "#A0B8BE", fontWeight: 600 }}>Loading clients...</div>
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
           </div>
@@ -2366,7 +2366,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px", background: "#F5FAFA", borderRadius: 9, border: "1px solid #E0EEF0" }}>
 
-                <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--teal-light, #E0F7FA)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: " var(--app-accent, #00BCD4)", flexShrink: 0 }}>
+                <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--teal-light, var(--teal-light, #E0F7FA))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: " var(--app-accent, var(--app-accent, #00BCD4))", flexShrink: 0 }}>
 
                   <i className={`ti ${row.icon}`} />
 
@@ -2388,7 +2388,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 16 }}>
 
-            <button onClick={() => { setViewClientModal(false); openEdit(activeClient); }} style={{ padding: "9px 18px", background: " var(--app-accent, #00BCD4)", border: "none", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
+            <button onClick={() => { setViewClientModal(false); openEdit(activeClient); }} style={{ padding: "9px 18px", background: " var(--app-accent, var(--app-accent, #00BCD4))", border: "none", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
 
             <button onClick={() => setViewClientModal(false)} style={{ padding: "9px 18px", background: "#F5FAFA", border: "1px solid #E0EEF0", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
 
@@ -2899,7 +2899,7 @@ ${onboardingLink}`;
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
 
-        <div onClick={() => setStatusFilter("All Status")} style={{ background: statusFilter === "All Status" ? "var(--teal-light, #E0F7FA)" : "#fff", border: `1px solid ${statusFilter === "All Status" ? " var(--app-accent, #00BCD4)" : "var(--border)"}`, borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
+        <div onClick={() => setStatusFilter("All Status")} style={{ background: statusFilter === "All Status" ? "var(--teal-light, var(--teal-light, #E0F7FA))" : "#fff", border: `1px solid ${statusFilter === "All Status" ? " var(--app-accent, var(--app-accent, #00BCD4))" : "var(--border)"}`, borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
 
           <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "rgba(var(--app-accent-rgb,0,188,212),0.08)", color: "var(--app-accent)" }}><i className="ti ti-users"></i></div>
 
@@ -2941,7 +2941,7 @@ ${onboardingLink}`;
 
           <i className="ti ti-search" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--text-soft)", fontSize: 16 }}></i>
 
-          <input type="text" placeholder="Search by name, email, role..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "10px 12px 10px 38px", background: "#fff", border: "1.5px solid var(--border)", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text)", outline: "none", transition: "border-color 0.2s" }} onFocus={e => e.target.style.borderColor = " var(--app-accent, #00BCD4)"} onBlur={e => e.target.style.borderColor = "var(--border)"} />
+          <input type="text" placeholder="Search by name, email, role..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "10px 12px 10px 38px", background: "#fff", border: "1.5px solid var(--border)", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text)", outline: "none", transition: "border-color 0.2s" }} onFocus={e => e.target.style.borderColor = " var(--app-accent, var(--app-accent, #00BCD4))"} onBlur={e => e.target.style.borderColor = "var(--border)"} />
 
         </div>
 
@@ -3033,7 +3033,7 @@ ${onboardingLink}`;
 
 
 
-                const avColors = ["linear-gradient(135deg, var(--app-accent, #00BCD4),#0097a7)", "linear-gradient(135deg,#7c3aed,#5b21b6)", "linear-gradient(135deg,#d97706,#b45309)", "linear-gradient(135deg,#16a34a,#15803d)", "linear-gradient(135deg,#dc2626,#991b1b)", "linear-gradient(135deg,#ec4899,#be185d)"];
+                const avColors = ["linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097a7)", "linear-gradient(135deg,#7c3aed,#5b21b6)", "linear-gradient(135deg,#d97706,#b45309)", "linear-gradient(135deg,#16a34a,#15803d)", "linear-gradient(135deg,#dc2626,#991b1b)", "linear-gradient(135deg,#ec4899,#be185d)"];
 
                 const avBg = avColors[i % avColors.length];
 
@@ -4271,7 +4271,7 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
           {onBack && (
 
-            <button onClick={onBack} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--teal-light, #E0F7FA)", border: "none", borderRadius: 10, cursor: "pointer", color: " var(--app-accent, #00BCD4)", flexShrink: 0 }}>
+            <button onClick={onBack} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--teal-light, var(--teal-light, #E0F7FA))", border: "none", borderRadius: 10, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #00BCD4))", flexShrink: 0 }}>
 
               <i className="ti ti-arrow-left" style={{ fontSize: 18 }} />
 
@@ -6744,7 +6744,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
     candy: { label: "Candy", sidebar: "#c026d3", accent: "#c026d3", bg: "#fdf4ff", muted: "#a21caf", border: "#f5d0fe", dot: "#c026d3" },
 
-    teal: { label: "Teal", sidebar: " var(--app-accent, #00BCD4)", accent: " var(--app-accent, #00BCD4)", bg: "#F5FAFA", muted: "#607D86", border: "#E0EEF0", dot: " var(--app-accent, #00BCD4)" },
+    teal: { label: "Teal", sidebar: "#00BCD4", accent: "#00BCD4", bg: "#F5FAFA", muted: "#607D86", border: "#E0EEF0", dot: "#00ACC1" },
 
   };
 
@@ -9162,7 +9162,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 )}
                 {showNotifPanel && (
                   <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: 44, right: 0, width: 380, background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', border: '1px solid #E2E8F0', zIndex: 99999, overflow: 'hidden' }}>
-                    <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'linear-gradient(135deg, var(--app-accent, #00BCD4),#0097A7)' }}>
+                    <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097A7)' }}>
                       <div style={{ fontSize: 15, fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
                         <i className="ti ti-bell"></i> Notifications
                         {pendingLeaves.length > 0 && <span style={{ background: '#EF4444', color: '#fff', borderRadius: 20, padding: '2px 8px', fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length}</span>}
@@ -9206,7 +9206,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       )}
                     </div>
                     <div style={{ padding: '12px 16px', borderTop: '1px solid #E2E8F0', textAlign: 'center' }}>
-                      <button onClick={() => setShowNotifPanel(false)} style={{ background: 'none', border: 'none', color: ' var(--app-accent, #00BCD4)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                      <button onClick={() => setShowNotifPanel(false)} style={{ background: 'none', border: 'none', color: ' var(--app-accent, var(--app-accent, #00BCD4))', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                         ✕
                       </button>
                     </div>
@@ -9392,7 +9392,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <div className="content">
 
             {isInFreeTrial() && (
-              <div style={{ background: 'linear-gradient(90deg, var(--app-accent, #00BCD4),#0097A7)', color: '#fff', padding: '10px 20px', borderRadius: 10, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
+              <div style={{ background: 'linear-gradient(90deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097A7)', color: '#fff', padding: '10px 20px', borderRadius: 10, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
                 <span><i className="ti ti-gift" style={{ marginRight: 8 }}></i>Free Trial Active — {getTrialDaysRemaining()} day{getTrialDaysRemaining() !== 1 ? 's' : ''} remaining (up to {FREE_TRIAL_LIMITS.client} clients, {FREE_TRIAL_LIMITS.employee} employees, {FREE_TRIAL_LIMITS.manager} managers)</span>
                 <button onClick={() => { setForceUpgradeTab(true); setActive('mysubscriptions'); }} style={{ background: '#fff', color: '#0097A7', border: 'none', borderRadius: 8, padding: '5px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>Upgrade Now</button>
               </div>
@@ -10073,7 +10073,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                     <div key={e._id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
 
-                                      <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,  var(--app-accent, #00BCD4), #0097A7)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800 }}>
+                                      <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,  var(--app-accent, var(--app-accent, #00BCD4)), #0097A7)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800 }}>
 
                                         {(e.name || "E")[0].toUpperCase()}
 
@@ -10227,7 +10227,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   </div>
 
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: " var(--app-accent, #00BCD4)", cursor: "pointer" }}>
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer" }}>
 
                                     HR Panel
 
@@ -10339,7 +10339,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
 
-                                    <i className="ti ti-alert-circle" style={{ color: " var(--app-accent, #00BCD4)" }}></i> Overdue Tasks
+                                    <i className="ti ti-alert-circle" style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))" }}></i> Overdue Tasks
 
                                     <span style={{ background: "#fef2f2", color: "#dc2626", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>
 
@@ -10349,7 +10349,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   </div>
 
-                                  <div onClick={() => { setSidebarOverride("dashboard"); setActive("tasks"); }} style={{ fontSize: 13, fontWeight: 700, color: " var(--app-accent, #00BCD4)", cursor: "pointer" }}>
+                                  <div onClick={() => { setSidebarOverride("dashboard"); setActive("tasks"); }} style={{ fontSize: 13, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer" }}>
 
                                     All Tasks
 
@@ -10363,7 +10363,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                     <div key={t._id} style={{ display: "flex", alignItems: "flex-start", gap: 12, paddingBottom: 16, borderBottom: idx === 4 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
 
-                                      <input type="checkbox" style={{ marginTop: 2, accentColor: " var(--app-accent, #00BCD4)" }} />
+                                      <input type="checkbox" style={{ marginTop: 2, accentColor: " var(--app-accent, var(--app-accent, #00BCD4))" }} />
 
                                       <div style={{ flex: 1 }}>
 
@@ -10393,13 +10393,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
 
-                                    <i className="ti ti-file-description" style={{ color: " var(--app-accent, #00BCD4)" }}></i> Doc Requests
+                                    <i className="ti ti-file-description" style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))" }}></i> Doc Requests
 
                                     <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{employeeDocs.filter(d => d.status === "PENDING").length} PENDING</span>
 
                                   </div>
 
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: " var(--app-accent, #00BCD4)", cursor: "pointer" }}>
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer" }}>
 
                                     Manage
 
@@ -10707,7 +10707,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             )}
 
-            {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client) => { setClients(prev => [...prev, client]); setPendingNewClientId(client._id); setActive("clients"); }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || ' var(--app-accent, #00BCD4)'} />}
+            {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client) => { setClients(prev => [...prev, client]); setPendingNewClientId(client._id); setActive("clients"); }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || ' var(--app-accent, var(--app-accent, #00BCD4))'} />}
 
             {validActive === "clients" && <ClientsPage key={clients.length > 0 ? "loaded" : "empty"} clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
 
@@ -11710,7 +11710,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                   width: 60,
                                   height: 60,
                                   borderRadius: 14,
-                                  background: " var(--app-accent, #00BCD4)",
+                                  background: " var(--app-accent, var(--app-accent, #00BCD4))",
                                   display: "flex",
                                   alignItems: "center",
                                   justifyContent: "center",
@@ -11758,9 +11758,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                         <div key={t.val} onClick={() => setNc(p => ({ ...p, clientType: t.val }))}
 
-                          style={{ border: `2px solid ${nc.clientType === t.val ? ' var(--app-accent, #00BCD4)' : '#E0E6EA'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? 'var(--teal-light, #E0F7FA)' : '#F4F6F8', transition: 'all .15s', position: 'relative' }}>
+                          style={{ border: `2px solid ${nc.clientType === t.val ? ' var(--app-accent, var(--app-accent, #00BCD4))' : '#E0E6EA'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? 'var(--teal-light, var(--teal-light, #E0F7FA))' : '#F4F6F8', transition: 'all .15s', position: 'relative' }}>
 
-                          {nc.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: ' var(--app-accent, #00BCD4)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
+                          {nc.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: ' var(--app-accent, var(--app-accent, #00BCD4))', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
 
                           <div style={{ fontSize: 22, marginBottom: 4 }}>{t.icon}</div>
 
@@ -11781,7 +11781,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, #00BCD4)', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-building" style={{ color: '#fff', fontSize: 16 }}></i></span> Basic Info</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-building" style={{ color: '#fff', fontSize: 16 }}></i></span> Basic Info</div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
 
@@ -11809,7 +11809,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, #00BCD4)', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-phone-call" style={{ color: '#fff', fontSize: 16 }}></i></span> Primary Contact</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-phone-call" style={{ color: '#fff', fontSize: 16 }}></i></span> Primary Contact</div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
 
@@ -11835,7 +11835,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, #00BCD4)', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-map-pin" style={{ color: '#fff', fontSize: 16 }}></i></span> Address</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-map-pin" style={{ color: '#fff', fontSize: 16 }}></i></span> Address</div>
 
                     <div style={{ marginBottom: 12 }}><Fld label="Street / Building Address" value={nc.address} onChange={v => setNc({ ...nc, address: v })} /></div>
 
@@ -11858,8 +11858,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   {/* ── ONLINE PRESENCE ── */}
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ background: ' var(--app-accent, #00BCD4)', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
                         <i className="ti ti-link" style={{ color: '#fff', fontSize: 16 }}></i>
                       </span>
                       Online Presence
@@ -11876,7 +11876,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, #00BCD4)', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-credit-card" style={{ color: '#fff', fontSize: 16 }}></i></span> Billing & Terms</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-credit-card" style={{ color: '#fff', fontSize: 16 }}></i></span> Billing & Terms</div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
 
@@ -11898,7 +11898,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Search’ Portal Access</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Search’ Portal Access</div>
 
                     <div style={{ position: 'relative', marginBottom: 4 }}>
 
@@ -11922,7 +11922,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, #00BCD4)', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-notes" style={{ color: '#fff', fontSize: 16 }}></i></span> Internal Notes</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-notes" style={{ color: '#fff', fontSize: 16 }}></i></span> Internal Notes</div>
 
                     <textarea value={nc.notes} onChange={e => setNc({ ...nc, notes: e.target.value })}
 

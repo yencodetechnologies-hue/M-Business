@@ -4,14 +4,14 @@ import { BASE_URL } from "../config";
 
 const T = {
   primary: "var(--app-primary, #0f172a)",
-  accent: "var(--app-accent, #00BCD4)",
+  accent: "var(--app-accent, var(--app-accent, #00BCD4))",
   accentRgb: "var(--app-accent-rgb, 0,188,212)",
   text: "var(--app-text, #1e293b)",
   muted: "var(--app-muted, #64748b)",
   border: "var(--app-border, #e2e8f0)",
   bg: "var(--app-bg, #f8fafc)",
   bgSoft: "var(--teal-lighter, #F0FDFE)",
-  bgSoft2: "var(--teal-light, #E0F7FA)",
+  bgSoft2: "var(--teal-light, var(--teal-light, #E0F7FA))",
   card: "#ffffff"
 };
 
@@ -277,7 +277,7 @@ export default function EmployeeOnboarding() {
               disabled={loading}
               style={{
                 width: "50%",
-                background: `linear-gradient(135deg, ${T.accent}, var(--app-accent2, #00ACC1))`,
+                background: `linear-gradient(135deg, ${T.accent}, var(--app-accent2, var(--app-accent2, #00ACC1)))`,
                 color: "#fff",
                 border: "none",
                 borderRadius: 14,
@@ -348,14 +348,14 @@ function Input({ label, value, onChange, error, type = "text", placeholder }) {
 function DocInput({ label, icon, file, onChange }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: "var(--app-bg, #f8fafc)", borderRadius: 12, border: "1.5px solid var(--app-border, #e2e8f0)" }}>
-      <div style={{ width: 36, height: 36, borderRadius: 10, background: "var(--teal-light, #E0F7FA)", border: "1px solid var(--teal-light, #b2ebf2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: "var(--app-accent, #00BCD4)" }}>
+      <div style={{ width: 36, height: 36, borderRadius: 10, background: "var(--teal-light, var(--teal-light, #E0F7FA))", border: "1px solid var(--teal-light, #b2ebf2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: "var(--app-accent, var(--app-accent, #00BCD4))" }}>
         <i className={`ti ${icon}`}></i>
       </div>
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-text, #1e293b)" }}>{label}</div>
-        <div style={{ fontSize: 11, color: file ? "var(--app-accent, #00BCD4)" : "var(--app-muted, #94a3b8)", fontWeight: 600 }}>{file ? file.name : ""}</div>
+        <div style={{ fontSize: 11, color: file ? "var(--app-accent, var(--app-accent, #00BCD4))" : "var(--app-muted, #94a3b8)", fontWeight: 600 }}>{file ? file.name : ""}</div>
       </div>
-      <label style={{ background: file ? "#dcfce7" : "var(--app-accent, #00BCD4)", color: file ? "#166534" : "#fff", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", border: "none" }}>
+      <label style={{ background: file ? "#dcfce7" : "var(--app-accent, var(--app-accent, #00BCD4))", color: file ? "#166534" : "#fff", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", border: "none" }}>
         {file ? "Change" : "Upload"}
         <input type="file" style={{ display: "none" }} onChange={e => onChange(e.target.files[0])} />
       </label>

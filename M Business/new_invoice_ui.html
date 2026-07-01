@@ -19,8 +19,8 @@
     }
 
     :root {
-      --teal: var(--app-accent, #00BCD4);
-      --teal2var(--app-accent2, #00ACC1);
+      --teal: var(--app-accent, var(--app-accent, #00BCD4));
+      --teal2var(--app-accent2, var(--app-accent2, #00ACC1));
       --teal3: #26D0CE;
       --teal4: #006E7F;
       --teal-light: var(--teal-light, #E0F7FA);
@@ -43,7 +43,7 @@
       --purple-bg: #EEE9FF;
       --blue: #2563EB;
       --blue-bg: #EFF4FF;
-      --sidebar-grad: linear-gradient(180deg, #26D0CE 0%, var(--app-accent, #00BCD4) 35%, #00ACC1 65%, #006E7F 100%);
+      --sidebar-grad: linear-gradient(180deg, #26D0CE 0%, var(--app-accent, var(--app-accent, #00BCD4)) 35%, var(--app-accent2, #00ACC1) 65%, #006E7F 100%);
       --font: 'Nunito', sans-serif;
       --radius: 14px;
     }

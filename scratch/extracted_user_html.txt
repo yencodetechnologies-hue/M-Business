@@ -13,7 +13,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --teal: var(--app-accent, #00BCD4);--teal2:#00ACC1;--teal3:#006E7F;
+  --teal: var(--app-accent, var(--app-accent, #00BCD4));--teal2:var(--app-accent2, #00ACC1);--teal3:#006E7F;
   --teal-light:var(--teal-light, #E0F7FA);--teal-lighter:var(--teal-lighter, #F0FDFE);--teal-mid:rgba(0,188,212,.12);
   --bg:#F3F8F9;--surface:#FFFFFF;--surface2:#F8FAFB;--border:#DFF0F2;--border2:#C5DDE0;
   --text:#0D2027;--text2:#4E6B75;--text3:#96B0B8;

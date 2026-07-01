@@ -16,9 +16,9 @@ const CSS = `
 .settings-nav{background:var(--app-card,#fff);border:1.5px solid var(--app-border,#E0EEF0);border-radius:16px;padding:8px;position:sticky;top:22px}
 .sn-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;color:var(--app-muted,#607D86);font-size:13px;font-weight:600;transition:all .15s;margin-bottom:2px}
 .sn-item:hover{background:var(--app-bg,#F5FAFA);color:var(--app-text,#1A2E35)}
-.sn-item.sn-active{background:rgba(var(--app-accent-rgb,0,188,212),.12);color:var(--app-accent, var(--app-accent, #00BCD4))}
+.sn-item.sn-active{background:rgba(var(--app-accent-rgb,0,188,212),.12);color:var(--app-accent, var(--app-accent, var(--app-accent, #00BCD4)))}
 .sn-item i{font-size:16px;flex-shrink:0;color:var(--app-muted,#607D86)}
-.sn-item.sn-active i,.sn-item:hover i{color:var(--app-accent, var(--app-accent, #00BCD4))}
+.sn-item.sn-active i,.sn-item:hover i{color:var(--app-accent, var(--app-accent, var(--app-accent, #00BCD4)))}
 .sn-divider{border:none;border-top:1px solid var(--app-border,#E0EEF0);margin:6px 0}
 .settings-panels{display:flex;flex-direction:column;gap:20px}
 .settings-section{background:var(--app-card,#fff);border:1.5px solid var(--app-border,#E0EEF0);border-radius:16px;overflow:hidden}
@@ -32,27 +32,27 @@ const CSS = `
 .form-group:last-child{margin-bottom:0}
 .form-label{font-size:11px;font-weight:700;color:var(--app-muted,#607D86);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;display:block}
 .form-input{width:100%;padding:10px 13px;background:var(--app-bg,#F5FAFA);border:1.5px solid var(--app-border,#E0EEF0);border-radius:10px;font-size:13px;color:var(--app-text,#1A2E35);font-family:inherit;outline:none;transition:all .15s;box-sizing:border-box}
-.form-input:focus{border-color:var(--app-accent, var(--app-accent, #00BCD4));background:#fff;box-shadow:0 0 0 3px rgba(var(--app-accent-rgb,0,188,212),.08)}
+.form-input:focus{border-color:var(--app-accent, var(--app-accent, var(--app-accent, #00BCD4)));background:#fff;box-shadow:0 0 0 3px rgba(var(--app-accent-rgb,0,188,212),.08)}
 .form-select{width:100%;padding:10px 13px;background:var(--app-bg,#F5FAFA);border:1.5px solid var(--app-border,#E0EEF0);border-radius:10px;font-size:13px;color:var(--app-text,#1A2E35);font-family:inherit;outline:none;cursor:pointer;transition:all .15s;box-sizing:border-box}
-.form-select:focus{border-color:var(--app-accent, var(--app-accent, #00BCD4))}
+.form-select:focus{border-color:var(--app-accent, var(--app-accent, var(--app-accent, #00BCD4)))}
 .form-textarea{width:100%;padding:10px 13px;background:var(--app-bg,#F5FAFA);border:1.5px solid var(--app-border,#E0EEF0);border-radius:10px;font-size:13px;color:var(--app-text,#1A2E35);font-family:inherit;outline:none;transition:all .15s;resize:vertical;min-height:80px;box-sizing:border-box}
-.form-textarea:focus{border-color:var(--app-accent, var(--app-accent, #00BCD4));background:#fff;box-shadow:0 0 0 3px rgba(var(--app-accent-rgb,0,188,212),.08)}
+.form-textarea:focus{border-color:var(--app-accent, var(--app-accent, var(--app-accent, #00BCD4)));background:#fff;box-shadow:0 0 0 3px rgba(var(--app-accent-rgb,0,188,212),.08)}
 .form-hint{font-size:10px;color:var(--app-muted,#607D86);margin-top:5px;font-weight:600}
 .avatar-upload{display:flex;align-items:center;gap:18px;margin-bottom:22px}
-.avatar-big{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--app-accent, var(--app-accent, #00BCD4)),#006E7F);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;flex-shrink:0;border:3px solid rgba(var(--app-accent-rgb,0,188,212),.2);position:relative}
-.avatar-edit{position:absolute;bottom:0;right:0;width:22px;height:22px;border-radius:50%;background:var(--app-accent, var(--app-accent, #00BCD4));border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;cursor:pointer}
-.avatar-upload-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(var(--app-accent-rgb,0,188,212),.1);border:1.5px solid var(--app-accent, var(--app-accent, #00BCD4));border-radius:9px;font-size:12px;font-weight:700;color:var(--app-accent, var(--app-accent, #00BCD4));cursor:pointer;font-family:inherit;transition:all .15s}
-.avatar-upload-btn:hover{background:var(--app-accent, var(--app-accent, #00BCD4));color:#fff}
+.avatar-big{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--app-accent, var(--app-accent, var(--app-accent, #00BCD4))),#006E7F);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;flex-shrink:0;border:3px solid rgba(var(--app-accent-rgb,0,188,212),.2);position:relative}
+.avatar-edit{position:absolute;bottom:0;right:0;width:22px;height:22px;border-radius:50%;background:var(--app-accent, var(--app-accent, var(--app-accent, #00BCD4)));border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;cursor:pointer}
+.avatar-upload-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(var(--app-accent-rgb,0,188,212),.1);border:1.5px solid var(--app-accent, var(--app-accent, var(--app-accent, #00BCD4)));border-radius:9px;font-size:12px;font-weight:700;color:var(--app-accent, var(--app-accent, var(--app-accent, #00BCD4)));cursor:pointer;font-family:inherit;transition:all .15s}
+.avatar-upload-btn:hover{background:var(--app-accent, var(--app-accent, var(--app-accent, #00BCD4)));color:#fff}
 .avatar-remove{font-size:11px;color:var(--app-muted,#607D86);cursor:pointer;font-weight:600}
 .avatar-remove:hover{color:#EF4444}
 .logo-upload-area{border:2px dashed var(--app-border,#E0EEF0);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all .15s;margin-bottom:16px}
-.logo-upload-area:hover{border-color:var(--app-accent, var(--app-accent, #00BCD4));background:rgba(var(--app-accent-rgb,0,188,212),.04)}
+.logo-upload-area:hover{border-color:var(--app-accent, var(--app-accent, var(--app-accent, #00BCD4)));background:rgba(var(--app-accent-rgb,0,188,212),.04)}
 .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--app-border,#E0EEF0)}
 .toggle-row:last-child{border-bottom:none;padding-bottom:0}
 .toggle-label{font-size:13px;font-weight:700;color:var(--app-text,#1A2E35)}
 .toggle-desc{font-size:11px;color:var(--app-muted,#607D86);margin-top:2px}
 .toggle{width:42px;height:24px;border-radius:12px;position:relative;cursor:pointer;flex-shrink:0;transition:background .2s}
-.toggle.t-on{background:var(--app-accent, var(--app-accent, #00BCD4))}
+.toggle.t-on{background:var(--app-accent, var(--app-accent, var(--app-accent, #00BCD4)))}
 .toggle.t-off{background:var(--app-border,#C5DDE0)}
 .toggle::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;transition:all .2s;box-shadow:0 1px 4px rgba(0,0,0,.15)}
 .toggle.t-on::after{right:3px}
@@ -63,7 +63,7 @@ const CSS = `
 .color-swatch.sw-selected::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:14px;font-weight:800}
 .color-swatch:hover{transform:scale(1.1)}
 .section-save{display:flex;justify-content:flex-end;margin-top:18px;padding-top:16px;border-top:1px solid var(--app-border,#E0EEF0)}
-.sec-save-btn{display:flex;align-items:center;gap:6px;padding:10px 22px;background:var(--app-accent, var(--app-accent, #00BCD4));color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;box-shadow:0 3px 10px rgba(var(--app-accent-rgb,0,188,212),.25)}
+.sec-save-btn{display:flex;align-items:center;gap:6px;padding:10px 22px;background:var(--app-accent, var(--app-accent, var(--app-accent, #00BCD4)));color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;box-shadow:0 3px 10px rgba(var(--app-accent-rgb,0,188,212),.25)}
 .sec-save-btn:hover{opacity:.9}
 .sec-save-btn:disabled{opacity:.6;cursor:not-allowed}
 .sec-cancel-btn{display:flex;align-items:center;gap:6px;padding:10px 18px;background:none;color:var(--app-muted,#607D86);border:1.5px solid var(--app-border,#E0EEF0);border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-right:8px;transition:all .15s}
@@ -249,7 +249,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
     }
   };
 
-  const accent = `var(--app-accent,  var(--app-accent, #00BCD4))`;
+  const accent = `var(--app-accent,  var(--app-accent, var(--app-accent, #00BCD4)))`;
   const accentLight = `rgba(var(--app-accent-rgb,0,188,212),.1)`;
 
   return (
@@ -465,7 +465,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                         title="Custom color"
                         onClick={() => document.getElementById('customColorPicker')?.click()}
                       />
-                      <input id="customColorPicker" type="color" value={customColor || ' var(--app-accent, #00BCD4)'} onChange={e => { setCustomColor(e.target.value); setAppTheme('custom'); }} style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }} />
+                      <input id="customColorPicker" type="color" value={customColor || ' var(--app-accent, var(--app-accent, #00BCD4))'} onChange={e => { setCustomColor(e.target.value); setAppTheme('custom'); }} style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }} />
                     </div>
                   </div>
                   <div className="form-hint">Current: {themes?.[appTheme]?.label || 'Custom'} ({appTheme === 'custom' ? customColor : themes?.[appTheme]?.accent})</div>

@@ -1,9 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
 
 :root {
-    --teal: #00BCD4;
-    --teal2: #00ACC1;
-    --teal-light: #E0F7FA;
+    --teal: var(--app-accent, #00BCD4);
+    --teal2: var(--app-accent2, #00ACC1);
+    --teal-light: var(--teal-light, #E0F7FA);
     --teal-lighter: #F0FDFE;
     --bg: #F5FAFA;
     --surface: #FFFFFF;
@@ -6538,7 +6538,7 @@ tbody tr:last-child td {
 }
 
 .inv-creator-form-input:focus {
-    border-color: #00BCD4 !important;
+    border-color: var(--app-accent, #00BCD4) !important;
     background: #FFFFFF;
     box-shadow: 0 0 0 3px rgba(0, 188, 212, .08);
 }
@@ -6573,7 +6573,7 @@ tbody tr:last-child td {
 }
 
 .inv-creator-form-select:focus {
-    border-color: #00BCD4 !important;
+    border-color: var(--app-accent, #00BCD4) !important;
     box-shadow: 0 0 0 3px rgba(0, 188, 212, .08);
 }
 
@@ -6593,7 +6593,7 @@ tbody tr:last-child td {
 }
 
 .inv-creator-form-textarea:focus {
-    border-color: #00BCD4 !important;
+    border-color: var(--app-accent, #00BCD4) !important;
     box-shadow: 0 0 0 3px rgba(0, 188, 212, .08);
 }
 
@@ -6618,11 +6618,11 @@ tbody tr:last-child td {
 }
 
 .inv-creator-template-opt:hover {
-    border-color: #00BCD4;
+    border-color: var(--app-accent, #00BCD4);
 }
 
 .inv-creator-template-opt.selected {
-    border-color: #00BCD4;
+    border-color: var(--app-accent, #00BCD4);
     background: #F0FDFE;
 }
 
@@ -6638,7 +6638,7 @@ tbody tr:last-child td {
 }
 
 .inv-creator-template-opt.selected .inv-creator-template-opt-name {
-    color: #00BCD4;
+    color: var(--app-accent, #00BCD4);
 }
 
 .inv-creator-items-table {
@@ -6683,7 +6683,7 @@ tbody tr:last-child td {
 }
 
 .inv-creator-item-input:focus {
-    border-color: #00BCD4 !important;
+    border-color: var(--app-accent, #00BCD4) !important;
     background: #FFFFFF;
     box-shadow: 0 0 0 2px rgba(0, 188, 212, .08);
 }
@@ -6734,11 +6734,11 @@ tbody tr:last-child td {
     gap: 6px;
     padding: 8px 14px;
     background: #F0FDFE;
-    border: 1.5px dashed #00BCD4;
+    border: 1.5px dashed var(--app-accent, #00BCD4);
     border-radius: 9px;
     font-size: 12px;
     font-weight: 700;
-    color: #00BCD4;
+    color: var(--app-accent, #00BCD4);
     cursor: pointer;
     transition: all .15s;
     font-family: inherit;
@@ -6747,7 +6747,7 @@ tbody tr:last-child td {
 }
 
 .inv-creator-add-item-btn:hover {
-    background: #E0F7FA;
+    background: var(--teal-light, #E0F7FA);
 }
 
 .inv-creator-totals-section {
@@ -6784,9 +6784,9 @@ tbody tr:last-child td {
 
 .inv-creator-total-row.grand {
     padding: 10px 14px;
-    background: linear-gradient(135deg, #F0FDFE, #E0F7FA);
+    background: linear-gradient(135deg, #F0FDFE, var(--teal-light, #E0F7FA));
     border-radius: 10px;
-    border: 1.5px solid #E0F7FA;
+    border: 1.5px solid var(--teal-light, #E0F7FA);
     margin-top: 6px;
 }
 
@@ -6799,7 +6799,7 @@ tbody tr:last-child td {
 .inv-creator-total-row.grand .inv-creator-total-val {
     font-size: 18px;
     font-weight: 900;
-    color: #00BCD4;
+    color: var(--app-accent, #00BCD4);
 }
 
 .inv-creator-payment-terms-grid {
@@ -6820,13 +6820,13 @@ tbody tr:last-child td {
 }
 
 .inv-creator-pt-opt:hover {
-    border-color: #00BCD4;
+    border-color: var(--app-accent, #00BCD4);
 }
 
 .inv-creator-pt-opt.selected {
-    border-color: #00BCD4;
+    border-color: var(--app-accent, #00BCD4);
     background: #F0FDFE;
-    color: #00BCD4;
+    color: var(--app-accent, #00BCD4);
 }
 
 .inv-creator-pt-opt-days {
@@ -6836,7 +6836,7 @@ tbody tr:last-child td {
 }
 
 .inv-creator-pt-opt.selected .inv-creator-pt-opt-days {
-    color: #00BCD4;
+    color: var(--app-accent, #00BCD4);
 }
 
 .inv-creator-pt-opt-label {
@@ -6846,7 +6846,7 @@ tbody tr:last-child td {
 }
 
 .inv-creator-pt-opt.selected .inv-creator-pt-opt-label {
-    color: #00BCD4;
+    color: var(--app-accent, #00BCD4);
 }
 
 .inv-creator-sig-pad {
@@ -6864,7 +6864,7 @@ tbody tr:last-child td {
 }
 
 .inv-creator-sig-pad:hover {
-    border-color: #00BCD4;
+    border-color: var(--app-accent, #00BCD4);
     background: #F0FDFE;
 }
 
@@ -6992,7 +6992,7 @@ tbody tr:last-child td {
 }
 
 .inv-creator-form-input:focus {
-    border-color: #00BCD4 !important;
+    border-color: var(--app-accent, #00BCD4) !important;
     background: #FFFFFF;
     box-shadow: 0 0 0 3px rgba(0, 188, 212, .08);
 }
@@ -7028,7 +7028,7 @@ tbody tr:last-child td {
 }
 
 .inv-creator-form-select:focus {
-    border-color: #00BCD4 !important;
+    border-color: var(--app-accent, #00BCD4) !important;
     box-shadow: 0 0 0 3px rgba(0, 188, 212, .08);
 }
 
@@ -7049,7 +7049,7 @@ tbody tr:last-child td {
 }
 
 .inv-creator-form-textarea:focus {
-    border-color: #00BCD4 !important;
+    border-color: var(--app-accent, #00BCD4) !important;
     box-shadow: 0 0 0 3px rgba(0, 188, 212, .08);
 }
 
@@ -7267,11 +7267,11 @@ input[type=number] {
 }
 
 .inv-creator-template-opt:hover {
-    border-color: #00BCD4;
+    border-color: var(--app-accent, #00BCD4);
 }
 
 .inv-creator-template-opt.selected {
-    border-color: #00BCD4;
+    border-color: var(--app-accent, #00BCD4);
     background: #F0FDFE;
 }
 
@@ -7287,7 +7287,7 @@ input[type=number] {
 }
 
 .inv-creator-template-opt.selected .inv-creator-template-opt-name {
-    color: #00BCD4;
+    color: var(--app-accent, #00BCD4);
 }
 
 .inv-creator-items-table {
@@ -7332,7 +7332,7 @@ input[type=number] {
 }
 
 .inv-creator-item-input:focus {
-    border-color: #00BCD4 !important;
+    border-color: var(--app-accent, #00BCD4) !important;
     background: #FFFFFF;
     box-shadow: 0 0 0 2px rgba(0, 188, 212, .08);
 }
@@ -7383,11 +7383,11 @@ input[type=number] {
     gap: 6px;
     padding: 8px 14px;
     background: #F0FDFE;
-    border: 1.5px dashed #00BCD4;
+    border: 1.5px dashed var(--app-accent, #00BCD4);
     border-radius: 9px;
     font-size: 12px;
     font-weight: 700;
-    color: #00BCD4;
+    color: var(--app-accent, #00BCD4);
     cursor: pointer;
     transition: all .15s;
     font-family: inherit;
@@ -7396,7 +7396,7 @@ input[type=number] {
 }
 
 .inv-creator-add-item-btn:hover {
-    background: #E0F7FA;
+    background: var(--teal-light, #E0F7FA);
 }
 
 .inv-creator-totals-section {
@@ -7433,9 +7433,9 @@ input[type=number] {
 
 .inv-creator-total-row.grand {
     padding: 10px 14px;
-    background: linear-gradient(135deg, #F0FDFE, #E0F7FA);
+    background: linear-gradient(135deg, #F0FDFE, var(--teal-light, #E0F7FA));
     border-radius: 10px;
-    border: 1.5px solid #E0F7FA;
+    border: 1.5px solid var(--teal-light, #E0F7FA);
     margin-top: 6px;
 }
 
@@ -7448,7 +7448,7 @@ input[type=number] {
 .inv-creator-total-row.grand .inv-creator-total-val {
     font-size: 18px;
     font-weight: 900;
-    color: #00BCD4;
+    color: var(--app-accent, #00BCD4);
 }
 
 .inv-creator-payment-terms-grid {
@@ -7469,13 +7469,13 @@ input[type=number] {
 }
 
 .inv-creator-pt-opt:hover {
-    border-color: #00BCD4;
+    border-color: var(--app-accent, #00BCD4);
 }
 
 .inv-creator-pt-opt.selected {
-    border-color: #00BCD4;
+    border-color: var(--app-accent, #00BCD4);
     background: #F0FDFE;
-    color: #00BCD4;
+    color: var(--app-accent, #00BCD4);
 }
 
 .inv-creator-pt-opt-days {
@@ -7485,7 +7485,7 @@ input[type=number] {
 }
 
 .inv-creator-pt-opt.selected .inv-creator-pt-opt-days {
-    color: #00BCD4;
+    color: var(--app-accent, #00BCD4);
 }
 
 .inv-creator-pt-opt-label {
@@ -7495,7 +7495,7 @@ input[type=number] {
 }
 
 .inv-creator-pt-opt.selected .inv-creator-pt-opt-label {
-    color: #00BCD4;
+    color: var(--app-accent, #00BCD4);
 }
 
 .inv-creator-sig-pad {
@@ -7513,7 +7513,7 @@ input[type=number] {
 }
 
 .inv-creator-sig-pad:hover {
-    border-color: #00BCD4;
+    border-color: var(--app-accent, #00BCD4);
     background: #F0FDFE;
 }
 

@@ -168,7 +168,7 @@ const viewProposal = (proposal) => {
         content = `<div style="font-size:${fs}px; font-weight:${fw}; color:${el.color || '#000'}; white-space:pre-wrap; width:${el.width || el.w}px;">${val}</div>`;
       } else if (el.type === "shape") {
         const br = el.borderRadius !== undefined ? (typeof el.borderRadius === 'number' ? el.borderRadius + 'px' : el.borderRadius) : (el.shape === 'circle' ? '50%' : '4px');
-        content = `<div style="width:${el.width || el.w || 60}px; height:${el.height || el.h || 60}px; background:${el.color || ' var(--app-accent, #00BCD4)'}; border-radius:${br};"></div>`;
+        content = `<div style="width:${el.width || el.w || 60}px; height:${el.height || el.h || 60}px; background:${el.color || ' var(--app-accent, var(--app-accent, #00BCD4))'}; border-radius:${br};"></div>`;
       } else if (el.type === "image") {
         content = `<img src="${el.src}" style="width:${el.width || el.w || 200}px; height:${el.height || el.h || 'auto'}; object-fit:contain; pointer-events:none;" />`;
       } else if (el.type === "icon") {
@@ -264,7 +264,7 @@ const viewProposal = (proposal) => {
           .slide-page { background: #fff; box-shadow: 0 4px 24px rgba(0,0,0,0.10); border-radius: 12px; overflow: hidden; }
           .top-bar { position: sticky; top: 0; z-index: 100; background: #1e293b; color: #fff; padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; }
           .top-bar h2 { font-size: 16px; font-weight: 700; margin: 0; }
-          .print-btn { background:  var(--app-accent, #00BCD4); color: #fff; border: none; border-radius: 8px; padding: 8px 20px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+          .print-btn { background:  var(--app-accent, var(--app-accent, #00BCD4)); color: #fff; border: none; border-radius: 8px; padding: 8px 20px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
           @media print { .top-bar { display: none; } body { background: white; } .slide-page { box-shadow: none; border-radius: 0; } @page { size: A4; margin: 0; } }
         </style>
       </head>

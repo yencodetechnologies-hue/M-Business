@@ -31,7 +31,7 @@ new_block = '''      {/* Invoice Preview Modal - Full Template */}
         const grandTotal = isInclusive ? afterDisc + extra : afterDisc + totalTax + extra;
         const amountPaid = Number(inv.amountPaid) || 0;
         const balanceDue = grandTotal - amountPaid;
-        const accentColor = ' var(--app-accent, #00BCD4)';
+        const accentColor = ' var(--app-accent, var(--app-accent, #00BCD4))';
         const s = (inv.status || '').toLowerCase();
         const statusLabel = s === 'paid' ? 'PAID' : s === 'part_paid' ? 'PART PAID' : s === 'overdue' ? 'OVERDUE' : s === 'sent' ? 'SENT' : s === 'draft' ? 'DRAFT' : 'PENDING';
         const statusStyle = s === 'paid' ? { bg: '#d1fae5', color: '#059669', border: '#10b981' }

@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   <style>
     :root {
-      --teal: var(--app-accent, #00BCD4);
+      --teal: var(--app-accent, var(--app-accent, #00BCD4));
       --teal-dk: #0097A7;
       --teal-lt: var(--teal-light, #E0F7FA);
       --ink: #0D1B2A;
@@ -36,7 +36,7 @@
       --orange: #F97316;
       --orange-lt: #FFEDD5;
       --orange-tx: #C2410C;
-      --sidebar-grad: linear-gradient(180deg, #26D0CE 0%, var(--app-accent, #00BCD4) 35%, #00ACC1 65%, #006E7F 100%);
+      --sidebar-grad: linear-gradient(180deg, #26D0CE 0%, var(--app-accent, var(--app-accent, #00BCD4)) 35%, var(--app-accent2, #00ACC1) 65%, #006E7F 100%);
       --font: 'Nunito', sans-serif;
     }
 

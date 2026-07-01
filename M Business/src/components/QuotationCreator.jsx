@@ -160,7 +160,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
   const sendThemeToIframe = () => {
     if (iframeRef.current && iframeRef.current.contentWindow) {
-      const color = getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || ' var(--app-accent, #00BCD4)';
+      const color = getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || ' var(--app-accent, var(--app-accent, #00BCD4))';
       iframeRef.current.contentWindow.postMessage({ type: 'SET_THEME', color }, '*');
     }
   };

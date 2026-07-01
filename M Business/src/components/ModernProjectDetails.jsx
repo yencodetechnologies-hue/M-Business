@@ -6,7 +6,7 @@ import ProjectPaymentModals from './ProjectPaymentModals';
 
 // ── Shared Colors ──
 const P = {
-  primary: ' var(--app-accent, #00BCD4)', primaryDark: '#0097A7', primaryLight: 'var(--teal-light, #E0F7FA)', primaryMid: '#B2EBF2',
+  primary: ' var(--app-accent, var(--app-accent, #00BCD4))', primaryDark: '#0097A7', primaryLight: 'var(--teal-light, var(--teal-light, #E0F7FA))', primaryMid: '#B2EBF2',
   textDark: '#1A2332', textMid: '#4A5568', textLight: '#718096',
   bg: '#F0F4F8', white: '#FFFFFF', border: '#E2E8F0',
   green: '#26C281', greenLight: '#D1FAE5', orange: '#F59E0B', orangeLight: '#FEF3C7',
@@ -162,7 +162,7 @@ function getInitials(name) {
 }
 
 function getAvatarColor(name) {
-  const colors = [' var(--app-accent, #00BCD4)', '#8B5CF6', '#F59E0B', '#26C281', '#EC4899', '#3B82F6'];
+  const colors = [' var(--app-accent, var(--app-accent, #00BCD4))', '#8B5CF6', '#F59E0B', '#26C281', '#EC4899', '#3B82F6'];
   if (!name) return colors[0];
   return colors[name.charCodeAt(0) % colors.length];
 }
@@ -810,7 +810,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       }
       const newGroup = await axios.post(`${BASE_URL}/api/groups`, {
         label: "Tasks",
-        color: " var(--app-accent, #00BCD4)"
+        color: " var(--app-accent, var(--app-accent, #00BCD4))"
       });
       return newGroup.data._id;
     } catch (e) {
@@ -1582,7 +1582,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   });
 
                   const isActive = !isDone && idx === firstNotDone;
-                  const circleColor = isDone ? P.red : isActive ? 'var(--teal-light, #E0F7FA)' : '#fff';
+                  const circleColor = isDone ? P.red : isActive ? 'var(--teal-light, var(--teal-light, #E0F7FA))' : '#fff';
                   const circleBorder = isDone ? P.red : isActive ? P.primary : P.border;
                   const textColor = isDone ? P.red : isActive ? P.primary : P.textLight;
                   const statusLabel = isDone ? 'Done' : isActive ? 'Active' : 'Pending';
@@ -2103,7 +2103,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       ].map(t => (
                         <div key={t.key}
                           onClick={() => { setActivePayTab(t.key); setSelectedPaymentItems([]); }}
-                          style={{ background: activePayTab === t.key ? ' var(--app-accent, #00BCD4)' : '#fff', border: `1px solid ${activePayTab === t.key ? ' var(--app-accent, #00BCD4)' : '#E8EDF2'}`, borderRadius: 12, padding: '14px 8px', textAlign: 'center', cursor: 'pointer', transition: 'all .15s' }}
+                          style={{ background: activePayTab === t.key ? ' var(--app-accent, var(--app-accent, #00BCD4))' : '#fff', border: `1px solid ${activePayTab === t.key ? ' var(--app-accent, var(--app-accent, #00BCD4))' : '#E8EDF2'}`, borderRadius: 12, padding: '14px 8px', textAlign: 'center', cursor: 'pointer', transition: 'all .15s' }}
                         >
                           <div style={{ width: 38, height: 38, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px', fontSize: 18, background: activePayTab === t.key ? 'rgba(255,255,255,.25)' : t.bg, color: activePayTab === t.key ? '#fff' : t.color }}>
                             <i className={`ti ${t.icon}`}></i>
@@ -2145,7 +2145,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                 setPaymentModalsState(prev => ({ ...prev, [b.modal]: true }));
                               }
                             }}
-                            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: ' var(--app-accent, #00BCD4)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}
+                            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: ' var(--app-accent, var(--app-accent, #00BCD4))', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}
                           >
                             <i className={`ti ${b.icon}`} style={{ fontSize: 13 }}></i> {b.label}
                           </button>
@@ -2287,7 +2287,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                 return (
                                   <tr key={i} style={{ borderBottom: '1px solid #F1F5F9' }}>
                                     <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.paymentNo || `PAY-00${i + 1}`}</td>
-                                    <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: ' var(--app-accent, #00BCD4)' }}>{rec.linkedInvoice || '—'}</td>
+                                    <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))' }}>{rec.linkedInvoice || '—'}</td>
                                     <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
                                     <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: isLate ? '#EF4444' : '#2D3E50' }}>
                                       {effectiveDueDate ? new Date(effectiveDueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
@@ -2701,26 +2701,26 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               <div style={{ background: '#fff', width: '100%', maxWidth: 640, borderRadius: 12, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'Arial,sans-serif', overflow: 'hidden' }}>
                 <div style={{ background: '#1A2332', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <i className="ti ti-file-invoice" style={{ color: ' var(--app-accent, #00BCD4)', fontSize: 18 }}></i>
+                    <i className="ti ti-file-invoice" style={{ color: ' var(--app-accent, var(--app-accent, #00BCD4))', fontSize: 18 }}></i>
                     <span style={{ color: '#fff', fontWeight: 800, fontSize: 14 }}>Invoice Preview — {inv.invoiceNo}</span>
                   </div>
                   <div style={{ display: 'flex', gap: 8 }}>
                     <button onClick={() => { setPreviewInvoice(null); setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo) })); }} style={{ padding: '6px 14px', background: '#fff', color: '#374151', border: '1px solid #E8EDF2', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}><i className="ti ti-edit"></i> Edit</button>
                     <button onClick={() => { if (confirm('Delete this invoice?')) { handleDeleteRecord('invoices', (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo)); setPreviewInvoice(null); } }} style={{ padding: '6px 14px', background: '#FEE2E2', color: '#EF4444', border: '1px solid #FECACA', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}><i className="ti ti-trash"></i> Delete</button>
-                    <button onClick={() => window.print()} style={{ padding: '6px 14px', background: ' var(--app-accent, #00BCD4)', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}><i className="ti ti-printer"></i> Print / PDF</button>
+                    <button onClick={() => window.print()} style={{ padding: '6px 14px', background: ' var(--app-accent, var(--app-accent, #00BCD4))', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}><i className="ti ti-printer"></i> Print / PDF</button>
                     <button onClick={() => setPreviewInvoice(null)} style={{ padding: '6px 14px', background: '#374151', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>✕</button>
                   </div>
                 </div>
                 <div id="invoice-print-area" style={{ padding: '36px 40px', background: '#fff' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
                     <div>
-                      {user?.logoUrl ? (<img src={user.logoUrl} alt="Logo" style={{ height: 70, borderRadius: 12, marginBottom: 12, objectFit: 'contain' }} />) : (<div style={{ width: 60, height: 60, borderRadius: 12, background: 'linear-gradient(135deg, var(--app-accent, #00BCD4),#0097A7)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}><span style={{ color: '#fff', fontWeight: 900, fontSize: 24 }}>{(user?.companyName || 'Y')[0].toUpperCase()}</span></div>)}
+                      {user?.logoUrl ? (<img src={user.logoUrl} alt="Logo" style={{ height: 70, borderRadius: 12, marginBottom: 12, objectFit: 'contain' }} />) : (<div style={{ width: 60, height: 60, borderRadius: 12, background: 'linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097A7)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}><span style={{ color: '#fff', fontWeight: 900, fontSize: 24 }}>{(user?.companyName || 'Y')[0].toUpperCase()}</span></div>)}
                       <div style={{ fontWeight: 900, fontSize: 20, color: '#0f1c2e', letterSpacing: '1px', textTransform: 'uppercase' }}>{user?.companyName || 'YOUR COMPANY'}</div>
                       <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4, lineHeight: 1.7 }}>{user?.email}<br />{user?.phone}<br />{user?.address}</div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontSize: 32, fontWeight: 900, color: 'rgba(0,188,212,0.1)', letterSpacing: '-1px', marginBottom: 4 }}>INVOICE</div>
-                      <div style={{ fontSize: 16, fontWeight: 800, color: ' var(--app-accent, #00BCD4)' }}>{inv.invoiceNo}</div>
+                      <div style={{ fontSize: 16, fontWeight: 800, color: ' var(--app-accent, var(--app-accent, #00BCD4))' }}>{inv.invoiceNo}</div>
                       <div style={{ display: 'flex', gap: 20, marginTop: 14, justifyContent: 'flex-end' }}>
                         <div style={{ textAlign: 'right' }}><div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 3 }}>Date</div><div style={{ fontSize: 12, fontWeight: 700, color: '#0f1c2e' }}>{inv.issueDate ? new Date(inv.issueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div></div>
                         <div style={{ textAlign: 'right' }}><div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 3 }}>Due Date</div><div style={{ fontSize: 12, fontWeight: 700, color: '#ea580c' }}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div></div>
@@ -2732,7 +2732,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   <div style={{ borderBottom: '2px solid #E8EDF2', paddingBottom: 20, marginBottom: 20 }}>
                     <div style={{ fontSize: 9, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: 10 }}>Bill To</div>
                     <div style={{ fontWeight: 800, fontSize: 17, color: '#0f1c2e' }}>{inv.clientName || clientName}</div>
-                    <div style={{ fontSize: 13, color: ' var(--app-accent, #00BCD4)', fontWeight: 600, marginTop: 2 }}>{inv.clientName || clientName}</div>
+                    <div style={{ fontSize: 13, color: ' var(--app-accent, var(--app-accent, #00BCD4))', fontWeight: 600, marginTop: 2 }}>{inv.clientName || clientName}</div>
                   </div>
                   <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 20 }}>
                     <thead><tr style={{ background: '#f8fafc' }}>{['#', 'Description', 'Qty', 'Unit Rate', 'Tax Rate', 'Amount'].map(h => (<th key={h} style={{ padding: '9px 11px', textAlign: h === 'Amount' || h === 'Unit Rate' || h === 'Qty' || h === 'Tax Rate' ? 'right' : 'left', fontSize: 9, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1.5, borderBottom: '2px solid #E8EDF2' }}>{h}</th>))}</tr></thead>
@@ -2745,7 +2745,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 8px', background: '#0f1c2e', borderRadius: 6, marginTop: 4, color: '#fff' }}><span style={{ fontSize: 10, fontWeight: 800 }}>Balance Due</span><span style={{ fontSize: 12, fontWeight: 900 }}>{currency}{total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>
                     </div>
                   </div>
-                  {inv.notes && (<div style={{ borderTop: '1px solid #E8EDF2', paddingTop: 14 }}><div style={{ fontSize: 8, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 2 }}>Notes</div><div style={{ fontSize: 8, color: '#64748b', lineHeight: 1.5 }}>{inv.notes}</div></div>)}
+                  {inv.notes && (<div style={{ borderTop: '1px solid #E8EDF2', paddingTop: 14 }}><div style={{ fontSize: 8, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 2 }}>Notes</div><div style={{ fontSize: 8, color: '#64748b', lineHeight: 1.5 }}>{inv.notes}</div></div>)}
                 </div>
                 <div style={{ borderTop: '1px solid #E8EDF2', padding: '10px 40px', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{inv.invoiceNo}</div>

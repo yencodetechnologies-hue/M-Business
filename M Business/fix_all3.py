@@ -47,12 +47,12 @@ send_modal_html = """
     <div style="margin-bottom:20px;">
       <label style="font-size:10px;font-weight:700;color:#1A2E35;text-transform:uppercase;letter-spacing:.7px;display:block;margin-bottom:6px;">Recipient Name</label>
       <input type="text" id="f-clientName" placeholder="Enter client or employee name..." style="width:100%;padding:9px 12px;border:1.5px solid #E0EEF0;border-radius:8px;font-size:13px;font-family:inherit;color:#1A2E35;outline:none;" 
-        onfocus="this.style.borderColor=' var(--app-accent, #00BCD4)'" onblur="this.style.borderColor='#E0EEF0'"/>
+        onfocus="this.style.borderColor=' var(--app-accent, var(--app-accent, #00BCD4))'" onblur="this.style.borderColor='#E0EEF0'"/>
     </div>
     
     <div style="display:flex;gap:10px;">
       <button onclick="closeSendModal()" style="flex:1;padding:10px;border:1.5px solid #E0EEF0;border-radius:8px;background:#fff;font-size:13px;font-weight:600;color:#607D86;cursor:pointer;font-family:inherit;">Cancel</button>
-      <button onclick="sendDoc()" style="flex:2;padding:10px;border:none;border-radius:8px;background:linear-gradient(135deg, var(--app-accent, #00BCD4),#00ACC1);font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;">
+      <button onclick="sendDoc()" style="flex:2;padding:10px;border:none;border-radius:8px;background:linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),var(--app-accent2, #00ACC1));font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;">
         <i class="ti ti-send" style="margin-right:6px;"></i>Send Now
       </button>
     </div>
@@ -143,7 +143,7 @@ new_send_func = """function sendDoc() {
   
   // Show toast
   const t = document.createElement('div');
-  t.style.cssText = "position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#26C281, var(--app-accent, #00BCD4));color:#fff;padding:14px 22px;border-radius:12px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.15);font-size:13px;display:flex;align-items:center;gap:8px;";
+  t.style.cssText = "position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#26C281, var(--app-accent, var(--app-accent, #00BCD4)));color:#fff;padding:14px 22px;border-radius:12px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.15);font-size:13px;display:flex;align-items:center;gap:8px;";
   t.innerHTML = '<i class="ti ti-circle-check" style="font-size:18px;"></i> Document sent to ' + clientName + '!';
   document.body.appendChild(t);
   setTimeout(()=>{ t.style.transition='opacity 0.4s'; t.style.opacity='0'; setTimeout(()=>t.remove(),400); }, 3000);

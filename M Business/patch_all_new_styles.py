@@ -60,35 +60,35 @@ css_styles = """
         .form-group:last-child { margin-bottom: 0; }
         .form-label { font-size: 11px; font-weight: 700; color: #607D86; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; display: block; }
         .form-input { width: 100%; padding: 10px 13px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 13px; color: #1A2E35; font-family: inherit; outline: none; transition: all .15s; }
-        .form-input:focus { border-color:  var(--app-accent, #00BCD4) !important; background: #FFFFFF; box-shadow: 0 0 0 3px rgba(0,188,212,.08); }
+        .form-input:focus { border-color:  var(--app-accent, var(--app-accent, #00BCD4)) !important; background: #FFFFFF; box-shadow: 0 0 0 3px rgba(0,188,212,.08); }
         .form-input::placeholder { color: #A0B8BE; }
         .form-input:read-only { background: #F8FAFB; color: #A0B8BE; cursor: not-allowed; }
         .form-select { width: 100%; padding: 10px 13px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 13px; color: #1A2E35; font-family: inherit; outline: none; cursor: pointer; appearance: none; -webkit-appearance: none; transition: all .15s; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A0B8BE' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
-        .form-select:focus { border-color:  var(--app-accent, #00BCD4) !important; box-shadow: 0 0 0 3px rgba(0,188,212,.08); }
+        .form-select:focus { border-color:  var(--app-accent, var(--app-accent, #00BCD4)) !important; box-shadow: 0 0 0 3px rgba(0,188,212,.08); }
         .form-textarea { width: 100%; padding: 10px 13px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 13px; color: #1A2E35; font-family: inherit; outline: none; resize: vertical; min-height: 72px; transition: all .15s; }
-        .form-textarea:focus { border-color:  var(--app-accent, #00BCD4) !important; box-shadow: 0 0 0 3px rgba(0,188,212,.08); }
+        .form-textarea:focus { border-color:  var(--app-accent, var(--app-accent, #00BCD4)) !important; box-shadow: 0 0 0 3px rgba(0,188,212,.08); }
         .form-textarea::placeholder { color: #A0B8BE; }
 
         .template-row { display: flex; gap: 8px; margin-bottom: 14px; }
         .template-opt { flex: 1; padding: 10px; border: 1.5px solid #E0EEF0; border-radius: 10px; cursor: pointer; text-align: center; transition: all .15s; }
-        .template-opt:hover { border-color:  var(--app-accent, #00BCD4); }
-        .template-opt.selected { border-color:  var(--app-accent, #00BCD4); background: var(--teal-lighter, #F0FDFE); }
+        .template-opt:hover { border-color:  var(--app-accent, var(--app-accent, #00BCD4)); }
+        .template-opt.selected { border-color:  var(--app-accent, var(--app-accent, #00BCD4)); background: var(--teal-lighter, #F0FDFE); }
         .template-opt-icon { font-size: 20px; margin-bottom: 4px; }
         .template-opt-name { font-size: 10px; font-weight: 700; color: #607D86; }
-        .template-opt.selected .template-opt-name { color:  var(--app-accent, #00BCD4); }
+        .template-opt.selected .template-opt-name { color:  var(--app-accent, var(--app-accent, #00BCD4)); }
 
         .items-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
         .items-table thead tr th { font-size: 10px; font-weight: 700; color: #A0B8BE; text-transform: uppercase; letter-spacing: .6px; padding: 8px 10px; text-align: left; background: #F8FAFB; border-bottom: 1px solid #E0EEF0; }
         .items-table tbody tr td { padding: 6px 6px; border-bottom: 1px solid #E0EEF0; vertical-align: middle; }
         .items-table tbody tr:last-child td { border-bottom: none; }
         .item-input { width: 100%; padding: 8px 10px; background: #F5FAFA; border: 1.5px solid transparent; border-radius: 8px; font-size: 12px; color: #1A2E35; font-family: inherit; outline: none; transition: all .15s; }
-        .item-input:focus { border-color:  var(--app-accent, #00BCD4) !important; background: #FFFFFF; box-shadow: 0 0 0 2px rgba(0,188,212,.08); }
+        .item-input:focus { border-color:  var(--app-accent, var(--app-accent, #00BCD4)) !important; background: #FFFFFF; box-shadow: 0 0 0 2px rgba(0,188,212,.08); }
         .item-input.desc { min-width: 160px; }
         .item-input.num { width: 70px; text-align: right; }
         .item-total { font-size: 13px; font-weight: 700; color: #1A2E35; padding: 0 10px; min-width: 80px; text-align: right; }
         .del-row-btn { width: 26px; height: 26px; border-radius: 7px; background: none; border: 1.5px solid #E0EEF0; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: #A0B8BE; transition: all .15s; flex-shrink: 0; }
         .del-row-btn:hover { border-color: #F05C5C; color: #F05C5C; background: #FEF2F2; }
-        .add-item-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--teal-lighter, #F0FDFE); border: 1.5px dashed  var(--app-accent, #00BCD4); border-radius: 9px; font-size: 12px; font-weight: 700; color:  var(--app-accent, #00BCD4); cursor: pointer; transition: all .15s; font-family: inherit; width: 100%; justify-content: center; }
+        .add-item-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--teal-lighter, #F0FDFE); border: 1.5px dashed  var(--app-accent, var(--app-accent, #00BCD4)); border-radius: 9px; font-size: 12px; font-weight: 700; color:  var(--app-accent, var(--app-accent, #00BCD4)); cursor: pointer; transition: all .15s; font-family: inherit; width: 100%; justify-content: center; }
         .add-item-btn:hover { background: var(--teal-light, #E0F7FA); }
 
         .totals-section { border-top: 1px solid #E0EEF0; padding-top: 14px; margin-top: 4px; }
@@ -99,19 +99,19 @@ css_styles = """
         .total-row.tax .total-val { color: #F5A623; }
         .total-row.grand { padding: 10px 14px; background: linear-gradient(135deg, var(--teal-lighter, #F0FDFE), var(--teal-light, #E0F7FA)); border-radius: 10px; border: 1.5px solid var(--teal-light, #E0F7FA); margin-top: 6px; }
         .total-row.grand .total-label { font-size: 14px; font-weight: 800; color: #1A2E35; }
-        .total-row.grand .total-val { font-size: 18px; font-weight: 900; color:  var(--app-accent, #00BCD4); }
+        .total-row.grand .total-val { font-size: 18px; font-weight: 900; color:  var(--app-accent, var(--app-accent, #00BCD4)); }
 
         .payment-terms-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
         .pt-opt { padding: 8px 6px; border: 1.5px solid #E0EEF0; border-radius: 9px; cursor: pointer; text-align: center; transition: all .15s; font-family: inherit; }
-        .pt-opt:hover { border-color:  var(--app-accent, #00BCD4); }
-        .pt-opt.selected { border-color:  var(--app-accent, #00BCD4); background: var(--teal-lighter, #F0FDFE); color:  var(--app-accent, #00BCD4); }
+        .pt-opt:hover { border-color:  var(--app-accent, var(--app-accent, #00BCD4)); }
+        .pt-opt.selected { border-color:  var(--app-accent, var(--app-accent, #00BCD4)); background: var(--teal-lighter, #F0FDFE); color:  var(--app-accent, var(--app-accent, #00BCD4)); }
         .pt-opt-days { font-size: 14px; font-weight: 800; color: #1A2E35; }
-        .pt-opt.selected .pt-opt-days { color:  var(--app-accent, #00BCD4); }
+        .pt-opt.selected .pt-opt-days { color:  var(--app-accent, var(--app-accent, #00BCD4)); }
         .pt-opt-label { font-size: 9px; color: #A0B8BE; font-weight: 600; }
-        .pt-opt.selected .pt-opt-label { color:  var(--app-accent, #00BCD4); }
+        .pt-opt.selected .pt-opt-label { color:  var(--app-accent, var(--app-accent, #00BCD4)); }
 
         .sig-pad { border: 2px dashed #C5DDE0; border-radius: 10px; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: all .15s; background: #F5FAFA; }
-        .sig-pad:hover { border-color:  var(--app-accent, #00BCD4); background: var(--teal-lighter, #F0FDFE); }
+        .sig-pad:hover { border-color:  var(--app-accent, var(--app-accent, #00BCD4)); background: var(--teal-lighter, #F0FDFE); }
 """
 
 # Let's replace the stylesheet content inside the first <style> block of the return statement

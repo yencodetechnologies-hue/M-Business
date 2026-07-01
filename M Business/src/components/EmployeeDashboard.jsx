@@ -658,7 +658,7 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
   const leaveHistory = attendance.filter(a => a.status === "leave" || a.status === "absent").slice(0, 3);
   const initials = name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
 
-  const TC = { teal: " var(--app-accent, #00BCD4)", bg: "#f0f4f8", card: "#fff", border: "#e5eaf0", text: "#0f1c2e", textMid: "#4a5568", textSoft: "#94a3b8", green: "#16a34a", amber: "#d97706", red: "#dc2626", blue: "#2563eb" };
+  const TC = { teal: " var(--app-accent, var(--app-accent, #00BCD4))", bg: "#f0f4f8", card: "#fff", border: "#e5eaf0", text: "#0f1c2e", textMid: "#4a5568", textSoft: "#94a3b8", green: "#16a34a", amber: "#d97706", red: "#dc2626", blue: "#2563eb" };
 
   const docItems = [
     { name: "Offer Letter", meta: "Jan 2024 · PDF", icon: "Document", color: "#6366F1" },
@@ -681,7 +681,7 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
 
 
       {/* Hero */}
-      <div style={{ background: "linear-gradient(135deg,#0f9baa, var(--app-accent, #00BCD4),#26c6da)", borderRadius: 18, padding: "24px 28px", display: "flex", alignItems: "center", gap: 18, color: "#fff", position: "relative", overflow: "hidden" }}>
+      <div style={{ background: "linear-gradient(135deg,#0f9baa, var(--app-accent, var(--app-accent, #00BCD4)),#26c6da)", borderRadius: 18, padding: "24px 28px", display: "flex", alignItems: "center", gap: 18, color: "#fff", position: "relative", overflow: "hidden" }}>
         <div style={{ width: 56, height: 56, borderRadius: 16, background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 900, border: "2px solid rgba(255,255,255,0.3)", flexShrink: 0 }}>{initials}</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 12, opacity: 0.7, fontWeight: 600 }}>My Profile</div>

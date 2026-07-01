@@ -129,7 +129,7 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
 
         {/* KPI CARDS */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 16, marginBottom: 22 }}>
-          {[['Total Income', total, '#26C281', income.length + ' records'], ['Received', received, ' var(--app-accent, #00BCD4)', income.filter(i => i.status !== 'Pending').length + ' payments'], ['Pending', pending, '#F59E0B', income.filter(i => i.status === 'Pending').length + ' outstanding']].map(([label, val, color, sub]) => (
+          {[['Total Income', total, '#26C281', income.length + ' records'], ['Received', received, ' var(--app-accent, var(--app-accent, #00BCD4))', income.filter(i => i.status !== 'Pending').length + ' payments'], ['Pending', pending, '#F59E0B', income.filter(i => i.status === 'Pending').length + ' outstanding']].map(([label, val, color, sub]) => (
             <div key={label} style={{ background: '#fff', borderRadius: 14, padding: '18px 20px', boxShadow: '0 2px 12px rgba(0,188,212,.08)', borderLeft: `4px solid ${color}` }}>
               <div style={{ fontSize: 11, fontWeight: 800, color: '#718096', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 }}>{label}</div>
               <div style={{ fontSize: 24, fontWeight: 900, color: '#1A2332' }}>{fmt(val)}</div>

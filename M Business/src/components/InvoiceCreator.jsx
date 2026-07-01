@@ -502,7 +502,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
   const sendThemeToIframe = () => {
     if (iframeRef.current && iframeRef.current.contentWindow) {
-      const color = getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || ' var(--app-accent, #00BCD4)';
+      const color = getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || ' var(--app-accent, var(--app-accent, #00BCD4))';
       iframeRef.current.contentWindow.postMessage({ type: 'SET_THEME', color }, '*');
     }
   };
@@ -555,11 +555,11 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         };
       case "Classic":
         return {
-          primaryColor: " var(--app-accent, #00BCD4)",
-          primaryBg: "var(--teal-light, #E0F7FA)",
-          logoColor: "linear-gradient(135deg,  var(--app-accent, #00BCD4), #006E7F)",
+          primaryColor: " var(--app-accent, var(--app-accent, #00BCD4))",
+          primaryBg: "var(--teal-light, var(--teal-light, #E0F7FA))",
+          logoColor: "linear-gradient(135deg,  var(--app-accent, var(--app-accent, #00BCD4)), #006E7F)",
           borderStyle: "1px solid #E0EEF0",
-          headerUnderline: "3px solid  var(--app-accent, #00BCD4)",
+          headerUnderline: "3px solid  var(--app-accent, var(--app-accent, #00BCD4))",
           fontFamily: "'Nunito', sans-serif"
         };
       case "Modern":
@@ -1243,7 +1243,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         <div className="page-header">
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             {onBack && (
-              <button onClick={onBack} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--teal-light, #E0F7FA)", border: "none", borderRadius: 10, cursor: "pointer", color: " var(--app-accent, #00BCD4)", flexShrink: 0 }}>
+              <button onClick={onBack} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--teal-light, var(--teal-light, #E0F7FA))", border: "none", borderRadius: 10, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #00BCD4))", flexShrink: 0 }}>
                 <i className="ti ti-arrow-left" style={{ fontSize: 18 }} />
               </button>
             )}

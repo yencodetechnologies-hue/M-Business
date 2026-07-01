@@ -4,7 +4,7 @@ import { BASE_URL } from '../config';
 import AddClientView from './AddClientView';
 // ── Shared Colors ──
 const P = {
-  primary: ' var(--app-accent, #00BCD4)', primaryDark: '#0097A7', primaryLight: 'var(--teal-light, #E0F7FA)', primaryMid: '#B2EBF2',
+  primary: ' var(--app-accent, var(--app-accent, #00BCD4))', primaryDark: '#0097A7', primaryLight: 'var(--teal-light, var(--teal-light, #E0F7FA))', primaryMid: '#B2EBF2',
   textDark: '#1A2332', textMid: '#4A5568', textLight: '#718096',
   bg: '#F0F4F8', white: '#FFFFFF', border: '#E2E8F0',
   green: '#26C281', greenLight: '#D1FAE5', orange: '#F59E0B', orangeLight: '#FEF3C7',
@@ -100,7 +100,7 @@ function getInitials(name) {
 }
 
 function getAvatarColor(name) {
-  const colors = [' var(--app-accent, #00BCD4)', '#8B5CF6', '#F59E0B', '#26C281', '#EC4899', '#3B82F6'];
+  const colors = [' var(--app-accent, var(--app-accent, #00BCD4))', '#8B5CF6', '#F59E0B', '#26C281', '#EC4899', '#3B82F6'];
   if (!name) return colors[0];
   return colors[name.charCodeAt(0) % colors.length];
 }
@@ -338,12 +338,12 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                     <div style={{
                       flex: 1,
                       padding: '11px 14px',
-                      border: '1.5px solid  var(--app-accent, #00BCD4)',
+                      border: '1.5px solid  var(--app-accent, var(--app-accent, #00BCD4))',
                       borderRadius: 10,
                       fontSize: 14,
                       fontWeight: 700,
                       color: '#0D2027',
-                      background: 'var(--teal-light, #E0F7FA)',
+                      background: 'var(--teal-light, var(--teal-light, #E0F7FA))',
                       display: 'flex',
                       alignItems: 'center',
                       gap: 10,
@@ -351,7 +351,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                     }}>
                       <div style={{
                         width: 28, height: 28, borderRadius: '50%',
-                        background: 'linear-gradient(135deg, var(--app-accent, #00BCD4),#0097A7)',
+                        background: 'linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097A7)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         color: '#fff', fontSize: 12, fontWeight: 800, flexShrink: 0
                       }}>

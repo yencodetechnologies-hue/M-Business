@@ -24,7 +24,7 @@ var(--teal-light, #E0F7FA)
 
 :root{
 
-  --teal: var(--app-accent, #00BCD4);--teal2:#00ACC1;--teal-light:#E0F7FA;--teal-lighter:var(--teal-lighter, #F0FDFE);
+  --teal: var(--app-accent, var(--app-accent, #00BCD4));--teal2:var(--app-accent2, #00ACC1);--teal-light:#E0F7FA;--teal-lighter:var(--teal-lighter, #F0FDFE);
 
   --bg:#F5FAFA;--surface:#FFFFFF;--surface2:#F8FAFB;--border:#E0EEF0;--border2:#C5DDE0;
 

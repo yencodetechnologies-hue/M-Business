@@ -22,7 +22,7 @@ const inputStyle = { width: '100%', padding: '10px 12px', borderRadius: 8, borde
 const rowStyle = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 };
 const btnRowStyle = { display: 'flex', justifyContent: 'center', gap: 12, marginTop: 24 };
 
-const submitBtnStyle = { padding: '10px 24px', background: ' var(--app-accent, #00BCD4)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' };
+const submitBtnStyle = { padding: '10px 24px', background: ' var(--app-accent, var(--app-accent, #00BCD4))', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' };
 const cancelBtnStyle = { padding: '10px 24px', background: '#fff', color: '#4A5568', border: '1.5px solid #E8EDF2', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' };
 
 export default function ProjectPaymentModals({
@@ -283,7 +283,7 @@ export default function ProjectPaymentModals({
         <div style={modalStyle}>
           <div style={headerStyle}>
             <h3 style={titleStyle}>
-              <div style={{ background: 'var(--teal-light, #E0F7FA)', color: ' var(--app-accent, #00BCD4)', padding: 8, borderRadius: 8 }}><i className="ti ti-file-invoice"></i></div>
+              <div style={{ background: 'var(--teal-light, var(--teal-light, #E0F7FA))', color: ' var(--app-accent, var(--app-accent, #00BCD4))', padding: 8, borderRadius: 8 }}><i className="ti ti-file-invoice"></i></div>
               {editData ? `Edit Invoice — ${editData.invoiceNo || ''}` : 'New Invoice'}
             </h3>
             <button style={closeBtnStyle} onClick={closeModals}>✕</button>

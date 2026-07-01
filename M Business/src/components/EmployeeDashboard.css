@@ -1,5 +1,5 @@
 :root {
-  --teal: var(--app-accent, #00BCD4);
+  --teal: var(--app-accent, var(--app-accent, #00BCD4));
   --teal-dim: rgba(0, 188, 212, 0.08);
   --teal-mid: rgba(0, 188, 212, 0.15);
   --teal-glow: rgba(0, 188, 212, 0.25);
@@ -36,7 +36,7 @@
 
 /* ── GREETING HERO ── */
 .greet-hero {
-  background: linear-gradient(135deg, var(--app-accent, #00BCD4) 0%, #0097a7 60%, #006978 100%);
+  background: linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)) 0%, #0097a7 60%, #006978 100%);
   border-radius: 16px;
   padding: 28px 32px;
   display: flex;

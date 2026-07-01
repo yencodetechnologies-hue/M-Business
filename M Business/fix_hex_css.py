@@ -16,8 +16,8 @@ for directory in directories:
             original_content = content
             
             # Replace hex codes (case-insensitive)
-            content = re.sub(r'(?i) var(--app-accent, #00BCD4)', 'var(--teal)', content)
-            content = re.sub(r'(?i)#00ACC1', 'var(--teal2)', content)
+            content = re.sub(r'(?i) var(--app-accent, var(--app-accent, #00BCD4))', 'var(--teal)', content)
+            content = re.sub(r'(?i)var(--app-accent2, #00ACC1)', 'var(--teal2)', content)
             content = re.sub(r'(?i)var(--teal-light, #E0F7FA)', 'var(--teal-light)', content)
             content = re.sub(r'(?i)var(--teal-lighter, #F0FDFE)', 'var(--teal-lighter)', content)
             

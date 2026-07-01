@@ -1,7 +1,7 @@
 
 // ── STATE ──
 let docType = 'lh';
-let color = '#00BCD4';
+let color = ' var(--app-accent, #00BCD4)';
 let font = 'Nunito, sans-serif';
 let logoUrl = null;
 let lhLayout = 'logo-left';

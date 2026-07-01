@@ -590,9 +590,9 @@
   align-items: center !important;
   justify-content: center !important;
   min-height: 260px !important;
-  border: 2.5px dashed #00BCD4 !important;
+  border: 2.5px dashed var(--app-accent, #00BCD4) !important;
   border-radius: 16px !important;
-  background: linear-gradient(135deg, #E0F7FA 0%, #F0FDFF 100%) !important;
+  background: linear-gradient(135deg, var(--teal-light, #E0F7FA) 0%, #F0FDFF 100%) !important;
   cursor: pointer !important;
   gap: 12px !important;
   transition: all 0.2s !important;

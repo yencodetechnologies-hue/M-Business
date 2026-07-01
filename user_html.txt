@@ -1,87 +1,168 @@
 <USER_REQUEST>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M Business – Invoices</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --teal:#00BCD4;--teal2:#00ACC1;--teal-light:#E0F7FA;--teal-lighter:#F0FDFE;
-  --bg:#F5FAFA;--surface:#FFFFFF;--surface2:#F8FAFB;--border:#E0EEF0;--border2:#C5DDE0;
-  --text:#1A2E35;--text2:#607D86;--text3:#A0B8BE;
-  --green:#26C281;--green-bg:#E8FAF3;
-  --amber:#F5A623;--amber-bg:#FEF5E6;
-  --red:#F05C5C;--red-bg:#FEF2F2;
-  --purple:#7C5CFC;--purple-bg:#EEE9FF;
-  --blue:#2563EB;--blue-bg:#EFF4FF;
-  --font:'Nunito',sans-serif;--radius:16px;--radius-sm:10px;
-}
-html,body{height:100%;font-family:var(--font);font-size:14px;background:var(--bg);color:var(--text)}
-body{display:flex;min-height:100vh}
-
-/* SIDEBAR */
-.sidebar{width:210px;min-width:210px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;overflow:hidden;z-index:100;box-shadow:2px 0 16px rgba(0,188,212,.07)}
-.logo{padding:24px 20px 18px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
-.logo-mark{font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.5px}
-.logo-badge{background:var(--teal);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px;margin-left:2px}
-.profile-area{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>M Business – Invoices</title>
+
+<link rel="preconnect" href="https://fonts.goovar(--teal-light, #E0F7FA).com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+<style>
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+
+  --teal: var(--app-accent, #00BCD4);--teal2:#00ACC1;--teal-light:#E0F7FA;--teal-lighter:var(--teal-lighter, #F0FDFE);
+
+  --bg:#F5FAFA;--surface:#FFFFFF;--surface2:#F8FAFB;--border:#E0EEF0;--border2:#C5DDE0;
+
+  --text:#1A2E35;--text2:#607D86;--text3:#A0B8BE;
+
+  --green:#26C281;--green-bg:#E8FAF3;
+
+  --amber:#F5A623;--amber-bg:#FEF5E6;
+
+  --red:#F05C5C;--red-bg:#FEF2F2;
+
+  --purple:#7C5CFC;--purple-bg:#EEE9FF;
+
+  --blue:#2563EB;--blue-bg:#EFF4FF;
+
+  --font:'Nunito',sans-serif;--radius:16px;--radius-sm:10px;
+
+}
+
+html,body{height:100%;font-family:var(--font);font-size:14px;background:var(--bg);color:var(--text)}
+
+body{display:flex;min-height:100vh}
+
+
+
+/* SIDEBAR */
+
+.sidebar{width:210px;min-width:210px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;overflow:hidden;z-index:100;box-shadow:2px 0 16px rgba(0,188,212,.07)}
+
+.logo{padding:24px 20px 18px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+
+.logo-mark{font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.5px}
+
+.logo-badge{background:var(--teal);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px;margin-left:2px}
+
+.profile-area{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+
 .profile-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--teal),#006E7F);displ
 <truncated 45216 bytes>
-/i> Add Account</button>
-  </div>
-</aside>
-
-<!-- MAIN -->
-<div class="main">
-  <div class="topbar">
-    <div class="search-wrap">
-      <i class="ti ti-search"></i>
-      <input type="text" placeholder="Search transactions…">
-    </div>
-    <div class="topbar-right">
-      <div class="topbar-icon"><i class="ti ti-bell"></i><span class="notif-dot"></span></div>
-      <div class="topbar-icon"><i class="ti ti-settings"></i></div>
-      <button class="create-btn"><i class="ti ti-plus" style="font-size:15px"></i> Add Account</button>
-    </div>
-  </div>
-
-  <div class="content">
-
-    <!-- PAGE HEADER -->
-    <div class="page-header">
-      <div>
-        <div class="page-title">Accounts</div>
-        <div class="page-sub">Manage your business bank accounts and balances</div>
-      </div>
-      <div class="header-actions">
-        <button class="filter-btn"><i class="ti ti-filter" style="font-size:14px"></i> Filter</button>
-        <button class="filter-btn"><i class="ti ti-calendar" style="font-size:14px"></i> May 2026</button>
-        <button class="filter-btn"><i class="ti ti-download" style="font-size:14px"></i> Statement</button>
-      </div>
-    </div>
-
-    <!-- ACCOUNT CARDS -->
-    <div class="account-cards">
-      <!-- PRIMARY -->
-      <div class="account-card primary">
-        <div class="card-chip">
-          <div>
-            <div class="card-chip-label">Primary Account</div>
-          </div>
-          <div class="card-chip-icon"><i class="ti ti-credit-card"></i></div>
-        </div>
-        <div class="card-balance-label">Available Balance</div>
-        <div class="card-balance">₹1,24,500.00</div>
-        <div class="card-footer">
-          <div>
-            <div class="card-dots"><div class="card-dot"></div><div class="card-dot"></div><div class="card-dot last"></div></div>
+/i> Add Account</button>
+
+  </div>
+
+</aside>
+
+
+
+<!-- MAIN -->
+
+<div class="main">
+
+  <div class="topbar">
+
+    <div class="search-wrap">
+
+      <i class="ti ti-search"></i>
+
+      <input type="text" placeholder="Search transactions…">
+
+    </div>
+
+    <div class="topbar-right">
+
+      <div class="topbar-icon"><i class="ti ti-bell"></i><span class="notif-dot"></span></div>
+
+      <div class="topbar-icon"><i class="ti ti-settings"></i></div>
+
+      <button class="create-btn"><i class="ti ti-plus" style="font-size:15px"></i> Add Account</button>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="content">
+
+
+
+    <!-- PAGE HEADER -->
+
+    <div class="page-header">
+
+      <div>
+
+        <div class="page-title">Accounts</div>
+
+        <div class="page-sub">Manage your business bank accounts and balances</div>
+
+      </div>
+
+      <div class="header-actions">
+
+        <button class="filter-btn"><i class="ti ti-filter" style="font-size:14px"></i> Filter</button>
+
+        <button class="filter-btn"><i class="ti ti-calendar" style="font-size:14px"></i> May 2026</button>
+
+        <button class="filter-btn"><i class="ti ti-download" style="font-size:14px"></i> Statement</button>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ACCOUNT CARDS -->
+
+    <div class="account-cards">
+
+      <!-- PRIMARY -->
+
+      <div class="account-card primary">
+
+        <div class="card-chip">
+
+          <div>
+
+            <div class="card-chip-label">Primary Account</div>
+
+          </div>
+
+          <div class="card-chip-icon"><i class="ti ti-credit-card"></i></div>
+
+        </div>
+
+        <div class="card-balance-label">Available Balance</div>
+
+        <div class="card-balance">₹1,24,500.00</div>
+
+        <div class="card-footer">
+
+          <div>
+
+            <div class="card-dots"><div class="card-dot"></div><div class="card-dot"></div><div class="card-dot last"></div></div>
+
             <div class="
 <truncated 190836 bytes>
 

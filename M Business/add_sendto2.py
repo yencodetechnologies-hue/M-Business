@@ -27,7 +27,7 @@ send_to_section = """
               <label class="fl">Recipient Email (optional)</label>
               <input class="fi" id="lh-recipient-email" placeholder="email@example.com" type="email">
             </div>
-            <button onclick="sendFromLetterhead()" style="width:100%;padding:10px;background:linear-gradient(135deg,#00BCD4,#00ACC1);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;">
+            <button onclick="sendFromLetterhead()" style="width:100%;padding:10px;background:linear-gradient(135deg, var(--app-accent, #00BCD4),#00ACC1);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;">
               <i class="ti ti-send" style="font-size:15px;"></i> Send Letterhead
             </button>
           </div>
@@ -76,7 +76,7 @@ function sendFromLetterhead() {
   
   // Toast
   const t = document.createElement('div');
-  t.style.cssText = "position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#26C281,#00BCD4);color:#fff;padding:14px 22px;border-radius:12px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.15);font-size:13px;display:flex;align-items:center;gap:8px;";
+  t.style.cssText = "position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#26C281, var(--app-accent, #00BCD4));color:#fff;padding:14px 22px;border-radius:12px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.15);font-size:13px;display:flex;align-items:center;gap:8px;";
   t.innerHTML = '<i class="ti ti-circle-check" style="font-size:18px;"></i> Letterhead sent to ' + name + '!';
   document.body.appendChild(t);
   setTimeout(() => { t.style.transition='opacity 0.4s'; t.style.opacity='0'; setTimeout(() => t.remove(), 400); }, 3000);

@@ -1,799 +1,1769 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>M Business – Create Invoice</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{
-  --teal:#00BCD4;--teal2:#00ACC1;--teal3:#26D0CE;--teal4:#006E7F;
-  --teal-light:#E0F7FA;--teal-lighter:#F0FDFE;
-  --bg:#F5FAFA;--surface:#FFFFFF;--surface2:#F8FAFB;--border:#E0EEF0;--border2:#C5DDE0;
-  --text:#1A2E35;--text2:#607D86;--text3:#A0B8BE;
-  --green:#26C281;--green-bg:#E8FAF3;
-  --amber:#F5A623;--amber-bg:#FEF5E6;
-  --red:#F05C5C;--red-bg:#FEF2F2;
-  --purple:#7C5CFC;--purple-bg:#EEE9FF;
-  --blue:#2563EB;--blue-bg:#EFF4FF;
-  --sidebar-grad:linear-gradient(180deg,#26D0CE 0%,#00BCD4 35%,#00ACC1 65%,#006E7F 100%);
-  --font:'Nunito',sans-serif;--radius:14px;
-}
-html,body{min-height:100%;font-family:var(--font);font-size:14px;background:var(--bg);color:var(--text);overflow-x:hidden}
-body{display:flex;min-height:100vh}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>M Business – Create Invoice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent
+    }
 
-/* ── SIDEBAR ── */
-.sidebar{width:210px;min-width:210px;background:var(--sidebar-grad);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;overflow:hidden;z-index:100;box-shadow:4px 0 20px rgba(0,188,212,.2)}
-.sb-profile{padding:20px 18px 17px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.18)}
-.sb-avatar{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0;border:2px solid rgba(255,255,255,.3)}
-.sb-name{font-size:13px;font-weight:800;color:#fff}
-.sb-role{font-size:9px;color:rgba(255,255,255,.65);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-top:1px}
-.nav{display:flex;flex-direction:column;gap:2px;padding:14px 10px;flex:1}
-.nav-label{font-size:9px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1.1px;padding:8px 10px 4px}
-.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;cursor:pointer;color:rgba(255,255,255,.7);font-size:12px;font-weight:600;transition:all .15s}
-.nav-item:hover{background:rgba(255,255,255,.14);color:#fff}
-.nav-item.active{background:rgba(255,255,255,.24);color:#fff}
-.nav-item i{font-size:15px;flex-shrink:0}
-.nav-badge{margin-left:auto;background:var(--teal);color:#fff;font-size:9px;font-weight:800;padding:1px 6px;border-radius:20px}
-.sb-footer{padding:12px 10px 20px;border-top:1px solid rgba(255,255,255,.15)}
-.logout-btn{width:100%;padding:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:9px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:6px}
-.logout-btn:hover{background:rgba(255,255,255,.2)}
+    :root {
+      --teal: var(--app-accent, #00BCD4);
+      --teal2var(--app-accent2, #00ACC1);
+      --teal3: #26D0CE;
+      --teal4: #006E7F;
+      --teal-light: var(--teal-light, #E0F7FA);
+      --teal-lighter: var(--teal-lighter, #F0FDFE);
+      --bg: #F5FAFA;
+      --surface: #FFFFFF;
+      --surface2: #F8FAFB;
+      --border: #E0EEF0;
+      --border2: #C5DDE0;
+      --text: #1A2E35;
+      --text2: #607D86;
+      --text3: #A0B8BE;
+      --green: #26C281;
+      --green-bg: #E8FAF3;
+      --amber: #F5A623;
+      --amber-bg: #FEF5E6;
+      --red: #F05C5C;
+      --red-bg: #FEF2F2;
+      --purple: #7C5CFC;
+      --purple-bg: #EEE9FF;
+      --blue: #2563EB;
+      --blue-bg: #EFF4FF;
+      --sidebar-grad: linear-gradient(180deg, #26D0CE 0%, var(--app-accent, #00BCD4) 35%, #00ACC1 65%, #006E7F 100%);
+      --font: 'Nunito', sans-serif;
+      --radius: 14px;
+    }
 
-/* ── MAIN ── */
-.main{flex:1;margin-left:210px;display:flex;flex-direction:column;min-width:0}
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 8px rgba(0,188,212,.06)}
-.topbar-left{display:flex;align-items:center;gap:10px}
-.back-btn{display:flex;align-items:center;gap:5px;padding:7px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s}
-.back-btn:hover{border-color:var(--teal);color:var(--teal)}
-.topbar-title{font-size:16px;font-weight:800;color:var(--text)}
-.topbar-actions{display:flex;align-items:center;gap:8px}
-.btn-secondary{display:flex;align-items:center;gap:6px;padding:9px 16px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s}
-.btn-secondary:hover{border-color:var(--teal);color:var(--teal)}
-.btn-primary{display:flex;align-items:center;gap:6px;padding:9px 18px;background:var(--teal);color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;transition:all .15s;box-shadow:0 3px 10px rgba(0,188,212,.25)}
-.btn-primary:hover{background:var(--teal2)}
-.btn-primary.green{background:var(--green);box-shadow:0 3px 10px rgba(38,194,129,.25)}
-.btn-primary.green:hover{background:#1da86e}
+    html,
+    body {
+      min-height: 100%;
+      font-family: var(--font);
+      font-size: 14px;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden
+    }
 
-/* ── CONTENT ── */
-.content{padding:20px 28px 40px;display:grid;grid-template-columns:1fr 440px;gap:20px;align-items:start}
+    body {
+      display: flex;
+      min-height: 100vh
+    }
 
-/* ── FORM SIDE ── */
-.form-side{display:flex;flex-direction:column;gap:16px}
-.card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden}
-.card-header{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border)}
-.card-title{font-size:13px;font-weight:800;color:var(--text)}
-.card-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.card-body{padding:18px}
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 210px;
+      min-width: 210px;
+      background: var(--sidebar-grad);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      overflow: hidden;
+      z-index: 100;
+      box-shadow: 4px 0 20px rgba(0, 188, 212, .2)
+    }
 
-/* FORM */
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
-.form-group{margin-bottom:14px}
-.form-group:last-child{margin-bottom:0}
-.form-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;display:block}
-.form-input{width:100%;padding:10px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;transition:all .15s}
-.form-input:focus{border-color:var(--teal);background:var(--surface);box-shadow:0 0 0 3px rgba(0,188,212,.08)}
-.form-input::placeholder{color:var(--text3)}
-.form-input:read-only{background:var(--surface2);color:var(--text3);cursor:not-allowed}
-.form-select{width:100%;padding:10px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;transition:all .15s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A0B8BE' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
-.form-select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,188,212,.08)}
-.form-textarea{width:100%;padding:10px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;resize:vertical;min-height:72px;transition:all .15s}
-.form-textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,188,212,.08)}
-.form-textarea::placeholder{color:var(--text3)}
+    .sb-profile {
+      padding: 20px 18px 17px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, .18)
+    }
 
-/* TEMPLATE PICKER */
-.template-row{display:flex;gap:8px;margin-bottom:14px}
-.template-opt{flex:1;padding:10px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;text-align:center;transition:all .15s}
-.template-opt:hover{border-color:var(--teal)}
-.template-opt.selected{border-color:var(--teal);background:var(--teal-lighter)}
-.template-opt-icon{font-size:20px;margin-bottom:4px}
-.template-opt-name{font-size:10px;font-weight:700;color:var(--text2)}
-.template-opt.selected .template-opt-name{color:var(--teal)}
+    .sb-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+      border: 2px solid rgba(255, 255, 255, .3)
+    }
 
-/* LINE ITEMS TABLE */
-.items-table{width:100%;border-collapse:collapse;margin-bottom:12px}
-.items-table thead tr th{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:8px 10px;text-align:left;background:var(--surface2);border-bottom:1px solid var(--border)}
-.items-table tbody tr td{padding:6px 6px;border-bottom:1px solid var(--border);vertical-align:middle}
-.items-table tbody tr:last-child td{border-bottom:none}
-.item-input{width:100%;padding:8px 10px;background:var(--bg);border:1.5px solid transparent;border-radius:8px;font-size:12px;color:var(--text);font-family:var(--font);outline:none;transition:all .15s}
-.item-input:focus{border-color:var(--teal);background:var(--surface);box-shadow:0 0 0 2px rgba(0,188,212,.08)}
-.item-input.desc{min-width:160px}
-.item-input.num{width:70px;text-align:right}
-.item-total{font-size:13px;font-weight:700;color:var(--text);padding:0 10px;min-width:80px;text-align:right}
-.del-row-btn{width:26px;height:26px;border-radius:7px;background:none;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--text3);transition:all .15s;flex-shrink:0}
-.del-row-btn:hover{border-color:var(--red);color:var(--red);background:var(--red-bg)}
-.add-item-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--teal-lighter);border:1.5px dashed var(--teal);border-radius:9px;font-size:12px;font-weight:700;color:var(--teal);cursor:pointer;transition:all .15s;font-family:var(--font);width:100%;justify-content:center}
-.add-item-btn:hover{background:var(--teal-light)}
+    .sb-name {
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff
+    }
 
-/* TOTALS */
-.totals-section{border-top:1px solid var(--border);padding-top:14px;margin-top:4px}
-.total-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px}
-.total-label{color:var(--text2);font-weight:600}
-.total-val{font-weight:700;color:var(--text)}
-.total-row.discount .total-val{color:var(--green)}
-.total-row.tax .total-val{color:var(--amber)}
-.total-row.grand{padding:10px 14px;background:linear-gradient(135deg,var(--teal-lighter),var(--teal-light));border-radius:10px;border:1.5px solid var(--teal-light);margin-top:6px}
-.total-row.grand .total-label{font-size:14px;font-weight:800;color:var(--text)}
-.total-row.grand .total-val{font-size:18px;font-weight:900;color:var(--teal)}
+    .sb-role {
+      font-size: 9px;
+      color: rgba(255, 255, 255, .65);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-top: 1px
+    }
 
-/* PAYMENT TERMS */
-.payment-terms-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
-.pt-opt{padding:8px 6px;border:1.5px solid var(--border);border-radius:9px;cursor:pointer;text-align:center;transition:all .15s;font-family:var(--font)}
-.pt-opt:hover{border-color:var(--teal)}
-.pt-opt.selected{border-color:var(--teal);background:var(--teal-lighter);color:var(--teal)}
-.pt-opt-days{font-size:14px;font-weight:800;color:var(--text)}
-.pt-opt.selected .pt-opt-days{color:var(--teal)}
-.pt-opt-label{font-size:9px;color:var(--text3);font-weight:600}
-.pt-opt.selected .pt-opt-label{color:var(--teal)}
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 14px 10px;
+      flex: 1
+    }
 
-/* SIGNATURE */
-.sig-pad{border:2px dashed var(--border2);border-radius:10px;height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
-.sig-pad:hover{border-color:var(--teal);background:var(--teal-lighter)}
+    .nav-label {
+      font-size: 9px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, .5);
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      padding: 8px 10px 4px
+    }
 
-/* ── PREVIEW SIDE ── */
-.preview-side{position:sticky;top:78px}
-.preview-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.06)}
-.preview-toolbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--surface2)}
-.pt-title{font-size:12px;font-weight:800;color:var(--text)}
-.pt-actions{display:flex;gap:6px}
-.pt-btn{display:flex;align-items:center;gap:4px;padding:6px 10px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;font-size:10px;font-weight:700;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s}
-.pt-btn:hover{border-color:var(--teal);color:var(--teal)}
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 10px;
+      border-radius: 9px;
+      cursor: pointer;
+      color: rgba(255, 255, 255, .7);
+      font-size: 12px;
+      font-weight: 600;
+      transition: all .15s
+    }
 
-/* INVOICE PREVIEW DOC */
-.invoice-preview{padding:24px;font-family:var(--font);font-size:12px;color:#1A2E35;background:#fff;min-height:560px}
-.inv-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:16px;border-bottom:3px solid var(--teal)}
-.inv-logo-area{}
-.inv-logo-box{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--teal4));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff;margin-bottom:8px}
-.inv-company-name{font-size:14px;font-weight:800;color:var(--text)}
-.inv-company-details{font-size:10px;color:var(--text3);line-height:1.7;margin-top:3px}
-.inv-title-area{text-align:right}
-.inv-title-word{font-size:28px;font-weight:900;color:var(--teal);letter-spacing:-.5px}
-.inv-id{font-size:12px;font-weight:700;color:var(--text);margin-top:4px}
-.inv-dates{font-size:10px;color:var(--text3);margin-top:2px;line-height:1.8}
-.inv-status{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;margin-top:6px}
-.inv-status.draft{background:var(--surface2);color:var(--text3);border:1px solid var(--border)}
-.inv-status.sent{background:var(--blue-bg);color:var(--blue)}
-.inv-status.paid{background:var(--green-bg);color:var(--green)}
+    .nav-item:hover {
+      background: rgba(255, 255, 255, .14);
+      color: #fff
+    }
 
-.inv-parties{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-.inv-party-label{font-size:9px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
-.inv-party-name{font-size:13px;font-weight:800;color:var(--text)}
-.inv-party-detail{font-size:10px;color:var(--text3);line-height:1.7;margin-top:2px}
+    .nav-item.active {
+      background: rgba(255, 255, 255, .24);
+      color: #fff
+    }
 
-.inv-items-table{width:100%;border-collapse:collapse;margin-bottom:16px}
-.inv-items-table thead tr{background:linear-gradient(135deg,var(--teal),var(--teal4))}
-.inv-items-table thead th{padding:8px 10px;font-size:10px;font-weight:700;color:#fff;text-align:left;letter-spacing:.4px}
-.inv-items-table thead th:last-child{text-align:right}
-.inv-items-table tbody tr{border-bottom:1px solid var(--border)}
-.inv-items-table tbody tr:nth-child(even){background:var(--surface2)}
-.inv-items-table tbody td{padding:8px 10px;font-size:11px;color:var(--text)}
-.inv-items-table tbody td:last-child{text-align:right;font-weight:700}
+    .nav-item i {
+      font-size: 15px;
+      flex-shrink: 0
+    }
 
-.inv-totals{margin-left:auto;width:200px}
-.inv-total-row{display:flex;justify-content:space-between;padding:5px 0;font-size:11px;border-bottom:1px solid var(--border)}
-.inv-total-row:last-child{border-bottom:none}
-.inv-total-row .lbl{color:var(--text2)}
-.inv-total-row .val{font-weight:700;color:var(--text)}
-.inv-grand-row{display:flex;justify-content:space-between;padding:8px 10px;background:linear-gradient(135deg,var(--teal),var(--teal4));border-radius:8px;margin-top:6px}
-.inv-grand-row .lbl{font-size:12px;font-weight:800;color:#fff}
-.inv-grand-row .val{font-size:14px;font-weight:900;color:#fff}
+    .nav-badge {
+      margin-left: auto;
+      background: var(--teal);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 20px
+    }
 
-.inv-footer{margin-top:20px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-end}
-.inv-notes{flex:1}
-.inv-notes-title{font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
-.inv-notes-text{font-size:10px;color:var(--text3);line-height:1.6}
-.inv-sig{text-align:right}
-.inv-sig-line{width:100px;height:1px;background:var(--text3);margin-left:auto;margin-bottom:4px}
-.inv-sig-name{font-size:10px;font-weight:700;color:var(--text)}
-.inv-sig-role{font-size:9px;color:var(--text3)}
-.inv-bank{margin-top:14px;padding:10px 12px;background:var(--teal-lighter);border-radius:8px;border-left:3px solid var(--teal)}
-.inv-bank-title{font-size:10px;font-weight:700;color:var(--teal);margin-bottom:4px}
-.inv-bank-detail{font-size:10px;color:var(--text2);line-height:1.7}
+    .sb-footer {
+      padding: 12px 10px 20px;
+      border-top: 1px solid rgba(255, 255, 255, .15)
+    }
 
-/* MOBILE */
-@media(max-width:1100px){.content{grid-template-columns:1fr}.preview-side{position:static}}
-@media(max-width:768px){
-  .sidebar{display:none}.main{margin-left:0}
-  .content{padding:14px 16px 40px;grid-template-columns:1fr}
-  .form-row,.form-row-3{grid-template-columns:1fr}
-  .payment-terms-grid{grid-template-columns:repeat(2,1fr)}
-  .template-row{flex-wrap:wrap}
-  .inv-parties{grid-template-columns:1fr}
-}
-</style>
+    .logout-btn {
+      width: 100%;
+      padding: 9px;
+      background: rgba(255, 255, 255, .12);
+      border: 1px solid rgba(255, 255, 255, .18);
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      font-family: var(--font);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, .2)
+    }
+
+    /* ── MAIN ── */
+    .main {
+      flex: 1;
+      margin-left: 210px;
+      display: flex;
+      flex-direction: column;
+      min-width: 0
+    }
+
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 1px 8px rgba(0, 188, 212, .06)
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 12px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text2);
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all .15s
+    }
+
+    .back-btn:hover {
+      border-color: var(--teal);
+      color: var(--teal)
+    }
+
+    .topbar-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text)
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .btn-secondary {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 16px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text2);
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all .15s
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--teal);
+      color: var(--teal)
+    }
+
+    .btn-primary {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      background: var(--teal);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: all .15s;
+      box-shadow: 0 3px 10px rgba(0, 188, 212, .25)
+    }
+
+    .btn-primary:hover {
+      background: var(--teal2)
+    }
+
+    .btn-primary.green {
+      background: var(--green);
+      box-shadow: 0 3px 10px rgba(38, 194, 129, .25)
+    }
+
+    .btn-primary.green:hover {
+      background: #1da86e
+    }
+
+    /* ── CONTENT ── */
+    .content {
+      padding: 20px 28px 40px;
+      display: grid;
+      grid-template-columns: 1fr 440px;
+      gap: 20px;
+      align-items: start
+    }
+
+    /* ── FORM SIDE ── */
+    .form-side {
+      display: flex;
+      flex-direction: column;
+      gap: 16px
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text)
+    }
+
+    .card-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0
+    }
+
+    .card-body {
+      padding: 18px
+    }
+
+    /* FORM */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px
+    }
+
+    .form-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px
+    }
+
+    .form-group {
+      margin-bottom: 14px
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0
+    }
+
+    .form-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-bottom: 6px;
+      display: block
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px 13px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 13px;
+      color: var(--text);
+      font-family: var(--font);
+      outline: none;
+      transition: all .15s
+    }
+
+    .form-input:focus {
+      border-color: var(--teal);
+      background: var(--surface);
+      box-shadow: 0 0 0 3px rgba(0, 188, 212, .08)
+    }
+
+    .form-input::placeholder {
+      color: var(--text3)
+    }
+
+    .form-input:read-only {
+      background: var(--surface2);
+      color: var(--text3);
+      cursor: not-allowed
+    }
+
+    .form-select {
+      width: 100%;
+      padding: 10px 13px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 13px;
+      color: var(--text);
+      font-family: var(--font);
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      transition: all .15s;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A0B8BE' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center
+    }
+
+    .form-select:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(0, 188, 212, .08)
+    }
+
+    .form-textarea {
+      width: 100%;
+      padding: 10px 13px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 13px;
+      color: var(--text);
+      font-family: var(--font);
+      outline: none;
+      resize: vertical;
+      min-height: 72px;
+      transition: all .15s
+    }
+
+    .form-textarea:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(0, 188, 212, .08)
+    }
+
+    .form-textarea::placeholder {
+      color: var(--text3)
+    }
+
+    /* TEMPLATE PICKER */
+    .template-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px
+    }
+
+    .template-opt {
+      flex: 1;
+      padding: 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: center;
+      transition: all .15s
+    }
+
+    .template-opt:hover {
+      border-color: var(--teal)
+    }
+
+    .template-opt.selected {
+      border-color: var(--teal);
+      background: var(--teal-lighter)
+    }
+
+    .template-opt-icon {
+      font-size: 20px;
+      margin-bottom: 4px
+    }
+
+    .template-opt-name {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text2)
+    }
+
+    .template-opt.selected .template-opt-name {
+      color: var(--teal)
+    }
+
+    /* LINE ITEMS TABLE */
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 12px
+    }
+
+    .items-table thead tr th {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      padding: 8px 10px;
+      text-align: left;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border)
+    }
+
+    .items-table tbody tr td {
+      padding: 6px 6px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle
+    }
+
+    .items-table tbody tr:last-child td {
+      border-bottom: none
+    }
+
+    .item-input {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--bg);
+      border: 1.5px solid transparent;
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--text);
+      font-family: var(--font);
+      outline: none;
+      transition: all .15s
+    }
+
+    .item-input:focus {
+      border-color: var(--teal);
+      background: var(--surface);
+      box-shadow: 0 0 0 2px rgba(0, 188, 212, .08)
+    }
+
+    .item-input.desc {
+      min-width: 160px
+    }
+
+    .item-input.num {
+      width: 70px;
+      text-align: right
+    }
+
+    .item-total {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      padding: 0 10px;
+      min-width: 80px;
+      text-align: right
+    }
+
+    .del-row-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      background: none;
+      border: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text3);
+      transition: all .15s;
+      flex-shrink: 0
+    }
+
+    .del-row-btn:hover {
+      border-color: var(--red);
+      color: var(--red);
+      background: var(--red-bg)
+    }
+
+    .add-item-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: var(--teal-lighter);
+      border: 1.5px dashed var(--teal);
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--teal);
+      cursor: pointer;
+      transition: all .15s;
+      font-family: var(--font);
+      width: 100%;
+      justify-content: center
+    }
+
+    .add-item-btn:hover {
+      background: var(--teal-light)
+    }
+
+    /* TOTALS */
+    .totals-section {
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+      margin-top: 4px
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      font-size: 13px
+    }
+
+    .total-label {
+      color: var(--text2);
+      font-weight: 600
+    }
+
+    .total-val {
+      font-weight: 700;
+      color: var(--text)
+    }
+
+    .total-row.discount .total-val {
+      color: var(--green)
+    }
+
+    .total-row.tax .total-val {
+      color: var(--amber)
+    }
+
+    .total-row.grand {
+      padding: 10px 14px;
+      background: linear-gradient(135deg, var(--teal-lighter), var(--teal-light));
+      border-radius: 10px;
+      border: 1.5px solid var(--teal-light);
+      margin-top: 6px
+    }
+
+    .total-row.grand .total-label {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text)
+    }
+
+    .total-row.grand .total-val {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--teal)
+    }
+
+    /* PAYMENT TERMS */
+    .payment-terms-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 14px
+    }
+
+    .pt-opt {
+      padding: 8px 6px;
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      cursor: pointer;
+      text-align: center;
+      transition: all .15s;
+      font-family: var(--font)
+    }
+
+    .pt-opt:hover {
+      border-color: var(--teal)
+    }
+
+    .pt-opt.selected {
+      border-color: var(--teal);
+      background: var(--teal-lighter);
+      color: var(--teal)
+    }
+
+    .pt-opt-days {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text)
+    }
+
+    .pt-opt.selected .pt-opt-days {
+      color: var(--teal)
+    }
+
+    .pt-opt-label {
+      font-size: 9px;
+      color: var(--text3);
+      font-weight: 600
+    }
+
+    .pt-opt.selected .pt-opt-label {
+      color: var(--teal)
+    }
+
+    /* SIGNATURE */
+    .sig-pad {
+      border: 2px dashed var(--border2);
+      border-radius: 10px;
+      height: 90px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all .15s;
+      background: var(--bg)
+    }
+
+    .sig-pad:hover {
+      border-color: var(--teal);
+      background: var(--teal-lighter)
+    }
+
+    /* ── PREVIEW SIDE ── */
+    .preview-side {
+      position: sticky;
+      top: 78px
+    }
+
+    .preview-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .06)
+    }
+
+    .preview-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2)
+    }
+
+    .pt-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text)
+    }
+
+    .pt-actions {
+      display: flex;
+      gap: 6px
+    }
+
+    .pt-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 10px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text2);
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all .15s
+    }
+
+    .pt-btn:hover {
+      border-color: var(--teal);
+      color: var(--teal)
+    }
+
+    /* INVOICE PREVIEW DOC */
+    .invoice-preview {
+      padding: 24px;
+      font-family: var(--font);
+      font-size: 12px;
+      color: #1A2E35;
+      background: #fff;
+      min-height: 560px
+    }
+
+    .inv-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 3px solid var(--teal)
+    }
+
+    .inv-logo-area {}
+
+    .inv-logo-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--teal), var(--teal4));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 8px
+    }
+
+    .inv-company-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text)
+    }
+
+    .inv-company-details {
+      font-size: 10px;
+      color: var(--text3);
+      line-height: 1.7;
+      margin-top: 3px
+    }
+
+    .inv-title-area {
+      text-align: right
+    }
+
+    .inv-title-word {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--teal);
+      letter-spacing: -.5px
+    }
+
+    .inv-id {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      margin-top: 4px
+    }
+
+    .inv-dates {
+      font-size: 10px;
+      color: var(--text3);
+      margin-top: 2px;
+      line-height: 1.8
+    }
+
+    .inv-status {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      margin-top: 6px
+    }
+
+    .inv-status.draft {
+      background: var(--surface2);
+      color: var(--text3);
+      border: 1px solid var(--border)
+    }
+
+    .inv-status.sent {
+      background: var(--blue-bg);
+      color: var(--blue)
+    }
+
+    .inv-status.paid {
+      background: var(--green-bg);
+      color: var(--green)
+    }
+
+    .inv-parties {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px
+    }
+
+    .inv-party-label {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--teal);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      margin-bottom: 5px
+    }
+
+    .inv-party-name {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text)
+    }
+
+    .inv-party-detail {
+      font-size: 10px;
+      color: var(--text3);
+      line-height: 1.7;
+      margin-top: 2px
+    }
+
+    .inv-items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px
+    }
+
+    .inv-items-table thead tr {
+      background: linear-gradient(135deg, var(--teal), var(--teal4))
+    }
+
+    .inv-items-table thead th {
+      padding: 8px 10px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      text-align: left;
+      letter-spacing: .4px
+    }
+
+    .inv-items-table thead th:last-child {
+      text-align: right
+    }
+
+    .inv-items-table tbody tr {
+      border-bottom: 1px solid var(--border)
+    }
+
+    .inv-items-table tbody tr:nth-child(even) {
+      background: var(--surface2)
+    }
+
+    .inv-items-table tbody td {
+      padding: 8px 10px;
+      font-size: 11px;
+      color: var(--text)
+    }
+
+    .inv-items-table tbody td:last-child {
+      text-align: right;
+      font-weight: 700
+    }
+
+    .inv-totals {
+      margin-left: auto;
+      width: 200px
+    }
+
+    .inv-total-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      font-size: 11px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .inv-total-row:last-child {
+      border-bottom: none
+    }
+
+    .inv-total-row .lbl {
+      color: var(--text2)
+    }
+
+    .inv-total-row .val {
+      font-weight: 700;
+      color: var(--text)
+    }
+
+    .inv-grand-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 10px;
+      background: linear-gradient(135deg, var(--teal), var(--teal4));
+      border-radius: 8px;
+      margin-top: 6px
+    }
+
+    .inv-grand-row .lbl {
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff
+    }
+
+    .inv-grand-row .val {
+      font-size: 14px;
+      font-weight: 900;
+      color: #fff
+    }
+
+    .inv-footer {
+      margin-top: 20px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end
+    }
+
+    .inv-notes {
+      flex: 1
+    }
+
+    .inv-notes-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--teal);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-bottom: 4px
+    }
+
+    .inv-notes-text {
+      font-size: 10px;
+      color: var(--text3);
+      line-height: 1.6
+    }
+
+    .inv-sig {
+      text-align: right
+    }
+
+    .inv-sig-line {
+      width: 100px;
+      height: 1px;
+      background: var(--text3);
+      margin-left: auto;
+      margin-bottom: 4px
+    }
+
+    .inv-sig-name {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text)
+    }
+
+    .inv-sig-role {
+      font-size: 9px;
+      color: var(--text3)
+    }
+
+    .inv-bank {
+      margin-top: 14px;
+      padding: 10px 12px;
+      background: var(--teal-lighter);
+      border-radius: 8px;
+      border-left: 3px solid var(--teal)
+    }
+
+    .inv-bank-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--teal);
+      margin-bottom: 4px
+    }
+
+    .inv-bank-detail {
+      font-size: 10px;
+      color: var(--text2);
+      line-height: 1.7
+    }
+
+    /* MOBILE */
+    @media(max-width:1100px) {
+      .content {
+        grid-template-columns: 1fr
+      }
+
+      .preview-side {
+        position: static
+      }
+    }
+
+    @media(max-width:768px) {
+      .sidebar {
+        display: none
+      }
+
+      .main {
+        margin-left: 0
+      }
+
+      .content {
+        padding: 14px 16px 40px;
+        grid-template-columns: 1fr
+      }
+
+      .form-row,
+      .form-row-3 {
+        grid-template-columns: 1fr
+      }
+
+      .payment-terms-grid {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .template-row {
+        flex-wrap: wrap
+      }
+
+      .inv-parties {
+        grid-template-columns: 1fr
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <div class="sb-profile">
-    <div class="sb-avatar">P</div>
-    <div><div class="sb-name">prabhu</div><div class="sb-role">Owner</div></div>
-  </div>
-  <nav class="nav">
-    <div class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
-    <div class="nav-label">Management</div>
-    <div class="nav-item"><i class="ti ti-briefcase"></i>Projects</div>
-    <div class="nav-item"><i class="ti ti-users"></i>Team</div>
-    <div class="nav-label">Finance</div>
-    <div class="nav-item"><i class="ti ti-file-text"></i>Quotations</div>
-    <div class="nav-item"><i class="ti ti-presentation"></i>Proposals</div>
-    <div class="nav-item active"><i class="ti ti-receipt"></i>Invoices<span class="nav-badge">5</span></div>
-    <div class="nav-item"><i class="ti ti-credit-card"></i>Accounts</div>
-    <div class="nav-item"><i class="ti ti-arrows-exchange"></i>Payments</div>
-    <div class="nav-item"><i class="ti ti-cash"></i>Expenses</div>
-    <div class="nav-label">Resources</div>
-    <div class="nav-item"><i class="ti ti-rocket"></i>Subscriptions</div>
-    <div class="nav-item"><i class="ti ti-settings"></i>Settings</div>
-  </nav>
-  <div class="sb-footer">
-    <button class="logout-btn"><i class="ti ti-logout" style="font-size:14px"></i> Logout</button>
-  </div>
-</aside>
-
-<!-- MAIN -->
-<div class="main">
-
-  <header class="topbar">
-    <div class="topbar-left">
-      <button class="back-btn"><i class="ti ti-arrow-left" style="font-size:13px"></i> Invoices</button>
-      <div class="topbar-title">Create Invoice</div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-profile">
+      <div class="sb-avatar">P</div>
+      <div>
+        <div class="sb-name">prabhu</div>
+        <div class="sb-role">Owner</div>
+      </div>
     </div>
-    <div class="topbar-actions">
-      <button class="btn-secondary"><i class="ti ti-eye" style="font-size:14px"></i> Preview</button>
-      <button class="btn-secondary" onclick="saveDraft()"><i class="ti ti-device-floppy" style="font-size:14px"></i> Save Draft</button>
-      <button class="btn-secondary"><i class="ti ti-download" style="font-size:14px"></i> PDF</button>
-      <button class="btn-primary green" onclick="sendInvoice()"><i class="ti ti-send" style="font-size:14px"></i> Send Invoice</button>
+    <nav class="nav">
+      <div class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
+      <div class="nav-label">Management</div>
+      <div class="nav-item"><i class="ti ti-briefcase"></i>Projects</div>
+      <div class="nav-item"><i class="ti ti-users"></i>Team</div>
+      <div class="nav-label">Finance</div>
+      <div class="nav-item"><i class="ti ti-file-text"></i>Quotations</div>
+      <div class="nav-item"><i class="ti ti-presentation"></i>Proposals</div>
+      <div class="nav-item active"><i class="ti ti-receipt"></i>Invoices<span class="nav-badge">5</span></div>
+      <div class="nav-item"><i class="ti ti-credit-card"></i>Accounts</div>
+      <div class="nav-item"><i class="ti ti-arrows-exchange"></i>Payments</div>
+      <div class="nav-item"><i class="ti ti-cash"></i>Expenses</div>
+      <div class="nav-label">Resources</div>
+      <div class="nav-item"><i class="ti ti-rocket"></i>Subscriptions</div>
+      <div class="nav-item"><i class="ti ti-settings"></i>Settings</div>
+    </nav>
+    <div class="sb-footer">
+      <button class="logout-btn"><i class="ti ti-logout" style="font-size:14px"></i> Logout</button>
     </div>
-  </header>
+  </aside>
 
-  <div class="content">
+  <!-- MAIN -->
+  <div class="main">
 
-    <!-- ── FORM SIDE ── -->
-    <div class="form-side">
-
-      <!-- TEMPLATE -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ti ti-layout-grid"></i></div>
-          <div class="card-title">Invoice Template</div>
-        </div>
-        <div class="card-body">
-          <div class="template-row">
-            <div class="template-opt selected" onclick="selectTemplate(this)">
-              <div class="template-opt-icon">🟦</div>
-              <div class="template-opt-name">Classic</div>
-            </div>
-            <div class="template-opt" onclick="selectTemplate(this)">
-              <div class="template-opt-icon">🖤</div>
-              <div class="template-opt-name">Modern</div>
-            </div>
-            <div class="template-opt" onclick="selectTemplate(this)">
-              <div class="template-opt-icon">🟩</div>
-              <div class="template-opt-name">Minimal</div>
-            </div>
-            <div class="template-opt" onclick="selectTemplate(this)">
-              <div class="template-opt-icon">🟧</div>
-              <div class="template-opt-name">Bold</div>
-            </div>
-          </div>
-        </div>
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="back-btn"><i class="ti ti-arrow-left" style="font-size:13px"></i> Invoices</button>
+        <div class="topbar-title">Create Invoice</div>
       </div>
-
-      <!-- INVOICE DETAILS -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ti ti-receipt-2"></i></div>
-          <div class="card-title">Invoice Details</div>
-        </div>
-        <div class="card-body">
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Invoice Number</label>
-              <input class="form-input" type="text" id="invNumber" value="INV-2026-1262" readonly>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Invoice Date</label>
-              <input class="form-input" type="date" id="invDate" value="2026-06-01" oninput="updatePreview()">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Due Date</label>
-              <input class="form-input" type="date" id="dueDate" value="2026-06-15" oninput="updatePreview()">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Category</label>
-              <select class="form-select" id="invCategory" onchange="updatePreview()">
-                <option>Advance Payment</option>
-                <option>Milestone</option>
-                <option>Final Invoice</option>
-                <option>Monthly Retainer</option>
-                <option>Consulting</option>
-              </select>
-            </div>
-          </div>
-        </div>
+      <div class="topbar-actions">
+        <button class="btn-secondary"><i class="ti ti-eye" style="font-size:14px"></i> Preview</button>
+        <button class="btn-secondary" onclick="saveDraft()"><i class="ti ti-device-floppy" style="font-size:14px"></i>
+          Save Draft</button>
+        <button class="btn-secondary"><i class="ti ti-download" style="font-size:14px"></i> PDF</button>
+        <button class="btn-primary green" onclick="sendInvoice()"><i class="ti ti-send" style="font-size:14px"></i> Send
+          Invoice</button>
       </div>
+    </header>
 
-      <!-- FROM (SENDER) -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ti ti-building"></i></div>
-          <div class="card-title">From (Your Details)</div>
-        </div>
-        <div class="card-body">
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Company Name</label>
-              <input class="form-input" type="text" id="fromCompany" value="YENCODE Technologies" oninput="updatePreview()">
-            </div>
-            <div class="form-group">
-              <label class="form-label">GST Number</label>
-              <input class="form-input" type="text" id="fromGST" value="33ABCDE1234F1Z5" oninput="updatePreview()">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Email</label>
-              <input class="form-input" type="email" id="fromEmail" value="yencodetechnologies@gmail.com" oninput="updatePreview()">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Phone</label>
-              <input class="form-input" type="tel" id="fromPhone" value="+91 89254 33533" oninput="updatePreview()">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Address</label>
-            <input class="form-input" type="text" id="fromAddress" value="Chennai, Tamil Nadu, India – 600001" oninput="updatePreview()">
-          </div>
-        </div>
-      </div>
+    <div class="content">
 
-      <!-- TO (CLIENT) -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-user-circle"></i></div>
-          <div class="card-title">Bill To (Client)</div>
-          <button style="margin-left:auto;display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--teal-lighter);border:1.5px solid var(--teal);border-radius:7px;font-size:10px;font-weight:700;color:var(--teal);cursor:pointer;font-family:var(--font)"><i class="ti ti-search" style="font-size:12px"></i> Select Client</button>
-        </div>
-        <div class="card-body">
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Client / Company Name</label>
-              <input class="form-input" type="text" id="toName" placeholder="e.g. STA Corporation" oninput="updatePreview()">
-            </div>
-            <div class="form-group">
-              <label class="form-label">GST Number (optional)</label>
-              <input class="form-input" type="text" id="toGST" placeholder="Client GST number" oninput="updatePreview()">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Email</label>
-              <input class="form-input" type="email" id="toEmail" placeholder="client@email.com" oninput="updatePreview()">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Phone</label>
-              <input class="form-input" type="tel" id="toPhone" placeholder="+91 XXXXX XXXXX" oninput="updatePreview()">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Address</label>
-            <input class="form-input" type="text" id="toAddress" placeholder="Client address" oninput="updatePreview()">
-          </div>
-        </div>
-      </div>
+      <!-- ── FORM SIDE ── -->
+      <div class="form-side">
 
-      <!-- LINE ITEMS -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ti ti-list-details"></i></div>
-          <div class="card-title">Line Items</div>
-        </div>
-        <div class="card-body">
-          <table class="items-table">
-            <thead>
-              <tr>
-                <th style="width:36%">Description</th>
-                <th style="width:12%">Qty</th>
-                <th style="width:18%">Unit Price</th>
-                <th style="width:14%">Tax %</th>
-                <th style="width:16%;text-align:right">Total</th>
-                <th style="width:4%"></th>
-              </tr>
-            </thead>
-            <tbody id="itemsBody">
-              <tr>
-                <td><input type="text" class="item-input desc" placeholder="e.g. Website Design" value="UI/UX Design" oninput="calcTotals()"></td>
-                <td><input type="number" class="item-input num" value="1" min="1" oninput="calcTotals()"></td>
-                <td><input type="number" class="item-input num" value="20000" oninput="calcTotals()" style="width:90px"></td>
-                <td><input type="number" class="item-input num" value="18" min="0" max="100" oninput="calcTotals()" style="width:55px"></td>
-                <td class="item-total" id="total_0">₹23,600</td>
-                <td><button class="del-row-btn" onclick="removeRow(this)"><i class="ti ti-trash"></i></button></td>
-              </tr>
-              <tr>
-                <td><input type="text" class="item-input desc" placeholder="e.g. Frontend Development" value="Frontend Development" oninput="calcTotals()"></td>
-                <td><input type="number" class="item-input num" value="1" min="1" oninput="calcTotals()"></td>
-                <td><input type="number" class="item-input num" value="30000" oninput="calcTotals()" style="width:90px"></td>
-                <td><input type="number" class="item-input num" value="18" min="0" max="100" oninput="calcTotals()" style="width:55px"></td>
-                <td class="item-total" id="total_1">₹35,400</td>
-                <td><button class="del-row-btn" onclick="removeRow(this)"><i class="ti ti-trash"></i></button></td>
-              </tr>
-            </tbody>
-          </table>
-          <button class="add-item-btn" onclick="addRow()"><i class="ti ti-plus" style="font-size:14px"></i> Add Line Item</button>
-
-          <!-- TOTALS -->
-          <div class="totals-section">
-            <div class="form-row" style="margin-bottom:10px">
-              <div class="form-group">
-                <label class="form-label">Discount (%)</label>
-                <input class="form-input" type="number" id="discountPct" placeholder="0" value="0" min="0" max="100" oninput="calcTotals()">
+        <!-- TEMPLATE -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon" style="background:var(--purple-bg);color:var(--purple)"><i
+                class="ti ti-layout-grid"></i></div>
+            <div class="card-title">Invoice Template</div>
+          </div>
+          <div class="card-body">
+            <div class="template-row">
+              <div class="template-opt selected" onclick="selectTemplate(this)">
+                <div class="template-opt-icon">🟦</div>
+                <div class="template-opt-name">Classic</div>
               </div>
-              <div class="form-group">
-                <label class="form-label">Shipping / Extra Charges</label>
-                <input class="form-input" type="number" id="extraCharges" placeholder="0" value="0" oninput="calcTotals()">
+              <div class="template-opt" onclick="selectTemplate(this)">
+                <div class="template-opt-icon">🖤</div>
+                <div class="template-opt-name">Modern</div>
+              </div>
+              <div class="template-opt" onclick="selectTemplate(this)">
+                <div class="template-opt-icon">🟩</div>
+                <div class="template-opt-name">Minimal</div>
+              </div>
+              <div class="template-opt" onclick="selectTemplate(this)">
+                <div class="template-opt-icon">🟧</div>
+                <div class="template-opt-name">Bold</div>
               </div>
             </div>
-            <div class="total-row"><span class="total-label">Subtotal</span><span class="total-val" id="subtotalVal">₹50,000</span></div>
-            <div class="total-row discount"><span class="total-label">Discount</span><span class="total-val" id="discountVal">- ₹0</span></div>
-            <div class="total-row tax"><span class="total-label">GST / Tax</span><span class="total-val" id="taxVal">+ ₹9,000</span></div>
-            <div class="total-row"><span class="total-label">Extra Charges</span><span class="total-val" id="extraVal">+ ₹0</span></div>
-            <div class="total-row grand"><span class="total-label">Total Amount</span><span class="total-val" id="grandTotal">₹59,000</span></div>
           </div>
         </div>
-      </div>
 
-      <!-- PAYMENT TERMS -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-clock"></i></div>
-          <div class="card-title">Payment Terms & Bank Details</div>
-        </div>
-        <div class="card-body">
-          <label class="form-label">Payment Due</label>
-          <div class="payment-terms-grid">
-            <div class="pt-opt selected" onclick="selectTerm(this,'Immediate')">
-              <div class="pt-opt-days">NOW</div>
-              <div class="pt-opt-label">Immediate</div>
-            </div>
-            <div class="pt-opt" onclick="selectTerm(this,'Net 7')">
-              <div class="pt-opt-days">7</div>
-              <div class="pt-opt-label">Net 7 days</div>
-            </div>
-            <div class="pt-opt" onclick="selectTerm(this,'Net 15')">
-              <div class="pt-opt-days">15</div>
-              <div class="pt-opt-label">Net 15 days</div>
-            </div>
-            <div class="pt-opt" onclick="selectTerm(this,'Net 30')">
-              <div class="pt-opt-days">30</div>
-              <div class="pt-opt-label">Net 30 days</div>
-            </div>
+        <!-- INVOICE DETAILS -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon" style="background:var(--teal-light);color:var(--teal)"><i
+                class="ti ti-receipt-2"></i></div>
+            <div class="card-title">Invoice Details</div>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Payment Method</label>
-              <select class="form-select">
-                <option>Bank Transfer / NEFT</option>
-                <option>UPI</option>
-                <option>Cheque</option>
-                <option>Cash</option>
-                <option>Online Payment Link</option>
-              </select>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Invoice Number</label>
+                <input class="form-input" type="text" id="invNumber" value="INV-2026-1262" readonly>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Invoice Date</label>
+                <input class="form-input" type="date" id="invDate" value="2026-06-01" oninput="updatePreview()">
+              </div>
             </div>
-            <div class="form-group">
-              <label class="form-label">Currency</label>
-              <select class="form-select">
-                <option>₹ INR – Indian Rupee</option>
-                <option>$ USD – US Dollar</option>
-                <option>€ EUR – Euro</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Bank Name</label>
-              <input class="form-input" type="text" placeholder="e.g. HDFC Bank" value="HDFC Bank">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Account Number</label>
-              <input class="form-input" type="text" placeholder="Account number" value="5020123456789">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">IFSC Code</label>
-              <input class="form-input" type="text" placeholder="IFSC code" value="HDFC0001234">
-            </div>
-            <div class="form-group">
-              <label class="form-label">UPI ID</label>
-              <input class="form-input" type="text" placeholder="your@upi" value="yencode@okaxis">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Due Date</label>
+                <input class="form-input" type="date" id="dueDate" value="2026-06-15" oninput="updatePreview()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Category</label>
+                <select class="form-select" id="invCategory" onchange="updatePreview()">
+                  <option>Advance Payment</option>
+                  <option>Milestone</option>
+                  <option>Final Invoice</option>
+                  <option>Monthly Retainer</option>
+                  <option>Consulting</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- NOTES & SIGNATURE -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-notes"></i></div>
-          <div class="card-title">Notes, Terms & Signature</div>
+        <!-- FROM (SENDER) -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ti ti-building"></i>
+            </div>
+            <div class="card-title">From (Your Details)</div>
+          </div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Company Name</label>
+                <input class="form-input" type="text" id="fromCompany" value="YENCODE Technologies"
+                  oninput="updatePreview()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">GST Number</label>
+                <input class="form-input" type="text" id="fromGST" value="33ABCDE1234F1Z5" oninput="updatePreview()">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input class="form-input" type="email" id="fromEmail" value="yencodetechnologies@gmail.com"
+                  oninput="updatePreview()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone</label>
+                <input class="form-input" type="tel" id="fromPhone" value="+91 89254 33533" oninput="updatePreview()">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Address</label>
+              <input class="form-input" type="text" id="fromAddress" value="Chennai, Tamil Nadu, India – 600001"
+                oninput="updatePreview()">
+            </div>
+          </div>
         </div>
-        <div class="card-body">
-          <div class="form-group">
-            <label class="form-label">Invoice Notes</label>
-            <textarea class="form-textarea" id="invNotes" oninput="updatePreview()">Thank you for your business! Please make payment within the due date.
+
+        <!-- TO (CLIENT) -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon" style="background:var(--amber-bg);color:var(--amber)"><i
+                class="ti ti-user-circle"></i></div>
+            <div class="card-title">Bill To (Client)</div>
+            <button
+              style="margin-left:auto;display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--teal-lighter);border:1.5px solid var(--teal);border-radius:7px;font-size:10px;font-weight:700;color:var(--teal);cursor:pointer;font-family:var(--font)"><i
+                class="ti ti-search" style="font-size:12px"></i> Select Client</button>
+          </div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Client / Company Name</label>
+                <input class="form-input" type="text" id="toName" placeholder="e.g. STA Corporation"
+                  oninput="updatePreview()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">GST Number (optional)</label>
+                <input class="form-input" type="text" id="toGST" placeholder="Client GST number"
+                  oninput="updatePreview()">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input class="form-input" type="email" id="toEmail" placeholder="client@email.com"
+                  oninput="updatePreview()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone</label>
+                <input class="form-input" type="tel" id="toPhone" placeholder="+91 XXXXX XXXXX"
+                  oninput="updatePreview()">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Address</label>
+              <input class="form-input" type="text" id="toAddress" placeholder="Client address"
+                oninput="updatePreview()">
+            </div>
+          </div>
+        </div>
+
+        <!-- LINE ITEMS -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon" style="background:var(--blue-bg);color:var(--blue)"><i
+                class="ti ti-list-details"></i></div>
+            <div class="card-title">Line Items</div>
+          </div>
+          <div class="card-body">
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th style="width:36%">Description</th>
+                  <th style="width:12%">Qty</th>
+                  <th style="width:18%">Unit Price</th>
+                  <th style="width:14%">Tax %</th>
+                  <th style="width:16%;text-align:right">Total</th>
+                  <th style="width:4%"></th>
+                </tr>
+              </thead>
+              <tbody id="itemsBody">
+                <tr>
+                  <td><input type="text" class="item-input desc" placeholder="e.g. Website Design" value="UI/UX Design"
+                      oninput="calcTotals()"></td>
+                  <td><input type="number" class="item-input num" value="1" min="1" oninput="calcTotals()"></td>
+                  <td><input type="number" class="item-input num" value="20000" oninput="calcTotals()"
+                      style="width:90px"></td>
+                  <td><input type="number" class="item-input num" value="18" min="0" max="100" oninput="calcTotals()"
+                      style="width:55px"></td>
+                  <td class="item-total" id="total_0">₹23,600</td>
+                  <td><button class="del-row-btn" onclick="removeRow(this)"><i class="ti ti-trash"></i></button></td>
+                </tr>
+                <tr>
+                  <td><input type="text" class="item-input desc" placeholder="e.g. Frontend Development"
+                      value="Frontend Development" oninput="calcTotals()"></td>
+                  <td><input type="number" class="item-input num" value="1" min="1" oninput="calcTotals()"></td>
+                  <td><input type="number" class="item-input num" value="30000" oninput="calcTotals()"
+                      style="width:90px"></td>
+                  <td><input type="number" class="item-input num" value="18" min="0" max="100" oninput="calcTotals()"
+                      style="width:55px"></td>
+                  <td class="item-total" id="total_1">₹35,400</td>
+                  <td><button class="del-row-btn" onclick="removeRow(this)"><i class="ti ti-trash"></i></button></td>
+                </tr>
+              </tbody>
+            </table>
+            <button class="add-item-btn" onclick="addRow()"><i class="ti ti-plus" style="font-size:14px"></i> Add Line
+              Item</button>
+
+            <!-- TOTALS -->
+            <div class="totals-section">
+              <div class="form-row" style="margin-bottom:10px">
+                <div class="form-group">
+                  <label class="form-label">Discount (%)</label>
+                  <input class="form-input" type="number" id="discountPct" placeholder="0" value="0" min="0" max="100"
+                    oninput="calcTotals()">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Shipping / Extra Charges</label>
+                  <input class="form-input" type="number" id="extraCharges" placeholder="0" value="0"
+                    oninput="calcTotals()">
+                </div>
+              </div>
+              <div class="total-row"><span class="total-label">Subtotal</span><span class="total-val"
+                  id="subtotalVal">₹50,000</span></div>
+              <div class="total-row discount"><span class="total-label">Discount</span><span class="total-val"
+                  id="discountVal">- ₹0</span></div>
+              <div class="total-row tax"><span class="total-label">GST / Tax</span><span class="total-val" id="taxVal">+
+                  ₹9,000</span></div>
+              <div class="total-row"><span class="total-label">Extra Charges</span><span class="total-val"
+                  id="extraVal">+ ₹0</span></div>
+              <div class="total-row grand"><span class="total-label">Total Amount</span><span class="total-val"
+                  id="grandTotal">₹59,000</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAYMENT TERMS -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-clock"></i>
+            </div>
+            <div class="card-title">Payment Terms & Bank Details</div>
+          </div>
+          <div class="card-body">
+            <label class="form-label">Payment Due</label>
+            <div class="payment-terms-grid">
+              <div class="pt-opt selected" onclick="selectTerm(this,'Immediate')">
+                <div class="pt-opt-days">NOW</div>
+                <div class="pt-opt-label">Immediate</div>
+              </div>
+              <div class="pt-opt" onclick="selectTerm(this,'Net 7')">
+                <div class="pt-opt-days">7</div>
+                <div class="pt-opt-label">Net 7 days</div>
+              </div>
+              <div class="pt-opt" onclick="selectTerm(this,'Net 15')">
+                <div class="pt-opt-days">15</div>
+                <div class="pt-opt-label">Net 15 days</div>
+              </div>
+              <div class="pt-opt" onclick="selectTerm(this,'Net 30')">
+                <div class="pt-opt-days">30</div>
+                <div class="pt-opt-label">Net 30 days</div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Payment Method</label>
+                <select class="form-select">
+                  <option>Bank Transfer / NEFT</option>
+                  <option>UPI</option>
+                  <option>Cheque</option>
+                  <option>Cash</option>
+                  <option>Online Payment Link</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Currency</label>
+                <select class="form-select">
+                  <option>₹ INR – Indian Rupee</option>
+                  <option>$ USD – US Dollar</option>
+                  <option>€ EUR – Euro</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Bank Name</label>
+                <input class="form-input" type="text" placeholder="e.g. HDFC Bank" value="HDFC Bank">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Account Number</label>
+                <input class="form-input" type="text" placeholder="Account number" value="5020123456789">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">IFSC Code</label>
+                <input class="form-input" type="text" placeholder="IFSC code" value="HDFC0001234">
+              </div>
+              <div class="form-group">
+                <label class="form-label">UPI ID</label>
+                <input class="form-input" type="text" placeholder="your@upi" value="yencode@okaxis">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NOTES & SIGNATURE -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-notes"></i>
+            </div>
+            <div class="card-title">Notes, Terms & Signature</div>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Invoice Notes</label>
+              <textarea class="form-textarea" id="invNotes" oninput="updatePreview()">Thank you for your business! Please make payment within the due date.
 For queries contact: yencodetechnologies@gmail.com</textarea>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Terms & Conditions</label>
-            <textarea class="form-textarea" id="invTerms">1. Payment is due within the agreed terms.
+            </div>
+            <div class="form-group">
+              <label class="form-label">Terms & Conditions</label>
+              <textarea class="form-textarea" id="invTerms">1. Payment is due within the agreed terms.
 2. Late payments are subject to 2% monthly interest.
 3. All disputes subject to Chennai jurisdiction.</textarea>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Authorised Signature</label>
-            <div class="sig-pad" onclick="this.innerHTML='<i class=\'ti ti-check\' style=\'font-size:22px;color:var(--teal)\'></i><div style=\'font-size:11px;color:var(--teal);font-weight:700;margin-top:4px\'>Signature Added</div>'">
-              <i class="ti ti-signature" style="font-size:24px;color:var(--text3)"></i>
-              <div style="font-size:11px;color:var(--text3);font-weight:600">Click to add signature</div>
             </div>
+            <div class="form-group">
+              <label class="form-label">Authorised Signature</label>
+              <div class="sig-pad"
+                onclick="this.innerHTML='<i class=\'ti ti-check\' style=\'font-size:22px;color:var(--teal)\'></i><div style=\'font-size:11px;color:var(--teal);font-weight:700;margin-top:4px\'>Signature Added</div>'">
+                <i class="ti ti-signature" style="font-size:24px;color:var(--text3)"></i>
+                <div style="font-size:11px;color:var(--text3);font-weight:600">Click to add signature</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── PREVIEW SIDE ── -->
+      <div class="preview-side">
+        <div class="preview-card">
+          <div class="preview-toolbar">
+            <div class="pt-title">📄 Live Preview</div>
+            <div class="pt-actions">
+              <button class="pt-btn"><i class="ti ti-download" style="font-size:12px"></i> PDF</button>
+              <button class="pt-btn"><i class="ti ti-printer" style="font-size:12px"></i> Print</button>
+            </div>
+          </div>
+
+          <!-- LIVE INVOICE PREVIEW -->
+          <div class="invoice-preview" id="invoicePreview">
+
+            <!-- HEADER -->
+            <div class="inv-header">
+              <div class="inv-logo-area">
+                <div class="inv-logo-box">YT</div>
+                <div class="inv-company-name" id="pFromCompany">YENCODE Technologies</div>
+                <div class="inv-company-details" id="pFromDetails">
+                  yencodetechnologies@gmail.com<br>
+                  +91 89254 33533<br>
+                  Chennai, Tamil Nadu, India
+                </div>
+              </div>
+              <div class="inv-title-area">
+                <div class="inv-title-word">INVOICE</div>
+                <div class="inv-id" id="pInvNumber">#INV-2026-1262</div>
+                <div class="inv-dates">
+                  <span id="pInvDate">Issue: 01 Jun 2026</span><br>
+                  <span id="pDueDate">Due: 15 Jun 2026</span>
+                </div>
+                <div class="inv-status draft" id="pStatus">DRAFT</div>
+              </div>
+            </div>
+
+            <!-- PARTIES -->
+            <div class="inv-parties">
+              <div>
+                <div class="inv-party-label">From</div>
+                <div class="inv-party-name" id="pFromName">YENCODE Technologies</div>
+                <div class="inv-party-detail" id="pFromDetail2">
+                  GST: 33ABCDE1234F1Z5<br>
+                  Chennai, Tamil Nadu, India
+                </div>
+              </div>
+              <div>
+                <div class="inv-party-label">Bill To</div>
+                <div class="inv-party-name" id="pToName" style="color:var(--text3)">— Client Name —</div>
+                <div class="inv-party-detail" id="pToDetail">
+                  <span style="color:var(--text3)">Enter client details in the form</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- ITEMS TABLE -->
+            <table class="inv-items-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Description</th>
+                  <th>Qty</th>
+                  <th>Unit Price</th>
+                  <th>Tax</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody id="previewItems">
+                <tr>
+                  <td>1</td>
+                  <td>UI/UX Design</td>
+                  <td>1</td>
+                  <td>₹20,000</td>
+                  <td>18%</td>
+                  <td>₹23,600</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Frontend Development</td>
+                  <td>1</td>
+                  <td>₹30,000</td>
+                  <td>18%</td>
+                  <td>₹35,400</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- TOTALS -->
+            <div class="inv-totals">
+              <div class="inv-total-row"><span class="lbl">Subtotal</span><span class="val"
+                  id="pSubtotal">₹50,000</span></div>
+              <div class="inv-total-row"><span class="lbl">GST (18%)</span><span class="val" id="pTax">₹9,000</span>
+              </div>
+              <div class="inv-total-row" id="pDiscountRow" style="display:none"><span class="lbl">Discount</span><span
+                  class="val" id="pDiscount" style="color:var(--green)">-₹0</span></div>
+              <div class="inv-grand-row"><span class="lbl">Total Due</span><span class="val" id="pGrand">₹59,000</span>
+              </div>
+            </div>
+
+            <!-- BANK -->
+            <div class="inv-bank">
+              <div class="inv-bank-title">Payment Details</div>
+              <div class="inv-bank-detail">
+                Bank: HDFC Bank &nbsp;|&nbsp; A/C: 5020123456789 &nbsp;|&nbsp; IFSC: HDFC0001234<br>
+                UPI: yencode@okaxis
+              </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="inv-footer">
+              <div class="inv-notes">
+                <div class="inv-notes-title">Notes</div>
+                <div class="inv-notes-text" id="pNotes">Thank you for your business! Please make payment within the due
+                  date.</div>
+              </div>
+              <div class="inv-sig">
+                <div class="inv-sig-line"></div>
+                <div class="inv-sig-name">Prabhu R</div>
+                <div class="inv-sig-role">YENCODE Technologies</div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
 
     </div>
-
-    <!-- ── PREVIEW SIDE ── -->
-    <div class="preview-side">
-      <div class="preview-card">
-        <div class="preview-toolbar">
-          <div class="pt-title">📄 Live Preview</div>
-          <div class="pt-actions">
-            <button class="pt-btn"><i class="ti ti-download" style="font-size:12px"></i> PDF</button>
-            <button class="pt-btn"><i class="ti ti-printer" style="font-size:12px"></i> Print</button>
-          </div>
-        </div>
-
-        <!-- LIVE INVOICE PREVIEW -->
-        <div class="invoice-preview" id="invoicePreview">
-
-          <!-- HEADER -->
-          <div class="inv-header">
-            <div class="inv-logo-area">
-              <div class="inv-logo-box">YT</div>
-              <div class="inv-company-name" id="pFromCompany">YENCODE Technologies</div>
-              <div class="inv-company-details" id="pFromDetails">
-                yencodetechnologies@gmail.com<br>
-                +91 89254 33533<br>
-                Chennai, Tamil Nadu, India
-              </div>
-            </div>
-            <div class="inv-title-area">
-              <div class="inv-title-word">INVOICE</div>
-              <div class="inv-id" id="pInvNumber">#INV-2026-1262</div>
-              <div class="inv-dates">
-                <span id="pInvDate">Issue: 01 Jun 2026</span><br>
-                <span id="pDueDate">Due: 15 Jun 2026</span>
-              </div>
-              <div class="inv-status draft" id="pStatus">DRAFT</div>
-            </div>
-          </div>
-
-          <!-- PARTIES -->
-          <div class="inv-parties">
-            <div>
-              <div class="inv-party-label">From</div>
-              <div class="inv-party-name" id="pFromName">YENCODE Technologies</div>
-              <div class="inv-party-detail" id="pFromDetail2">
-                GST: 33ABCDE1234F1Z5<br>
-                Chennai, Tamil Nadu, India
-              </div>
-            </div>
-            <div>
-              <div class="inv-party-label">Bill To</div>
-              <div class="inv-party-name" id="pToName" style="color:var(--text3)">— Client Name —</div>
-              <div class="inv-party-detail" id="pToDetail">
-                <span style="color:var(--text3)">Enter client details in the form</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- ITEMS TABLE -->
-          <table class="inv-items-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Description</th>
-                <th>Qty</th>
-                <th>Unit Price</th>
-                <th>Tax</th>
-                <th>Total</th>
-              </tr>
-            </thead>
-            <tbody id="previewItems">
-              <tr>
-                <td>1</td>
-                <td>UI/UX Design</td>
-                <td>1</td>
-                <td>₹20,000</td>
-                <td>18%</td>
-                <td>₹23,600</td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>Frontend Development</td>
-                <td>1</td>
-                <td>₹30,000</td>
-                <td>18%</td>
-                <td>₹35,400</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <!-- TOTALS -->
-          <div class="inv-totals">
-            <div class="inv-total-row"><span class="lbl">Subtotal</span><span class="val" id="pSubtotal">₹50,000</span></div>
-            <div class="inv-total-row"><span class="lbl">GST (18%)</span><span class="val" id="pTax">₹9,000</span></div>
-            <div class="inv-total-row" id="pDiscountRow" style="display:none"><span class="lbl">Discount</span><span class="val" id="pDiscount" style="color:var(--green)">-₹0</span></div>
-            <div class="inv-grand-row"><span class="lbl">Total Due</span><span class="val" id="pGrand">₹59,000</span></div>
-          </div>
-
-          <!-- BANK -->
-          <div class="inv-bank">
-            <div class="inv-bank-title">Payment Details</div>
-            <div class="inv-bank-detail">
-              Bank: HDFC Bank &nbsp;|&nbsp; A/C: 5020123456789 &nbsp;|&nbsp; IFSC: HDFC0001234<br>
-              UPI: yencode@okaxis
-            </div>
-          </div>
-
-          <!-- FOOTER -->
-          <div class="inv-footer">
-            <div class="inv-notes">
-              <div class="inv-notes-title">Notes</div>
-              <div class="inv-notes-text" id="pNotes">Thank you for your business! Please make payment within the due date.</div>
-            </div>
-            <div class="inv-sig">
-              <div class="inv-sig-line"></div>
-              <div class="inv-sig-name">Prabhu R</div>
-              <div class="inv-sig-role">YENCODE Technologies</div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
   </div>
-</div>
 
-<script>
-let rowCount=2;
+  <script>
+    let rowCount = 2;
 
-function fmt(n){return'₹'+Number(n).toLocaleString('en-IN')}
+    function fmt(n) { return '₹' + Number(n).toLocaleString('en-IN') }
 
-function calcTotals(){
-  const rows=document.querySelectorAll('#itemsBody tr');
-  let subtotal=0,tax=0;
-  const previewBody=document.getElementById('previewItems');
-  previewBody.innerHTML='';
-  rows.forEach((r,i)=>{
-    const inputs=r.querySelectorAll('.item-input');
-    const desc=inputs[0].value||'—';
-    const qty=parseFloat(inputs[1].value)||0;
-    const price=parseFloat(inputs[2].value)||0;
-    const taxPct=parseFloat(inputs[3].value)||0;
-    const lineBase=qty*price;
-    const lineTax=lineBase*taxPct/100;
-    const lineTotal=lineBase+lineTax;
-    subtotal+=lineBase;
-    tax+=lineTax;
-    if(r.querySelector('.item-total'))r.querySelector('.item-total').textContent=fmt(lineTotal);
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${i+1}</td><td>${desc}</td><td>${qty}</td><td>${fmt(price)}</td><td>${taxPct}%</td><td>${fmt(lineTotal)}</td>`;
-    previewBody.appendChild(tr);
-  });
-  const discPct=parseFloat(document.getElementById('discountPct').value)||0;
-  const extra=parseFloat(document.getElementById('extraCharges').value)||0;
-  const discount=subtotal*discPct/100;
-  const grand=subtotal-discount+tax+extra;
-  document.getElementById('subtotalVal').textContent=fmt(subtotal);
-  document.getElementById('discountVal').textContent='- '+fmt(discount);
-  document.getElementById('taxVal').textContent='+ '+fmt(tax);
-  document.getElementById('extraVal').textContent='+ '+fmt(extra);
-  document.getElementById('grandTotal').textContent=fmt(grand);
-  // Preview
-  document.getElementById('pSubtotal').textContent=fmt(subtotal);
-  document.getElementById('pTax').textContent=fmt(tax);
-  document.getElementById('pGrand').textContent=fmt(grand);
-  const discRow=document.getElementById('pDiscountRow');
-  if(discount>0){discRow.style.display='flex';document.getElementById('pDiscount').textContent='-'+fmt(discount);}else{discRow.style.display='none';}
-}
+    function calcTotals() {
+      const rows = document.querySelectorAll('#itemsBody tr');
+      let subtotal = 0, tax = 0;
+      const previewBody = document.getElementById('previewItems');
+      previewBody.innerHTML = '';
+      rows.forEach((r, i) => {
+        const inputs = r.querySelectorAll('.item-input');
+        const desc = inputs[0].value || '—';
+        const qty = parseFloat(inputs[1].value) || 0;
+        const price = parseFloat(inputs[2].value) || 0;
+        const taxPct = parseFloat(inputs[3].value) || 0;
+        const lineBase = qty * price;
+        const lineTax = lineBase * taxPct / 100;
+        const lineTotal = lineBase + lineTax;
+        subtotal += lineBase;
+        tax += lineTax;
+        if (r.querySelector('.item-total')) r.querySelector('.item-total').textContent = fmt(lineTotal);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${i + 1}</td><td>${desc}</td><td>${qty}</td><td>${fmt(price)}</td><td>${taxPct}%</td><td>${fmt(lineTotal)}</td>`;
+        previewBody.appendChild(tr);
+      });
+      const discPct = parseFloat(document.getElementById('discountPct').value) || 0;
+      const extra = parseFloat(document.getElementById('extraCharges').value) || 0;
+      const discount = subtotal * discPct / 100;
+      const grand = subtotal - discount + tax + extra;
+      document.getElementById('subtotalVal').textContent = fmt(subtotal);
+      document.getElementById('discountVal').textContent = '- ' + fmt(discount);
+      document.getElementById('taxVal').textContent = '+ ' + fmt(tax);
+      document.getElementById('extraVal').textContent = '+ ' + fmt(extra);
+      document.getElementById('grandTotal').textContent = fmt(grand);
+      // Preview
+      document.getElementById('pSubtotal').textContent = fmt(subtotal);
+      document.getElementById('pTax').textContent = fmt(tax);
+      document.getElementById('pGrand').textContent = fmt(grand);
+      const discRow = document.getElementById('pDiscountRow');
+      if (discount > 0) { discRow.style.display = 'flex'; document.getElementById('pDiscount').textContent = '-' + fmt(discount); } else { discRow.style.display = 'none'; }
+    }
 
-function addRow(){
-  const tbody=document.getElementById('itemsBody');
-  const tr=document.createElement('tr');
-  tr.innerHTML=`<td><input type="text" class="item-input desc" placeholder="Item description" oninput="calcTotals()"></td>
+    function addRow() {
+      const tbody = document.getElementById('itemsBody');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td><input type="text" class="item-input desc" placeholder="Item description" oninput="calcTotals()"></td>
     <td><input type="number" class="item-input num" value="1" min="1" oninput="calcTotals()"></td>
     <td><input type="number" class="item-input num" value="0" oninput="calcTotals()" style="width:90px"></td>
     <td><input type="number" class="item-input num" value="18" min="0" max="100" oninput="calcTotals()" style="width:55px"></td>
     <td class="item-total" id="total_${rowCount}">₹0</td>
     <td><button class="del-row-btn" onclick="removeRow(this)"><i class="ti ti-trash"></i></button></td>`;
-  tbody.appendChild(tr);
-  rowCount++;
-  calcTotals();
-}
+      tbody.appendChild(tr);
+      rowCount++;
+      calcTotals();
+    }
 
-function removeRow(btn){
-  const rows=document.querySelectorAll('#itemsBody tr');
-  if(rows.length<=1)return;
-  btn.closest('tr').remove();
-  calcTotals();
-}
+    function removeRow(btn) {
+      const rows = document.querySelectorAll('#itemsBody tr');
+      if (rows.length <= 1) return;
+      btn.closest('tr').remove();
+      calcTotals();
+    }
 
-function updatePreview(){
-  const fc=document.getElementById('fromCompany').value;
-  const fe=document.getElementById('fromEmail').value;
-  const fp=document.getElementById('fromPhone').value;
-  const fa=document.getElementById('fromAddress').value;
-  const fg=document.getElementById('fromGST').value;
-  document.getElementById('pFromCompany').textContent=fc||'Your Company';
-  document.getElementById('pFromName').textContent=fc||'Your Company';
-  document.getElementById('pFromDetails').innerHTML=`${fe}<br>${fp}<br>${fa}`;
-  document.getElementById('pFromDetail2').innerHTML=`GST: ${fg}<br>${fa}`;
-  const tn=document.getElementById('toName').value;
-  const te=document.getElementById('toEmail').value;
-  const tp=document.getElementById('toPhone').value;
-  const ta=document.getElementById('toAddress').value;
-  const tg=document.getElementById('toGST').value;
-  document.getElementById('pToName').textContent=tn||'— Client Name —';
-  document.getElementById('pToName').style.color=tn?'var(--text)':'var(--text3)';
-  document.getElementById('pToDetail').innerHTML=tn?`${tg?'GST: '+tg+'<br>':''}${te?te+'<br>':''}${tp?tp+'<br>':''}${ta}`:'<span style="color:var(--text3)">Enter client details in the form</span>';
-  const id=document.getElementById('invNumber').value;
-  document.getElementById('pInvNumber').textContent='#'+id;
-  const d1=document.getElementById('invDate').value;
-  const d2=document.getElementById('dueDate').value;
-  if(d1)document.getElementById('pInvDate').textContent='Issue: '+new Date(d1).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
-  if(d2)document.getElementById('pDueDate').textContent='Due: '+new Date(d2).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
-  const notes=document.getElementById('invNotes').value;
-  document.getElementById('pNotes').textContent=notes.split('\n')[0];
-}
+    function updatePreview() {
+      const fc = document.getElementById('fromCompany').value;
+      const fe = document.getElementById('fromEmail').value;
+      const fp = document.getElementById('fromPhone').value;
+      const fa = document.getElementById('fromAddress').value;
+      const fg = document.getElementById('fromGST').value;
+      document.getElementById('pFromCompany').textContent = fc || 'Your Company';
+      document.getElementById('pFromName').textContent = fc || 'Your Company';
+      document.getElementById('pFromDetails').innerHTML = `${fe}<br>${fp}<br>${fa}`;
+      document.getElementById('pFromDetail2').innerHTML = `GST: ${fg}<br>${fa}`;
+      const tn = document.getElementById('toName').value;
+      const te = document.getElementById('toEmail').value;
+      const tp = document.getElementById('toPhone').value;
+      const ta = document.getElementById('toAddress').value;
+      const tg = document.getElementById('toGST').value;
+      document.getElementById('pToName').textContent = tn || '— Client Name —';
+      document.getElementById('pToName').style.color = tn ? 'var(--text)' : 'var(--text3)';
+      document.getElementById('pToDetail').innerHTML = tn ? `${tg ? 'GST: ' + tg + '<br>' : ''}${te ? te + '<br>' : ''}${tp ? tp + '<br>' : ''}${ta}` : '<span style="color:var(--text3)">Enter client details in the form</span>';
+      const id = document.getElementById('invNumber').value;
+      document.getElementById('pInvNumber').textContent = '#' + id;
+      const d1 = document.getElementById('invDate').value;
+      const d2 = document.getElementById('dueDate').value;
+      if (d1) document.getElementById('pInvDate').textContent = 'Issue: ' + new Date(d1).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+      if (d2) document.getElementById('pDueDate').textContent = 'Due: ' + new Date(d2).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+      const notes = document.getElementById('invNotes').value;
+      document.getElementById('pNotes').textContent = notes.split('\n')[0];
+    }
 
-function selectTemplate(el){
-  document.querySelectorAll('.template-opt').forEach(o=>o.classList.remove('selected'));
-  el.classList.add('selected');
-}
+    function selectTemplate(el) {
+      document.querySelectorAll('.template-opt').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+    }
 
-function selectTerm(el,val){
-  document.querySelectorAll('.pt-opt').forEach(o=>o.classList.remove('selected'));
-  el.classList.add('selected');
-}
+    function selectTerm(el, val) {
+      document.querySelectorAll('.pt-opt').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+    }
 
-function saveDraft(){
-  const status=document.getElementById('pStatus');
-  status.textContent='DRAFT';
-  status.className='inv-status draft';
-  alert('Invoice saved as draft!');
-}
+    function saveDraft() {
+      const status = document.getElementById('pStatus');
+      status.textContent = 'DRAFT';
+      status.className = 'inv-status draft';
+      alert('Invoice saved as draft!');
+    }
 
-function sendInvoice(){
-  const tn=document.getElementById('toName').value;
-  if(!tn){alert('Please enter client name before sending.');document.getElementById('toName').focus();return;}
-  const status=document.getElementById('pStatus');
-  status.textContent='SENT';
-  status.className='inv-status sent';
-  alert('Invoice sent successfully to '+tn+'!');
-}
+    function sendInvoice() {
+      const tn = document.getElementById('toName').value;
+      if (!tn) { alert('Please enter client name before sending.'); document.getElementById('toName').focus(); return; }
+      const status = document.getElementById('pStatus');
+      status.textContent = 'SENT';
+      status.className = 'inv-status sent';
+      alert('Invoice sent successfully to ' + tn + '!');
+    }
 
-// Init
-calcTotals();
-updatePreview();
-</script>
+    // Init
+    calcTotals();
+    updatePreview();
+  </script>
 </body>
+
 </html>

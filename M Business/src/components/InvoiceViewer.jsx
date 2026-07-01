@@ -6,7 +6,7 @@ import { BASE_URL } from "../config";
 function formatCurrency(val, symbol = "₹", compact = false, disableCompact = false) {
   const num = parseFloat(val) || 0;
   const absNum = Math.abs(num);
-  
+
   if (!disableCompact && ((compact && absNum >= 100000) || absNum >= 10000000)) {
     try {
       const isINR = symbol === "₹";
@@ -20,7 +20,7 @@ function formatCurrency(val, symbol = "₹", compact = false, disableCompact = f
       // Fallback
     }
   }
-  
+
   const isINR = symbol === "₹";
   return symbol + (/[A-Za-z]/.test(symbol) ? " " : "") + num.toLocaleString(isINR ? "en-IN" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
@@ -44,21 +44,21 @@ export default function InvoiceViewer() {
       const decoded = decodeURIComponent(escape(atob(safeEncoded)));
       const slim = JSON.parse(decoded);
       const inv = {
-        invoiceNo: slim.no || slim.invoiceNo, 
-        date: slim.date || slim.date, 
+        invoiceNo: slim.no || slim.invoiceNo,
+        date: slim.date || slim.date,
         dueDate: slim.due || slim.dueDate,
-        companyName: slim.co || slim.companyName || "", 
+        companyName: slim.co || slim.companyName || "",
         companyEmail: slim.email || slim.companyEmail || "",
-        companyPhone: slim.phone || slim.companyPhone || "", 
+        companyPhone: slim.phone || slim.companyPhone || "",
         companyAddress: slim.addr || slim.companyAddress || "",
-        client: slim.cl || slim.client || "", 
+        client: slim.cl || slim.client || "",
         project: slim.proj || slim.project || "",
-        gstRate: slim.gst || slim.gstRate || 0, 
-        notes: slim.notes || slim.notes || "", 
+        gstRate: slim.gst || slim.gstRate || 0,
+        notes: slim.notes || slim.notes || "",
         terms: slim.terms || slim.terms || "",
-        isGstIncluded: slim.incGst !== undefined ? slim.incGst : slim.isGstIncluded, 
+        isGstIncluded: slim.incGst !== undefined ? slim.incGst : slim.isGstIncluded,
         amountPaid: slim.paid || slim.amountPaid || 0,
-        upiId: slim.upi || slim.upiId || "", 
+        upiId: slim.upi || slim.upiId || "",
         currency: slim.cur || slim.currency || "₹",
         paymentHistory: slim.history || slim.paymentHistory || [],
         logoUrl: slim.logo || slim.logoUrl || "",
@@ -67,7 +67,7 @@ export default function InvoiceViewer() {
         signatureType: slim.sigType || slim.signatureType || "text",
         template: slim.temp || slim.template || "Classic",
       };
-      
+
       let items = [];
       if (slim.items && slim.items.length > 0) {
         if (slim.items[0].d !== undefined) {
@@ -80,7 +80,7 @@ export default function InvoiceViewer() {
           }));
         }
       }
-      const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate)||0) * (parseFloat(i.quantity)||0), 0);
+      const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
       let subtotal, gstAmt, total;
       if (inv.isGstIncluded) {
         total = subtotalRaw;
@@ -118,7 +118,7 @@ export default function InvoiceViewer() {
               });
             }
           })
-          .catch(() => {});
+          .catch(() => { });
       }
 
       // Fetch branding if CID exists and no logo in payload
@@ -129,7 +129,7 @@ export default function InvoiceViewer() {
               setData(prev => prev ? ({ ...prev, inv: { ...prev.inv, logoUrl: res.data.logoUrl } }) : prev);
             }
           })
-          .catch(() => {});
+          .catch(() => { });
       }
     } catch (e) {
       setError("Could not read invoice data.");
@@ -177,8 +177,8 @@ export default function InvoiceViewer() {
   const { inv, items, subtotal, gstAmt, total, balanceDue, finalPaid } = data;
   const isPaid = balanceDue <= 0;
   // Prevent QRCodeSVG from crashing if the URL with base64 payload is too large
-  const qrData = window.location.href.length > 1000 
-    ? `${window.location.origin}/invoice-view?no=${inv.invoiceNo}` 
+  const qrData = window.location.href.length > 1000
+    ? `${window.location.origin}/invoice-view?no=${inv.invoiceNo}`
     : window.location.href;
 
   const getTemplateStyles = (templateName) => {
@@ -194,11 +194,11 @@ export default function InvoiceViewer() {
         };
       case "Classic":
         return {
-          primaryColor: "#00BCD4",
-          primaryBg: "#E0F7FA",
-          logoColor: "linear-gradient(135deg, #00BCD4, #006E7F)",
+          primaryColor: " var(--app-accent, #00BCD4)",
+          primaryBg: "var(--teal-light, #E0F7FA)",
+          logoColor: "linear-gradient(135deg,  var(--app-accent, #00BCD4), #006E7F)",
           borderStyle: "1px solid #E0EEF0",
-          headerUnderline: "3px solid #00BCD4",
+          headerUnderline: "3px solid  var(--app-accent, #00BCD4)",
           fontFamily: "'Nunito', sans-serif"
         };
       case "Modern":
@@ -218,7 +218,7 @@ export default function InvoiceViewer() {
   // --- Pagination Logic ---
   const ITEMS_PER_PAGE_FIRST = 10;
   const ITEMS_PER_PAGE_REST = 16;
-  
+
   const pages = [];
   if (items.length <= ITEMS_PER_PAGE_FIRST) {
     pages.push(items);
@@ -260,12 +260,12 @@ export default function InvoiceViewer() {
             const upiLink = `upi://pay?pa=${inv.upiId}&pn=${encodeURIComponent(inv.companyName)}&am=${balanceDue.toFixed(2)}&cu=INR&tn=${encodeURIComponent("Invoice " + inv.invoiceNo)}`;
             window.location.href = upiLink;
           }} style={{ padding: "10px 22px", background: "linear-gradient(135deg,#065f46,#059669)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>
-             Pay via UPI
+            Pay via UPI
           </button>
         )}
         <button className="action-btn" onClick={handleShare}
           style={{ padding: "10px 22px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>
-           Share Link
+          Share Link
         </button>
       </div>
 
@@ -372,114 +372,113 @@ export default function InvoiceViewer() {
                   </thead>
                   <tbody>
                     {pageItems.map((item, idx) => (
-                    <tr key={idx} style={{ borderBottom: "1px solid var(--app-border)" }}>
-                      <td style={{ padding: "12px 11px", color: "var(--app-muted)", fontWeight: 700, fontSize: 12, opacity: 0.5 }}>{String(globalItemOffset + idx + 1).padStart(2, "0")}</td>
-                  <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#111827" }}>{item.description || "—"}</td>
-                  <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
-                  <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, inv.currency)}</td>
-                  <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#111827" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              {isLastPage && (
-                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
-                  <div style={{ width: "min(280px,100%)" }}>
-                    {[
-                      ["Subtotal", formatCurrency(subtotal, inv.currency)],
-                      [`GST (${inv.gstRate}%)${inv.isGstIncluded ? " (Incl.)" : ""}`, formatCurrency(gstAmt, inv.currency)],
-                      ["Total Amount", formatCurrency(total, inv.currency)],
-                      ["Amount Paid", formatCurrency(finalPaid, inv.currency)]
-                    ].map(([l, v]) => (
-                      <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f8fafc" }}>
-                        <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
-                        <span style={{ fontSize: 12, fontWeight: 600, color: "#111827" }}>{v}</span>
-                      </div>
+                      <tr key={idx} style={{ borderBottom: "1px solid var(--app-border)" }}>
+                        <td style={{ padding: "12px 11px", color: "var(--app-muted)", fontWeight: 700, fontSize: 12, opacity: 0.5 }}>{String(globalItemOffset + idx + 1).padStart(2, "0")}</td>
+                        <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#111827" }}>{item.description || "—"}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, inv.currency)}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#111827" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
+                      </tr>
                     ))}
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: currentT.primaryBg, borderRadius: 12, marginTop: 8, border: currentT.borderStyle || "1.5px solid #e2e8f0" }}>
-                      <span style={{ fontSize: 13, fontWeight: 800, color: "#64748b" }}>BALANCE DUE</span>
-                      <span style={{ fontSize: 19, fontWeight: 900, color: isPaid ? "#059669" : currentT.primaryColor }}>{formatCurrency(balanceDue, inv.currency)}</span>
+                  </tbody>
+                </table>
+
+                {isLastPage && (
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
+                    <div style={{ width: "min(280px,100%)" }}>
+                      {[
+                        ["Subtotal", formatCurrency(subtotal, inv.currency)],
+                        [`GST (${inv.gstRate}%)${inv.isGstIncluded ? " (Incl.)" : ""}`, formatCurrency(gstAmt, inv.currency)],
+                        ["Total Amount", formatCurrency(total, inv.currency)],
+                        ["Amount Paid", formatCurrency(finalPaid, inv.currency)]
+                      ].map(([l, v]) => (
+                        <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f8fafc" }}>
+                          <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
+                          <span style={{ fontSize: 12, fontWeight: 600, color: "#111827" }}>{v}</span>
+                        </div>
+                      ))}
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: currentT.primaryBg, borderRadius: 12, marginTop: 8, border: currentT.borderStyle || "1.5px solid #e2e8f0" }}>
+                        <span style={{ fontSize: 13, fontWeight: 800, color: "#64748b" }}>BALANCE DUE</span>
+                        <span style={{ fontSize: 19, fontWeight: 900, color: isPaid ? "#059669" : currentT.primaryColor }}>{formatCurrency(balanceDue, inv.currency)}</span>
+                      </div>
                     </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Notes + QR + Signature */}
+              {isLastPage && (
+                <div className="invoice-bottom-grid" style={{ padding: "0 32px 24px", alignItems: "flex-start", flexShrink: 0 }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {inv.notes && (
+                      <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
+                        <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>Edit NOTES</div>
+                        <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{inv.notes}</div>
+                      </div>
+                    )}
+                    {inv.terms && (
+                      <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
+                        <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>Scroll TERMS</div>
+                        <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{inv.terms}</div>
+                      </div>
+                    )}
+                    {inv.upiId && (
+                      <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
+                        <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}> UPI PAYMENT</div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{inv.upiId}</div>
+                      </div>
+                    )}
+                    {inv.paymentHistory?.length > 0 && (
+                      <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
+                        <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 8 }}> PAYMENT HISTORY</div>
+                        {inv.paymentHistory.map((p, i) => (
+                          <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 11, padding: "4px 0", borderBottom: i < inv.paymentHistory.length - 1 ? "1px solid #f1f5f9" : "none" }}>
+                            <span style={{ color: "#64748b" }}>{formatDate(p.date)}{p.category === "Advance" ? " (Advance)" : ""}</span>
+                            <span style={{ fontWeight: 700, color: "#0f172a" }}>{formatCurrency(p.amount, inv.currency)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="no-print" style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#f8fafc", borderRadius: 12, padding: "14px 16px", border: currentT.borderStyle || "1px solid #e2e8f0", minWidth: 140 }}>
+                    <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textAlign: "center" }}>SCAN INVOICE</div>
+                    <div style={{ background: "#fff", padding: 12, borderRadius: 8, border: currentT.borderStyle || "1px solid #e2e8f0" }}>
+                      <QRCodeSVG value={qrData} size={160} bgColor="#ffffff" fgColor={currentT.primaryColor} />
+                    </div>
+                    <div style={{ fontSize: 8, color: "#9ca3af", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{inv.invoiceNo}</div>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", background: "#f8fafc", borderRadius: 12, padding: "14px 16px", border: currentT.borderStyle || "1px solid #e2e8f0", minWidth: 140, minHeight: 145 }}>
+                    <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
+                      {inv.signature ? (
+                        inv.signatureType === "image" ? (
+                          <img src={inv.signature} alt="Signature" style={{ maxHeight: 45, maxWidth: 120, objectFit: "contain" }} />
+                        ) : (
+                          <div style={{ fontFamily: "'Dancing Script', cursive", fontSize: 24, fontWeight: "bold", color: currentT.primaryColor, textAlign: "center" }}>{inv.signature}</div>
+                        )
+                      ) : (
+                        <div style={{ height: 45 }} />
+                      )}
+                    </div>
+                    <div style={{ width: "100%", height: 1, background: currentT.borderStyle || "#e2e8f0", marginBottom: 4 }}></div>
+                    <div style={{ fontSize: 9, fontWeight: 700, color: "#1e1b4b", textAlign: "center" }}>{inv.companyName}</div>
+                    <div style={{ fontSize: 8, color: "#64748b", textAlign: "center", marginTop: 2 }}>Authorized Signatory</div>
                   </div>
                 </div>
               )}
-            </div>
 
-            {/* Notes + QR + Signature */}
-            {isLastPage && (
-              <div className="invoice-bottom-grid" style={{ padding: "0 32px 24px", alignItems: "flex-start", flexShrink: 0 }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  {inv.notes && (
-                    <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
-                      <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>Edit NOTES</div>
-                      <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{inv.notes}</div>
-                    </div>
-                  )}
-                  {inv.terms && (
-                    <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
-                      <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>Scroll TERMS</div>
-                      <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{inv.terms}</div>
-                    </div>
-                  )}
-                  {inv.upiId && (
-                    <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
-                      <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}> UPI PAYMENT</div>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{inv.upiId}</div>
-                    </div>
-                  )}
-                  {inv.paymentHistory?.length > 0 && (
-                    <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
-                      <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 8 }}> PAYMENT HISTORY</div>
-                      {inv.paymentHistory.map((p, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 11, padding: "4px 0", borderBottom: i < inv.paymentHistory.length - 1 ? "1px solid #f1f5f9" : "none" }}>
-                          <span style={{ color: "#64748b" }}>{formatDate(p.date)}{p.category === "Advance" ? " (Advance)" : ""}</span>
-                          <span style={{ fontWeight: 700, color: "#0f172a" }}>{formatCurrency(p.amount, inv.currency)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div className="no-print" style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#f8fafc", borderRadius: 12, padding: "14px 16px", border: currentT.borderStyle || "1px solid #e2e8f0", minWidth: 140 }}>
-                  <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textAlign: "center" }}>SCAN INVOICE</div>
-                  <div style={{ background: "#fff", padding: 12, borderRadius: 8, border: currentT.borderStyle || "1px solid #e2e8f0" }}>
-                    <QRCodeSVG value={qrData} size={160} bgColor="#ffffff" fgColor={currentT.primaryColor} />
-                  </div>
-                  <div style={{ fontSize: 8, color: "#9ca3af", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{inv.invoiceNo}</div>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", background: "#f8fafc", borderRadius: 12, padding: "14px 16px", border: currentT.borderStyle || "1px solid #e2e8f0", minWidth: 140, minHeight: 145 }}>
-                  <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
-                    {inv.signature ? (
-                      inv.signatureType === "image" ? (
-                        <img src={inv.signature} alt="Signature" style={{ maxHeight: 45, maxWidth: 120, objectFit: "contain" }} />
-                      ) : (
-                        <div style={{ fontFamily: "'Dancing Script', cursive", fontSize: 24, fontWeight: "bold", color: currentT.primaryColor, textAlign: "center" }}>{inv.signature}</div>
-                      )
-                    ) : (
-                      <div style={{ height: 45 }} />
-                    )}
-                  </div>
-                  <div style={{ width: "100%", height: 1, background: currentT.borderStyle || "#e2e8f0", marginBottom: 4 }}></div>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: "#1e1b4b", textAlign: "center" }}>{inv.companyName}</div>
-                  <div style={{ fontSize: 8, color: "#64748b", textAlign: "center", marginTop: 2 }}>Authorized Signatory</div>
-                </div>
+              <div className="flex-spacer" style={{ flex: 1 }} />
+
+              {/* Footer */}
+              <div style={{ background: "#f8fafc", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: currentT.borderStyle || "1px solid #e2e8f0" }}>
+                <div style={{ fontSize: 11, color: "#94a3b8" }}>{inv.companyName}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: currentT.primaryColor }}>Thank you for your business!</div>
+                <div style={{ fontSize: 11, color: "#94a3b8" }}>Page {pageIndex + 1} of {pages.length}</div>
               </div>
-            )}
-
-            <div className="flex-spacer" style={{ flex: 1 }} />
-
-            {/* Footer */}
-            <div style={{ background: "#f8fafc", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: currentT.borderStyle || "1px solid #e2e8f0" }}>
-              <div style={{ fontSize: 11, color: "#94a3b8" }}>{inv.companyName}</div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: currentT.primaryColor }}>Thank you for your business!</div>
-              <div style={{ fontSize: 11, color: "#94a3b8" }}>Page {pageIndex + 1} of {pages.length}</div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
       </div>
     </div>
   );
 }
 
-   

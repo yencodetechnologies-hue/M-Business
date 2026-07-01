@@ -4,7 +4,7 @@ import { BASE_URL } from '../config';
 
 // ── palette -------------------------------------------------------
 const P = {
-  primary: '#00BCD4', primaryDark: '#0097A7', primaryLight: '#E0F7FA', primaryMid: '#B2EBF2',
+  primary: ' var(--app-accent, #00BCD4)', primaryDark: '#0097A7', primaryLight: 'var(--teal-light, #E0F7FA)', primaryMid: '#B2EBF2',
   textDark: '#1A2332', textMid: '#4A5568', textLight: '#718096',
   bg: '#F0F4F8', white: '#FFFFFF', border: '#E2E8F0',
   green: '#26C281', greenLight: '#D1FAE5',
@@ -163,7 +163,7 @@ function getInitials(name) {
   return p.length >= 2 ? (p[0][0] + p[1][0]).toUpperCase() : name.substring(0, 2).toUpperCase();
 }
 
-const AV_COLORS = ['#00BCD4', '#8B5CF6', '#F59E0B', '#26C281', '#EC4899', '#3B82F6', '#EF4444', '#10B981'];
+const AV_COLORS = [' var(--app-accent, #00BCD4)', '#8B5CF6', '#F59E0B', '#26C281', '#EC4899', '#3B82F6', '#EF4444', '#10B981'];
 function avColor(name, i = 0) {
   if (!name) return AV_COLORS[i % AV_COLORS.length];
   return AV_COLORS[(name.charCodeAt(0) + i) % AV_COLORS.length];

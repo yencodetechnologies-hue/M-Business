@@ -29,7 +29,7 @@ export default function AuditorLogin({ onLogin }) {
 .brand-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--app-accent),#0097A7);border-radius:12px;display:flex;align-items:center;justify-content:center;}
 .brand-icon i{font-size:22px;color:#fff;}
 .brand-name{font-size:22px;font-weight:900;color:#fff;}
-.brand-name span{color:#00BCD4;}
+.brand-name span{color: var(--app-accent, #00BCD4);}
 .panel-title{font-size:36px;font-weight:900;color:#fff;line-height:1.2;margin-bottom:16px;}
 .panel-title span{color:#8B5CF6;}
 .panel-sub{font-size:15px;color:rgba(255,255,255,.55);line-height:1.7;max-width:380px;}
@@ -67,7 +67,7 @@ export default function AuditorLogin({ onLogin }) {
           <div className="panel-sub">Securely review your client's financial records, download statements, and add audit remarks — all in one place.</div>
           <div className="features">
             <div className="feat"><div className="feat-icon" style={{ background: 'rgba(139,92,246,.2)' }}><i className="ti ti-file-analytics" style={{ color: '#8B5CF6' }}></i></div>View full income & expense statements</div>
-            <div className="feat"><div className="feat-icon" style={{ background: 'rgba(0,188,212,.2)' }}><i className="ti ti-building-bank" style={{ color: '#00BCD4' }}></i></div>Bank reconciliation & transaction review</div>
+            <div className="feat"><div className="feat-icon" style={{ background: 'rgba(0,188,212,.2)' }}><i className="ti ti-building-bank" style={{ color: ' var(--app-accent, #00BCD4)' }}></i></div>Bank reconciliation & transaction review</div>
             <div className="feat"><div className="feat-icon" style={{ background: 'rgba(38,194,129,.2)' }}><i className="ti ti-download" style={{ color: '#26C281' }}></i></div>Download PDF, Excel & CSV reports</div>
             <div className="feat"><div className="feat-icon" style={{ background: 'rgba(245,158,11,.2)' }}><i className="ti ti-message-2" style={{ color: '#F59E0B' }}></i></div>Add audit notes & flag transactions</div>
           </div>

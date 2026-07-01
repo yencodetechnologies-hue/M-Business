@@ -3,7 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { BASE_URL } from '../config';
 
-export default function AddClientView({ onBack, onClientAdded, onClientUpdated, user, editData, themeColor = '#00BCD4' }) {
+export default function AddClientView({ onBack, onClientAdded, onClientUpdated, user, editData, themeColor = ' var(--app-accent, #00BCD4)' }) {
   const TC = themeColor; // shorthand
   const TC_LIGHT = `${themeColor}18`; // ~10% opacity tint
   const isEdit = !!editData;
@@ -241,7 +241,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                     { id: 'b2c', icon: 'Profile', label: 'B2C', sub: 'Individual person' },
                     { id: 'freelancer', icon: 'Job', label: 'Freelancer', sub: 'Consultant / Solo' }
                   ].map(t => (
-                    <div key={t.id} onClick={() => setFormData({ ...formData, clientType: t.id })} style={{ border: `2px solid ${formData.clientType === t.id ? '#00BCD4' : '#E0E6EA'}`, borderRadius: 12, padding: '14px 12px', textAlign: 'center', cursor: 'pointer', background: formData.clientType === t.id ? TC_LIGHT : '#fff', position: 'relative' }}>
+                    <div key={t.id} onClick={() => setFormData({ ...formData, clientType: t.id })} style={{ border: `2px solid ${formData.clientType === t.id ? ' var(--app-accent, #00BCD4)' : '#E0E6EA'}`, borderRadius: 12, padding: '14px 12px', textAlign: 'center', cursor: 'pointer', background: formData.clientType === t.id ? TC_LIGHT : '#fff', position: 'relative' }}>
 
                       <span style={{ fontSize: 24, color: formData.clientType === t.id ? TC : '#94A3B0', display: 'block', marginBottom: 6 }}>{t.icon}</span>
                       <div style={{ fontSize: 13, fontWeight: 600, color: formData.clientType === t.id ? '#0097A7' : '#5A6A7A' }}>{t.label}</div>
@@ -325,7 +325,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: `linear-gradient(90deg, ${TC_LIGHT} 0%, #ffffff 100%)` }}>
               <div style={{ width: 36, height: 36, background: TC, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📞</div>
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Primary Contact</div><div style={{ fontSize: 12, color: '#94A3B0' }}>Main point of contact at this client</div></div>
-              <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 20, background: '#E0F7FA', color: '#0097A7' }}>Core</span>
+              <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 20, background: 'var(--teal-light, #E0F7FA)', color: '#0097A7' }}>Core</span>
             </div>
             <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Contact person name</label><input name="contactPersonName" value={formData.contactPersonName} onChange={handleChange} placeholder="Full name" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
@@ -457,7 +457,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
             <div style={{ fontSize: 13, color: '#94A3B0', display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ color: TC }}>Security</span> All data is saved securely.</div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={onBack} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 22px', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer', background: '#F4F6F8', color: '#5A6A7A', border: '1.5px solid #E0E6EA' }}>Cancel</button>
-              <button onClick={submitForm} disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 22px', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', background: saving ? '#80DEEA' : '#00BCD4', color: 'white', border: '1.5px solid #00BCD4', opacity: saving ? 0.8 : 1, transition: 'all 0.2s' }}>
+              <button onClick={submitForm} disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 22px', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', background: saving ? '#80DEEA' : ' var(--app-accent, #00BCD4)', color: 'white', border: '1.5px solid  var(--app-accent, #00BCD4)', opacity: saving ? 0.8 : 1, transition: 'all 0.2s' }}>
                 {saving ? (
                   <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
 

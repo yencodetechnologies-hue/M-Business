@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
-const primary = '#00BCD4';
+const primary = ' var(--app-accent, #00BCD4)';
 const primaryDark = '#0097A7';
-const primaryLight = '#E0F7FA';
+const primaryLight = 'var(--teal-light, #E0F7FA)';
 const primaryMid = '#B2EBF2';
 const textDark = '#1A2332';
 const textMid = '#4A5568';
@@ -72,14 +72,14 @@ const css = [
 ].join('\n');
 
 const STRIPES = [
-  { bg: 'linear-gradient(90deg,#00BCD4,#0097A7)', cls: '' },
+  { bg: 'linear-gradient(90deg, var(--app-accent, #00BCD4),#0097A7)', cls: '' },
   { bg: 'linear-gradient(90deg,#8B5CF6,#7C3AED)', cls: 'p' },
-  { bg: 'linear-gradient(90deg,#26C281,#059669)',  cls: 'g' },
+  { bg: 'linear-gradient(90deg,#26C281,#059669)', cls: 'g' },
 ];
 
 function badgeProps(status) {
   const s = (status || '').toLowerCase();
-  if (s.includes('hold'))  return { cls: 'mep-badge-hold',      txt: 'On Hold' };
+  if (s.includes('hold')) return { cls: 'mep-badge-hold', txt: 'On Hold' };
   if (s === 'done' || s === 'completed') return { cls: 'mep-badge-completed', txt: 'Completed' };
   return { cls: 'mep-badge-active', txt: 'Active' };
 }
@@ -101,16 +101,16 @@ export default function ModernEmployeeProjects({ projects, tasks, user, onViewPr
 
   const isDoneStatus = s => ['done', 'completed'].includes((s || '').toLowerCase());
 
-  const activeCount    = projects.filter(p => !isDoneStatus(p.status)).length;
-  const completedCount = projects.filter(p =>  isDoneStatus(p.status)).length;
-  const pendingTasks   = tasks.filter(t => !isDoneStatus(t.status)).length;
-  const loggedHours    = projects.reduce((a, p) => a + (p.loggedHours || 0), 0);
+  const activeCount = projects.filter(p => !isDoneStatus(p.status)).length;
+  const completedCount = projects.filter(p => isDoneStatus(p.status)).length;
+  const pendingTasks = tasks.filter(t => !isDoneStatus(t.status)).length;
+  const loggedHours = projects.reduce((a, p) => a + (p.loggedHours || 0), 0);
 
   const firstName = (user?.name || 'Employee').split(' ')[0];
 
   const list = projects.filter(p => {
-    if (filter === 'active')    return !isDoneStatus(p.status);
-    if (filter === 'completed') return  isDoneStatus(p.status);
+    if (filter === 'active') return !isDoneStatus(p.status);
+    if (filter === 'completed') return isDoneStatus(p.status);
     return true;
   });
 
@@ -118,8 +118,8 @@ export default function ModernEmployeeProjects({ projects, tasks, user, onViewPr
     <div className="mep-root">
       <style>{css}</style>
 
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
-        <h1 style={{ fontSize:20, fontWeight:900, color:textDark, margin:0 }}>My Projects</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <h1 style={{ fontSize: 20, fontWeight: 900, color: textDark, margin: 0 }}>My Projects</h1>
       </div>
 
       <div className="mep-welcome">
@@ -127,17 +127,17 @@ export default function ModernEmployeeProjects({ projects, tasks, user, onViewPr
           <h2>Good morning, {firstName}! </h2>
           <p>{activeCount} active projects · {pendingTasks} tasks due</p>
         </div>
-        <div style={{ display:'flex', gap:24 }}>
+        <div style={{ display: 'flex', gap: 24 }}>
           <div className="mep-ws"><div className="mep-n">{activeCount}</div><div className="mep-l">Projects</div></div>
           <div className="mep-ws"><div className="mep-n">{pendingTasks}</div><div className="mep-l">My Tasks</div></div>
           <div className="mep-ws"><div className="mep-n">{loggedHours}h</div><div className="mep-l">This Month</div></div>
         </div>
       </div>
 
-      <div style={{ display:'flex', gap:8, marginBottom:18 }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 18 }}>
         {[
-          { key: 'active',    label: 'Active (' + activeCount + ')' },
-          { key: 'all',       label: 'All Projects' },
+          { key: 'active', label: 'Active (' + activeCount + ')' },
+          { key: 'all', label: 'All Projects' },
           { key: 'completed', label: 'Completed (' + completedCount + ')' },
         ].map(btn => (
           <button
@@ -152,16 +152,16 @@ export default function ModernEmployeeProjects({ projects, tasks, user, onViewPr
 
       <div>
         {list.length === 0 ? (
-          <div style={{ padding:'40px 0', textAlign:'center', color:textLight, fontSize:14 }}>
+          <div style={{ padding: '40px 0', textAlign: 'center', color: textLight, fontSize: 14 }}>
             No projects found.
           </div>
         ) : (
           list.map((p, idx) => {
             const stripe = STRIPES[idx % STRIPES.length];
-            const badge  = badgeProps(p.status);
+            const badge = badgeProps(p.status);
             const pTasks = tasks.filter(t => t.project === p.name || t.projectId === p._id || t.projectId === p.id);
-            const pct    = calcPct(p, pTasks);
-            const show   = pTasks.slice(0, 3);
+            const pct = calcPct(p, pTasks);
+            const show = pTasks.slice(0, 3);
 
             return (
               <div key={p._id || idx} className="mep-epc" onClick={() => onViewProject && onViewProject(p)}>
@@ -181,7 +181,7 @@ export default function ModernEmployeeProjects({ projects, tasks, user, onViewPr
                       <div className="mep-tasks-lbl">My Tasks</div>
                       {show.map((t, i) => {
                         const done = isDoneStatus(t.status);
-                        const ip   = (t.status || '').toLowerCase() === 'in progress';
+                        const ip = (t.status || '').toLowerCase() === 'in progress';
                         return (
                           <div key={i} className="mep-mt-row">
                             <div className={'mep-mt-chk' + (done ? ' done' : ip ? ' ip' : '')}></div>

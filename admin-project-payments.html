@@ -1,462 +1,1496 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Project Payments — M Business</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-<style>
-:root {
-  --teal:#00BCD4; --teal-dk:#0097A7; --teal-lt:#E0F7FA;
-  --ink:#0D1B2A;  --ink2:#2D3E50;   --muted:#7B8FA1;
-  --border:#E8EDF2; --surface:#F4F7FA; --white:#fff;
-  --green:#22C55E; --green-lt:#DCFCE7; --green-tx:#15803D;
-  --amber:#F59E0B; --amber-lt:#FEF3C7; --amber-tx:#B45309;
-  --red:#EF4444;   --red-lt:#FEE2E2;   --red-tx:#B91C1C;
-  --purple:#8B5CF6;--purple-lt:#EDE9FE;--purple-tx:#6D28D9;
-  --blue:#3B82F6;  --blue-lt:#DBEAFE;  --blue-tx:#1D4ED8;
-  --orange:#F97316;--orange-lt:#FFEDD5;--orange-tx:#C2410C;
-  --sidebar-grad:linear-gradient(180deg,#26D0CE 0%,#00BCD4 35%,#00ACC1 65%,#006E7F 100%);
-  --font:'Nunito',sans-serif;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:var(--font);background:var(--surface);color:var(--ink);display:flex;min-height:100vh;}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Payments — M Business</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    :root {
+      --teal: var(--app-accent, #00BCD4);
+      --teal-dk: #0097A7;
+      --teal-lt: var(--teal-light, #E0F7FA);
+      --ink: #0D1B2A;
+      --ink2: #2D3E50;
+      --muted: #7B8FA1;
+      --border: #E8EDF2;
+      --surface: #F4F7FA;
+      --white: #fff;
+      --green: #22C55E;
+      --green-lt: #DCFCE7;
+      --green-tx: #15803D;
+      --amber: #F59E0B;
+      --amber-lt: #FEF3C7;
+      --amber-tx: #B45309;
+      --red: #EF4444;
+      --red-lt: #FEE2E2;
+      --red-tx: #B91C1C;
+      --purple: #8B5CF6;
+      --purple-lt: #EDE9FE;
+      --purple-tx: #6D28D9;
+      --blue: #3B82F6;
+      --blue-lt: #DBEAFE;
+      --blue-tx: #1D4ED8;
+      --orange: #F97316;
+      --orange-lt: #FFEDD5;
+      --orange-tx: #C2410C;
+      --sidebar-grad: linear-gradient(180deg, #26D0CE 0%, var(--app-accent, #00BCD4) 35%, #00ACC1 65%, #006E7F 100%);
+      --font: 'Nunito', sans-serif;
+    }
 
-/* ── SIDEBAR (Teal) ── */
-.sidebar{width:210px;min-width:210px;background:var(--sidebar-grad);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;overflow:hidden;z-index:100;box-shadow:4px 0 20px rgba(0,188,212,.2)}
-.sb-profile{padding:20px 18px 17px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.18)}
-.sb-avatar{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0;border:2px solid rgba(255,255,255,.3)}
-.sb-name{font-size:13px;font-weight:800;color:#fff}
-.sb-role{font-size:9px;color:rgba(255,255,255,.65);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-top:1px}
-.nav{display:flex;flex-direction:column;gap:2px;padding:14px 10px;flex:1}
-.nav-label{font-size:9px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1.1px;padding:8px 10px 4px}
-.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;cursor:pointer;color:rgba(255,255,255,.7);font-size:12px;font-weight:600;transition:all .15s;text-decoration:none;}
-.nav-item:hover{background:rgba(255,255,255,.14);color:#fff}
-.nav-item.active{background:rgba(255,255,255,.24);color:#fff}
-.nav-item i{font-size:15px;flex-shrink:0}
-.sb-footer{padding:12px 10px 20px;border-top:1px solid rgba(255,255,255,.15);margin-top:auto;}
-.logout-btn{width:100%;padding:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:9px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:6px}
-.logout-btn:hover{background:rgba(255,255,255,.2)}
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-/* ── MAIN ── */
-.main{margin-left:210px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
+    body {
+      font-family: var(--font);
+      background: var(--surface);
+      color: var(--ink);
+      display: flex;
+      min-height: 100vh;
+    }
 
-/* ── TOPBAR ── */
-.topbar{background:var(--white);border-bottom:1px solid var(--border);height:54px;display:flex;align-items:center;padding:0 26px;gap:12px;position:sticky;top:0;z-index:40;}
-.tb-search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 13px;width:280px;}
-.tb-search input{background:none;border:none;outline:none;font-family:inherit;font-size:13px;color:var(--ink);width:100%;}
-.tb-search input::placeholder{color:var(--muted);}
-.tb-search i{color:var(--muted);font-size:15px;}
-.tb-space{flex:1;}
-.tb-ico{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:17px;cursor:pointer;border:none;background:transparent;position:relative;}
-.tb-ico:hover{background:var(--surface);}
-.tb-ico .ndot{position:absolute;top:7px;right:7px;width:6px;height:6px;background:var(--red);border-radius:50%;border:1.5px solid #fff;}
-.tb-company{display:flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:9px;padding:5px 13px;font-size:12px;font-weight:800;color:var(--ink2);cursor:pointer;}
-.co-dot{width:8px;height:8px;background:var(--teal);border-radius:50%;}
+    /* ── SIDEBAR (Teal) ── */
+    .sidebar {
+      width: 210px;
+      min-width: 210px;
+      background: var(--sidebar-grad);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      overflow: hidden;
+      z-index: 100;
+      box-shadow: 4px 0 20px rgba(0, 188, 212, .2)
+    }
 
-/* ── PAGE ── */
-.page{padding:26px 26px 48px;}
+    .sb-profile {
+      padding: 20px 18px 17px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, .18)
+    }
 
-/* ── PAGE HEADER ── */
-.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:26px;flex-wrap:wrap;gap:14px;}
-.ph-left{}
-.ph-eye{font-size:11px;font-weight:900;color:var(--teal);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px;}
-.ph-title{font-size:24px;font-weight:900;color:var(--ink);letter-spacing:-.5px;}
-.ph-sub{font-size:13px;color:var(--muted);font-weight:600;margin-top:4px;}
-.ph-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .sb-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+      border: 2px solid rgba(255, 255, 255, .3)
+    }
 
-/* project selector */
-.proj-sel{display:flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:8px 14px;cursor:pointer;}
-.proj-icon{width:30px;height:30px;border-radius:8px;background:var(--teal-lt);color:var(--teal-dk);display:flex;align-items:center;justify-content:center;font-size:15px;}
-.proj-info{}
-.proj-name{font-size:13px;font-weight:800;color:var(--ink);}
-.proj-client{font-size:11px;color:var(--muted);font-weight:600;}
-.proj-arrow{color:var(--muted);font-size:16px;margin-left:4px;}
+    .sb-name {
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff
+    }
 
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;border:none;transition:all .12s;white-space:nowrap;}
-.btn i{font-size:15px;}
-.btn-primary{background:var(--teal);color:#fff;}
-.btn-primary:hover{background:var(--teal-dk);}
-.btn-ghost{background:var(--white);color:var(--ink2);border:1px solid var(--border);}
-.btn-ghost:hover{background:var(--surface);}
+    .sb-role {
+      font-size: 9px;
+      color: rgba(255, 255, 255, .65);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-top: 1px
+    }
 
-/* ── PAYMENT TYPE TABS ── */
-.pay-tabs{display:flex;gap:0;background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:22px;flex-wrap:wrap;}
-.pay-tab{flex:1;min-width:140px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 12px;cursor:pointer;border-right:1px solid var(--border);transition:all .14s;position:relative;}
-.pay-tab:last-child{border-right:none;}
-.pay-tab:hover{background:var(--surface);}
-.pay-tab.active{background:var(--teal);color:#fff;}
-.pay-tab.active .pt-icon{background:rgba(255,255,255,.2);color:#fff;}
-.pay-tab.active .pt-label{color:#fff;}
-.pay-tab.active .pt-desc{color:rgba(255,255,255,.7);}
-.pt-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .14s;}
-.pt-label{font-size:12.5px;font-weight:900;color:var(--ink);transition:color .14s;}
-.pt-desc{font-size:10.5px;font-weight:600;color:var(--muted);transition:color .14s;text-align:center;}
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 14px 10px;
+      flex: 1
+    }
 
-.pt-icon.inv   {background:var(--blue-lt);   color:var(--blue-tx);}
-.pt-icon.pay   {background:var(--green-lt);  color:var(--green-tx);}
-.pt-icon.adv   {background:var(--purple-lt); color:var(--purple-tx);}
-.pt-icon.add   {background:var(--orange-lt); color:var(--orange-tx);}
-.pt-icon.mile  {background:var(--amber-lt);  color:var(--amber-tx);}
+    .nav-label {
+      font-size: 9px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, .5);
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      padding: 8px 10px 4px
+    }
 
-/* ── STATS ROW ── */
-.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;}
-@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr);}}
-.sc{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;}
-.sc::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
-.sc.c-blue::after{background:var(--blue);}
-.sc.c-green::after{background:var(--green);}
-.sc.c-purple::after{background:var(--purple);}
-.sc.c-orange::after{background:var(--orange);}
-.sc.c-amber::after{background:var(--amber);}
-.sc-lbl{font-size:10.5px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;}
-.sc-val{font-size:22px;font-weight:900;color:var(--ink);letter-spacing:-.5px;line-height:1;}
-.sc-sub{font-size:11px;color:var(--muted);font-weight:600;margin-top:4px;}
-.sc-ico{position:absolute;top:14px;right:14px;font-size:20px;opacity:.15;}
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 10px;
+      border-radius: 9px;
+      cursor: pointer;
+      color: rgba(255, 255, 255, .7);
+      font-size: 12px;
+      font-weight: 600;
+      transition: all .15s;
+      text-decoration: none;
+    }
 
-/* ── PANEL ── */
-.panel{background:var(--white);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
-.panel-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;}
-.panel-title{font-size:14px;font-weight:900;color:var(--ink);display:flex;align-items:center;gap:8px;}
-.panel-title i{font-size:16px;color:var(--teal);}
-.count-chip{background:var(--teal-lt);color:var(--teal-dk);font-size:11px;font-weight:900;padding:2px 9px;border-radius:20px;}
-.panel-actions{display:flex;align-items:center;gap:8px;}
+    .nav-item:hover {
+      background: rgba(255, 255, 255, .14);
+      color: #fff
+    }
 
-/* ── GRID HEADER ── */
-.grid-hd{display:grid;gap:8px;padding:10px 20px;background:#FAFBFD;border-bottom:1px solid var(--border);}
-.grid-hd.inv-grid  {grid-template-columns:2fr 1fr 1fr 1fr 1fr 90px;}
-.grid-hd.pay-grid  {grid-template-columns:2fr 1fr 1fr 1fr 1fr 90px;}
-.grid-hd.adv-grid  {grid-template-columns:2fr 1fr 1fr 1fr 1fr 90px;}
-.grid-hd.mile-grid {grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr 90px;}
-.gh{font-size:10.5px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;}
+    .nav-item.active {
+      background: rgba(255, 255, 255, .24);
+      color: #fff
+    }
 
-/* ── GRID ROW ── */
-.grid-row{display:grid;gap:8px;padding:0 20px;align-items:center;min-height:58px;border-bottom:1px solid var(--border);border-left:3px solid transparent;transition:background .12s;cursor:pointer;position:relative;}
-.grid-row:last-child{border-bottom:none;}
-.grid-row:hover{background:#F8FBFD;}
-.grid-row.inv-grid  {grid-template-columns:2fr 1fr 1fr 1fr 1fr 90px;}
-.grid-row.pay-grid  {grid-template-columns:2fr 1fr 1fr 1fr 1fr 90px;}
-.grid-row.adv-grid  {grid-template-columns:2fr 1fr 1fr 1fr 1fr 90px;}
-.grid-row.mile-grid {grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr 90px;}
+    .nav-item i {
+      font-size: 15px;
+      flex-shrink: 0
+    }
 
-.grid-row.paid   {border-left-color:var(--green);}
-.grid-row.pending{border-left-color:var(--amber);}
-.grid-row.overdue{border-left-color:var(--red);}
-.grid-row.partial{border-left-color:var(--blue);}
-.grid-row.draft  {border-left-color:#CBD5E1;}
-.grid-row.upcoming{border-left-color:var(--purple);}
+    .sb-footer {
+      padding: 12px 10px 20px;
+      border-top: 1px solid rgba(255, 255, 255, .15);
+      margin-top: auto;
+    }
 
-.cell-main{}
-.cell-id{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:1px;}
-.cell-name{font-size:13.5px;font-weight:800;color:var(--ink);}
-.cell-sub{font-size:11px;font-weight:600;color:var(--muted);margin-top:1px;}
+    .logout-btn {
+      width: 100%;
+      padding: 9px;
+      background: rgba(255, 255, 255, .12);
+      border: 1px solid rgba(255, 255, 255, .18);
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      font-family: var(--font);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px
+    }
 
-.cell-amt{font-size:14px;font-weight:900;color:var(--ink);letter-spacing:-.3px;}
-.cell-amt.paid-color{color:var(--green-tx);}
-.cell-amt.pending-color{color:var(--amber-tx);}
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, .2)
+    }
 
-.cell-date{font-size:12.5px;font-weight:700;color:var(--ink2);}
-.cell-date.overdue-date{color:var(--red);font-weight:800;}
+    /* ── MAIN ── */
+    .main {
+      margin-left: 210px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
 
-/* status pill */
-.spill{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:900;white-space:nowrap;}
-.spill i{font-size:11px;}
-.sp-paid     {background:var(--green-lt);  color:var(--green-tx);}
-.sp-pending  {background:var(--amber-lt);  color:var(--amber-tx);}
-.sp-overdue  {background:var(--red-lt);    color:var(--red-tx);}
-.sp-partial  {background:var(--blue-lt);   color:var(--blue-tx);}
-.sp-draft    {background:#F1F5F9;          color:#475569;}
-.sp-upcoming {background:var(--purple-lt); color:var(--purple-tx);}
-.sp-sent     {background:var(--teal-lt);   color:var(--teal-dk);}
-.sp-released {background:var(--green-lt);  color:var(--green-tx);}
-.sp-held     {background:var(--amber-lt);  color:var(--amber-tx);}
+    /* ── TOPBAR ── */
+    .topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      height: 54px;
+      display: flex;
+      align-items: center;
+      padding: 0 26px;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
 
-/* progress bar */
-.prog-wrap{display:flex;align-items:center;gap:7px;}
-.prog-bar{flex:1;height:5px;background:#E2E8F0;border-radius:10px;overflow:hidden;max-width:80px;}
-.prog-fill{height:100%;border-radius:10px;background:var(--teal);}
-.prog-fill.green{background:var(--green);}
-.prog-fill.amber{background:var(--amber);}
-.prog-lbl{font-size:11px;font-weight:800;color:var(--muted);}
+    .tb-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 13px;
+      width: 280px;
+    }
 
-/* milestone dot */
-.m-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-.m-dot.done{background:var(--green);}
-.m-dot.active{background:var(--teal);}
-.m-dot.upcoming{background:#CBD5E1;}
-.m-dot.overdue{background:var(--red);}
+    .tb-search input {
+      background: none;
+      border: none;
+      outline: none;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--ink);
+      width: 100%;
+    }
 
-/* row actions */
-.row-acts{display:flex;align-items:center;gap:3px;opacity:0;transition:opacity .12s;}
-.grid-row:hover .row-acts{opacity:1;}
-.ract{width:27px;height:27px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);cursor:pointer;border:none;background:transparent;transition:all .12s;}
-.ract:hover{background:var(--surface);color:var(--ink);}
-.ract.del:hover{background:var(--red-lt);color:var(--red);}
+    .tb-search input::placeholder {
+      color: var(--muted);
+    }
 
-/* summary foot */
-.grid-foot{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:#FAFBFD;border-top:1px solid var(--border);flex-wrap:wrap;gap:8px;}
-.gf-left{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
-.gf-dot{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:var(--muted);}
-.gf-dot-c{width:7px;height:7px;border-radius:50%;}
-.gf-total{font-size:13px;font-weight:900;color:var(--ink);}
+    .tb-search i {
+      color: var(--muted);
+      font-size: 15px;
+    }
 
-/* add row */
-.add-row-btn{display:flex;align-items:center;gap:8px;padding:11px 20px;color:var(--muted);font-size:12.5px;font-weight:700;cursor:pointer;transition:all .12s;border-top:1px dashed #E2E8F0;}
-.add-row-btn:hover{color:var(--teal);background:#F0FBFD;}
-.add-row-btn i{font-size:16px;}
+    .tb-space {
+      flex: 1;
+    }
 
-/* section hidden */
-.pay-section{display:none;}
-.pay-section.active{display:block;}
+    .tb-ico {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 17px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      position: relative;
+    }
 
-/* ── MODAL ── */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(13,27,42,.42);z-index:200;align-items:center;justify-content:center;}
-.modal-bg.open{display:flex;}
-.modal{background:var(--white);border-radius:16px;border:1px solid var(--border);width:520px;max-width:96vw;padding:26px;max-height:90vh;overflow-y:auto;}
-.mhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
-.mhd-left{display:flex;align-items:center;gap:10px;}
-.mhd-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;}
-.mhd-title{font-size:16px;font-weight:900;color:var(--ink);}
-.mhd-close{width:30px;height:30px;border-radius:7px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;display:flex;align-items:center;justify-content:center;transition:background .12s;}
-.mhd-close:hover{background:var(--surface);}
+    .tb-ico:hover {
+      background: var(--surface);
+    }
 
-.mfields{display:flex;flex-direction:column;gap:14px;}
-.mrow2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.mrow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
-.mfield label{display:block;font-size:10.5px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;}
-.mfield input,.mfield select,.mfield textarea{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:9px;font-family:inherit;font-size:13px;color:var(--ink);background:var(--white);outline:none;transition:border-color .12s;}
-.mfield textarea{resize:vertical;min-height:70px;}
-.mfield input:focus,.mfield select:focus,.mfield textarea:focus{border-color:var(--teal);}
-.mfield input::placeholder,.mfield textarea::placeholder{color:var(--muted);}
-.mfield .prefix-wrap{position:relative;}
-.mfield .prefix-wrap input{padding-left:30px;}
-.mfield .prefix{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:700;color:var(--muted);}
+    .tb-ico .ndot {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      width: 6px;
+      height: 6px;
+      background: var(--red);
+      border-radius: 50%;
+      border: 1.5px solid #fff;
+    }
 
-.mactions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;}
-.btn-cancel{padding:8px 18px;border-radius:9px;border:1px solid var(--border);background:var(--white);font-size:13px;font-weight:800;font-family:inherit;color:var(--ink2);cursor:pointer;}
-.btn-submit{display:flex;align-items:center;gap:6px;padding:8px 20px;border-radius:9px;background:var(--teal);color:#fff;font-size:13px;font-weight:800;font-family:inherit;border:none;cursor:pointer;transition:background .12s;}
-.btn-submit:hover{background:var(--teal-dk);}
+    .tb-company {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 5px 13px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--ink2);
+      cursor: pointer;
+    }
 
-/* ── TOAST ── */
-.toast{position:fixed;bottom:22px;right:22px;background:var(--ink);color:#fff;font-size:13px;font-weight:800;padding:11px 18px;border-radius:10px;display:flex;align-items:center;gap:8px;z-index:400;transform:translateY(70px);opacity:0;transition:all .25s cubic-bezier(.34,1.56,.64,1);pointer-events:none;}
-.toast.show{transform:translateY(0);opacity:1;}
-.toast i{font-size:15px;color:var(--teal);}
-</style>
+    .co-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--teal);
+      border-radius: 50%;
+    }
+
+    /* ── PAGE ── */
+    .page {
+      padding: 26px 26px 48px;
+    }
+
+    /* ── PAGE HEADER ── */
+    .ph {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 26px;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .ph-left {}
+
+    .ph-eye {
+      font-size: 11px;
+      font-weight: 900;
+      color: var(--teal);
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .ph-title {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--ink);
+      letter-spacing: -.5px;
+    }
+
+    .ph-sub {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .ph-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* project selector */
+    .proj-sel {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+
+    .proj-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: var(--teal-lt);
+      color: var(--teal-dk);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+    }
+
+    .proj-info {}
+
+    .proj-name {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .proj-client {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .proj-arrow {
+      color: var(--muted);
+      font-size: 16px;
+      margin-left: 4px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      transition: all .12s;
+      white-space: nowrap;
+    }
+
+    .btn i {
+      font-size: 15px;
+    }
+
+    .btn-primary {
+      background: var(--teal);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--teal-dk);
+    }
+
+    .btn-ghost {
+      background: var(--white);
+      color: var(--ink2);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      background: var(--surface);
+    }
+
+    /* ── PAYMENT TYPE TABS ── */
+    .pay-tabs {
+      display: flex;
+      gap: 0;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+    }
+
+    .pay-tab {
+      flex: 1;
+      min-width: 140px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 14px 12px;
+      cursor: pointer;
+      border-right: 1px solid var(--border);
+      transition: all .14s;
+      position: relative;
+    }
+
+    .pay-tab:last-child {
+      border-right: none;
+    }
+
+    .pay-tab:hover {
+      background: var(--surface);
+    }
+
+    .pay-tab.active {
+      background: var(--teal);
+      color: #fff;
+    }
+
+    .pay-tab.active .pt-icon {
+      background: rgba(255, 255, 255, .2);
+      color: #fff;
+    }
+
+    .pay-tab.active .pt-label {
+      color: #fff;
+    }
+
+    .pay-tab.active .pt-desc {
+      color: rgba(255, 255, 255, .7);
+    }
+
+    .pt-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all .14s;
+    }
+
+    .pt-label {
+      font-size: 12.5px;
+      font-weight: 900;
+      color: var(--ink);
+      transition: color .14s;
+    }
+
+    .pt-desc {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--muted);
+      transition: color .14s;
+      text-align: center;
+    }
+
+    .pt-icon.inv {
+      background: var(--blue-lt);
+      color: var(--blue-tx);
+    }
+
+    .pt-icon.pay {
+      background: var(--green-lt);
+      color: var(--green-tx);
+    }
+
+    .pt-icon.adv {
+      background: var(--purple-lt);
+      color: var(--purple-tx);
+    }
+
+    .pt-icon.add {
+      background: var(--orange-lt);
+      color: var(--orange-tx);
+    }
+
+    .pt-icon.mile {
+      background: var(--amber-lt);
+      color: var(--amber-tx);
+    }
+
+    /* ── STATS ROW ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    @media(max-width:900px) {
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .sc {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sc::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .sc.c-blue::after {
+      background: var(--blue);
+    }
+
+    .sc.c-green::after {
+      background: var(--green);
+    }
+
+    .sc.c-purple::after {
+      background: var(--purple);
+    }
+
+    .sc.c-orange::after {
+      background: var(--orange);
+    }
+
+    .sc.c-amber::after {
+      background: var(--amber);
+    }
+
+    .sc-lbl {
+      font-size: 10.5px;
+      font-weight: 900;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      margin-bottom: 6px;
+    }
+
+    .sc-val {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--ink);
+      letter-spacing: -.5px;
+      line-height: 1;
+    }
+
+    .sc-sub {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .sc-ico {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      font-size: 20px;
+      opacity: .15;
+    }
+
+    /* ── PANEL ── */
+    .panel {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-title i {
+      font-size: 16px;
+      color: var(--teal);
+    }
+
+    .count-chip {
+      background: var(--teal-lt);
+      color: var(--teal-dk);
+      font-size: 11px;
+      font-weight: 900;
+      padding: 2px 9px;
+      border-radius: 20px;
+    }
+
+    .panel-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── GRID HEADER ── */
+    .grid-hd {
+      display: grid;
+      gap: 8px;
+      padding: 10px 20px;
+      background: #FAFBFD;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .grid-hd.inv-grid {
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr 90px;
+    }
+
+    .grid-hd.pay-grid {
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr 90px;
+    }
+
+    .grid-hd.adv-grid {
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr 90px;
+    }
+
+    .grid-hd.mile-grid {
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 90px;
+    }
+
+    .gh {
+      font-size: 10.5px;
+      font-weight: 900;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .7px;
+    }
+
+    /* ── GRID ROW ── */
+    .grid-row {
+      display: grid;
+      gap: 8px;
+      padding: 0 20px;
+      align-items: center;
+      min-height: 58px;
+      border-bottom: 1px solid var(--border);
+      border-left: 3px solid transparent;
+      transition: background .12s;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .grid-row:last-child {
+      border-bottom: none;
+    }
+
+    .grid-row:hover {
+      background: #F8FBFD;
+    }
+
+    .grid-row.inv-grid {
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr 90px;
+    }
+
+    .grid-row.pay-grid {
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr 90px;
+    }
+
+    .grid-row.adv-grid {
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr 90px;
+    }
+
+    .grid-row.mile-grid {
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 90px;
+    }
+
+    .grid-row.paid {
+      border-left-color: var(--green);
+    }
+
+    .grid-row.pending {
+      border-left-color: var(--amber);
+    }
+
+    .grid-row.overdue {
+      border-left-color: var(--red);
+    }
+
+    .grid-row.partial {
+      border-left-color: var(--blue);
+    }
+
+    .grid-row.draft {
+      border-left-color: #CBD5E1;
+    }
+
+    .grid-row.upcoming {
+      border-left-color: var(--purple);
+    }
+
+    .cell-main {}
+
+    .cell-id {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 1px;
+    }
+
+    .cell-name {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .cell-sub {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+
+    .cell-amt {
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--ink);
+      letter-spacing: -.3px;
+    }
+
+    .cell-amt.paid-color {
+      color: var(--green-tx);
+    }
+
+    .cell-amt.pending-color {
+      color: var(--amber-tx);
+    }
+
+    .cell-date {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--ink2);
+    }
+
+    .cell-date.overdue-date {
+      color: var(--red);
+      font-weight: 800;
+    }
+
+    /* status pill */
+    .spill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .spill i {
+      font-size: 11px;
+    }
+
+    .sp-paid {
+      background: var(--green-lt);
+      color: var(--green-tx);
+    }
+
+    .sp-pending {
+      background: var(--amber-lt);
+      color: var(--amber-tx);
+    }
+
+    .sp-overdue {
+      background: var(--red-lt);
+      color: var(--red-tx);
+    }
+
+    .sp-partial {
+      background: var(--blue-lt);
+      color: var(--blue-tx);
+    }
+
+    .sp-draft {
+      background: #F1F5F9;
+      color: #475569;
+    }
+
+    .sp-upcoming {
+      background: var(--purple-lt);
+      color: var(--purple-tx);
+    }
+
+    .sp-sent {
+      background: var(--teal-lt);
+      color: var(--teal-dk);
+    }
+
+    .sp-released {
+      background: var(--green-lt);
+      color: var(--green-tx);
+    }
+
+    .sp-held {
+      background: var(--amber-lt);
+      color: var(--amber-tx);
+    }
+
+    /* progress bar */
+    .prog-wrap {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .prog-bar {
+      flex: 1;
+      height: 5px;
+      background: #E2E8F0;
+      border-radius: 10px;
+      overflow: hidden;
+      max-width: 80px;
+    }
+
+    .prog-fill {
+      height: 100%;
+      border-radius: 10px;
+      background: var(--teal);
+    }
+
+    .prog-fill.green {
+      background: var(--green);
+    }
+
+    .prog-fill.amber {
+      background: var(--amber);
+    }
+
+    .prog-lbl {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--muted);
+    }
+
+    /* milestone dot */
+    .m-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .m-dot.done {
+      background: var(--green);
+    }
+
+    .m-dot.active {
+      background: var(--teal);
+    }
+
+    .m-dot.upcoming {
+      background: #CBD5E1;
+    }
+
+    .m-dot.overdue {
+      background: var(--red);
+    }
+
+    /* row actions */
+    .row-acts {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      opacity: 0;
+      transition: opacity .12s;
+    }
+
+    .grid-row:hover .row-acts {
+      opacity: 1;
+    }
+
+    .ract {
+      width: 27px;
+      height: 27px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--muted);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      transition: all .12s;
+    }
+
+    .ract:hover {
+      background: var(--surface);
+      color: var(--ink);
+    }
+
+    .ract.del:hover {
+      background: var(--red-lt);
+      color: var(--red);
+    }
+
+    /* summary foot */
+    .grid-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: #FAFBFD;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .gf-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .gf-dot {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .gf-dot-c {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    .gf-total {
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--ink);
+    }
+
+    /* add row */
+    .add-row-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 20px;
+      color: var(--muted);
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .12s;
+      border-top: 1px dashed #E2E8F0;
+    }
+
+    .add-row-btn:hover {
+      color: var(--teal);
+      background: #F0FBFD;
+    }
+
+    .add-row-btn i {
+      font-size: 16px;
+    }
+
+    /* section hidden */
+    .pay-section {
+      display: none;
+    }
+
+    .pay-section.active {
+      display: block;
+    }
+
+    /* ── MODAL ── */
+    .modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(13, 27, 42, .42);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-bg.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--white);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      width: 520px;
+      max-width: 96vw;
+      padding: 26px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .mhd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+
+    .mhd-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mhd-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .mhd-title {
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--ink);
+    }
+
+    .mhd-close {
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .12s;
+    }
+
+    .mhd-close:hover {
+      background: var(--surface);
+    }
+
+    .mfields {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .mrow2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .mrow3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .mfield label {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 900;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      margin-bottom: 5px;
+    }
+
+    .mfield input,
+    .mfield select,
+    .mfield textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--ink);
+      background: var(--white);
+      outline: none;
+      transition: border-color .12s;
+    }
+
+    .mfield textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    .mfield input:focus,
+    .mfield select:focus,
+    .mfield textarea:focus {
+      border-color: var(--teal);
+    }
+
+    .mfield input::placeholder,
+    .mfield textarea::placeholder {
+      color: var(--muted);
+    }
+
+    .mfield .prefix-wrap {
+      position: relative;
+    }
+
+    .mfield .prefix-wrap input {
+      padding-left: 30px;
+    }
+
+    .mfield .prefix {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .mactions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .btn-cancel {
+      padding: 8px 18px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--white);
+      font-size: 13px;
+      font-weight: 800;
+      font-family: inherit;
+      color: var(--ink2);
+      cursor: pointer;
+    }
+
+    .btn-submit {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 20px;
+      border-radius: 9px;
+      background: var(--teal);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+      transition: background .12s;
+    }
+
+    .btn-submit:hover {
+      background: var(--teal-dk);
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      background: var(--ink);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 11px 18px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 400;
+      transform: translateY(70px);
+      opacity: 0;
+      transition: all .25s cubic-bezier(.34, 1.56, .64, 1);
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast i {
+      font-size: 15px;
+      color: var(--teal);
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <div class="sb-profile">
-    <div class="sb-avatar">P</div>
-    <div><div class="sb-name">PRABHU</div><div class="sb-role">Owner</div></div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-profile">
+      <div class="sb-avatar">P</div>
+      <div>
+        <div class="sb-name">PRABHU</div>
+        <div class="sb-role">Owner</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <a class="nav-item" href="#"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+      <div class="nav-label">INTERNAL MANAGEMENT</div>
+      <a class="nav-item" href="#"><i class="ti ti-users"></i>Clients</a>
+      <a class="nav-item" href="#"><i class="ti ti-user-circle"></i>Employees</a>
+      <a class="nav-item" href="#"><i class="ti ti-truck"></i>Vendors</a>
+      <div class="nav-label">PROJECTS</div>
+      <a class="nav-item" href="#"><i class="ti ti-layout-kanban"></i>Projects</a>
+      <a class="nav-item" href="#"><i class="ti ti-checkbox"></i>Tasks</a>
+      <a class="nav-item" href="#"><i class="ti ti-calendar"></i>Calendar</a>
+      <div class="nav-label">FINANCE</div>
+      <a class="nav-item" href="#"><i class="ti ti-file-text"></i>Quotations</a>
+      <a class="nav-item" href="#"><i class="ti ti-presentation"></i>Project Proposals</a>
+      <a class="nav-item" href="#"><i class="ti ti-receipt"></i>Invoices</a>
+      <a class="nav-item" href="#"><i class="ti ti-credit-card"></i>Accounts</a>
+      <a class="nav-item active" href="#"><i class="ti ti-arrows-exchange"></i>Payments</a>
+    </nav>
+    <div class="sb-footer">
+      <button class="logout-btn"><i class="ti ti-logout" style="font-size:14px"></i> Logout</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div class="tb-search"><i class="ti ti-search"></i><input type="text" placeholder="Search payments, invoices…" />
+      </div>
+      <div class="tb-space"></div>
+      <button class="tb-ico"><i class="ti ti-bell"></i><span class="ndot"></span></button>
+      <button class="tb-ico"><i class="ti ti-settings"></i></button>
+      <div class="tb-company"><span class="co-dot"></span>YENCODE TECHNOLOGIES</div>
+    </header>
+
+    <main class="page">
+      <div class="ph">
+        <div class="ph-left">
+          <div class="ph-eye">Finance / Payments</div>
+          <h1 class="ph-title">Project Payments</h1>
+          <p class="ph-sub">Manage invoices, payments and milestones for all projects</p>
+        </div>
+        <div class="ph-right">
+          <div class="proj-sel" onclick="showToast('Switch project')">
+            <div class="proj-icon"><i class="ti ti-briefcase"></i></div>
+            <div class="proj-info">
+              <div class="proj-name">Website Redesign</div>
+              <div class="proj-client">Acme Corp · ₹2,50,000</div>
+            </div>
+            <i class="ti ti-chevron-down proj-arrow"></i>
+          </div>
+          <button class="btn btn-ghost" onclick="showToast('Exported!')"><i class="ti ti-download"></i>Export</button>
+          <button class="btn btn-primary" onclick="openModal()"><i class="ti ti-plus"></i>Raise Payment</button>
+        </div>
+      </div>
+
+      <div class="pay-tabs">
+        <div class="pay-tab active" onclick="switchTab('invoice',this)">
+          <div class="pt-icon inv"><i class="ti ti-file-invoice"></i></div>
+          <div class="pt-label">Invoice</div>
+          <div class="pt-desc">Standard billing</div>
+        </div>
+        <div class="pay-tab" onclick="switchTab('payment',this)">
+          <div class="pt-icon pay"><i class="ti ti-credit-card"></i></div>
+          <div class="pt-label">Payment</div>
+          <div class="pt-desc">Received amounts</div>
+        </div>
+        <div class="pay-tab" onclick="switchTab('advance',this)">
+          <div class="pt-icon adv"><i class="ti ti-pig-money"></i></div>
+          <div class="pt-label">Advance</div>
+          <div class="pt-desc">Upfront payments</div>
+        </div>
+        <div class="pay-tab" onclick="switchTab('additional',this)">
+          <div class="pt-icon add"><i class="ti ti-circle-plus"></i></div>
+          <div class="pt-label">Additional</div>
+          <div class="pt-desc">Extra charges</div>
+        </div>
+        <div class="pay-tab" onclick="switchTab('milestone',this)">
+          <div class="pt-icon mile"><i class="ti ti-flag"></i></div>
+          <div class="pt-label">Milestone</div>
+          <div class="pt-desc">Phase-based billing</div>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats">
+        <div class="sc c-blue">
+          <i class="ti ti-file-invoice sc-ico"></i>
+          <div class="sc-lbl">Total Invoiced</div>
+          <div class="sc-val">₹2,50,000</div>
+          <div class="sc-sub">4 invoices raised</div>
+        </div>
+        <div class="sc c-green">
+          <i class="ti ti-circle-check sc-ico"></i>
+          <div class="sc-lbl">Received</div>
+          <div class="sc-val">₹1,40,000</div>
+          <div class="sc-sub">56% collected</div>
+        </div>
+        <div class="sc c-purple">
+          <i class="ti ti-pig-money sc-ico"></i>
+          <div class="sc-lbl">Advance Paid</div>
+          <div class="sc-val">₹50,000</div>
+          <div class="sc-sub">Adjusted: ₹25,000</div>
+        </div>
+        <div class="sc c-orange">
+          <i class="ti ti-circle-plus sc-ico"></i>
+          <div class="sc-lbl">Additional</div>
+          <div class="sc-val">₹18,500</div>
+          <div class="sc-sub">2 extra charges</div>
+        </div>
+        <div class="sc c-amber">
+          <i class="ti ti-alert-circle sc-ico"></i>
+          <div class="sc-lbl">Outstanding</div>
+          <div class="sc-val">₹1,28,500</div>
+          <div class="sc-sub">Due this month</div>
+        </div>
+      </div>
+
+      <!-- ═══ INVOICE SECTION ═══ -->
+      <div class="pay-section active" id="sec-invoice">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title"><i class="ti ti-file-invoice"></i>Invoices <span class="count-chip">4</span></div>
+            <div class="panel-actions">
+              <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px;"><i
+                  class="ti ti-filter"></i>Filter</button>
+              <button class="btn btn-primary" style="font-size:12px;padding:6px 12px;" onclick="openModal('invoice')"><i
+                  class="ti ti-plus"></i>New Invoice</button>
+            </div>
+          </div>
+          <div class="grid-hd inv-grid">
+            <div class="gh">Invoice</div>
+            <div class="gh">Amount</div>
+            <div class="gh">Issue date</div>
+            <div class="gh">Due date</div>
+            <div class="gh">Status</div>
+            <div class="gh"></div>
+          </div>
+          <div id="invoice-rows">
+            <div class="grid-row inv-grid paid">
+              <div class="cell-main">
+                <div class="cell-id">INV-001</div>
+                <div class="cell-name">Website Design Phase 1</div>
+                <div class="cell-sub">Acme Corp</div>
+              </div>
+              <div class="cell-amt paid-color">₹75,000</div>
+              <div class="cell-date">01 Apr 2026</div>
+              <div class="cell-date">15 Apr 2026</div>
+              <div><span class="spill sp-paid"><i class="ti ti-circle-check"></i>Paid</span></div>
+              <div class="row-acts"><button class="ract" title="View"><i class="ti ti-eye"></i></button><button
+                  class="ract" title="Edit"><i class="ti ti-edit"></i></button><button class="ract del"
+                  title="Delete"><i class="ti ti-trash"></i></button></div>
+            </div>
+            <div class="grid-row inv-grid paid">
+              <div class="cell-main">
+                <div class="cell-id">INV-002</div>
+                <div class="cell-name">Development Sprint 1</div>
+                <div class="cell-sub">Acme Corp</div>
+              </div>
+              <div class="cell-amt paid-color">₹65,000</div>
+              <div class="cell-date">01 May 2026</div>
+              <div class="cell-date">15 May 2026</div>
+              <div><span class="spill sp-paid"><i class="ti ti-circle-check"></i>Paid</span></div>
+              <div class="row-acts"><button class="ract"><i class="ti ti-eye"></i></button><button class="ract"><i
+                    class="ti ti-edit"></i></button><button class="ract del"><i class="ti ti-trash"></i></button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
   </div>
-  <nav class="nav">
-    <a class="nav-item" href="#"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
-    <div class="nav-label">INTERNAL MANAGEMENT</div>
-    <a class="nav-item" href="#"><i class="ti ti-users"></i>Clients</a>
-    <a class="nav-item" href="#"><i class="ti ti-user-circle"></i>Employees</a>
-    <a class="nav-item" href="#"><i class="ti ti-truck"></i>Vendors</a>
-    <div class="nav-label">PROJECTS</div>
-    <a class="nav-item" href="#"><i class="ti ti-layout-kanban"></i>Projects</a>
-    <a class="nav-item" href="#"><i class="ti ti-checkbox"></i>Tasks</a>
-    <a class="nav-item" href="#"><i class="ti ti-calendar"></i>Calendar</a>
-    <div class="nav-label">FINANCE</div>
-    <a class="nav-item" href="#"><i class="ti ti-file-text"></i>Quotations</a>
-    <a class="nav-item" href="#"><i class="ti ti-presentation"></i>Project Proposals</a>
-    <a class="nav-item" href="#"><i class="ti ti-receipt"></i>Invoices</a>
-    <a class="nav-item" href="#"><i class="ti ti-credit-card"></i>Accounts</a>
-    <a class="nav-item active" href="#"><i class="ti ti-arrows-exchange"></i>Payments</a>
-  </nav>
-  <div class="sb-footer">
-    <button class="logout-btn"><i class="ti ti-logout" style="font-size:14px"></i> Logout</button>
-  </div>
-</aside>
 
-<!-- MAIN -->
-<div class="main">
-  <header class="topbar">
-    <div class="tb-search"><i class="ti ti-search"></i><input type="text" placeholder="Search payments, invoices…"/></div>
-    <div class="tb-space"></div>
-    <button class="tb-ico"><i class="ti ti-bell"></i><span class="ndot"></span></button>
-    <button class="tb-ico"><i class="ti ti-settings"></i></button>
-    <div class="tb-company"><span class="co-dot"></span>YENCODE TECHNOLOGIES</div>
-  </header>
-
-  <main class="page">
-    <div class="ph">
-      <div class="ph-left">
-        <div class="ph-eye">Finance / Payments</div>
-        <h1 class="ph-title">Project Payments</h1>
-        <p class="ph-sub">Manage invoices, payments and milestones for all projects</p>
-      </div>
-      <div class="ph-right">
-        <div class="proj-sel" onclick="showToast('Switch project')">
-          <div class="proj-icon"><i class="ti ti-briefcase"></i></div>
-          <div class="proj-info">
-            <div class="proj-name">Website Redesign</div>
-            <div class="proj-client">Acme Corp · ₹2,50,000</div>
-          </div>
-          <i class="ti ti-chevron-down proj-arrow"></i>
+  <!-- ═══ MODAL ═══ -->
+  <div class="modal-bg" id="modalBg" onclick="bgClick(event)">
+    <div class="modal" id="modalBox">
+      <div class="mhd">
+        <div class="mhd-left">
+          <div class="mhd-icon" id="mIcon"><i class="ti ti-file-invoice"></i></div>
+          <span class="mhd-title" id="mTitle">New Invoice</span>
         </div>
-        <button class="btn btn-ghost" onclick="showToast('Exported!')"><i class="ti ti-download"></i>Export</button>
-        <button class="btn btn-primary" onclick="openModal()"><i class="ti ti-plus"></i>Raise Payment</button>
+        <button class="mhd-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
       </div>
-    </div>
-
-    <div class="pay-tabs">
-      <div class="pay-tab active" onclick="switchTab('invoice',this)">
-        <div class="pt-icon inv"><i class="ti ti-file-invoice"></i></div>
-        <div class="pt-label">Invoice</div>
-        <div class="pt-desc">Standard billing</div>
-      </div>
-      <div class="pay-tab" onclick="switchTab('payment',this)">
-        <div class="pt-icon pay"><i class="ti ti-credit-card"></i></div>
-        <div class="pt-label">Payment</div>
-        <div class="pt-desc">Received amounts</div>
-      </div>
-      <div class="pay-tab" onclick="switchTab('advance',this)">
-        <div class="pt-icon adv"><i class="ti ti-pig-money"></i></div>
-        <div class="pt-label">Advance</div>
-        <div class="pt-desc">Upfront payments</div>
-      </div>
-      <div class="pay-tab" onclick="switchTab('additional',this)">
-        <div class="pt-icon add"><i class="ti ti-circle-plus"></i></div>
-        <div class="pt-label">Additional</div>
-        <div class="pt-desc">Extra charges</div>
-      </div>
-      <div class="pay-tab" onclick="switchTab('milestone',this)">
-        <div class="pt-icon mile"><i class="ti ti-flag"></i></div>
-        <div class="pt-label">Milestone</div>
-        <div class="pt-desc">Phase-based billing</div>
-      </div>
-    </div>
-
-    <!-- STATS -->
-    <div class="stats">
-      <div class="sc c-blue">
-        <i class="ti ti-file-invoice sc-ico"></i>
-        <div class="sc-lbl">Total Invoiced</div>
-        <div class="sc-val">₹2,50,000</div>
-        <div class="sc-sub">4 invoices raised</div>
-      </div>
-      <div class="sc c-green">
-        <i class="ti ti-circle-check sc-ico"></i>
-        <div class="sc-lbl">Received</div>
-        <div class="sc-val">₹1,40,000</div>
-        <div class="sc-sub">56% collected</div>
-      </div>
-      <div class="sc c-purple">
-        <i class="ti ti-pig-money sc-ico"></i>
-        <div class="sc-lbl">Advance Paid</div>
-        <div class="sc-val">₹50,000</div>
-        <div class="sc-sub">Adjusted: ₹25,000</div>
-      </div>
-      <div class="sc c-orange">
-        <i class="ti ti-circle-plus sc-ico"></i>
-        <div class="sc-lbl">Additional</div>
-        <div class="sc-val">₹18,500</div>
-        <div class="sc-sub">2 extra charges</div>
-      </div>
-      <div class="sc c-amber">
-        <i class="ti ti-alert-circle sc-ico"></i>
-        <div class="sc-lbl">Outstanding</div>
-        <div class="sc-val">₹1,28,500</div>
-        <div class="sc-sub">Due this month</div>
-      </div>
-    </div>
-
-    <!-- ═══ INVOICE SECTION ═══ -->
-    <div class="pay-section active" id="sec-invoice">
-      <div class="panel">
-        <div class="panel-head">
-          <div class="panel-title"><i class="ti ti-file-invoice"></i>Invoices <span class="count-chip">4</span></div>
-          <div class="panel-actions">
-            <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px;"><i class="ti ti-filter"></i>Filter</button>
-            <button class="btn btn-primary" style="font-size:12px;padding:6px 12px;" onclick="openModal('invoice')"><i class="ti ti-plus"></i>New Invoice</button>
-          </div>
+      <div class="mfields" id="mFields">
+        <div class="mrow2">
+          <div class="mfield"><label>Invoice #</label><input type="text" placeholder="INV-005" value="INV-005" /></div>
+          <div class="mfield"><label>Project</label><select>
+              <option>Website Redesign</option>
+              <option>Mobile App</option>
+            </select></div>
         </div>
-        <div class="grid-hd inv-grid">
-          <div class="gh">Invoice</div><div class="gh">Amount</div><div class="gh">Issue date</div><div class="gh">Due date</div><div class="gh">Status</div><div class="gh"></div>
+        <div class="mfield"><label>Description</label><input type="text" placeholder="e.g. Development Sprint 3" />
         </div>
-        <div id="invoice-rows">
-          <div class="grid-row inv-grid paid">
-            <div class="cell-main"><div class="cell-id">INV-001</div><div class="cell-name">Website Design Phase 1</div><div class="cell-sub">Acme Corp</div></div>
-            <div class="cell-amt paid-color">₹75,000</div>
-            <div class="cell-date">01 Apr 2026</div>
-            <div class="cell-date">15 Apr 2026</div>
-            <div><span class="spill sp-paid"><i class="ti ti-circle-check"></i>Paid</span></div>
-            <div class="row-acts"><button class="ract" title="View"><i class="ti ti-eye"></i></button><button class="ract" title="Edit"><i class="ti ti-edit"></i></button><button class="ract del" title="Delete"><i class="ti ti-trash"></i></button></div>
-          </div>
-          <div class="grid-row inv-grid paid">
-            <div class="cell-main"><div class="cell-id">INV-002</div><div class="cell-name">Development Sprint 1</div><div class="cell-sub">Acme Corp</div></div>
-            <div class="cell-amt paid-color">₹65,000</div>
-            <div class="cell-date">01 May 2026</div>
-            <div class="cell-date">15 May 2026</div>
-            <div><span class="spill sp-paid"><i class="ti ti-circle-check"></i>Paid</span></div>
-            <div class="row-acts"><button class="ract"><i class="ti ti-eye"></i></button><button class="ract"><i class="ti ti-edit"></i></button><button class="ract del"><i class="ti ti-trash"></i></button></div>
-          </div>
+        <div class="mrow2">
+          <div class="mfield"><label>Amount</label><input type="number" placeholder="0" /></div>
         </div>
       </div>
-    </div>
-  </main>
-</div>
-
-<!-- ═══ MODAL ═══ -->
-<div class="modal-bg" id="modalBg" onclick="bgClick(event)">
-  <div class="modal" id="modalBox">
-    <div class="mhd">
-      <div class="mhd-left">
-        <div class="mhd-icon" id="mIcon"><i class="ti ti-file-invoice"></i></div>
-        <span class="mhd-title" id="mTitle">New Invoice</span>
+      <div class="mactions">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-submit" onclick="submitModal()"><i class="ti ti-check"></i><span
+            id="mSubmitLabel">Save</span></button>
       </div>
-      <button class="mhd-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
-    </div>
-    <div class="mfields" id="mFields">
-      <div class="mrow2">
-        <div class="mfield"><label>Invoice #</label><input type="text" placeholder="INV-005" value="INV-005"/></div>
-        <div class="mfield"><label>Project</label><select><option>Website Redesign</option><option>Mobile App</option></select></div>
-      </div>
-      <div class="mfield"><label>Description</label><input type="text" placeholder="e.g. Development Sprint 3"/></div>
-      <div class="mrow2">
-        <div class="mfield"><label>Amount</label><input type="number" placeholder="0"/></div>
-      </div>
-    </div>
-    <div class="mactions">
-      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-      <button class="btn-submit" onclick="submitModal()"><i class="ti ti-check"></i><span id="mSubmitLabel">Save</span></button>
     </div>
   </div>
-</div>
 
-<div class="toast" id="toast"><i class="ti ti-check"></i><span id="toastMsg">Saved</span></div>
+  <div class="toast" id="toast"><i class="ti ti-check"></i><span id="toastMsg">Saved</span></div>
 
-<script>
-function showToast(msg) {
-  document.getElementById('toastMsg').innerText = msg;
-  document.getElementById('toast').classList.add('show');
-  setTimeout(() => { document.getElementById('toast').classList.remove('show'); }, 3000);
-}
-function switchTab(tab, element) {
-  document.querySelectorAll('.pay-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.pay-section').forEach(s => s.classList.remove('active'));
-  element.classList.add('active');
-  document.getElementById('sec-' + tab)?.classList.add('active');
-}
-function openModal() {
-  document.getElementById('modalBg').classList.add('open');
-}
-function closeModal() {
-  document.getElementById('modalBg').classList.remove('open');
-}
-function submitModal() {
-  closeModal();
-  showToast('Saved successfully');
-}
-function bgClick(e) {
-  if (e.target.id === 'modalBg') closeModal();
-}
-</script>
+  <script>
+    function showToast(msg) {
+      document.getElementById('toastMsg').innerText = msg;
+      document.getElementById('toast').classList.add('show');
+      setTimeout(() => { document.getElementById('toast').classList.remove('show'); }, 3000);
+    }
+    function switchTab(tab, element) {
+      document.querySelectorAll('.pay-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.pay-section').forEach(s => s.classList.remove('active'));
+      element.classList.add('active');
+      document.getElementById('sec-' + tab)?.classList.add('active');
+    }
+    function openModal() {
+      document.getElementById('modalBg').classList.add('open');
+    }
+    function closeModal() {
+      document.getElementById('modalBg').classList.remove('open');
+    }
+    function submitModal() {
+      closeModal();
+      showToast('Saved successfully');
+    }
+    function bgClick(e) {
+      if (e.target.id === 'modalBg') closeModal();
+    }
+  </script>
 </body>
+
 </html>

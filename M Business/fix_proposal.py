@@ -37,7 +37,7 @@ injection = """
 
   const sendThemeToIframe = () => {
     if (iframeRef.current && iframeRef.current.contentWindow) {
-      const color = getComputedStyle(document.documentElement).getPropertyValue('--teal').trim() || '#00BCD4';
+      const color = getComputedStyle(document.documentElement).getPropertyValue('--teal').trim() || ' var(--app-accent, #00BCD4)';
       iframeRef.current.contentWindow.postMessage({ type: 'SET_THEME', color }, '*');
     }
   };

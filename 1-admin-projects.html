@@ -10,9 +10,9 @@
   <style>
     /* ── SHARED DESIGN SYSTEM: M Business ── */
     :root {
-      --primary: #00BCD4;
+      --primary: var(--app-accent, #00BCD4);
       --primary-dark: #0097A7;
-      --primary-light: #E0F7FA;
+      --primary-light: var(--teal-light, #E0F7FA);
       --primary-mid: #B2EBF2;
       --text-dark: #1A2332;
       --text-mid: #4A5568;
@@ -1927,7 +1927,7 @@
                 style="font-size:11px;padding:5px 10px;"><i class="ti ti-user-plus"></i>Add</button>
             </div>
             <div class="member-row">
-              <div class="av av-sm" style="background:#00BCD4;">VK</div>
+              <div class="av av-sm" style="background: var(--app-accent, #00BCD4);">VK</div>
               <div style="flex:1;">
                 <div style="font-size:13px;font-weight:700;">Vijay Kumar</div>
                 <div style="font-size:11px;color:var(--text-light);">Tech Lead</div>
@@ -1935,7 +1935,7 @@
               <div>
                 <div style="font-size:10px;color:var(--text-light);text-align:right;margin-bottom:3px;">12 tasks</div>
                 <div class="member-wl">
-                  <div class="member-wl-fill" style="width:80%;background:#00BCD4;"></div>
+                  <div class="member-wl-fill" style="width:80%;background: var(--app-accent, #00BCD4);"></div>
                 </div>
               </div>
             </div>

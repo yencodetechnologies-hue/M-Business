@@ -27,7 +27,7 @@ send_to_html = """
               <label class="fl">Email (optional)</label>
               <input class="fi" id="lh-recipient-email" placeholder="email@example.com" type="email">
             </div>
-            <button onclick="sendFromLetterhead()" style="width:100%;padding:10px;background:linear-gradient(135deg,#00BCD4,#00ACC1);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;">
+            <button onclick="sendFromLetterhead()" style="width:100%;padding:10px;background:linear-gradient(135deg, var(--app-accent, #00BCD4),#00ACC1);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;">
               <i class="ti ti-send" style="font-size:15px;"></i>Send Letterhead
             </button>
           </div>

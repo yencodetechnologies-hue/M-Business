@@ -804,7 +804,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
         <button onClick={onClose} style={{
           background: "#f0fdfe", border: "1.5px solid #e0eef0",
           borderRadius: 8, padding: "7px 14px", fontSize: 12,
-          fontWeight: 700, cursor: "pointer", color: "#00BCD4",
+          fontWeight: 700, cursor: "pointer", color: " var(--app-accent, #00BCD4)",
           display: "flex", alignItems: "center", gap: 6
         }}>
           <i className="ti ti-arrow-left"></i> Back
@@ -849,14 +849,14 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
         <button onClick={onShare} style={{
           background: "#f0fdfe", border: "1.5px solid #e0eef0",
           borderRadius: 8, padding: "7px 14px", fontSize: 12,
-          fontWeight: 700, cursor: "pointer", color: "#00BCD4",
+          fontWeight: 700, cursor: "pointer", color: " var(--app-accent, #00BCD4)",
           display: "flex", alignItems: "center", gap: 6
         }}>
           <i className="ti ti-share"></i> Share
         </button>
 
         <button onClick={onPrint} style={{
-          background: "#00BCD4", border: "none",
+          background: " var(--app-accent, #00BCD4)", border: "none",
           borderRadius: 8, padding: "7px 16px", fontSize: 12,
           fontWeight: 700, cursor: "pointer", color: "#fff",
           display: "flex", alignItems: "center", gap: 6
@@ -899,7 +899,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                 boxShadow: "0 2px 14px rgba(0,0,0,0.06)"
               }}>
                 {/* Cover */}
-                <div style={{ textAlign: "center", marginBottom: 32, paddingBottom: 24, borderBottom: "3px solid #00BCD4" }}>
+                <div style={{ textAlign: "center", marginBottom: 32, paddingBottom: 24, borderBottom: "3px solid  var(--app-accent, #00BCD4)" }}>
                   <div style={{ fontSize: 30, fontWeight: 900, color: "#0D2027", marginBottom: 8 }}>
                     {prop.title || "Project Proposal"}
                   </div>
@@ -916,7 +916,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                       display: "inline-block", marginTop: 12,
                       background: "#f0fdfe", border: "1.5px solid #e0eef0",
                       borderRadius: 10, padding: "8px 20px",
-                      fontSize: 16, fontWeight: 800, color: "#00BCD4"
+                      fontSize: 16, fontWeight: 800, color: " var(--app-accent, #00BCD4)"
                     }}>
                       ₹{Number(prop.value).toLocaleString("en-IN")}
                     </div>
@@ -931,7 +931,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                     border: "1.5px solid #e0eef0"
                   }}>
                     <div style={{
-                      fontSize: 10, fontWeight: 800, color: "#00BCD4",
+                      fontSize: 10, fontWeight: 800, color: " var(--app-accent, #00BCD4)",
                       textTransform: "uppercase", letterSpacing: 1, marginBottom: 10
                     }}>
                       {SLIDE_TYPES.find(x => x.id === slide.type)?.label || slide.type}
@@ -956,7 +956,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                             padding: "8px 12px", background: "#fff",
                             borderRadius: 8, border: "1px solid #e0eef0", fontSize: 13, color: "#374151"
                           }}>
-                            <span style={{ color: "#00BCD4", fontWeight: 900, marginTop: 1 }}>Yes</span> {item}
+                            <span style={{ color: " var(--app-accent, #00BCD4)", fontWeight: 900, marginTop: 1 }}>Yes</span> {item}
                           </div>
                         ))}
                       </div>
@@ -970,7 +970,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                           }}>
                             <span style={{ fontWeight: 700, color: "#0D2027" }}>Phase {pi + 1}:</span>{" "}
                             <span style={{ color: "#607D86" }}>{ph.label}</span>{" "}
-                            <span style={{ color: "#00BCD4", fontWeight: 700 }}>{ph.dur}</span>
+                            <span style={{ color: " var(--app-accent, #00BCD4)", fontWeight: 700 }}>{ph.dur}</span>
                           </div>
                         ))}
                       </div>
@@ -978,7 +978,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                     {slide.rows && slide.rows.length > 0 && (
                       <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 8 }}>
                         <thead>
-                          <tr style={{ background: "#00BCD4" }}>
+                          <tr style={{ background: " var(--app-accent, #00BCD4)" }}>
                             <th style={{ padding: "8px 14px", color: "#fff", fontSize: 12, textAlign: "left", borderRadius: "6px 0 0 6px" }}>Item</th>
                             <th style={{ padding: "8px 14px", color: "#fff", fontSize: 12, textAlign: "right", borderRadius: "0 6px 6px 0" }}>Cost</th>
                           </tr>
@@ -997,7 +997,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                       <div style={{
                         display: "flex", justifyContent: "flex-end",
                         marginTop: 10, padding: "10px 14px",
-                        background: "#00BCD4", borderRadius: 8,
+                        background: " var(--app-accent, #00BCD4)", borderRadius: 8,
                         fontSize: 15, fontWeight: 900, color: "#fff"
                       }}>
                         Total: {slide.total}
@@ -1013,7 +1013,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                           }}>
                             <div style={{
                               width: 40, height: 40, borderRadius: "50%",
-                              background: "#00BCD4", color: "#fff",
+                              background: " var(--app-accent, #00BCD4)", color: "#fff",
                               display: "flex", alignItems: "center", justifyContent: "center",
                               fontWeight: 800, fontSize: 14, margin: "0 auto 8px"
                             }}>{m.avatar || m.name?.[0]}</div>
@@ -1026,7 +1026,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                     {slide.cta && (
                       <div style={{
                         marginTop: 16, display: "inline-block",
-                        background: "#00BCD4", color: "#fff",
+                        background: " var(--app-accent, #00BCD4)", color: "#fff",
                         borderRadius: 10, padding: "12px 28px",
                         fontSize: 14, fontWeight: 700
                       }}>{slide.cta}</div>
@@ -1091,9 +1091,9 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
                   <div style={{ background: "#fff", borderRadius: 10, border: "1px solid #e0eef0", padding: "16px 20px", textAlign: "center" }}>
                     <div style={{ fontSize: 10, fontWeight: 700, color: "#96B0B8", textTransform: "uppercase", letterSpacing: .6, marginBottom: 12 }}>Authorised Signatory</div>
                     <div style={{ height: 64, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
-                      <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg,#006E7F,#00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, color: "#fff" }}>Yes</div>
+                      <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg,#006E7F, var(--app-accent, #00BCD4))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, color: "#fff" }}>Yes</div>
                     </div>
-                    <div style={{ height: 1, background: "#00BCD4", marginBottom: 8 }} />
+                    <div style={{ height: 1, background: " var(--app-accent, #00BCD4)", marginBottom: 8 }} />
                     <div style={{ fontSize: 12, fontWeight: 700, color: "#0D2027" }}>Company Representative</div>
                     <div style={{ fontSize: 10, color: "#96B0B8", marginTop: 3 }}>Authorised Signatory</div>
                   </div>
@@ -1162,7 +1162,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
   const sendThemeToIframe = () => {
     if (iframeRef.current && iframeRef.current.contentWindow) {
-      const color = getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || '#00BCD4';
+      const color = getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || ' var(--app-accent, #00BCD4)';
       iframeRef.current.contentWindow.postMessage({ type: 'SET_THEME', color }, '*');
     }
   };
@@ -1595,9 +1595,9 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   const successRate = decided > 0 ? Math.round((wonCount / decided) * 100) : 0;
   if (view === "list") {
     const total = proposals.length;
-const totalVal = proposals.reduce((s, p) => s + (Number(p.value) || Number(p.total) || 0), 0);
+    const totalVal = proposals.reduce((s, p) => s + (Number(p.value) || Number(p.total) || 0), 0);
     const wonCount = proposals.filter(p => p.status === "approved" || p.status === "won").length;
-const wonVal = proposals.filter(p => p.status === "approved" || p.status === "won").reduce((s, p) => s + (Number(p.value) || Number(p.total) || 0), 0);
+    const wonVal = proposals.filter(p => p.status === "approved" || p.status === "won").reduce((s, p) => s + (Number(p.value) || Number(p.total) || 0), 0);
     const activeCount = proposals.filter(p => p.status === "pending" || p.status === "negotiation" || p.status === "sent").length;
     const decided = proposals.filter(p => p.status === "approved" || p.status === "won" || p.status === "rejected" || p.status === "lost").length;
     const successRate = decided > 0 ? Math.round((wonCount / decided) * 100) : 0;
@@ -1627,7 +1627,7 @@ const wonVal = proposals.filter(p => p.status === "approved" || p.status === "wo
 
     const fmtDate = (d) => { try { return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }); } catch { return "—"; } };
 
-  const getVal = (p) => Number(p.value) || Number(p.total) || 0;
+    const getVal = (p) => Number(p.value) || Number(p.total) || 0;
     const pipelineStages = [
       { label: "Won", color: "var(--green)", count: wonCount, val: wonVal },
       { label: "Active", color: "var(--purple)", count: activeCount, val: proposals.filter(p => p.status === "pending" || p.status === "negotiation" || p.status === "sent").reduce((s, p) => s + getVal(p), 0) },
@@ -1643,15 +1643,15 @@ const wonVal = proposals.filter(p => p.status === "approved" || p.status === "wo
       <div style={{ fontFamily: "var(--font,'Nunito',sans-serif)", minHeight: "100%", background: "var(--bg,#F5FAFA)", padding: "24px 28px 40px" }}>
         <style>{`
           .prop-list-wrap .stat-card{background:var(--surface,#fff);border:1.5px solid var(--border,#E0EEF0);border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .15s;}
-          .prop-list-wrap .stat-card:hover{border-color:var(--teal,#00BCD4);box-shadow:0 4px 16px rgba(0,188,212,.1);}
+          .prop-list-wrap .stat-card:hover{border-color:var(--teal, var(--app-accent, #00BCD4));box-shadow:0 4px 16px rgba(0,188,212,.1);}
           .prop-list-wrap .proposal-card{background:var(--surface,#fff);border:1.5px solid var(--border,#E0EEF0);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .2s;margin-bottom:14px;}
-          .prop-list-wrap .proposal-card:hover{border-color:var(--teal,#00BCD4);box-shadow:0 6px 24px rgba(0,188,212,.1);}
+          .prop-list-wrap .proposal-card:hover{border-color:var(--teal, var(--app-accent, #00BCD4));box-shadow:0 6px 24px rgba(0,188,212,.1);}
           .prop-list-wrap .prop-tab{padding:7px 18px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--text2,#607D86);transition:all .15s;border:none;background:none;font-family:inherit;}
-          .prop-list-wrap .prop-tab.active{background:var(--teal,#00BCD4);color:#fff;box-shadow:0 2px 10px rgba(0,188,212,.3);}
-          .prop-list-wrap .prop-tab:not(.active):hover{background:var(--teal-light,#E0F7FA);color:var(--teal,#00BCD4);}
+          .prop-list-wrap .prop-tab.active{background:var(--teal, var(--app-accent, #00BCD4));color:#fff;box-shadow:0 2px 10px rgba(0,188,212,.3);}
+          .prop-list-wrap .prop-tab:not(.active):hover{background:var(--teal-light,var(--teal-light, #E0F7FA));color:var(--teal, var(--app-accent, #00BCD4));}
           .prop-list-wrap .pf-btn{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:1.5px solid var(--border,#E0EEF0);background:none;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--text2,#607D86);transition:all .15s;}
-          .prop-list-wrap .pf-btn:hover{border-color:var(--teal,#00BCD4);color:var(--teal,#00BCD4);background:var(--teal-light,#E0F7FA);}
-          .prop-list-wrap .pf-btn.primary{background:var(--teal,#00BCD4);color:#fff;border-color:var(--teal,#00BCD4);}
+          .prop-list-wrap .pf-btn:hover{border-color:var(--teal, var(--app-accent, #00BCD4));color:var(--teal, var(--app-accent, #00BCD4));background:var(--teal-light,var(--teal-light, #E0F7FA));}
+          .prop-list-wrap .pf-btn.primary{background:var(--teal, var(--app-accent, #00BCD4));color:#fff;border-color:var(--teal, var(--app-accent, #00BCD4));}
           .prop-list-wrap .pf-btn.primary:hover{background:var(--teal2,#00ACC1);}
           .prop-list-wrap .pf-btn.danger{color:var(--red,#F05C5C);border-color:var(--red-bg,#FEF2F2);}
           .prop-list-wrap .badge-pill{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;}
@@ -1663,22 +1663,22 @@ const wonVal = proposals.filter(p => p.status === "approved" || p.status === "wo
           .prop-list-wrap .badge-lost{background:var(--red-bg,#FEF2F2);color:var(--red,#F05C5C);} .prop-list-wrap .badge-lost::before{background:var(--red,#F05C5C);}
           .prop-list-wrap .badge-negotiation{background:var(--purple-bg,#EEE9FF);color:var(--purple,#7C5CFC);} .prop-list-wrap .badge-negotiation::before{background:var(--purple,#7C5CFC);}
           .prop-list-wrap .scope-tag{padding:4px 10px;background:var(--bg,#F5FAFA);border:1.5px solid var(--border,#E0EEF0);border-radius:20px;font-size:10px;font-weight:700;color:var(--text2,#607D86);}
-          .prop-list-wrap .add-card{background:var(--teal-lighter,#F0FDFE);border:2px dashed var(--teal,#00BCD4);border-radius:16px;padding:28px;cursor:pointer;display:flex;align-items:center;gap:18px;transition:all .2s;}
-          .prop-list-wrap .add-card:hover{background:var(--teal-light,#E0F7FA);}
+          .prop-list-wrap .add-card{background:var(--teal-lighter,var(--teal-lighter, #F0FDFE));border:2px dashed var(--teal, var(--app-accent, #00BCD4));border-radius:16px;padding:28px;cursor:pointer;display:flex;align-items:center;gap:18px;transition:all .2s;}
+          .prop-list-wrap .add-card:hover{background:var(--teal-light,var(--teal-light, #E0F7FA));}
           .prop-list-wrap .tmpl-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg,#F5FAFA);border-radius:9px;border:1.5px solid var(--border,#E0EEF0);margin-bottom:8px;cursor:pointer;transition:all .15s;}
           .prop-list-wrap .tmpl-item:last-child{margin-bottom:0;}
-          .prop-list-wrap .tmpl-item:hover{border-color:var(--teal,#00BCD4);background:var(--teal-lighter,#F0FDFE);}
+          .prop-list-wrap .tmpl-item:hover{border-color:var(--teal, var(--app-accent, #00BCD4));background:var(--teal-lighter,var(--teal-lighter, #F0FDFE));}
           .prop-list-wrap .stage-item-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg,#F5FAFA);border-radius:10px;border:1.5px solid var(--border,#E0EEF0);margin-bottom:8px;}
           .prop-list-wrap .filter-btn{display:flex;align-items:center;gap:6px;padding:9px 16px;background:var(--surface,#fff);border:1.5px solid var(--border,#E0EEF0);border-radius:10px;font-size:12px;font-weight:700;color:var(--text2,#607D86);cursor:pointer;font-family:inherit;transition:all .15s;}
-          .prop-list-wrap .filter-btn:hover{border-color:var(--teal,#00BCD4);color:var(--teal,#00BCD4);}
-          .prop-list-wrap .new-prop-btn{display:flex;align-items:center;gap:7px;padding:11px 20px;background:var(--teal,#00BCD4);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:background .15s;box-shadow:0 4px 14px rgba(0,188,212,.25);}
+          .prop-list-wrap .filter-btn:hover{border-color:var(--teal, var(--app-accent, #00BCD4));color:var(--teal, var(--app-accent, #00BCD4));}
+          .prop-list-wrap .new-prop-btn{display:flex;align-items:center;gap:7px;padding:11px 20px;background:var(--teal, var(--app-accent, #00BCD4));color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:background .15s;box-shadow:0 4px 14px rgba(0,188,212,.25);}
           .prop-list-wrap .new-prop-btn:hover{background:var(--teal2,#00ACC1);}
           .prop-list-wrap .prog-bar{height:5px;background:var(--border,#E0EEF0);border-radius:3px;overflow:hidden;margin-top:8px;}
           .prop-list-wrap .prog-fill{height:100%;border-radius:3px;}
           .prop-list-wrap .search-wrap{position:relative;flex:1;max-width:320px;}
           .prop-list-wrap .search-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3,#A0B8BE);font-size:15px;}
           .prop-list-wrap .search-wrap input{width:100%;padding:10px 14px 10px 36px;background:var(--surface,#fff);border:1.5px solid var(--border,#E0EEF0);border-radius:12px;font-size:13px;color:var(--text,#1A2E35);font-family:inherit;outline:none;transition:all .15s;}
-          .prop-list-wrap .search-wrap input:focus{border-color:var(--teal,#00BCD4);box-shadow:0 0 0 3px rgba(0,188,212,.08);}
+          .prop-list-wrap .search-wrap input:focus{border-color:var(--teal, var(--app-accent, #00BCD4));box-shadow:0 0 0 3px rgba(0,188,212,.08);}
         `}</style>
 
         <div className="prop-list-wrap">
@@ -1712,12 +1712,12 @@ const wonVal = proposals.filter(p => p.status === "approved" || p.status === "wo
 
           {/* STATS ROW */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 22 }}>
-            <div className="stat-card" onClick={() => { setActiveCard("all"); setPropTab("all"); }} style={{ border: activeCard === "all" ? "2px solid var(--teal,#00BCD4)" : "1.5px solid var(--border,#E0EEF0)", boxShadow: activeCard === "all" ? "0 4px 16px rgba(0,188,212,.18)" : "" }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--teal-light,#E0F7FA)", color: "var(--teal,#00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-presentation"></i></div>
+            <div className="stat-card" onClick={() => { setActiveCard("all"); setPropTab("all"); }} style={{ border: activeCard === "all" ? "2px solid var(--teal, var(--app-accent, #00BCD4))" : "1.5px solid var(--border,#E0EEF0)", boxShadow: activeCard === "all" ? "0 4px 16px rgba(0,188,212,.18)" : "" }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--teal-light,var(--teal-light, #E0F7FA))", color: "var(--teal, var(--app-accent, #00BCD4))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-presentation"></i></div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{total}</div>
                 <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>Total Proposals</div>
-                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--teal,#00BCD4)" }}>₹{totalVal.toLocaleString("en-IN")} pipeline</div>
+                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--teal, var(--app-accent, #00BCD4))" }}>₹{totalVal.toLocaleString("en-IN")} pipeline</div>
               </div>
             </div>
             <div className="stat-card" onClick={() => { setActiveCard("won"); setPropTab("won"); }} style={{ border: activeCard === "won" ? "2px solid var(--green,#26C281)" : "1.5px solid var(--border,#E0EEF0)", boxShadow: activeCard === "won" ? "0 4px 16px rgba(38,194,129,.18)" : "" }}>
@@ -1773,9 +1773,9 @@ const wonVal = proposals.filter(p => p.status === "approved" || p.status === "wo
                 <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--text3,#A0B8BE)", fontSize: 14 }}></div>
               ) : filtered.length === 0 ? (
                 <div className="add-card" onClick={openNewModal}>
-                  <div style={{ width: 52, height: 52, borderRadius: 14, background: "var(--teal,#00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, color: "#fff", boxShadow: "0 4px 12px rgba(0,188,212,.3)", flexShrink: 0 }}><i className="ti ti-plus"></i></div>
+                  <div style={{ width: 52, height: 52, borderRadius: 14, background: "var(--teal, var(--app-accent, #00BCD4))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, color: "#fff", boxShadow: "0 4px 12px rgba(0,188,212,.3)", flexShrink: 0 }}><i className="ti ti-plus"></i></div>
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: "var(--teal,#00BCD4)" }}>{propTab === "all" && !propSearch ? "Create Your First Proposal" : "No proposals found"}</div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "var(--teal, var(--app-accent, #00BCD4))" }}>{propTab === "all" && !propSearch ? "Create Your First Proposal" : "No proposals found"}</div>
                     <div style={{ fontSize: 12, color: "var(--text3,#A0B8BE)", marginTop: 3 }}>Build a professional proposal with scope, timeline and pricing</div>
                   </div>
                 </div>
@@ -1787,7 +1787,7 @@ const wonVal = proposals.filter(p => p.status === "approved" || p.status === "wo
                     const clientInitial = (p.client || "?").charAt(0).toUpperCase();
                     const grad = themeGrad(p);
                     const created = p.updated || p.createdAt || p.created;
-                   const value = Number(p.value) || Number(p.total) || 0;
+                    const value = Number(p.value) || Number(p.total) || 0;
                     const slides = p.slides?.length || 0;
                     return (
                       <div key={p.id || p._id} className="proposal-card" onClick={() => { setOpenMenuId(null); openDoc(p); }}>
@@ -1795,10 +1795,10 @@ const wonVal = proposals.filter(p => p.status === "approved" || p.status === "wo
                         <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 20px", borderBottom: "1px solid var(--border,#E0EEF0)" }}>
                           <div style={{ width: 48, height: 48, borderRadius: 13, background: grad, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 800, color: "#fff", flexShrink: 0 }}>{initials}</div>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: 10, fontWeight: 800, color: "var(--teal,#00BCD4)", letterSpacing: 0.5, marginBottom: 2 }}>{p.id}</div>
+                            <div style={{ fontSize: 10, fontWeight: 800, color: "var(--teal, var(--app-accent, #00BCD4))", letterSpacing: 0.5, marginBottom: 2 }}>{p.id}</div>
                             <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text,#1A2E35)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.title || "Untitled Proposal"}</div>
                             <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 3 }}>
-                              <div style={{ width: 18, height: 18, borderRadius: "50%", background: "var(--teal,#00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 7, fontWeight: 800, color: "#fff", flexShrink: 0 }}>{clientInitial}</div>
+                              <div style={{ width: 18, height: 18, borderRadius: "50%", background: "var(--teal, var(--app-accent, #00BCD4))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 7, fontWeight: 800, color: "#fff", flexShrink: 0 }}>{clientInitial}</div>
                               <span style={{ fontSize: 11, color: "var(--text2,#607D86)", fontWeight: 600 }}>{p.client || "No client assigned"}</span>
                             </div>
                           </div>
@@ -1807,7 +1807,7 @@ const wonVal = proposals.filter(p => p.status === "approved" || p.status === "wo
                             <button onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === (p.id || p._id) ? null : (p.id || p._id)); }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3,#A0B8BE)", fontSize: 17, padding: 4 }}><i className="ti ti-dots-vertical"></i></button>
                             {openMenuId === (p.id || p._id) && (
                               <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 28, right: 0, background: "#fff", border: "1.5px solid #e0eef0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 999, minWidth: 160, overflow: "hidden" }}>
-                                <div onClick={e => { setOpenMenuId(null); setViewingProposal(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-eye" style={{ color: "#00BCD4" }}></i> View</div>
+                                <div onClick={e => { setOpenMenuId(null); setViewingProposal(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-eye" style={{ color: " var(--app-accent, #00BCD4)" }}></i> View</div>
                                 <div onClick={e => { setOpenMenuId(null); shareProposal(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-share" style={{ color: "#7C5CFC" }}></i> Share</div>
                                 <div onClick={e => { setOpenMenuId(null); printProposal(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-download" style={{ color: "#2563EB" }}></i> PDF</div>
                                 <div onClick={e => { setOpenMenuId(null); deleteProposal(p.id, p._id, e); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }} onMouseEnter={e => e.currentTarget.style.background = "#fff1f2"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-trash" style={{ color: "#EF4444" }}></i> Delete</div>
@@ -1820,7 +1820,7 @@ const wonVal = proposals.filter(p => p.status === "approved" || p.status === "wo
                         <div style={{ padding: "16px 20px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, borderBottom: "1px solid var(--border,#E0EEF0)" }}>
                           <div>
                             <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text3,#A0B8BE)", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4 }}>Proposal Value</div>
-                            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--teal,#00BCD4)" }}>₹{value.toLocaleString("en-IN")}</div>
+                            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--teal, var(--app-accent, #00BCD4))" }}>₹{value.toLocaleString("en-IN")}</div>
                             <div style={{ fontSize: 10, color: "var(--text3,#A0B8BE)", marginTop: 2 }}>Estimated</div>
                           </div>
                           <div>
@@ -1855,7 +1855,7 @@ const wonVal = proposals.filter(p => p.status === "approved" || p.status === "wo
                             <span style={{ fontSize: 10, color: "var(--text3,#A0B8BE)", fontWeight: 600 }}>{badge.label}</span>
                           </div>
                           <div className="prog-bar">
-                            <div className="prog-fill" style={{ width: badge.cls === "draft" ? "10%" : badge.cls === "sent" ? "30%" : badge.cls === "review" ? "50%" : badge.cls === "negotiation" ? "75%" : badge.cls === "won" ? "100%" : "5%", background: badge.cls === "won" ? "linear-gradient(90deg,var(--green,#26C281),#6EE7B7)" : badge.cls === "negotiation" ? "linear-gradient(90deg,var(--purple,#7C5CFC),#B39DFF)" : badge.cls === "sent" ? "linear-gradient(90deg,var(--blue,#2563EB),#7EC8FD)" : "linear-gradient(90deg,var(--teal,#00BCD4),#26D0CE)" }}></div>
+                            <div className="prog-fill" style={{ width: badge.cls === "draft" ? "10%" : badge.cls === "sent" ? "30%" : badge.cls === "review" ? "50%" : badge.cls === "negotiation" ? "75%" : badge.cls === "won" ? "100%" : "5%", background: badge.cls === "won" ? "linear-gradient(90deg,var(--green,#26C281),#6EE7B7)" : badge.cls === "negotiation" ? "linear-gradient(90deg,var(--purple,#7C5CFC),#B39DFF)" : badge.cls === "sent" ? "linear-gradient(90deg,var(--blue,#2563EB),#7EC8FD)" : "linear-gradient(90deg,var(--teal, var(--app-accent, #00BCD4)),#26D0CE)" }}></div>
                           </div>
                         </div>
 
@@ -1864,7 +1864,7 @@ const wonVal = proposals.filter(p => p.status === "approved" || p.status === "wo
                           <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", display: "flex", alignItems: "center", gap: 5, fontWeight: 600 }}>
                             <i className="ti ti-calendar" style={{ fontSize: 11 }}></i> Valid until {fmtDate(new Date(Date.now() + 30 * 86400000))}
                           </div>
-                          <div style={{ fontSize: 15, fontWeight: 800, color: "var(--teal,#00BCD4)" }}>₹{value.toLocaleString("en-IN")}</div>
+                          <div style={{ fontSize: 15, fontWeight: 800, color: "var(--teal, var(--app-accent, #00BCD4))" }}>₹{value.toLocaleString("en-IN")}</div>
                           <div style={{ display: "flex", gap: 6 }} onClick={e => e.stopPropagation()}>
                             <button className="pf-btn" onClick={e => { e.stopPropagation(); setViewingProposal(p); }}><i className="ti ti-eye" style={{ fontSize: 12 }}></i> View</button>
                             <button className="pf-btn" onClick={e => { e.stopPropagation(); shareProposal(p); }}><i className="ti ti-share" style={{ fontSize: 12 }}></i> Share</button>
@@ -1877,9 +1877,9 @@ const wonVal = proposals.filter(p => p.status === "approved" || p.status === "wo
 
                   {/* Add new card */}
                   <div className="add-card" onClick={openNewModal}>
-                    <div style={{ width: 52, height: 52, borderRadius: 14, background: "var(--teal,#00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, color: "#fff", boxShadow: "0 4px 12px rgba(0,188,212,.3)", flexShrink: 0 }}><i className="ti ti-plus"></i></div>
+                    <div style={{ width: 52, height: 52, borderRadius: 14, background: "var(--teal, var(--app-accent, #00BCD4))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, color: "#fff", boxShadow: "0 4px 12px rgba(0,188,212,.3)", flexShrink: 0 }}><i className="ti ti-plus"></i></div>
                     <div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: "var(--teal,#00BCD4)" }}>Create New Proposal</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: "var(--teal, var(--app-accent, #00BCD4))" }}>Create New Proposal</div>
                       <div style={{ fontSize: 12, color: "var(--text3,#A0B8BE)", marginTop: 3 }}>Build a professional proposal with scope, timeline and pricing</div>
                     </div>
                   </div>
@@ -1894,9 +1894,9 @@ const wonVal = proposals.filter(p => p.status === "approved" || p.status === "wo
               <div style={{ background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 16, padding: 20 }}>
                 <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text,#1A2E35)", marginBottom: 4 }}>Pipeline Summary</div>
                 <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", marginBottom: 16 }}>Total value across all stages</div>
-                <div style={{ textAlign: "center", padding: 14, background: "var(--teal-lighter,#F0FDFE)", borderRadius: 12, border: "1.5px solid var(--teal-light,#E0F7FA)", marginBottom: 14 }}>
+                <div style={{ textAlign: "center", padding: 14, background: "var(--teal-lighter,var(--teal-lighter, #F0FDFE))", borderRadius: 12, border: "1.5px solid var(--teal-light,var(--teal-light, #E0F7FA))", marginBottom: 14 }}>
                   <div style={{ fontSize: 10, color: "var(--text3,#A0B8BE)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>Total Pipeline Value</div>
-                  <div style={{ fontSize: 26, fontWeight: 800, color: "var(--teal,#00BCD4)", marginTop: 3, letterSpacing: -0.5 }}>₹{totalVal.toLocaleString("en-IN")}</div>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: "var(--teal, var(--app-accent, #00BCD4))", marginTop: 3, letterSpacing: -0.5 }}>₹{totalVal.toLocaleString("en-IN")}</div>
                   <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", marginTop: 2 }}>Across {total} proposals</div>
                 </div>
                 <div>
@@ -1921,7 +1921,7 @@ const wonVal = proposals.filter(p => p.status === "approved" || p.status === "wo
                       strokeDasharray={`${successRate * 2.39} ${239 - successRate * 2.39}`} strokeDashoffset="28" strokeLinecap="round" />
                     <defs>
                       <linearGradient id="wg2" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%" stopColor="#00BCD4" />
+                        <stop offset="0%" stopColor=" var(--app-accent, #00BCD4)" />
                         <stop offset="100%" stopColor="#26C281" />
                       </linearGradient>
                     </defs>
@@ -1950,7 +1950,7 @@ const wonVal = proposals.filter(p => p.status === "approved" || p.status === "wo
               <div style={{ background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 16, padding: 18 }}>
                 <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text,#1A2E35)", marginBottom: 12 }}>Quick Start Templates</div>
                 {[
-                  { icon: "ti-world", label: "Web Development", meta: "Full-stack project template", bg: "var(--teal-light,#E0F7FA)", color: "var(--teal,#00BCD4)" },
+                  { icon: "ti-world", label: "Web Development", meta: "Full-stack project template", bg: "var(--teal-light,var(--teal-light, #E0F7FA))", color: "var(--teal, var(--app-accent, #00BCD4))" },
                   { icon: "ti-device-mobile", label: "Mobile App", meta: "iOS / Android template", bg: "var(--purple-bg,#EEE9FF)", color: "var(--purple,#7C5CFC)" },
                   { icon: "ti-chart-bar", label: "Digital Marketing", meta: "SEO, ads & content", bg: "var(--amber-bg,#FEF5E6)", color: "var(--amber,#F5A623)" },
                   { icon: "ti-cpu", label: "Custom Software", meta: "Enterprise solution", bg: "var(--blue-bg,#EFF4FF)", color: "var(--blue,#2563EB)" },
@@ -1961,7 +1961,7 @@ const wonVal = proposals.filter(p => p.status === "approved" || p.status === "wo
                       <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text,#1A2E35)" }}>{tmpl.label}</div>
                       <div style={{ fontSize: 10, color: "var(--text3,#A0B8BE)" }}>{tmpl.meta}</div>
                     </div>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "var(--teal,#00BCD4)" }}>Use </span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "var(--teal, var(--app-accent, #00BCD4))" }}>Use </span>
                   </div>
                 ))}
               </div>

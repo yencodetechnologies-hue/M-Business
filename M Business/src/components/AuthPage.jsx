@@ -225,7 +225,7 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
           max-width: 900px;
           min-height: 500px;
           border-radius: 22px;
-          border: 2px solid #00BCD4;
+          border: 2px solid  var(--app-accent, #00BCD4);
           box-shadow:
             0 0 0 1px rgba(116,41,204,0.12),
             0 0 60px rgba(116,41,204,0.28),
@@ -259,7 +259,7 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
           position: absolute;
           top: 0; bottom: 0;
           width: 42%;
-          background: linear-gradient(155deg, #00BCD4, #00BCD4 60%, #00BCD4 100%);
+          background: linear-gradient(155deg,  var(--app-accent, #00BCD4),  var(--app-accent, #00BCD4) 60%,  var(--app-accent, #00BCD4) 100%);
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -300,12 +300,12 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
 
         .purple-btn {
           width: 100%; padding: 13px 0;
-          background: linear-gradient(90deg, #00BCD4, #00BCD4);
+          background: linear-gradient(90deg,  var(--app-accent, #00BCD4),  var(--app-accent, #00BCD4));
           border: none; border-radius: 50px;
           color: #fff; font-size: 15px; font-weight: 700;
           cursor: pointer; font-family: inherit;
           display: flex; align-items: center; justify-content: center; gap: 8px;
-          box-shadow: 0 4px 22px #00BCD4;
+          box-shadow: 0 4px 22px  var(--app-accent, #00BCD4);
           margin-top: 8px; transition: opacity .2s;
         }
         .purple-btn:disabled { opacity: 0.55; cursor: not-allowed; }
@@ -322,7 +322,7 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
 
         .link-btn {
           background: none; border: none;
-          color: #00BCD4; font-weight: 700;
+          color:  var(--app-accent, #00BCD4); font-weight: 700;
           cursor: pointer; font-family: inherit; font-size: 13px;
         }
 
@@ -486,7 +486,7 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
 
               <div style={{ textAlign: "right", marginBottom: 22, marginTop: -4 }}>
                 <button onClick={() => { setTab("forgot"); setError(""); setSuccess(""); }}
-                  style={{ background: "none", border: "none", color: "#00BCD4", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
+                  style={{ background: "none", border: "none", color: " var(--app-accent, #00BCD4)", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
                   Forgot Password?
                 </button>
               </div>

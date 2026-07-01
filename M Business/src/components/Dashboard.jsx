@@ -510,7 +510,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 
           {/* BASIC INFO */}
           <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Company Basic Info</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Company Basic Info</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
               <Fld label="Client / Display Name *" value={editForm.clientName} onChange={v => { setEditForm(p => ({ ...p, clientName: v })); setEditErr(p => ({ ...p, clientName: '' })); }} error={editErr.clientName} />
               <Fld label="Company Name" value={editForm.companyName} onChange={v => setEditForm(p => ({ ...p, companyName: v }))} />
@@ -524,7 +524,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 
           {/* PRIMARY CONTACT */}
           <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Document Primary Contact</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Document Primary Contact</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
               <Fld label="Contact Person Name" value={editForm.contactPersonName} onChange={v => setEditForm(p => ({ ...p, contactPersonName: v }))} />
               <Fld label="Designation" value={editForm.designation} onChange={v => setEditForm(p => ({ ...p, designation: v }))} />
@@ -537,7 +537,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 
           {/* ADDRESS */}
           <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Location Address</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Location Address</div>
             <div style={{ marginBottom: 12 }}><Fld label="Street / Building Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} /></div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
               <Fld label="City" value={editForm.city} onChange={v => setEditForm(p => ({ ...p, city: v }))} />
@@ -549,7 +549,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 
           {/* ONLINE PRESENCE */}
           <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Web Online Presence</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Web Online Presence</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
               <Fld label="Website URL" value={editForm.website} onChange={v => setEditForm(p => ({ ...p, website: v }))} />
               <Fld label="LinkedIn Profile" value={editForm.linkedin} onChange={v => setEditForm(p => ({ ...p, linkedin: v }))} />
@@ -558,7 +558,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 
           {/* BILLING & TERMS */}
           <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}> Billing & Terms</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}> Billing & Terms</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
               <Fld label="Billing Currency" value={editForm.billingCurrency} onChange={v => setEditForm(p => ({ ...p, billingCurrency: v }))} options={['INR — Indian Rupee', 'USD — US Dollar', 'GBP — British Pound', 'EUR — Euro', 'AED — UAE Dirham', 'SGD — Singapore Dollar', 'AUD — Australian Dollar']} />
               <Fld label="Payment Terms" value={editForm.paymentTerms} onChange={v => setEditForm(p => ({ ...p, paymentTerms: v }))} options={['', 'Due on receipt', 'Net 7', 'Net 15', 'Net 30', 'Net 45', 'Net 60', '50% Advance + 50% on delivery', 'Custom']} />
@@ -569,7 +569,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 
           {/* PORTAL PASSWORD */}
           <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Secure Portal Access</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Secure Portal Access</div>
             <input type="password" value={editForm.password} onChange={e => setEditForm(p => ({ ...p, password: e.target.value }))}
               style={{ width: '100%', border: '1.5px solid var(--app-border)', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: T.text, background: 'var(--app-bg)', boxSizing: 'border-box', outline: 'none' }}
               placeholder="Leave blank to keep current password" />
@@ -577,7 +577,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 
           {/* INTERNAL NOTES */}
           <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Edit Internal Notes</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Edit Internal Notes</div>
             <textarea value={editForm.notes} onChange={e => setEditForm(p => ({ ...p, notes: e.target.value }))}
               style={{ width: '100%', border: '1.5px solid #E0E6EA', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: T.text, background: '#fff', boxSizing: 'border-box', outline: 'none', minHeight: 70, resize: 'vertical', fontFamily: 'inherit' }}
               placeholder="Any internal context, special instructions..." />
@@ -2113,7 +2113,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
           {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
           {validActive === "reports" && <ReportsPage clients={clients} projects={projects} employees={employees} managers={managers} />}
-          {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client) => { setClients(prev => [...prev, client]); setPendingNewClientId(client._id); setActive("clients"); }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || '#00BCD4'} />}
+          {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client) => { setClients(prev => [...prev, client]); setPendingNewClientId(client._id); setActive("clients"); }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || ' var(--app-accent, #00BCD4)'} />}
         </div>
       </div>
 
@@ -2197,7 +2197,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
                 {[{ val: 'b2b', icon: '🏢', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: '👤', label: 'B2C', sub: 'Individual person' }, { val: 'freelancer', icon: '💼', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
                   <div key={t.val} onClick={() => setNc(p => ({ ...p, clientType: t.val }))}
-                    style={{ border: `2px solid ${nc.clientType === t.val ? '#00BCD4' : '#E0E6EA'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? '#E0F7FA' : '#F4F6F8', transition: 'all .15s', position: 'relative' }}>
+                    style={{ border: `2px solid ${nc.clientType === t.val ? ' var(--app-accent, #00BCD4)' : '#E0E6EA'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? 'var(--teal-light, #E0F7FA)' : '#F4F6F8', transition: 'all .15s', position: 'relative' }}>
                     {nc.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: accentColor, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
                     <div style={{ fontSize: 22, marginBottom: 4 }}>{t.icon}</div>
                     <div style={{ fontSize: 12, fontWeight: 700, color: nc.clientType === t.val ? '#007B8A' : '#1A2332' }}>{t.label}</div>
@@ -2209,7 +2209,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {/* ── BASIC INFO ── */}
             <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Company Basic Info</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Company Basic Info</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
                 <Fld label="Client / Display Name *" value={nc.name} onChange={v => { setNc({ ...nc, name: v }); setNcError(p => ({ ...p, name: '' })); }} error={ncError.name} />
                 <Fld label="Company Name" value={nc.company} onChange={v => setNc({ ...nc, company: v })} />
@@ -2223,7 +2223,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {/* ── PRIMARY CONTACT ── */}
             <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Document Primary Contact</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Document Primary Contact</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
                 <Fld label="Contact Person Name" value={nc.contactPersonName} onChange={v => setNc({ ...nc, contactPersonName: v })} />
                 <Fld label="Designation" value={nc.designation || ''} onChange={v => setNc({ ...nc, designation: v })} />
@@ -2236,7 +2236,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {/* ── ADDRESS ── */}
             <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Location Address</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Location Address</div>
               <div style={{ marginBottom: 12 }}><Fld label="Street / Building Address" value={nc.address} onChange={v => setNc({ ...nc, address: v })} /></div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
                 <Fld label="City" value={nc.city} onChange={v => setNc({ ...nc, city: v })} />
@@ -2248,7 +2248,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {/* ── ONLINE PRESENCE ── */}
             <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Web Online Presence</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Web Online Presence</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
                 <Fld label="Website URL" value={nc.website} onChange={v => setNc({ ...nc, website: v })} />
                 <Fld label="LinkedIn Profile" value={nc.linkedin} onChange={v => setNc({ ...nc, linkedin: v })} />
@@ -2257,7 +2257,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {/* ── BILLING & TERMS ── */}
             <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}> Billing & Terms</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}> Billing & Terms</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
                 <Fld label="Billing Currency" value={nc.billingCurrency} onChange={v => setNc({ ...nc, billingCurrency: v })} options={['INR — Indian Rupee', 'USD — US Dollar', 'GBP — British Pound', 'EUR — Euro', 'AED — UAE Dirham', 'SGD — Singapore Dollar', 'AUD — Australian Dollar']} />
                 <Fld label="Payment Terms" value={nc.paymentTerms} onChange={v => setNc({ ...nc, paymentTerms: v })} options={['', 'Due on receipt', 'Net 7', 'Net 15', 'Net 30', 'Net 45', 'Net 60', '50% Advance + 50% on delivery', 'Custom']} />
@@ -2268,7 +2268,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {/* ── PORTAL ACCESS ── */}
             <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Secure Portal Access</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Secure Portal Access</div>
               <div style={{ position: 'relative', marginBottom: 4 }}>
                 <input type={showClientPass ? 'text' : 'password'} value={nc.password} onChange={e => setNc({ ...nc, password: e.target.value })}
                   style={{ width: '100%', border: `1.5px solid ${ncError.password ? '#EF4444' : 'var(--app-border)'}`, borderRadius: 10, padding: '10px 46px 10px 14px', fontSize: 13, color: T.text, background: 'var(--app-bg)', boxSizing: 'border-box', outline: 'none' }}
@@ -2280,7 +2280,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {/* ── INTERNAL NOTES ── */}
             <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Edit Internal Notes</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, #00BCD4)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Edit Internal Notes</div>
               <textarea value={nc.notes} onChange={e => setNc({ ...nc, notes: e.target.value })}
                 style={{ width: '100%', border: '1.5px solid #E0E6EA', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: T.text, background: '#fff', boxSizing: 'border-box', outline: 'none', minHeight: 70, resize: 'vertical', fontFamily: 'inherit' }}
                 placeholder="Any internal context, special instructions, or notes..." />

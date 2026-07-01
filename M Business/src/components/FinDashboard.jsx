@@ -111,7 +111,7 @@ export default function FinDashboard() {
       <style>{`
 /* ── M Business Finance Design System ── */
 :root {
-  --primary:#00BCD4; --primary-dark:#0097A7; --primary-light:#E0F7FA; --primary-mid:#B2EBF2;
+  --primary: var(--app-accent, #00BCD4); --primary-dark:#0097A7; --primary-light:var(--teal-light, #E0F7FA); --primary-mid:#B2EBF2;
   --text-dark:#1A2332; --text-mid:#4A5568; --text-light:#718096;
   --bg:#F0F4F8; --white:#FFFFFF; --border:#E2E8F0;
   --green:#26C281; --green-light:#D1FAE5; --green-dark:#065F46;

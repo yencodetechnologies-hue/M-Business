@@ -25,7 +25,7 @@ export default function AuditorPortal({ onBack }) {
 
       const inc = (iRes.data || []).map(x => ({ ...x, _type: 'Income' }));
       const exp = (eRes.data || []).map(x => ({ ...x, _type: 'Expense' }));
-      setTransactions([...inc, ...exp].sort((a,b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)));
+      setTransactions([...inc, ...exp].sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)));
     } catch (e) {
       console.error(e);
     } finally {
@@ -90,8 +90,8 @@ export default function AuditorPortal({ onBack }) {
     }
   };
 
-  const totalIncome = transactions.filter(t => t._type === 'Income').reduce((s,t) => s + Number(t.amount || t.totalAmount || 0), 0);
-  const totalExpense = transactions.filter(t => t._type === 'Expense').reduce((s,t) => s + Number(t.amount || t.totalAmount || 0), 0);
+  const totalIncome = transactions.filter(t => t._type === 'Income').reduce((s, t) => s + Number(t.amount || t.totalAmount || 0), 0);
+  const totalExpense = transactions.filter(t => t._type === 'Expense').reduce((s, t) => s + Number(t.amount || t.totalAmount || 0), 0);
   const netProfit = totalIncome - totalExpense;
 
   return (
@@ -99,7 +99,7 @@ export default function AuditorPortal({ onBack }) {
       <style>{`
 /* ── M Business Finance Design System ── */
 :root {
-  --primary:#00BCD4; --primary-dark:#0097A7; --primary-light:#E0F7FA; --primary-mid:#B2EBF2;
+  --primary: var(--app-accent, #00BCD4); --primary-dark:#0097A7; --primary-light:var(--teal-light, #E0F7FA); --primary-mid:#B2EBF2;
   --text-dark:#1A2332; --text-mid:#4A5568; --text-light:#718096;
   --bg:#F0F4F8; --white:#FFFFFF; --border:#E2E8F0;
   --green:#26C281; --green-light:#D1FAE5; --green-dark:#065F46;
@@ -180,12 +180,12 @@ tr:hover td{background:#FAFCFE;}
             <div className="aud-brand-name">Audit Portal</div>
             <span className="aud-brand-sub">— M Business</span>
           </div>
-          <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div className="aud-chip">
-              <div className="av av-sm" style={{background:'#8B5CF6'}}>RA</div>Rajan Auditors & Co.
+              <div className="av av-sm" style={{ background: '#8B5CF6' }}>RA</div>Rajan Auditors & Co.
             </div>
-            <div className="aud-chip" style={{color:'rgba(255,255,255,.5)',cursor:'pointer'}} onClick={onBack}>
-              <i className="ti ti-logout" style={{fontSize:'14px'}}></i>Logout
+            <div className="aud-chip" style={{ color: 'rgba(255,255,255,.5)', cursor: 'pointer' }} onClick={onBack}>
+              <i className="ti ti-logout" style={{ fontSize: '14px' }}></i>Logout
             </div>
           </div>
         </div>
@@ -203,40 +203,40 @@ tr:hover td{background:#FAFCFE;}
             </div>
           </div>
 
-          <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'18px',flexWrap:'wrap'}}>
-            <span style={{fontSize:'13px',fontWeight:700,color:'var(--text-mid)'}}>Period:</span>
-            <select className="filter-sel" style={{fontSize:'12px'}}><option>June 2026</option></select>
-            <span style={{fontSize:'13px',fontWeight:700,color:'var(--text-mid)'}}>Account:</span>
-            <select className="filter-sel" style={{fontSize:'12px'}}><option>All Accounts</option></select>
-            <span style={{fontSize:'13px',fontWeight:700,color:'var(--text-mid)'}}>Type:</span>
-            <select className="filter-sel" style={{fontSize:'12px'}}><option>All Transactions</option></select>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '18px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-mid)' }}>Period:</span>
+            <select className="filter-sel" style={{ fontSize: '12px' }}><option>June 2026</option></select>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-mid)' }}>Account:</span>
+            <select className="filter-sel" style={{ fontSize: '12px' }}><option>All Accounts</option></select>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-mid)' }}>Type:</span>
+            <select className="filter-sel" style={{ fontSize: '12px' }}><option>All Transactions</option></select>
           </div>
 
           <div className="tabs-bar">
-            <button className={`atab ${activeTab === 'statements' ? 'active' : ''}`} onClick={() => setActiveTab('statements')}><i className="ti ti-file-analytics" style={{marginRight:'5px'}}></i>Statements</button>
-            <button className={`atab ${activeTab === 'transactions' ? 'active' : ''}`} onClick={() => setActiveTab('transactions')}><i className="ti ti-list" style={{marginRight:'5px'}}></i>All Transactions</button>
-            <button className={`atab ${activeTab === 'bank' ? 'active' : ''}`} onClick={() => setActiveTab('bank')}><i className="ti ti-building-bank" style={{marginRight:'5px'}}></i>Bank Reconciliation</button>
-            <button className={`atab ${activeTab === 'notes' ? 'active' : ''}`} onClick={() => setActiveTab('notes')}><i className="ti ti-message-2" style={{marginRight:'5px'}}></i>Audit Notes{notes.length > 0 && <span className="tab-notif">{notes.length}</span>}</button>
+            <button className={`atab ${activeTab === 'statements' ? 'active' : ''}`} onClick={() => setActiveTab('statements')}><i className="ti ti-file-analytics" style={{ marginRight: '5px' }}></i>Statements</button>
+            <button className={`atab ${activeTab === 'transactions' ? 'active' : ''}`} onClick={() => setActiveTab('transactions')}><i className="ti ti-list" style={{ marginRight: '5px' }}></i>All Transactions</button>
+            <button className={`atab ${activeTab === 'bank' ? 'active' : ''}`} onClick={() => setActiveTab('bank')}><i className="ti ti-building-bank" style={{ marginRight: '5px' }}></i>Bank Reconciliation</button>
+            <button className={`atab ${activeTab === 'notes' ? 'active' : ''}`} onClick={() => setActiveTab('notes')}><i className="ti ti-message-2" style={{ marginRight: '5px' }}></i>Audit Notes{notes.length > 0 && <span className="tab-notif">{notes.length}</span>}</button>
           </div>
 
           {activeTab === 'statements' && (
             <div>
-              <div style={{fontSize:'13px',color:'var(--text-mid)',marginBottom:'16px',padding:'12px 16px',background:'var(--primary-light)',borderRadius:'10px',borderLeft:'4px solid var(--primary)',fontWeight:600}}>
-                <i className="ti ti-info-circle" style={{marginRight:'6px',color:'var(--primary)'}}></i>
+              <div style={{ fontSize: '13px', color: 'var(--text-mid)', marginBottom: '16px', padding: '12px 16px', background: 'var(--primary-light)', borderRadius: '10px', borderLeft: '4px solid var(--primary)', fontWeight: 600 }}>
+                <i className="ti ti-info-circle" style={{ marginRight: '6px', color: 'var(--primary)' }}></i>
                 Statements fetched directly from ledger.
               </div>
               <div className="dl-card">
-                <div className="dl-icon" style={{background:'var(--green-light)'}}><i className="ti ti-arrow-bar-down" style={{color:'var(--green)'}}></i></div>
-                <div><div className="dl-title">Income Statement</div><div className="dl-meta">{transactions.filter(t=>t._type==='Income').length} transactions · ₹{totalIncome.toLocaleString('en-IN')} total</div></div>
+                <div className="dl-icon" style={{ background: 'var(--green-light)' }}><i className="ti ti-arrow-bar-down" style={{ color: 'var(--green)' }}></i></div>
+                <div><div className="dl-title">Income Statement</div><div className="dl-meta">{transactions.filter(t => t._type === 'Income').length} transactions · ₹{totalIncome.toLocaleString('en-IN')} total</div></div>
                 <div className="dl-btns">
-                  <button className="exp-btn exp-pdf" onClick={() => dlToast('Income Statement','PDF')}><i className="ti ti-file-type-pdf"></i>PDF</button>
+                  <button className="exp-btn exp-pdf" onClick={() => dlToast('Income Statement', 'PDF')}><i className="ti ti-file-type-pdf"></i>PDF</button>
                 </div>
               </div>
               <div className="dl-card">
-                <div className="dl-icon" style={{background:'var(--red-light)'}}><i className="ti ti-arrow-bar-up" style={{color:'var(--red-dark)'}}></i></div>
-                <div><div className="dl-title">Expense Statement</div><div className="dl-meta">{transactions.filter(t=>t._type==='Expense').length} transactions · ₹{totalExpense.toLocaleString('en-IN')} total</div></div>
+                <div className="dl-icon" style={{ background: 'var(--red-light)' }}><i className="ti ti-arrow-bar-up" style={{ color: 'var(--red-dark)' }}></i></div>
+                <div><div className="dl-title">Expense Statement</div><div className="dl-meta">{transactions.filter(t => t._type === 'Expense').length} transactions · ₹{totalExpense.toLocaleString('en-IN')} total</div></div>
                 <div className="dl-btns">
-                  <button className="exp-btn exp-pdf" onClick={() => dlToast('Expense Statement','PDF')}><i className="ti ti-file-type-pdf"></i>PDF</button>
+                  <button className="exp-btn exp-pdf" onClick={() => dlToast('Expense Statement', 'PDF')}><i className="ti ti-file-type-pdf"></i>PDF</button>
                 </div>
               </div>
             </div>
@@ -244,8 +244,8 @@ tr:hover td{background:#FAFCFE;}
 
           {activeTab === 'transactions' && (
             <div className="card">
-              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'16px'}}>
-                <div style={{fontSize:'15px',fontWeight:800}}>All Transactions — June 2026</div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                <div style={{ fontSize: '15px', fontWeight: 800 }}>All Transactions — June 2026</div>
               </div>
               <div className="table-wrap">
                 <table>
@@ -258,12 +258,12 @@ tr:hover td{background:#FAFCFE;}
                       return (
                         <tr key={i} className={isFlagged ? "flagged-row" : ""}>
                           <td>{new Date(txn.date || txn.createdAt).toLocaleDateString()}</td>
-                          <td style={{color: isFlagged ? 'var(--orange-dark)' : 'var(--primary)', fontWeight: 700}}>{id}</td>
+                          <td style={{ color: isFlagged ? 'var(--orange-dark)' : 'var(--primary)', fontWeight: 700 }}>{id}</td>
                           <td>{txn.description || txn.clientName || 'Transaction'}{hasNote && <div className="audit-note"><i className="ti ti-message-2"></i>{isFlagged ? "Flagged: " : "Note: "}{hasNote.note}</div>}</td>
                           <td><span className={`badge ${txn._type === 'Income' ? 'badge-income' : 'badge-expense'}`}>{txn._type}</span></td>
                           <td className={txn._type === 'Income' ? 'amt-in' : 'amt-out'}>{txn._type === 'Income' ? '+' : '−'}₹{Number(txn.amount || txn.totalAmount || 0).toLocaleString('en-IN')}</td>
                           <td><span className={`badge ${txn.status === 'Paid' ? 'badge-paid' : 'badge-pending'}`}>{txn.status || 'Completed'}</span></td>
-                          <td><div style={{display:'flex',gap:'5px'}}><button className="flag-btn" style={isFlagged ? {background:'var(--orange)',color:'#fff'} : {}} onClick={() => flagRow(txn)}><i className="ti ti-flag"></i>{isFlagged ? 'Flagged' : 'Flag'}</button><button className="note-btn" onClick={() => addNoteQuick(txn)}><i className="ti ti-message-2"></i>Note</button></div></td>
+                          <td><div style={{ display: 'flex', gap: '5px' }}><button className="flag-btn" style={isFlagged ? { background: 'var(--orange)', color: '#fff' } : {}} onClick={() => flagRow(txn)}><i className="ti ti-flag"></i>{isFlagged ? 'Flagged' : 'Flag'}</button><button className="note-btn" onClick={() => addNoteQuick(txn)}><i className="ti ti-message-2"></i>Note</button></div></td>
                         </tr>
                       );
                     })}
@@ -277,8 +277,8 @@ tr:hover td{background:#FAFCFE;}
             <div className="grid-2">
               {loading ? <div>Loading banks...</div> : banks.map((b, i) => (
                 <div key={i} className="card">
-                  <div style={{fontSize:'14px',fontWeight:800,marginBottom:'14px'}}><i className="ti ti-building-bank"></i>{b.bankName} ••••{b.accountNo?.slice(-4)}</div>
-                  <div>Closing Balance: ₹{Number(b.balance||0).toLocaleString('en-IN')}</div>
+                  <div style={{ fontSize: '14px', fontWeight: 800, marginBottom: '14px' }}><i className="ti ti-building-bank"></i>{b.bankName} ••••{b.accountNo?.slice(-4)}</div>
+                  <div>Closing Balance: ₹{Number(b.balance || 0).toLocaleString('en-IN')}</div>
                 </div>
               ))}
             </div>
@@ -286,21 +286,21 @@ tr:hover td{background:#FAFCFE;}
 
           {activeTab === 'notes' && (
             <div>
-              <div className="card" style={{marginBottom:'18px'}}>
-                <div style={{fontSize:'14px',fontWeight:800,marginBottom:'16px'}}><i className="ti ti-message-2" style={{color:'var(--purple)'}}></i>Add Audit Note</div>
-                <div className="form-group"><label>Transaction / Reference ID</label><input placeholder="e.g. INV-019 or EXP-063" className="inp" style={{width:'100%',padding:'11px 14px',border:'1.5px solid var(--border)',borderRadius:'10px',fontFamily:'Nunito,sans-serif',fontSize:'13px',outline:'none'}} value={newNote.transactionId} onChange={e => setNewNote({...newNote, transactionId: e.target.value})} /></div>
-                <div className="form-group"><label>Note / Remark</label><textarea placeholder="Enter your audit observation, query or remark here..." style={{width:'100%',padding:'11px 14px',border:'1.5px solid var(--border)',borderRadius:'10px',fontFamily:'Nunito,sans-serif',fontSize:'13px',color:'var(--text-dark)',background:'var(--bg)',outline:'none',minHeight:'90px'}} value={newNote.note} onChange={e => setNewNote({...newNote, note: e.target.value})}></textarea></div>
-                <div style={{display:'flex',gap:'10px'}}>
-                  <button className="btn" style={{background:'var(--orange-light)',color:'var(--orange-dark)',border:'1px solid var(--orange)'}} onClick={() => saveNote('flag')}><i className="ti ti-flag"></i>Flag Transaction</button>
-                  <button className="btn" style={{background:'var(--purple-light)',color:'var(--purple)',border:'1px solid var(--purple)'}} onClick={() => saveNote('note')}><i className="ti ti-message-2"></i>Save Note</button>
+              <div className="card" style={{ marginBottom: '18px' }}>
+                <div style={{ fontSize: '14px', fontWeight: 800, marginBottom: '16px' }}><i className="ti ti-message-2" style={{ color: 'var(--purple)' }}></i>Add Audit Note</div>
+                <div className="form-group"><label>Transaction / Reference ID</label><input placeholder="e.g. INV-019 or EXP-063" className="inp" style={{ width: '100%', padding: '11px 14px', border: '1.5px solid var(--border)', borderRadius: '10px', fontFamily: 'Nunito,sans-serif', fontSize: '13px', outline: 'none' }} value={newNote.transactionId} onChange={e => setNewNote({ ...newNote, transactionId: e.target.value })} /></div>
+                <div className="form-group"><label>Note / Remark</label><textarea placeholder="Enter your audit observation, query or remark here..." style={{ width: '100%', padding: '11px 14px', border: '1.5px solid var(--border)', borderRadius: '10px', fontFamily: 'Nunito,sans-serif', fontSize: '13px', color: 'var(--text-dark)', background: 'var(--bg)', outline: 'none', minHeight: '90px' }} value={newNote.note} onChange={e => setNewNote({ ...newNote, note: e.target.value })}></textarea></div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button className="btn" style={{ background: 'var(--orange-light)', color: 'var(--orange-dark)', border: '1px solid var(--orange)' }} onClick={() => saveNote('flag')}><i className="ti ti-flag"></i>Flag Transaction</button>
+                  <button className="btn" style={{ background: 'var(--purple-light)', color: 'var(--purple)', border: '1px solid var(--purple)' }} onClick={() => saveNote('note')}><i className="ti ti-message-2"></i>Save Note</button>
                 </div>
               </div>
               <div className="card">
-                <div style={{fontSize:'14px',fontWeight:800,marginBottom:'16px'}}>Existing Notes & Flags</div>
+                <div style={{ fontSize: '14px', fontWeight: 800, marginBottom: '16px' }}>Existing Notes & Flags</div>
                 {loading ? <div>Loading notes...</div> : notes.length === 0 ? <div>No audit notes added yet.</div> : notes.map((n, i) => (
-                  <div key={i} style={{padding:'14px',background: n.flagged ? 'var(--orange-light)' : 'var(--purple-light)',borderRadius:'10px',borderLeft:`4px solid ${n.flagged ? 'var(--orange)' : 'var(--purple)'}`,marginBottom:'12px'}}>
-                    <div style={{fontSize:'12px',fontWeight:800,color: n.flagged ? 'var(--orange-dark)' : 'var(--purple)',marginBottom:'4px'}}><i className={n.flagged ? "ti ti-flag" : "ti ti-message-2"}></i>{n.flagged ? 'FLAGGED' : 'NOTE'} — {n.transactionId} ({new Date(n.createdAt).toLocaleDateString()})</div>
-                    <div style={{fontSize:'13px',color:'var(--text-dark)'}}>{n.note}</div>
+                  <div key={i} style={{ padding: '14px', background: n.flagged ? 'var(--orange-light)' : 'var(--purple-light)', borderRadius: '10px', borderLeft: `4px solid ${n.flagged ? 'var(--orange)' : 'var(--purple)'}`, marginBottom: '12px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 800, color: n.flagged ? 'var(--orange-dark)' : 'var(--purple)', marginBottom: '4px' }}><i className={n.flagged ? "ti ti-flag" : "ti ti-message-2"}></i>{n.flagged ? 'FLAGGED' : 'NOTE'} — {n.transactionId} ({new Date(n.createdAt).toLocaleDateString()})</div>
+                    <div style={{ fontSize: '13px', color: 'var(--text-dark)' }}>{n.note}</div>
                   </div>
                 ))}
               </div>

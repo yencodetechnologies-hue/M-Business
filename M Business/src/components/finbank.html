@@ -1,620 +1,2046 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Bank Accounts — M Business Finance</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-<style>/* ── M Business Finance Design System ── */
-:root {
-  --primary:#00BCD4; --primary-dark:#0097A7; --primary-light:#E0F7FA; --primary-mid:#B2EBF2;
-  --text-dark:#1A2332; --text-mid:#4A5568; --text-light:#718096;
-  --bg:#F0F4F8; --white:#FFFFFF; --border:#E2E8F0;
-  --green:#26C281; --green-light:#D1FAE5; --green-dark:#065F46;
-  --orange:#F59E0B; --orange-light:#FEF3C7; --orange-dark:#92400E;
-  --red:#FF6B6B; --red-dark:#EF4444; --red-light:#FEE2E2;
-  --purple:#8B5CF6; --purple-light:#EDE9FE;
-  --blue:#3B82F6; --blue-light:#DBEAFE;
-  --radius:14px; --shadow:0 2px 12px rgba(0,188,212,.08); --shadow-lg:0 8px 32px rgba(0,188,212,.14);
-  --sidebar-w:250px;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text-dark);min-height:100vh;display:flex;}
-a{text-decoration:none;color:inherit;}
-/* SIDEBAR */
-.sidebar{width:var(--sidebar-w);background:var(--white);height:100vh;position:fixed;top:0;left:0;display:flex;flex-direction:column;border-right:1px solid var(--border);z-index:100;}
-.sidebar-logo{padding:20px 22px 16px;border-bottom:1px solid var(--border);font-size:19px;font-weight:900;color:var(--primary);display:flex;align-items:center;gap:10px;}
-.logo-icon{width:34px;height:34px;background:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;}
-.logo-icon i{color:#fff;font-size:17px;}
-.sidebar-logo span{color:var(--text-dark);}
-.sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto;}
-.nav-sec{font-size:10px;font-weight:700;color:var(--text-light);letter-spacing:1.2px;text-transform:uppercase;padding:12px 12px 6px;}
-.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:var(--text-mid);font-size:13.5px;font-weight:600;cursor:pointer;transition:all .15s;margin-bottom:2px;}
-.nav-item i{font-size:17px;width:20px;text-align:center;}
-.nav-item:hover{background:var(--primary-light);color:var(--primary);}
-.nav-item.active{background:var(--primary);color:#fff;}
-.sidebar-footer{padding:14px 10px;border-top:1px solid var(--border);}
-.sidebar-user{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;}
-.sidebar-user:hover{background:var(--bg);}
-/* MAIN */
-.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh;}
-.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 26px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
-.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-light);}
-.breadcrumb a{color:var(--primary);font-weight:700;}
-.page-title{font-size:19px;font-weight:900;color:var(--text-dark);}
-.topbar-actions{display:flex;align-items:center;gap:10px;}
-.content{padding:26px;flex:1;}
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s;}
-.btn-primary{background:var(--primary);color:#fff;}.btn-primary:hover{background:var(--primary-dark);}
-.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text-mid);}.btn-outline:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light);}
-.btn-green{background:var(--green);color:#fff;}.btn-green:hover{background:#1aab6d;}
-.btn-red{background:var(--red-light);color:var(--red-dark);border:1.5px solid #FCA5A5;}.btn-red:hover{background:var(--red-dark);color:#fff;}
-.btn-sm{padding:6px 12px;font-size:12px;}
-/* CARDS */
-.card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;}
-/* KPI */
-.kpi-grid{display:grid;gap:16px;margin-bottom:22px;}
-.kpi-grid-4{grid-template-columns:repeat(4,1fr);}
-.kpi-grid-5{grid-template-columns:repeat(5,1fr);}
-.kpi{background:var(--white);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);border-left:4px solid transparent;}
-.kpi.income{border-left-color:var(--green);}
-.kpi.expense{border-left-color:var(--red);}
-.kpi.profit{border-left-color:var(--primary);}
-.kpi.pending{border-left-color:var(--orange);}
-.kpi.vendor{border-left-color:var(--purple);}
-.kpi-label{font-size:11px;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;}
-.kpi-value{font-size:24px;font-weight:900;color:var(--text-dark);margin-bottom:4px;}
-.kpi-sub{font-size:12px;font-weight:600;display:flex;align-items:center;gap:4px;}
-.kpi-sub.up{color:var(--green);}
-.kpi-sub.down{color:var(--red);}
-.kpi-sub.neutral{color:var(--text-light);}
-/* TABLE */
-.table-wrap{overflow-x:auto;}
-table{width:100%;border-collapse:collapse;font-size:13px;}
-thead tr{background:var(--bg);}
-th{padding:10px 14px;text-align:left;font-size:11px;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:.7px;white-space:nowrap;}
-td{padding:12px 14px;border-bottom:1px solid var(--bg);color:var(--text-dark);font-weight:600;}
-tr:last-child td{border-bottom:none;}
-tr:hover td{background:#FAFCFE;}
-/* BADGES */
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
-.badge-income{background:var(--green-light);color:var(--green-dark);}
-.badge-expense{background:var(--red-light);color:var(--red-dark);}
-.badge-paid{background:var(--green-light);color:var(--green-dark);}
-.badge-pending{background:var(--orange-light);color:var(--orange-dark);}
-.badge-overdue{background:var(--red-light);color:var(--red-dark);}
-.badge-partial{background:var(--blue-light);color:#1E40AF;}
-/* FORMS */
-.form-group{margin-bottom:16px;}
-.form-group label{display:block;font-size:11px;font-weight:800;color:var(--text-mid);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;color:var(--text-dark);background:var(--bg);outline:none;transition:border .15s;}
-.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--primary);background:#fff;}
-.form-2col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.form-3col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
-/* MODAL */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
-.modal-bg.open{display:flex;}
-.modal{background:var(--white);border-radius:18px;padding:28px 30px;width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.18);animation:modalIn .2s ease;}
-.modal-sm{width:420px;}
-.modal-lg{width:720px;}
-@keyframes modalIn{from{opacity:0;transform:translateY(-14px) scale(.97)}to{opacity:1;transform:none}}
-.modal-title{font-size:18px;font-weight:900;color:var(--text-dark);display:flex;align-items:center;gap:10px;margin-bottom:22px;}
-.modal-title i{color:var(--primary);}
-.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;padding-top:16px;border-top:1px solid var(--border);}
-/* TABS */
-.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:20px;}
-.tab-btn{padding:10px 18px;font-size:13px;font-weight:700;color:var(--text-mid);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;background:transparent;border-top:none;border-left:none;border-right:none;font-family:'Nunito',sans-serif;transition:all .15s;}
-.tab-btn.active{color:var(--primary);border-bottom-color:var(--primary);}
-.tab-pane{display:none;animation:fadeUp .18s ease;}
-.tab-pane.active{display:block;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-/* PROGRESS */
-.progress-bg{background:var(--bg);border-radius:20px;height:8px;overflow:hidden;}
-.progress-fill{height:100%;border-radius:20px;}
-.pf-green{background:linear-gradient(90deg,var(--green),#059669);}
-.pf-red{background:linear-gradient(90deg,var(--red),#DC2626);}
-.pf-primary{background:linear-gradient(90deg,var(--primary),var(--primary-dark));}
-.pf-orange{background:linear-gradient(90deg,var(--orange),#D97706);}
-/* AVATAR */
-.av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;}
-.av-sm{width:28px;height:28px;font-size:10px;}
-.av-md{width:36px;height:36px;font-size:13px;}
-/* TOAST */
-.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:500;display:flex;flex-direction:column;gap:10px;}
-.toast{background:var(--text-dark);color:#fff;padding:13px 20px;border-radius:12px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);animation:toastIn .22s ease;min-width:240px;}
-.toast i{font-size:17px;}
-.toast.success i{color:var(--green);}
-.toast.warning i{color:var(--orange);}
-.toast.error i{color:var(--red);}
-@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
-/* TOOLBAR */
-.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
-.search-box{display:flex;align-items:center;gap:8px;background:var(--white);border:1.5px solid var(--border);border-radius:10px;padding:9px 14px;min-width:220px;}
-.search-box:focus-within{border-color:var(--primary);}
-.search-box i{color:var(--text-light);font-size:16px;}
-.search-box input{border:none;outline:none;background:transparent;font-family:'Nunito',sans-serif;font-size:13px;width:100%;}
-.filter-sel{padding:9px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;color:var(--text-mid);background:var(--white);outline:none;cursor:pointer;}
-.filter-sel:focus{border-color:var(--primary);}
-/* EXPORT BUTTONS */
-.export-row{display:flex;gap:8px;flex-wrap:wrap;}
-.exp-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid;transition:all .15s;}
-.exp-pdf{background:var(--red-light);color:var(--red-dark);border-color:#FCA5A5;}.exp-pdf:hover{background:var(--red-dark);color:#fff;}
-.exp-excel{background:var(--green-light);color:var(--green-dark);border-color:#6EE7B7;}.exp-excel:hover{background:var(--green);color:#fff;}
-.exp-csv{background:var(--blue-light);color:#1E40AF;border-color:#93C5FD;}.exp-csv:hover{background:var(--blue);color:#fff;}
-/* LAYOUT HELPERS */
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
-.grid-main-side{display:grid;grid-template-columns:1fr 320px;gap:22px;}
-.divider{height:1px;background:var(--border);margin:16px 0;}
-/* AMOUNT COLORS */
-.amt-in{color:var(--green);font-weight:800;}
-.amt-out{color:var(--red-dark);font-weight:800;}
-.amt-neutral{color:var(--text-dark);font-weight:800;}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Bank Accounts — M Business Finance</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    /* ── M Business Finance Design System ── */
+    :root {
+      --primary: var(--app-accent, #00BCD4);
+      --primary-dark: #0097A7;
+      --primary-light: var(--teal-light, #E0F7FA);
+      --primary-mid: #B2EBF2;
+      --text-dark: #1A2332;
+      --text-mid: #4A5568;
+      --text-light: #718096;
+      --bg: #F0F4F8;
+      --white: #FFFFFF;
+      --border: #E2E8F0;
+      --green: #26C281;
+      --green-light: #D1FAE5;
+      --green-dark: #065F46;
+      --orange: #F59E0B;
+      --orange-light: #FEF3C7;
+      --orange-dark: #92400E;
+      --red: #FF6B6B;
+      --red-dark: #EF4444;
+      --red-light: #FEE2E2;
+      --purple: #8B5CF6;
+      --purple-light: #EDE9FE;
+      --blue: #3B82F6;
+      --blue-light: #DBEAFE;
+      --radius: 14px;
+      --shadow: 0 2px 12px rgba(0, 188, 212, .08);
+      --shadow-lg: 0 8px 32px rgba(0, 188, 212, .14);
+      --sidebar-w: 250px;
+    }
 
-.bank-card{border-radius:16px;padding:22px 24px;color:#fff;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
-.bank-card::before{content:"";position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.1);}
-.bank-card::after{content:"";position:absolute;bottom:-40px;right:20px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.07);}
-.bank-card:hover{transform:translateY(-3px);}
-.bank-card .bank-name{font-size:11px;font-weight:800;opacity:.8;text-transform:uppercase;letter-spacing:.8px;}
-.bank-card .bank-bal{font-size:28px;font-weight:900;margin:10px 0 4px;}
-.bank-card .bank-acc{font-size:12px;opacity:.75;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.bank-card .bank-sync{font-size:11px;opacity:.65;margin-top:8px;display:flex;align-items:center;gap:5px;}
-.rec-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--bg);}
-.rec-row:last-child{border-bottom:none;}
-.rec-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.rec-icon.in{background:var(--green-light);}
-.rec-icon.in i{color:var(--green);}
-.rec-icon.out{background:var(--red-light);}
-.rec-icon.out i{color:var(--red-dark);}
-.rec-match{background:var(--green-light);color:var(--green-dark);font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;margin-left:auto;}
-.rec-unmatched{background:var(--orange-light);color:var(--orange-dark);font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;margin-left:auto;}
-/* ── IMPORT MODAL STYLES ── */
-.imp-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
-.imp-modal-bg.open{display:flex;}
-.imp-modal{background:#fff;border-radius:20px;width:780px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.22);animation:modalIn .2s ease;}
-@keyframes modalIn{from{opacity:0;transform:translateY(-16px) scale(.97)}to{opacity:1;transform:none}}
-.imp-header{background:linear-gradient(135deg,var(--primary),var(--primary-dark));padding:22px 28px;border-radius:20px 20px 0 0;}
-.imp-header h2{font-size:18px;font-weight:900;color:#fff;display:flex;align-items:center;gap:10px;margin-bottom:4px;}
-.imp-header p{font-size:13px;color:rgba(255,255,255,.8);}
-.imp-body{padding:24px 28px;}
-/* STEP INDICATOR */
-.imp-steps{display:flex;align-items:center;margin-bottom:26px;}
-.imp-step{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--text-light);}
-.imp-step-num{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;}
-.imp-step.done .imp-step-num{background:var(--green);border-color:var(--green);color:#fff;}
-.imp-step.active .imp-step-num{background:var(--primary);border-color:var(--primary);color:#fff;}
-.imp-step.active{color:var(--text-dark);}
-.imp-step-line{flex:1;height:2px;background:var(--border);margin:0 8px;}
-.imp-step-line.done{background:var(--green);}
-/* DROP ZONE */
-.drop-zone{border:2px dashed var(--border);border-radius:14px;padding:36px 24px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--bg);}
-.drop-zone:hover,.drop-zone.drag{border-color:var(--primary);background:var(--primary-light);}
-.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;}
-.drop-zone i{font-size:40px;color:var(--primary-mid);margin-bottom:12px;display:block;}
-.drop-zone h3{font-size:15px;font-weight:800;color:var(--text-dark);margin-bottom:6px;}
-.drop-zone p{font-size:13px;color:var(--text-light);}
-.format-chips{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
-.fmt-chip{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid var(--border);color:var(--text-mid);}
-.fmt-chip.csv{background:#DBEAFE;border-color:#93C5FD;color:#1E40AF;}
-.fmt-chip.excel{background:var(--green-light);border-color:#6EE7B7;color:var(--green-dark);}
-.fmt-chip.pdf{background:var(--red-light);border-color:#FCA5A5;color:var(--red-dark);}
-/* BANK SELECTOR */
-.bank-selector{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
-.bs-opt{padding:14px 16px;border:2px solid var(--border);border-radius:12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px;}
-.bs-opt:hover{border-color:var(--primary);background:var(--primary-light);}
-.bs-opt.sel{border-color:var(--primary);background:var(--primary-light);}
-.bs-opt-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.bs-opt-icon i{font-size:18px;}
-.bs-opt-name{font-size:13px;font-weight:700;color:var(--text-dark);}
-.bs-opt-acc{font-size:11px;color:var(--text-light);}
-/* COLUMN MAPPER */
-.col-mapper{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
-.cm-row{display:flex;flex-direction:column;gap:5px;}
-.cm-label{font-size:11px;font-weight:800;color:var(--text-mid);text-transform:uppercase;letter-spacing:.6px;}
-.cm-sel{padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Nunito',sans-serif;font-size:13px;color:var(--text-dark);background:var(--bg);outline:none;}
-.cm-sel:focus{border-color:var(--primary);}
-/* PREVIEW TABLE */
-.preview-table-wrap{max-height:260px;overflow-y:auto;border:1.5px solid var(--border);border-radius:10px;margin-bottom:16px;}
-.preview-table-wrap table{width:100%;border-collapse:collapse;font-size:12px;}
-.preview-table-wrap th{padding:8px 12px;background:var(--bg);font-size:10px;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:.6px;position:sticky;top:0;}
-.preview-table-wrap td{padding:9px 12px;border-bottom:1px solid var(--bg);font-weight:600;}
-.preview-table-wrap tr:hover td{background:#FAFCFE;}
-.row-in td:first-child{border-left:3px solid var(--green);}
-.row-out td:first-child{border-left:3px solid var(--red-dark);}
-/* IMPORT SUMMARY */
-.imp-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
-.is-box{background:var(--bg);border-radius:10px;padding:12px;text-align:center;border:1.5px solid var(--border);}
-.is-num{font-size:18px;font-weight:900;color:var(--text-dark);}
-.is-lbl{font-size:10px;color:var(--text-light);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-top:3px;}
-/* FOOTER */
-.imp-footer{display:flex;justify-content:space-between;align-items:center;padding:16px 28px;border-top:1px solid var(--border);background:var(--bg);border-radius:0 0 20px 20px;}
-</style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--white);
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+      z-index: 100;
+    }
+
+    .sidebar-logo {
+      padding: 20px 22px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 19px;
+      font-weight: 900;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 34px;
+      height: 34px;
+      background: var(--primary);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-icon i {
+      color: #fff;
+      font-size: 17px;
+    }
+
+    .sidebar-logo span {
+      color: var(--text-dark);
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 12px 10px;
+      overflow-y: auto;
+    }
+
+    .nav-sec {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-light);
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      padding: 12px 12px 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      color: var(--text-mid);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+      margin-bottom: 2px;
+    }
+
+    .nav-item i {
+      font-size: 17px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .nav-item:hover {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .nav-item.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .sidebar-footer {
+      padding: 14px 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .sidebar-user:hover {
+      background: var(--bg);
+    }
+
+    /* MAIN */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 26px;
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-light);
+    }
+
+    .breadcrumb a {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .page-title {
+      font-size: 19px;
+      font-weight: 900;
+      color: var(--text-dark);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .content {
+      padding: 26px;
+      flex: 1;
+    }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all .15s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text-mid);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .btn-green {
+      background: var(--green);
+      color: #fff;
+    }
+
+    .btn-green:hover {
+      background: #1aab6d;
+    }
+
+    .btn-red {
+      background: var(--red-light);
+      color: var(--red-dark);
+      border: 1.5px solid #FCA5A5;
+    }
+
+    .btn-red:hover {
+      background: var(--red-dark);
+      color: #fff;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px 24px;
+    }
+
+    /* KPI */
+    .kpi-grid {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .kpi-grid-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .kpi-grid-5 {
+      grid-template-columns: repeat(5, 1fr);
+    }
+
+    .kpi {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+      border-left: 4px solid transparent;
+    }
+
+    .kpi.income {
+      border-left-color: var(--green);
+    }
+
+    .kpi.expense {
+      border-left-color: var(--red);
+    }
+
+    .kpi.profit {
+      border-left-color: var(--primary);
+    }
+
+    .kpi.pending {
+      border-left-color: var(--orange);
+    }
+
+    .kpi.vendor {
+      border-left-color: var(--purple);
+    }
+
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      margin-bottom: 6px;
+    }
+
+    .kpi-value {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+    }
+
+    .kpi-sub {
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .kpi-sub.up {
+      color: var(--green);
+    }
+
+    .kpi-sub.down {
+      color: var(--red);
+    }
+
+    .kpi-sub.neutral {
+      color: var(--text-light);
+    }
+
+    /* TABLE */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead tr {
+      background: var(--bg);
+    }
+
+    th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--bg);
+      color: var(--text-dark);
+      font-weight: 600;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: #FAFCFE;
+    }
+
+    /* BADGES */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .badge-income {
+      background: var(--green-light);
+      color: var(--green-dark);
+    }
+
+    .badge-expense {
+      background: var(--red-light);
+      color: var(--red-dark);
+    }
+
+    .badge-paid {
+      background: var(--green-light);
+      color: var(--green-dark);
+    }
+
+    .badge-pending {
+      background: var(--orange-light);
+      color: var(--orange-dark);
+    }
+
+    .badge-overdue {
+      background: var(--red-light);
+      color: var(--red-dark);
+    }
+
+    .badge-partial {
+      background: var(--blue-light);
+      color: #1E40AF;
+    }
+
+    /* FORMS */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-mid);
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      color: var(--text-dark);
+      background: var(--bg);
+      outline: none;
+      transition: border .15s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary);
+      background: #fff;
+    }
+
+    .form-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-3col {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+    }
+
+    /* MODAL */
+    .modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .45);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(3px);
+    }
+
+    .modal-bg.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--white);
+      border-radius: 18px;
+      padding: 28px 30px;
+      width: 560px;
+      max-width: 95vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .18);
+      animation: modalIn .2s ease;
+    }
+
+    .modal-sm {
+      width: 420px;
+    }
+
+    .modal-lg {
+      width: 720px;
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: translateY(-14px) scale(.97)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .modal-title i {
+      color: var(--primary);
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-mid);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      background: transparent;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      font-family: 'Nunito', sans-serif;
+      transition: all .15s;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-pane {
+      display: none;
+      animation: fadeUp .18s ease;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(4px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    /* PROGRESS */
+    .progress-bg {
+      background: var(--bg);
+      border-radius: 20px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 20px;
+    }
+
+    .pf-green {
+      background: linear-gradient(90deg, var(--green), #059669);
+    }
+
+    .pf-red {
+      background: linear-gradient(90deg, var(--red), #DC2626);
+    }
+
+    .pf-primary {
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+    }
+
+    .pf-orange {
+      background: linear-gradient(90deg, var(--orange), #D97706);
+    }
+
+    /* AVATAR */
+    .av {
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .av-sm {
+      width: 28px;
+      height: 28px;
+      font-size: 10px;
+    }
+
+    .av-md {
+      width: 36px;
+      height: 36px;
+      font-size: 13px;
+    }
+
+    /* TOAST */
+    .toast-wrap {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      background: var(--text-dark);
+      color: #fff;
+      padding: 13px 20px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .2);
+      animation: toastIn .22s ease;
+      min-width: 240px;
+    }
+
+    .toast i {
+      font-size: 17px;
+    }
+
+    .toast.success i {
+      color: var(--green);
+    }
+
+    .toast.warning i {
+      color: var(--orange);
+    }
+
+    .toast.error i {
+      color: var(--red);
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateX(20px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    /* TOOLBAR */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 14px;
+      min-width: 220px;
+    }
+
+    .search-box:focus-within {
+      border-color: var(--primary);
+    }
+
+    .search-box i {
+      color: var(--text-light);
+      font-size: 16px;
+    }
+
+    .search-box input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      width: 100%;
+    }
+
+    .filter-sel {
+      padding: 9px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-mid);
+      background: var(--white);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .filter-sel:focus {
+      border-color: var(--primary);
+    }
+
+    /* EXPORT BUTTONS */
+    .export-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .exp-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1.5px solid;
+      transition: all .15s;
+    }
+
+    .exp-pdf {
+      background: var(--red-light);
+      color: var(--red-dark);
+      border-color: #FCA5A5;
+    }
+
+    .exp-pdf:hover {
+      background: var(--red-dark);
+      color: #fff;
+    }
+
+    .exp-excel {
+      background: var(--green-light);
+      color: var(--green-dark);
+      border-color: #6EE7B7;
+    }
+
+    .exp-excel:hover {
+      background: var(--green);
+      color: #fff;
+    }
+
+    .exp-csv {
+      background: var(--blue-light);
+      color: #1E40AF;
+      border-color: #93C5FD;
+    }
+
+    .exp-csv:hover {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    /* LAYOUT HELPERS */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .grid-main-side {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 22px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 16px 0;
+    }
+
+    /* AMOUNT COLORS */
+    .amt-in {
+      color: var(--green);
+      font-weight: 800;
+    }
+
+    .amt-out {
+      color: var(--red-dark);
+      font-weight: 800;
+    }
+
+    .amt-neutral {
+      color: var(--text-dark);
+      font-weight: 800;
+    }
+
+    .bank-card {
+      border-radius: 16px;
+      padding: 22px 24px;
+      color: #fff;
+      cursor: pointer;
+      transition: all .2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bank-card::before {
+      content: "";
+      position: absolute;
+      top: -30px;
+      right: -30px;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .1);
+    }
+
+    .bank-card::after {
+      content: "";
+      position: absolute;
+      bottom: -40px;
+      right: 20px;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .07);
+    }
+
+    .bank-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .bank-card .bank-name {
+      font-size: 11px;
+      font-weight: 800;
+      opacity: .8;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+    }
+
+    .bank-card .bank-bal {
+      font-size: 28px;
+      font-weight: 900;
+      margin: 10px 0 4px;
+    }
+
+    .bank-card .bank-acc {
+      font-size: 12px;
+      opacity: .75;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .bank-card .bank-sync {
+      font-size: 11px;
+      opacity: .65;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .rec-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--bg);
+    }
+
+    .rec-row:last-child {
+      border-bottom: none;
+    }
+
+    .rec-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .rec-icon.in {
+      background: var(--green-light);
+    }
+
+    .rec-icon.in i {
+      color: var(--green);
+    }
+
+    .rec-icon.out {
+      background: var(--red-light);
+    }
+
+    .rec-icon.out i {
+      color: var(--red-dark);
+    }
+
+    .rec-match {
+      background: var(--green-light);
+      color: var(--green-dark);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-left: auto;
+    }
+
+    .rec-unmatched {
+      background: var(--orange-light);
+      color: var(--orange-dark);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-left: auto;
+    }
+
+    /* ── IMPORT MODAL STYLES ── */
+    .imp-modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .5);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .imp-modal-bg.open {
+      display: flex;
+    }
+
+    .imp-modal {
+      background: #fff;
+      border-radius: 20px;
+      width: 780px;
+      max-width: 96vw;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, .22);
+      animation: modalIn .2s ease;
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: translateY(-16px) scale(.97)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .imp-header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      padding: 22px 28px;
+      border-radius: 20px 20px 0 0;
+    }
+
+    .imp-header h2 {
+      font-size: 18px;
+      font-weight: 900;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .imp-header p {
+      font-size: 13px;
+      color: rgba(255, 255, 255, .8);
+    }
+
+    .imp-body {
+      padding: 24px 28px;
+    }
+
+    /* STEP INDICATOR */
+    .imp-steps {
+      display: flex;
+      align-items: center;
+      margin-bottom: 26px;
+    }
+
+    .imp-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-light);
+    }
+
+    .imp-step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .imp-step.done .imp-step-num {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+
+    .imp-step.active .imp-step-num {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .imp-step.active {
+      color: var(--text-dark);
+    }
+
+    .imp-step-line {
+      flex: 1;
+      height: 2px;
+      background: var(--border);
+      margin: 0 8px;
+    }
+
+    .imp-step-line.done {
+      background: var(--green);
+    }
+
+    /* DROP ZONE */
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 14px;
+      padding: 36px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+      position: relative;
+      background: var(--bg);
+    }
+
+    .drop-zone:hover,
+    .drop-zone.drag {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .drop-zone input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .drop-zone i {
+      font-size: 40px;
+      color: var(--primary-mid);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .drop-zone h3 {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+    }
+
+    .drop-zone p {
+      font-size: 13px;
+      color: var(--text-light);
+    }
+
+    .format-chips {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .fmt-chip {
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1.5px solid var(--border);
+      color: var(--text-mid);
+    }
+
+    .fmt-chip.csv {
+      background: #DBEAFE;
+      border-color: #93C5FD;
+      color: #1E40AF;
+    }
+
+    .fmt-chip.excel {
+      background: var(--green-light);
+      border-color: #6EE7B7;
+      color: var(--green-dark);
+    }
+
+    .fmt-chip.pdf {
+      background: var(--red-light);
+      border-color: #FCA5A5;
+      color: var(--red-dark);
+    }
+
+    /* BANK SELECTOR */
+    .bank-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .bs-opt {
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bs-opt:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .bs-opt.sel {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .bs-opt-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .bs-opt-icon i {
+      font-size: 18px;
+    }
+
+    .bs-opt-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .bs-opt-acc {
+      font-size: 11px;
+      color: var(--text-light);
+    }
+
+    /* COLUMN MAPPER */
+    .col-mapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .cm-row {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .cm-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-mid);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+    }
+
+    .cm-sel {
+      padding: 9px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      color: var(--text-dark);
+      background: var(--bg);
+      outline: none;
+    }
+
+    .cm-sel:focus {
+      border-color: var(--primary);
+    }
+
+    /* PREVIEW TABLE */
+    .preview-table-wrap {
+      max-height: 260px;
+      overflow-y: auto;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+
+    .preview-table-wrap table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .preview-table-wrap th {
+      padding: 8px 12px;
+      background: var(--bg);
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      position: sticky;
+      top: 0;
+    }
+
+    .preview-table-wrap td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--bg);
+      font-weight: 600;
+    }
+
+    .preview-table-wrap tr:hover td {
+      background: #FAFCFE;
+    }
+
+    .row-in td:first-child {
+      border-left: 3px solid var(--green);
+    }
+
+    .row-out td:first-child {
+      border-left: 3px solid var(--red-dark);
+    }
+
+    /* IMPORT SUMMARY */
+    .imp-summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .is-box {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+      border: 1.5px solid var(--border);
+    }
+
+    .is-num {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--text-dark);
+    }
+
+    .is-lbl {
+      font-size: 10px;
+      color: var(--text-light);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-top: 3px;
+    }
+
+    /* FOOTER */
+    .imp-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 28px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 0 0 20px 20px;
+    }
+  </style>
 </head>
+
 <body>
-<aside class="sidebar">
-  <div class="sidebar-logo"><div class="logo-icon"><i class="ti ti-building-skyscraper"></i></div>M <span>Business</span></div>
-  <nav class="sidebar-nav">
-    <div class="nav-sec">Main</div>
-    <div class="nav-item" onclick="location.href='#'"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
-    <div class="nav-item" onclick="location.href='../3-admin-project-details.html'"><i class="ti ti-layout-kanban"></i>Projects</div>
-    <div class="nav-item"><i class="ti ti-users"></i>Clients</div>
-    <div class="nav-item"><i class="ti ti-user-circle"></i>Team</div>
-    <div class="nav-sec">Finance</div>
-    <div class="nav-item " onclick="location.href='fin-dashboard.html'"><i class="ti ti-chart-pie"></i>Finance Overview</div>
-    <div class="nav-item " onclick="location.href='fin-income.html'"><i class="ti ti-arrow-bar-down"></i>Income</div>
-    <div class="nav-item " onclick="location.href='fin-expenses.html'"><i class="ti ti-arrow-bar-up"></i>Expenses</div>
-    <div class="nav-item " onclick="location.href='fin-vendors.html'"><i class="ti ti-truck"></i>Vendors</div>
-    <div class="nav-item active" onclick="location.href='fin-bank.html'"><i class="ti ti-building-bank"></i>Bank Accounts</div>
-    <div class="nav-item " onclick="location.href='fin-reports.html'"><i class="ti ti-file-analytics"></i>Reports & Export</div>
-    <div class="nav-sec">Tools</div>
-    <div class="nav-item"><i class="ti ti-receipt"></i>Invoices</div>
-    <div class="nav-item"><i class="ti ti-message-circle"></i>Messages</div>
-    <div class="nav-item"><i class="ti ti-settings"></i>Settings</div>
-  </nav>
-  <div class="sidebar-footer">
-    <div class="sidebar-user">
-      <div class="av av-md" style="background:var(--primary);">PR</div>
-      <div><div style="font-size:13px;font-weight:700;">Prabhu R.</div><div style="font-size:11px;color:var(--text-light);">Administrator</div></div>
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon"><i class="ti ti-building-skyscraper"></i></div>M <span>Business</span>
     </div>
-  </div>
-</aside>
-
-<div class="main">
-  <div class="topbar">
-    <div class="breadcrumb"><a href="fin-dashboard.html">Finance</a><i class="ti ti-chevron-right"></i><span>Bank Accounts</span></div>
-    <div class="topbar-actions">
-      <button class="btn btn-outline" onclick="openImport()" style="border-color:var(--primary);color:var(--primary);"><i class="ti ti-upload"></i>Import Statement</button>
-      <button class="btn btn-outline" onclick="toast('Syncing all accounts...\nLast sync: just now','success')"><i class="ti ti-refresh"></i>Sync All</button>
-      <button class="btn btn-primary" onclick="document.getElementById('linkBankModal').classList.add('open')"><i class="ti ti-plus"></i>Link Bank Account</button>
-    </div>
-  </div>
-  <div class="content">
-    <!-- BANK CARDS -->
-    <div class="grid-2" style="margin-bottom:22px;">
-      <div class="bank-card" style='background: "linear-gradient(135deg,var(--app-accent),#0097A7);"'>
-        <div class="bank-name">HDFC Bank — Current Account</div>
-        <div class="bank-bal">₹12,84,320</div>
-        <div class="bank-acc"><i class="ti ti-credit-card" style="font-size:14px;"></i> ••••  ••••  ••••  4821 &nbsp;·&nbsp; IFSC: HDFC0001234</div>
-        <div style="display:flex;gap:8px;margin-top:14px;">
-          <span style="background:rgba(255,255,255,.2);border-radius:8px;padding:4px 12px;font-size:11px;font-weight:700;">Primary</span>
-          <span style="background:rgba(255,255,255,.2);border-radius:8px;padding:4px 12px;font-size:11px;font-weight:700;">Current A/C</span>
-        </div>
-        <div class="bank-sync"><i class="ti ti-refresh" style="font-size:13px;"></i>Synced 2 hours ago</div>
+    <nav class="sidebar-nav">
+      <div class="nav-sec">Main</div>
+      <div class="nav-item" onclick="location.href='#'"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
+      <div class="nav-item" onclick="location.href='../3-admin-project-details.html'"><i
+          class="ti ti-layout-kanban"></i>Projects</div>
+      <div class="nav-item"><i class="ti ti-users"></i>Clients</div>
+      <div class="nav-item"><i class="ti ti-user-circle"></i>Team</div>
+      <div class="nav-sec">Finance</div>
+      <div class="nav-item " onclick="location.href='fin-dashboard.html'"><i class="ti ti-chart-pie"></i>Finance
+        Overview</div>
+      <div class="nav-item " onclick="location.href='fin-income.html'"><i class="ti ti-arrow-bar-down"></i>Income</div>
+      <div class="nav-item " onclick="location.href='fin-expenses.html'"><i class="ti ti-arrow-bar-up"></i>Expenses
       </div>
-      <div class="bank-card" style="background:linear-gradient(135deg,#8B5CF6,#7C3AED);">
-        <div class="bank-name">ICICI Bank — Savings Account</div>
-        <div class="bank-bal">₹4,21,800</div>
-        <div class="bank-acc"><i class="ti ti-credit-card" style="font-size:14px;"></i> ••••  ••••  ••••  7734 &nbsp;·&nbsp; IFSC: ICIC0004567</div>
-        <div style="display:flex;gap:8px;margin-top:14px;">
-          <span style="background:rgba(255,255,255,.2);border-radius:8px;padding:4px 12px;font-size:11px;font-weight:700;">Secondary</span>
-          <span style="background:rgba(255,255,255,.2);border-radius:8px;padding:4px 12px;font-size:11px;font-weight:700;">Savings A/C</span>
-        </div>
-        <div class="bank-sync"><i class="ti ti-refresh" style="font-size:13px;"></i>Synced 2 hours ago</div>
-      </div>
-    </div>
-
-    <!-- TOTAL + RECONCILIATION STATUS -->
-    <div class="kpi-grid kpi-grid-4" style="margin-bottom:22px;">
-      <div class="kpi profit"><div class="kpi-label">Total Balance</div><div class="kpi-value">₹17,06,120</div><div class="kpi-sub up"><i class="ti ti-building-bank"></i>Across 2 accounts</div></div>
-      <div class="kpi income"><div class="kpi-label">Matched Txns</div><div class="kpi-value">142</div><div class="kpi-sub up"><i class="ti ti-check"></i>96% reconciled</div></div>
-      <div class="kpi pending"><div class="kpi-label">Unmatched</div><div class="kpi-value">6</div><div class="kpi-sub down"><i class="ti ti-alert-circle"></i>Need review</div></div>
-      <div class="kpi expense"><div class="kpi-label">Last Reconciled</div><div class="kpi-value">Jun 4</div><div class="kpi-sub neutral"><i class="ti ti-clock"></i>Yesterday</div></div>
-    </div>
-
-    <div class="grid-main-side">
-      <!-- LEFT: STATEMENT / RECONCILIATION -->
-      <div>
-        <div class="card">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-            <div style="font-size:15px;font-weight:800;color:var(--text-dark);display:flex;align-items:center;gap:8px;"><i class="ti ti-list" style="color:var(--primary);"></i>Bank Statement — HDFC ••••4821</div>
-            <select class="filter-sel" style="font-size:12px;padding:6px 12px;">
-              <option>HDFC — ••••4821</option><option>ICICI — ••••7734</option>
-            </select>
-          </div>
-          <div style="display:flex;gap:8px;margin-bottom:14px;">
-            <span style="background:var(--green-light);color:var(--green-dark);padding:4px 12px;border-radius:8px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px;"><i class="ti ti-circle-check" style="font-size:13px;"></i>142 Matched</span>
-            <span style="background:var(--orange-light);color:var(--orange-dark);padding:4px 12px;border-radius:8px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px;"><i class="ti ti-alert-circle" style="font-size:13px;"></i>6 Unmatched</span>
-          </div>
-          <div class="rec-row">
-            <div class="rec-icon in"><i class="ti ti-arrow-down"></i></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:700;">Credit — NovaMart Inc.</div><div style="font-size:11px;color:var(--text-light);">Jun 3 · Ref: NEFT/TXN2026060312</div></div>
-            <div class="amt-in" style="font-size:14px;">+₹1,87,500</div>
-            <span class="rec-match"><i class="ti ti-check" style="font-size:10px;"></i> Matched</span>
-          </div>
-          <div class="rec-row">
-            <div class="rec-icon out"><i class="ti ti-arrow-up"></i></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:700;">Debit — AWS Auto-debit</div><div style="font-size:11px;color:var(--text-light);">Jun 4 · Ref: NACH/AWS2026000</div></div>
-            <div class="amt-out" style="font-size:14px;">−₹42,000</div>
-            <span class="rec-match"><i class="ti ti-check" style="font-size:10px;"></i> Matched</span>
-          </div>
-          <div class="rec-row">
-            <div class="rec-icon in"><i class="ti ti-arrow-down"></i></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:700;">Credit — UNKNOWN SENDER</div><div style="font-size:11px;color:var(--text-light);">Jun 5 · Ref: IMPS/20260503456</div></div>
-            <div class="amt-in" style="font-size:14px;">+₹50,000</div>
-            <span class="rec-unmatched"><i class="ti ti-alert-circle" style="font-size:10px;"></i> Unmatched</span>
-          </div>
-          <div class="rec-row">
-            <div class="rec-icon out"><i class="ti ti-arrow-up"></i></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:700;">Debit — Prestige Business Park</div><div style="font-size:11px;color:var(--text-light);">Jun 2 · Ref: NEFT/RENT2026062</div></div>
-            <div class="amt-out" style="font-size:14px;">−₹75,000</div>
-            <span class="rec-match"><i class="ti ti-check" style="font-size:10px;"></i> Matched</span>
-          </div>
-          <div class="rec-row">
-            <div class="rec-icon out"><i class="ti ti-arrow-up"></i></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:700;">Debit — Payroll Jun 2026</div><div style="font-size:11px;color:var(--text-light);">Jun 1 · Ref: BULK/SALARY062026</div></div>
-            <div class="amt-out" style="font-size:14px;">−₹5,40,000</div>
-            <span class="rec-match"><i class="ti ti-check" style="font-size:10px;"></i> Matched</span>
-          </div>
-        </div>
-      </div>
-      <!-- RIGHT: ACCOUNT DETAILS -->
-      <div style="display:flex;flex-direction:column;gap:18px;">
-        <div class="card">
-          <div style="font-size:14px;font-weight:800;color:var(--text-dark);margin-bottom:14px;display:flex;align-items:center;gap:7px;"><i class="ti ti-building-bank" style="color:var(--primary);"></i>Account Summary</div>
-          <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
-            <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bg);"><span style="color:var(--text-light);font-weight:600;">Opening Balance</span><span style="font-weight:700;">₹8,62,320</span></div>
-            <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bg);"><span style="color:var(--text-light);font-weight:600;">Total Credits</span><span class="amt-in">+₹18,42,000</span></div>
-            <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bg);"><span style="color:var(--text-light);font-weight:600;">Total Debits</span><span class="amt-out">−₹14,20,000</span></div>
-            <div style="display:flex;justify-content:space-between;padding:7px 0;"><span style="font-weight:800;color:var(--text-dark);">Closing Balance</span><span style="font-weight:900;color:var(--primary);font-size:16px;">₹12,84,320</span></div>
-          </div>
-        </div>
-        <div class="card">
-          <div style="font-size:14px;font-weight:800;color:var(--text-dark);margin-bottom:12px;">Export Statement</div>
-          <div style="display:flex;flex-direction:column;gap:8px;">
-            <button class="exp-btn exp-pdf" style="justify-content:flex-start;" onclick="toast('Downloading PDF statement...','success')"><i class="ti ti-file-type-pdf"></i>Download PDF</button>
-            <button class="exp-btn exp-excel" style="justify-content:flex-start;" onclick="toast('Downloading Excel...','success')"><i class="ti ti-file-spreadsheet"></i>Download Excel</button>
-            <button class="exp-btn exp-csv" style="justify-content:flex-start;" onclick="toast('Downloading CSV...','success')"><i class="ti ti-file-text"></i>Download CSV</button>
-          </div>
+      <div class="nav-item " onclick="location.href='fin-vendors.html'"><i class="ti ti-truck"></i>Vendors</div>
+      <div class="nav-item active" onclick="location.href='fin-bank.html'"><i class="ti ti-building-bank"></i>Bank
+        Accounts</div>
+      <div class="nav-item " onclick="location.href='fin-reports.html'"><i class="ti ti-file-analytics"></i>Reports &
+        Export</div>
+      <div class="nav-sec">Tools</div>
+      <div class="nav-item"><i class="ti ti-receipt"></i>Invoices</div>
+      <div class="nav-item"><i class="ti ti-message-circle"></i>Messages</div>
+      <div class="nav-item"><i class="ti ti-settings"></i>Settings</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="av av-md" style="background:var(--primary);">PR</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;">Prabhu R.</div>
+          <div style="font-size:11px;color:var(--text-light);">Administrator</div>
         </div>
       </div>
     </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="breadcrumb"><a href="fin-dashboard.html">Finance</a><i class="ti ti-chevron-right"></i><span>Bank
+          Accounts</span></div>
+      <div class="topbar-actions">
+        <button class="btn btn-outline" onclick="openImport()"
+          style="border-color:var(--primary);color:var(--primary);"><i class="ti ti-upload"></i>Import
+          Statement</button>
+        <button class="btn btn-outline" onclick="toast('Syncing all accounts...\nLast sync: just now','success')"><i
+            class="ti ti-refresh"></i>Sync All</button>
+        <button class="btn btn-primary" onclick="document.getElementById('linkBankModal').classList.add('open')"><i
+            class="ti ti-plus"></i>Link Bank Account</button>
+      </div>
+    </div>
+    <div class="content">
+      <!-- BANK CARDS -->
+      <div class="grid-2" style="margin-bottom:22px;">
+        <div class="bank-card" style='background: "linear-gradient(135deg,var(--app-accent),#0097A7);"'>
+          <div class="bank-name">HDFC Bank — Current Account</div>
+          <div class="bank-bal">₹12,84,320</div>
+          <div class="bank-acc"><i class="ti ti-credit-card" style="font-size:14px;"></i> •••• •••• •••• 4821
+            &nbsp;·&nbsp; IFSC: HDFC0001234</div>
+          <div style="display:flex;gap:8px;margin-top:14px;">
+            <span
+              style="background:rgba(255,255,255,.2);border-radius:8px;padding:4px 12px;font-size:11px;font-weight:700;">Primary</span>
+            <span
+              style="background:rgba(255,255,255,.2);border-radius:8px;padding:4px 12px;font-size:11px;font-weight:700;">Current
+              A/C</span>
+          </div>
+          <div class="bank-sync"><i class="ti ti-refresh" style="font-size:13px;"></i>Synced 2 hours ago</div>
+        </div>
+        <div class="bank-card" style="background:linear-gradient(135deg,#8B5CF6,#7C3AED);">
+          <div class="bank-name">ICICI Bank — Savings Account</div>
+          <div class="bank-bal">₹4,21,800</div>
+          <div class="bank-acc"><i class="ti ti-credit-card" style="font-size:14px;"></i> •••• •••• •••• 7734
+            &nbsp;·&nbsp; IFSC: ICIC0004567</div>
+          <div style="display:flex;gap:8px;margin-top:14px;">
+            <span
+              style="background:rgba(255,255,255,.2);border-radius:8px;padding:4px 12px;font-size:11px;font-weight:700;">Secondary</span>
+            <span
+              style="background:rgba(255,255,255,.2);border-radius:8px;padding:4px 12px;font-size:11px;font-weight:700;">Savings
+              A/C</span>
+          </div>
+          <div class="bank-sync"><i class="ti ti-refresh" style="font-size:13px;"></i>Synced 2 hours ago</div>
+        </div>
+      </div>
+
+      <!-- TOTAL + RECONCILIATION STATUS -->
+      <div class="kpi-grid kpi-grid-4" style="margin-bottom:22px;">
+        <div class="kpi profit">
+          <div class="kpi-label">Total Balance</div>
+          <div class="kpi-value">₹17,06,120</div>
+          <div class="kpi-sub up"><i class="ti ti-building-bank"></i>Across 2 accounts</div>
+        </div>
+        <div class="kpi income">
+          <div class="kpi-label">Matched Txns</div>
+          <div class="kpi-value">142</div>
+          <div class="kpi-sub up"><i class="ti ti-check"></i>96% reconciled</div>
+        </div>
+        <div class="kpi pending">
+          <div class="kpi-label">Unmatched</div>
+          <div class="kpi-value">6</div>
+          <div class="kpi-sub down"><i class="ti ti-alert-circle"></i>Need review</div>
+        </div>
+        <div class="kpi expense">
+          <div class="kpi-label">Last Reconciled</div>
+          <div class="kpi-value">Jun 4</div>
+          <div class="kpi-sub neutral"><i class="ti ti-clock"></i>Yesterday</div>
+        </div>
+      </div>
+
+      <div class="grid-main-side">
+        <!-- LEFT: STATEMENT / RECONCILIATION -->
+        <div>
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+              <div
+                style="font-size:15px;font-weight:800;color:var(--text-dark);display:flex;align-items:center;gap:8px;">
+                <i class="ti ti-list" style="color:var(--primary);"></i>Bank Statement — HDFC ••••4821
+              </div>
+              <select class="filter-sel" style="font-size:12px;padding:6px 12px;">
+                <option>HDFC — ••••4821</option>
+                <option>ICICI — ••••7734</option>
+              </select>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:14px;">
+              <span
+                style="background:var(--green-light);color:var(--green-dark);padding:4px 12px;border-radius:8px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px;"><i
+                  class="ti ti-circle-check" style="font-size:13px;"></i>142 Matched</span>
+              <span
+                style="background:var(--orange-light);color:var(--orange-dark);padding:4px 12px;border-radius:8px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px;"><i
+                  class="ti ti-alert-circle" style="font-size:13px;"></i>6 Unmatched</span>
+            </div>
+            <div class="rec-row">
+              <div class="rec-icon in"><i class="ti ti-arrow-down"></i></div>
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:700;">Credit — NovaMart Inc.</div>
+                <div style="font-size:11px;color:var(--text-light);">Jun 3 · Ref: NEFT/TXN2026060312</div>
+              </div>
+              <div class="amt-in" style="font-size:14px;">+₹1,87,500</div>
+              <span class="rec-match"><i class="ti ti-check" style="font-size:10px;"></i> Matched</span>
+            </div>
+            <div class="rec-row">
+              <div class="rec-icon out"><i class="ti ti-arrow-up"></i></div>
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:700;">Debit — AWS Auto-debit</div>
+                <div style="font-size:11px;color:var(--text-light);">Jun 4 · Ref: NACH/AWS2026000</div>
+              </div>
+              <div class="amt-out" style="font-size:14px;">−₹42,000</div>
+              <span class="rec-match"><i class="ti ti-check" style="font-size:10px;"></i> Matched</span>
+            </div>
+            <div class="rec-row">
+              <div class="rec-icon in"><i class="ti ti-arrow-down"></i></div>
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:700;">Credit — UNKNOWN SENDER</div>
+                <div style="font-size:11px;color:var(--text-light);">Jun 5 · Ref: IMPS/20260503456</div>
+              </div>
+              <div class="amt-in" style="font-size:14px;">+₹50,000</div>
+              <span class="rec-unmatched"><i class="ti ti-alert-circle" style="font-size:10px;"></i> Unmatched</span>
+            </div>
+            <div class="rec-row">
+              <div class="rec-icon out"><i class="ti ti-arrow-up"></i></div>
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:700;">Debit — Prestige Business Park</div>
+                <div style="font-size:11px;color:var(--text-light);">Jun 2 · Ref: NEFT/RENT2026062</div>
+              </div>
+              <div class="amt-out" style="font-size:14px;">−₹75,000</div>
+              <span class="rec-match"><i class="ti ti-check" style="font-size:10px;"></i> Matched</span>
+            </div>
+            <div class="rec-row">
+              <div class="rec-icon out"><i class="ti ti-arrow-up"></i></div>
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:700;">Debit — Payroll Jun 2026</div>
+                <div style="font-size:11px;color:var(--text-light);">Jun 1 · Ref: BULK/SALARY062026</div>
+              </div>
+              <div class="amt-out" style="font-size:14px;">−₹5,40,000</div>
+              <span class="rec-match"><i class="ti ti-check" style="font-size:10px;"></i> Matched</span>
+            </div>
+          </div>
+        </div>
+        <!-- RIGHT: ACCOUNT DETAILS -->
+        <div style="display:flex;flex-direction:column;gap:18px;">
+          <div class="card">
+            <div
+              style="font-size:14px;font-weight:800;color:var(--text-dark);margin-bottom:14px;display:flex;align-items:center;gap:7px;">
+              <i class="ti ti-building-bank" style="color:var(--primary);"></i>Account Summary
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+              <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bg);">
+                <span style="color:var(--text-light);font-weight:600;">Opening Balance</span><span
+                  style="font-weight:700;">₹8,62,320</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bg);">
+                <span style="color:var(--text-light);font-weight:600;">Total Credits</span><span
+                  class="amt-in">+₹18,42,000</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bg);">
+                <span style="color:var(--text-light);font-weight:600;">Total Debits</span><span
+                  class="amt-out">−₹14,20,000</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:7px 0;"><span
+                  style="font-weight:800;color:var(--text-dark);">Closing Balance</span><span
+                  style="font-weight:900;color:var(--primary);font-size:16px;">₹12,84,320</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-size:14px;font-weight:800;color:var(--text-dark);margin-bottom:12px;">Export Statement
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <button class="exp-btn exp-pdf" style="justify-content:flex-start;"
+                onclick="toast('Downloading PDF statement...','success')"><i class="ti ti-file-type-pdf"></i>Download
+                PDF</button>
+              <button class="exp-btn exp-excel" style="justify-content:flex-start;"
+                onclick="toast('Downloading Excel...','success')"><i class="ti ti-file-spreadsheet"></i>Download
+                Excel</button>
+              <button class="exp-btn exp-csv" style="justify-content:flex-start;"
+                onclick="toast('Downloading CSV...','success')"><i class="ti ti-file-text"></i>Download CSV</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
 
-<!-- LINK BANK MODAL -->
-<div class="modal-bg" id="linkBankModal">
-  <div class="modal modal-sm">
-    <div class="modal-title"><i class="ti ti-building-bank"></i>Link Bank Account</div>
-    <div class="form-group"><label>Bank Name *</label><select><option>HDFC Bank</option><option>ICICI Bank</option><option>State Bank of India</option><option>Axis Bank</option><option>Kotak Mahindra</option><option>Yes Bank</option></select></div>
-    <div class="form-group"><label>Account Number *</label><input placeholder="Enter account number"></div>
-    <div class="form-group"><label>Confirm Account Number *</label><input placeholder="Re-enter account number"></div>
-    <div class="form-2col">
-      <div class="form-group"><label>IFSC Code *</label><input placeholder="e.g. HDFC0001234"></div>
-      <div class="form-group"><label>Account Type</label><select><option>Current</option><option>Savings</option><option>OD</option></select></div>
-    </div>
-    <div class="form-group"><label>Account Holder Name</label><input value="YENCODE Technologies Pvt Ltd"></div>
-    <div style="background:var(--orange-light);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--orange-dark);font-weight:600;margin-bottom:16px;display:flex;align-items:flex-start;gap:8px;">
-      <i class="ti ti-shield-lock" style="font-size:16px;margin-top:1px;"></i>
-      A small test deposit of ₹1 will be made to verify the account. This amount will be reversed within 24 hours.
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="document.getElementById('linkBankModal').classList.remove('open')">Cancel</button>
-      <button class="btn btn-primary" onclick="linkBank()"><i class="ti ti-link"></i>Link & Verify</button>
+  <!-- LINK BANK MODAL -->
+  <div class="modal-bg" id="linkBankModal">
+    <div class="modal modal-sm">
+      <div class="modal-title"><i class="ti ti-building-bank"></i>Link Bank Account</div>
+      <div class="form-group"><label>Bank Name *</label><select>
+          <option>HDFC Bank</option>
+          <option>ICICI Bank</option>
+          <option>State Bank of India</option>
+          <option>Axis Bank</option>
+          <option>Kotak Mahindra</option>
+          <option>Yes Bank</option>
+        </select></div>
+      <div class="form-group"><label>Account Number *</label><input placeholder="Enter account number"></div>
+      <div class="form-group"><label>Confirm Account Number *</label><input placeholder="Re-enter account number"></div>
+      <div class="form-2col">
+        <div class="form-group"><label>IFSC Code *</label><input placeholder="e.g. HDFC0001234"></div>
+        <div class="form-group"><label>Account Type</label><select>
+            <option>Current</option>
+            <option>Savings</option>
+            <option>OD</option>
+          </select></div>
+      </div>
+      <div class="form-group"><label>Account Holder Name</label><input value="YENCODE Technologies Pvt Ltd"></div>
+      <div
+        style="background:var(--orange-light);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--orange-dark);font-weight:600;margin-bottom:16px;display:flex;align-items:flex-start;gap:8px;">
+        <i class="ti ti-shield-lock" style="font-size:16px;margin-top:1px;"></i>
+        A small test deposit of ₹1 will be made to verify the account. This amount will be reversed within 24 hours.
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline"
+          onclick="document.getElementById('linkBankModal').classList.remove('open')">Cancel</button>
+        <button class="btn btn-primary" onclick="linkBank()"><i class="ti ti-link"></i>Link & Verify</button>
+      </div>
     </div>
   </div>
-</div>
-<div class="toast-wrap" id="tw"></div>
-<script>
-function linkBank(){document.getElementById('linkBankModal').classList.remove('open');toast('Bank account linked! Verify the test deposit.','success');}
-function toast(msg,type='success'){const w=document.getElementById('tw');const t=document.createElement('div');t.className='toast '+type;t.innerHTML=`<i class="ti ti-circle-check"></i>${msg}`;w.appendChild(t);setTimeout(()=>t.remove(),3000);}
-document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');}));
+  <div class="toast-wrap" id="tw"></div>
+  <script>
+    function linkBank() { document.getElementById('linkBankModal').classList.remove('open'); toast('Bank account linked! Verify the test deposit.', 'success'); }
+    function toast(msg, type = 'success') { const w = document.getElementById('tw'); const t = document.createElement('div'); t.className = 'toast ' + type; t.innerHTML = `<i class="ti ti-circle-check"></i>${msg}`; w.appendChild(t); setTimeout(() => t.remove(), 3000); }
+    document.querySelectorAll('.modal-bg').forEach(m => m.addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('open'); }));
 
-// ── Import Modal Logic -------------------------------------
-let impCurrentStep = 1;
-let selectedBank = 'HDFC';
-let importedFile = null;
+    // ── Import Modal Logic -------------------------------------
+    let impCurrentStep = 1;
+    let selectedBank = 'HDFC';
+    let importedFile = null;
 
-const stepLabels = ['','Select Bank','Upload File','Map Columns','Review & Import'];
+    const stepLabels = ['', 'Select Bank', 'Upload File', 'Map Columns', 'Review & Import'];
 
-function openImport(){
-  document.getElementById('importModal').classList.add('open');
-  impGoTo(1);
-}
+    function openImport() {
+      document.getElementById('importModal').classList.add('open');
+      impGoTo(1);
+    }
 
-function selectBank(b){
-  selectedBank = b;
-  document.querySelectorAll('.bs-opt').forEach(o=>o.classList.remove('sel'));
-  document.getElementById('bs'+b.charAt(0).toUpperCase()+b.slice(1))?.classList.add('sel');
-}
+    function selectBank(b) {
+      selectedBank = b;
+      document.querySelectorAll('.bs-opt').forEach(o => o.classList.remove('sel'));
+      document.getElementById('bs' + b.charAt(0).toUpperCase() + b.slice(1))?.classList.add('sel');
+    }
 
-function handleFile(input){
-  const f = input.files[0];
-  if(!f) return;
-  importedFile = f;
-  const info = document.getElementById('fileInfo');
-  document.getElementById('fileName').textContent = f.name;
-  document.getElementById('fileSize').textContent = (f.size/1024).toFixed(1)+' KB — '+f.type.split('/').pop().toUpperCase();
-  info.style.display='flex';
-  document.getElementById('dropZone').style.borderColor='var(--green)';
-  document.getElementById('dropZone').style.background='var(--green-light)';
-}
+    function handleFile(input) {
+      const f = input.files[0];
+      if (!f) return;
+      importedFile = f;
+      const info = document.getElementById('fileInfo');
+      document.getElementById('fileName').textContent = f.name;
+      document.getElementById('fileSize').textContent = (f.size / 1024).toFixed(1) + ' KB — ' + f.type.split('/').pop().toUpperCase();
+      info.style.display = 'flex';
+      document.getElementById('dropZone').style.borderColor = 'var(--green)';
+      document.getElementById('dropZone').style.background = 'var(--green-light)';
+    }
 
-function impNext(){
-  if(impCurrentStep===4){
-    // FINAL IMPORT
-    document.getElementById('importModal').classList.remove('open');
-    toast('Yes 144 transactions imported successfully! 4 duplicates skipped.','success');
-    setTimeout(()=>{ location.reload(); },1200);
-    return;
-  }
-  if(impCurrentStep===2 && !importedFile){
-    toast('Please select a file first','warning');
-    return;
-  }
-  impGoTo(impCurrentStep+1);
-}
+    function impNext() {
+      if (impCurrentStep === 4) {
+        // FINAL IMPORT
+        document.getElementById('importModal').classList.remove('open');
+        toast('Yes 144 transactions imported successfully! 4 duplicates skipped.', 'success');
+        setTimeout(() => { location.reload(); }, 1200);
+        return;
+      }
+      if (impCurrentStep === 2 && !importedFile) {
+        toast('Please select a file first', 'warning');
+        return;
+      }
+      impGoTo(impCurrentStep + 1);
+    }
 
-function impPrev(){ impGoTo(impCurrentStep-1); }
+    function impPrev() { impGoTo(impCurrentStep - 1); }
 
-function impGoTo(step){
-  impCurrentStep = step;
-  [1,2,3,4].forEach(s=>{
-    const el = document.getElementById('impStep'+s);
-    if(el) el.style.display = s===step ? 'block' : 'none';
-    const st = document.getElementById('st'+s);
-    if(st){ st.className='imp-step'+(s<step?' done':s===step?' active':''); }
-    const sl = document.getElementById('sl'+s);
-    if(sl){ sl.className='imp-step-line'+(s<step?' done':''); }
-  });
-  document.getElementById('impStepLabel').textContent = 'Step '+step+' of 4 — '+stepLabels[step];
-  document.getElementById('impBack').style.display = step>1?'flex':'none';
-  document.getElementById('impNext').innerHTML = step===4?'<i class="ti ti-upload"></i> Import Now':'Next <i class="ti ti-arrow-right"></i>';
-  document.getElementById('impNext').style.background = step===4?'var(--green)':'var(--primary)';
-}
+    function impGoTo(step) {
+      impCurrentStep = step;
+      [1, 2, 3, 4].forEach(s => {
+        const el = document.getElementById('impStep' + s);
+        if (el) el.style.display = s === step ? 'block' : 'none';
+        const st = document.getElementById('st' + s);
+        if (st) { st.className = 'imp-step' + (s < step ? ' done' : s === step ? ' active' : ''); }
+        const sl = document.getElementById('sl' + s);
+        if (sl) { sl.className = 'imp-step-line' + (s < step ? ' done' : ''); }
+      });
+      document.getElementById('impStepLabel').textContent = 'Step ' + step + ' of 4 — ' + stepLabels[step];
+      document.getElementById('impBack').style.display = step > 1 ? 'flex' : 'none';
+      document.getElementById('impNext').innerHTML = step === 4 ? '<i class="ti ti-upload"></i> Import Now' : 'Next <i class="ti ti-arrow-right"></i>';
+      document.getElementById('impNext').style.background = step === 4 ? 'var(--green)' : 'var(--primary)';
+    }
 
-document.getElementById('importModal').addEventListener('click',e=>{
-  if(e.target===e.currentTarget) e.currentTarget.classList.remove('open');
-});
+    document.getElementById('importModal').addEventListener('click', e => {
+      if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+    });
 
-// Drag & drop
-const dz = document.getElementById('dropZone');
-if(dz){
-  dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag');});
-  dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
-  dz.addEventListener('drop',e=>{
-    e.preventDefault();dz.classList.remove('drag');
-    const f=e.dataTransfer.files[0];
-    if(f){document.getElementById('fileInput').files=e.dataTransfer.files;handleFile({files:[f]});}
-  });
-}
-</script>
-<!-- ----------------------------------------
+    // Drag & drop
+    const dz = document.getElementById('dropZone');
+    if (dz) {
+      dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+      dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+      dz.addEventListener('drop', e => {
+        e.preventDefault(); dz.classList.remove('drag');
+        const f = e.dataTransfer.files[0];
+        if (f) { document.getElementById('fileInput').files = e.dataTransfer.files; handleFile({ files: [f] }); }
+      });
+    }
+  </script>
+  <!-- ----------------------------------------
      BANK STATEMENT IMPORT MODAL
 ---------------------------------------- -->
-<div class="imp-modal-bg" id="importModal">
-  <div class="imp-modal">
-    <div class="imp-header">
-      <h2><i class="ti ti-upload"></i>Import Bank Statement</h2>
-      <p>Upload CSV, Excel (.xlsx) or PDF statement from your bank — we'll read and map it automatically.</p>
-    </div>
-    <div class="imp-body">
-
-      <!-- STEP INDICATOR -->
-      <div class="imp-steps">
-        <div class="imp-step active" id="st1"><div class="imp-step-num">1</div>Select Bank</div>
-        <div class="imp-step-line" id="sl1"></div>
-        <div class="imp-step" id="st2"><div class="imp-step-num">2</div>Upload File</div>
-        <div class="imp-step-line" id="sl2"></div>
-        <div class="imp-step" id="st3"><div class="imp-step-num">3</div>Map Columns</div>
-        <div class="imp-step-line" id="sl3"></div>
-        <div class="imp-step" id="st4"><div class="imp-step-num">4</div>Review & Import</div>
+  <div class="imp-modal-bg" id="importModal">
+    <div class="imp-modal">
+      <div class="imp-header">
+        <h2><i class="ti ti-upload"></i>Import Bank Statement</h2>
+        <p>Upload CSV, Excel (.xlsx) or PDF statement from your bank — we'll read and map it automatically.</p>
       </div>
+      <div class="imp-body">
 
-      <!-- STEP 1: SELECT BANK -->
-      <div id="impStep1">
-        <div style="font-size:13px;font-weight:700;color:var(--text-mid);margin-bottom:12px;">Which account is this statement for?</div>
-        <div class="bank-selector">
-          <div class="bs-opt sel" id="bsHDFC" onclick="selectBank('HDFC')">
-            <div class="bs-opt-icon" style="background:var(--primary-light);"><i class="ti ti-building-bank" style="color:var(--primary);"></i></div>
-            <div><div class="bs-opt-name">HDFC Bank</div><div class="bs-opt-acc">Current A/C ••••4821</div></div>
+        <!-- STEP INDICATOR -->
+        <div class="imp-steps">
+          <div class="imp-step active" id="st1">
+            <div class="imp-step-num">1</div>Select Bank
           </div>
-          <div class="bs-opt" id="bsICICI" onclick="selectBank('ICICI')">
-            <div class="bs-opt-icon" style="background:var(--purple-light);"><i class="ti ti-building-bank" style="color:var(--purple);"></i></div>
-            <div><div class="bs-opt-name">ICICI Bank</div><div class="bs-opt-acc">Savings A/C ••••7734</div></div>
+          <div class="imp-step-line" id="sl1"></div>
+          <div class="imp-step" id="st2">
+            <div class="imp-step-num">2</div>Upload File
           </div>
-          <div class="bs-opt" id="bsNew" onclick="selectBank('new')">
-            <div class="bs-opt-icon" style="background:var(--green-light);"><i class="ti ti-plus" style="color:var(--green);"></i></div>
-            <div><div class="bs-opt-name">New Account</div><div class="bs-opt-acc">Add & import</div></div>
+          <div class="imp-step-line" id="sl2"></div>
+          <div class="imp-step" id="st3">
+            <div class="imp-step-num">3</div>Map Columns
           </div>
-          <div class="bs-opt" id="bsOther" onclick="selectBank('other')">
-            <div class="bs-opt-icon" style="background:var(--orange-light);"><i class="ti ti-dots" style="color:var(--orange);"></i></div>
-            <div><div class="bs-opt-name">Other Bank</div><div class="bs-opt-acc">Generic import</div></div>
+          <div class="imp-step-line" id="sl3"></div>
+          <div class="imp-step" id="st4">
+            <div class="imp-step-num">4</div>Review & Import
           </div>
         </div>
-        <div style="background:var(--primary-light);border-radius:10px;padding:11px 14px;font-size:12px;color:var(--primary-dark);font-weight:600;display:flex;align-items:flex-start;gap:8px;margin-top:4px;">
-          <i class="ti ti-info-circle" style="font-size:15px;margin-top:1px;"></i>
-          We auto-detect HDFC, ICICI, SBI, Axis, Kotak column formats. For other banks, you'll manually map columns in Step 3.
-        </div>
-      </div>
 
-      <!-- STEP 2: UPLOAD FILE -->
-      <div id="impStep2" style="display:none;">
-        <div class="drop-zone" id="dropZone">
-          <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.pdf" onchange="handleFile(this)">
-          <i class="ti ti-cloud-upload"></i>
-          <h3>Drag & drop your bank statement here</h3>
-          <p>or click to browse files</p>
-          <div class="format-chips">
-            <span class="fmt-chip csv"><i class="ti ti-file-text" style="font-size:11px;margin-right:3px;"></i>CSV</span>
-            <span class="fmt-chip excel"><i class="ti ti-file-spreadsheet" style="font-size:11px;margin-right:3px;"></i>Excel .xlsx/.xls</span>
-            <span class="fmt-chip pdf"><i class="ti ti-file-type-pdf" style="font-size:11px;margin-right:3px;"></i>PDF (text-based)</span>
+        <!-- STEP 1: SELECT BANK -->
+        <div id="impStep1">
+          <div style="font-size:13px;font-weight:700;color:var(--text-mid);margin-bottom:12px;">Which account is this
+            statement for?</div>
+          <div class="bank-selector">
+            <div class="bs-opt sel" id="bsHDFC" onclick="selectBank('HDFC')">
+              <div class="bs-opt-icon" style="background:var(--primary-light);"><i class="ti ti-building-bank"
+                  style="color:var(--primary);"></i></div>
+              <div>
+                <div class="bs-opt-name">HDFC Bank</div>
+                <div class="bs-opt-acc">Current A/C ••••4821</div>
+              </div>
+            </div>
+            <div class="bs-opt" id="bsICICI" onclick="selectBank('ICICI')">
+              <div class="bs-opt-icon" style="background:var(--purple-light);"><i class="ti ti-building-bank"
+                  style="color:var(--purple);"></i></div>
+              <div>
+                <div class="bs-opt-name">ICICI Bank</div>
+                <div class="bs-opt-acc">Savings A/C ••••7734</div>
+              </div>
+            </div>
+            <div class="bs-opt" id="bsNew" onclick="selectBank('new')">
+              <div class="bs-opt-icon" style="background:var(--green-light);"><i class="ti ti-plus"
+                  style="color:var(--green);"></i></div>
+              <div>
+                <div class="bs-opt-name">New Account</div>
+                <div class="bs-opt-acc">Add & import</div>
+              </div>
+            </div>
+            <div class="bs-opt" id="bsOther" onclick="selectBank('other')">
+              <div class="bs-opt-icon" style="background:var(--orange-light);"><i class="ti ti-dots"
+                  style="color:var(--orange);"></i></div>
+              <div>
+                <div class="bs-opt-name">Other Bank</div>
+                <div class="bs-opt-acc">Generic import</div>
+              </div>
+            </div>
+          </div>
+          <div
+            style="background:var(--primary-light);border-radius:10px;padding:11px 14px;font-size:12px;color:var(--primary-dark);font-weight:600;display:flex;align-items:flex-start;gap:8px;margin-top:4px;">
+            <i class="ti ti-info-circle" style="font-size:15px;margin-top:1px;"></i>
+            We auto-detect HDFC, ICICI, SBI, Axis, Kotak column formats. For other banks, you'll manually map columns in
+            Step 3.
           </div>
         </div>
-        <div id="fileInfo" style="display:none;background:var(--green-light);border-radius:10px;padding:12px 16px;margin-top:12px;display:flex;align-items:center;gap:10px;">
-          <i class="ti ti-circle-check" style="color:var(--green);font-size:20px;"></i>
-          <div><div style="font-size:13px;font-weight:700;color:var(--green-dark);" id="fileName">—</div><div style="font-size:11px;color:var(--text-light);" id="fileSize">—</div></div>
+
+        <!-- STEP 2: UPLOAD FILE -->
+        <div id="impStep2" style="display:none;">
+          <div class="drop-zone" id="dropZone">
+            <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.pdf" onchange="handleFile(this)">
+            <i class="ti ti-cloud-upload"></i>
+            <h3>Drag & drop your bank statement here</h3>
+            <p>or click to browse files</p>
+            <div class="format-chips">
+              <span class="fmt-chip csv"><i class="ti ti-file-text"
+                  style="font-size:11px;margin-right:3px;"></i>CSV</span>
+              <span class="fmt-chip excel"><i class="ti ti-file-spreadsheet"
+                  style="font-size:11px;margin-right:3px;"></i>Excel .xlsx/.xls</span>
+              <span class="fmt-chip pdf"><i class="ti ti-file-type-pdf" style="font-size:11px;margin-right:3px;"></i>PDF
+                (text-based)</span>
+            </div>
+          </div>
+          <div id="fileInfo"
+            style="display:none;background:var(--green-light);border-radius:10px;padding:12px 16px;margin-top:12px;display:flex;align-items:center;gap:10px;">
+            <i class="ti ti-circle-check" style="color:var(--green);font-size:20px;"></i>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--green-dark);" id="fileName">—</div>
+              <div style="font-size:11px;color:var(--text-light);" id="fileSize">—</div>
+            </div>
+          </div>
+          <div
+            style="background:var(--orange-light);border-radius:10px;padding:11px 14px;font-size:12px;color:var(--orange-dark);font-weight:600;display:flex;gap:8px;margin-top:12px;">
+            <i class="ti ti-lock" style="font-size:15px;"></i>
+            Your file is processed locally in your browser. Nothing is sent to any server until you confirm import.
+          </div>
         </div>
-        <div style="background:var(--orange-light);border-radius:10px;padding:11px 14px;font-size:12px;color:var(--orange-dark);font-weight:600;display:flex;gap:8px;margin-top:12px;">
-          <i class="ti ti-lock" style="font-size:15px;"></i>
-          Your file is processed locally in your browser. Nothing is sent to any server until you confirm import.
+
+        <!-- STEP 3: MAP COLUMNS -->
+        <div id="impStep3" style="display:none;">
+          <div style="font-size:13px;font-weight:700;color:var(--text-mid);margin-bottom:14px;">
+            Map your file's columns to M Business fields. We've auto-detected the format — verify and adjust if needed.
+          </div>
+          <div
+            style="background:var(--green-light);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--green-dark);font-weight:700;display:flex;align-items:center;gap:7px;margin-bottom:14px;">
+            <i class="ti ti-sparkles" style="font-size:15px;"></i>Auto-detected: HDFC Bank CSV format — 8 columns mapped
+            automatically
+          </div>
+          <div class="col-mapper">
+            <div class="cm-row">
+              <div class="cm-label">Date Column *</div><select class="cm-sel">
+                <option>Column A — Date</option>
+                <option>Column B</option>
+                <option>Column C</option>
+              </select>
+            </div>
+            <div class="cm-row">
+              <div class="cm-label">Description *</div><select class="cm-sel">
+                <option>Column B — Narration</option>
+                <option>Column C</option>
+                <option>Column D</option>
+              </select>
+            </div>
+            <div class="cm-row">
+              <div class="cm-label">Debit Amount</div><select class="cm-sel">
+                <option>Column C — Debit</option>
+                <option>Column D</option>
+                <option>Column E</option>
+              </select>
+            </div>
+            <div class="cm-row">
+              <div class="cm-label">Credit Amount</div><select class="cm-sel">
+                <option>Column D — Credit</option>
+                <option>Column E</option>
+                <option>Column F</option>
+              </select>
+            </div>
+            <div class="cm-row">
+              <div class="cm-label">Balance</div><select class="cm-sel">
+                <option>Column E — Balance</option>
+                <option>Column F</option>
+                <option>— Skip —</option>
+              </select>
+            </div>
+            <div class="cm-row">
+              <div class="cm-label">Reference No.</div><select class="cm-sel">
+                <option>Column F — Chq/Ref No.</option>
+                <option>Column G</option>
+                <option>— Skip —</option>
+              </select>
+            </div>
+          </div>
+          <div
+            style="display:flex;gap:10px;align-items:center;margin-bottom:14px;padding:12px 14px;background:var(--bg);border-radius:10px;font-size:12px;font-weight:600;color:var(--text-mid);">
+            <i class="ti ti-calendar" style="color:var(--primary);font-size:15px;"></i>
+            Date format detected: <strong style="color:var(--text-dark);">DD/MM/YYYY</strong>
+            <select class="cm-sel" style="margin-left:auto;width:auto;padding:5px 10px;">
+              <option>DD/MM/YYYY</option>
+              <option>MM/DD/YYYY</option>
+              <option>YYYY-MM-DD</option>
+              <option>DD-MMM-YYYY</option>
+            </select>
+          </div>
         </div>
+
+        <!-- STEP 4: REVIEW & IMPORT -->
+        <div id="impStep4" style="display:none;">
+          <div class="imp-summary">
+            <div class="is-box">
+              <div class="is-num" id="sumTotal">148</div>
+              <div class="is-lbl">Total Rows</div>
+            </div>
+            <div class="is-box" style="border-color:var(--green);">
+              <div class="is-num" style="color:var(--green);" id="sumCredits">62</div>
+              <div class="is-lbl">Credits (In)</div>
+            </div>
+            <div class="is-box" style="border-color:var(--red-dark);">
+              <div class="is-num" style="color:var(--red-dark);" id="sumDebits">86</div>
+              <div class="is-lbl">Debits (Out)</div>
+            </div>
+            <div class="is-box" style="border-color:var(--orange);">
+              <div class="is-num" style="color:var(--orange);" id="sumDups">4</div>
+              <div class="is-lbl">Duplicates</div>
+            </div>
+          </div>
+          <div style="font-size:13px;font-weight:700;color:var(--text-mid);margin-bottom:10px;">Preview — first 8 rows
+          </div>
+          <div class="preview-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Description</th>
+                  <th>Debit</th>
+                  <th>Credit</th>
+                  <th>Balance</th>
+                  <th>Auto-Category</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="row-in">
+                  <td>05/06/2026</td>
+                  <td>NEFT-NovaMart Inc.</td>
+                  <td>—</td>
+                  <td>₹2,12,500</td>
+                  <td>₹12,84,320</td>
+                  <td><span
+                      style="background:var(--green-light);color:var(--green-dark);padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;">Project
+                      Revenue</span></td>
+                  <td><span style="color:var(--green);font-weight:800;font-size:11px;">Yes New</span></td>
+                </tr>
+                <tr class="row-out">
+                  <td>04/06/2026</td>
+                  <td>NACH-AMAZON WEB SERVICES</td>
+                  <td>₹42,000</td>
+                  <td>—</td>
+                  <td>₹10,71,820</td>
+                  <td><span
+                      style="background:var(--primary-light);color:var(--primary-dark);padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;">Infrastructure</span>
+                  </td>
+                  <td><span style="color:var(--green);font-weight:800;font-size:11px;">Yes New</span></td>
+                </tr>
+                <tr class="row-in">
+                  <td>03/06/2026</td>
+                  <td>NEFT-MEDICORE PVT LTD</td>
+                  <td>—</td>
+                  <td>₹1,87,500</td>
+                  <td>₹11,13,820</td>
+                  <td><span
+                      style="background:var(--green-light);color:var(--green-dark);padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;">Project
+                      Revenue</span></td>
+                  <td><span style="color:var(--orange);font-weight:800;font-size:11px;">Warning Duplicate</span></td>
+                </tr>
+                <tr class="row-out">
+                  <td>02/06/2026</td>
+                  <td>NEFT-PRESTIGE BUSINESS PARK</td>
+                  <td>₹75,000</td>
+                  <td>—</td>
+                  <td>₹9,26,320</td>
+                  <td><span
+                      style="background:var(--orange-light);color:var(--orange-dark);padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;">Operations</span>
+                  </td>
+                  <td><span style="color:var(--green);font-weight:800;font-size:11px;">Yes New</span></td>
+                </tr>
+                <tr class="row-out">
+                  <td>01/06/2026</td>
+                  <td>BULK-SALARY DISBURSEMENT JUN2026</td>
+                  <td>₹5,40,000</td>
+                  <td>—</td>
+                  <td>₹9,01,320</td>
+                  <td><span
+                      style="background:var(--red-light);color:var(--red-dark);padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;">Payroll</span>
+                  </td>
+                  <td><span style="color:var(--green);font-weight:800;font-size:11px;">Yes New</span></td>
+                </tr>
+                <tr class="row-in">
+                  <td>31/05/2026</td>
+                  <td>RTGS-LOGITRACK SYSTEMS</td>
+                  <td>—</td>
+                  <td>₹3,50,000</td>
+                  <td>₹14,41,320</td>
+                  <td><span
+                      style="background:var(--green-light);color:var(--green-dark);padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;">Project
+                      Revenue</span></td>
+                  <td><span style="color:var(--green);font-weight:800;font-size:11px;">Yes New</span></td>
+                </tr>
+                <tr class="row-in">
+                  <td>30/05/2026</td>
+                  <td>IMPS-UNKNOWN SENDER</td>
+                  <td>—</td>
+                  <td>₹50,000</td>
+                  <td>₹10,91,320</td>
+                  <td><span
+                      style="background:var(--orange-light);color:var(--orange-dark);padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;">Unclassified</span>
+                  </td>
+                  <td><span style="color:var(--orange);font-weight:800;font-size:11px;">Warning Review</span></td>
+                </tr>
+                <tr class="row-out">
+                  <td>29/05/2026</td>
+                  <td>POS-OFFICE SUPPLIES STORE</td>
+                  <td>₹8,500</td>
+                  <td>—</td>
+                  <td>₹10,41,320</td>
+                  <td><span
+                      style="background:var(--text-light);color:#fff;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;">Misc</span>
+                  </td>
+                  <td><span style="color:var(--green);font-weight:800;font-size:11px;">Yes New</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div
+            style="background:var(--orange-light);border-radius:10px;padding:11px 14px;font-size:12px;color:var(--orange-dark);font-weight:600;display:flex;align-items:center;gap:8px;">
+            <i class="ti ti-alert-circle" style="font-size:15px;"></i>
+            4 duplicate transactions detected — these will be skipped. 1 unclassified transaction needs manual review
+            after import.
+          </div>
+        </div>
+
+      </div><!-- end imp-body -->
+
+      <!-- FOOTER -->
+      <div class="imp-footer">
+        <button class="btn btn-outline" id="impBack" onclick="impPrev()" style="display:none;"><i
+            class="ti ti-arrow-left"></i>Back</button>
+        <div style="font-size:12px;color:var(--text-light);font-weight:600;" id="impStepLabel">Step 1 of 4 — Select Bank
+        </div>
+        <button class="btn btn-primary" id="impNext" onclick="impNext()">Next <i class="ti ti-arrow-right"></i></button>
       </div>
-
-      <!-- STEP 3: MAP COLUMNS -->
-      <div id="impStep3" style="display:none;">
-        <div style="font-size:13px;font-weight:700;color:var(--text-mid);margin-bottom:14px;">
-          Map your file's columns to M Business fields. We've auto-detected the format — verify and adjust if needed.
-        </div>
-        <div style="background:var(--green-light);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--green-dark);font-weight:700;display:flex;align-items:center;gap:7px;margin-bottom:14px;">
-          <i class="ti ti-sparkles" style="font-size:15px;"></i>Auto-detected: HDFC Bank CSV format — 8 columns mapped automatically
-        </div>
-        <div class="col-mapper">
-          <div class="cm-row"><div class="cm-label">Date Column *</div><select class="cm-sel"><option>Column A — Date</option><option>Column B</option><option>Column C</option></select></div>
-          <div class="cm-row"><div class="cm-label">Description *</div><select class="cm-sel"><option>Column B — Narration</option><option>Column C</option><option>Column D</option></select></div>
-          <div class="cm-row"><div class="cm-label">Debit Amount</div><select class="cm-sel"><option>Column C — Debit</option><option>Column D</option><option>Column E</option></select></div>
-          <div class="cm-row"><div class="cm-label">Credit Amount</div><select class="cm-sel"><option>Column D — Credit</option><option>Column E</option><option>Column F</option></select></div>
-          <div class="cm-row"><div class="cm-label">Balance</div><select class="cm-sel"><option>Column E — Balance</option><option>Column F</option><option>— Skip —</option></select></div>
-          <div class="cm-row"><div class="cm-label">Reference No.</div><select class="cm-sel"><option>Column F — Chq/Ref No.</option><option>Column G</option><option>— Skip —</option></select></div>
-        </div>
-        <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;padding:12px 14px;background:var(--bg);border-radius:10px;font-size:12px;font-weight:600;color:var(--text-mid);">
-          <i class="ti ti-calendar" style="color:var(--primary);font-size:15px;"></i>
-          Date format detected: <strong style="color:var(--text-dark);">DD/MM/YYYY</strong>
-          <select class="cm-sel" style="margin-left:auto;width:auto;padding:5px 10px;">
-            <option>DD/MM/YYYY</option><option>MM/DD/YYYY</option><option>YYYY-MM-DD</option><option>DD-MMM-YYYY</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- STEP 4: REVIEW & IMPORT -->
-      <div id="impStep4" style="display:none;">
-        <div class="imp-summary">
-          <div class="is-box"><div class="is-num" id="sumTotal">148</div><div class="is-lbl">Total Rows</div></div>
-          <div class="is-box" style="border-color:var(--green);"><div class="is-num" style="color:var(--green);" id="sumCredits">62</div><div class="is-lbl">Credits (In)</div></div>
-          <div class="is-box" style="border-color:var(--red-dark);"><div class="is-num" style="color:var(--red-dark);" id="sumDebits">86</div><div class="is-lbl">Debits (Out)</div></div>
-          <div class="is-box" style="border-color:var(--orange);"><div class="is-num" style="color:var(--orange);" id="sumDups">4</div><div class="is-lbl">Duplicates</div></div>
-        </div>
-        <div style="font-size:13px;font-weight:700;color:var(--text-mid);margin-bottom:10px;">Preview — first 8 rows</div>
-        <div class="preview-table-wrap">
-          <table>
-            <thead><tr><th>Date</th><th>Description</th><th>Debit</th><th>Credit</th><th>Balance</th><th>Auto-Category</th><th>Status</th></tr></thead>
-            <tbody>
-              <tr class="row-in"><td>05/06/2026</td><td>NEFT-NovaMart Inc.</td><td>—</td><td>₹2,12,500</td><td>₹12,84,320</td><td><span style="background:var(--green-light);color:var(--green-dark);padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;">Project Revenue</span></td><td><span style="color:var(--green);font-weight:800;font-size:11px;">Yes New</span></td></tr>
-              <tr class="row-out"><td>04/06/2026</td><td>NACH-AMAZON WEB SERVICES</td><td>₹42,000</td><td>—</td><td>₹10,71,820</td><td><span style="background:var(--primary-light);color:var(--primary-dark);padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;">Infrastructure</span></td><td><span style="color:var(--green);font-weight:800;font-size:11px;">Yes New</span></td></tr>
-              <tr class="row-in"><td>03/06/2026</td><td>NEFT-MEDICORE PVT LTD</td><td>—</td><td>₹1,87,500</td><td>₹11,13,820</td><td><span style="background:var(--green-light);color:var(--green-dark);padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;">Project Revenue</span></td><td><span style="color:var(--orange);font-weight:800;font-size:11px;">Warning Duplicate</span></td></tr>
-              <tr class="row-out"><td>02/06/2026</td><td>NEFT-PRESTIGE BUSINESS PARK</td><td>₹75,000</td><td>—</td><td>₹9,26,320</td><td><span style="background:var(--orange-light);color:var(--orange-dark);padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;">Operations</span></td><td><span style="color:var(--green);font-weight:800;font-size:11px;">Yes New</span></td></tr>
-              <tr class="row-out"><td>01/06/2026</td><td>BULK-SALARY DISBURSEMENT JUN2026</td><td>₹5,40,000</td><td>—</td><td>₹9,01,320</td><td><span style="background:var(--red-light);color:var(--red-dark);padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;">Payroll</span></td><td><span style="color:var(--green);font-weight:800;font-size:11px;">Yes New</span></td></tr>
-              <tr class="row-in"><td>31/05/2026</td><td>RTGS-LOGITRACK SYSTEMS</td><td>—</td><td>₹3,50,000</td><td>₹14,41,320</td><td><span style="background:var(--green-light);color:var(--green-dark);padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;">Project Revenue</span></td><td><span style="color:var(--green);font-weight:800;font-size:11px;">Yes New</span></td></tr>
-              <tr class="row-in"><td>30/05/2026</td><td>IMPS-UNKNOWN SENDER</td><td>—</td><td>₹50,000</td><td>₹10,91,320</td><td><span style="background:var(--orange-light);color:var(--orange-dark);padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;">Unclassified</span></td><td><span style="color:var(--orange);font-weight:800;font-size:11px;">Warning Review</span></td></tr>
-              <tr class="row-out"><td>29/05/2026</td><td>POS-OFFICE SUPPLIES STORE</td><td>₹8,500</td><td>—</td><td>₹10,41,320</td><td><span style="background:var(--text-light);color:#fff;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;">Misc</span></td><td><span style="color:var(--green);font-weight:800;font-size:11px;">Yes New</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div style="background:var(--orange-light);border-radius:10px;padding:11px 14px;font-size:12px;color:var(--orange-dark);font-weight:600;display:flex;align-items:center;gap:8px;">
-          <i class="ti ti-alert-circle" style="font-size:15px;"></i>
-          4 duplicate transactions detected — these will be skipped. 1 unclassified transaction needs manual review after import.
-        </div>
-      </div>
-
-    </div><!-- end imp-body -->
-
-    <!-- FOOTER -->
-    <div class="imp-footer">
-      <button class="btn btn-outline" id="impBack" onclick="impPrev()" style="display:none;"><i class="ti ti-arrow-left"></i>Back</button>
-      <div style="font-size:12px;color:var(--text-light);font-weight:600;" id="impStepLabel">Step 1 of 4 — Select Bank</div>
-      <button class="btn btn-primary" id="impNext" onclick="impNext()">Next <i class="ti ti-arrow-right"></i></button>
     </div>
   </div>
-</div>
-</body></html>
+</body>
+
+</html>

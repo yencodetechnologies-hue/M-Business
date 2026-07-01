@@ -99,7 +99,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
 
   const projIcons = ['ti-world', 'ti-device-mobile', 'ti-chart-bar', 'ti-code', 'ti-building', 'ti-rocket'];
   const projColors = [
-    { bg: '#F0FDFE', color: '#00BCD4' },
+    { bg: 'var(--teal-lighter, #F0FDFE)', color: ' var(--app-accent, #00BCD4)' },
     { bg: '#EEF2FF', color: '#6366F1' },
     { bg: '#ECFDF5', color: '#10B981' },
     { bg: '#FFF7ED', color: '#F59E0B' },
@@ -443,7 +443,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
 
   return (
     <div style={{
-      "--teal": "#00BCD4",
+      "--teal": " var(--app-accent, #00BCD4)",
       "--bg": "#F5F7FA",
       "--card": "#FFFFFF",
       "--text": "#1A2E35",
@@ -512,7 +512,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         .ed-proj-item:last-child { border-bottom: none; }
         .ed-proj-item:hover { background: #FAFAFA; }
         .ed-proj-info { display: flex; align-items: center; gap: 12px; }
-        .ed-proj-icon { width: 36px; height: 36px; border-radius: 8px; background: #F0FDFE; color: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .ed-proj-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--teal-lighter, #F0FDFE); color: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 18px; }
         .ed-proj-name { font-size: 13px; font-weight: 800; color: #0F172A; }
         .ed-proj-role { font-size: 11px; font-weight: 600; color: #64748B; }
         .ed-proj-stat { text-align: right; }
@@ -882,7 +882,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
             onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
               <div style={{ fontSize: 17, fontWeight: 800, color: '#0f1c2e', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <i className="ti ti-calendar-plus" style={{ color: '#00BCD4' }}></i> Add Leave Request
+                <i className="ti ti-calendar-plus" style={{ color: ' var(--app-accent, #00BCD4)' }}></i> Add Leave Request
               </div>
               <button onClick={() => setShowLeaveModal(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#94a3b8' }}>✕</button>
             </div>
@@ -895,7 +895,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
               {leaveForm.type === 'Other' && (
                 <input type="text" placeholder="Type your custom leave type..." value={leaveForm.customType}
                   onChange={e => setLeaveForm(p => ({ ...p, customType: e.target.value }))}
-                  style={{ width: '100%', marginTop: 8, padding: '10px 14px', border: '1.5px solid #00BCD4', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }}
+                  style={{ width: '100%', marginTop: 8, padding: '10px 14px', border: '1.5px solid  var(--app-accent, #00BCD4)', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }}
                   autoFocus />
               )}
             </div>

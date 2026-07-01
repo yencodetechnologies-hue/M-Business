@@ -1,86 +1,100 @@
 <USER_REQUEST>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard — M Business</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-<style>
-:root {
-  --teal: #00BCD4;
-  --teal-light: #26C6DA;
-  --teal-dark: #0097A7;
-  --teal-dim: rgba(0,188,212,0.10);
-  --teal-glow: rgba(0,188,212,0.18);
-  --bg: #f0f4f8;
-  --sidebar-bg: #ffffff;
-  --card: #ffffff;
-  --card2: #f6f9fc;
-  --border: rgba(0,0,0,0.08);
-  --border2: rgba(0,188,212,0.22);
-  --text: #0f1c2e;
-  --text-mid: rgba(15,28,46,0.58);
-  --text-soft: rgba(15,28,46,0.33);
-  --green: #16a34a;
-  --amber: #d97706;
-  --red: #dc2626;
-  --blue: #2563eb;
-  --purple: #7c3aed;
-  --pink: #db2777;
-  --sidebar-w: 232px;
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; overflow-x: hidden; }
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(0,188,212,0.25); border-radius: 4px; }
+  <!DOCTYPE html>
+  <html lang="en">
 
-/* ── SIDEBAR ── */
-.sidebar {
-  width: var(--sidebar-w); flex-shrink: 0;
-  background: var(--sidebar-bg);
-  border-right: 1px solid var(--border);
-  box-shadow: 2px 0 16px rgba(0,0,0,0.05);
-  position: fixed; top:0; left:0; bottom:0;
-  z-index: 200; overflow-y: auto;
-  display: flex; flex-direction: column;
-}
-.sidebar-logo {
-  padding: 20px 20px 18px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 10px;
-}
-.logo-icon {
-  width: 34px; height: 34px; border-radius: 9px;
-  background: linear-gradient(135deg, var(--teal), var(--teal-dark));
-  display: flex; align-items: center; justify-content: center;
-<truncated 45215 bytes>
-  <div class="card-header">
-            <div class="card-title"><i class="ti ti-bolt"></i> Quick Access</div>
-          </div>
-          <div class="shortcuts-grid">
-            <div class="shortcut-btn" onclick="showToast('Opening Client Manager…')">
-              <div class="shortcut-icon" style="background:rgba(0,188,212,0.10);color:var(--teal-dark)"><i class="ti ti-users"></i></div>
-              <div><div class="shortcut-label">Clients</div><div class="shortcut-sub">24 total</div></div>
-            </div>
-            <div class="shortcut-btn" onclick="showToast('Opening Employee List…')">
-              <div class="shortcut-icon" style="background:rgba(124,58,237,0.10);color:var(--purple)"><i class="ti ti-user-circle"></i></div>
-              <div><div class="shortcut-label">Employees</div><div class="shortcut-sub">9 staff</div></div>
-            </div>
-            <div class="shortcut-btn" onclick="showToast('Opening Invoice Creator…')">
-              <div class="shortcut-icon" style="background:rgba(22,163,74,0.10);color:var(--green)"><i class="ti ti-file-invoice"></i></div>
-              <div><div class="shortcut-label">Invoices</div><div class="shortcut-sub">3 unpaid</div></div>
-            </div>
-            <div class="shortcut-btn" onclick="showToast('Opening Quotation Builder…')">
-              <div class="shortcut-icon" style="background:rgba(37,99,235,0.10);color:var(--blue)"><i class="ti ti-receipt"></i></div>
-              <div><div class="shortcut-label">Quotations</div><div class="shortcut-sub">Builder</div></div>
-            </div>
-            <div class="shortcut-btn" onclick="showToast('Opening Proposal Creator…')">
-              <div class="shortcut-icon" style="background:rgba(217,119,6,0.10);color:var(--amber)"><i class="ti ti-report-money"></i></div>
-              <div><div class="shortcut-label">Prop
-<truncated 22877 bytes>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — M Business</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <style>
+      :root {
+        --teal: var(--app-accent, #00BCD4);
+        --teal-light: #26C6DA;
+        --teal-dark: #0097A7;
+        --teal-dim: rgba(0, 188, 212, 0.10);
+        --teal-glow: rgba(0, 188, 212, 0.18);
+        --bg: #f0f4f8;
+        --sidebar-bg: #ffffff;
+        --card: #ffffff;
+        --card2: #f6f9fc;
+        --border: rgba(0, 0, 0, 0.08);
+        --border2: rgba(0, 188, 212, 0.22);
+        --text: #0f1c2e;
+        --text-mid: rgba(15, 28, 46, 0.58);
+        --text-soft: rgba(15, 28, 46, 0.33);
+        --green: #16a34a;
+        --amber: #d97706;
+        --red: #dc2626;
+        --blue: #2563eb;
+        --purple: #7c3aed;
+        --pink: #db2777;
+        --sidebar-w: 232px;
+      }
 
-NOTE: The output was truncated because it was too long. Use a more targeted query or a smaller range to get the information you need.
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Nunito', sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        overflow-x: hidden;
+      }
+
+      ::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(0, 188, 212, 0.25);
+        border-radius: 4px;
+      }
+
+      /* ── SIDEBAR ── */
+      .sidebar {
+        width: var(--sidebar-w);
+        flex-shrink: 0;
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--border);
+        box-shadow: 2px 0 16px rgba(0, 0, 0, 0.05);
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 200;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .sidebar-logo {
+        padding: 20px 20px 18px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .logo-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        <truncated 45215 bytes><div class="card-header"><div class="card-title"><i class="ti ti-bolt"></i>Quick Access</div></div><div class="shortcuts-grid"><div class="shortcut-btn" onclick="showToast('Opening Client Manager…')"><div class="shortcut-icon" style="background:rgba(0,188,212,0.10);color:var(--teal-dark)"><i class="ti ti-users"></i></div><div><div class="shortcut-label">Clients</div><div class="shortcut-sub">24 total</div></div></div><div class="shortcut-btn" onclick="showToast('Opening Employee List…')"><div class="shortcut-icon" style="background:rgba(124,58,237,0.10);color:var(--purple)"><i class="ti ti-user-circle"></i></div><div><div class="shortcut-label">Employees</div><div class="shortcut-sub">9 staff</div></div></div><div class="shortcut-btn" onclick="showToast('Opening Invoice Creator…')"><div class="shortcut-icon" style="background:rgba(22,163,74,0.10);color:var(--green)"><i class="ti ti-file-invoice"></i></div><div><div class="shortcut-label">Invoices</div><div class="shortcut-sub">3 unpaid</div></div></div><div class="shortcut-btn" onclick="showToast('Opening Quotation Builder…')"><div class="shortcut-icon" style="background:rgba(37,99,235,0.10);color:var(--blue)"><i class="ti ti-receipt"></i></div><div><div class="shortcut-label">Quotations</div><div class="shortcut-sub">Builder</div></div></div><div class="shortcut-btn" onclick="showToast('Opening Proposal Creator…')"><div class="shortcut-icon" style="background:rgba(217,119,6,0.10);color:var(--amber)"><i class="ti ti-report-money"></i></div><div><div class="shortcut-label">Prop <truncated 22877 bytes>NOTE: The output was truncated because it was too long. Use a more targeted query or a smaller range to get the information you need.

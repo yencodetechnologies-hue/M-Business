@@ -34,7 +34,8 @@ exports.addClient = async (req, res) => {
       paymentTerms,
       creditLimit,
       preferredPaymentMode,
-      internalNotes
+      internalNotes,
+      sendCredentials
     } = req.body;
 
     console.log("Adding client:", { clientName, email, companyId: req.companyId });
@@ -45,10 +46,8 @@ exports.addClient = async (req, res) => {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
-    // Deleted clients are allowed to re-register as a completely fresh account
-    // Default password is "123456" if the subadmin leaves the password field blank
-    const hashedPassword = await bcrypt.hash(password && password.trim() ? password : "123456", 10);
-
+    const plainPassword = password && password.trim() ? password : "123456";
+    const hashedPassword = await bcrypt.hash(plainPassword, 10);
     const newClient = new Client({
       clientName,
       companyName,
@@ -86,17 +85,31 @@ exports.addClient = async (req, res) => {
     await newClient.save();
 
     // Send welcome email in background
-    const welcomeMessage = `
-      <h3>Welcome to the Platform, ${clientName}!</h3>
-      <p>Your account has been successfully created.</p>
-      <p><strong>Company:</strong> ${companyName || 'N/A'}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Status:</strong> ${status || 'Active'}</p>
-      <p>You can now access your dashboard and start using our services.</p>
-    `;
+    const welcomeMessage = sendCredentials
+      ? `
+        <h3>Welcome to the Platform, ${clientName}!</h3>
+        <p>Your account has been successfully created. Here are your login details:</p>
+        <div style="background:#F4F6F8;border:1.5px solid #E0E6EA;border-radius:10px;padding:16px 20px;margin:16px 0;">
+          <p style="margin:4px 0;"><strong>Login Email:</strong> ${normalizedEmail}</p>
+          <p style="margin:4px 0;"><strong>Password:</strong> ${plainPassword}</p>
+        </div>
+        <p><strong>Company:</strong> ${companyName || 'N/A'}</p>
+        <p>You can now log in to your client dashboard using the credentials above. For security, we recommend changing your password after your first login.</p>
+      `
+      : `
+        <h3>Welcome to the Platform, ${clientName}!</h3>
+        <p>Your account has been successfully created.</p>
+        <p><strong>Company:</strong> ${companyName || 'N/A'}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Status:</strong> ${status || 'Active'}</p>
+        <p>You can now access your dashboard and start using our services.</p>
+      `;
 
-    sendQuickEmail(email, "Welcome - Account Created Successfully", welcomeMessage)
-      .catch(err => console.error("Failed to send welcome email:", err));
+    sendQuickEmail(
+      email,
+      sendCredentials ? "Your Login Credentials - Account Created Successfully" : "Welcome - Account Created Successfully",
+      welcomeMessage
+    ).catch(err => console.error("Failed to send welcome email:", err));
 
     res.status(201).json({
       message: "Client Added Successfully",

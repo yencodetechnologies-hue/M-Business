@@ -113,6 +113,12 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   const [name, setName] = useState(editProject?.name || '');
   const [description, setDescription] = useState(editProject?.description || editProject?.purpose || '');
   const [client, setClient] = useState(editProject?.client || prefillClient?.clientName || prefillClient?.name || '');
+  // The project's client is otherwise only ever saved as a NAME string, which
+  // is how "Open Portal" ends up resolving to the wrong client whenever two
+  // clients share a name (or the match is ambiguous) — it has no reliable ID
+  // to go on. This tracks the actual client _id selected in the dropdown so
+  // it can be saved on the project and used for an exact, unambiguous match.
+  const [clientId, setClientId] = useState(editProject?.clientId || prefillClient?._id || '');
   const [category, setCategory] = useState(editProject?.category || 'Web Development');
   const [priority, setPriority] = useState(editProject?.priority || 'medium');
   const [status, setStatus] = useState(editProject?.status || 'Active');
@@ -213,6 +219,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
         name,
         description,
         client,
+        clientId: clientId || null,
         contactPersonName,
         contactPersonNo,
         contactEmail,
@@ -372,12 +379,15 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                         setClient(selectedName);
                         const sel = clients.find(c => (c.clientName || c.name) === selectedName);
                         if (sel) {
+                          setClientId(sel._id || sel.id || '');
                           setContactPersonName(sel.contactPersonName || '');
                           setContactPersonNo(sel.contactPersonNo || sel.phone || '');
                           setContactEmail(sel.email || '');
                           setCompanyName(sel.companyName || sel.company || '');
                           setClientPhone(sel.phone || '');
                           setClientAddress(sel.address || '');
+                        } else {
+                          setClientId('');
                         }
                       }}
                       style={{ flex: 1 }}
@@ -398,6 +408,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                       const newName = newClient?.clientName || newClient?.name || '';
                       if (newName) {
                         setClient(newName);
+                        setClientId(newClient._id || newClient.id || '');
                         setContactPersonName(newClient.contactPersonName || '');
                         setContactPersonNo(newClient.contactPersonNo || newClient.phone || '');
                         setContactEmail(newClient.email || '');

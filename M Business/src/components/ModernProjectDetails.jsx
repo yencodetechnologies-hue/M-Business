@@ -1320,11 +1320,14 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   };
 
   useEffect(() => {
+    // Clients viewing their own portal never see the Client Portal panel
+    // (see the render guard below), so don't even generate a link for them.
+    if (user?.role === 'client') return;
     // Clear any cached link from a previously viewed project/client first,
     // so generatePortalLink() below is forced to build a fresh one.
     setPortalLinkUrl('');
     if (currProject?._id) generatePortalLink();
-  }, [currProject?._id, currProject?.client]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currProject?._id, currProject?.client, user?.role]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const copyPortalLink = async () => {
     const link = portalLinkUrl || await generatePortalLink();
@@ -2586,33 +2589,39 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             )}
           </div>
 
-          {/* PORTAL LINK */}
-          <div style={{ background: `linear-gradient(135deg, #004D5E, ${P.primary})`, borderRadius: P.radius, padding: 22, color: '#fff' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 800, marginBottom: 14 }}>
-              <i className="ti ti-world" style={{ fontSize: 16 }}></i> Client Portal
+          {/* PORTAL LINK — staff-only. A client viewing a project inside their
+              OWN portal must never see this: generatePortalLink() looks the
+              client up by name as a fallback, and if another client has a
+              similar/duplicate name it can resolve to the WRONG client and
+              send this client into someone else's portal. */}
+          {user?.role !== 'client' && (
+            <div style={{ background: `linear-gradient(135deg, #004D5E, ${P.primary})`, borderRadius: P.radius, padding: 22, color: '#fff' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 800, marginBottom: 14 }}>
+                <i className="ti ti-world" style={{ fontSize: 16 }}></i> Client Portal
+              </div>
+              <div style={{ fontSize: 12, opacity: 0.85, marginBottom: 6 }}>{clientName}</div>
+              <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: 9, padding: '9px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 16 }}>
+                <span style={{ fontSize: 11, fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {loadingPortalLink ? 'Generating link...' : (portalLinkUrl ? `/client-portal/${portalLinkUrl.split('/client-portal/')[1]?.split('?')[0]}` : 'Link not generated')}
+                </span>
+                <button onClick={copyPortalLink} style={{ flexShrink: 0, padding: '4px 10px', borderRadius: 6, border: 'none', background: 'rgba(255,255,255,0.25)', color: '#fff', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Copy</button>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <button onClick={async () => { const link = portalLinkUrl || await generatePortalLink(); if (link) window.open(link, '_blank'); }} style={{ padding: '10px', borderRadius: 9, border: 'none', background: '#fff', color: P.primaryDark, fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                  <i className="ti ti-external-link"></i> Open Portal
+                </button>
+                <button onClick={copyPortalLink} style={{ padding: '10px', borderRadius: 9, border: '1.5px solid rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                  <i className="ti ti-copy"></i> Copy Link
+                </button>
+                <button onClick={sharePortalLinkViaWhatsApp} style={{ padding: '10px', borderRadius: 9, border: 'none', background: '#25D366', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                  <i className="ti ti-brand-whatsapp"></i> WhatsApp
+                </button>
+                <button onClick={sharePortalLinkViaEmail} style={{ padding: '10px', borderRadius: 9, border: '1.5px solid rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                  <i className="ti ti-mail"></i> Email Link
+                </button>
+              </div>
             </div>
-            <div style={{ fontSize: 12, opacity: 0.85, marginBottom: 6 }}>{clientName}</div>
-            <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: 9, padding: '9px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 16 }}>
-              <span style={{ fontSize: 11, fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {loadingPortalLink ? 'Generating link...' : (portalLinkUrl ? `/client-portal/${portalLinkUrl.split('/client-portal/')[1]?.split('?')[0]}` : 'Link not generated')}
-              </span>
-              <button onClick={copyPortalLink} style={{ flexShrink: 0, padding: '4px 10px', borderRadius: 6, border: 'none', background: 'rgba(255,255,255,0.25)', color: '#fff', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Copy</button>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-              <button onClick={async () => { const link = portalLinkUrl || await generatePortalLink(); if (link) window.open(link, '_blank'); }} style={{ padding: '10px', borderRadius: 9, border: 'none', background: '#fff', color: P.primaryDark, fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                <i className="ti ti-external-link"></i> Open Portal
-              </button>
-              <button onClick={copyPortalLink} style={{ padding: '10px', borderRadius: 9, border: '1.5px solid rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                <i className="ti ti-copy"></i> Copy Link
-              </button>
-              <button onClick={sharePortalLinkViaWhatsApp} style={{ padding: '10px', borderRadius: 9, border: 'none', background: '#25D366', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                <i className="ti ti-brand-whatsapp"></i> WhatsApp
-              </button>
-              <button onClick={sharePortalLinkViaEmail} style={{ padding: '10px', borderRadius: 9, border: '1.5px solid rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                <i className="ti ti-mail"></i> Email Link
-              </button>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 

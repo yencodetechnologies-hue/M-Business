@@ -177,11 +177,19 @@ const sendOTPEmail = async (userEmail, otp, purpose = 'verification') => {
 
 // Quick email utility
 const sendQuickEmail = async (to, subject, message) => {
+  // NOTE: `message` may already contain block-level HTML (headings, divs,
+  // its own <p> tags) — e.g. the client credentials email. Wrapping it in
+  // an outer <p> here is invalid HTML (a <p> can't contain a <div> or
+  // another <p>), which makes email clients auto-close the outer tag at
+  // the first nested block element. That breaks the layout inconsistently
+  // across clients and can cause parts of the message — like a password
+  // sitting inside a nested <div>/<p> — to render blank or get dropped.
+  // Use a plain <div> container instead so nested HTML is always valid.
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
       ${mbHeader}
       <div style="background:#fff;padding:32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;">
-        <p style="color:#1f2937;">${message}</p>
+        <div style="color:#1f2937;">${message}</div>
         ${mbFooter}
       </div>
     </div>
@@ -195,7 +203,7 @@ const sendEmployeeStatusUpdateEmail = async (userEmail, userName, companyName, s
   const statusColor = isApproved ? "#22c55e" : "#ef4444";
   const statusBg = isApproved ? "#f0fdf4" : "#fef2f2";
   const statusBorder = isApproved ? "#bbf7d0" : "#fecaca";
-  
+
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
       ${mbHeader}
@@ -207,9 +215,9 @@ const sendEmployeeStatusUpdateEmail = async (userEmail, userName, companyName, s
         <div style="background:${statusBg};border:1.5px solid ${statusBorder};border-radius:10px;padding:20px;margin:24px 0;">
           <p style="margin:0;color:${statusColor};font-weight:700;font-size:16px;">Status: ${status.toUpperCase()}</p>
           <p style="margin:8px 0 0;color:#4b5563;font-size:14px;">
-            ${isApproved 
-              ? "You can now log in to your dashboard and start using the platform. Welcome aboard!" 
-              : "Unfortunately, your registration could not be approved at this time. Please contact your administrator for more information."}
+            ${isApproved
+      ? "You can now log in to your dashboard and start using the platform. Welcome aboard!"
+      : "Unfortunately, your registration could not be approved at this time. Please contact your administrator for more information."}
           </p>
         </div>
 

@@ -44,7 +44,8 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
     preferredPaymentMode: editData?.preferredPaymentMode || '',
     password: '',
     notes: editData?.internalNotes || editData?.notes || '',
-    logoUrl: editData?.logoUrl || ''
+    logoUrl: editData?.logoUrl || '',
+    sendCredentials: !editData
   });
 
   const [showPass, setShowPass] = useState(false);
@@ -161,7 +162,8 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
         paymentTerms: formData.paymentTerms,
         creditLimit: formData.creditLimit,
         preferredPaymentMode: formData.preferredPaymentMode,
-        internalNotes: formData.notes
+        internalNotes: formData.notes,
+        sendCredentials: !isEdit && !!formData.sendCredentials
       };
 
       if (isEdit) {
@@ -436,10 +438,12 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                 </div>
                 {errors.confirmPassword && <div style={{ fontSize: 11, color: '#EF5350' }}>{errors.confirmPassword}</div>}
               </div>
+          
             </div>
           </div>
 
           {/* Internal Notes */}
+
           <div id="notes" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: `linear-gradient(90deg, ${TC_LIGHT} 0%, #ffffff 100%)` }}>
               <div style={{ width: 36, height: 36, background: TC, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📝</div>

@@ -17,7 +17,7 @@ const P = {
 
 const INTEGRATIONS = [
   { id: "gmail", name: "Gmail", icon: "", description: "Email notifications on status change" },
-  { id: "slack", name: "Slack", icon: "Comment", description: "Post updates to Slack channels" },
+  { id: "slack", name: "Slack", icon: "💬", description: "Post updates to Slack channels" },
   { id: "googleCalendar", name: "Google Calendar", icon: "Date", description: "Sync due dates with your calendar" },
   { id: "github", name: "GitHub", icon: "", description: "Link commits and PRs to tasks" },
   { id: "zapier", name: "Zapier", icon: "", description: "Connect to 5000+ apps via Zapier" }

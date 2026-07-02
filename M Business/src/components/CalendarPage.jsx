@@ -331,6 +331,18 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <style>{`
+        @media (max-width: 900px) {
+          .cal-split-grid { grid-template-columns: 1fr !important; }
+          .cal-split-grid > div:first-child { position: static !important; }
+        }
+        @media (max-width: 640px) {
+          .cal-stats-grid { grid-template-columns: repeat(2,1fr) !important; }
+        }
+        @media (max-width: 480px) {
+          .cal-stats-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
 
       {/* Toast */}
       {toast && (
@@ -343,7 +355,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
       )}
 
       {/* Stats Row */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20 }}>
+      <div className="cal-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20 }}>
         {stats.map(({ t, v, c, i }) => {
           const filterKey = t === "Total" ? "All" : t;
           const isActive = filter === filterKey;
@@ -375,7 +387,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
       </div>
 
       {/* ── MAIN SPLIT LAYOUT --------------------------------------- */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, alignItems: "start", maxWidth: 1200, margin: "0 auto", width: "100%" }}>
+      <div className="cal-split-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, alignItems: "start", maxWidth: 1200, margin: "0 auto", width: "100%" }}>
 
         {/* ── LEFT: CALENDAR ---------------------------------------- */}
         <div style={{
@@ -551,15 +563,15 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
             }}>
               <h3 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: finalTheme.text || "var(--app-text)" }}>
                 {selectedDate
-                  ? `Date Events on ${selectedDate} (${shown.length})`
-                  : `Date All Events (${shown.length})`}
+                  ? `Events on ${selectedDate} (${shown.length})`
+                  : `All Events (${shown.length})`}
               </h3>
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 <div style={{ position: "relative" }}>
 
                   <input placeholder="Search…" value={search}
                     onChange={e => { setSearch(e.target.value); setSelectedDate(null); }}
-                    style={{ ...inp(false), paddingLeft: 30, width: 150, padding: "7px 10px 7px 30px" }} />
+                    style={{ ...inp(false), paddingLeft: 30, width: "100%", minWidth: 120, padding: "7px 10px 7px 30px", boxSizing: "border-box" }} />
                 </div>
                 {!isClient && !isEmployee && (
                   <button onClick={() => openAdd(selectedDate || "")} style={Btn}>
@@ -727,30 +739,59 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
       {/* ── MODALS ------------------------------------------------- */}
       {modal === "project" && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div style={{ background: finalTheme.card, borderRadius: 24, width: "100%", maxWidth: 450, padding: 28, boxShadow: "0 20px 50px rgba(0,0,0,0.15)", border: `1.5px solid ${finalTheme.border}` }}>
+          <div style={{ background: finalTheme.card, borderRadius: 24, width: "100%", maxWidth: 450, padding: 28, boxShadow: "0 20px 50px rgba(0,0,0,0.15)" }}>
             <h2 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 900, color: finalTheme.text || "var(--app-text)", display: "flex", alignItems: "center", gap: 10 }}>Build Project Deadline</h2>
-            <div style={{ background: finalTheme.bg, padding: 20, borderRadius: 16, marginBottom: 24, border: `1px solid ${finalTheme.border}` }}>
-              <div style={{ fontSize: 18, fontWeight: 800, color: finalTheme.text || "var(--app-text)" }}>{form._original.name}</div>
-              <div style={{ fontSize: 13, color: finalTheme.muted, marginTop: 6, fontWeight: 600 }}>Deadline: {form.date}</div>
-              <div style={{ fontSize: 13, color: finalTheme.muted, fontWeight: 600 }}>Client: {form.client || "—"}</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px", background: finalTheme.bg, borderRadius: 9, border: `1px solid ${finalTheme.border}` }}>
+                <div style={{ width: 30, height: 30, borderRadius: 8, background: `${finalTheme.accent}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: finalTheme.accent, flexShrink: 0 }}>
+                  <i className="ti ti-briefcase" />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 10, color: finalTheme.muted, fontWeight: 600 }}>Project</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: finalTheme.text || "var(--app-text)", marginTop: 1 }}>{form._original.name}</div>
+                </div>
+              </div>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px", background: finalTheme.bg, borderRadius: 9, border: `1px solid ${finalTheme.border}` }}>
+                <div style={{ width: 30, height: 30, borderRadius: 8, background: `${finalTheme.accent}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: finalTheme.accent, flexShrink: 0 }}>
+                  <i className="ti ti-user" />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 10, color: finalTheme.muted, fontWeight: 600 }}>Client</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: finalTheme.text || "var(--app-text)", marginTop: 1 }}>{form.client || "—"}</div>
+                </div>
+              </div>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px", background: finalTheme.bg, borderRadius: 9, border: `1px solid ${finalTheme.border}` }}>
+                <div style={{ width: 30, height: 30, borderRadius: 8, background: `${finalTheme.accent}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: finalTheme.accent, flexShrink: 0 }}>
+                  <i className="ti ti-calendar" />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 10, color: finalTheme.muted, fontWeight: 600 }}>Deadline</div>
+                  <input
+                    type="date"
+                    value={form.date}
+                    onChange={e => setForm({ ...form, date: e.target.value })}
+                    style={{ border: "none", background: "#fff", padding: 0, fontSize: 13, fontWeight: 700, color: finalTheme.text || "var(--app-text)", marginTop: 1, width: "100%", outline: "none", fontFamily: "inherit", colorScheme: "light" }}
+                    disabled={form._readOnly}
+                  />
+                </div>
+              </div>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px", background: finalTheme.bg, borderRadius: 9, border: `1px solid ${finalTheme.border}` }}>
+                <div style={{ width: 30, height: 30, borderRadius: 8, background: `${finalTheme.accent}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: finalTheme.accent, flexShrink: 0 }}>
+                  <i className="ti ti-toggle-right" />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 10, color: finalTheme.muted, fontWeight: 600 }}>Status</div>
+                  <select
+                    value={form._original.status}
+                    onChange={e => setForm({ ...form, _original: { ...form._original, status: e.target.value } })}
+                    style={{ border: "none", background: "none", padding: 0, fontSize: 13, fontWeight: 700, color: finalTheme.text || "var(--app-text)", marginTop: 1, width: "100%", outline: "none", fontFamily: "inherit", cursor: "pointer" }}
+                    disabled={form._readOnly}
+                  >
+                    {(config?.projectStatuses || ["Pending", "In Progress", "Completed", "On Hold"]).map(s => <option key={s}>{s}</option>)}
+                  </select>
+                </div>
+              </div>
             </div>
-            <label style={{ display: "block", fontSize: 11, color: finalTheme.accent, fontWeight: 700, marginBottom: 8 }}>DEADLINE</label>
-            <input
-              type="date"
-              value={form.date}
-              onChange={e => setForm({ ...form, date: e.target.value })}
-              style={{ ...inp(false), marginBottom: 16 }}
-              disabled={form._readOnly}
-            />
-            <label style={{ display: "block", fontSize: 11, color: finalTheme.accent, fontWeight: 700, marginBottom: 8 }}>UPDATE STATUS</label>
-            <select
-              value={form._original.status}
-              onChange={e => setForm({ ...form, _original: { ...form._original, status: e.target.value } })}
-              style={inp(false)}
-              disabled={form._readOnly}
-            >
-              {(config?.projectStatuses || ["Pending", "In Progress", "Completed", "On Hold"]).map(s => <option key={s}>{s}</option>)}
-            </select>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 20 }}>
               <button onClick={() => setModal(null)} style={{ background: finalTheme.bg, border: "none", color: finalTheme.text || "var(--app-text)", borderRadius: 10, padding: "10px 20px", cursor: "pointer", fontWeight: 600 }}>{form._readOnly ? "Close" : "Cancel"}</button>
               {!form._readOnly && (
@@ -768,7 +809,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
 
       {modal === "task" && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div style={{ background: finalTheme.card, borderRadius: 24, width: "100%", maxWidth: 450, padding: 28, boxShadow: "0 20px 50px rgba(0,0,0,0.15)", border: `1.5px solid ${finalTheme.border}` }}>
+          <div style={{ background: finalTheme.card, borderRadius: 24, width: "100%", maxWidth: 450, padding: 28, boxShadow: "0 20px 50px rgba(0,0,0,0.15)" }}>
             <h2 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 900, color: finalTheme.text || "var(--app-text)", display: "flex", alignItems: "center", gap: 10 }}>Edit Task Details</h2>
             <div style={{ background: finalTheme.bg, padding: 20, borderRadius: 16, marginBottom: 24, border: `1px solid ${finalTheme.border}` }}>
               <div style={{ fontSize: 18, fontWeight: 800, color: finalTheme.text || "var(--app-text)" }}>{form._original.title || form._original.name}</div>

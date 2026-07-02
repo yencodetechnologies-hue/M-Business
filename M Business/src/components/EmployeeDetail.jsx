@@ -243,6 +243,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
 
   const [newDocName, setNewDocName] = useState("");
   const [newDocType, setNewDocType] = useState("Offer Letter");
+  const [newDocCustomName, setNewDocCustomName] = useState("");
 
   // Interactions
   const handleToggleTask = async (taskId) => {
@@ -345,28 +346,23 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
 
   const handleRequestDocSubmit = async (e) => {
     e.preventDefault();
-    if (!newDocName.trim()) return;
+    // For "Other", the actual document name comes from the custom name field.
+    const finalDocName = newDocType === "Other" ? newDocCustomName.trim() : newDocName.trim();
+    if (!finalDocName) return;
     try {
-      // Create a database notification for the employee requesting the document
-      await axios.post(`${BASE_URL}/api/notifications`, {
-        userId: emp._id || emp.employeeId,
-        text: `Please upload your ${newDocName} (${newDocType})`,
-        type: "warning",
-        icon: "Folder",
-        companyId: emp.companyId || ""
+      const res = await axios.post(`${BASE_URL}/api/document-requests`, {
+        employeeId: emp._id || emp.employeeId,
+        employeeName: emp.name || emp.employeeName || "",
+        documentName: finalDocName,
+        documentType: newDocType,
+        companyId: emp.companyId || "",
       });
 
-      const newDoc = {
-        _id: "doc_" + Date.now(),
-        name: newDocName,
-        type: newDocType,
-        uploadedAt: new Date().toISOString(),
-        url: "#"
-      };
-      setRequestedDocs(prev => [...prev, newDoc]);
+      setRequestedDocs(prev => [...prev, res.data]);
       setShowRequestDocModal(false);
       setNewDocName("");
       setNewDocType("Offer Letter");
+      setNewDocCustomName("");
     } catch (err) {
       console.error("Failed to request document:", err);
       alert("Failed to request document: " + (err.response?.data?.message || err.message));
@@ -1012,17 +1008,6 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
               </div>
               <form onSubmit={handleRequestDocSubmit}>
                 <div style={{ marginBottom: 16 }}>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Document Name</label>
-                  <input
-                    type="text"
-                    value={newDocName}
-                    onChange={e => setNewDocName(e.target.value)}
-                    required
-                    placeholder="e.g. Aadhar Card"
-                    style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700 }}
-                  />
-                </div>
-                <div style={{ marginBottom: 20 }}>
                   <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Document Type</label>
                   <select
                     value={newDocType}
@@ -1037,6 +1022,31 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                     <option value="Other">Other</option>
                   </select>
                 </div>
+                {newDocType === "Other" ? (
+                  <div style={{ marginBottom: 20 }}>
+                    <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Custom Document Name</label>
+                    <input
+                      type="text"
+                      value={newDocCustomName}
+                      onChange={e => setNewDocCustomName(e.target.value)}
+                      required
+                      placeholder="e.g. Experience Letter from previous employer"
+                      style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700 }}
+                    />
+                  </div>
+                ) : (
+                  <div style={{ marginBottom: 20 }}>
+                    <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Document Name</label>
+                    <input
+                      type="text"
+                      value={newDocName}
+                      onChange={e => setNewDocName(e.target.value)}
+                      required
+                      placeholder="e.g. Aadhar Card"
+                      style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700 }}
+                    />
+                  </div>
+                )}
                 <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
                   <button type="button" onClick={() => setShowRequestDocModal(false)} style={{ background: "#f1f5f9", color: "var(--text-muted)", border: "none", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
                   <button type="submit" style={{ background: "var(--teal)", color: "#fff", border: "none", padding: "10px 20px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Request Document</button>

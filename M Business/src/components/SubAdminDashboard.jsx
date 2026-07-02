@@ -6614,7 +6614,29 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [invoicePrefill, setInvoicePrefill] = useState(null);
   const [prevActiveBeforeInvoice, setPrevActiveBeforeInvoice] = useState("dashboard");
 
-  const [sidebarOverride, setSidebarOverride] = useState(null);
+  const [sidebarOverride, setSidebarOverride] = useState(() => {
+    try {
+      const savedActive = localStorage.getItem("activeTab_subadmin");
+      if (savedActive === "project-details") {
+        return localStorage.getItem("sidebarOverride_subadmin") || null;
+      }
+    } catch (e) { }
+    return null;
+  });
+
+  // Keep the saved sidebar-highlight override in sync with its current value,
+  // so a refresh while viewing a project via Clients \u2192 Project (or any other
+  // "borrowed" entry point) keeps the sidebar pointing at the same section
+  // instead of falling back to highlighting "Projects".
+  useEffect(() => {
+    try {
+      if (sidebarOverride) {
+        localStorage.setItem("sidebarOverride_subadmin", sidebarOverride);
+      } else {
+        localStorage.removeItem("sidebarOverride_subadmin");
+      }
+    } catch (e) { }
+  }, [sidebarOverride]);
 
   const [autoOpenInvoice, setAutoOpenInvoice] = useState(false);
 
@@ -6697,8 +6719,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
   const hexToRgb = (hex) => {
-
-    if (!hex || hex.startsWith("var")) return "124, 58, 237"; // Default purple if invalid
+    if (!hex || hex.startsWith("var")) return "0, 188, 212"; // Default teal if invalid
 
     const r = parseInt(hex.slice(1, 3), 16);
 
@@ -10948,7 +10969,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} onSelectProject={(p) => setSelectedProjectForTasks(p)} autoOpenAddModal={autoOpenTaskModal} onAddModalOpened={(val) => setAutoOpenTaskModal(!!val)} />}
 
-            {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={companyId} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} />}
+            {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={companyId} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} THEME={currentTheme} />}
 
             {validActive === "messaging" && <MessagingPage user={user} />}
 

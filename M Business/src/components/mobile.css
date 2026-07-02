@@ -1,0 +1,266 @@
+/* ============================================================
+   GLOBAL MOBILE RESPONSIVE LAYER
+   Loaded last (see main.jsx) so its rules win the cascade.
+   Uses !important deliberately: most dashboards in this app
+   set layout via inline React styles, and only a stylesheet
+   rule marked !important can override an inline style.
+   ============================================================ */
+
+/* ---------- Base / typography ---------- */
+@media (max-width: 768px) {
+    html {
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        overflow-x: hidden;
+    }
+
+    h1 {
+        font-size: 22px !important;
+    }
+
+    h2 {
+        font-size: 19px !important;
+    }
+
+    h3 {
+        font-size: 16px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 19px !important;
+    }
+
+    h2 {
+        font-size: 17px !important;
+    }
+}
+
+/* ---------- Sidebars (covers .sidebar AND .emp-sidebar family) ---------- */
+@media (max-width: 768px) {
+
+    .sidebar,
+    .emp-sidebar,
+    [class*="sidebar"] {
+        max-width: 82vw !important;
+    }
+}
+
+@media (max-width: 380px) {
+
+    .sidebar,
+    .emp-sidebar,
+    [class*="sidebar"] {
+        width: 88vw !important;
+        max-width: 300px !important;
+    }
+}
+
+/* Mobile top bars: make sure they're visible + usable */
+@media (max-width: 768px) {
+
+    .mob-topbar,
+    .emp-mob-bar,
+    .emp-desktop-header {
+        display: flex !important;
+        align-items: center !important;
+        padding: 10px 14px !important;
+        gap: 10px !important;
+    }
+}
+
+/* Overlay behind an open mobile sidebar should always cover the screen */
+@media (max-width: 768px) {
+    .mob-overlay {
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 998 !important;
+    }
+}
+
+/* ---------- Main content area ---------- */
+@media (max-width: 768px) {
+
+    .main,
+    .content,
+    .main-content,
+    .main-pad {
+        padding: 12px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .main,
+    .content,
+    .main-content,
+    .main-pad {
+        padding: 10px !important;
+    }
+}
+
+/* ---------- Grids: stat cards / two-col / three-col / forms ---------- */
+@media (max-width: 900px) {
+    .three-col {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .dash-stats,
+    .stat-grid,
+    .stats-grid,
+    .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+    }
+
+    .two-col,
+    .three-col,
+    .modal-2col,
+    .dash-2col,
+    .perm-form-grid,
+    .perm-type-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .page-header,
+    .header-actions {
+        flex-wrap: wrap !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+    }
+
+    .page-header>*,
+    .header-actions>* {
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .dash-stats,
+    .stat-grid,
+    .stats-grid,
+    .kpi-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Any generic auto-fit/auto-fill grid with a min column wider than the
+   viewport still collapses correctly on its own; this just tightens gaps
+   on very small screens so cards don't touch the edges. */
+@media (max-width: 480px) {
+
+    [style*="display: grid"],
+    [style*="display:grid"] {
+        row-gap: 10px;
+    }
+}
+
+/* ---------- Tables ---------- */
+@media (max-width: 768px) {
+    table {
+        display: block !important;
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        white-space: nowrap !important;
+    }
+
+    .table-wrap,
+    .table-responsive,
+    .table-container {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+}
+
+/* ---------- Modals ---------- */
+@media (max-width: 768px) {
+
+    .modal,
+    .modal-content,
+    .modal-box,
+    [class*="modal"] {
+        max-width: 94vw !important;
+        width: 94vw !important;
+        max-height: 88vh !important;
+        overflow-y: auto !important;
+        border-radius: 16px !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .modal,
+    .modal-content,
+    .modal-box,
+    [class*="modal"] {
+        max-width: 100vw !important;
+        width: 100vw !important;
+        max-height: 100vh !important;
+        height: 100vh !important;
+        border-radius: 0 !important;
+    }
+}
+
+/* ---------- Forms ---------- */
+@media (max-width: 768px) {
+
+    input,
+    select,
+    textarea,
+    button {
+        font-size: 16px !important;
+        /* prevents iOS auto-zoom on focus */
+    }
+
+    form label,
+    .field-label {
+        font-size: 12px !important;
+    }
+}
+
+/* ---------- Buttons / actions that shouldn't overflow ---------- */
+@media (max-width: 480px) {
+
+    .create-btn,
+    .header-actions button,
+    .page-header button {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+}
+
+/* ---------- Cards that use fixed multi-column card grids ---------- */
+@media (max-width: 640px) {
+    .premium-card {
+        padding: 16px !important;
+    }
+}
+
+/* ---------- Hide desktop-only chrome on small screens ---------- */
+@media (max-width: 768px) {
+    .topbar {
+        display: none !important;
+    }
+}
+
+/* ---------- Print stays untouched ---------- */
+@media print {
+
+    .mob-topbar,
+    .emp-mob-bar,
+    .sidebar,
+    .emp-sidebar {
+        display: none !important;
+    }
+}

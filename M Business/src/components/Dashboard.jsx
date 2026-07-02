@@ -37,7 +37,7 @@ const NAV = [
   { key: "tracking", icon: "Metrics", label: "Project Status" },
   { key: "tasks", icon: "Success", label: "Tasks" },
   { key: "calendar", icon: "Date", label: "Calendar" },
-  { key: "messaging", icon: "Comment", label: "Messages" },
+  { key: "messaging", icon: "💬", label: "Messages" },
   { key: "settings", icon: "Settings", label: "Settings" },
   { key: "accounts", icon: "Profile", label: "Accounts" },
 

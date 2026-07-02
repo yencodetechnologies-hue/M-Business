@@ -326,6 +326,41 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
   const [docs, setDocs] = useState([]);
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [docRequests, setDocRequests] = useState([]);
+  const [uploadingId, setUploadingId] = useState(null);
+
+  const fetchDocRequests = async () => {
+    try {
+      const empId = user?._id || user?.id;
+      if (!empId) return;
+      const res = await axios.get(`${BASE_URL}/api/document-requests/employee/${empId}`);
+      setDocRequests(res.data || []);
+    } catch (err) {
+      console.error("[EmployeeDocs] Failed to fetch document requests:", err);
+    }
+  };
+
+  const handleUploadForRequest = async (request, file) => {
+    if (!file) return;
+    setUploadingId(request._id);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const uploadRes = await axios.post(`${BASE_URL}/api/upload`, fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      await axios.patch(`${BASE_URL}/api/document-requests/${request._id}/upload`, {
+        fileUrl: uploadRes.data.url,
+        fileName: uploadRes.data.name || file.name,
+      });
+      await fetchDocRequests();
+    } catch (err) {
+      console.error("[EmployeeDocs] Upload failed:", err);
+      alert("Failed to upload document. Please try again.");
+    } finally {
+      setUploadingId(null);
+    }
+  };
 
   useEffect(() => {
     const fetchDocs = async () => {
@@ -367,6 +402,7 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
       }
     };
     fetchDocs();
+    fetchDocRequests();
   }, [user]);
 
   if (selectedDoc) {
@@ -394,19 +430,17 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
     );
   }
 
-  // Filter pending document request notifications (unread warnings or texts with upload/document)
-  const pendingRequests = (notifications || []).filter(
-    n => !n.isRead && (n.type === "warning" || n.msg?.toLowerCase().includes("upload") || n.title?.toLowerCase().includes("document"))
-  );
+  const pendingDocRequests = docRequests.filter(r => r.status === "pending");
+  const uploadedDocRequests = docRequests.filter(r => r.status !== "pending");
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16, padding: 24 }}>
       <div style={{ fontSize: 22, fontWeight: 800, color: T.text }}>My Documents</div>
 
-      {pendingRequests.length > 0 && (
+      {pendingDocRequests.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {pendingRequests.map(req => (
-            <div key={req.id} style={{
+          {pendingDocRequests.map(req => (
+            <div key={req._id} style={{
               background: T.warningBg,
               border: `1.5px solid ${T.warningBorder}`,
               borderRadius: T.radius,
@@ -430,33 +464,67 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
                   fontSize: 20,
                   color: "#D97706"
                 }}>
-                  Folder
+                  <i className="ti ti-folder"></i>
                 </div>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: "#92400E" }}>Pending Document Request</div>
-                  <div style={{ fontSize: 12.5, color: "#B45309", marginTop: 2, fontWeight: 500 }}>{req.msg}</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: "#92400E" }}>{req.documentName}</div>
+                  <div style={{ fontSize: 12.5, color: "#B45309", marginTop: 2, fontWeight: 500 }}>{req.documentType} · Requested {new Date(req.requestedAt).toLocaleDateString("en-IN")}</div>
                 </div>
               </div>
-              <button
-                onClick={() => onAcknowledge && onAcknowledge(req.id)}
-                style={{
-                  background: "#D97706",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: T.radiusSm,
-                  padding: "8px 16px",
-                  fontSize: 12,
-                  fontWeight: 800,
-                  cursor: "pointer",
-                  fontFamily: "inherit",
-                  boxShadow: "0 2px 6px rgba(217, 119, 6, 0.2)",
-                  transition: "all 0.15s"
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = "#B45309"}
-                onMouseLeave={e => e.currentTarget.style.background = "#D97706"}
-              >
-                Acknowledge
-              </button>
+              <label style={{
+                background: uploadingId === req._id ? "#f5c98a" : "#D97706",
+                color: "#fff",
+                border: "none",
+                borderRadius: T.radiusSm,
+                padding: "8px 16px",
+                fontSize: 12,
+                fontWeight: 800,
+                cursor: uploadingId === req._id ? "not-allowed" : "pointer",
+                fontFamily: "inherit",
+                boxShadow: "0 2px 6px rgba(217, 119, 6, 0.2)",
+                display: "flex",
+                alignItems: "center",
+                gap: 6
+              }}>
+                <i className={uploadingId === req._id ? "ti ti-loader-2" : "ti ti-upload"}></i>
+                {uploadingId === req._id ? "Uploading..." : "Upload"}
+                <input
+                  type="file"
+                  style={{ display: "none" }}
+                  disabled={uploadingId === req._id}
+                  onChange={e => handleUploadForRequest(req, e.target.files?.[0])}
+                />
+              </label>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {uploadedDocRequests.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: T.textMuted, marginTop: 4 }}>Submitted for Review</div>
+          {uploadedDocRequests.map(req => (
+            <div key={req._id} style={{
+              background: T.successBg,
+              border: `1.5px solid ${T.successBorder}`,
+              borderRadius: T.radius,
+              padding: "14px 18px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 12,
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 9, background: "#DCFCE7", display: "flex", alignItems: "center", justifyContent: "center", color: T.success, fontSize: 16 }}>
+                  <i className="ti ti-check"></i>
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>{req.documentName}</div>
+                  <div style={{ fontSize: 11, color: T.textMuted, marginTop: 2 }}>Uploaded {req.uploadedAt ? new Date(req.uploadedAt).toLocaleDateString("en-IN") : ""}</div>
+                </div>
+              </div>
+              {req.fileUrl && <a href={req.fileUrl} target="_blank" rel="noreferrer" style={{ fontSize: 11, fontWeight: 700, color: T.success, textDecoration: "underline" }}>View file</a>}
             </div>
           ))}
         </div>
@@ -491,7 +559,7 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
   );
 }
 
-function DashboardPage({ user, projects, tasks, proposals, attendance, salary, setPage, docStatus, onOpenProfile }) {
+function DashboardPage({ user, projects, tasks, proposals, attendance, salary, setPage, docStatus, onOpenProfile, onViewProject }) {
   const name = user?.name || "Employee";
   const today = todayStr();
   const todayAtt = attendance.find(a => a.date === today);
@@ -610,7 +678,7 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
           {projects.filter(p => !["done", "completed"].includes((p.status || "").toLowerCase())).slice(0, 4).map((p, i, arr) => (
             <div key={p._id || i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: i < arr.length - 1 ? `1px solid ${T.border}` : "none" }}>
               <div style={{ width: 3, height: 36, borderRadius: 99, background: T.accent, flexShrink: 0 }} />
-              <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ flex: 1, minWidth: 0, cursor: onViewProject ? "pointer" : "default" }} onClick={() => onViewProject && onViewProject(p)}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
                 <div style={{ fontSize: 11, color: T.textMuted, marginTop: 2 }}>{p.client || "—"} · Due {p.deadline || "—"}</div>
                 <div style={{ marginTop: 6, display: "flex", alignItems: "center", gap: 8 }}>
@@ -2140,7 +2208,7 @@ export default function EmployeeDashboard({ user, setUser }) {
           {/* Main Content */}
           <div className="main-pad" style={{ flex: 1, padding: "22px 28px", overflowY: "auto" }}>
             <EmployeeSubscriptionWarning user={resolvedUser} />
-            {page === "dashboard" && <DashboardPage user={resolvedUser} projects={projects} tasks={tasks} proposals={proposals} attendance={attendance} salary={salary} setPage={setPage} docStatus={docStatus} onOpenProfile={() => setProfileOpen(true)} />}
+            {page === "dashboard" && <DashboardPage user={resolvedUser} projects={projects} tasks={tasks} proposals={proposals} attendance={attendance} salary={salary} setPage={setPage} docStatus={docStatus} onOpenProfile={() => setProfileOpen(true)} onViewProject={(p) => { setSelectedEmpProject(p); setPage("projects"); }} />}
             {page === "myprofile" && <MyProfilePage user={resolvedUser} projects={projects} tasks={tasks} attendance={attendance} onBack={() => setPage("dashboard")} />}
             {page === "projects" && !selectedEmpProject && <ModernEmployeeProjects projects={projects} tasks={tasks} user={resolvedUser} onViewProject={(p) => setSelectedEmpProject(p)} />}
             {page === "projects" && selectedEmpProject && <ModernEmployeeProjectDetails project={selectedEmpProject} tasks={tasks} user={resolvedUser} onBack={() => setSelectedEmpProject(null)} onMessageTeam={() => setPage("messaging")} />}

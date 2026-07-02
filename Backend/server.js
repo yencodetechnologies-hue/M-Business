@@ -86,6 +86,7 @@ const incomeRoutes = require("./routes/incomeroutes");
 const notificationRoutes = require("./routes/notificationroutes");
 const configRoutes = require("./routes/configroutes");
 const documentRoutes = require("./routes/documentroutes");
+const documentRequestRoutes = require("./routes/documentRequestRoutes");
 const approvalRoutes = require("./routes/approvalroutes");
 const bankRoutes = require("./routes/bankroutes");
 const financeRoutes = require("./routes/financeroutes");

@@ -1235,7 +1235,7 @@ function ShareModal({ onClose }) {
    INTEGRATE MODAL
 ---------------------------------------------------------- */
 function IntegrateModal({ onClose, showToast }) {
-  const integrations = [{ icon: "", name: "Gmail", desc: "Email notifications on status change", badge: "Popular" }, { icon: "Comment", name: "Slack", desc: "Post updates to Slack channels", badge: "Popular" }, { icon: "Date", name: "Google Calendar", desc: "Sync due dates with your calendar", badge: null }, { icon: "", name: "GitHub", desc: "Link commits and PRs to tasks", badge: null }, { icon: "", name: "Zapier", desc: "Connect to 5000+ apps via Zapier", badge: "New" }];
+  const integrations = [{ icon: "", name: "Gmail", desc: "Email notifications on status change", badge: "Popular" }, { icon: "💬", name: "Slack", desc: "Post updates to Slack channels", badge: "Popular" }, { icon: "Date", name: "Google Calendar", desc: "Sync due dates with your calendar", badge: null }, { icon: "", name: "GitHub", desc: "Link commits and PRs to tasks", badge: null }, { icon: "", name: "Zapier", desc: "Connect to 5000+ apps via Zapier", badge: "New" }];
   const [connecting, setConnecting] = useState(null);
 
   const handleConnect = (name) => {
@@ -1912,7 +1912,7 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
         <div ref={dotsRef} onClick={e => { e.stopPropagation(); setDotsOpen(v => !v); }} style={{ width: 26, height: 26, borderRadius: 5, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, color: P.muted, letterSpacing: 1, userSelect: "none" }} onMouseEnter={e => e.currentTarget.style.background = P.border} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>···</div>
         {dotsOpen && (<DD anchor={dotsRef} onClose={() => setDotsOpen(false)} w={180}>
           <MI icon="⎘" title="Duplicate" onClick={() => { onDup(task); setDotsOpen(false); }} />
-          <MI icon="Comment" title="Share WhatsApp" onClick={() => { shareTask(task); setDotsOpen(false); }} />
+          <MI icon="💬" title="Share WhatsApp" onClick={() => { shareTask(task); setDotsOpen(false); }} />
           <Sep />
           <MI title="Delete task" danger onClick={() => { onDel(id); setDotsOpen(false); }} />
         </DD>)}

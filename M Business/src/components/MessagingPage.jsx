@@ -289,7 +289,7 @@ export default function MessagingPage({ user }) {
           </>
         ) : (
           <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "var(--text3)", padding: 40, textAlign: "center", background: "var(--bg)" }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>Comment</div>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>💬</div>
             <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "var(--text)" }}>Your Messages</h3>
             <p style={{ fontSize: 13, maxWidth: 300, margin: "8px 0 0" }}>Select a conversation from the left to start messaging.</p>
           </div>

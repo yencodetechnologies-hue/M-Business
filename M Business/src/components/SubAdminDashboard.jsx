@@ -6564,7 +6564,31 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   }, [active]);
   const [modal, setModal] = useState(null);
-  const [jumpProject, setJumpProject] = useState(null);
+  const [jumpProject, setJumpProject] = useState(() => {
+    // jumpProject itself can't be fully restored yet (the real `projects`
+    // list hasn't loaded at this point in initial render) — a lightweight
+    // placeholder is set here just so the "project-details" view doesn't
+    // flash back to the Projects list for a frame; a later effect (placed
+    // after `projects` is declared, to avoid a temporal-dead-zone error)
+    // swaps in the real, full project object once `projects` finishes loading.
+    try {
+      const savedId = localStorage.getItem("jumpProjectId_subadmin");
+      const savedActive = localStorage.getItem("activeTab_subadmin");
+      if (savedId && savedActive === "project-details") return { _id: savedId, _restoring: true };
+    } catch (e) { }
+    return null;
+  });
+
+  // Keep the saved project id in sync whenever the selected project changes.
+  useEffect(() => {
+    try {
+      if (jumpProject?._id) {
+        localStorage.setItem("jumpProjectId_subadmin", jumpProject._id);
+      } else {
+        localStorage.removeItem("jumpProjectId_subadmin");
+      }
+    } catch (e) { }
+  }, [jumpProject?._id]);
   const [jumpInvoicePrefill, setJumpInvoicePrefill] = useState(null);
   const [pendingInvoiceNav, setPendingInvoiceNav] = useState(false);
 
@@ -6981,6 +7005,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
   const [projects, setProjects] = useState([]);
+
+  // Once the real projects list has loaded, swap the lightweight
+  // placeholder set above (in jumpProject's initializer) for the actual
+  // full project object, restoring the exact project view after a refresh.
+  useEffect(() => {
+    if (jumpProject?._restoring && projects.length > 0) {
+      const restored = projects.find(p => p._id === jumpProject._id);
+      setJumpProject(restored || null);
+    }
+  }, [jumpProject, projects]);
 
   // projectsWithProgress is computed below after tasks state is declared
 

@@ -212,7 +212,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [sendingFileApproval, setSendingFileApproval] = useState(false);
   const [postUpdateOnUpload, setPostUpdateOnUpload] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [uploadFileObj, setUploadFileObj] = useState(null);
+  const [uploadFiles, setUploadFiles] = useState([]); // array of File objects (multi-select support)
+  const [uploadFileError, setUploadFileError] = useState(''); // required-field validation message
+  const uploadFileObj = uploadFiles[0] || null; // kept for single-file flows (e.g. Send for Approval)
   const [uploadHeading, setUploadHeading] = useState('');
   const [uploadDescription, setUploadDescription] = useState('');
   const [uploadSendToClient, setUploadSendToClient] = useState(false);
@@ -638,7 +640,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       });
       alert(`File sent for approval to ${isTeam ? 'the team member' : 'the client'}!`);
       setShowUploadModal(false);
-      setUploadFileObj(null);
+      setUploadFiles([]);
       setUploadHeading('');
       setUploadDescription('');
       setUploadSendForApproval(false);
@@ -1134,37 +1136,58 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   };
 
   const handleModalFileSelect = (e) => {
-    const file = e.target.files[0];
-    if (file) setUploadFileObj(file);
+    const selected = Array.from(e.target.files || []);
+    if (selected.length === 0) return;
+    setUploadFiles(prev => [...prev, ...selected]);
+    setUploadFileError('');
+    e.target.value = ''; // allow re-selecting the same file again later
+  };
+
+  const handleRemoveUploadFile = (index) => {
+    setUploadFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleModalUpload = async () => {
+    if (uploadFiles.length === 0) {
+      setUploadFileError('Please select at least one file to upload.');
+      return;
+    }
+    setUploadFileError('');
     setUploadingModal(true);
     try {
       let updatedFiles = currProject.files || [];
-      if (uploadFileObj) {
-        const formData = new FormData();
-        formData.append("file", uploadFileObj);
-        const res = await axios.post(`${BASE_URL}/api/upload`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        const uploadedUrl = res.data.url;
-        const newFileObj = {
-          name: uploadHeading || uploadFileObj.name,
-          description: uploadDescription,
-          url: uploadedUrl,
-          size: uploadFileObj.size,
-          type: uploadFileObj.type,
-          uploadedAt: new Date().toISOString(),
-          sentToClient: uploadSendToClient ? (uploadClientName || currProject.client || clientName || 'client') : null,
-          sentToEmployee: uploadSendToEmployee ? uploadEmployeeName : null,
-        };
-        updatedFiles = [...updatedFiles, newFileObj];
+      const newlyUploaded = [];
+      if (uploadFiles.length > 0) {
+        for (let i = 0; i < uploadFiles.length; i++) {
+          const fileObj = uploadFiles[i];
+          const formData = new FormData();
+          formData.append("file", fileObj);
+          const res = await axios.post(`${BASE_URL}/api/upload`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+          const uploadedUrl = res.data.url;
+          // If multiple files share one heading, number them so titles stay unique
+          const heading = uploadHeading
+            ? (uploadFiles.length > 1 ? `${uploadHeading} (${i + 1})` : uploadHeading)
+            : fileObj.name;
+          const newFileObj = {
+            name: heading,
+            description: uploadDescription,
+            url: uploadedUrl,
+            size: fileObj.size,
+            type: fileObj.type,
+            uploadedAt: new Date().toISOString(),
+            sentToClient: uploadSendToClient ? (uploadClientName || currProject.client || clientName || 'client') : null,
+            sentToEmployee: uploadSendToEmployee ? uploadEmployeeName : null,
+          };
+          newlyUploaded.push(newFileObj);
+        }
+        updatedFiles = [...updatedFiles, ...newlyUploaded];
       }
       const payload = { files: updatedFiles };
       let newUploadedUrl = '';
-      if (uploadFileObj && updatedFiles.length > (currProject.files || []).length) {
-        newUploadedUrl = updatedFiles[updatedFiles.length - 1].url;
+      if (newlyUploaded.length > 0) {
+        newUploadedUrl = newlyUploaded[newlyUploaded.length - 1].url;
       }
       if (postUpdateOnUpload) {
         const visibleTo = [];
@@ -1228,7 +1251,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       }
       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, payload);
       setShowUploadModal(false);
-      setUploadFileObj(null);
+      setUploadFiles([]);
       setUploadHeading('');
       setUploadDescription('');
       setUploadSendToClient(false);
@@ -1292,17 +1315,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         ? clientList.find(c => String(c._id) === String(snapshotClientId))
         : null;
 
-      // Step 2: Name-based fallback for older projects that only saved client name
-      if (!matched && snapshotClientName) {
-        matched = clientList.find(c =>
-          (c.clientName || c.name || '').toLowerCase().trim() === snapshotClientName
-        );
-      }
 
-      if (!matched) {
-        alert('Could not find this client\'s account. Make sure the client is added under Clients.');
-        return '';
-      }
 
       const subadminCompanyId = user?.companyId || user?._id || user?.id || snapshotCompanyId || '';
       const tokenRes = await axios.post(`${BASE_URL}/api/clients/${matched._id}/portal-token`, {
@@ -2913,7 +2926,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   <span style={{ color: '#fff', fontWeight: 800, fontSize: 15 }}>Upload File</span>
                 </div>
                 <button
-                  onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); setUploadSendForApproval(false); setPostUpdateOnUpload(false); }}
+                  onClick={() => { setShowUploadModal(false); setUploadFiles([]); setUploadFileError(''); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); setUploadSendForApproval(false); setPostUpdateOnUpload(false); }}
                   style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}
                 >
                   ✕
@@ -2921,11 +2934,34 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               </div>
 
               <div style={{ padding: '22px 24px', maxHeight: '80vh', overflowY: 'auto' }}>
-                <div onClick={() => document.getElementById('modal-file-input').click()} style={{ border: `2px dashed ${uploadFileObj ? P.primary : P.border}`, borderRadius: 10, padding: '22px 16px', textAlign: 'center', cursor: 'pointer', marginBottom: 16, background: uploadFileObj ? P.primaryLight : P.bg, transition: 'all .2s' }}>
-                  <i className={`ti ${uploadFileObj ? 'ti-file-check' : 'ti-cloud-upload'}`} style={{ fontSize: 28, color: uploadFileObj ? P.green : P.textLight, display: 'block', marginBottom: 6 }}></i>
-                  {uploadFileObj ? (<div><div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>{uploadFileObj.name}</div><div style={{ fontSize: 11, color: P.textLight, marginTop: 3 }}>{(uploadFileObj.size / 1024).toFixed(1)} KB · Click to change</div></div>) : (<div><div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Click to browse or drag & drop</div><div style={{ fontSize: 11, color: P.textLight, marginTop: 3 }}>Images, PDFs, Docs supported</div></div>)}
+                <div onClick={() => document.getElementById('modal-file-input').click()} style={{ border: `2px dashed ${uploadFiles.length > 0 ? P.primary : (uploadFileError ? '#EF4444' : P.border)}`, borderRadius: 10, padding: '22px 16px', textAlign: 'center', cursor: 'pointer', marginBottom: uploadFiles.length > 0 ? 8 : 4, background: uploadFiles.length > 0 ? P.primaryLight : P.bg, transition: 'all .2s' }}>
+                  <i className={`ti ${uploadFiles.length > 0 ? 'ti-file-check' : 'ti-cloud-upload'}`} style={{ fontSize: 28, color: uploadFiles.length > 0 ? P.green : P.textLight, display: 'block', marginBottom: 6 }}></i>
+                  {uploadFiles.length > 0 ? (
+                    <div><div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>{uploadFiles.length} file{uploadFiles.length > 1 ? 's' : ''} selected</div><div style={{ fontSize: 11, color: P.textLight, marginTop: 3 }}>Click to add more files</div></div>
+                  ) : (
+                    <div><div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Click to browse or drag & drop</div><div style={{ fontSize: 11, color: P.textLight, marginTop: 3 }}>Images, PDFs, Docs supported · multiple files allowed</div></div>
+                  )}
                 </div>
-                <input id="modal-file-input" type="file" onChange={handleModalFileSelect} style={{ display: 'none' }} />
+                <input id="modal-file-input" type="file" multiple onChange={handleModalFileSelect} style={{ display: 'none' }} />
+                {uploadFiles.length > 0 && (
+                  <div style={{ marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {uploadFiles.map((f, idx) => (
+                      <div key={`${f.name}-${idx}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '7px 10px', borderRadius: 8, background: P.bg, border: `1px solid ${P.border}` }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                          <i className="ti ti-file" style={{ fontSize: 14, color: P.primary, flexShrink: 0 }}></i>
+                          <span style={{ fontSize: 12, fontWeight: 600, color: P.textDark, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{f.name}</span>
+                          <span style={{ fontSize: 11, color: P.textLight, flexShrink: 0 }}>({(f.size / 1024).toFixed(1)} KB)</span>
+                        </div>
+                        <button type="button" onClick={() => handleRemoveUploadFile(idx)} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', fontSize: 14, padding: 2, flexShrink: 0 }}>✕</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {uploadFileError && (
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#EF4444', marginBottom: 14, marginTop: -2, display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <i className="ti ti-alert-circle" style={{ fontSize: 13 }}></i>{uploadFileError}
+                  </div>
+                )}
                 <div style={{ marginBottom: 12 }}>
                   <label style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', display: 'block', marginBottom: 5 }}>File Heading</label>
                   <input type="text" value={uploadHeading} onChange={e => setUploadHeading(e.target.value)} placeholder="e.g. Design Mockup v2" style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', boxSizing: 'border-box' }} />
@@ -2952,9 +2988,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   {uploadSendToEmployee && (<select value={uploadEmployeeName} onChange={e => setUploadEmployeeName(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.purple}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', background: '#fff', color: P.textDark, marginTop: 10 }}><option value="">-- Select Employee --</option>{(employees || []).map(emp => (<option key={emp._id} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName}{emp.role ? ` (${emp.role})` : ''}</option>))}</select>)}
                 </div>
                 <div style={{ display: 'flex', gap: 10 }}>
-                  <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); setUploadSendForApproval(false); setPostUpdateOnUpload(false); }} style={{ flex: 1, padding: '10px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Draft</button>
+                  <button onClick={() => { setShowUploadModal(false); setUploadFiles([]); setUploadFileError(''); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); setUploadSendForApproval(false); setPostUpdateOnUpload(false); }} style={{ flex: 1, padding: '10px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Draft</button>
                   <button
-                    onClick={uploadSendForApproval ? handleSendFileForApproval : handleModalUpload}
+                    onClick={() => {
+                      if (uploadFiles.length === 0) { setUploadFileError('Please select at least one file to upload.'); return; }
+                      (uploadSendForApproval ? handleSendFileForApproval : handleModalUpload)();
+                    }}
                     disabled={uploadingModal || sendingFileApproval}
                     style={{ flex: 2, padding: '10px', borderRadius: 10, border: 'none', background: (uploadingModal || sendingFileApproval) ? P.border : P.primary, color: (uploadingModal || sendingFileApproval) ? P.textLight : '#fff', fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 800, cursor: (uploadingModal || sendingFileApproval) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
                   >

@@ -434,7 +434,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
   const docsToShow = [
     ...apiDocs,
     ...pendingDbRequested,
-    ...requestedDocs.filter(rd => !apiDocs.some(ad => (ad.name || "").toLowerCase() === rd.name.toLowerCase()))
+    ...requestedDocs.filter(rd => !apiDocs.some(ad => (ad.name || "").toLowerCase() === (rd.name || "").toLowerCase()))
   ].filter(d => !deletedDocIds.includes(String(d._id)));
 
   return (

@@ -453,6 +453,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [downloadingAll, setDownloadingAll] = useState(false);
+  // Plain ref, not state — updates synchronously, so a click that fires
+  // before React re-renders (fast double-click) still sees the lock.
+  const downloadingAllRef = React.useRef(false);
 
   // Profile Dropdown
   const [profileOpen, setProfileOpen] = useState(false);
@@ -640,37 +643,52 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   // start a second overlapping loop, which was causing files to appear to
   // download over and over.
   const handleDownloadAll = async () => {
-    if (downloadingAll) return;
-    const links = allFiles.map(f => f.url).filter(Boolean);
-    if (links.length === 0) return;
+    if (downloadingAllRef.current) return;
+    // De-dupe by URL: allFiles mixes docs/project files/invoice cards and
+    // can contain the same file more than once, which made "Download All"
+    // look like it was downloading forever.
+    const seen = new Set();
+    const uniqueFiles = allFiles.filter(f => {
+      if (!f.url || seen.has(f.url)) return false;
+      seen.add(f.url);
+      return true;
+    });
+    if (uniqueFiles.length === 0) return;
+    downloadingAllRef.current = true;
     setDownloadingAll(true);
     try {
-      if (links.length === 1) {
-        const a = document.createElement("a");
-        a.href = links[0];
-        a.download = allFiles[0]?.name || "file";
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      if (uniqueFiles.length === 1) {
+        await downloadSingleFile(uniqueFiles[0]);
         return;
       }
-      for (let i = 0; i < links.length; i++) {
-        try {
-          const res = await fetch(links[i]);
-          const blob = await res.blob();
-          const blobUrl = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = blobUrl;
-          a.download = allFiles[i]?.name || `file_${i + 1}`;
-          document.body.appendChild(a); a.click();
-          document.body.removeChild(a);
-          setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-          await new Promise(r => setTimeout(r, 800));
-        } catch (e) {
-          window.open(links[i], "_blank");
-          await new Promise(r => setTimeout(r, 800));
-        }
+      for (let i = 0; i < uniqueFiles.length; i++) {
+        await downloadSingleFile(uniqueFiles[i]);
+        await new Promise(r => setTimeout(r, 800));
       }
     } finally {
+      downloadingAllRef.current = false;
       setDownloadingAll(false);
+    }
+  };
+
+  // Forces a real download instead of relying on <a download>, which browsers
+  // silently ignore for cross-origin file URLs (it just opens the file
+  // instead of saving it). Fetching the bytes ourselves and downloading the
+  // resulting blob works regardless of the file's origin.
+  const downloadSingleFile = async (file) => {
+    if (!file?.url) return;
+    try {
+      const res = await fetch(file.url);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = file.name || "file";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    } catch (e) {
+      console.error("Download failed:", e);
+      alert("Couldn't download this file. Please try again.");
     }
   };
 
@@ -1682,12 +1700,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               }}><i className="ti ti-eye"></i></div>
               <div className="fc-download" title="Download" onClick={(e) => {
                 e.stopPropagation();
-                if (file.url) {
-                  const a = document.createElement("a");
-                  a.href = file.url; a.download = file.name || "file";
-                  a.target = "_blank";
-                  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-                }
+                downloadSingleFile(file);
               }}><i className="ti ti-download"></i></div>
               <div className="fc-icon" style={{ background: file.bg, color: file.col }}><i className={`ti ${file.icon}`}></i></div>
               <div className="fc-name">{file.name}</div>
@@ -1735,12 +1748,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               }}><i className="ti ti-eye"></i></div>
               <div className="inv-dl" title="Download" style={{ marginLeft: 6 }} onClick={(e) => {
                 e.stopPropagation();
-                if (file.url) {
-                  const a = document.createElement("a");
-                  a.href = file.url; a.download = file.name || "file";
-                  a.target = "_blank";
-                  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-                }
+                downloadSingleFile(file);
               }}><i className="ti ti-download"></i></div>
             </div>
           ))}

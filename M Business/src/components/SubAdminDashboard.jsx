@@ -9273,22 +9273,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     title={isUsageAtLimit("client", clients.length) ? `Plan limit reached` : "Add new client"}
 
-                    onClick={async () => {
-
-                      const freshSub = await fetchSubscription();
-
-                      const limit = getSubscriptionLimit("client", freshSub || subscription);
-
+                    onClick={() => {
+                      const limit = getSubscriptionLimit("client", subscription);
                       if (limit !== Infinity && clients.length >= limit) {
-
                         setLimitModal({ type: "client", limit });
-
                         return;
-
                       }
-
                       setActive("addClient");
-
+                      fetchSubscription(); // refresh in background, don't block opening the form
                     }}
 
                     style={{ opacity: isUsageAtLimit("client", clients.length) ? 0.5 : 1 }}
@@ -9323,24 +9315,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     title={isUsageAtLimit("employee", employees.length) ? `Plan limit reached` : "Add new employee"}
 
-                    onClick={async () => {
-
-                      const freshSub = await fetchSubscription();
-
-                      const limit = getSubscriptionLimit("employee", freshSub || subscription);
-
+                    onClick={() => {
+                      const limit = getSubscriptionLimit("employee", subscription);
                       if (limit !== Infinity && employees.length >= limit) {
-
                         setLimitModal({ type: "employee", limit });
-
                         return;
-
                       }
-
                       setNeError({}); setModal("employee");
-
+                      fetchSubscription(); // refresh in background, don't block opening the form
                     }}
-
                     style={{ opacity: isUsageAtLimit("employee", employees.length) ? 0.5 : 1 }}
 
                   >
@@ -9373,22 +9356,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     className="create-btn"
 
-                    onClick={async () => {
-
-                      const freshSub = await fetchSubscription();
-
-                      const limit = getSubscriptionLimit("manager", freshSub || subscription);
-
+                    onClick={() => {
+                      const limit = getSubscriptionLimit("manager", subscription);
                       if (limit !== Infinity && managers.length >= limit) {
-
                         setLimitModal({ type: "manager", limit });
-
                         return;
-
                       }
-
                       setNmError({}); setShowMgrPass(false); setModal("manager");
-
+                      fetchSubscription(); // refresh in background, don't block opening the form
                     }}
 
                     style={{ opacity: isUsageAtLimit("manager", managers.length) ? 0.5 : 1 }}
@@ -12269,26 +12244,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <button
 
-                    onClick={async () => {
-
-                      await fetchSubscription();
-
+                    onClick={() => {
                       const limit = getSubscriptionLimit("employee");
-
                       if (subscription && employees.length >= limit) {
-
                         setLimitModal({ type: "employee", limit });
-
                         return;
-
                       }
-
                       setReturnToModal(modal);
-
                       setModal("employee");
-
+                      fetchSubscription(); // refresh in background, don't block opening the form
                     }}
-
                     style={{ background: "none", border: "none", color: "var(--app-accent)", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
 
                   >

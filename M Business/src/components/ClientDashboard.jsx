@@ -2679,7 +2679,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                   const endD = proj.end ? new Date(proj.end).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : proj.deadline || '—';
                   return (
                     <div key={proj._id || idx}
-                      onClick={() => setSelectedClientProject(proj)}
+                      onClick={() => { setSelectedClientProject(proj); setActive('projects'); }}
                       style={{ background: C.surface, border: '1.5px solid ' + C.border, borderRadius: 16, padding: '20px 22px', cursor: 'pointer', transition: 'all .2s', boxShadow: '0 2px 12px rgba(0,188,212,.06)' }}
                       onMouseEnter={e => { e.currentTarget.style.borderColor = C.teal; e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,188,212,.15)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
                       onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,188,212,.06)'; e.currentTarget.style.transform = 'none'; }}

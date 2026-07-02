@@ -325,6 +325,17 @@ function DocumentsCard({ docStatus, onOpenProfile }) {
 function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
   const [docs, setDocs] = useState([]);
   const [selectedDoc, setSelectedDoc] = useState(null);
+  const [previewFile, setPreviewFile] = useState(null);
+
+  // A file can only be shown inline (image/PDF) — anything else the browser
+  // will always try to download, so we don't offer a fake "view" for those.
+  const isPreviewableFile = (file) => {
+    const mime = (file?.type || "").toLowerCase();
+    const name = (file?.name || "").toLowerCase();
+    if (mime.includes("pdf") || name.endsWith(".pdf")) return "pdf";
+    if (mime.includes("image") || /\.(jpg|jpeg|png|gif|webp|svg)$/.test(name)) return "image";
+    return null;
+  };
   const [loading, setLoading] = useState(true);
   const [docRequests, setDocRequests] = useState([]);
   const [uploadingId, setUploadingId] = useState(null);

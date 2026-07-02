@@ -452,6 +452,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [downloadingAll, setDownloadingAll] = useState(false);
 
   // Profile Dropdown
   const [profileOpen, setProfileOpen] = useState(false);
@@ -476,6 +477,17 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
   // Document preview states
   const [selectedDoc, setSelectedDoc] = useState(null);
+  const [previewFile, setPreviewFile] = useState(null);
+
+  // A file can only be shown inline (image/PDF) — anything else the browser
+  // will always try to download, so we don't offer a fake "view" for those.
+  const isPreviewableFile = (file) => {
+    const mime = (file?.type || "").toLowerCase();
+    const name = (file?.name || "").toLowerCase();
+    if (mime.includes("pdf") || name.endsWith(".pdf")) return "pdf";
+    if (mime.includes("image") || /\.(jpg|jpeg|png|gif|webp|svg)$/.test(name)) return "image";
+    return null;
+  };
 
   // Payment Checkout Modal
   const [payModalOpen, setPayModalOpen] = useState(false);
@@ -622,6 +634,46 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     } catch (e) { console.error(e); }
     setRefreshing(false);
   };
+
+  // Downloads every file one at a time. Guarded by `downloadingAll` so a
+  // double-click (or clicking it again while it's still running) can't
+  // start a second overlapping loop, which was causing files to appear to
+  // download over and over.
+  const handleDownloadAll = async () => {
+    if (downloadingAll) return;
+    const links = allFiles.map(f => f.url).filter(Boolean);
+    if (links.length === 0) return;
+    setDownloadingAll(true);
+    try {
+      if (links.length === 1) {
+        const a = document.createElement("a");
+        a.href = links[0];
+        a.download = allFiles[0]?.name || "file";
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        return;
+      }
+      for (let i = 0; i < links.length; i++) {
+        try {
+          const res = await fetch(links[i]);
+          const blob = await res.blob();
+          const blobUrl = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = blobUrl;
+          a.download = allFiles[i]?.name || `file_${i + 1}`;
+          document.body.appendChild(a); a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+          await new Promise(r => setTimeout(r, 800));
+        } catch (e) {
+          window.open(links[i], "_blank");
+          await new Promise(r => setTimeout(r, 800));
+        }
+      }
+    } finally {
+      setDownloadingAll(false);
+    }
+  };
+
   const handleLogout = () => {
     if (portalMode) {
       // Client Portal tab is fully isolated: never touch the shared "user"
@@ -1617,7 +1669,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           {filteredFiles.map((file, idx) => (
             <div key={idx} className="file-card" onClick={() => {
               if (file.url) {
-                window.open(file.url, "_blank");
+                isPreviewableFile(file) ? setPreviewFile(file) : window.open(file.url, "_blank", "noopener");
               } else if (file.raw) {
                 setSelectedDoc(file.raw);
               }
@@ -1625,7 +1677,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               {file.badge && <span className="fc-new-badge">{file.badge}</span>}
               <div className="fc-download" title="View" style={{ right: 42 }} onClick={(e) => {
                 e.stopPropagation();
-                if (file.url) window.open(file.url, "_blank", "noopener");
+                if (!file.url) return;
+                isPreviewableFile(file) ? setPreviewFile(file) : window.open(file.url, "_blank", "noopener");
               }}><i className="ti ti-eye"></i></div>
               <div className="fc-download" title="Download" onClick={(e) => {
                 e.stopPropagation();
@@ -1661,8 +1714,11 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         <div style={{ maxHeight: 268, overflowY: "auto" }}>
           {recentFiles.map((file, idx) => (
             <div key={idx} className="invoice-item" onClick={() => {
-              if (file.url) window.open(file.url, "_blank");
-              else if (file.raw) setSelectedDoc(file.raw);
+              if (file.url) {
+                isPreviewableFile(file) ? setPreviewFile(file) : window.open(file.url, "_blank", "noopener");
+              } else if (file.raw) {
+                setSelectedDoc(file.raw);
+              }
             }}>
               <div className="inv-icon" style={{ background: file.bg, color: file.col }}><i className={`ti ${file.icon}`}></i></div>
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -1674,7 +1730,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               </div>
               <div className="inv-dl" title="View" onClick={(e) => {
                 e.stopPropagation();
-                if (file.url) window.open(file.url, "_blank", "noopener");
+                if (!file.url) return;
+                isPreviewableFile(file) ? setPreviewFile(file) : window.open(file.url, "_blank", "noopener");
               }}><i className="ti ti-eye"></i></div>
               <div className="inv-dl" title="Download" style={{ marginLeft: 6 }} onClick={(e) => {
                 e.stopPropagation();
@@ -2283,35 +2340,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     <i className={`ti ${refreshing ? "ti-loader-2" : "ti-refresh"}`} style={{ fontSize: 13, animation: refreshing ? "spin 1s linear infinite" : "none" }}></i>
                     {refreshing ? "Refreshing..." : "Refresh"}
                   </div>
-                  <div className="sec-action" onClick={async () => {
-                    const links = allFiles.map(f => f.url).filter(Boolean);
-                    if (links.length === 0) return;
-                    if (links.length === 1) {
-                      const a = document.createElement("a");
-                      a.href = links[0];
-                      a.download = allFiles[0]?.name || "file";
-                      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-                      return;
-                    }
-                    for (let i = 0; i < links.length; i++) {
-                      try {
-                        const res = await fetch(links[i]);
-                        const blob = await res.blob();
-                        const blobUrl = URL.createObjectURL(blob);
-                        const a = document.createElement("a");
-                        a.href = blobUrl;
-                        a.download = allFiles[i]?.name || `file_${i + 1}`;
-                        document.body.appendChild(a); a.click();
-                        document.body.removeChild(a);
-                        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-                        await new Promise(r => setTimeout(r, 800));
-                      } catch (e) {
-                        window.open(links[i], "_blank");
-                        await new Promise(r => setTimeout(r, 800));
-                      }
-                    }
-                  }}>
-                    <i className="ti ti-download" style={{ fontSize: 13 }}></i> Download All
+                  <div className="sec-action" onClick={handleDownloadAll} style={{ opacity: downloadingAll ? 0.6 : 1, cursor: downloadingAll ? "not-allowed" : "pointer", pointerEvents: downloadingAll ? "none" : "auto" }}>
+                    <i className={`ti ${downloadingAll ? "ti-loader-2" : "ti-download"}`} style={{ fontSize: 13, animation: downloadingAll ? "spin 1s linear infinite" : "none" }}></i>
+                    {downloadingAll ? "Downloading..." : "Download All"}
                   </div>
                 </div>
               </div>
@@ -2381,38 +2412,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 <div className="sec-title-icon" style={{ background: C.blueBg, color: C.blue }}><i className="ti ti-files"></i></div>
                 Files & Documents Checklist
               </div>
-              <div className="sec-action" onClick={async () => {
-                const links = allFiles.map(f => f.url).filter(Boolean);
-                if (links.length === 0) return;
-                // Single file  direct download
-                if (links.length === 1) {
-                  const a = document.createElement("a");
-                  a.href = links[0];
-                  a.download = allFiles[0]?.name || "file";
-                  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-                  return;
-                }
-                // Multiple files  fetch as blob and download one by one
-                for (let i = 0; i < links.length; i++) {
-                  try {
-                    const res = await fetch(links[i]);
-                    const blob = await res.blob();
-                    const blobUrl = URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = blobUrl;
-                    a.download = allFiles[i]?.name || `file_${i + 1}`;
-                    document.body.appendChild(a); a.click();
-                    document.body.removeChild(a);
-                    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-                    await new Promise(r => setTimeout(r, 800));
-                  } catch (e) {
-                    // Open in a new tab if there is a CORS issue
-                    window.open(links[i], "_blank");
-                    await new Promise(r => setTimeout(r, 800));
-                  }
-                }
-              }}>
-                <i className="ti ti-download" style={{ fontSize: 13 }}></i> Download All
+              <div className="sec-action" onClick={handleDownloadAll} style={{ opacity: downloadingAll ? 0.6 : 1, cursor: downloadingAll ? "not-allowed" : "pointer", pointerEvents: downloadingAll ? "none" : "auto" }}>
+                <i className={`ti ${downloadingAll ? "ti-loader-2" : "ti-download"}`} style={{ fontSize: 13, animation: downloadingAll ? "spin 1s linear infinite" : "none" }}></i>
+                {downloadingAll ? "Downloading..." : "Download All"}
               </div>
             </div>
             {renderFilesComponent()}
@@ -2837,6 +2839,24 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                   <>Confirm & Pay ₹{(paymentInvoice.total - (paymentInvoice.amountPaid || 0)).toLocaleString("en-IN")}</>
                 )}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {previewFile && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,0.75)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => setPreviewFile(null)}>
+          <div style={{ background: "#fff", width: "100%", maxWidth: 900, height: "85vh", borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ padding: "14px 20px", borderBottom: "1px solid " + C.border, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+              <div style={{ fontSize: 14, fontWeight: 800, color: C.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingRight: 12 }}>{previewFile.name}</div>
+              <button onClick={() => setPreviewFile(null)} style={{ background: C.bg, border: "1px solid " + C.border, color: C.text2, width: 30, height: 30, borderRadius: 8, cursor: "pointer", fontSize: 15, flexShrink: 0 }}>✕</button>
+            </div>
+            <div style={{ flex: 1, background: "#f4f4f4", display: "flex", alignItems: "center", justifyContent: "center", overflow: "auto" }}>
+              {isPreviewableFile(previewFile) === "image" ? (
+                <img src={previewFile.url} alt={previewFile.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
+              ) : (
+                <iframe src={previewFile.url} title={previewFile.name} style={{ width: "100%", height: "100%", border: "none" }} />
+              )}
             </div>
           </div>
         </div>

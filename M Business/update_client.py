@@ -6,6 +6,17 @@ messages_comp = """// ── Messages / Documents Page ────────�
 function MessagesPage() {
   const [docs, setDocs] = useState([]);
   const [selectedDoc, setSelectedDoc] = useState(null);
+  const [previewFile, setPreviewFile] = useState(null);
+
+  // A file can only be shown inline (image/PDF) — anything else the browser
+  // will always try to download, so we don't offer a fake "view" for those.
+  const isPreviewableFile = (file) => {
+    const mime = (file?.type || "").toLowerCase();
+    const name = (file?.name || "").toLowerCase();
+    if (mime.includes("pdf") || name.endsWith(".pdf")) return "pdf";
+    if (mime.includes("image") || /\.(jpg|jpeg|png|gif|webp|svg)$/.test(name)) return "image";
+    return null;
+  };
 
   useEffect(() => {
     // Read from localStorage

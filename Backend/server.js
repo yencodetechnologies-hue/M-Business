@@ -134,6 +134,7 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/config", configRoutes);
 app.use("/api/documents", documentRoutes);
+app.use("/api/document-requests", documentRequestRoutes);
 app.use("/api/approvals", approvalRoutes);
 app.use("/api/banks", bankRoutes);
 app.use("/api/audit-notes", auditRoutes);

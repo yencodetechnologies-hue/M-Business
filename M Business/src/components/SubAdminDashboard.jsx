@@ -6548,18 +6548,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     if (params && params.get("payment")) return "mysubscriptions";
 
     const saved = localStorage.getItem("activeTab_subadmin") || "dashboard";
-    if (["project-details", "create-project", "edit-project"].includes(saved)) return "projects";
+    if (["create-project", "edit-project"].includes(saved)) return "projects";
     return saved;
   });
 
   useEffect(() => {
-
-    const toSave = ["project-details", "create-project", "edit-project"].includes(active)
-
+    const toSave = ["create-project", "edit-project"].includes(active)
       ? "projects"
-
       : active;
-
     localStorage.setItem("activeTab_subadmin", toSave);
 
   }, [active]);

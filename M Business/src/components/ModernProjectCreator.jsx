@@ -341,7 +341,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
               <div className="mpc-form-group">
                 <label>Client *</label>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  {(prefillClient || editProject) ? (
+                  {(prefillClient) ? (
                     <div style={{
                       flex: 1,
                       padding: '11px 14px',

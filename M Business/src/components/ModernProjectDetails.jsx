@@ -214,6 +214,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadFiles, setUploadFiles] = useState([]); // array of File objects (multi-select support)
   const [uploadFileError, setUploadFileError] = useState(''); // required-field validation message
+  const [uploadShareError, setUploadShareError] = useState(''); // "share with" required validation message
   const uploadFileObj = uploadFiles[0] || null; // kept for single-file flows (e.g. Send for Approval)
   const [uploadHeading, setUploadHeading] = useState('');
   const [uploadDescription, setUploadDescription] = useState('');
@@ -1252,6 +1253,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, payload);
       setShowUploadModal(false);
       setUploadFiles([]);
+      setUploadFileError('');
+      setUploadShareError('');
       setUploadHeading('');
       setUploadDescription('');
       setUploadSendToClient(false);
@@ -2926,7 +2929,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   <span style={{ color: '#fff', fontWeight: 800, fontSize: 15 }}>Upload File</span>
                 </div>
                 <button
-                  onClick={() => { setShowUploadModal(false); setUploadFiles([]); setUploadFileError(''); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); setUploadSendForApproval(false); setPostUpdateOnUpload(false); }}
+                  onClick={() => { setShowUploadModal(false); setUploadFiles([]); setUploadFileError(''); setUploadShareError(''); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); setUploadSendForApproval(false); setPostUpdateOnUpload(false); }}
                   style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}
                 >
                   ✕
@@ -2972,26 +2975,39 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 </div>
                 <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 10 }}>Share With</div>
                 <div style={{ border: `1.5px solid ${uploadSendToClient ? P.primary : P.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 10, background: uploadSendToClient ? P.primaryLight : '#fff', transition: 'all .15s' }}>
-                  <div onClick={() => { const newVal = !uploadSendToClient; setUploadSendToClient(newVal); setUploadClientName(newVal ? (currProject.client || clientName || '') : ''); }} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                  <div onClick={() => { const newVal = !uploadSendToClient; setUploadSendToClient(newVal); setUploadClientName(newVal ? (currProject.client || clientName || '') : ''); if (newVal || uploadSendToEmployee) setUploadShareError(''); }} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
                     <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${uploadSendToClient ? P.primary : P.border}`, background: uploadSendToClient ? P.primary : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{uploadSendToClient && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>Yes</span>}</div>
                     <i className="ti ti-building" style={{ color: P.primary, fontSize: 16 }}></i>
                     <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Client Portal</span>
                   </div>
-                  {uploadSendToClient && (<select value={uploadClientName} onChange={e => setUploadClientName(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.primary}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', background: '#fff', color: P.textDark, marginTop: 10 }}><option value="">-- Select Client --</option>{currProject.client && <option value={currProject.client}>{currProject.client}</option>}{(clients || []).filter(c => (c.clientName || c.name) !== currProject.client).map(c => (<option key={c._id || c.clientName} value={c.clientName || c.name}>{c.clientName || c.name}</option>))}</select>)}
+                  {uploadSendToClient && (
+                    <div style={{ marginTop: 10, padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.primary}`, background: '#fff', fontSize: 13, color: P.textDark, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <i className="ti ti-user-check" style={{ color: P.primary, fontSize: 14 }}></i>
+                      {currProject.client || clientName || 'This client'}
+                    </div>
+                  )}
                 </div>
                 <div style={{ border: `1.5px solid ${uploadSendToEmployee ? P.purple : P.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 10, background: uploadSendToEmployee ? P.purpleLight : '#fff', transition: 'all .15s' }}>
-                  <div onClick={() => { setUploadSendToEmployee(!uploadSendToEmployee); setUploadEmployeeName(''); }} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                  <div onClick={() => { const newVal = !uploadSendToEmployee; setUploadSendToEmployee(newVal); setUploadEmployeeName(''); if (newVal || uploadSendToClient) setUploadShareError(''); }} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
                     <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${uploadSendToEmployee ? P.purple : P.border}`, background: uploadSendToEmployee ? P.purple : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{uploadSendToEmployee && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>Yes</span>}</div>
                     <i className="ti ti-users" style={{ color: P.purple, fontSize: 16 }}></i>
                     <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Employee Portal</span>
                   </div>
                   {uploadSendToEmployee && (<select value={uploadEmployeeName} onChange={e => setUploadEmployeeName(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.purple}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', background: '#fff', color: P.textDark, marginTop: 10 }}><option value="">-- Select Employee --</option>{(employees || []).map(emp => (<option key={emp._id} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName}{emp.role ? ` (${emp.role})` : ''}</option>))}</select>)}
                 </div>
+                {uploadShareError && (
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#EF4444', marginBottom: 14, marginTop: -4, display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <i className="ti ti-alert-circle" style={{ fontSize: 13 }}></i>{uploadShareError}
+                  </div>
+                )}
                 <div style={{ display: 'flex', gap: 10 }}>
-                  <button onClick={() => { setShowUploadModal(false); setUploadFiles([]); setUploadFileError(''); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); setUploadSendForApproval(false); setPostUpdateOnUpload(false); }} style={{ flex: 1, padding: '10px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Draft</button>
+                  <button onClick={() => { setShowUploadModal(false); setUploadFiles([]); setUploadFileError(''); setUploadShareError(''); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); setUploadSendForApproval(false); setPostUpdateOnUpload(false); }} style={{ flex: 1, padding: '10px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Draft</button>
                   <button
                     onClick={() => {
-                      if (uploadFiles.length === 0) { setUploadFileError('Please select at least one file to upload.'); return; }
+                      let hasError = false;
+                      if (uploadFiles.length === 0) { setUploadFileError('Please select at least one file to upload.'); hasError = true; } else { setUploadFileError(''); }
+                      if (!uploadSendToClient && !uploadSendToEmployee) { setUploadShareError('Please choose to share with Client Portal or Employee Portal.'); hasError = true; } else { setUploadShareError(''); }
+                      if (hasError) return;
                       (uploadSendForApproval ? handleSendFileForApproval : handleModalUpload)();
                     }}
                     disabled={uploadingModal || sendingFileApproval}

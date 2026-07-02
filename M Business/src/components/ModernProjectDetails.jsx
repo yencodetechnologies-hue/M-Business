@@ -1518,15 +1518,17 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 </button>
               )}
 
-              <button className="mpd-btn mpd-btn-primary" onClick={() => {
-                setActiveTab('updates');
-                setComposerOpen(true);
-                setTimeout(() => {
-                  composerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 100);
-              }}>
-                <i className="ti ti-speakerphone"></i> Post Update
-              </button>
+              {!hideTopActions && (
+                <button className="mpd-btn mpd-btn-primary" onClick={() => {
+                  setActiveTab('updates');
+                  setComposerOpen(true);
+                  setTimeout(() => {
+                    composerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }, 100);
+                }}>
+                  <i className="ti ti-speakerphone"></i> Post Update
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -1673,9 +1675,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   <i className="ti ti-list"></i> List
                 </button>
               </div>
-              <button className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMilestone(true)} style={{ padding: '6px 12px', fontSize: 12 }}>
-                <i className="ti ti-plus"></i> Add Milestone
-              </button>
+              {!hideTopActions && (
+                <button className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMilestone(true)} style={{ padding: '6px 12px', fontSize: 12 }}>
+                  <i className="ti ti-plus"></i> Add Milestone
+                </button>
+              )}
             </div>
           </div>
           {(!currProject.milestones || currProject.milestones.length === 0) ? (
@@ -1876,7 +1880,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <div className="mpd-card" style={{ padding: 0, overflow: 'hidden', marginBottom: 20 }}>
               <div className="mpd-card-header" style={{ padding: '20px 24px 10px', marginBottom: 0 }}>
                 <div className="mpd-card-title"><i className="ti ti-list-check"></i> Tasks</div>
-                <button className="mpd-btn mpd-btn-outline" onClick={() => { setEditingTask(null); setNewTaskTitle(''); setNewTaskDesc(''); setNewTaskPriority('medium'); setNewTaskAssignTo([]); setNewTaskDue(''); setNewTaskMilestone(''); setShowAddTaskModal(true); }} style={{ padding: '6px 12px', fontSize: 12 }}><i className="ti ti-plus"></i> Add Task</button>
+                {!hideTopActions && (
+                  <button className="mpd-btn mpd-btn-outline" onClick={() => { setEditingTask(null); setNewTaskTitle(''); setNewTaskDesc(''); setNewTaskPriority('medium'); setNewTaskAssignTo([]); setNewTaskDue(''); setNewTaskMilestone(''); setShowAddTaskModal(true); }} style={{ padding: '6px 12px', fontSize: 12 }}><i className="ti ti-plus"></i> Add Task</button>
+                )}
               </div>
               <div style={{ padding: '0 24px 14px' }}>
                 <div className="mpd-task-filters">

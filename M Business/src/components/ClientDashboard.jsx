@@ -443,6 +443,14 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   }, [active, portalMode]);
 
   const [projects, setProjects] = useState([]);
+
+  // Auto-open the detail view (matches the ModernProjectDetails layout)
+  // when the client only has a single project, instead of showing the grid list first.
+  useEffect(() => {
+    if (active === "projects" && !selectedClientProject && projects.length === 1) {
+      setSelectedClientProject(projects[0]);
+    }
+  }, [active, projects, selectedClientProject]);
   const [tasks, setTasks] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [proposals, setProposals] = useState([]);
@@ -2298,7 +2306,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     <div className="cp-root">
       <style>{CSS}</style>
       {renderTopNav()}
-      {renderHero()}
+      {!(active === "projects" && selectedClientProject) && renderHero()}
 
       {/* Main Container */}
       <div className="page-body">
@@ -2649,7 +2657,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           </div>
         )}
 
-        {active === "projects" && !selectedClientProject && (
+        {active === "projects" && !selectedClientProject && projects.length !== 1 && (
           <div>
             <div className="sec-header">
               <div className="sec-title">
@@ -2724,6 +2732,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         )}
         {active === "projects" && selectedClientProject && (
           <ModernProjectDetails
+            hideTopActions
+            fromClientContext
             project={{
               ...selectedClientProject,
               contactEmail: selectedClientProject.contactEmail || user?.email || "",

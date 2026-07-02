@@ -363,6 +363,7 @@ export default function ModernProjectsPage({ user }) {
               onBack={() => { sessionStorage.removeItem('selectedProjectId'); setSelectedProject(null); }}
               tasks={tasksForProject(selectedProject)}
               onUpdate={fetchAll}
+              fromClientContext={false}
               fetchProjects={fetchAll}
               fetchTasks={fetchAll}
               onEdit={() => openEdit(selectedProject)}

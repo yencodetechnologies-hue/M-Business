@@ -1647,6 +1647,46 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     );
   }
 
+  // Compact Files & Documents card for the Overview tab — same visual
+  // footprint/style as the Invoices & Payments card, instead of the large
+  // grid used on the dedicated Files tab.
+  function renderFilesOverviewComponent() {
+    const recentFiles = allFiles.slice(0, 6);
+    return (
+      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden" }}>
+        <div style={{ maxHeight: 268, overflowY: "auto" }}>
+          {recentFiles.map((file, idx) => (
+            <div key={idx} className="invoice-item" onClick={() => {
+              if (file.url) window.open(file.url, "_blank");
+              else if (file.raw) setSelectedDoc(file.raw);
+            }}>
+              <div className="inv-icon" style={{ background: file.bg, color: file.col }}><i className={`ti ${file.icon}`}></i></div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="inv-id" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.name}</div>
+                <div className="inv-desc" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.description || file.meta}</div>
+              </div>
+              <div style={{ textAlign: "right", marginRight: 10 }}>
+                <div className="inv-date">{file.date}</div>
+              </div>
+              <div className="inv-dl" onClick={(e) => {
+                e.stopPropagation();
+                if (file.url) {
+                  const a = document.createElement("a");
+                  a.href = file.url; a.download = file.name || "file";
+                  a.target = "_blank";
+                  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                }
+              }}><i className="ti ti-download"></i></div>
+            </div>
+          ))}
+          {recentFiles.length === 0 && (
+            <div style={{ padding: 30, textAlign: "center", color: C.text3, fontSize: 12 }}>No files found.</div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   // Render Invoices helper
   function renderInvoicesComponent() {
     const unpaidInvoices = finalInvoicesList.filter(inv => inv.status !== "paid");
@@ -2267,7 +2307,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                   </div>
                 </div>
               </div>
-              {renderFilesComponent()}
+              {renderFilesOverviewComponent()}
             </div>
 
             {/* Invoices and Messages */}

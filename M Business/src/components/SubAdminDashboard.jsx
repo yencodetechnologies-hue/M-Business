@@ -9445,7 +9445,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 <button onClick={() => { setForceUpgradeTab(true); setActive('mysubscriptions'); }} style={{ background: '#fff', color: '#0097A7', border: 'none', borderRadius: 8, padding: '5px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>Upgrade Now</button>
               </div>
             )}
-            {!isInFreeTrial() && !subscription && (
+            {!subLoading && !isInFreeTrial() && !subscription && (
               <div style={{ background: '#FEE2E2', color: '#DC2626', padding: '10px 20px', borderRadius: 10, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
                 <span><i className="ti ti-alert-circle" style={{ marginRight: 8 }}></i>Choose a subscription plan to continue.</span>
                 <button onClick={() => { setForceUpgradeTab(true); setActive('mysubscriptions'); }} style={{ background: '#DC2626', color: '#fff', border: 'none', borderRadius: 8, padding: '5px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>Upgrade Now</button>
@@ -10678,6 +10678,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 user={user}
 
                 clients={clients}
+
+                fromClientContext={sidebarOverride === "clients"}
 
                 scrollContainerRef={mainScrollRef}
 

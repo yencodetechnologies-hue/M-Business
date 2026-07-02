@@ -183,7 +183,7 @@ function DetailField({ label, value, fullWidth }) {
   );
 }
 
-export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions, onNext, onNewInvoice, onViewInvoice, onNewProposal, onNewQuotation, autoOpenInvoice, onAutoOpenInvoiceDone }) {
+export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions, onNext, onNewInvoice, onViewInvoice, onNewProposal, onNewQuotation, autoOpenInvoice, onAutoOpenInvoiceDone, fromClientContext = false }) {
   const [activeTab, setActiveTab] = useState(() => {
     try {
       const saved = localStorage.getItem('project_tabs_order');
@@ -475,9 +475,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       mountedId.current = project._id;
       setCurrProject(project);   // sync immediately, no waiting
       setPortalLinkUrl('');      // discard any portal link cached for the old project
-      loadLatest();              // then refresh with the latest server data
+      if (!project?._restoring) loadLatest();   // skip network calls for the lightweight post-refresh placeholder — the parent will hand us the real project shortly and this effect will run again
     }
-  }, [project?._id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [project?._id, project?._restoring]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (autoOpenInvoice) {
       setActiveTab('payments');
@@ -1294,6 +1294,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   };
 
   const generatePortalLink = async (forProjectId = currProject?._id) => {
+    // Don't attempt a lookup while the project is still the lightweight
+    // post-refresh placeholder — it has no client/company data yet.
+    if (currProject?._restoring) return '';
     // Snapshot the project identifiers at the moment this function is called.
     // This prevents stale closure values from a previously viewed project being used.
     const snapshotClientId = currProject?.clientId || resolvedClientId || '';
@@ -1333,7 +1336,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       return link;
     } catch (err) {
       console.error('Failed to generate portal link:', err);
-      alert('Failed to generate client portal link. Please try again.');
       return '';
     } finally {
       setLoadingPortalLink(false);
@@ -1344,11 +1346,17 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     // Clients viewing their own portal never see the Client Portal panel
     // (see the render guard below), so don't even generate a link for them.
     if (user?.role === 'client') return;
+    // Skip while currProject is just the lightweight "restoring" placeholder
+    // set after a page refresh (only has _id, no client/company data yet).
+    // Firing the lookup now would always fail and throw a spurious
+    // "Could not find this client's account" / "Failed to generate client
+    // portal link" alert before the real project data has finished loading.
+    if (currProject?._restoring) return;
     // Always invalidate and regenerate the portal link when the project or its client changes.
     setPortalLinkUrl('');
     lastPortalProjectId.current = null;
     if (currProject?._id) generatePortalLink();
-  }, [currProject?._id, currProject?.client, currProject?.clientId, user?.role]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currProject?._id, currProject?.client, currProject?.clientId, currProject?._restoring, user?.role]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const copyPortalLink = async () => {
     const link = portalLinkUrl || await generatePortalLink();
@@ -2981,10 +2989,20 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Client Portal</span>
                   </div>
                   {uploadSendToClient && (
-                    <div style={{ marginTop: 10, padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.primary}`, background: '#fff', fontSize: 13, color: P.textDark, display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <i className="ti ti-user-check" style={{ color: P.primary, fontSize: 14 }}></i>
-                      {currProject.client || clientName || 'This client'}
-                    </div>
+                    fromClientContext ? (
+                      <div style={{ marginTop: 10, padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.primary}`, background: '#fff', fontSize: 13, color: P.textDark, display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <i className="ti ti-user-check" style={{ color: P.primary, fontSize: 14 }}></i>
+                        {currProject.client || clientName || 'This client'}
+                      </div>
+                    ) : (
+                      <select value={uploadClientName} onChange={e => setUploadClientName(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.primary}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', background: '#fff', color: P.textDark, marginTop: 10 }}>
+                        <option value="">-- Select Client --</option>
+                        {currProject.client && <option value={currProject.client}>{currProject.client}</option>}
+                        {(clients || []).filter(c => (c.clientName || c.name) !== currProject.client).map(c => (
+                          <option key={c._id || c.clientName} value={c.clientName || c.name}>{c.clientName || c.name}</option>
+                        ))}
+                      </select>
+                    )
                   )}
                 </div>
                 <div style={{ border: `1.5px solid ${uploadSendToEmployee ? P.purple : P.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 10, background: uploadSendToEmployee ? P.purpleLight : '#fff', transition: 'all .15s' }}>

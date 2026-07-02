@@ -533,6 +533,7 @@ export default function AdminDashboard({ user, setUser }) {
               employees={[]}
               user={user}
               clients={clients}
+              fromClientContext={true}
               onUpdate={() => fetchProjects()}
               onNewInvoice={(proj, prefill) => {
                 setJumpInvoicePrefill(prefill || { client: proj?.client || '', project: proj?.name || '' });

@@ -644,9 +644,6 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   // download over and over.
   const handleDownloadAll = async () => {
     if (downloadingAllRef.current) return;
-    // De-dupe by URL: allFiles mixes docs/project files/invoice cards and
-    // can contain the same file more than once, which made "Download All"
-    // look like it was downloading forever.
     const seen = new Set();
     const uniqueFiles = allFiles.filter(f => {
       if (!f.url || seen.has(f.url)) return false;
@@ -671,10 +668,6 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     }
   };
 
-  // Forces a real download instead of relying on <a download>, which browsers
-  // silently ignore for cross-origin file URLs (it just opens the file
-  // instead of saving it). Fetching the bytes ourselves and downloading the
-  // resulting blob works regardless of the file's origin.
   const downloadSingleFile = async (file) => {
     if (!file?.url) return;
     try {
@@ -691,6 +684,12 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       alert("Couldn't download this file. Please try again.");
     }
   };
+
+  // Forces a real download instead of relying on <a download>, which browsers
+  // silently ignore for cross-origin file URLs (it just opens the file
+  // instead of saving it). Fetching the bytes ourselves and downloading the
+  // resulting blob works regardless of the file's origin.
+
 
   const handleLogout = () => {
     if (portalMode) {
@@ -1004,7 +1003,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     invoiceRef: inv,
   }));
 
-  const allFiles = [...allFilesBase, ...invoiceFileCards];
+  const allFiles = allFilesBase;
   const filteredFiles = fileFilter === "All" ? allFiles : allFiles.filter(f => f.type === fileFilter);
   const totalPaid = finalInvoicesList.filter(i => i.status === "paid").reduce((sum, i) => sum + i.total, 0);
   const totalPending = finalInvoicesList.filter(i => i.status === "pending" || i.status === "unpaid" || i.status === "sent").reduce((sum, i) => sum + (i.total - i.amountPaid), 0);
@@ -1677,7 +1676,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     return (
       <div className="files-panel">
         <div className="files-toolbar">
-          {["All", "Designs", "Documents", "Reports", "Invoices"].map(filter => (
+          {["All", "Designs", "Documents", "Reports"].map(filter => (
             <button key={filter} className={`ft-filter ${fileFilter === filter ? "active" : ""}`} onClick={() => setFileFilter(filter)}>
               {filter} ({filter === "All" ? allFiles.length : allFiles.filter(f => f.type === filter).length})
             </button>

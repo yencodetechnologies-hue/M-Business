@@ -444,13 +444,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
   const [projects, setProjects] = useState([]);
 
-  // Auto-open the detail view (matches the ModernProjectDetails layout)
-  // when the client only has a single project, instead of showing the grid list first.
-  useEffect(() => {
-    if (active === "projects" && !selectedClientProject && projects.length === 1) {
-      setSelectedClientProject(projects[0]);
-    }
-  }, [active, projects, selectedClientProject]);
+  // (auto-open removed — always show the "My Projects" grid first, like the screenshot)
   const [tasks, setTasks] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [proposals, setProposals] = useState([]);
@@ -1119,7 +1113,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
     /* ── PAGE BODY ── */
     .cp-root .page-body { max-width: 1200px; margin: 0 auto; padding: 28px 24px 60px; display: flex; flex-direction: column; gap: 28px; min-width: 0; }
-    .cp-root .page-body > * { min-width: 0; overflow-x: auto; }
+    .cp-root .page-body > * { min-width: 0; }
+    .cp-root .page-body > *:not(.mpd-root) { overflow-x: auto; }
 
     /* ── SECTION HEADERS ── */
     .cp-root .sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
@@ -2657,7 +2652,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           </div>
         )}
 
-        {active === "projects" && !selectedClientProject && projects.length !== 1 && (
+        {active === "projects" && !selectedClientProject && (
           <div>
             <div className="sec-header">
               <div className="sec-title">
@@ -2732,7 +2727,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         )}
         {active === "projects" && selectedClientProject && (
           <ModernProjectDetails
-            hideTopActions
+            key={selectedClientProject._id || selectedClientProject.id}
             fromClientContext
             project={{
               ...selectedClientProject,
@@ -2744,6 +2739,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               String(t.projectId || t.project) === String(selectedClientProject._id || selectedClientProject.id)
             )}
             user={user}
+
             onBack={() => setSelectedClientProject(null)}
             onMessageTeam={() => setActive("messages")}
             fetchProjects={async () => {
@@ -2754,7 +2750,10 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 const res = await axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}&clientId=${encodeURIComponent(myClientId)}`, {
                   headers: { 'x-company-id': user?.companyId || "" }
                 });
-                setProjects(res.data || []);
+                const updated = res.data || [];
+                setProjects(updated);
+                const fresh = updated.find(p => String(p._id || p.id) === String(selectedClientProject._id || selectedClientProject.id));
+                if (fresh) setSelectedClientProject(fresh);
               } catch (e) { console.error(e); }
             }}
             fetchTasks={async () => {

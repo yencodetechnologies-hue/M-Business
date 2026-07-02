@@ -574,13 +574,16 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
   const name = user?.name || "Employee";
   const today = todayStr();
   const todayAtt = attendance.find(a => a.date === today);
-  const presentDays = attendance.filter(a => a.status === "present").length;
-  const absentDays = attendance.filter(a => a.status === "absent").length;
-  const leaveDays = attendance.filter(a => a.status === "leave").length;
+  const currentMonthKey = today.slice(0, 7); // "YYYY-MM"
+  const thisMonthAttendance = attendance.filter(a => (a.date || "").startsWith(currentMonthKey));
+  const presentDays = thisMonthAttendance.filter(a => a.status === "present").length;
+  const absentDays = thisMonthAttendance.filter(a => a.status === "absent").length;
+  const leaveDays = thisMonthAttendance.filter(a => a.status === "leave").length;
   const totalMarked = presentDays + absentDays + leaveDays;
   const attRate = totalMarked > 0 ? Math.round((presentDays / totalMarked) * 100) : 0;
-  const leaveTotal = 18;
-  const leaveLeft = Math.max(leaveTotal - leaveDays, 0);
+  const leaveTotal = user?.leaveBalance ?? user?.totalLeaveDays ?? 18;
+  const leaveDaysAllTime = attendance.filter(a => a.status === "leave").length;
+  const leaveLeft = Math.max(leaveTotal - leaveDaysAllTime, 0);
   const pendingTasks = tasks.filter(t => !["done", "completed"].includes((t.status || "").toLowerCase())).length;
   const activeProjectsCount = projects.filter(p => !["done", "completed"].includes((p.status || "").toLowerCase())).length;
   const latestSalary = salary[0];

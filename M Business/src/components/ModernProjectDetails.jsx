@@ -23,7 +23,19 @@ const CSS = `
 .mpd-breadcrumb { display:flex; align-items:center; gap:6px; font-size:13px; color:${P.textLight}; font-weight:700; }
 .mpd-breadcrumb a { color:${P.primary}; cursor:pointer; text-decoration:none; }
 .mpd-breadcrumb a:hover { text-decoration:underline; }
-.mpd-topbar-actions { display:flex; align-items:center; gap:10px; }
+.mpd-topbar-actions { display:flex; align-items:center; gap:10px; flex-wrap: wrap; }
+
+@media (max-width: 768px) {
+  .mpd-root { overflow-x: hidden; }
+  .mpd-topbar { flex-wrap: wrap; gap: 12px; }
+  .mpd-topbar-actions { width: 100%; }
+  .mpd-topbar-actions button { flex: 1 1 auto; min-width: 0; font-size: 12px; padding: 8px 10px; }
+  .mpd-proj-header { flex-direction: column; }
+  .mpd-ph-right { width: 100%; align-items: flex-start; }
+  .mpd-prog-card { flex-direction: column; }
+  .mpd-prog-divider { display: none; }
+  .mpd-card-header { flex-wrap: wrap; gap: 10px; }
+}
 
 /* BUTTONS */
 .mpd-btn { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; border-radius:10px; font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; cursor:pointer; border:none; transition:all .15s; }
@@ -1575,7 +1587,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
                       </span>
                       <button onClick={() => setViewProjectApproval(a)} style={{ padding: '5px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#fff', color: P.primary, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>View</button>
-                      <button onClick={() => handleDeleteApproval(a._id)} style={{ padding: '5px 12px', borderRadius: 8, border: '1.5px solid #FCA5A5', background: P.redLight, color: P.red, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Delete</button>
+                      {!hideTopActions && (
+                        <button onClick={() => handleDeleteApproval(a._id)} style={{ padding: '5px 12px', borderRadius: 8, border: '1.5px solid #FCA5A5', background: P.redLight, color: P.red, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Delete</button>
+                      )}
                     </div>
                   </div>
                 );

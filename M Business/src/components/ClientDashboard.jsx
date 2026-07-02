@@ -1623,7 +1623,11 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               }
             }}>
               {file.badge && <span className="fc-new-badge">{file.badge}</span>}
-              <div className="fc-download" onClick={(e) => {
+              <div className="fc-download" title="View" style={{ right: 42 }} onClick={(e) => {
+                e.stopPropagation();
+                if (file.url) window.open(file.url, "_blank", "noopener");
+              }}><i className="ti ti-eye"></i></div>
+              <div className="fc-download" title="Download" onClick={(e) => {
                 e.stopPropagation();
                 if (file.url) {
                   const a = document.createElement("a");
@@ -1668,7 +1672,11 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               <div style={{ textAlign: "right", marginRight: 10 }}>
                 <div className="inv-date">{file.date}</div>
               </div>
-              <div className="inv-dl" onClick={(e) => {
+              <div className="inv-dl" title="View" onClick={(e) => {
+                e.stopPropagation();
+                if (file.url) window.open(file.url, "_blank", "noopener");
+              }}><i className="ti ti-eye"></i></div>
+              <div className="inv-dl" title="Download" style={{ marginLeft: 6 }} onClick={(e) => {
                 e.stopPropagation();
                 if (file.url) {
                   const a = document.createElement("a");

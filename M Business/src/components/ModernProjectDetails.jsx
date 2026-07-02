@@ -1287,7 +1287,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       });
       const clientList = Array.isArray(res.data) ? res.data : [];
 
-      // Step 1: Match by stored clientId (most reliable — direct ID match)
+      // Step 1: Match by stored clientId (most reliable ï¿½ direct ID match)
       let matched = snapshotClientId
         ? clientList.find(c => String(c._id) === String(snapshotClientId))
         : null;
@@ -1305,17 +1305,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       }
 
       const subadminCompanyId = user?.companyId || user?._id || user?.id || snapshotCompanyId || '';
-      const clientToken = btoa(JSON.stringify({
-        clientId: matched._id,
-        email: matched.email,
-        name: matched.clientName || matched.name,
-        companyName: matched.companyName || matched.company || '',
+      const tokenRes = await axios.post(`${BASE_URL}/api/clients/${matched._id}/portal-token`, {
         companyId: subadminCompanyId,
         agencyName: user?.companyName || user?.name || '',
-        exp: Date.now() + 24 * 60 * 60 * 1000
-      }));
+        projectId: snapshotProjectId || '',
+      });
 
-      const link = `${window.location.origin}/client-portal/${matched._id}?token=${clientToken}`;
+      const link = `${window.location.origin}/client-portal/${matched._id}?token=${tokenRes.data.token}`;
       setPortalLinkUrl(link);
       lastPortalProjectId.current = snapshotProjectId;
       return link;

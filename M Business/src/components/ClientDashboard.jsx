@@ -360,8 +360,20 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       const token = params.get("token");
 
       if (token) {
-        const decoded = JSON.parse(atob(token));
-        if (decoded.exp && Date.now() > decoded.exp) return null;
+        // Real JWTs are 3 base64url segments: header.payload.signature.
+        // We only need to read the payload (middle segment) here for
+        // display purposes — the backend is what actually verifies the
+        // signature on every data request, this is not a security check.
+        const payloadB64Url = token.split(".")[1];
+        const payloadB64 = payloadB64Url.replace(/-/g, "+").replace(/_/g, "/");
+        const padded = payloadB64.padEnd(payloadB64.length + (4 - (payloadB64.length % 4)) % 4, "=");
+        const decoded = JSON.parse(atob(padded));
+
+        // Standard JWT `exp` is in SECONDS since epoch, but Date.now() is in
+        // MILLISECONDS — must multiply by 1000 before comparing, or every
+        // fresh token will incorrectly look already expired.
+        if (decoded.exp && Date.now() > decoded.exp * 1000) return null;
+
         if (decoded.agencyName) {
           localStorage.setItem("portalAgencyName", decoded.agencyName);
         }
@@ -377,7 +389,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           role: "client",
           agencyName: decoded.agencyName || "",
           portalProjectId: decoded.projectId || "",
-          exp: decoded.exp || (Date.now() + 24 * 60 * 60 * 1000),
+          exp: decoded.exp ? decoded.exp * 1000 : (Date.now() + 24 * 60 * 60 * 1000),
         };
 
         // Persist so refreshing THIS SAME portal link keeps the client signed in.

@@ -65,20 +65,20 @@ function StatusPicker({ current = "pending", onChange }) {
   return (
     <div style={{ background: "var(--app-bg)", borderRadius: 12, padding: "14px 16px", border: "1px solid var(--app-border)" }}>
       <div style={{ fontSize: 11, fontWeight: 700, color: "var(--app-accent)", marginBottom: 10 }}>UPDATE STATUS</div>
-      {["Pending", "Hired", "Rejected"].map(s => (
-        <button key={s} onClick={() => onChange(s)} style={{
-          flex: 1, padding: "10px", borderRadius: 10,
-          border: `2px solid ${current?.toLowerCase() === s.toLowerCase() ? sc(s) : "var(--app-border)"}`,
-          background: current?.toLowerCase() === s.toLowerCase() ? `${sc(s)}15` : "#fff",
-          color: current?.toLowerCase() === s.toLowerCase() ? sc(s) : "var(--app-muted)",
-          fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s",
-        }}>
-          {s === "Pending" ? "Pending Pending" : s === "Hired" ? "Success Hired" : "Error Rejected"}
-        </button>
-      ))}
+      <div style={{ display: "flex", gap: 8 }}>
+        {["Pending", "Hired", "Rejected"].map(s => (
+          <button key={s} onClick={() => onChange(s)} style={{
+            flex: 1, padding: "10px", borderRadius: 10,
+            border: `2px solid ${current?.toLowerCase() === s.toLowerCase() ? sc(s) : "var(--app-border)"}`,
+            background: current?.toLowerCase() === s.toLowerCase() ? `${sc(s)}15` : "#fff",
+            color: current?.toLowerCase() === s.toLowerCase() ? sc(s) : "var(--app-muted)",
+            fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s",
+          }}>
+            {s === "Pending" ? "Pending Pending" : s === "Hired" ? "Success Hired" : "Error Rejected"}
+          </button>
+        ))}
+      </div>
     </div>
-    </div >
-    </div >
   );
 }
 

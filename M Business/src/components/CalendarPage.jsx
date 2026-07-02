@@ -12,7 +12,17 @@ const TC = { Meeting: "var(--app-accent)", Call: "var(--app-accent)", Review: "#
 const EMPTY = { name: "", project: "", client: "", date: "", start: "", end: "", notes: "", type: "Meeting", category: "Event" };
 
 export default function CalendarPage({ projects = [], tasks = [], clients = [], companyId, onUpdateProject, onUpdateTask, config, user, THEME }) {
-  const finalTheme = THEME || { accent: "var(--app-accent)", muted: "var(--app-muted)", card: "var(--app-card)", bg: "var(--app-bg)", border: "var(--app-border)", text: "var(--app-text)" };
+  const finalTheme = {
+    accent: "#00BCD4",
+    gradient: "linear-gradient(135deg, #00BCD4, #0097A7)",
+    muted: "#607D86",
+    card: "#FFFFFF",
+    bg: "#F5FAFA",
+    border: "#E0EEF0",
+    text: "#1A2E35",
+    shadow: "0 20px 50px rgba(0,0,0,0.15)",
+    ...THEME,
+  };
 
   // Update TC to use dynamic theme accent if available
   const TYPE_COLORS = {
@@ -188,15 +198,8 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
       }
 
       setModal(null);
-    } catch {
-      if (modal === "add") {
-        setEvents(p => [{ ...form, _id: Date.now().toString(), createdBy: user?.name || user?.clientName || "", createdByRole: user?.role || user?.userRole || "" }, ...p]);
-        showToast("Success Saved locally!");
-      } else {
-        setEvents(p => p.map(x => (x._id || x.id) === editId ? { ...x, ...form } : x));
-        showToast("Success Updated locally!");
-      }
-      setModal(null);
+    } catch (err) {
+      showToast("Error Failed to save. Please try again.");
     }
     setSaving(false);
   };
@@ -300,7 +303,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
   const cNames = clients.map(c => c.clientName || c.name || "");
 
   const Btn = {
-    background: finalTheme.gradient || "var(--app-accent-gradient, var(--app-accent, #6366f1))",
+    background: finalTheme.gradient || finalTheme.accent,
     color: "#fff",
     border: "none",
     borderRadius: 12,
@@ -309,18 +312,18 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
     fontSize: 13,
     cursor: "pointer",
     whiteSpace: "nowrap",
-    boxShadow: "0 8px 20px rgba(var(--app-accent-rgb, 99, 102, 241), 0.2)",
+    boxShadow: `0 8px 20px ${finalTheme.accent}33`,
     transition: "all 0.2s"
   };
 
   const inp = (hasErr) => ({
     width: "100%",
-    border: `1.5px solid ${hasErr ? "#ef4444" : "var(--app-border)"}`,
+    border: `1.5px solid ${hasErr ? "#ef4444" : finalTheme.border}`,
     borderRadius: 12,
     padding: "12px 16px",
     fontSize: 14,
-    color: "var(--app-text)",
-    background: "var(--app-surface)",
+    color: finalTheme.text,
+    background: "#FFFFFF",
     outline: "none",
     fontFamily: "inherit",
     boxSizing: "border-box",
@@ -740,7 +743,10 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
       {modal === "project" && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div style={{ background: finalTheme.card, borderRadius: 24, width: "100%", maxWidth: 450, padding: 28, boxShadow: "0 20px 50px rgba(0,0,0,0.15)" }}>
-            <h2 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 900, color: finalTheme.text || "var(--app-text)", display: "flex", alignItems: "center", gap: 10 }}>Build Project Deadline</h2>
+            <h2 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 900, color: finalTheme.text, display: "flex", alignItems: "center", gap: 10 }}>
+              <i className="ti ti-briefcase" style={{ color: finalTheme.accent }} />
+              Build Project Deadline
+            </h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
               <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px", background: finalTheme.bg, borderRadius: 9, border: `1px solid ${finalTheme.border}` }}>
                 <div style={{ width: 30, height: 30, borderRadius: 8, background: `${finalTheme.accent}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: finalTheme.accent, flexShrink: 0 }}>

@@ -1760,7 +1760,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [empSaveLoading, setEmpSaveLoading] = useState(false);
 
   const [projects, setProjects] = useState([]);
-  const [np, setNp] = useState({ name: "", client: "", companyName: "", phone: "", address: "", contactPersonName: "", contactPersonNo: "", contactEmail: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "₹", team: "", status: "Pending", assignedTo: [] });
+  const [np, setNp] = useState({ name: "", client: "", clientId: "", companyName: "", phone: "", address: "", contactPersonName: "", contactPersonNo: "", contactEmail: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "₹", team: "", status: "Pending", assignedTo: [] });
   const [npError, setNpError] = useState({});
   const [projSaveLoading, setProjSaveLoading] = useState(false);
 
@@ -1775,6 +1775,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [config, setConfig] = useState(null);
   const [viewProject, setViewProject] = useState(null);
   const [subscription, setSubscription] = useState(null);
+  const [subLoading, setSubLoading] = useState(false);
   const fetchSubscription = async () => {
     try {
       setSubLoading(true);
@@ -2103,7 +2104,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "M Business"} />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
           {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} onSelectProject={(p) => setSelectedProjectForTasks(p)} autoOpenAddModal={autoOpenTaskModal} onAddModalOpened={(val) => setAutoOpenTaskModal(!!val)} />}
-          {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={user?.companyId || user?._id || ""} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} />}
+          {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} THEME={{ accent: "#00BCD4", gradient: "linear-gradient(135deg, #00BCD4, #0097A7)", muted: "#607D86", card: "#FFFFFF", bg: "#F5FAFA", border: "#E0EEF0", text: "#1A2E35" }} />}
           {validActive === "messaging" && <MessagingPage user={user} />}
           {validActive === "settings" && <SettingsPage THEME={T} user={user} onProfileUpdate={(updates) => { const updated = { ...user, ...updates }; setUser(updated); try { localStorage.setItem("user", JSON.stringify(updated)); } catch { } }} />}
 
@@ -2113,7 +2114,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
           {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
           {validActive === "reports" && <ReportsPage clients={clients} projects={projects} employees={employees} managers={managers} />}
-          {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client) => { setClients(prev => [...prev, client]); setPendingNewClientId(client._id); setActive("clients"); }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || ' var(--app-accent, var(--app-accent, #00BCD4))'} />}
+          {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client) => { setClients(prev => [...prev, client]); setActive("clients"); }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || accentColor} />}
         </div>
       </div>
 
@@ -2340,6 +2341,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   setNp({
                     ...np,
                     client: v,
+                    clientId: sel?._id || sel?.id || "",
                     companyName: sel?.companyName || sel?.company || np.companyName,
                     phone: sel?.phone || np.phone,
                     address: sel?.address || np.address,
@@ -2350,7 +2352,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   setNpError(p => ({ ...p, client: "" }));
                 }}
                 error={npError.client}
-                onAddClient={() => { setModal("client"); setNcError({}); setShowClientPass(false); }}
               />
             )}
             {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {npError.client}</div>}

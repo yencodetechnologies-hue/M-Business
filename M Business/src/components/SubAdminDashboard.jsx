@@ -9973,6 +9973,98 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                               </div>
 
+                              {/* Active Projects (moved directly under the chart, no gap) */}
+
+                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+
+                                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+
+                                    <i className="ti ti-folder" style={{ color: "var(--app-accent)" }}></i> Active Projects
+
+                                  </div>
+
+                                  <div onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)", cursor: "pointer" }}>
+
+                                    View All
+
+                                  </div>
+
+                                </div>
+
+                                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+                                  {projects.filter(p => p.status === "Active" || p.status === "Pending").slice(0, 5).map((p, idx) => {
+
+                                    const colors = ["var(--app-accent)", "var(--app-accent)", "var(--app-accent)", "var(--app-accent)", "var(--app-accent)"];
+
+                                    const bColor = colors[idx % colors.length];
+
+                                    const progress = p.progress || 25;
+
+                                    const barColor = progress > 70 ? "#16a34a" : progress > 40 ? "#f59e0b" : "#dc2626";
+
+                                    const badgeText = "IN PROGRESS";
+
+                                    const badgeColor = "var(--app-accent)";
+
+                                    return (
+
+                                      <div key={p._id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 16, borderBottom: idx === 4 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
+
+                                        <div style={{ display: "flex", gap: 12 }}>
+
+                                          <div style={{ width: 3, background: bColor, borderRadius: 2 }}></div>
+
+                                          <div>
+
+                                            <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{p.name || p.title}</div>
+
+                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{clients.find(c => c._id === p.clientId)?.clientName || "Internal"} Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
+
+                                          </div>
+
+                                        </div>
+
+                                        <div style={{ width: 100, textAlign: "right" }}>
+
+                                          <div style={{ display: "inline-block", color: badgeColor, background: `${badgeColor}15`, padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800, marginBottom: 8, letterSpacing: "0.5px" }}>
+
+                                            {badgeText}
+
+                                          </div>
+
+                                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+
+                                            <div style={{ flex: 1, height: 4, background: "rgba(0,0,0,0.06)", borderRadius: 2 }}>
+
+                                              <div style={{ width: `${progress}%`, height: "100%", background: barColor, borderRadius: 2 }}></div>
+
+                                            </div>
+
+                                            <div style={{ fontSize: 11, fontWeight: 800, color: barColor }}>{progress}%</div>
+
+                                          </div>
+
+                                        </div>
+
+                                      </div>
+
+                                    );
+
+                                  })}
+
+                                  {projects.filter(p => p.status === "Active" || p.status === "Pending").length === 0 && (
+
+                                    <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No active projects</div>
+
+                                  )}
+
+                                </div>
+
+                              </div>
+
                             </div>
 
                             {/* RIGHT COLUMN */}
@@ -10114,101 +10206,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-                              {/* Active Projects */}
 
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-
-                                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
-
-                                    <i className="ti ti-folder" style={{ color: "var(--app-accent)" }}></i> Active Projects
-
-                                  </div>
-
-                                  <div onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)", cursor: "pointer" }}>
-
-                                    View All
-
-                                  </div>
-
-                                </div>
-
-                                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-                                  {projects.filter(p => p.status === "Active" || p.status === "Pending").slice(0, 5).map((p, idx) => {
-
-                                    const colors = ["var(--app-accent)", "var(--app-accent)", "var(--app-accent)", "var(--app-accent)", "var(--app-accent)"];
-
-                                    const bColor = colors[idx % colors.length];
-
-                                    const progress = p.progress || 25;
-
-                                    const barColor = progress > 70 ? "#16a34a" : progress > 40 ? "#f59e0b" : "#dc2626";
-
-                                    const badgeText = "IN PROGRESS";
-
-                                    const badgeColor = "var(--app-accent)";
-
-
-
-                                    return (
-
-                                      <div key={p._id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 16, borderBottom: idx === 4 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
-
-                                        <div style={{ display: "flex", gap: 12 }}>
-
-                                          <div style={{ width: 3, background: bColor, borderRadius: 2 }}></div>
-
-                                          <div>
-
-                                            <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{p.name || p.title}</div>
-
-                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{clients.find(c => c._id === p.clientId)?.clientName || "Internal"} Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
-
-                                          </div>
-
-                                        </div>
-
-                                        <div style={{ width: 100, textAlign: "right" }}>
-
-                                          <div style={{ display: "inline-block", color: badgeColor, background: `${badgeColor}15`, padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800, marginBottom: 8, letterSpacing: "0.5px" }}>
-
-                                            {badgeText}
-
-                                          </div>
-
-                                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-
-                                            <div style={{ flex: 1, height: 4, background: "rgba(0,0,0,0.06)", borderRadius: 2 }}>
-
-                                              <div style={{ width: `${progress}%`, height: "100%", background: barColor, borderRadius: 2 }}></div>
-
-                                            </div>
-
-                                            <div style={{ fontSize: 11, fontWeight: 800, color: barColor }}>{progress}%</div>
-
-                                          </div>
-
-                                        </div>
-
-                                      </div>
-
-                                    );
-
-                                  })}
-
-                                  {projects.filter(p => p.status === "Active" || p.status === "Pending").length === 0 && (
-
-                                    <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No active projects</div>
-
-                                  )}
-
-                                </div>
-
-                              </div>
-
-                              {/* Leave Requests (Dynamic from backend) */}
 
                               <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
 

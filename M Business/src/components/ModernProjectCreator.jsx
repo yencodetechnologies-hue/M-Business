@@ -135,6 +135,15 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   });
   const [budget, setBudget] = useState(editProject?.budget || '');
   const [currency, setCurrency] = useState(editProject?.currency || '₹');
+
+  useEffect(() => {
+    if (editProject) {
+      setBudget(editProject.budget ?? '');
+      setCurrency(editProject.currency || '₹');
+      setBilled(editProject.billed ?? '');
+      setReceived(editProject.received ?? '');
+    }
+  }, [editProject?._id, editProject?.id]);
   const [contactPersonName, setContactPersonName] = useState(editProject?.contactPersonName || prefillClient?.contactPersonName || '');
   const [contactPersonNo, setContactPersonNo] = useState(editProject?.contactPersonNo || prefillClient?.contactPersonNo || prefillClient?.phone || '');
   const [contactEmail, setContactEmail] = useState(editProject?.contactEmail || editProject?.clientEmail || prefillClient?.email || '');
@@ -233,12 +242,12 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
         start,
         end,
         deadline: end || start || '',
-        budget,
+        budget: Number(budget) || 0,
         currency,
-        billed: billed || 0,
-        received: received || 0,
-        pending: pending || 0,
-        spent: 0,
+        billed: Number(billed) || 0,
+        received: Number(received) || 0,
+        pending: Number(pending) || 0,
+        spent: Number(spent) || 0,
         assignedTo: assigned,
         milestones: milestones.filter(m => m.name.trim()),
         portalSettings: portalOpts
@@ -262,7 +271,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
 
       setLoading(false); // ← reset loading BEFORE onSuccess so button is not stuck
 
-      const savedProject = res.data?.project || res.data;
+      const savedProject = { ...(res.data?.project || res.data), budget: Number(budget) || 0, billed: Number(billed) || 0, received: Number(received) || 0, pending: Number(pending) || 0 };
       if (onSuccess) await onSuccess(savedProject);
 
       // Fire-and-forget notifications (don't block on these)

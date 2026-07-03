@@ -10720,21 +10720,21 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 onBack={() => { const returnTo = sidebarOverride || "projects"; setSidebarOverride(null); setActive(returnTo); }}
 
-                onSuccess={async (updatedProj) => {
+                onSuccess={(updatedProj) => {
 
-                  const saved = updatedProj?.project || updatedProj || jumpProject;
+                  const saved = updatedProj || jumpProject;
 
                   const merged = { ...jumpProject, ...saved };
 
-                  setJumpProject(merged);
-
                   setProjects(prev => prev.map(p => (p._id === merged._id ? { ...p, ...merged } : p)));
-
-                  setSidebarOverride(null);
 
                   setFromEditProject(true);
 
-                  startNavTransition(() => setActive("project-details"));
+                  setSidebarOverride(null);
+
+                  setJumpProject(merged);
+
+                  setActive("project-details");
 
                 }}
 

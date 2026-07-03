@@ -385,7 +385,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       const currentList = currProject[arrayName] || [];
       const updatedList = currentList.filter((_, i) => i !== index);
       const updatePayload = { [arrayName]: updatedList };
-      // When deleting an expense, recalculate the spent total from remaining expenses
       if (arrayName === 'expenses') {
         updatePayload.spent = updatedList.reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
       }
@@ -395,6 +394,26 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       alert('Failed to delete record.');
     }
   };
+
+  // 👇 ADD THE NEW FUNCTION HERE 👇
+  const handleDeleteInvoice = async (inv) => {
+    if (!confirm('Delete this invoice?')) return;
+    try {
+      if (inv._source === 'global' && inv._globalId) {
+        await axios.delete(`${BASE_URL}/api/invoices/${inv._globalId}`);
+        setProjectInvoices(prev => prev.filter(g => g.id !== inv._globalId));
+      } else {
+        const index = (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo);
+        if (index === -1) return;
+        const updatedList = (currProject.invoices || []).filter((_, i) => i !== index);
+        await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { invoices: updatedList });
+      }
+      loadLatest();
+    } catch (err) {
+      alert('Failed to delete invoice.');
+    }
+  };
+  // 👆 END OF NEW FUNCTION 👆
 
   const handleSendSelectedToPortal = async (targetClient) => {
     if (selectedPaymentItems.length === 0) return;
@@ -749,9 +768,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const autoAdditionalTotal = (currProject.additionalCharges || []).reduce((sum, a) => sum + parseAmt(a.amount), 0);
   const autoMilestoneTotal = (currProject.milestonePayments || []).reduce((sum, m) => sum + parseAmt(m.amount), 0);
   const autoBudgetAmt = billed + autoAdditionalTotal + autoMilestoneTotal;
-  const manualBudget = currProject.budget ? Number(currProject.budget) : 0;
-  const budgetAmt = Math.max(autoBudgetAmt, manualBudget);
-
+  const manualBudget = currProject.budget !== undefined && currProject.budget !== null && currProject.budget !== ''
+    ? Number(currProject.budget)
+    : 0;
+  const budgetAmt = currProject.budget !== undefined && currProject.budget !== null && currProject.budget !== ''
+    ? manualBudget
+    : autoBudgetAmt;
   // Fall back to manually entered received value if no payments recorded
   const receivedFromPayments = (currProject.paymentsReceived || []).reduce((sum, p) => sum + parseAmt(p.amount), 0);
   const manualReceived = parseAmt(currProject.received);
@@ -2886,7 +2908,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   </div>
                   <div style={{ display: 'flex', gap: 8 }}>
                     <button onClick={() => { setPreviewInvoice(null); setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo) })); }} style={{ padding: '6px 14px', background: '#fff', color: '#374151', border: '1px solid #E8EDF2', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}><i className="ti ti-edit"></i> Edit</button>
-                    <button onClick={() => { if (confirm('Delete this invoice?')) { handleDeleteRecord('invoices', (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo)); setPreviewInvoice(null); } }} style={{ padding: '6px 14px', background: '#FEE2E2', color: '#EF4444', border: '1px solid #FECACA', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}><i className="ti ti-trash"></i> Delete</button>
+                    <button onClick={() => { handleDeleteInvoice(inv); setPreviewInvoice(null); }} style={{ padding: '6px 14px', background: '#FEE2E2', color: '#EF4444', border: '1px solid #FECACA', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}><i className="ti ti-trash"></i> Delete</button>
                     <button onClick={() => window.print()} style={{ padding: '6px 14px', background: ' var(--app-accent, var(--app-accent, #00BCD4))', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}><i className="ti ti-printer"></i> Print / PDF</button>
                     <button onClick={() => setPreviewInvoice(null)} style={{ padding: '6px 14px', background: '#374151', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>✕</button>
                   </div>

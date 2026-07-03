@@ -4313,6 +4313,7 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
         onAddProject={() => {
           setJumpProject(null);
           setJumpProject(null);
+          setJumpProject(null);
           if (setActive) setActive("create-project");
         }}
         onNewInvoice={(p, editInv, editIdx) => {

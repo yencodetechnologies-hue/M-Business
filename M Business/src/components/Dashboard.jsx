@@ -1731,7 +1731,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [active, setActive] = useState(() => localStorage.getItem("activeTab_dashboard") || "dashboard");
   useEffect(() => { localStorage.setItem("activeTab_dashboard", active); }, [active]);
   const [modal, setModal] = useState(null);
-  const [prefillClientName, setPrefillClientName] = useState("");
+
+  const [prefillClient, setPrefillClient] = useState(null);
 
   // Ensure np.client is synced when prefillClientName is set
   useEffect(() => {

@@ -249,9 +249,10 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
 
       let res;
       if (editProject) {
-        const projectId = editProject?._id || editProject?.id;
-        if (isEdit && !projectId) {
-          alert("Error: Project ID is missing. Please go back and try again.");
+        const projectId = editProject._id || editProject.id;
+        if (!projectId || projectId === 'undefined') {
+          alert('Error: Project ID is missing. Please go back and try again.');
+          setLoading(false);
           return;
         }
         res = await axios.put(`${BASE_URL}/api/projects/${projectId}`, payload, { headers });
@@ -261,7 +262,8 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
 
       setLoading(false); // ← reset loading BEFORE onSuccess so button is not stuck
 
-      if (onSuccess) await onSuccess(res.data);
+      const savedProject = res.data?.project || res.data;
+      if (onSuccess) await onSuccess(savedProject);
 
       // Fire-and-forget notifications (don't block on these)
       if (!editProject && assigned.length > 0) {
@@ -342,7 +344,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
               <div className="mpc-form-group">
                 <label>Client *</label>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  {(prefillClient) ? (
+                  {prefillClient ? (
                     <div style={{
                       flex: 1,
                       padding: '11px 14px',

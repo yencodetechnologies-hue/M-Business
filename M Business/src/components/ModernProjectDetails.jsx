@@ -239,6 +239,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   // Live state synchronized with backend
   const [currProject, setCurrProject] = useState(project);
+
+  useEffect(() => {
+    if (project && (project.name || project.client)) {
+      setCurrProject(project);
+    }
+  }, [project?._id, project?.name, project?.client]);
   const [currTasks, setCurrTasks] = useState(tasks);
   const [loadingProject, setLoadingProject] = useState(false);
 
@@ -448,8 +454,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           headers: { 'x-company-id': project?.companyId || '' }
         })
       ]);
-      if (pRes.data) {
-        setCurrProject(pRes.data);
+      const fetched = pRes.data;
+      // Guard against a race with the backend: if the fetched project is
+      // missing its name/client (write not fully committed yet), don't let
+      // it clobber the good data we already have — this is what caused the
+      // "shows correctly once, then flickers to Unnamed Project" bug.
+      if (fetched && (fetched.name || fetched.client)) {
+        setCurrProject(fetched);
       }
       if (Array.isArray(tRes.data)) {
         setCurrTasks(tRes.data);
@@ -487,7 +498,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       mountedId.current = project._id;
       setCurrProject(project);   // sync immediately, no waiting
       setPortalLinkUrl('');      // discard any portal link cached for the old project
-      if (!project?._restoring) loadLatest();   // skip network calls for the lightweight post-refresh placeholder — the parent will hand us the real project shortly and this effect will run again
+      if (!project?._restoring) loadLatest();
     }
   }, [project?._id, project?._restoring]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {

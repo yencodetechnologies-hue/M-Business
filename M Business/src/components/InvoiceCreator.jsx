@@ -785,14 +785,19 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   // ── Delete invoice ------------------------------------------
   const handleDelete = async (entry) => {
     const id = entry._id || entry.id;
-    // Try backend
-    try { await axios.delete(`${BASE_URL}/api/invoices/${id}`); } catch { }
-    // Remove locally
+    try {
+      await axios.delete(`${BASE_URL}/api/invoices/${id}`);
+    } catch (err) {
+      console.error('Delete invoice failed:', err);
+      alert('Failed to delete invoice from the server. Please try again.');
+      setDeleteTarget(null);
+      return;
+    }
     deleteDraftLocal(entry.invoiceNo);
     setInvoiceList(prev => prev.filter(e => (e.id || e.invoiceNo) !== (id || entry.invoiceNo)));
     setDeleteTarget(null);
     setStep("list");
-    showToast("Delete Invoice deleted!");
+    showToast("Invoice deleted!");
   };
 
   // ── Update status inline ------------------------------------

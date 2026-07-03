@@ -397,6 +397,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   // 👇 ADD THE NEW FUNCTION HERE 👇
   const handleDeleteInvoice = async (inv) => {
+    console.log('Deleting invoice:', inv);
     if (!confirm('Delete this invoice?')) return;
     try {
       if (inv._source === 'global' && inv._globalId) {
@@ -761,9 +762,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     return sum + invAmount + taxAmt;
   }, 0);
   const billedFromInvoices = billedGlobal + billedLocal;
-  // Fall back to manually entered billed value if no invoices exist
+  // Only fall back to manually entered billed value if the project has
+  // never had any invoices at all (not just zero after deletion)
   const manualBilled = parseAmt(currProject.billed);
-  const billed = billedFromInvoices > 0 ? billedFromInvoices : manualBilled;
+  const hasAnyInvoices = mergedInvoices.length > 0;
+  const billed = hasAnyInvoices ? billedFromInvoices : manualBilled;
+  window.debugBudget = { billedGlobal, billedLocal, billedFromInvoices, manualBilled, billed, mergedInvoices, projectInvoices, currProjectInvoices: currProject.invoices };
 
   const autoAdditionalTotal = (currProject.additionalCharges || []).reduce((sum, a) => sum + parseAmt(a.amount), 0);
   const autoMilestoneTotal = (currProject.milestonePayments || []).reduce((sum, m) => sum + parseAmt(m.amount), 0);

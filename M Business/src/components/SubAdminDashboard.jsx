@@ -9434,154 +9434,212 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 {/* MOBILE DASHBOARD (visible only under 768px) */}
                 <div className="mobile-dashboard-view" style={{ display: "none" }}>
                   <style>{`
-                    @media (max-width: 768px) {
-                      .mobile-dashboard-view { display: block !important; }
-                      .desktop-dashboard-view { display: none !important; }
-                    }
-                  `}</style>
+    @media (max-width: 768px) {
+      .mobile-dashboard-view { display: block !important; }
+      .desktop-dashboard-view { display: none !important; }
+    }
+    @keyframes floatIn { from { opacity:0; transform:translateY(14px);} to {opacity:1; transform:translateY(0);} }
+    @keyframes shimmerMove { 0%{background-position:-200% 0;} 100%{background-position:200% 0;} }
+    .mob-card { animation: floatIn .4s ease both; }
+    .mob-shimmer {
+      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.12) 37%, rgba(255,255,255,0.03) 63%);
+      background-size: 400% 100%;
+      animation: shimmerMove 2.5s ease infinite;
+    }
+  `}</style>
 
-                  <div style={{ background: "#0f172a", borderRadius: "0 0 28px 28px", padding: "20px 20px 28px", color: "#fff" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-                      <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => setSidebarOpen(true)}>
-                        <i className="ti ti-menu-2"></i>
-                      </div>
-                      <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                        <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-                          <i className="ti ti-bell"></i>
-                          <span style={{ position: "absolute", top: 6, right: 6, width: 7, height: 7, borderRadius: "50%", background: "#ef4444" }}></span>
+                  {/* HERO HEADER — glass + gradient mesh */}
+                  <div style={{
+                    position: "relative",
+                    background: "radial-gradient(120% 120% at 15% 0%, #1e1b4b 0%, #0f0a29 45%, #05030f 100%)",
+                    borderRadius: "0 0 32px 32px",
+                    padding: "18px 18px 100px",
+                    color: "#fff",
+                    overflow: "hidden"
+                  }}>
+                    {/* decorative mesh blobs */}
+                    <div style={{ position: "absolute", top: -60, right: -40, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, var(--app-accent) 0%, transparent 70%)", opacity: 0.35, filter: "blur(10px)" }} />
+                    <div style={{ position: "absolute", bottom: -80, left: -30, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, #7c3aed 0%, transparent 70%)", opacity: 0.25, filter: "blur(14px)" }} />
+
+                    <div style={{ position: "relative", zIndex: 2 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                        <div onClick={() => setSidebarOpen(true)} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.08)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <i className="ti ti-menu-2" style={{ fontSize: 18 }}></i>
                         </div>
-                        <div style={{ width: 40, height: 40, borderRadius: 12, background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 13 }}>
-                          {(user?.name || "PR").substring(0, 2).toUpperCase()}
+                        <div style={{ textAlign: "center" }}>
+                          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", fontWeight: 700, letterSpacing: 1 }}>WELCOME BACK</div>
+                          <div style={{ fontSize: 14, fontWeight: 800 }}>{(user?.companyName || user?.name || "Business")}</div>
+                        </div>
+                        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                          <div onClick={() => { setShowNotifPanel(v => !v); fetchPendingLeaves(); }} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.08)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                            <i className="ti ti-bell" style={{ fontSize: 17 }}></i>
+                            {pendingLeaves.length > 0 && (
+                              <span style={{ position: "absolute", top: 5, right: 6, width: 8, height: 8, borderRadius: "50%", background: "#ff4d6d", boxShadow: "0 0 0 2px #0f0a29" }}></span>
+                            )}
+                          </div>
+                          <div onClick={() => setShowProfile(true)} style={{ width: 42, height: 42, borderRadius: 14, background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 13, boxShadow: "0 6px 18px rgba(0,188,212,0.4)" }}>
+                            {(user?.name || "PR").substring(0, 2).toUpperCase()}
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                      <i className="ti ti-currency-rupee"></i> Revenue this month
-                    </div>
-                    <div style={{ display: "flex", alignItems: "baseline", gap: 8, justifyContent: "space-between" }}>
-                      <div>
-                        <span style={{ fontSize: 40, fontWeight: 900 }}>Rs.{(totalRevenue || 0).toLocaleString()}</span>
-                        <span style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginLeft: 6 }}>INR</span>
+                      <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                        <i className="ti ti-sparkles" style={{ color: "var(--app-accent)" }}></i> Revenue this month
                       </div>
-                      <span style={{ background: "rgba(34,197,94,0.15)", color: "#4ade80", fontSize: 12, fontWeight: 700, padding: "4px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 4 }}>
-                        <i className="ti ti-trending-up"></i> 12%
-                      </span>
-                    </div>
+                      <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 6 }}>
+                        <span style={{ fontSize: 42, fontWeight: 900, letterSpacing: -1, background: "linear-gradient(90deg,#fff,#c7d2fe)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                          Rs.{(totalRevenue || 0).toLocaleString()}
+                        </span>
+                        <span style={{ background: "rgba(74,222,128,0.15)", color: "#4ade80", fontSize: 12, fontWeight: 800, padding: "5px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 4 }}>
+                          <i className="ti ti-trending-up"></i> 12%
+                        </span>
+                      </div>
 
-                    <div style={{ height: 70, margin: "18px 0" }}>
-                      <svg viewBox="0 0 300 70" width="100%" height="100%" preserveAspectRatio="none">
-                        <polyline fill="none" stroke="var(--app-accent)" strokeWidth="2.5" points="0,50 50,45 100,55 150,20 200,30 250,15 300,25" />
-                      </svg>
-                    </div>
-
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
-                      <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 14, padding: "14px 12px" }}>
-                        <div style={{ fontSize: 20, fontWeight: 800 }}>{clients.length}</div>
-                        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>Clients</div>
-                      </div>
-                      <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 14, padding: "14px 12px" }}>
-                        <div style={{ fontSize: 20, fontWeight: 800 }}>{projects.length}</div>
-                        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>Projects</div>
-                      </div>
-                      <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 14, padding: "14px 12px" }}>
-                        <div style={{ fontSize: 20, fontWeight: 800 }}>{employees.length}</div>
-                        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>Employees</div>
+                      <div style={{ height: 60, marginTop: 10 }}>
+                        <svg viewBox="0 0 300 60" width="100%" height="100%" preserveAspectRatio="none">
+                          <defs>
+                            <linearGradient id="mobAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="var(--app-accent)" stopOpacity="0.4" />
+                              <stop offset="100%" stopColor="var(--app-accent)" stopOpacity="0" />
+                            </linearGradient>
+                          </defs>
+                          <path d="M0,45 L50,40 L100,48 L150,18 L200,26 L250,12 L300,20 L300,60 L0,60 Z" fill="url(#mobAreaGrad)" />
+                          <polyline fill="none" stroke="var(--app-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points="0,45 50,40 100,48 150,18 200,26 250,12 300,20" />
+                        </svg>
                       </div>
                     </div>
                   </div>
 
-                  <div style={{ background: "#fff", borderRadius: 20, margin: "-20px 16px 0", padding: "18px 12px", boxShadow: "0 8px 24px rgba(0,0,0,0.08)", position: "relative", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8, textAlign: "center" }}>
+                  {/* FLOATING STAT STRIP */}
+                  <div style={{ margin: "-72px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
                     {[
-                      { icon: "ti-file-invoice", label: "Invoice", color: "#0d9488", bg: "#ccfbf1", action: () => { setSidebarOverride("dashboard"); setActive("invoices"); } },
-                      { icon: "ti-user-plus", label: "Client", color: "#7c3aed", bg: "#ede9fe", action: () => { setSidebarOverride("dashboard"); setActive("addClient"); } },
-                      { icon: "ti-folder-plus", label: "Project", color: "#d97706", bg: "#fef3c7", action: () => { setJumpProject(null); setActive("create-project"); } },
-                      { icon: "ti-clipboard-list", label: "Proposal", color: "#16a34a", bg: "#dcfce7", action: () => { setSidebarOverride("dashboard"); setActive("proposals"); } },
-                    ].map((a, i) => (
-                      <div key={i} onClick={a.action} style={{ cursor: "pointer" }}>
-                        <div style={{ width: 44, height: 44, borderRadius: 14, background: a.bg, color: a.color, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 6px", fontSize: 18 }}>
-                          <i className={`ti ${a.icon}`}></i>
+                      { icon: "ti-users", label: "Clients", val: clients.length, grad: "linear-gradient(135deg,#7c3aed,#a78bfa)" },
+                      { icon: "ti-folder", label: "Projects", val: projects.length, grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+                      { icon: "ti-user-circle", label: "Team", val: employees.length, grad: "linear-gradient(135deg,#f59e0b,#fbbf24)" },
+                    ].map((s, i) => (
+                      <div key={i} className="mob-card" style={{ animationDelay: `${i * 60}ms`, background: "#fff", borderRadius: 18, padding: "14px 10px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)" }}>
+                        <div style={{ width: 34, height: 34, borderRadius: 11, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", color: "#fff", fontSize: 15, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
+                          <i className={`ti ${s.icon}`}></i>
                         </div>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: "#334155" }}>{a.label}</div>
+                        <div style={{ fontSize: 19, fontWeight: 900, color: "#0f0a29" }}>{s.val}</div>
+                        <div style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 700, marginTop: 1 }}>{s.label}</div>
                       </div>
                     ))}
                   </div>
 
-                  <div style={{ padding: "20px 16px 90px" }}>
+                  {/* QUICK ACTIONS — pill scroller */}
+                  <div style={{ padding: "22px 16px 6px" }}>
+                    <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
+                      {[
+                        { icon: "ti-file-invoice", label: "Invoice", color: "#0d9488", bg: "linear-gradient(135deg,#ccfbf1,#99f6e4)", action: () => { setSidebarOverride("dashboard"); setActive("invoices"); } },
+                        { icon: "ti-user-plus", label: "Client", color: "#7c3aed", bg: "linear-gradient(135deg,#ede9fe,#ddd6fe)", action: () => { setSidebarOverride("dashboard"); setActive("addClient"); } },
+                        { icon: "ti-folder-plus", label: "Project", color: "#d97706", bg: "linear-gradient(135deg,#fef3c7,#fde68a)", action: () => { setJumpProject(null); setActive("create-project"); } },
+                        { icon: "ti-clipboard-list", label: "Proposal", color: "#16a34a", bg: "linear-gradient(135deg,#dcfce7,#bbf7d0)", action: () => { setSidebarOverride("dashboard"); setActive("proposals"); } },
+                        { icon: "ti-receipt", label: "Quote", color: "#2563eb", bg: "linear-gradient(135deg,#dbeafe,#bfdbfe)", action: () => { setSidebarOverride("dashboard"); setActive("quotations"); } },
+                      ].map((a, i) => (
+                        <div key={i} onClick={a.action} style={{ flex: "0 0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 6, cursor: "pointer", minWidth: 68 }}>
+                          <div style={{ width: 52, height: 52, borderRadius: 16, background: a.bg, color: a.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 6px 16px rgba(0,0,0,0.06)" }}>
+                            <i className={`ti ${a.icon}`}></i>
+                          </div>
+                          <div style={{ fontSize: 10.5, fontWeight: 700, color: "#334155" }}>{a.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* PROJECTS — redesigned cards */}
+                  <div style={{ padding: "16px 16px 100px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", display: "flex", alignItems: "center", gap: 8 }}>
-                        <i className="ti ti-folder" style={{ color: "var(--app-accent)" }}></i> Projects
+                      <div style={{ fontSize: 16, fontWeight: 900, color: "#0f0a29", display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ width: 6, height: 18, borderRadius: 4, background: "var(--app-accent)", display: "inline-block" }}></span>
+                        Active Projects
                       </div>
-                      <div onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>View All</div>
+                      <div onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ fontSize: 12.5, fontWeight: 800, color: "var(--app-accent)", display: "flex", alignItems: "center", gap: 3 }}>
+                        View All <i className="ti ti-chevron-right" style={{ fontSize: 13 }}></i>
+                      </div>
                     </div>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                       {projectsWithProgress.slice(0, 6).map((p, idx) => {
                         const progress = p.progress || 0;
-                        const ringColor = progress >= 80 ? "#16a34a" : progress >= 40 ? "var(--app-accent)" : progress > 0 ? "#dc2626" : "#dc2626";
+                        const ringColor = progress >= 80 ? "#16a34a" : progress >= 40 ? "var(--app-accent)" : "#dc2626";
                         const clientName = clients.find(c => c._id === p.clientId)?.clientName || p.client || "Internal";
-                        const [expandedIdx, setExpandedIdxLocal] = [null, null]; // placeholder, replaced below
+                        const isExpanded = expandedMobileProjectIdx === idx;
                         return (
-                          <div key={p._id || idx} onClick={() => setExpandedMobileProjectIdx(prev => prev === idx ? null : idx)} style={{ background: "#fff", borderRadius: 18, padding: "16px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.04)", cursor: "pointer" }}>
+                          <div
+                            key={p._id || idx}
+                            className="mob-card"
+                            style={{ animationDelay: `${idx * 40}ms`, background: "#fff", borderRadius: 20, padding: "16px 16px", boxShadow: isExpanded ? "0 14px 34px rgba(15,10,41,0.12)" : "0 4px 16px rgba(15,10,41,0.06)", border: `1px solid ${isExpanded ? "rgba(0,188,212,0.25)" : "rgba(0,0,0,0.04)"}`, cursor: "pointer", transition: "all .25s" }}
+                            onClick={() => setExpandedMobileProjectIdx(prev => prev === idx ? null : idx)}
+                          >
                             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                              <div style={{ position: "relative", width: 46, height: 46, flexShrink: 0 }}>
-                                <svg width="46" height="46" viewBox="0 0 46 46">
-                                  <circle cx="23" cy="23" r="19" fill="none" stroke="#f1f5f9" strokeWidth="5" />
-                                  <circle cx="23" cy="23" r="19" fill="none" stroke={ringColor} strokeWidth="5" strokeDasharray={`${(progress / 100) * 119.4} 119.4`} strokeLinecap="round" transform="rotate(-90 23 23)" />
+                              <div style={{ position: "relative", width: 50, height: 50, flexShrink: 0 }}>
+                                <svg width="50" height="50" viewBox="0 0 50 50">
+                                  <circle cx="25" cy="25" r="21" fill="none" stroke="#f1f5f9" strokeWidth="5" />
+                                  <circle cx="25" cy="25" r="21" fill="none" stroke={ringColor} strokeWidth="5" strokeDasharray={`${(progress / 100) * 132} 132`} strokeLinecap="round" transform="rotate(-90 25 25)" style={{ transition: "stroke-dasharray .5s ease" }} />
                                 </svg>
-                                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: ringColor }}>
-                                  {progress === 0 ? (
-                                    <span style={{ position: "relative" }}>
-                                      0%
-                                      <span style={{ position: "absolute", top: -14, right: -6, width: 6, height: 6, borderRadius: "50%", background: "#dc2626" }}></span>
-                                    </span>
-                                  ) : `${progress}%`}
+                                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: ringColor }}>
+                                  {progress}%
                                 </div>
                               </div>
                               <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontSize: 15, fontWeight: 800, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name} — {clientName}</div>
-                                <div style={{ height: 5, background: "#f1f5f9", borderRadius: 3, marginTop: 10 }}>
-                                  <div style={{ width: `${progress}%`, height: "100%", background: ringColor, borderRadius: 3 }}></div>
+                                <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f0a29", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
+                                <div style={{ fontSize: 11.5, color: "#94a3b8", marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
+                                  <i className="ti ti-building" style={{ fontSize: 12 }}></i>{clientName}
+                                </div>
+                                <div style={{ height: 6, background: "#f1f5f9", borderRadius: 3, marginTop: 9, overflow: "hidden" }}>
+                                  <div style={{ width: `${progress}%`, height: "100%", background: `linear-gradient(90deg, ${ringColor}, ${ringColor}cc)`, borderRadius: 3, transition: "width .5s ease" }}></div>
                                 </div>
                               </div>
-                              <i className={`ti ti-chevron-${expandedMobileProjectIdx === idx ? "up" : "down"}`} style={{ color: "#94a3b8", fontSize: 18, flexShrink: 0 }}></i>
+                              <i className={`ti ti-chevron-${isExpanded ? "up" : "down"}`} style={{ color: "#cbd5e1", fontSize: 18, flexShrink: 0 }}></i>
                             </div>
-                            {expandedMobileProjectIdx === idx && (
-                              <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid #f1f5f9", display: "flex", flexDirection: "column", gap: 10 }}>
+
+                            {isExpanded && (
+                              <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px dashed #e2e8f0", display: "flex", flexDirection: "column", gap: 10 }}>
                                 {p.end && (
-                                  <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#ccfbf1", color: "#0d9488", padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, width: "fit-content" }}>
+                                  <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "linear-gradient(135deg,#ccfbf1,#a7f3d0)", color: "#0d9488", padding: "6px 12px", borderRadius: 20, fontSize: 11.5, fontWeight: 800, width: "fit-content" }}>
                                     <i className="ti ti-clock"></i> Due in {Math.max(0, Math.ceil((new Date(p.end) - new Date()) / 86400000))} days
                                   </div>
                                 )}
-                                <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "#64748b" }}>
-                                  <i className="ti ti-user" style={{ fontSize: 15 }}></i>
-                                  Assigned to {Array.isArray(p.assignedTo) ? (p.assignedTo[0] || "Unassigned") : (p.assignedTo || "Unassigned")}
+                                <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "#64748b" }}>
+                                  <i className="ti ti-user" style={{ fontSize: 14 }}></i>
+                                  {Array.isArray(p.assignedTo) ? (p.assignedTo[0] || "Unassigned") : (p.assignedTo || "Unassigned")}
                                 </div>
-                                <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "#64748b" }}>
-                                  <i className="ti ti-currency-rupee" style={{ fontSize: 15 }}></i>
+                                <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "#64748b" }}>
+                                  <i className="ti ti-currency-rupee" style={{ fontSize: 14 }}></i>
                                   {formatCurrency(p.budget, p.currency)} budget
                                 </div>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setJumpProject(p); setActive("project-details"); }}
+                                  style={{ marginTop: 4, background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 10, padding: "10px", fontSize: 12.5, fontWeight: 800, cursor: "pointer" }}
+                                >
+                                  Open Project
+                                </button>
                               </div>
                             )}
                           </div>
                         );
                       })}
+                      {projectsWithProgress.length === 0 && (
+                        <div style={{ textAlign: "center", padding: "30px 0", color: "#94a3b8", fontSize: 13 }}>No projects yet</div>
+                      )}
                     </div>
                   </div>
 
-                  <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "space-around", alignItems: "center", padding: "10px 0 22px", zIndex: 4000 }}>
+                  {/* FLOATING BOTTOM NAV — glass pill */}
+                  <div style={{ position: "fixed", bottom: 14, left: 14, right: 14, background: "rgba(15,10,41,0.92)", backdropFilter: "blur(16px)", borderRadius: 24, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "10px 6px", zIndex: 4000, boxShadow: "0 12px 32px rgba(15,10,41,0.35)" }}>
                     {[
                       { icon: "ti-home", label: "Home", key: "dashboard" },
                       { icon: "ti-folder", label: "Projects", key: "projects" },
                       { icon: null, label: "", key: "add" },
                       { icon: "ti-users", label: "Clients", key: "clients" },
-                      { icon: "ti-dots", label: "More", key: "more" },
+                      { icon: "ti-dots", label: "More", key: "settings" },
                     ].map((n, i) => n.key === "add" ? (
-                      <div key={i} onClick={() => { setJumpProject(null); setActive("create-project"); }} style={{ width: 50, height: 50, borderRadius: "50%", background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 22, marginTop: -30, boxShadow: "0 8px 20px rgba(0,0,0,0.2)" }}>+</div>
+                      <div key={i} onClick={() => { setJumpProject(null); setActive("create-project"); }} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#26d0ce)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", border: "3px solid #0f0a29" }}>+</div>
                     ) : (
-                      <div key={i} onClick={() => setActive(n.key)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: active === n.key ? "var(--app-accent)" : "#94a3b8" }}>
-                        <i className={`ti ${n.icon}`} style={{ fontSize: 20 }}></i>
-                        <span style={{ fontSize: 10, fontWeight: 700 }}>{n.label}</span>
+                      <div key={i} onClick={() => setActive(n.key)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: active === n.key ? "var(--app-accent)" : "rgba(255,255,255,0.5)", padding: "4px 10px" }}>
+                        <i className={`ti ${n.icon}`} style={{ fontSize: 19 }}></i>
+                        <span style={{ fontSize: 9.5, fontWeight: 700 }}>{n.label}</span>
                       </div>
                     ))}
                   </div>

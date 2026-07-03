@@ -6540,8 +6540,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const companyNameStr = user?.companyName || "M Business";
 
   const [dashSearch, setDashSearch] = useState("");
-
   const [dashTasksProj, setDashTasksProj] = useState(null);
+  const [expandedMobileProjectIdx, setExpandedMobileProjectIdx] = useState(1);
 
   const [pendingNewClientId, setPendingNewClientId] = useState(null);
 
@@ -9515,27 +9515,54 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       <div onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>View All</div>
                     </div>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                       {projectsWithProgress.slice(0, 6).map((p, idx) => {
                         const progress = p.progress || 0;
-                        const ringColor = progress >= 80 ? "#16a34a" : progress >= 40 ? "var(--app-accent)" : "#dc2626";
+                        const ringColor = progress >= 80 ? "#16a34a" : progress >= 40 ? "var(--app-accent)" : progress > 0 ? "#dc2626" : "#dc2626";
                         const clientName = clients.find(c => c._id === p.clientId)?.clientName || p.client || "Internal";
+                        const [expandedIdx, setExpandedIdxLocal] = [null, null]; // placeholder, replaced below
                         return (
-                          <div key={p._id || idx} style={{ background: "#fff", borderRadius: 16, padding: 16, boxShadow: "0 2px 10px rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.05)" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                              <svg width="46" height="46" viewBox="0 0 46 46">
-                                <circle cx="23" cy="23" r="19" fill="none" stroke="#f1f5f9" strokeWidth="5" />
-                                <circle cx="23" cy="23" r="19" fill="none" stroke={ringColor} strokeWidth="5" strokeDasharray={`${(progress / 100) * 119.4} 119.4`} strokeLinecap="round" transform="rotate(-90 23 23)" />
-                                <text x="23" y="27" textAnchor="middle" fontSize="11" fontWeight="800" fill={ringColor}>{progress}%</text>
-                              </svg>
+                          <div key={p._id || idx} onClick={() => setExpandedMobileProjectIdx(prev => prev === idx ? null : idx)} style={{ background: "#fff", borderRadius: 18, padding: "16px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.04)", cursor: "pointer" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                              <div style={{ position: "relative", width: 46, height: 46, flexShrink: 0 }}>
+                                <svg width="46" height="46" viewBox="0 0 46 46">
+                                  <circle cx="23" cy="23" r="19" fill="none" stroke="#f1f5f9" strokeWidth="5" />
+                                  <circle cx="23" cy="23" r="19" fill="none" stroke={ringColor} strokeWidth="5" strokeDasharray={`${(progress / 100) * 119.4} 119.4`} strokeLinecap="round" transform="rotate(-90 23 23)" />
+                                </svg>
+                                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: ringColor }}>
+                                  {progress === 0 ? (
+                                    <span style={{ position: "relative" }}>
+                                      0%
+                                      <span style={{ position: "absolute", top: -14, right: -6, width: 6, height: 6, borderRadius: "50%", background: "#dc2626" }}></span>
+                                    </span>
+                                  ) : `${progress}%`}
+                                </div>
+                              </div>
                               <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontSize: 14, fontWeight: 800, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name} — {clientName}</div>
-                                <div style={{ height: 5, background: "#f1f5f9", borderRadius: 3, marginTop: 8 }}>
+                                <div style={{ fontSize: 15, fontWeight: 800, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name} — {clientName}</div>
+                                <div style={{ height: 5, background: "#f1f5f9", borderRadius: 3, marginTop: 10 }}>
                                   <div style={{ width: `${progress}%`, height: "100%", background: ringColor, borderRadius: 3 }}></div>
                                 </div>
                               </div>
-                              <i className="ti ti-chevron-down" style={{ color: "#94a3b8" }}></i>
+                              <i className={`ti ti-chevron-${expandedMobileProjectIdx === idx ? "up" : "down"}`} style={{ color: "#94a3b8", fontSize: 18, flexShrink: 0 }}></i>
                             </div>
+                            {expandedMobileProjectIdx === idx && (
+                              <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid #f1f5f9", display: "flex", flexDirection: "column", gap: 10 }}>
+                                {p.end && (
+                                  <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#ccfbf1", color: "#0d9488", padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, width: "fit-content" }}>
+                                    <i className="ti ti-clock"></i> Due in {Math.max(0, Math.ceil((new Date(p.end) - new Date()) / 86400000))} days
+                                  </div>
+                                )}
+                                <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "#64748b" }}>
+                                  <i className="ti ti-user" style={{ fontSize: 15 }}></i>
+                                  Assigned to {Array.isArray(p.assignedTo) ? (p.assignedTo[0] || "Unassigned") : (p.assignedTo || "Unassigned")}
+                                </div>
+                                <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "#64748b" }}>
+                                  <i className="ti ti-currency-rupee" style={{ fontSize: 15 }}></i>
+                                  {formatCurrency(p.budget, p.currency)} budget
+                                </div>
+                              </div>
+                            )}
                           </div>
                         );
                       })}

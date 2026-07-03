@@ -213,6 +213,8 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
     if (!name.trim()) return alert("Project Name is required.");
     if (!client) return alert("Client is required.");
 
+    const isEdit = !!editProject;
+
     setLoading(true);
     try {
       const payload = {
@@ -247,10 +249,9 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
 
       let res;
       if (editProject) {
-        const projectId = editProject._id || editProject.id;
-        if (!projectId || projectId === 'undefined') {
-          alert('Error: Project ID is missing. Please go back and try again.');
-          setLoading(false);
+        const projectId = editProject?._id || editProject?.id;
+        if (isEdit && !projectId) {
+          alert("Error: Project ID is missing. Please go back and try again.");
           return;
         }
         res = await axios.put(`${BASE_URL}/api/projects/${projectId}`, payload, { headers });

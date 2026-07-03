@@ -10770,7 +10770,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 if (isEdit && proj) {
 
-                  setJumpProject(proj);
+                  setJumpProject({ ...proj, _fromClientPage: true });
 
                   setSidebarOpen(false);
 
@@ -12091,7 +12091,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 <Fld label="Project Name *" value={np.name} onChange={v => { setNp({ ...np, name: v }); setNpError(p => ({ ...p, name: "" })); }} error={npError.name} />
                 <div style={{ marginBottom: 14 }}>
                   <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CLIENT *</label>
-                  {prefillClient ? (
+                  {(prefillClient || (editProject && editProject._fromClientPage)) ? (
                     <div style={{ border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "var(--app-text, #333)", background: "var(--app-bg)", fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
                       <span style={{ fontSize: 16 }}>👤</span>
                       <span>{np.client}</span>

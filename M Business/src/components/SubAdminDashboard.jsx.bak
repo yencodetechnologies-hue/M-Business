@@ -2675,6 +2675,7 @@ useEffect(() => {
   const [tasks, setTasks] = useState([]);
   const [income, setIncome] = useState([]);
   const [expenses, setExpenses] = useState([]);
+  const totalRevenue = income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
   const [config, setConfig] = useState(null);
   const [viewProject, setViewProject] = useState(null);
 
@@ -2712,6 +2713,7 @@ useEffect(() => {
   const [invoices, setInvoices] = useState([]);
   const [income, setIncome] = useState([]);
   const [expenses, setExpenses] = useState([]);
+  const totalRevenue = income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
 
   const hasFetched = useRef(false);
   useEffect(() => { 

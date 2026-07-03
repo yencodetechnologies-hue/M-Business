@@ -1773,6 +1773,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [tasks, setTasks] = useState([]);
   const [income, setIncome] = useState([]);
   const [expenses, setExpenses] = useState([]);
+  const totalRevenue = income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
   const [config, setConfig] = useState(null);
   const [viewProject, setViewProject] = useState(null);
   const [subscription, setSubscription] = useState(null);

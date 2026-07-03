@@ -12,6 +12,7 @@ export default function FinBank() {
   const [selectedBankId, setSelectedBankId] = useState(null);
   const [income, setIncome] = useState([]);
   const [expenses, setExpenses] = useState([]);
+  const totalRevenue = income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
   const [loadingTxns, setLoadingTxns] = useState(true);
 
   const fetchBanks = async () => {

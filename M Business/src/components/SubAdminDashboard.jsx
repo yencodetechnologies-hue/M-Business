@@ -7069,8 +7069,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       return tid === (p._id || p.id);
     });
 
-    // Milestone-based progress — same rule as the Project Details page:
-    // a milestone counts as done if manually marked done, OR if all its tasks are completed.
     const milestonesArr = p.milestones || [];
     if (milestonesArr.length > 0) {
       const doneMilestones = milestonesArr.filter(m => {
@@ -7081,14 +7079,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       return { ...p, progress: Math.round((doneMilestones / milestonesArr.length) * 100) };
     }
 
-    // No milestones defined — fall back to task completion ratio
     if (projTasks.length > 0) {
       const completed = projTasks.filter(t => (t.status || '').toLowerCase() === 'completed' || (t.status || '').toLowerCase() === 'done').length;
       return { ...p, progress: Math.round((completed / projTasks.length) * 100) };
     }
-    // Fallback to manually stored progress
     return { ...p, progress: p.progress || 0 };
   });
+
   const fetchPackages = async () => {
 
     try {
@@ -7178,7 +7175,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const [expenses, setExpenses] = useState([]);
 
-
+  const totalRevenue = income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
 
   const [pendingLeaves, setPendingLeaves] = useState([]);
   const [showNotifPanel, setShowNotifPanel] = useState(false);
@@ -9432,1082 +9429,1208 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {/* ── Dashboard ── */}
-
-            {validActive === "dashboard" && (
-
+            {/* ── Dashboard ── */}{validActive === "dashboard" && (
               <>
+                {/* MOBILE DASHBOARD (visible only under 768px) */}
+                <div className="mobile-dashboard-view" style={{ display: "none" }}>
+                  <style>{`
+                    @media (max-width: 768px) {
+                      .mobile-dashboard-view { display: block !important; }
+                      .desktop-dashboard-view { display: none !important; }
+                    }
+                  `}</style>
 
-                {/* Theme Picker - Dashboard Page */}
-
-                <div style={{ position: "fixed", bottom: 28, right: 28, zIndex: 5000 }}>
-
-                  {showThemePicker && (
-
-                    <div style={{
-
-                      position: "absolute", bottom: 56, right: 0,
-
-                      background: "#fff", borderRadius: 18, padding: 20,
-
-                      boxShadow: "0 20px 60px rgba(0,0,0,0.18)", border: "1.5px solid var(--app-border)",
-
-                      width: 300, maxHeight: "70vh", overflowY: "auto"
-
-                    }}>
-
-                      <div style={{ fontSize: 13, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 14 }}>
-
-                        Choose Theme
-
+                  <div style={{ background: "#0f172a", borderRadius: "0 0 28px 28px", padding: "20px 20px 28px", color: "#fff" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+                      <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => setSidebarOpen(true)}>
+                        <i className="ti ti-menu-2"></i>
                       </div>
-
-                      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
-
-                        {Object.entries(THEMES).map(([key, t]) => (
-
-                          <button key={key} onClick={() => { setAppTheme(key); setShowThemePicker(false); }}
-
-                            style={{
-
-                              border: appTheme === key ? `2.5px solid ${t.dot}` : "2px solid var(--app-border)",
-
-                              borderRadius: 12, padding: "10px 6px", background: appTheme === key ? `${t.dot}15` : "#fafafa",
-
-                              cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
-
-                              fontFamily: "inherit", transition: "all 0.15s"
-
-                            }}>
-
-                            <div style={{ width: 28, height: 28, borderRadius: "50%", background: t.dot, boxShadow: `0 3px 8px ${t.dot}50` }} />
-
-                            <span style={{ fontSize: 10, fontWeight: 700, color: appTheme === key ? t.dot : "#64748b" }}>
-
-                              {t.label}
-
-                            </span>
-
-                          </button>
-
-                        ))}
-
+                      <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                        <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                          <i className="ti ti-bell"></i>
+                          <span style={{ position: "absolute", top: 6, right: 6, width: 7, height: 7, borderRadius: "50%", background: "#ef4444" }}></span>
+                        </div>
+                        <div style={{ width: 40, height: 40, borderRadius: 12, background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 13 }}>
+                          {(user?.name || "PR").substring(0, 2).toUpperCase()}
+                        </div>
                       </div>
+                    </div>
 
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                      <i className="ti ti-currency-rupee"></i> Revenue this month
+                    </div>
+                    <div style={{ display: "flex", alignItems: "baseline", gap: 8, justifyContent: "space-between" }}>
+                      <div>
+                        <span style={{ fontSize: 40, fontWeight: 900 }}>Rs.{(totalRevenue || 0).toLocaleString()}</span>
+                        <span style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginLeft: 6 }}>INR</span>
+                      </div>
+                      <span style={{ background: "rgba(34,197,94,0.15)", color: "#4ade80", fontSize: 12, fontWeight: 700, padding: "4px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 4 }}>
+                        <i className="ti ti-trending-up"></i> 12%
+                      </span>
+                    </div>
 
+                    <div style={{ height: 70, margin: "18px 0" }}>
+                      <svg viewBox="0 0 300 70" width="100%" height="100%" preserveAspectRatio="none">
+                        <polyline fill="none" stroke="var(--app-accent)" strokeWidth="2.5" points="0,50 50,45 100,55 150,20 200,30 250,15 300,25" />
+                      </svg>
+                    </div>
 
-                      {/* Custom Color Picker Section */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
+                      <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 14, padding: "14px 12px" }}>
+                        <div style={{ fontSize: 20, fontWeight: 800 }}>{clients.length}</div>
+                        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>Clients</div>
+                      </div>
+                      <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 14, padding: "14px 12px" }}>
+                        <div style={{ fontSize: 20, fontWeight: 800 }}>{projects.length}</div>
+                        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>Projects</div>
+                      </div>
+                      <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 14, padding: "14px 12px" }}>
+                        <div style={{ fontSize: 20, fontWeight: 800 }}>{employees.length}</div>
+                        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>Employees</div>
+                      </div>
+                    </div>
+                  </div>
 
-                      <div style={{ marginTop: 16, borderTop: "1.5px solid var(--app-border)", paddingTop: 14 }}>
+                  <div style={{ background: "#fff", borderRadius: 20, margin: "-20px 16px 0", padding: "18px 12px", boxShadow: "0 8px 24px rgba(0,0,0,0.08)", position: "relative", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8, textAlign: "center" }}>
+                    {[
+                      { icon: "ti-file-invoice", label: "Invoice", color: "#0d9488", bg: "#ccfbf1", action: () => { setSidebarOverride("dashboard"); setActive("invoices"); } },
+                      { icon: "ti-user-plus", label: "Client", color: "#7c3aed", bg: "#ede9fe", action: () => { setSidebarOverride("dashboard"); setActive("addClient"); } },
+                      { icon: "ti-folder-plus", label: "Project", color: "#d97706", bg: "#fef3c7", action: () => { setJumpProject(null); setActive("create-project"); } },
+                      { icon: "ti-clipboard-list", label: "Proposal", color: "#16a34a", bg: "#dcfce7", action: () => { setSidebarOverride("dashboard"); setActive("proposals"); } },
+                    ].map((a, i) => (
+                      <div key={i} onClick={a.action} style={{ cursor: "pointer" }}>
+                        <div style={{ width: 44, height: 44, borderRadius: 14, background: a.bg, color: a.color, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 6px", fontSize: 18 }}>
+                          <i className={`ti ${a.icon}`}></i>
+                        </div>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: "#334155" }}>{a.label}</div>
+                      </div>
+                    ))}
+                  </div>
 
-                        <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                  <div style={{ padding: "20px 16px 90px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", display: "flex", alignItems: "center", gap: 8 }}>
+                        <i className="ti ti-folder" style={{ color: "var(--app-accent)" }}></i> Projects
+                      </div>
+                      <div onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>View All</div>
+                    </div>
 
-                          🎯 Custom Color
+                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                      {projectsWithProgress.slice(0, 6).map((p, idx) => {
+                        const progress = p.progress || 0;
+                        const ringColor = progress >= 80 ? "#16a34a" : progress >= 40 ? "var(--app-accent)" : "#dc2626";
+                        const clientName = clients.find(c => c._id === p.clientId)?.clientName || p.client || "Internal";
+                        return (
+                          <div key={p._id || idx} style={{ background: "#fff", borderRadius: 16, padding: 16, boxShadow: "0 2px 10px rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.05)" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                              <svg width="46" height="46" viewBox="0 0 46 46">
+                                <circle cx="23" cy="23" r="19" fill="none" stroke="#f1f5f9" strokeWidth="5" />
+                                <circle cx="23" cy="23" r="19" fill="none" stroke={ringColor} strokeWidth="5" strokeDasharray={`${(progress / 100) * 119.4} 119.4`} strokeLinecap="round" transform="rotate(-90 23 23)" />
+                                <text x="23" y="27" textAnchor="middle" fontSize="11" fontWeight="800" fill={ringColor}>{progress}%</text>
+                              </svg>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontSize: 14, fontWeight: 800, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name} — {clientName}</div>
+                                <div style={{ height: 5, background: "#f1f5f9", borderRadius: 3, marginTop: 8 }}>
+                                  <div style={{ width: `${progress}%`, height: "100%", background: ringColor, borderRadius: 3 }}></div>
+                                </div>
+                              </div>
+                              <i className="ti ti-chevron-down" style={{ color: "#94a3b8" }}></i>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "space-around", alignItems: "center", padding: "10px 0 22px", zIndex: 4000 }}>
+                    {[
+                      { icon: "ti-home", label: "Home", key: "dashboard" },
+                      { icon: "ti-folder", label: "Projects", key: "projects" },
+                      { icon: null, label: "", key: "add" },
+                      { icon: "ti-users", label: "Clients", key: "clients" },
+                      { icon: "ti-dots", label: "More", key: "more" },
+                    ].map((n, i) => n.key === "add" ? (
+                      <div key={i} onClick={() => { setJumpProject(null); setActive("create-project"); }} style={{ width: 50, height: 50, borderRadius: "50%", background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 22, marginTop: -30, boxShadow: "0 8px 20px rgba(0,0,0,0.2)" }}>+</div>
+                    ) : (
+                      <div key={i} onClick={() => setActive(n.key)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: active === n.key ? "var(--app-accent)" : "#94a3b8" }}>
+                        <i className={`ti ${n.icon}`} style={{ fontSize: 20 }}></i>
+                        <span style={{ fontSize: 10, fontWeight: 700 }}>{n.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="desktop-dashboard-view">
+
+                  {/* Theme Picker - Dashboard Page */}
+
+                  <div style={{ position: "fixed", bottom: 28, right: 28, zIndex: 5000 }}>
+
+                    {showThemePicker && (
+
+                      <div style={{
+
+                        position: "absolute", bottom: 56, right: 0,
+
+                        background: "#fff", borderRadius: 18, padding: 20,
+
+                        boxShadow: "0 20px 60px rgba(0,0,0,0.18)", border: "1.5px solid var(--app-border)",
+
+                        width: 300, maxHeight: "70vh", overflowY: "auto"
+
+                      }}>
+
+                        <div style={{ fontSize: 13, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 14 }}>
+
+                          Choose Theme
 
                         </div>
 
-                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
 
-                          <div style={{ position: "relative", flexShrink: 0 }}>
+                          {Object.entries(THEMES).map(([key, t]) => (
 
-                            <div style={{
-
-                              width: 42, height: 42, borderRadius: 12,
-
-                              background: customColor,
-
-                              border: appTheme === "custom" ? `2.5px solid ${customColor}` : "2px solid var(--app-border)",
-
-                              boxShadow: `0 4px 12px ${customColor}40`,
-
-                              cursor: "pointer", transition: "all 0.2s",
-
-                              display: "flex", alignItems: "center", justifyContent: "center"
-
-                            }}
-
-                              onClick={() => document.getElementById("customColorInput")?.click()}
-
-                            >
-
-                              <span style={{ fontSize: 16 }}></span>
-
-                            </div>
-
-                            <input
-
-                              id="customColorInput"
-
-                              type="color"
-
-                              value={customColor}
-
-                              onChange={(e) => {
-
-                                setCustomColor(e.target.value);
-
-                                setAppTheme("custom");
-
-                              }}
+                            <button key={key} onClick={() => { setAppTheme(key); setShowThemePicker(false); }}
 
                               style={{
 
-                                position: "absolute", top: 0, left: 0, width: 42, height: 42,
+                                border: appTheme === key ? `2.5px solid ${t.dot}` : "2px solid var(--app-border)",
 
-                                opacity: 0, cursor: "pointer", border: "none"
+                                borderRadius: 12, padding: "10px 6px", background: appTheme === key ? `${t.dot}15` : "#fafafa",
 
-                              }}
+                                cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
 
-                            />
+                                fontFamily: "inherit", transition: "all 0.15s"
 
-                          </div>
+                              }}>
 
-                          <div style={{ flex: 1 }}>
+                              <div style={{ width: 28, height: 28, borderRadius: "50%", background: t.dot, boxShadow: `0 3px 8px ${t.dot}50` }} />
 
-                            <div style={{ fontSize: 12, fontWeight: 700, color: appTheme === "custom" ? customColor : "#64748b" }}>
+                              <span style={{ fontSize: 10, fontWeight: 700, color: appTheme === key ? t.dot : "#64748b" }}>
 
-                              {appTheme === "custom" ? "Custom Active" : "Pick any color"}
+                                {t.label}
 
-                            </div>
+                              </span>
 
-                            <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
-
-                              {customColor.toUpperCase()}
-
-                            </div>
-
-                          </div>
-
-                          {appTheme === "custom" && (
-
-                            <div style={{
-
-                              width: 20, height: 20, borderRadius: "50%",
-                              background: "#22c55e", boxShadow: "0 0 6px #22c55e80",
-                              display: "flex", alignItems: "center", justifyContent: "center",
-                              color: "#fff", fontSize: 12, fontWeight: 900, flexShrink: 0
-
-                            }}>✓</div>
-
-                          )}
-
-                        </div>
-
-
-
-                        {/* Quick custom color presets */}
-
-                        <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
-
-                          {["#2563eb", "#0891b2", "#059669", "#d97706", "#dc2626", "#db2777", "#7c2d12", "#4f46e5", "#0f766e", "#b91c1c"].map(c => (
-
-                            <div key={c} onClick={() => { setCustomColor(c); setAppTheme("custom"); setShowThemePicker(false); }}
-
-                              style={{
-
-                                width: 22, height: 22, borderRadius: 6, background: c, cursor: "pointer",
-
-                                border: customColor === c && appTheme === "custom" ? "2px solid #fff" : "2px solid transparent",
-
-                                boxShadow: customColor === c && appTheme === "custom" ? `0 0 0 2px ${c}, 0 2px 8px ${c}50` : `0 1px 4px ${c}30`,
-
-                                transition: "all 0.15s"
-
-                              }}
-
-                            />
+                            </button>
 
                           ))}
 
                         </div>
 
-                      </div>
-
-                    </div>
-
-                  )}
-
-                  <button onClick={() => setShowThemePicker(v => !v)}
-                    style={{
-                      width: 48, height: 48, borderRadius: "50%",
-                      background: appTheme === "custom"
-                        ? `linear-gradient(135deg, ${customColor}, ${customColor}dd)`
-                        : `linear-gradient(135deg, ${THEMES[appTheme]?.accent}, ${THEMES[appTheme]?.dot})`,
-                      border: "none", color: "#fff", fontSize: 20, cursor: "pointer",
-                      boxShadow: `0 6px 20px ${appTheme === "custom" ? customColor : (THEMES[appTheme]?.dot || "var(--app-accent)")}60`,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      transition: "all 0.2s"
-                    }}>
-                    🎨
-                  </button>
-                  <button
-                    onClick={() => { const ph = (user?.phone || "").replace(/\D/g, ""); window.open(ph ? "https://wa.me/" + ph : "https://web.whatsapp.com/", "_blank"); }}
-                    title="Open WhatsApp"
-                    style={{
-                      width: 48, height: 48, borderRadius: "50%",
-                      background: "#25D366",
-                      border: "none", cursor: "pointer",
-                      boxShadow: "0 6px 20px rgba(37,211,102,0.6)",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      transition: "all 0.2s", padding: 0,
-                      marginTop: 12
-                    }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 32 32" fill="none">
-                      <path d="M16 1C7.7 1 1 7.7 1 16c0 2.7.7 5.2 2 7.4L1 31l7.9-2c2.1 1.1 4.5 1.8 7.1 1.8 8.3 0 15-6.7 15-15S24.3 1 16 1z" fill="#fff" />
-                      <path d="M16 3.5C9 3.5 3.5 9 3.5 16c0 2.5.7 4.8 1.9 6.8l.3.5-1.3 4.7 4.9-1.3.5.3C11.6 28.1 13.7 28.5 16 28.5c7 0 12.5-5.5 12.5-12.5S23 3.5 16 3.5z" fill="#25D366" />
-                      <path d="M11.5 9.5c-.3-.7-.6-.7-.9-.7h-.7c-.3 0-.7.1-1.1.5-.4.4-1.5 1.5-1.5 3.6s1.6 4.2 1.8 4.5c.2.3 3 4.7 7.4 6.4 3.7 1.4 4.4 1.1 5.2 1 .8 0 2.5-1 2.8-2 .4-1 .4-1.8.3-2-.1-.2-.4-.3-.8-.5-.4-.2-2.5-1.2-2.8-1.3-.4-.1-.6-.2-.9.2-.3.4-1 1.3-1.3 1.6-.2.3-.5.3-.8.1-.4-.2-1.6-.6-3-1.9-1.1-1-1.9-2.2-2.1-2.6-.2-.4 0-.6.2-.8.2-.2.4-.4.5-.7.2-.2.2-.4.4-.7.1-.2 0-.5-.1-.7-.2-.2-.9-2.2-1.2-3z" fill="#fff" />
-                    </svg>
-                  </button>
-                </div>
 
 
+                        {/* Custom Color Picker Section */}
 
+                        <div style={{ marginTop: 16, borderTop: "1.5px solid var(--app-border)", paddingTop: 14 }}>
 
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>
 
+                            🎯 Custom Color
 
+                          </div>
 
+                          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
 
+                            <div style={{ position: "relative", flexShrink: 0 }}>
 
+                              <div style={{
 
+                                width: 42, height: 42, borderRadius: 12,
 
+                                background: customColor,
 
-                {dashTasksProj ? (
+                                border: appTheme === "custom" ? `2.5px solid ${customColor}` : "2px solid var(--app-border)",
 
-                  <div style={{ display: "flex", flexDirection: "column", gap: "16px", height: "100%", marginTop: "10px" }}>
+                                boxShadow: `0 4px 12px ${customColor}40`,
 
-                    <div>
+                                cursor: "pointer", transition: "all 0.2s",
 
+                                display: "flex", alignItems: "center", justifyContent: "center"
 
+                              }}
 
-                    </div>
+                                onClick={() => document.getElementById("customColorInput")?.click()}
 
-                    <div style={{ flex: 1 }}>
+                              >
 
-                      <ModernEmployeeProjectDetails
-
-                        project={dashTasksProj}
-
-                        tasks={tasks.filter(t => (t.project || t.projectId) === (dashTasksProj._id || dashTasksProj.id))}
-
-                        user={user}
-
-                        onBack={() => setDashTasksProj(null)}
-
-                        onMessageTeam={() => setActive("messaging")}
-
-                      />
-
-                    </div>
-
-                  </div>
-
-                ) : (
-
-                  <>
-
-                    {/* EXACT TEMPLATE LAYOUT - DYNAMIC */}
-
-                    {(() => {
-
-                      const activeProjCount = projects.filter(p => p.status === "Active" || p.status === "Pending").length;
-
-                      const pendingInvCount = invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length;
-
-                      const totalIncome = income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
-
-                      const totalInvAmt = invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").reduce((sum, i) => sum + (Number(i.grandTotal) || 0), 0);
-
-
-
-                      return (
-
-                        <div style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: 24, fontFamily: "'Nunito', sans-serif" }}>
-
-
-
-                          {/* TOP CARDS ROW */}
-
-                          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 20 }}>
-
-
-
-                            {/* Revenue Card */}
-
-                            <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
-
-                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-
-                                <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "#0097A7", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
-
-                                  <i className="ti ti-currency-rupee"></i>
-
-                                </div>
-
-                                <div style={{ background: "#e6fbf9", color: "#0097A7", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-
-                                  <i className="ti ti-trending-up"></i> 12%
-
-                                </div>
+                                <span style={{ fontSize: 16 }}></span>
 
                               </div>
 
-                              <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
+                              <input
 
-                                {formatShortCurrency(totalIncome)}
+                                id="customColorInput"
 
-                              </div>
+                                type="color"
 
-                              <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Revenue This Month</div>
+                                value={customColor}
+
+                                onChange={(e) => {
+
+                                  setCustomColor(e.target.value);
+
+                                  setAppTheme("custom");
+
+                                }}
+
+                                style={{
+
+                                  position: "absolute", top: 0, left: 0, width: 42, height: 42,
+
+                                  opacity: 0, cursor: "pointer", border: "none"
+
+                                }}
+
+                              />
 
                             </div>
 
+                            <div style={{ flex: 1 }}>
 
+                              <div style={{ fontSize: 12, fontWeight: 700, color: appTheme === "custom" ? customColor : "#64748b" }}>
 
-                            {/* Clients Card */}
-
-                            <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
-
-                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-
-                                <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
-
-                                  <i className="ti ti-users"></i>
-
-                                </div>
-
-                                <div style={{ background: "#dcfce7", color: "#166534", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-
-                                  <i className="ti ti-trending-up"></i> 3 new
-
-                                </div>
+                                {appTheme === "custom" ? "Custom Active" : "Pick any color"}
 
                               </div>
 
-                              <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
+                              <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
 
-                                {clients.length}
+                                {customColor.toUpperCase()}
 
                               </div>
-
-                              <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Total Clients</div>
-
-                              <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} active</div>
 
                             </div>
 
+                            {appTheme === "custom" && (
 
+                              <div style={{
 
-                            {/* Projects Card */}
+                                width: 20, height: 20, borderRadius: "50%",
+                                background: "#22c55e", boxShadow: "0 0 6px #22c55e80",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                color: "#fff", fontSize: 12, fontWeight: 900, flexShrink: 0
 
-                            <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
+                              }}>✓</div>
 
-                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-
-                                <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37,99,235,0.1)", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
-
-                                  <i className="ti ti-folder"></i>
-
-                                </div>
-
-                                <div style={{ background: "#f1f5f9", color: "#64748b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-
-                                  — same
-
-                                </div>
-
-                              </div>
-
-                              <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
-
-                                {activeProjCount}
-
-                              </div>
-
-                              <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Active Projects</div>
-
-                              <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>2 due this week</div>
-
-                            </div>
-
-
-
-                            {/* Invoices Card */}
-
-                            <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
-
-                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-
-                                <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
-
-                                  <i className="ti ti-file-invoice"></i>
-
-                                </div>
-
-                                <div style={{ background: "#fef2f2", color: "#991b1b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-
-                                  <i className="ti ti-trending-down"></i> overdue
-
-                                </div>
-
-                              </div>
-
-                              <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
-
-                                {pendingInvCount}
-
-                              </div>
-
-                              <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Unpaid Invoices</div>
-
-                              <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>{formatShortCurrency(totalInvAmt)} outstanding</div>
-
-                            </div>
-
-
-
-                            {/* Employees Card */}
-
-                            <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
-
-                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-
-                                <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(124,58,237,0.1)", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
-
-                                  <i className="ti ti-user-circle"></i>
-
-                                </div>
-
-                                <div style={{ background: "#f3e8ff", color: "#6b21a8", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-
-                                  <i className="ti ti-trending-up"></i> 2 new
-
-                                </div>
-
-                              </div>
-
-                              <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
-
-                                {employees.length}
-
-                              </div>
-
-                              <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Employees</div>
-
-                              <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>Active staff</div>
-
-                            </div>
-
-
+                            )}
 
                           </div>
 
 
 
-                          {/* MAIN CONTENT AREA */}
+                          {/* Quick custom color presets */}
 
-                          <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24 }}>
+                          <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
 
+                            {["#2563eb", "#0891b2", "#059669", "#d97706", "#dc2626", "#db2777", "#7c2d12", "#4f46e5", "#0f766e", "#b91c1c"].map(c => (
 
+                              <div key={c} onClick={() => { setCustomColor(c); setAppTheme("custom"); setShowThemePicker(false); }}
 
-                            {/* LEFT COLUMN */}
+                                style={{
 
-                            <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+                                  width: 22, height: 22, borderRadius: 6, background: c, cursor: "pointer",
 
+                                  border: customColor === c && appTheme === "custom" ? "2px solid #fff" : "2px solid transparent",
 
+                                  boxShadow: customColor === c && appTheme === "custom" ? `0 0 0 2px ${c}, 0 2px 8px ${c}50` : `0 1px 4px ${c}30`,
 
-                              {/* Total Revenue Bar Chart Placeholder */}
+                                  transition: "all 0.15s"
 
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+                                }}
 
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
+                              />
 
-                                  <div>
-
-                                    <div style={{ fontSize: 13, color: "rgba(15,28,46,0.6)", fontWeight: 700, marginBottom: 4 }}>Total Revenue</div>
-
-                                    <div style={{ fontSize: 24, fontWeight: 800, color: "#0f1c2e" }}>{formatShortCurrency(totalIncome)} <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(15,28,46,0.4)" }}>this year</span></div>
-
-                                  </div>
-
-                                  <div style={{ display: "flex", gap: 16, fontSize: 12, fontWeight: 700 }}>
-
-                                    <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(15,28,46,0.8)" }}>
-
-                                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--app-accent)" }}></div> Revenue
-
-                                    </div>
-
-                                    <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(15,28,46,0.8)" }}>
-
-                                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(var(--app-accent-rgb,0,188,212),0.2)" }}></div> Expenses
-
-                                    </div>
-
-                                  </div>
-
-                                </div>
-
-                                <div style={{ height: 180, display: "flex", alignItems: "flex-end", gap: 12, paddingBottom: 10 }}>
-
-                                  {/* Dummy chart bars matching the screenshot aesthetic */}
-
-                                  {[30, 45, 35, 60, 40, 75].map((h, i) => (
-
-                                    <div key={i} style={{ flex: 1, display: "flex", gap: 4, height: "100%", alignItems: "flex-end", padding: "0 4px" }}>
-
-                                      <div style={{ flex: 1, background: "var(--app-accent)", height: `${h}%`, borderRadius: "4px 4px 0 0" }}></div>
-
-                                      <div style={{ flex: 1, background: "rgba(var(--app-accent-rgb,0,188,212),0.2)", height: `${h * 0.4}%`, borderRadius: "4px 4px 0 0" }}></div>
-
-                                    </div>
-
-                                  ))}
-
-                                </div>
-
-                                <div style={{ display: "flex", justifyContent: "space-between", padding: "0 10px", fontSize: 11, color: "rgba(15,28,46,0.4)", fontWeight: 700 }}>
-
-                                  <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
-
-                                </div>
-
-                              </div>
-
-                              {/* Active Projects (moved directly under the chart, no gap) */}
-
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-
-                                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
-
-                                    <i className="ti ti-folder" style={{ color: "var(--app-accent)" }}></i> Active Projects
-
-                                  </div>
-
-                                  <div onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)", cursor: "pointer" }}>
-
-                                    View All
-
-                                  </div>
-
-                                </div>
-
-                                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-                                  {projects.filter(p => p.status === "Active" || p.status === "Pending").slice(0, 5).map((p, idx) => {
-
-                                    const colors = ["var(--app-accent)", "var(--app-accent)", "var(--app-accent)", "var(--app-accent)", "var(--app-accent)"];
-
-                                    const bColor = colors[idx % colors.length];
-
-                                    const progress = p.progress || 25;
-
-                                    const barColor = progress > 70 ? "#16a34a" : progress > 40 ? "#f59e0b" : "#dc2626";
-
-                                    const badgeText = "IN PROGRESS";
-
-                                    const badgeColor = "var(--app-accent)";
-
-                                    return (
-
-                                      <div key={p._id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 16, borderBottom: idx === 4 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
-
-                                        <div style={{ display: "flex", gap: 12 }}>
-
-                                          <div style={{ width: 3, background: bColor, borderRadius: 2 }}></div>
-
-                                          <div>
-
-                                            <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{p.name || p.title}</div>
-
-                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{clients.find(c => c._id === p.clientId)?.clientName || "Internal"} Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
-
-                                          </div>
-
-                                        </div>
-
-                                        <div style={{ width: 100, textAlign: "right" }}>
-
-                                          <div style={{ display: "inline-block", color: badgeColor, background: `${badgeColor}15`, padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800, marginBottom: 8, letterSpacing: "0.5px" }}>
-
-                                            {badgeText}
-
-                                          </div>
-
-                                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-
-                                            <div style={{ flex: 1, height: 4, background: "rgba(0,0,0,0.06)", borderRadius: 2 }}>
-
-                                              <div style={{ width: `${progress}%`, height: "100%", background: barColor, borderRadius: 2 }}></div>
-
-                                            </div>
-
-                                            <div style={{ fontSize: 11, fontWeight: 800, color: barColor }}>{progress}%</div>
-
-                                          </div>
-
-                                        </div>
-
-                                      </div>
-
-                                    );
-
-                                  })}
-
-                                  {projects.filter(p => p.status === "Active" || p.status === "Pending").length === 0 && (
-
-                                    <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No active projects</div>
-
-                                  )}
-
-                                </div>
-
-                              </div>
-
-                            </div>
-
-                            {/* RIGHT COLUMN */}
-
-                            <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-
-
-
-                              {/* Quick Access */}
-
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-
-                                <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
-
-                                  <i className="ti ti-bolt" style={{ color: "#0097A7" }}></i> Quick Access
-
-                                </div>
-
-                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-
-                                  {[
-
-                                    { icon: "ti-users", color: "#0097A7", bg: "rgba(0,188,212,0.1)", label: "Clients", sub: `${clients.length} total`, act: "clients" },
-
-                                    { icon: "ti-user-circle", color: "#7c3aed", bg: "rgba(124,58,237,0.1)", label: "Employees", sub: `${employees.length} staff`, act: "employees" },
-
-                                    { icon: "ti-file-invoice", color: "#16a34a", bg: "rgba(22,163,74,0.1)", label: "Invoices", sub: `${pendingInvCount} unpaid`, act: "invoices" },
-
-                                    { icon: "ti-receipt", color: "#2563eb", bg: "rgba(37,99,235,0.1)", label: "Quotations", sub: "Builder", act: "quotations" },
-
-                                    { icon: "ti-report-money", color: "#d97706", bg: "rgba(217,119,6,0.1)", label: "Proposals", sub: "Creator", act: "proposals" },
-
-                                    { icon: "ti-template", color: "#db2777", bg: "rgba(219,39,119,0.1)", label: "Templates", sub: "Designer", act: "templates" },
-
-                                    { icon: "ti-messages", color: "#0097A7", bg: "rgba(0,188,212,0.1)", label: "Messages", sub: "Internal", act: "messaging" },
-
-                                    { icon: "ti-world", color: "#16a34a", bg: "rgba(22,163,74,0.1)", label: "Client Portal", sub: "External", act: "clients" },
-
-                                    { icon: "ti-wallet", color: "#2563eb", bg: "rgba(37,99,235,0.1)", label: "Accounts", sub: "Income/Exp", act: "accounts" },
-
-
-
-                                  ].map((q, i) => (
-                                    <div key={i} onClick={() => setActive(q.act)} style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderRadius: 12, border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s" }}>
-                                      <div style={{ width: 34, height: 34, borderRadius: 10, background: q.bg, color: q.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>
-                                        <i className={`ti ${q.icon}`}></i>
-                                      </div>
-                                      <div>
-                                        <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>{q.label}</div>
-                                        <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{q.sub}</div>
-                                      </div>
-                                    </div>
-                                  ))}
-                                  <div
-                                    onClick={() => { const ph = (user?.phone || "").replace(/\D/g, ""); window.open(ph ? "https://wa.me/" + ph : "https://web.whatsapp.com/", "_blank"); }}
-                                    style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderRadius: 12, border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s" }}
-                                    onMouseEnter={e => e.currentTarget.style.background = "rgba(37,211,102,0.06)"}
-                                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                                  >
-                                    <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(37,211,102,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
-                                      💬
-                                    </div>
-                                    <div>
-                                      <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>WhatsApp</div>
-                                      <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>Open Chat</div>
-                                    </div>
-                                  </div>                              </div>
-                              </div>
-
-                              {/* Team Section */}
-
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-
-                                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
-
-                                    <i className="ti ti-user-circle" style={{ color: "#0097A7" }}></i> Team
-
-                                  </div>
-
-                                  <div onClick={() => setActive("employees")} style={{ fontSize: 13, fontWeight: 700, color: "#0097A7", cursor: "pointer" }}>
-
-                                    View All
-
-                                  </div>
-
-                                </div>
-
-                                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-                                  {employees.slice(0, 3).map(e => (
-
-                                    <div key={e._id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-
-                                      <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,  var(--app-accent, var(--app-accent, #00BCD4)), #0097A7)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800 }}>
-
-                                        {(e.name || "E")[0].toUpperCase()}
-
-                                      </div>
-
-                                      <div style={{ flex: 1 }}>
-
-                                        <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{e.name}</div>
-
-                                        <div style={{ fontSize: 12, color: "rgba(15,28,46,0.5)" }}>{e.role || "Employee"}</div>
-
-                                      </div>
-
-                                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#16a34a" }}></div>
-
-                                    </div>
-
-                                  ))}
-
-                                  {employees.length === 0 && <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center" }}>No team members</div>}
-
-                                </div>
-
-                              </div>
-
-
-
-                            </div>
-
-                          </div>
-
-
-
-                          {/* SECONDARY CONTENT AREA */}
-
-                          <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24 }}>
-
-
-
-                            {/* LEFT COLUMN 2 */}
-
-                            <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-
-
-
-
-
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-
-                                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
-
-                                    <i className="ti ti-user-x" style={{ color: "var(--app-accent)" }}></i> Leave Requests
-
-                                    <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length} PENDING</span>
-
-                                  </div>
-
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer" }}>
-
-                                    HR Panel
-
-                                  </div>
-
-                                </div>
-
-                                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-                                  {pendingLeaves.map((l, i) => {
-
-                                    const initials = l.employeeName ? l.employeeName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : "EE";
-
-                                    const colors = ["#f59e0b", "#a855f7", "#0ea5e9", "#ec4899", "#22c55e"];
-
-                                    const bg = colors[i % colors.length];
-
-                                    const getDuration = () => {
-
-                                      if (!l.from || !l.to) return "";
-
-                                      try {
-
-                                        const d1 = new Date(l.from);
-
-                                        const d2 = new Date(l.to);
-
-                                        if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return "";
-
-                                        const diffTime = Math.abs(d2 - d1);
-
-                                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-
-                                        return ` (${diffDays}d)`;
-
-                                      } catch (err) { return ""; }
-
-                                    };
-
-                                    const detail = `${l.type || "Leave"} ${l.from} - ${l.to}${getDuration()}`;
-
-
-
-                                    return (
-
-                                      <div key={l._id || i} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: 16, borderBottom: i === pendingLeaves.length - 1 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
-
-                                        <div style={{ width: 36, height: 36, borderRadius: "50%", background: bg, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>
-
-                                          {initials}
-
-                                        </div>
-
-                                        <div style={{ flex: 1 }}>
-
-                                          <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{l.employeeName}</div>
-
-                                          <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{detail}</div>
-
-                                        </div>
-
-                                        <div style={{ display: "flex", gap: 8 }}>
-
-                                          <button onClick={() => handleApproveLeave(l._id)} style={{ background: "#dcfce7", color: "#166534", border: "none", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
-
-                                            <i className="ti ti-check"></i> Approve
-
-                                          </button>
-
-                                          <button onClick={() => handleRejectLeave(l._id)} style={{ background: "#fef2f2", color: "#dc2626", border: "none", padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
-
-                                            <i className="ti ti-x"></i>
-
-                                          </button>
-
-                                        </div>
-
-                                      </div>
-
-                                    );
-
-                                  })}
-
-                                  {pendingLeaves.length === 0 && (
-
-                                    <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No pending leave requests.</div>
-
-                                  )}
-
-                                </div>
-
-                              </div>
-
-                            </div>
-
-
-
-                            {/* RIGHT COLUMN 2 */}
-
-                            <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-
-
-
-                              {/* Overdue Tasks */}
-
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-
-                                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
-
-                                    <i className="ti ti-alert-circle" style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))" }}></i> Overdue Tasks
-
-                                    <span style={{ background: "#fef2f2", color: "#dc2626", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>
-
-                                      {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).length}
-
-                                    </span>
-
-                                  </div>
-
-                                  <div onClick={() => { setSidebarOverride("dashboard"); setActive("tasks"); }} style={{ fontSize: 13, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer" }}>
-
-                                    All Tasks
-
-                                  </div>
-
-                                </div>
-
-                                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-                                  {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).slice(0, 5).map((t, idx) => (
-
-                                    <div key={t._id} style={{ display: "flex", alignItems: "flex-start", gap: 12, paddingBottom: 16, borderBottom: idx === 4 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
-
-                                      <input type="checkbox" style={{ marginTop: 2, accentColor: " var(--app-accent, var(--app-accent, #00BCD4))" }} />
-
-                                      <div style={{ flex: 1 }}>
-
-                                        <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e", marginBottom: 2 }}>{t.title}</div>
-
-                                        <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{employees.find(e => e._id === t.assignee)?.name || "Unassigned"} Due {t.deadline ? new Date(t.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
-
-                                      </div>
-
-                                      <div style={{ background: "#fef2f2", color: "#dc2626", padding: "4px 8px", borderRadius: 6, fontSize: 9, fontWeight: 800, letterSpacing: "0.5px" }}>HIGH</div>
-
-                                    </div>
-
-                                  ))}
-
-                                  {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).length === 0 && <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", padding: "10px 0" }}>No overdue tasks.</div>}
-
-                                </div>
-
-                              </div>
-
-                              {/* Doc Requests (Dynamic from backend) */}
-
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-
-                                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
-
-                                    <i className="ti ti-file-description" style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))" }}></i> Doc Requests
-
-                                    <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{employeeDocs.filter(d => d.status === "PENDING").length} PENDING</span>
-
-                                  </div>
-
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer" }}>
-
-                                    Manage
-
-                                  </div>
-
-                                </div>
-
-                                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-                                  {employeeDocs.map((d, i) => {
-
-                                    const docName = d.docType === "pan" ? "PAN Card" : d.docType === "aadhaar" ? "Aadhaar Card" : d.docType === "passbook" ? "Bank Passbook" : d.docType === "itr" ? "ITR Document" : d.docType;
-
-                                    const styleConfig =
-
-                                      d.docType === "pan" ? { bg: "#f1f5f9", c: "#0ea5e9" } :
-
-                                        d.docType === "passbook" ? { bg: "#f3e8ff", c: "#a855f7" } :
-
-                                          d.docType === "aadhaar" ? { bg: "#dcfce7", c: "#22c55e" } :
-
-                                            { bg: "#fef3c7", c: "#d97706" };
-
-
-
-                                    const isPending = d.status === "PENDING";
-
-                                    const statusColor = d.status === "APPROVED" ? "#16a34a" : d.status === "REJECTED" ? "#dc2626" : "#ea580c";
-
-
-
-                                    return (
-
-                                      <div key={d._id || i} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: 16, borderBottom: i === employeeDocs.length - 1 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
-
-                                        <div style={{ width: 32, height: 32, borderRadius: 8, background: styleConfig.bg, color: styleConfig.c, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>
-
-                                          <i className="ti ti-file-info"></i>
-
-                                        </div>
-
-                                        <div style={{ flex: 1 }}>
-
-                                          <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>{docName}</div>
-
-                                          <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{d.employeeName}</div>
-
-                                        </div>
-
-                                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-
-                                          <a href={d.url} target="_blank" rel="noreferrer" style={{ background: "#f1f5f9", color: "#64748b", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
-
-                                            <i className="ti ti-eye"></i> View
-
-                                          </a>
-
-                                          {isPending ? (
-
-                                            <>
-
-                                              <button onClick={() => handleApproveDoc(d._id)} style={{ background: "#dcfce7", color: "#166534", border: "none", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
-
-                                                Approve
-
-                                              </button>
-
-                                              <button onClick={() => handleRejectDoc(d._id)} style={{ background: "#fef2f2", color: "#dc2626", border: "none", padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
-
-                                                Reject
-
-                                              </button>
-
-                                            </>
-
-                                          ) : (
-
-                                            <div style={{ color: statusColor, fontSize: 10, fontWeight: 800, letterSpacing: "0.5px" }}>{d.status}</div>
-
-                                          )}
-
-                                        </div>
-
-                                      </div>
-
-                                    );
-
-                                  })}
-
-                                  {employeeDocs.length === 0 && (
-
-                                    <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No document requests.</div>
-
-                                  )}
-
-                                </div>
-
-                              </div>
-
-                            </div>
+                            ))}
 
                           </div>
 
                         </div>
 
-                      );
+                      </div>
 
-                    })()}
+                    )}
+
+                    <button onClick={() => setShowThemePicker(v => !v)}
+                      style={{
+                        width: 48, height: 48, borderRadius: "50%",
+                        background: appTheme === "custom"
+                          ? `linear-gradient(135deg, ${customColor}, ${customColor}dd)`
+                          : `linear-gradient(135deg, ${THEMES[appTheme]?.accent}, ${THEMES[appTheme]?.dot})`,
+                        border: "none", color: "#fff", fontSize: 20, cursor: "pointer",
+                        boxShadow: `0 6px 20px ${appTheme === "custom" ? customColor : (THEMES[appTheme]?.dot || "var(--app-accent)")}60`,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        transition: "all 0.2s"
+                      }}>
+                      🎨
+                    </button>
+                    <button
+                      onClick={() => { const ph = (user?.phone || "").replace(/\D/g, ""); window.open(ph ? "https://wa.me/" + ph : "https://web.whatsapp.com/", "_blank"); }}
+                      title="Open WhatsApp"
+                      style={{
+                        width: 48, height: 48, borderRadius: "50%",
+                        background: "#25D366",
+                        border: "none", cursor: "pointer",
+                        boxShadow: "0 6px 20px rgba(37,211,102,0.6)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        transition: "all 0.2s", padding: 0,
+                        marginTop: 12
+                      }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <path d="M16 1C7.7 1 1 7.7 1 16c0 2.7.7 5.2 2 7.4L1 31l7.9-2c2.1 1.1 4.5 1.8 7.1 1.8 8.3 0 15-6.7 15-15S24.3 1 16 1z" fill="#fff" />
+                        <path d="M16 3.5C9 3.5 3.5 9 3.5 16c0 2.5.7 4.8 1.9 6.8l.3.5-1.3 4.7 4.9-1.3.5.3C11.6 28.1 13.7 28.5 16 28.5c7 0 12.5-5.5 12.5-12.5S23 3.5 16 3.5z" fill="#25D366" />
+                        <path d="M11.5 9.5c-.3-.7-.6-.7-.9-.7h-.7c-.3 0-.7.1-1.1.5-.4.4-1.5 1.5-1.5 3.6s1.6 4.2 1.8 4.5c.2.3 3 4.7 7.4 6.4 3.7 1.4 4.4 1.1 5.2 1 .8 0 2.5-1 2.8-2 .4-1 .4-1.8.3-2-.1-.2-.4-.3-.8-.5-.4-.2-2.5-1.2-2.8-1.3-.4-.1-.6-.2-.9.2-.3.4-1 1.3-1.3 1.6-.2.3-.5.3-.8.1-.4-.2-1.6-.6-3-1.9-1.1-1-1.9-2.2-2.1-2.6-.2-.4 0-.6.2-.8.2-.2.4-.4.5-.7.2-.2.2-.4.4-.7.1-.2 0-.5-.1-.7-.2-.2-.9-2.2-1.2-3z" fill="#fff" />
+                      </svg>
+                    </button>
+                  </div>
 
 
 
-                  </>)}
 
+
+
+
+
+
+
+
+
+                  {dashTasksProj ? (
+
+                    <div style={{ display: "flex", flexDirection: "column", gap: "16px", height: "100%", marginTop: "10px" }}>
+
+                      <div>
+
+
+
+                      </div>
+
+                      <div style={{ flex: 1 }}>
+
+                        <ModernEmployeeProjectDetails
+
+                          project={dashTasksProj}
+
+                          tasks={tasks.filter(t => (t.project || t.projectId) === (dashTasksProj._id || dashTasksProj.id))}
+
+                          user={user}
+
+                          onBack={() => setDashTasksProj(null)}
+
+                          onMessageTeam={() => setActive("messaging")}
+
+                        />
+
+                      </div>
+
+                    </div>
+
+                  ) : (
+
+                    <>
+
+                      {/* EXACT TEMPLATE LAYOUT - DYNAMIC */}
+
+                      {(() => {
+
+                        const activeProjCount = projects.filter(p => p.status === "Active" || p.status === "Pending").length;
+
+                        const pendingInvCount = invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length;
+
+                        const totalIncome = income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
+
+                        const totalInvAmt = invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").reduce((sum, i) => sum + (Number(i.grandTotal) || 0), 0);
+
+
+
+                        return (
+
+                          <div style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: 24, fontFamily: "'Nunito', sans-serif" }}>
+
+
+
+                            {/* TOP CARDS ROW */}
+
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 20 }}>
+
+
+
+                              {/* Revenue Card */}
+
+                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
+
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+
+                                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "#0097A7", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+
+                                    <i className="ti ti-currency-rupee"></i>
+
+                                  </div>
+
+                                  <div style={{ background: "#e6fbf9", color: "#0097A7", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+
+                                    <i className="ti ti-trending-up"></i> 12%
+
+                                  </div>
+
+                                </div>
+
+                                <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
+
+                                  {formatShortCurrency(totalIncome)}
+
+                                </div>
+
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Revenue This Month</div>
+
+                              </div>
+
+
+
+                              {/* Clients Card */}
+
+                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
+
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+
+                                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+
+                                    <i className="ti ti-users"></i>
+
+                                  </div>
+
+                                  <div style={{ background: "#dcfce7", color: "#166534", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+
+                                    <i className="ti ti-trending-up"></i> 3 new
+
+                                  </div>
+
+                                </div>
+
+                                <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
+
+                                  {clients.length}
+
+                                </div>
+
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Total Clients</div>
+
+                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} active</div>
+
+                              </div>
+
+
+
+                              {/* Projects Card */}
+
+                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
+
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+
+                                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37,99,235,0.1)", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+
+                                    <i className="ti ti-folder"></i>
+
+                                  </div>
+
+                                  <div style={{ background: "#f1f5f9", color: "#64748b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+
+                                    — same
+
+                                  </div>
+
+                                </div>
+
+                                <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
+
+                                  {activeProjCount}
+
+                                </div>
+
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Active Projects</div>
+
+                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>2 due this week</div>
+
+                              </div>
+
+
+
+                              {/* Invoices Card */}
+
+                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
+
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+
+                                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+
+                                    <i className="ti ti-file-invoice"></i>
+
+                                  </div>
+
+                                  <div style={{ background: "#fef2f2", color: "#991b1b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+
+                                    <i className="ti ti-trending-down"></i> overdue
+
+                                  </div>
+
+                                </div>
+
+                                <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
+
+                                  {pendingInvCount}
+
+                                </div>
+
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Unpaid Invoices</div>
+
+                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>{formatShortCurrency(totalInvAmt)} outstanding</div>
+
+                              </div>
+
+
+
+                              {/* Employees Card */}
+
+                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
+
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+
+                                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(124,58,237,0.1)", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+
+                                    <i className="ti ti-user-circle"></i>
+
+                                  </div>
+
+                                  <div style={{ background: "#f3e8ff", color: "#6b21a8", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+
+                                    <i className="ti ti-trending-up"></i> 2 new
+
+                                  </div>
+
+                                </div>
+
+                                <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
+
+                                  {employees.length}
+
+                                </div>
+
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Employees</div>
+
+                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>Active staff</div>
+
+                              </div>
+
+
+
+                            </div>
+
+
+
+                            {/* MAIN CONTENT AREA */}
+
+                            <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "start" }}>
+
+
+
+                              {/* LEFT COLUMN */}
+
+                              <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+
+
+
+                                {/* Total Revenue Bar Chart Placeholder */}
+
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
+
+                                    <div>
+
+                                      <div style={{ fontSize: 13, color: "rgba(15,28,46,0.6)", fontWeight: 700, marginBottom: 4 }}>Total Revenue</div>
+
+                                      <div style={{ fontSize: 24, fontWeight: 800, color: "#0f1c2e" }}>{formatShortCurrency(totalIncome)} <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(15,28,46,0.4)" }}>this year</span></div>
+
+                                    </div>
+
+                                    <div style={{ display: "flex", gap: 16, fontSize: 12, fontWeight: 700 }}>
+
+                                      <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(15,28,46,0.8)" }}>
+
+                                        <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--app-accent)" }}></div> Revenue
+
+                                      </div>
+
+                                      <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(15,28,46,0.8)" }}>
+
+                                        <div style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(var(--app-accent-rgb,0,188,212),0.2)" }}></div> Expenses
+
+                                      </div>
+
+                                    </div>
+
+                                  </div>
+
+                                  <div style={{ height: 180, display: "flex", alignItems: "flex-end", gap: 12, paddingBottom: 10 }}>
+
+                                    {/* Dummy chart bars matching the screenshot aesthetic */}
+
+                                    {[30, 45, 35, 60, 40, 75].map((h, i) => (
+
+                                      <div key={i} style={{ flex: 1, display: "flex", gap: 4, height: "100%", alignItems: "flex-end", padding: "0 4px" }}>
+
+                                        <div style={{ flex: 1, background: "var(--app-accent)", height: `${h}%`, borderRadius: "4px 4px 0 0" }}></div>
+
+                                        <div style={{ flex: 1, background: "rgba(var(--app-accent-rgb,0,188,212),0.2)", height: `${h * 0.4}%`, borderRadius: "4px 4px 0 0" }}></div>
+
+                                      </div>
+
+                                    ))}
+
+                                  </div>
+
+                                  <div style={{ display: "flex", justifyContent: "space-between", padding: "0 10px", fontSize: 11, color: "rgba(15,28,46,0.4)", fontWeight: 700 }}>
+
+                                    <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+
+                                  </div>
+
+                                </div>
+
+                                {/* Active Projects (moved directly under the chart, no gap) */}
+
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+
+                                    <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+
+                                      <i className="ti ti-folder" style={{ color: "var(--app-accent)" }}></i> Active Projects
+
+                                    </div>
+
+                                    <div onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)", cursor: "pointer" }}>
+
+                                      View All
+
+                                    </div>
+
+                                  </div>
+
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+                                    {projects.filter(p => p.status === "Active" || p.status === "Pending").slice(0, 5).map((p, idx) => {
+
+                                      const colors = ["var(--app-accent)", "var(--app-accent)", "var(--app-accent)", "var(--app-accent)", "var(--app-accent)"];
+
+                                      const bColor = colors[idx % colors.length];
+
+                                      const progress = p.progress || 25;
+
+                                      const barColor = progress > 70 ? "#16a34a" : progress > 40 ? "#f59e0b" : "#dc2626";
+
+                                      const badgeText = "IN PROGRESS";
+
+                                      const badgeColor = "var(--app-accent)";
+
+                                      return (
+
+                                        <div key={p._id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 16, borderBottom: idx === 4 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
+
+                                          <div style={{ display: "flex", gap: 12 }}>
+
+                                            <div style={{ width: 3, background: bColor, borderRadius: 2 }}></div>
+
+                                            <div>
+
+                                              <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{p.name || p.title}</div>
+
+                                              <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{clients.find(c => c._id === p.clientId)?.clientName || "Internal"} Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
+
+                                            </div>
+
+                                          </div>
+
+                                          <div style={{ width: 100, textAlign: "right" }}>
+
+                                            <div style={{ display: "inline-block", color: badgeColor, background: `${badgeColor}15`, padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800, marginBottom: 8, letterSpacing: "0.5px" }}>
+
+                                              {badgeText}
+
+                                            </div>
+
+                                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+
+                                              <div style={{ flex: 1, height: 4, background: "rgba(0,0,0,0.06)", borderRadius: 2 }}>
+
+                                                <div style={{ width: `${progress}%`, height: "100%", background: barColor, borderRadius: 2 }}></div>
+
+                                              </div>
+
+                                              <div style={{ fontSize: 11, fontWeight: 800, color: barColor }}>{progress}%</div>
+
+                                            </div>
+
+                                          </div>
+
+                                        </div>
+
+                                      );
+
+                                    })}
+
+                                    {projects.filter(p => p.status === "Active" || p.status === "Pending").length === 0 && (
+
+                                      <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No active projects</div>
+
+                                    )}
+
+                                  </div>
+
+                                </div>
+
+                              </div>
+
+                              {/* RIGHT COLUMN */}
+
+                              <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+
+
+
+                                {/* Quick Access */}
+
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+
+                                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
+
+                                    <i className="ti ti-bolt" style={{ color: "#0097A7" }}></i> Quick Access
+
+                                  </div>
+
+                                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+
+                                    {[
+
+                                      { icon: "ti-users", color: "#0097A7", bg: "rgba(0,188,212,0.1)", label: "Clients", sub: `${clients.length} total`, act: "clients" },
+
+                                      { icon: "ti-user-circle", color: "#7c3aed", bg: "rgba(124,58,237,0.1)", label: "Employees", sub: `${employees.length} staff`, act: "employees" },
+
+                                      { icon: "ti-file-invoice", color: "#16a34a", bg: "rgba(22,163,74,0.1)", label: "Invoices", sub: `${pendingInvCount} unpaid`, act: "invoices" },
+
+                                      { icon: "ti-receipt", color: "#2563eb", bg: "rgba(37,99,235,0.1)", label: "Quotations", sub: "Builder", act: "quotations" },
+
+                                      { icon: "ti-report-money", color: "#d97706", bg: "rgba(217,119,6,0.1)", label: "Proposals", sub: "Creator", act: "proposals" },
+
+                                      { icon: "ti-template", color: "#db2777", bg: "rgba(219,39,119,0.1)", label: "Templates", sub: "Designer", act: "templates" },
+
+                                      { icon: "ti-messages", color: "#0097A7", bg: "rgba(0,188,212,0.1)", label: "Messages", sub: "Internal", act: "messaging" },
+
+                                      { icon: "ti-world", color: "#16a34a", bg: "rgba(22,163,74,0.1)", label: "Client Portal", sub: "External", act: "clients" },
+
+                                      { icon: "ti-wallet", color: "#2563eb", bg: "rgba(37,99,235,0.1)", label: "Accounts", sub: "Income/Exp", act: "accounts" },
+
+
+
+                                    ].map((q, i) => (
+                                      <div key={i} onClick={() => setActive(q.act)} style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderRadius: 12, border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s" }}>
+                                        <div style={{ width: 34, height: 34, borderRadius: 10, background: q.bg, color: q.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>
+                                          <i className={`ti ${q.icon}`}></i>
+                                        </div>
+                                        <div>
+                                          <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>{q.label}</div>
+                                          <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{q.sub}</div>
+                                        </div>
+                                      </div>
+                                    ))}
+                                    <div
+                                      onClick={() => { const ph = (user?.phone || "").replace(/\D/g, ""); window.open(ph ? "https://wa.me/" + ph : "https://web.whatsapp.com/", "_blank"); }}
+                                      style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderRadius: 12, border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s" }}
+                                      onMouseEnter={e => e.currentTarget.style.background = "rgba(37,211,102,0.06)"}
+                                      onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                                    >
+                                      <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(37,211,102,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                                        💬
+                                      </div>
+                                      <div>
+                                        <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>WhatsApp</div>
+                                        <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>Open Chat</div>
+                                      </div>
+                                    </div>                              </div>
+                                </div>
+
+                                {/* Team Section */}
+
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+
+                                    <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+
+                                      <i className="ti ti-user-circle" style={{ color: "#0097A7" }}></i> Team
+
+                                    </div>
+
+                                    <div onClick={() => setActive("employees")} style={{ fontSize: 13, fontWeight: 700, color: "#0097A7", cursor: "pointer" }}>
+
+                                      View All
+
+                                    </div>
+
+                                  </div>
+
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+                                    {employees.slice(0, 3).map(e => (
+
+                                      <div key={e._id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+
+                                        <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,  var(--app-accent, var(--app-accent, #00BCD4)), #0097A7)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800 }}>
+
+                                          {(e.name || "E")[0].toUpperCase()}
+
+                                        </div>
+
+                                        <div style={{ flex: 1 }}>
+
+                                          <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{e.name}</div>
+
+                                          <div style={{ fontSize: 12, color: "rgba(15,28,46,0.5)" }}>{e.role || "Employee"}</div>
+
+                                        </div>
+
+                                        <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#16a34a" }}></div>
+
+                                      </div>
+
+                                    ))}
+
+                                    {employees.length === 0 && <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center" }}>No team members</div>}
+
+                                  </div>
+
+                                </div>
+
+
+
+                              </div>
+
+                            </div>
+
+
+
+                            {/* SECONDARY CONTENT AREA */}
+
+
+                            <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "start" }}>
+
+
+
+                              {/* LEFT COLUMN 2 */}
+
+                              <div style={{ display: "flex", flexDirection: "column", gap: 24, alignSelf: "start" }}>
+
+
+
+
+
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+
+                                    <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+
+                                      <i className="ti ti-user-x" style={{ color: "var(--app-accent)" }}></i> Leave Requests
+
+                                      <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length} PENDING</span>
+
+                                    </div>
+
+                                    <div style={{ fontSize: 13, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer" }}>
+
+                                      HR Panel
+
+                                    </div>
+
+                                  </div>
+
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+                                    {pendingLeaves.map((l, i) => {
+
+                                      const initials = l.employeeName ? l.employeeName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : "EE";
+
+                                      const colors = ["#f59e0b", "#a855f7", "#0ea5e9", "#ec4899", "#22c55e"];
+
+                                      const bg = colors[i % colors.length];
+
+                                      const getDuration = () => {
+
+                                        if (!l.from || !l.to) return "";
+
+                                        try {
+
+                                          const d1 = new Date(l.from);
+
+                                          const d2 = new Date(l.to);
+
+                                          if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return "";
+
+                                          const diffTime = Math.abs(d2 - d1);
+
+                                          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+                                          return ` (${diffDays}d)`;
+
+                                        } catch (err) { return ""; }
+
+                                      };
+
+                                      const detail = `${l.type || "Leave"} ${l.from} - ${l.to}${getDuration()}`;
+
+
+
+                                      return (
+
+                                        <div key={l._id || i} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: 16, borderBottom: i === pendingLeaves.length - 1 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
+
+                                          <div style={{ width: 36, height: 36, borderRadius: "50%", background: bg, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>
+
+                                            {initials}
+
+                                          </div>
+
+                                          <div style={{ flex: 1 }}>
+
+                                            <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{l.employeeName}</div>
+
+                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{detail}</div>
+
+                                          </div>
+
+                                          <div style={{ display: "flex", gap: 8 }}>
+
+                                            <button onClick={() => handleApproveLeave(l._id)} style={{ background: "#dcfce7", color: "#166534", border: "none", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+
+                                              <i className="ti ti-check"></i> Approve
+
+                                            </button>
+
+                                            <button onClick={() => handleRejectLeave(l._id)} style={{ background: "#fef2f2", color: "#dc2626", border: "none", padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+
+                                              <i className="ti ti-x"></i>
+
+                                            </button>
+
+                                          </div>
+
+                                        </div>
+
+                                      );
+
+                                    })}
+
+                                    {pendingLeaves.length === 0 && (
+
+                                      <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No pending leave requests.</div>
+
+                                    )}
+
+                                  </div>
+
+                                </div>
+
+                              </div>
+
+
+
+                              {/* RIGHT COLUMN 2 */}
+
+                              <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+
+
+
+                                {/* Overdue Tasks */}
+
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+
+                                    <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+
+                                      <i className="ti ti-alert-circle" style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))" }}></i> Overdue Tasks
+
+                                      <span style={{ background: "#fef2f2", color: "#dc2626", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>
+
+                                        {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).length}
+
+                                      </span>
+
+                                    </div>
+
+                                    <div onClick={() => { setSidebarOverride("dashboard"); setActive("tasks"); }} style={{ fontSize: 13, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer" }}>
+
+                                      All Tasks
+
+                                    </div>
+
+                                  </div>
+
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+                                    {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).slice(0, 5).map((t, idx) => (
+
+                                      <div key={t._id} style={{ display: "flex", alignItems: "flex-start", gap: 12, paddingBottom: 16, borderBottom: idx === 4 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
+
+                                        <input type="checkbox" style={{ marginTop: 2, accentColor: " var(--app-accent, var(--app-accent, #00BCD4))" }} />
+
+                                        <div style={{ flex: 1 }}>
+
+                                          <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e", marginBottom: 2 }}>{t.title}</div>
+
+                                          <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{employees.find(e => e._id === t.assignee)?.name || "Unassigned"} Due {t.deadline ? new Date(t.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
+
+                                        </div>
+
+                                        <div style={{ background: "#fef2f2", color: "#dc2626", padding: "4px 8px", borderRadius: 6, fontSize: 9, fontWeight: 800, letterSpacing: "0.5px" }}>HIGH</div>
+
+                                      </div>
+
+                                    ))}
+
+                                    {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).length === 0 && <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", padding: "10px 0" }}>No overdue tasks.</div>}
+
+                                  </div>
+
+                                </div>
+
+                                {/* Doc Requests (Dynamic from backend) */}
+
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+
+                                    <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+
+                                      <i className="ti ti-file-description" style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))" }}></i> Doc Requests
+
+                                      <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{employeeDocs.filter(d => d.status === "PENDING").length} PENDING</span>
+
+                                    </div>
+
+                                    <div style={{ fontSize: 13, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer" }}>
+
+                                      Manage
+
+                                    </div>
+
+                                  </div>
+
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+                                    {employeeDocs.map((d, i) => {
+
+                                      const docName = d.docType === "pan" ? "PAN Card" : d.docType === "aadhaar" ? "Aadhaar Card" : d.docType === "passbook" ? "Bank Passbook" : d.docType === "itr" ? "ITR Document" : d.docType;
+
+                                      const styleConfig =
+
+                                        d.docType === "pan" ? { bg: "#f1f5f9", c: "#0ea5e9" } :
+
+                                          d.docType === "passbook" ? { bg: "#f3e8ff", c: "#a855f7" } :
+
+                                            d.docType === "aadhaar" ? { bg: "#dcfce7", c: "#22c55e" } :
+
+                                              { bg: "#fef3c7", c: "#d97706" };
+
+
+
+                                      const isPending = d.status === "PENDING";
+
+                                      const statusColor = d.status === "APPROVED" ? "#16a34a" : d.status === "REJECTED" ? "#dc2626" : "#ea580c";
+
+
+
+                                      return (
+
+                                        <div key={d._id || i} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: 16, borderBottom: i === employeeDocs.length - 1 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
+
+                                          <div style={{ width: 32, height: 32, borderRadius: 8, background: styleConfig.bg, color: styleConfig.c, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>
+
+                                            <i className="ti ti-file-info"></i>
+
+                                          </div>
+
+                                          <div style={{ flex: 1 }}>
+
+                                            <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>{docName}</div>
+
+                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{d.employeeName}</div>
+
+                                          </div>
+
+                                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+
+                                            <a href={d.url} target="_blank" rel="noreferrer" style={{ background: "#f1f5f9", color: "#64748b", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
+
+                                              <i className="ti ti-eye"></i> View
+
+                                            </a>
+
+                                            {isPending ? (
+
+                                              <>
+
+                                                <button onClick={() => handleApproveDoc(d._id)} style={{ background: "#dcfce7", color: "#166534", border: "none", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+
+                                                  Approve
+
+                                                </button>
+
+                                                <button onClick={() => handleRejectDoc(d._id)} style={{ background: "#fef2f2", color: "#dc2626", border: "none", padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+
+                                                  Reject
+
+                                                </button>
+
+                                              </>
+
+                                            ) : (
+
+                                              <div style={{ color: statusColor, fontSize: 10, fontWeight: 800, letterSpacing: "0.5px" }}>{d.status}</div>
+
+                                            )}
+
+                                          </div>
+
+                                        </div>
+
+                                      );
+
+                                    })}
+
+                                    {employeeDocs.length === 0 && (
+
+                                      <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No document requests.</div>
+
+                                    )}
+
+                                  </div>
+
+                                </div>
+
+                              </div>
+
+                            </div>
+
+                          </div>
+
+                        );
+
+                      })()}
+
+
+                    </>)}
+                </div>
               </>
-
             )}
 
 
@@ -13140,7 +13263,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
         </div>
 
-      </div>
+      </div >
 
     </div >
 

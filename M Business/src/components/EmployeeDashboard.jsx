@@ -1909,8 +1909,8 @@ export default function EmployeeDashboard({ user, setUser }) {
       const config = { headers: { "x-company-id": companyId } };
       const notifUrl = userId ? `${BASE_URL}/api/notifications/${userId}` : null;
       const [projRes, taskRes, propRes, attRes, salRes, eventRes, notifRes] = await Promise.allSettled([
-        axios.get(`${BASE}/projects/${enc}`, config),
-        axios.get(`${BASE}/tasks/${enc}`, config),
+        axios.get(`${BASE}/projects/employee/${enc}`, config),
+        axios.get(`${BASE}/tasks/employee/${enc}`, config),
         axios.get(`${BASE_URL}/api/proposals/employee/${enc}`, config),
         axios.get(`${BASE}/attendance/${enc}`, config),
         axios.get(`${BASE}/salary/${enc}`, config),

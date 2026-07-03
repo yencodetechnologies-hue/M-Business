@@ -15,6 +15,25 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET projects assigned to an employee
+router.get("/:employeeName", async (req, res) => {
+  try {
+    const companyId = req.companyId || "";
+    if (!companyId) return res.json([]);
+    const name = decodeURIComponent(req.params.employeeName).trim();
+    const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const safeName = escapeRegExp(name);
+    const projects = await Project.find({
+      companyId,
+      assignedTo: { $regex: new RegExp(`^\\s*${safeName}\\s*$`, "i") }
+    }).sort({ createdAt: -1 });
+    res.json(projects);
+  } catch (err) {
+    console.error("GET projects by employee error:", err.message);
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+});
+
 // GET projects by client name
 router.get("/client/:clientName", async (req, res) => {
   try {
@@ -54,6 +73,25 @@ router.get("/client/:clientName", async (req, res) => {
     res.json(projects);
   } catch (err) {
     console.error("GET by-client error:", err.message);
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+});
+
+// GET projects assigned to an employee
+router.get("/employee/:employeeName", async (req, res) => {
+  try {
+    const companyId = req.companyId || "";
+    if (!companyId) return res.json([]);
+    const name = decodeURIComponent(req.params.employeeName).trim();
+    const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const safeName = escapeRegExp(name);
+    const projects = await Project.find({
+      companyId,
+      assignedTo: { $regex: new RegExp(`^\\s*${safeName}\\s*$`, "i") }
+    }).sort({ createdAt: -1 });
+    res.json(projects);
+  } catch (err) {
+    console.error("GET projects by employee error:", err.message);
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 });

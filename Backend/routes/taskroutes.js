@@ -90,6 +90,27 @@ router.get("/client/:clientName", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+router.get("/employee/:employeeName", async (req, res) => {
+  try {
+    const Task = require("../models/TaskModels");
+    const name = decodeURIComponent(req.params.employeeName).trim();
+    const companyId = req.companyId || "";
+    if (!companyId) return res.json([]);
+    const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const safeName = escapeRegExp(name);
+    const tasks = await Task.find({
+      companyId,
+      isDeleted: false,
+      $or: [
+        { assignTo: { $regex: new RegExp(`^\\s*${safeName}\\s*$`, "i") } },
+        { assignedTo: { $regex: new RegExp(`^\\s*${safeName}\\s*$`, "i") } }
+      ]
+    }).sort({ createdAt: -1 });
+    res.json(tasks);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 router.get("/:id", getTask);
 router.get("/:id/members", getTaskMembers);
 router.post("/", createTask);

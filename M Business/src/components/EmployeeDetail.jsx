@@ -53,6 +53,18 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
     }
   };
 
+  const updateLeaveStatus = async (index, status) => {
+    const updatedLeaves = localLeaves.map((l, i) => i === index ? { ...l, status } : l);
+    setLocalLeaves(updatedLeaves);
+    try {
+      await axios.put(`${BASE_URL}/api/employees/${emp._id}`, { leaveRequests: updatedLeaves });
+    } catch (e) {
+      console.error(e);
+      alert('Failed to update leave status: ' + (e.response?.data?.msg || e.message));
+      setLocalLeaves(localLeaves);
+    }
+  };
+
   const getInitials = (name) => {
     if (!name) return "?";
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -668,8 +680,8 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                     <td>
                       {(!leave.status || leave.status === 'pending') ? (
                         <>
-                          <button className="ed-btn" style={{ padding: "4px 8px", fontSize: "10px", background: "#ECFDF5", color: "var(--success)", borderColor: "#D1FAE5" }}>Approve</button>
-                          <button className="ed-btn" style={{ padding: "4px 8px", fontSize: "10px", background: "#FEF2F2", color: "var(--danger)", borderColor: "#FEE2E2", marginLeft: "4px" }}>Reject</button>
+                          <button className="ed-btn" style={{ padding: "4px 8px", fontSize: "10px", background: "#ECFDF5", color: "var(--success)", borderColor: "#D1FAE5" }} onClick={() => updateLeaveStatus(i, 'approved')}>Approve</button>
+                          <button className="ed-btn" style={{ padding: "4px 8px", fontSize: "10px", background: "#FEF2F2", color: "var(--danger)", borderColor: "#FEE2E2", marginLeft: "4px" }} onClick={() => updateLeaveStatus(i, 'rejected')}>Reject</button>
                         </>
                       ) : <span style={{ color: "var(--text-muted)" }}>—</span>}
                     </td>

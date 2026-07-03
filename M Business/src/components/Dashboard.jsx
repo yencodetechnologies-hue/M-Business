@@ -1819,6 +1819,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const fetchProjects = async () => { try { const res = await axios.get(BASE_URL + "/api/projects"); setProjects(res.data); } catch (e) { console.log(e); } };
   const fetchManagers = async () => { try { const res = await axios.get(BASE_URL + "/api/managers"); setManagers(res.data); } catch (e) { console.log(e); } };
   const [selectedProjectForTasks, setSelectedProjectForTasks] = useState(null);
+  const [mobileExpandedProjectIdx, setMobileExpandedProjectIdx] = useState(null);
   const [autoOpenTaskModal, setAutoOpenTaskModal] = useState(false);
 
   const fetchTasks = async () => { try { const res = await axios.get(BASE_URL + "/api/tasks"); setTasks(res.data); } catch (e) { console.log(e); } };
@@ -2010,64 +2011,262 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               </div>
             </div>
           </div>
-
           {validActive === "dashboard" && <>
-            <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 18 }}>
-              {[{ t: "Total Clients", v: clients.length, i: "Team", c: "var(--app-accent)" }, { t: "Employees", v: employees.length, i: "‍Job", c: "var(--app-accent)" }, { t: "Managers", v: managers.length, i: "‍Job", c: "#f59e0b" }, { t: "Projects", v: projects.length, i: "Folder", c: "var(--app-muted)" }, { t: "Invoices", v: INVOICES.length, i: "", c: "#22C55E" }].map(({ t, v, i, c }) => (
-                <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}>
-                  <div style={{ position: "absolute", top: -12, right: -12, width: 60, height: 60, borderRadius: "50%", background: `radial-gradient(circle,${c}22,transparent)` }} />
-                  <div style={{ width: 38, height: 38, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginBottom: 8 }}>{i}</div>
-                  <div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div>
-                  <div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div>
+            {/* ══════════ PREMIUM MOBILE DASHBOARD ══════════ */}
+            <div className="mobile-dashboard-view" style={{ display: "none" }}>
+              <style>{`
+      @media (max-width: 768px) {
+        .mobile-dashboard-view { display: block !important; margin: -20px -20px 0; }
+        .desktop-dashboard-view { display: none !important; }
+      }
+      @keyframes mdFloatIn { from { opacity:0; transform:translateY(16px);} to {opacity:1; transform:translateY(0);} }
+      @keyframes mdPulseGlow { 0%,100%{opacity:.35;} 50%{opacity:.6;} }
+      .md-card{animation:mdFloatIn .45s cubic-bezier(.22,1,.36,1) both}
+      .md-glow{animation:mdPulseGlow 4s ease-in-out infinite}
+      .md-tap:active{transform:scale(.96);}
+      .md-tap{transition:transform .15s ease}
+    `}</style>
+
+              {/* HERO — deep gradient mesh header */}
+              <div style={{ position: "relative", background: "radial-gradient(130% 100% at 20% -10%, #241a5e 0%, #140f38 40%, #08061a 100%)", borderRadius: "0 0 34px 34px", padding: "20px 18px 96px", color: "#fff", overflow: "hidden" }}>
+                <div className="md-glow" style={{ position: "absolute", top: -70, right: -50, width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle, var(--app-accent) 0%, transparent 70%)", filter: "blur(6px)" }} />
+                <div className="md-glow" style={{ position: "absolute", bottom: -90, left: -40, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, #8b5cf6 0%, transparent 70%)", filter: "blur(10px)", animationDelay: "1.5s" }} />
+
+                <div style={{ position: "relative", zIndex: 2 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
+                    <div className="md-tap" onClick={() => setSidebarOpen(true)} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                      <i className="ti ti-menu-2" style={{ fontSize: 18 }}></i>
+                    </div>
+                    <div style={{ textAlign: "center", flex: 1, padding: "0 10px" }}>
+                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", fontWeight: 800, letterSpacing: 1.5 }}>WELCOME BACK</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{displayName}</div>
+                    </div>
+                    <div className="md-tap" style={{ width: 42, height: 42, borderRadius: 14, background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 13, boxShadow: "0 8px 20px rgba(0,188,212,0.4)", cursor: "pointer", flexShrink: 0 }}>
+                      {(user?.name || "PR").substring(0, 2).toUpperCase()}
+                    </div>
+                  </div>
+
+                  <div style={{ fontSize: 12.5, color: "rgba(255,255,255,0.5)", display: "flex", alignItems: "center", gap: 6, marginBottom: 8, fontWeight: 600 }}>
+                    <i className="ti ti-sparkles" style={{ color: "var(--app-accent)" }}></i> Revenue this month
+                  </div>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 4, flexWrap: "wrap" }}>
+                    <span style={{ fontSize: 38, fontWeight: 900, letterSpacing: -1, background: "linear-gradient(90deg,#fff,#c7d2fe)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                      ₹{(totalRevenue || 0).toLocaleString("en-IN")}
+                    </span>
+                    <span style={{ background: "rgba(74,222,128,0.15)", color: "#4ade80", fontSize: 11.5, fontWeight: 800, padding: "5px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 4 }}>
+                      <i className="ti ti-trending-up"></i> Live
+                    </span>
+                  </div>
+
+                  <div style={{ height: 56, marginTop: 12 }}>
+                    <svg viewBox="0 0 300 56" width="100%" height="100%" preserveAspectRatio="none">
+                      <defs>
+                        <linearGradient id="mdAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="var(--app-accent)" stopOpacity="0.45" />
+                          <stop offset="100%" stopColor="var(--app-accent)" stopOpacity="0" />
+                        </linearGradient>
+                      </defs>
+                      <path d="M0,42 L50,36 L100,44 L150,16 L200,24 L250,10 L300,18 L300,56 L0,56 Z" fill="url(#mdAreaGrad)" />
+                      <polyline fill="none" stroke="var(--app-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points="0,42 50,36 100,44 150,16 200,24 250,10 300,18" />
+                    </svg>
+                  </div>
                 </div>
-              ))}
-            </div>
-            <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 14, marginBottom: 14 }}>
-              <SC title="Recent Projects">
-                <div style={{ overflowX: "auto" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 300 }}>
-                    <thead>
-                      <tr style={{ background: "var(--app-bg)" }}>
-                        {["Project", "Company Name", "Status", "Share", "View"].map(c => <th key={c} style={{ padding: "8px 10px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)" }}>{c.toUpperCase()}</th>)}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {projects.slice(0, 5).map((p, i) => {
-                        const pTasks = (tasks || []).filter(t => (t.project === p.name || t.projectId === p._id || t.projectId === p.id));
-                        const doneTasks = pTasks.length > 0 ? pTasks.filter(t => t.status === "Done").length : 0;
-                        return (
-                          <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)", cursor: "pointer" }} onClick={() => { if (typeof setSelectedProjectForTasks === "function") setSelectedProjectForTasks(p); setActive("tasks"); }}>
-                            <td style={{ padding: "9px 10px", fontWeight: 600, color: T.text }}>
-                              <div style={{ fontSize: 13 }}>{p.name}</div>
-                              <div style={{ fontSize: 11, color: "#22C55E" }}>{p.currency || "₹"} {p.budget || "0"}</div>
-                              <div style={{ marginTop: 4, fontSize: 10, fontWeight: 700, color: "var(--app-accent)", display: "flex", alignItems: "center", gap: 4 }}>
-                                Document {pTasks.length > 0 ? `${doneTasks}/${pTasks.length} Tasks` : "No Tasks"}
+              </div>
+
+              {/* FLOATING STAT STRIP */}
+              <div style={{ margin: "-72px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
+                {[
+                  { icon: "ti-users", label: "Clients", val: clients.length, grad: "linear-gradient(135deg,#7c3aed,#a78bfa)" },
+                  { icon: "ti-folder", label: "Projects", val: projects.length, grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+                  { icon: "ti-user-circle", label: "Team", val: employees.length, grad: "linear-gradient(135deg,#f59e0b,#fbbf24)" },
+                ].map((s, i) => (
+                  <div key={i} className="md-card" style={{ animationDelay: `${i * 70}ms`, background: "#fff", borderRadius: 18, padding: "14px 8px", boxShadow: "0 10px 30px rgba(15,10,41,0.14)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)" }}>
+                    <div style={{ width: 34, height: 34, borderRadius: 11, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", color: "#fff", fontSize: 15, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
+                      <i className={`ti ${s.icon}`}></i>
+                    </div>
+                    <div style={{ fontSize: 19, fontWeight: 900, color: "#0f0a29" }}>{s.val}</div>
+                    <div style={{ fontSize: 10, color: "#94a3b8", fontWeight: 700, marginTop: 1 }}>{s.label}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* QUICK ACTIONS */}
+              <div style={{ padding: "22px 16px 4px" }}>
+                <div style={{ fontSize: 12, fontWeight: 800, color: "#0f0a29", marginBottom: 12, letterSpacing: 0.4 }}>QUICK ACTIONS</div>
+                <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4, WebkitOverflowScrolling: "touch" }}>
+                  {[
+                    { icon: "ti-user-plus", label: "Client", color: "#7c3aed", bg: "linear-gradient(135deg,#ede9fe,#ddd6fe)", action: () => setActive("addClient") },
+                    { icon: "ti-folder-plus", label: "Project", color: "#d97706", bg: "linear-gradient(135deg,#fef3c7,#fde68a)", action: () => setActive("projects") },
+                    { icon: "ti-user-plus", label: "Employee", color: "#0d9488", bg: "linear-gradient(135deg,#ccfbf1,#99f6e4)", action: () => setActive("employees") },
+                    { icon: "ti-checklist", label: "Tasks", color: "#16a34a", bg: "linear-gradient(135deg,#dcfce7,#bbf7d0)", action: () => setActive("tasks") },
+                    { icon: "ti-wallet", label: "Accounts", color: "#2563eb", bg: "linear-gradient(135deg,#dbeafe,#bfdbfe)", action: () => setActive("accounts") },
+                  ].map((a, i) => (
+                    <div key={i} className="md-tap" onClick={a.action} style={{ flex: "0 0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 6, cursor: "pointer", minWidth: 66 }}>
+                      <div style={{ width: 52, height: 52, borderRadius: 16, background: a.bg, color: a.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 6px 16px rgba(0,0,0,0.06)" }}>
+                        <i className={`ti ${a.icon}`}></i>
+                      </div>
+                      <div style={{ fontSize: 10.5, fontWeight: 700, color: "#334155" }}>{a.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* PROJECTS */}
+              <div style={{ padding: "18px 16px 30px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                  <div style={{ fontSize: 16, fontWeight: 900, color: "#0f0a29", display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ width: 6, height: 18, borderRadius: 4, background: "var(--app-accent)", display: "inline-block" }}></span>
+                    Active Projects
+                  </div>
+                  <div className="md-tap" onClick={() => setActive("projects")} style={{ fontSize: 12.5, fontWeight: 800, color: "var(--app-accent)", display: "flex", alignItems: "center", gap: 3, cursor: "pointer" }}>
+                    View All <i className="ti ti-chevron-right" style={{ fontSize: 13 }}></i>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {projects.slice(0, 6).map((p, idx) => {
+                    const pTasks = (tasks || []).filter(t => (t.project === p.name || t.projectId === p._id || t.projectId === p.id));
+                    const doneTasks = pTasks.length > 0 ? pTasks.filter(t => t.status === "Done").length : 0;
+                    const progress = pTasks.length > 0 ? Math.round((doneTasks / pTasks.length) * 100) : (p.progress || 0);
+                    const ringColor = progress >= 80 ? "#16a34a" : progress >= 40 ? "var(--app-accent)" : "#dc2626";
+                    const isExpanded = mobileExpandedProjectIdx === idx;
+                    return (
+                      <div
+                        key={p._id || p.id || idx}
+                        className="md-card"
+                        style={{ animationDelay: `${idx * 40}ms`, background: "#fff", borderRadius: 20, padding: "16px", boxShadow: isExpanded ? "0 14px 34px rgba(15,10,41,0.14)" : "0 4px 16px rgba(15,10,41,0.06)", border: `1px solid ${isExpanded ? "rgba(0,188,212,0.3)" : "rgba(0,0,0,0.04)"}`, cursor: "pointer", transition: "all .25s" }}
+                        onClick={() => setMobileExpandedProjectIdx(prev => prev === idx ? null : idx)}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                          <div style={{ position: "relative", width: 50, height: 50, flexShrink: 0 }}>
+                            <svg width="50" height="50" viewBox="0 0 50 50">
+                              <circle cx="25" cy="25" r="21" fill="none" stroke="#f1f5f9" strokeWidth="5" />
+                              <circle cx="25" cy="25" r="21" fill="none" stroke={ringColor} strokeWidth="5" strokeDasharray={`${(progress / 100) * 132} 132`} strokeLinecap="round" transform="rotate(-90 25 25)" style={{ transition: "stroke-dasharray .5s ease" }} />
+                            </svg>
+                            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: ringColor }}>{progress}%</div>
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f0a29", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
+                            <div style={{ fontSize: 11.5, color: "#94a3b8", marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
+                              <i className="ti ti-building" style={{ fontSize: 12 }}></i>{p.client || "Internal"}
+                            </div>
+                            <div style={{ height: 6, background: "#f1f5f9", borderRadius: 3, marginTop: 9, overflow: "hidden" }}>
+                              <div style={{ width: `${progress}%`, height: "100%", background: `linear-gradient(90deg, ${ringColor}, ${ringColor}cc)`, borderRadius: 3, transition: "width .5s ease" }}></div>
+                            </div>
+                          </div>
+                          <i className={`ti ti-chevron-${isExpanded ? "up" : "down"}`} style={{ color: "#cbd5e1", fontSize: 18, flexShrink: 0 }}></i>
+                        </div>
+
+                        {isExpanded && (
+                          <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px dashed #e2e8f0", display: "flex", flexDirection: "column", gap: 10 }}>
+                            {p.end && (
+                              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "linear-gradient(135deg,#ccfbf1,#a7f3d0)", color: "#0d9488", padding: "6px 12px", borderRadius: 20, fontSize: 11.5, fontWeight: 800, width: "fit-content" }}>
+                                <i className="ti ti-clock"></i> Due {new Date(p.end).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                               </div>
-                            </td>
-                            <td style={{ padding: "9px 10px", color: "var(--app-muted)" }}>{p.client}</td>
-                            <td style={{ padding: "9px 10px" }}><Badge label={p.status} /></td>
-                            <td style={{ padding: "9px 10px" }} onClick={e => e.stopPropagation()}>
-                              <button onClick={() => {
-                                const text = `Folder *Project Details*\n\nProject: ${p.name}\nCompany: ${p.client}\nStatus: ${p.status}\nDeadline: ${p.end ? new Date(p.end).toLocaleDateString() : "—"}\nBudget: ${p.currency || "₹"} ${p.budget || "0"}`;
-                                const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-                                window.open(wpUrl, "_blank");
-                              }} style={{ background: "#25D366", color: "#fff", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Share</button>
-                            </td>
-                            <td style={{ padding: "9px 10px" }}>
-                              <button onClick={() => setViewProject(p)} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 6, padding: "5px 12px", fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>View</button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                            )}
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "#64748b" }}>
+                              <i className="ti ti-currency-rupee" style={{ fontSize: 14 }}></i>
+                              {p.currency || "₹"} {p.budget || "0"} budget
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "#64748b" }}>
+                              <i className="ti ti-checklist" style={{ fontSize: 14 }}></i>
+                              {pTasks.length > 0 ? `${doneTasks}/${pTasks.length} tasks done` : "No tasks yet"}
+                            </div>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setViewProject(p); }}
+                              style={{ marginTop: 4, background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 10, padding: "10px", fontSize: 12.5, fontWeight: 800, cursor: "pointer" }}
+                            >
+                              Open Project
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                  {projects.length === 0 && (
+                    <div style={{ textAlign: "center", padding: "30px 0", color: "#94a3b8", fontSize: 13 }}>No projects yet</div>
+                  )}
                 </div>
-              </SC>
-              <SC title="Recent Activity">{[{ icon: "Profile", text: "New client added", time: "2m ago", c: "var(--app-accent)" }, { icon: "‍Job", text: "Employee joined", time: "30m ago", c: "var(--app-accent)" }, { icon: "", text: "Invoice created", time: "1h ago", c: "#22C55E" }, { icon: "Folder", text: "Project updated", time: "3h ago", c: "var(--app-muted)" }, { icon: "Success", text: "ERP completed", time: "2d ago", c: "#F59E0B" }].map((a, i) => (<div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 0", borderBottom: i < 4 ? "1px solid var(--app-bg)" : "none" }}><div style={{ width: 28, height: 28, borderRadius: 8, background: `${a.c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>{a.icon}</div><div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 12, fontWeight: 600, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.text}</div><div style={{ fontSize: 11, color: "var(--app-muted)" }}>{a.time}</div></div></div>))}</SC>
+              </div>
+
+              {/* FLOATING BOTTOM NAV */}
+              <div style={{ position: "fixed", bottom: 14, left: 14, right: 14, background: "rgba(15,10,41,0.94)", backdropFilter: "blur(16px)", borderRadius: 24, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "10px 6px", zIndex: 4000, boxShadow: "0 12px 32px rgba(15,10,41,0.35)" }}>
+                {[
+                  { icon: "ti-home", label: "Home", key: "dashboard" },
+                  { icon: "ti-folder", label: "Projects", key: "projects" },
+                  { icon: null, label: "", key: "add" },
+                  { icon: "ti-users", label: "Clients", key: "clients" },
+                  { icon: "ti-dots", label: "More", key: "settings" },
+                ].map((n, i) => n.key === "add" ? (
+                  <div key={i} className="md-tap" onClick={() => setActive("projects")} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#26d0ce)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", border: "3px solid #08061a", cursor: "pointer" }}>+</div>
+                ) : (
+                  <div key={i} className="md-tap" onClick={() => setActive(n.key)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: active === n.key ? "var(--app-accent)" : "rgba(255,255,255,0.5)", padding: "4px 10px", cursor: "pointer" }}>
+                    <i className={`ti ${n.icon}`} style={{ fontSize: 19 }}></i>
+                    <span style={{ fontSize: 9.5, fontWeight: 700 }}>{n.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-              <SC title="Project Progress">{TRACKING_SEED.map(t => (<div key={t.id} style={{ marginBottom: 12 }}><div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}><span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{t.name}</span><span style={{ fontSize: 12, fontWeight: 700, color: sc(t.status) }}>{t.pct}%</span></div><div style={{ background: "var(--app-border)", borderRadius: 6, height: 6 }}><div style={{ width: `${t.pct}%`, background: t.pct === 100 ? "linear-gradient(90deg,#22C55E,#4ade80)" : "linear-gradient(90deg,var(--app-accent),var(--app-muted))", borderRadius: 6, height: "100%" }} /></div><div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{t.client}</div></div>))}</SC>
-              <SC title="Invoice Status">{INVOICES.map(inv => (<div key={inv.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid var(--app-bg)" }}><div><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{inv.id} · {inv.client}</div><div style={{ fontSize: 11, color: "var(--app-muted)" }}>Due: {inv.due}</div></div><div style={{ textAlign: "right" }}><div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 3 }}>{inv.total}</div><Badge label={inv.status} /></div></div>))}</SC>
+
+            {/* ══════════ DESKTOP DASHBOARD (unchanged) ══════════ */}
+            <div className="desktop-dashboard-view">
+              <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 18 }}>
+                {[{ t: "Total Clients", v: clients.length, i: "Team", c: "var(--app-accent)" }, { t: "Employees", v: employees.length, i: "‍Job", c: "var(--app-accent)" }, { t: "Managers", v: managers.length, i: "‍Job", c: "#f59e0b" }, { t: "Projects", v: projects.length, i: "Folder", c: "var(--app-muted)" }, { t: "Invoices", v: INVOICES.length, i: "", c: "#22C55E" }].map(({ t, v, i, c }) => (
+                  <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}>
+                    <div style={{ position: "absolute", top: -12, right: -12, width: 60, height: 60, borderRadius: "50%", background: `radial-gradient(circle,${c}22,transparent)` }} />
+                    <div style={{ width: 38, height: 38, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginBottom: 8 }}>{i}</div>
+                    <div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 14, marginBottom: 14 }}>
+                <SC title="Recent Projects">
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 300 }}>
+                      <thead>
+                        <tr style={{ background: "var(--app-bg)" }}>
+                          {["Project", "Company Name", "Status", "Share", "View"].map(c => <th key={c} style={{ padding: "8px 10px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)" }}>{c.toUpperCase()}</th>)}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {projects.slice(0, 5).map((p, i) => {
+                          const pTasks = (tasks || []).filter(t => (t.project === p.name || t.projectId === p._id || t.projectId === p.id));
+                          const doneTasks = pTasks.length > 0 ? pTasks.filter(t => t.status === "Done").length : 0;
+                          return (
+                            <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)", cursor: "pointer" }} onClick={() => { if (typeof setSelectedProjectForTasks === "function") setSelectedProjectForTasks(p); setActive("tasks"); }}>
+                              <td style={{ padding: "9px 10px", fontWeight: 600, color: T.text }}>
+                                <div style={{ fontSize: 13 }}>{p.name}</div>
+                                <div style={{ fontSize: 11, color: "#22C55E" }}>{p.currency || "₹"} {p.budget || "0"}</div>
+                                <div style={{ marginTop: 4, fontSize: 10, fontWeight: 700, color: "var(--app-accent)", display: "flex", alignItems: "center", gap: 4 }}>
+                                  Document {pTasks.length > 0 ? `${doneTasks}/${pTasks.length} Tasks` : "No Tasks"}
+                                </div>
+                              </td>
+                              <td style={{ padding: "9px 10px", color: "var(--app-muted)" }}>{p.client}</td>
+                              <td style={{ padding: "9px 10px" }}><Badge label={p.status} /></td>
+                              <td style={{ padding: "9px 10px" }} onClick={e => e.stopPropagation()}>
+                                <button onClick={() => {
+                                  const text = `Folder *Project Details*\n\nProject: ${p.name}\nCompany: ${p.client}\nStatus: ${p.status}\nDeadline: ${p.end ? new Date(p.end).toLocaleDateString() : "—"}\nBudget: ${p.currency || "₹"} ${p.budget || "0"}`;
+                                  const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+                                  window.open(wpUrl, "_blank");
+                                }} style={{ background: "#25D366", color: "#fff", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Share</button>
+                              </td>
+                              <td style={{ padding: "9px 10px" }}>
+                                <button onClick={() => setViewProject(p)} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 6, padding: "5px 12px", fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>View</button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </SC>
+                <SC title="Recent Activity">{[{ icon: "Profile", text: "New client added", time: "2m ago", c: "var(--app-accent)" }, { icon: "‍Job", text: "Employee joined", time: "30m ago", c: "var(--app-accent)" }, { icon: "", text: "Invoice created", time: "1h ago", c: "#22C55E" }, { icon: "Folder", text: "Project updated", time: "3h ago", c: "var(--app-muted)" }, { icon: "Success", text: "ERP completed", time: "2d ago", c: "#F59E0B" }].map((a, i) => (<div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 0", borderBottom: i < 4 ? "1px solid var(--app-bg)" : "none" }}><div style={{ width: 28, height: 28, borderRadius: 8, background: `${a.c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>{a.icon}</div><div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 12, fontWeight: 600, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.text}</div><div style={{ fontSize: 11, color: "var(--app-muted)" }}>{a.time}</div></div></div>))}</SC>
+              </div>
+              <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                <SC title="Project Progress">{TRACKING_SEED.map(t => (<div key={t.id} style={{ marginBottom: 12 }}><div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}><span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{t.name}</span><span style={{ fontSize: 12, fontWeight: 700, color: sc(t.status) }}>{t.pct}%</span></div><div style={{ background: "var(--app-border)", borderRadius: 6, height: 6 }}><div style={{ width: `${t.pct}%`, background: t.pct === 100 ? "linear-gradient(90deg,#22C55E,#4ade80)" : "linear-gradient(90deg,var(--app-accent),var(--app-muted))", borderRadius: 6, height: "100%" }} /></div><div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{t.client}</div></div>))}</SC>
+                <SC title="Invoice Status">{INVOICES.map(inv => (<div key={inv.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid var(--app-bg)" }}><div><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{inv.id} · {inv.client}</div><div style={{ fontSize: 11, color: "var(--app-muted)" }}>Due: {inv.due}</div></div><div style={{ textAlign: "right" }}><div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 3 }}>{inv.total}</div><Badge label={inv.status} /></div></div>))}</SC>
+              </div>
             </div>
           </>}
 

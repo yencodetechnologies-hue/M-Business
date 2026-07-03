@@ -446,7 +446,7 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16, padding: 24 }}>
-      <div style={{ fontSize: 22, fontWeight: 800, color: T.text }}>My Documents</div>
+
 
       {pendingDocRequests.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -881,7 +881,7 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
         {/* Projects */}
         <div style={cardStyle}>
-          <div style={headStyle}><div style={titleStyle}>Job My Projects</div><span style={{ fontSize: 12, fontWeight: 800, color: TC.teal }}>{activeProj} active</span></div>
+          <div style={headStyle}><span style={{ fontSize: 12, fontWeight: 800, color: TC.teal }}>{activeProj} active</span></div>
           <div style={{ padding: "8px 18px" }}>
             {projects.slice(0, 4).map((p, i) => {
               const pTasks = tasks.filter(t => {

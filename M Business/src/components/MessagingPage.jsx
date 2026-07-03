@@ -14,6 +14,7 @@ export default function MessagingPage({ user }) {
   const [sending, setSending] = useState(false);
   const [attachUploading, setAttachUploading] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [convFilter, setConvFilter] = useState("all");
   const chatEndRef = useRef(null);
 
   const companyId = user?.companyId || user?._id || "";
@@ -121,14 +122,24 @@ export default function MessagingPage({ user }) {
         </div>
 
         <div className="conv-tabs">
-          <button className="ctab active">All <span style={{ background: "var(--teal)", color: "#fff", fontSize: 9, padding: "1px 5px", borderRadius: 20, marginLeft: 4 }}>{users.length}</span></button>
-          <button className="ctab">Internal</button>
-          <button className="ctab">Clients</button>
-          <button className="ctab">Groups</button>
+          <button className={`ctab ${convFilter === "all" ? "active" : ""}`} onClick={() => setConvFilter("all")}>All <span style={{ background: "var(--teal)", color: "#fff", fontSize: 9, padding: "1px 5px", borderRadius: 20, marginLeft: 4 }}>{users.length}</span></button>
+          <button className={`ctab ${convFilter === "internal" ? "active" : ""}`} onClick={() => setConvFilter("internal")}>Internal</button>
+          <button className={`ctab ${convFilter === "clients" ? "active" : ""}`} onClick={() => setConvFilter("clients")}>Clients</button>
+          <button className={`ctab ${convFilter === "groups" ? "active" : ""}`} onClick={() => setConvFilter("groups")}>Groups</button>
         </div>
 
         <div className="conv-list">
-          {users.map(u => {
+          {convFilter === "groups" ? (
+            <div style={{ padding: "30px 16px", textAlign: "center", color: "var(--app-muted, #94A3B0)", fontSize: 13 }}>
+              Group conversations aren't available yet.
+            </div>
+          ) : users.filter(u => {
+            if (convFilter === "all") return true;
+            const role = (u.role || "").toLowerCase();
+            if (convFilter === "clients") return role === "client";
+            if (convFilter === "internal") return role !== "client";
+            return true;
+          }).map(u => {
             const init = u.name ? u.name.substring(0, 2).toUpperCase() : "U";
             const lastMsg = messages.filter(m =>
               (m.senderId === (user.id || user._id) && m.receiverId === u._id) ||
@@ -259,7 +270,7 @@ export default function MessagingPage({ user }) {
                   <i className="ti ti-paperclip"></i>
                   <input type="file" style={{ display: "none" }} onChange={handleFileSelected} disabled={attachUploading} />
                 </label>
-               
+
                 <div className="toolbar-divider"></div>
                 <div className="toolbar-btn" title="Emoji" onClick={() => setShowEmojiPicker(v => !v)}>
                   <i className="ti ti-mood-smile"></i>

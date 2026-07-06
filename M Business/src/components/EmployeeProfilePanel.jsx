@@ -315,7 +315,7 @@ export function SubAdminDocumentsPage({ employees = [] }) {
       <div style={{ background: "#fff", borderRadius: 16, border: "1px solid var(--app-border)", padding: "16px 18px" }}>
         <div style={{ fontSize: 14, fontWeight: 800, color: "var(--app-text)", marginBottom: 14 }}>Folder Employee Documents</div>
         <div style={{ position: "relative", marginBottom: 14 }}>
-          <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}>Search</span>
+          <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}></span>
           <input placeholder="Search employee..." value={search} onChange={e => setSearch(e.target.value)}
             style={{ width: "100%", padding: "9px 12px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, outline: "none", fontFamily: "inherit", background: "var(--app-bg)", boxSizing: "border-box" }} />
         </div>

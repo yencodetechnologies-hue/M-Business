@@ -766,9 +766,9 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
           <div style={{
             display: "flex", alignItems: "center", gap: 6,
             border: `1px solid #0073ea`, borderRadius: 6,
-            padding: "8px 12px", background: "#fff"
+            padding: "8px 12px"
           }}>
-            <span style={{ fontSize: 14, color: P.muted }}>Search</span>
+            <span style={{ fontSize: 14, color: P.muted }}></span>
             <input
               ref={inputRef}
               value={search}

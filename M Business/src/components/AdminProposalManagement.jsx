@@ -552,7 +552,7 @@ function EmployeeDropdown({ employees, value, onChange, error }) {
                 top: "50%",
                 transform: "translateY(-50%)",
                 fontSize: 12
-              }}>Search</span>
+              }}></span>
               <input
                 autoFocus
                 placeholder="Search employee..."

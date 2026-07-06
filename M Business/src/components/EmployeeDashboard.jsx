@@ -389,10 +389,10 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
         const allDocs = Array.isArray(docsRes.data) ? docsRes.data : (docsRes.data?.value || []);
         const norm = (s) => (s || "").trim().toLowerCase().replace(/\s+/g, " ");
         const myDocs = allDocs.filter(d => {
-          if (empId && String(d.clientId || "").trim() === empId) return true;
+          if (empId && String(d.employeeId || "").trim() === empId) return true;
           const docClient = norm(d.client);
           const dn = norm(displayName);
-          return !!dn && (docClient === dn || docClient.includes(dn) || dn.includes(docClient));
+          return d.sendTo === "employee" && !!dn && (docClient === dn || docClient.includes(dn) || dn.includes(docClient));
         });
         const empName = user?.name || user?.employeeName || '';
         const projFiles = (Array.isArray(projRes.data) ? projRes.data : []).flatMap(p =>

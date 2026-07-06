@@ -35,7 +35,7 @@ new_inner = new_inner.replace('<div class="inv-logo-box">YT</div>', '${logo}')
 new_inner = new_inner.replace('YENCODE Technologies', '${co}')
 new_inner = new_inner.replace('GST: 33ABCDE1234F1Z5', 'GST: ${v("f-gst")||""}')
 new_inner = new_inner.replace('', '${v("f-email")||""}')
-new_inner = new_inner.replace('+91 89254 33533', '${v("f-phone")||""}')
+new_inner = new_inner.replace('', '${v("f-phone")||""}')
 new_inner = new_inner.replace('Chennai, Tamil Nadu, India – 600001', '${v("f-addr")||""}')
 
 # Invoice details

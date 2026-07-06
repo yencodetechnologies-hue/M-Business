@@ -515,7 +515,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     client: "", project: "", gstRate: 18, notes: "Thank you for your business! Please make payment within the due date.\nFor queries contact: ",
     terms: "1. Payment is due within the agreed terms.\n2. Late payments are subject to 2% monthly interest.\n3. All disputes subject to Chennai jurisdiction.",
     companyName: "YENCODE Technologies", companyEmail: "",
-    companyPhone: "+91 89254 33533", companyAddress: "Chennai, Tamil Nadu, India – 600001",
+    companyPhone: "", companyAddress: "Chennai, Tamil Nadu, India – 600001",
     currency: "INR",
     customCurrencySymbol: "",
     status: "pending",

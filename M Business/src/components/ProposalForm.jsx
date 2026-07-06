@@ -543,7 +543,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
         </div>
         <div class="form-row">
           <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="fromEmail" value="" oninput="up()"></div>
-          <div class="fg"><label class="fl">Phone</label><input class="fi" type="tel" id="fromPhone" value="+91 89254 33533" oninput="up()"></div>
+          <div class="fg"><label class="fl">Phone</label><input class="fi" type="tel" id="fromPhone" value="" oninput="up()"></div>
         </div>
         <div class="fg"><label class="fl">Address</label><input class="fi" type="text" id="fromAddr" value="Chennai, Tamil Nadu, India" oninput="up()"></div>
         <div style="height:1px;background:var(--border);margin:14px 0"></div>

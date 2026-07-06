@@ -30,9 +30,9 @@ old_blank_part = """  const blank = {
 
 new_blank_part = """  const blank = {
     invoiceNo: generateInvoiceNo(), orderNo: "", date: "2026-06-01", dueDate: "2026-06-15",
-    client: "", project: "", gstRate: 18, notes: "Thank you for your business! Please make payment within the due date.\\nFor queries contact: yencodetechnologies@gmail.com",
+    client: "", project: "", gstRate: 18, notes: "Thank you for your business! Please make payment within the due date.\\nFor queries contact: ",
     terms: "1. Payment is due within the agreed terms.\\n2. Late payments are subject to 2% monthly interest.\\n3. All disputes subject to Chennai jurisdiction.",
-    companyName: "YENCODE Technologies", companyEmail: "yencodetechnologies@gmail.com",
+    companyName: "YENCODE Technologies", companyEmail: "",
     companyPhone: "+91 89254 33533", companyAddress: "Chennai, Tamil Nadu, India – 600001",
     currency: "₹",
     template: "Classic",

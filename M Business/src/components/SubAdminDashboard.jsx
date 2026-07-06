@@ -2707,6 +2707,72 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
           onDelete={() => setDeleteTarget(viewEmp)}
 
+          onActivate={async () => {
+
+            if (!window.confirm(`Are you sure you want to activate ${viewEmp.name}?`)) return;
+
+            try {
+
+              await axios.put(`${BASE_URL}/api/employees/status/${viewEmp._id}`, { status: "Approved" });
+
+              setViewEmp(prev => ({ ...prev, status: "Approved" }));
+
+              setEmployees(prev => prev.map(e => e._id === viewEmp._id ? { ...e, status: "Approved" } : e));
+
+              showToast("✅ Employee activated!");
+
+            } catch (err) {
+
+              showToast("Failed to activate employee", "error");
+
+            }
+
+          }}
+
+          onActivate={async () => {
+
+            if (!window.confirm(`Are you sure you want to activate ${viewEmp.name}?`)) return;
+
+            try {
+
+              await axios.put(`${BASE_URL}/api/employees/status/${viewEmp._id}`, { status: "Approved" });
+
+              setViewEmp(prev => ({ ...prev, status: "Approved" }));
+
+              setEmployees(prev => prev.map(e => e._id === viewEmp._id ? { ...e, status: "Approved" } : e));
+
+              showToast("✅ Employee activated!");
+
+            } catch (err) {
+
+              showToast("Failed to activate employee", "error");
+
+            }
+
+          }}
+
+          onActivate={async () => {
+
+            if (!window.confirm(`Are you sure you want to activate ${viewEmp.name}?`)) return;
+
+            try {
+
+              await axios.put(`${BASE_URL}/api/employees/status/${viewEmp._id}`, { status: "Approved" });
+
+              setViewEmp(prev => ({ ...prev, status: "Approved" }));
+
+              setEmployees(prev => prev.map(e => e._id === viewEmp._id ? { ...e, status: "Approved" } : e));
+
+              showToast("✅ Employee activated!");
+
+            } catch (err) {
+
+              showToast("Failed to activate employee", "error");
+
+            }
+
+          }}
+
           onDeactivate={async () => {
 
             if (!window.confirm(`Are you sure you want to deactivate ${viewEmp.name}?`)) return;

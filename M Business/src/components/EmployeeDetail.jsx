@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BASE_URL } from "../config";
 
-export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeactivate, onChangeRole, empDocs, empDocsLoading, projects = [], tasks = [], onViewProject }) {
+export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeactivate, onActivate, onChangeRole, empDocs, empDocsLoading, projects = [], tasks = [], onViewProject }) {
   if (!emp) return null;
 
   const [taskTab, setTaskTab] = useState('all');
@@ -145,7 +145,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
       if (companyId) headers['x-company-id'] = companyId;
 
       // Fetch tasks directly assigned to this employee
-      const res = await axios.get(`${BASE_URL}/api/employee-dashboard/tasks/${encodeURIComponent(emp.name)}`, { headers });
+      const res = await axios.get(`${BASE_URL}/api/employee-dashboard/tasks/employee/${encodeURIComponent(emp.name)}`, { headers });
       const directTasks = res.data || [];
 
       // Also fetch ALL tasks for projects where this employee is a team member
@@ -569,7 +569,11 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         <div className="ed-actions">
           <button className="ed-btn" onClick={onEdit}><i className="ti ti-edit"></i> Edit Details</button>
           <button className="ed-btn warning" onClick={onChangeRole}><i className="ti ti-shield"></i> Change Role</button>
-          <button className="ed-btn danger" onClick={onDeactivate}><i className="ti ti-user-x"></i> Deactivate</button>
+          {["active", "approved"].includes((emp.status || "").toLowerCase()) ? (
+            <button className="ed-btn danger" onClick={onDeactivate}><i className="ti ti-user-x"></i> Deactivate</button>
+          ) : (
+            <button className="ed-btn" style={{ background: "#ECFDF5", color: "#059669", border: "1px solid #A7F3D0" }} onClick={onActivate}><i className="ti ti-user-check"></i> Activate</button>
+          )}
         </div>
       </div>
 

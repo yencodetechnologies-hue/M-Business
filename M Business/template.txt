@@ -342,7 +342,7 @@ body{display:flex}
             </div>
 
             <div class="form-row">
-              <div class="fg"><label class="fl">Initials</label><input class="fi" id="f-init" value="YT" maxlength="3" oninput="render()"></div>
+              <div class="fg"><label class="fl">Initials</label><input class="fi" id="f-init" value="" maxlength="3" oninput="render()"></div>
               <div class="fg"><label class="fl">Logo Size</label>
                 <div class="range-row"><input type="range" id="logoSz" min="28" max="100" value="52" oninput="setV('logoSzV',this.value,'px');render()"><span class="rv" id="logoSzV">52px</span></div>
               </div>
@@ -355,10 +355,10 @@ body{display:flex}
               <div class="fg"><label class="fl">Phone</label><input class="fi" id="f-phone" value="" oninput="render()"></div>
             </div>
             <div class="form-row">
-              <div class="fg"><label class="fl">Website</label><input class="fi" id="f-web" value="www.yencode.in" oninput="render()"></div>
+              <div class="fg"><label class="fl">Website</label><input class="fi" id="f-web" value="" oninput="render()"></div>
               <div class="fg"><label class="fl">GST No.</label><input class="fi" id="f-gst" value="33ABCDE1234F1Z5" oninput="render()"></div>
             </div>
-            <div class="fg"><label class="fl">Address</label><input class="fi" id="f-addr" value="Chennai, Tamil Nadu – 600001" oninput="render()"></div>
+            <div class="fg"><label class="fl">Address</label><input class="fi" id="f-addr" value="" oninput="render()"></div>
           </div>
         </div>
 

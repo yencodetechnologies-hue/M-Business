@@ -35,7 +35,7 @@ export default function QuotationCreatorModern({{ user, clients = [], projects =
     description: "",
     fromCompany: "YENCODE Technologies",
     fromName: "Prabhu R",
-    fromEmail: "yencodetechnologies@gmail.com",
+    fromEmail: "",
     fromPhone: "+91 89254 33533",
     toName: "",
     toContact: "",

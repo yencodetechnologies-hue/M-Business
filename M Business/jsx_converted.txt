@@ -385,7 +385,7 @@ body{display:flex;min-height:100vh}
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">Email</label>
-              <input className="form-input" type="email" id="fromEmail" value="yencodetechnologies@gmail.com" onInput="updatePreview()" />
+              <input className="form-input" type="email" id="fromEmail" value="" onInput="updatePreview()" />
             </div>
             <div className="form-group">
               <label className="form-label">Phone</label>
@@ -824,7 +824,7 @@ Phase 3: Testing & Launch (2 weeks)</textarea>
           </div>
           <div className="form-group">
             <label className="form-label">Notes to Client</label>
-            <textarea className="form-textarea" id="quoNotes" onInput="updatePreview()">Thank you for considering YENCODE Technologies. This quotation is valid for 15 days. For queries, reach us at yencodetechnologies@gmail.com</textarea>
+            <textarea className="form-textarea" id="quoNotes" onInput="updatePreview()">Thank you for considering YENCODE Technologies. This quotation is valid for 15 days. For queries, reach us at </textarea>
           </div>
           <div className="form-group">
             <label className="form-label">Terms & Conditions</label>
@@ -864,7 +864,7 @@ Phase 3: Testing & Launch (2 weeks)</textarea>
               <div className="quo-logo-box">YT</div>
               <div className="quo-company" id="pFromCompany">YENCODE Technologies</div>
               <div className="quo-company-sub" id="pFromSub">
-                yencodetechnologies@gmail.com<br>
+                <br>
                 +91 89254 33533
               </div>
             </div>

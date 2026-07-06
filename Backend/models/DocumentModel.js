@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const DocumentSchema = new mongoose.Schema({
     docType: { type: String, default: "lh" },
     sendTo: { type: String, enum: ['client', 'employee'], default: "client" },
-    client: { type: String, required: true }, // The display name or ID of the receiver
+    client: { type: String, required: true },
     recipientEmail: { type: String },
     htmlContent: { type: String, required: true },
     senderCompany: { type: String },

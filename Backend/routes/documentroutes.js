@@ -26,7 +26,6 @@ router.post('/', async (req, res) => {
 
         const savedDoc = await newDoc.save();
 
-        // Notify the client when a document/file is shared with them
         if (sendTo === "client" && clientId) {
             try {
                 await new Notification({
@@ -34,11 +33,9 @@ router.post('/', async (req, res) => {
                     type: "document",
                     icon: "ti-files",
                     text: `A new document has been shared with you`,
-                    link: "files",
-                    companyId: companyId || "",
                 }).save();
             } catch (notifErr) {
-                console.error("Failed to create document notification:", notifErr.message);
+                console.error("Failed to create notification:", notifErr.message);
             }
         }
 
@@ -59,21 +56,23 @@ router.get('/', async (req, res) => {
         let query = {};
         if (companyId) query.companyId = companyId;
 
-        // Strict clientId match if provided (portal requests always send this)
         const clientId = req.query.clientId || "";
-        if (clientId) {
+        const employeeId = req.query.employeeId || "";
+
+        if (employeeId) {
+            query.employeeId = employeeId;
+        } else if (clientId) {
             query.clientId = clientId;
         } else if (client) {
-            // Legacy fallback: name match for documents saved before clientId existed
             query.client = new RegExp(`^${client}$`, 'i');
         }
 
-        // If sendTo is provided, filter by recipient type (client/employee)
         if (sendTo) {
             query.sendTo = sendTo;
         }
 
-        const documents = await Document.find(query).sort({ dateSent: -1 }); res.json(documents);
+        const documents = await Document.find(query).sort({ dateSent: -1 });
+        res.json(documents);
     } catch (err) {
         res.status(500).json({ msg: err.message });
     }

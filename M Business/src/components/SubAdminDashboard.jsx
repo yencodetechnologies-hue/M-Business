@@ -7432,19 +7432,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     const handleMessage = async (e) => {
 
       if (e.data && e.data.type === "SEND_DOCUMENT") {
-
         const payload = e.data.payload;
-
         if (!payload) return;
 
-
-
         const companyId = resolveSubadminId();
-
         const sendTo = payload.sendTo || "client";
 
         let resolvedClientId = payload.clientId || "";
-
         if (!resolvedClientId && sendTo === "client") {
           const match = clients.find(c => (c.clientName || c.name) === payload.client);
           resolvedClientId = match?._id || match?.id || "";
@@ -7456,39 +7450,22 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         }
 
         try {
-
           await axios.post(`${BASE_URL}/api/documents`, {
-
             docType: payload.docType || "lh",
-
             sendTo,
-
             client: payload.client || (sendTo === "employee" ? "Employee" : "Client"),
-
             clientId: sendTo === "client" ? resolvedClientId : "",
-
             employeeId: sendTo === "employee" ? resolvedEmployeeId : "",
-
             recipientEmail: payload.recipientEmail || "",
-
             htmlContent: payload.htmlContent || "",
-
             senderCompany: companyNameStr,
-
             companyId
-
           });
-
           toast.success(`Document sent to ${payload.client || "Client"} successfully!`);
-
         } catch (err) {
-
           console.error("Failed to send document:", err);
-
           toast.error("Failed to send document. Check connection.");
-
         }
-
       }
 
       if (e.data && e.data.type === "SAVE_QUOTATION") {

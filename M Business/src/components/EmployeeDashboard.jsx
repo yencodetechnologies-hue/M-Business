@@ -379,11 +379,8 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
         const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
         const displayName = (user?.name || "").trim().toLowerCase();
         const empId = String(user?._id || user?.id || "").trim();
-        console.log("[EmployeeDocs] user=", user);
-        console.log("[EmployeeDocs] companyId=", companyId, "displayName=", displayName);
-        // Fetch all employee docs (bypassing strict companyId requirement) then filter by name client-side
         const [docsRes, projRes] = await Promise.all([
-          axios.get(`${BASE_URL}/api/documents?sendTo=employee`),
+          axios.get(`${BASE_URL}/api/documents?sendTo=employee${empId ? `&employeeId=${empId}` : ""}`),
           axios.get(`${BASE_URL}/api/projects`)
         ]);
         const allDocs = Array.isArray(docsRes.data) ? docsRes.data : (docsRes.data?.value || []);

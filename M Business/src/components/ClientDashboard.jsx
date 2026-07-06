@@ -2729,6 +2729,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           <ModernProjectDetails
             key={selectedClientProject._id || selectedClientProject.id}
             fromClientContext
+            hideTopActions
             project={{
               ...selectedClientProject,
               contactEmail: selectedClientProject.contactEmail || user?.email || "",

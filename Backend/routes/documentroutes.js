@@ -6,7 +6,7 @@ const Notification = require('../models/NotificationModel');
 // Send a new document (from subadmin to client/employee)
 router.post('/', async (req, res) => {
     try {
-        const { docType, sendTo, client, recipientEmail, htmlContent, senderCompany, companyId, clientId } = req.body;
+        const { docType, sendTo, client, recipientEmail, htmlContent, senderCompany, companyId, clientId, employeeId } = req.body;
 
         if (!companyId || !client || !htmlContent) {
             return res.status(400).json({ msg: "companyId, client name, and htmlContent are required." });
@@ -20,7 +20,8 @@ router.post('/', async (req, res) => {
             htmlContent,
             senderCompany,
             companyId,
-            clientId: clientId || ""
+            clientId: clientId || "",
+            employeeId: employeeId || ""
         });
 
         const savedDoc = await newDoc.save();

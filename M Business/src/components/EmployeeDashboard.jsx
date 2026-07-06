@@ -378,6 +378,7 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
       try {
         const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
         const displayName = (user?.name || "").trim().toLowerCase();
+        const empId = String(user?._id || user?.id || "").trim();
         console.log("[EmployeeDocs] user=", user);
         console.log("[EmployeeDocs] companyId=", companyId, "displayName=", displayName);
         // Fetch all employee docs (bypassing strict companyId requirement) then filter by name client-side
@@ -386,9 +387,12 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
           axios.get(`${BASE_URL}/api/projects`)
         ]);
         const allDocs = Array.isArray(docsRes.data) ? docsRes.data : (docsRes.data?.value || []);
+        const norm = (s) => (s || "").trim().toLowerCase().replace(/\s+/g, " ");
         const myDocs = allDocs.filter(d => {
-          const docClient = (d.client || "").trim().toLowerCase();
-          return !displayName || docClient === displayName || docClient.includes(displayName) || displayName.includes(docClient);
+          if (empId && String(d.clientId || "").trim() === empId) return true;
+          const docClient = norm(d.client);
+          const dn = norm(displayName);
+          return !!dn && (docClient === dn || docClient.includes(dn) || dn.includes(docClient));
         });
         const empName = user?.name || user?.employeeName || '';
         const projFiles = (Array.isArray(projRes.data) ? projRes.data : []).flatMap(p =>

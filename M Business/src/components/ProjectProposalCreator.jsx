@@ -1377,7 +1377,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     const nd = { ...d, updated: new Date().toISOString(), client: d.client || d.clientName || "" };
     persist(nd);
     setDoc(nd);
-    flash("Save Saved!");
+    flash(" Saved!");
   };
   const shareProposal = async (p = doc) => {
     await shareProposalAsPDF(p, companyName, async (proposal) => {

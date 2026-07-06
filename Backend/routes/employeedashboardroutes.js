@@ -133,7 +133,7 @@ router.get("/profile/:name", async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 // PROJECTS
 // ─────────────────────────────────────────────────────────────────────────────
-router.get("/projects/:name", async (req, res) => {
+router.get("/projects/employee/:name", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.name).trim();
     if (!name) return res.json([]);
@@ -177,7 +177,7 @@ router.get("/projects/:name", async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 // TASKS
 // ─────────────────────────────────────────────────────────────────────────────
-router.get("/tasks/:name", async (req, res) => {
+router.get("/tasks/employee/:name", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.name).trim();
     if (!name) return res.json([]);

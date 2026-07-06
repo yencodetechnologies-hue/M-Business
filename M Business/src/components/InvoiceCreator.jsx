@@ -1898,7 +1898,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           <button onClick={clearForm} style={{ padding: "8px 14px", background: "#fff", border: "1.5px solid #f3f4f6", borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: "pointer", color: "#6b7280", fontFamily: "inherit" }}>Clear</button>
           <button onClick={handleSaveDraft} disabled={!!saving}
             style={{ padding: "8px 18px", background: draftSaved ? "#22c55e" : "#fff", border: `1.5px solid ${draftSaved ? "#22c55e" : "#e5e7eb"}`, borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: saving ? "not-allowed" : "pointer", color: draftSaved ? "#fff" : "#374151", fontFamily: "inherit", transition: "all 0.3s" }}>
-            {saving === "draft" ? "Saving…" : draftSaved ? "Success Saved!" : "Save Save Draft"}
+            {saving === "draft" ? "Saving…" : draftSaved ? "Success Saved!" : " Save Draft"}
           </button>
           <button onClick={handleSavePreview} disabled={!!saving}
             style={{ padding: "8px 22px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
@@ -2649,7 +2649,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       <div style={{ display: "flex", gap: 10, marginBottom: 32 }}>
         <button onClick={handleSaveDraft} disabled={!!saving}
           style={{ padding: "13px", background: draftSaved ? "#22c55e" : "#fff", border: `1.5px solid ${draftSaved ? "#22c55e" : "#e5e7eb"}`, borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: saving ? "not-allowed" : "pointer", color: draftSaved ? "#fff" : "#374151", fontFamily: "inherit", transition: "all 0.3s" }}>
-          {saving === "draft" ? "Saving…" : draftSaved ? "Success Saved as Draft!" : "Save Save Draft"}
+          {saving === "draft" ? "Saving…" : draftSaved ? "Success Saved as Draft!" : " Save Draft"}
         </button>
 
         {editingId && (

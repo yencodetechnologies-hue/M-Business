@@ -7441,7 +7441,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
         const companyId = resolveSubadminId();
 
+        const sendTo = payload.sendTo || "client";
 
+        let resolvedClientId = payload.clientId || "";
+
+        if (!resolvedClientId && sendTo === "client") {
+          const match = clients.find(c => (c.clientName || c.name) === payload.client);
+          resolvedClientId = match?._id || match?.id || "";
+        }
+        let resolvedEmployeeId = payload.employeeId || "";
+        if (!resolvedEmployeeId && sendTo === "employee") {
+          const match = employees.find(emp => (emp.name || emp.employeeName) === payload.client);
+          resolvedEmployeeId = match?._id || match?.id || "";
+        }
 
         try {
 
@@ -7449,9 +7461,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             docType: payload.docType || "lh",
 
-            sendTo: payload.sendTo || "client",
+            sendTo,
 
-            client: payload.client || "Client",
+            client: payload.client || (sendTo === "employee" ? "Employee" : "Client"),
+
+            clientId: sendTo === "client" ? resolvedClientId : "",
+
+            employeeId: sendTo === "employee" ? resolvedEmployeeId : "",
 
             recipientEmail: payload.recipientEmail || "",
 

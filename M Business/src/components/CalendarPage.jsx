@@ -879,7 +879,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
               <button onClick={() => { setModal(null); setForm(EMPTY); setErr({}); }} style={{
                 background: "none", border: "none", fontSize: 20,
                 cursor: "pointer", color: finalTheme.accent
-              }}>Close</button>
+              }}>✕</button>
             </div>
 
             {/* Modal body */}
@@ -1047,7 +1047,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                 }}>{modal === "view" ? "Close" : "Cancel"}</button>
                 {modal !== "view" && (
                   <button onClick={save} disabled={saving} style={{ ...Btn, opacity: saving ? 0.7 : 1 }}>
-                    {saving ? "Saving…" : modal === "add" ? "Save Save Event" : "Success Update Event"}
+                    {saving ? "Saving…" : modal === "add" ? " Save Event" : "Success Update Event"}
                   </button>
                 )}
               </div>

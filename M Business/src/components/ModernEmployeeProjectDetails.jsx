@@ -337,9 +337,11 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
   const myProgress = myTotalCount > 0 ? Math.round((myCompletedCount / myTotalCount) * 100) : 0;
   const assigned = Array.isArray(project.assignedTo) ? project.assignedTo : (project.assignedTo ? [project.assignedTo] : []);
   const milestones = Array.isArray(project.milestones) && project.milestones.length > 0 ? project.milestones : [
-    { name: 'Project Kickoff', done: true, date: project.start || new Date().toISOString() },
-    { name: 'Initial Design Phase', done: false, date: '' },
-    { name: 'Final Delivery', done: false, date: project.end || project.deadline || '' }
+    ...(Array.isArray(project.milestones) ? project.milestones.map(m => ({
+      name: m.name || m.title || 'Milestone',
+      done: !!m.done,
+      date: m.date || ''
+    })) : [])
   ];
 
   // ── Sample updates (fallback when no backend updates exist) --------
@@ -673,7 +675,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                         className={`epd2-task-chk ${isDoneT ? 'done' : ''}`}
                         onClick={() => toggleTask(tid)}
                       >
-                        {isDoneT && <span style={{ color: '#fff', fontSize: 9, fontWeight: 900 }}>Yes</span>}
+                        {isDoneT && <i className="ti ti-check" style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}></i>}
                       </div>
                       <div className={`epd2-task-prio ${priCls}`}></div>
                       <div className={`epd2-task-name ${isDoneT ? 'done' : ''}`}>{t.name || t.title}</div>
@@ -783,29 +785,41 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
           {/* MILESTONES */}
           <div className="epd2-card">
             <div className="epd2-card-title" style={{ marginBottom: 14 }}>
-              <i className="ti ti-flag"></i>Milestones
+              <i className="ti ti-flag"></i>Milestone Progress
             </div>
             {milestones.length === 0 ? (
               <div style={{ fontSize: 12, color: P.textLight }}>No milestones defined.</div>
             ) : (
-              milestones.map((m, i) => {
-                const name = m.name || m;
-                const isDoneM = m.done === true || m.status === 'done' || m.status === 'completed';
-                // The first non-done milestone is "active"
-                const firstNotDone = milestones.findIndex(x => !x.done && x.status !== 'done' && x.status !== 'completed');
-                const isActive = !isDoneM && i === firstNotDone;
-                const dotColor = isDoneM ? P.green : isActive ? P.primary : P.border;
-                const dotShadow = isActive ? `0 0 0 3px ${P.primaryMid}` : 'none';
-                const valColor = isDoneM ? P.green : isActive ? P.primary : P.textLight;
-                const valText = isDoneM ? 'Done' : isActive ? 'Active' : (m.date ? fmtDate(m.date) : '—');
-                return (
-                  <div key={i} className="epd2-ms-row">
-                    <div className="epd2-ms-dot" style={{ background: dotColor, boxShadow: dotShadow }}></div>
-                    <div className="epd2-ms-name">{name}</div>
-                    <div className="epd2-ms-val" style={{ color: valColor }}>{valText}</div>
-                  </div>
-                );
-              })
+              <div style={{ display: 'flex', alignItems: 'flex-start', overflowX: 'auto', padding: '10px 0 4px' }}>
+                {milestones.map((m, i) => {
+                  const name = m.name || m;
+                  const isDoneM = m.done === true || m.status === 'done' || m.status === 'completed';
+                  const firstNotDone = milestones.findIndex(x => !x.done && x.status !== 'done' && x.status !== 'completed');
+                  const isActive = !isDoneM && i === firstNotDone;
+                  const dotColor = isDoneM ? P.green : isActive ? P.primary : '#fff';
+                  const dotBorder = isDoneM ? P.green : isActive ? P.primary : P.border;
+                  const textColor = isDoneM ? P.green : isActive ? P.primary : P.textLight;
+                  const valText = isDoneM ? 'Done' : isActive ? 'Active' : (m.date ? fmtDate(m.date) : 'Pending');
+                  return (
+                    <div key={i} style={{ flex: '1 0 140px', textAlign: 'center', position: 'relative' }}>
+                      {i > 0 && (
+                        <div style={{ position: 'absolute', top: 15, left: '-50%', width: '100%', height: 2, background: P.border, zIndex: 0 }}></div>
+                      )}
+                      <div style={{
+                        width: 30, height: 30, borderRadius: '50%', margin: '0 auto 8px', position: 'relative', zIndex: 1,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: dotColor, border: `2px solid ${dotBorder}`,
+                        color: isDoneM || isActive ? '#fff' : P.textLight,
+                        fontSize: 12, fontWeight: 800,
+                      }}>
+                        {isDoneM ? <i className="ti ti-check" style={{ fontSize: 14 }}></i> : i + 1}
+                      </div>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: P.textDark, marginBottom: 4 }}>{name}</div>
+                      <div style={{ fontSize: 11, color: textColor, fontWeight: 700 }}>{valText}</div>
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </div>
         </div>

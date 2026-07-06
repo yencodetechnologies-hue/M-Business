@@ -111,8 +111,8 @@ export default function MessagingPage({ user }) {
           <div className="conv-title-row">
             <div className="conv-title">Messages</div>
             <div className="conv-actions">
-              <div className="icon-btn"><i className="ti ti-edit"></i></div>
-              <div className="icon-btn"><i className="ti ti-dots-vertical"></i></div>
+
+
             </div>
           </div>
           <div className="conv-search">

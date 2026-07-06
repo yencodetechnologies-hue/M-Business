@@ -698,6 +698,10 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       // Client Portal tab is fully isolated: never touch the shared "user"
       // key (that's the Subadmin's own session) and never navigate away
       // to "/" — that route belongs to the Subadmin app, not the portal.
+      const pathClientId = window.location.pathname.split("/client-portal/")[1]?.split("?")[0] || "";
+      if (pathClientId) {
+        try { sessionStorage.removeItem(`portalSession_${pathClientId}`); } catch (e) { }
+      }
       setPortalUser(null);
       window.location.reload(); // reloads this same portal URL only
       return;
@@ -1026,7 +1030,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const CSS = `
   .cp-root {
       --teal:  var(--app-accent, var(--app-accent, #00BCD4));
---teal2: var(--app-accent2, var(--app-accent2, #00ACC1));
+      --teal2var(--app-accent2, var(--app-accent2, #00ACC1));
       --teal3: #006E7F;
       --teal-light: var(--teal-light, var(--teal-light, #E0F7FA));
       --teal-lighter: var(--teal-lighter, #F0FDFE);
@@ -1939,7 +1943,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               const timeStr = !isNaN(meetDate) ? meetDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : (meet.time || '—');
               const dateStr = !isNaN(meetDate) ? meetDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '';
               return (
-                <div key={meet._id || i} className="meeting-item" onClick={() => meet.meetLink ? window.open(meet.meetLink, '_blank') : alert(`Meeting: ${meet.title || meet.subject || 'Meeting'}`)}>
+                <div key={meet._id || i} className="meeting-item" onClick={() => meet.meetLink ? window.open(meet.meetLink, '_blank') : alert(`Meeting: ${meet.title || meet.subject}`)}>
                   <div className="mi-time-col">
                     <div className="mi-time">{timeStr}</div>
                     <div className="mi-dur">{meet.duration || '1h'}</div>

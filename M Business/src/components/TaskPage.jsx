@@ -849,7 +849,7 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
                     fontSize: 14, color: P.text, flex: 1,
                     fontWeight: isActive ? 500 : 400
                   }}>{emp}</span>
-                  {isActive && <span style={{ color: "var(--app-accent)", fontSize: 13 }}>Yes</span>}
+
                 </div>
               );
             })

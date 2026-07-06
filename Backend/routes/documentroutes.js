@@ -3,7 +3,6 @@ const router = express.Router();
 const Document = require('../models/DocumentModel');
 const Notification = require('../models/NotificationModel');
 
-// Send a new document (from subadmin to client/employee)
 router.post('/', async (req, res) => {
     try {
         const { docType, sendTo, client, recipientEmail, htmlContent, senderCompany, companyId, clientId, employeeId } = req.body;
@@ -36,6 +35,7 @@ router.post('/', async (req, res) => {
             try {
                 await new Notification({
                     userId: clientId,
+                    companyId,
                     type: "document",
                     icon: "ti-files",
                     text: `A new document has been shared with you`,
@@ -51,7 +51,6 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Get documents for a specific receiver or company
 router.get('/', async (req, res) => {
     try {
         const { companyId, client, sendTo } = req.query;

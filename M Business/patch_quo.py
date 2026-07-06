@@ -32,7 +32,7 @@ if start_td_css != -1 and end_td_css != -1:
 
 new_inner = quo_preview_inner
 new_inner = new_inner.replace('YENCODE Technologies', '${co}')
-new_inner = new_inner.replace('yencodetechnologies@gmail.com<br>\n                +91 89254 33533', '${v("f-email")||""}<br>\n                ${v("f-phone")||""}')
+new_inner = new_inner.replace('<br>\n                +91 89254 33533', '${v("f-email")||""}<br>\n                ${v("f-phone")||""}')
 new_inner = new_inner.replace('<div class="quo-logo-box">YT</div>', '${logo}')
 new_inner = new_inner.replace('#QUO-2026-0022', '#${v("f-quo-num")}')
 new_inner = new_inner.replace('Date: 01 Jun 2026', 'Date: ${fmtDate(v("f-quo-date"))}')

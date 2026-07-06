@@ -351,8 +351,8 @@ body{display:flex}
             <div class="fg"><label class="fl">Company Name</label><input class="fi" id="f-company" value="YENCODE Technologies" oninput="render()"></div>
             <div class="fg"><label class="fl">Tagline</label><input class="fi" id="f-tagline" value="Innovative Digital Solutions" oninput="render()"></div>
             <div class="form-row">
-              <div class="fg"><label class="fl">Email</label><input class="fi" id="f-email" value="yencodetechnologies@gmail.com" oninput="render()"></div>
-              <div class="fg"><label class="fl">Phone</label><input class="fi" id="f-phone" value="+91 89254 33533" oninput="render()"></div>
+              <div class="fg"><label class="fl">Email</label><input class="fi" id="f-email" value="" oninput="render()"></div>
+              <div class="fg"><label class="fl">Phone</label><input class="fi" id="f-phone" value="" oninput="render()"></div>
             </div>
             <div class="form-row">
               <div class="fg"><label class="fl">Website</label><input class="fi" id="f-web" value="www.yencode.in" oninput="render()"></div>

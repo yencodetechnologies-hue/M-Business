@@ -1656,80 +1656,96 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
 
 // ── SALARY PAGE ----------------------------------------------
 
-function SalaryPage({ salary, user }) {
-  const [selected, setSelected] = useState(salary[0] || null);
+function ReportsPage({ projects, tasks, attendance }) {
+  const totalTasks = tasks.length;
+  const doneTasks = tasks.filter(t => ["done", "completed"].includes((t.status || "").toLowerCase())).length;
+  const inProgTasks = tasks.filter(t => (t.status || "").toLowerCase() === "in progress").length;
+  const pendingTasks = totalTasks - doneTasks - inProgTasks;
+  const highPri = tasks.filter(t => (t.priority || "").toLowerCase() === "high").length;
+
+  const activeProjects = projects.filter(p => !["done", "completed"].includes((p.status || "").toLowerCase()));
+  const completedProjects = projects.filter(p => ["done", "completed"].includes((p.status || "").toLowerCase()));
+
+  const totalHoursLogged = projects.reduce((sum, p) => sum + (Number(p.loggedHours) || 0), 0);
+
+  const presentDays = attendance.filter(a => a.status === "present").length;
+  const absentDays = attendance.filter(a => a.status === "absent").length;
+  const leaveDays = attendance.filter(a => a.status === "leave").length;
+  const totalMarked = presentDays + absentDays + leaveDays;
+  const attRate = totalMarked > 0 ? Math.round((presentDays / totalMarked) * 100) : 0;
+
+  const projectRows = projects.map(p => {
+    const pTasks = tasks.filter(t => {
+      const tProjId = t.projectId && typeof t.projectId === 'object' ? t.projectId._id : t.projectId;
+      const tProjName = t.projectId && typeof t.projectId === 'object' ? t.projectId.name : t.project;
+      return (tProjId && (tProjId === p._id || tProjId === p.id)) || (tProjName && tProjName === p.name);
+    });
+    const done = pTasks.filter(t => ["done", "completed"].includes((t.status || "").toLowerCase())).length;
+    const pct = pTasks.length > 0 ? Math.round((done / pTasks.length) * 100) : (p.progress || 0);
+    return { name: p.name, status: p.status || "Active", total: pTasks.length, done, pct };
+  });
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <div>
-        <h1 style={{ fontSize: 20, fontWeight: 900, color: T.text, margin: 0 }}>Payment History</h1>
-        <p style={{ fontSize: 12, color: T.textMuted, marginTop: 4 }}>Your monthly payment breakdown</p>
+        <h1 style={{ fontSize: 20, fontWeight: 900, color: T.text, margin: 0 }}>Reports</h1>
+        <p style={{ fontSize: 12, color: T.textMuted, marginTop: 4 }}>Attendance, tasks, and project summary</p>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 16, alignItems: "start" }} className="two-col">
-        <Card title="Select Month">
-          {salary.map((s, i) => (
-            <div key={s._id || i} onClick={() => setSelected(s)}
-              style={{ padding: "11px 13px", borderRadius: T.radiusSm, cursor: "pointer", background: selected?._id === s._id ? T.accentLight : "transparent", border: selected?._id === s._id ? `1px solid ${T.borderDark}` : "1px solid transparent", marginBottom: 4, transition: "all 0.15s" }}
-              onMouseEnter={e => { if (selected?._id !== s._id) e.currentTarget.style.background = T.bg; }}
-              onMouseLeave={e => { if (selected?._id !== s._id) e.currentTarget.style.background = "transparent"; }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>{s.month}</div>
-                  <div style={{ fontSize: 11, color: T.textMuted, marginTop: 2 }}>{fmt(s.net)} net</div>
-                </div>
-                <Badge label={s.status || "paid"} />
-              </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14 }}>
+        <StatCard icon="◷" label="Attendance Rate" value={`${attRate}%`} sub={`${presentDays} present / ${totalMarked} marked`} onClick={() => { }} />
+        <StatCard icon="◈" label="Active Projects" value={activeProjects.length} sub={`${completedProjects.length} completed`} onClick={() => { }} />
+        <StatCard icon="◉" label="Tasks Completed" value={`${doneTasks}/${totalTasks}`} sub={`${pendingTasks} pending`} onClick={() => { }} />
+        <StatCard icon="◆" label="Hours Logged" value={totalHoursLogged} sub="Across all projects" onClick={() => { }} />
+      </div>
+
+      <Card title="Attendance Summary">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
+          {[["Present", presentDays, T.success], ["Absent", absentDays, T.danger], ["Leave", leaveDays, T.warning]].map(([lbl, val, color]) => (
+            <div key={lbl} style={{ background: T.bg, borderRadius: T.radiusSm, padding: "14px 10px", textAlign: "center", border: `1px solid ${T.border}` }}>
+              <div style={{ fontSize: 22, fontWeight: 900, color }}>{val}</div>
+              <div style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, marginTop: 4 }}>{lbl}</div>
             </div>
           ))}
-          {salary.length === 0 && <div style={{ textAlign: "center", padding: "2rem", color: T.textFaint, fontSize: 13 }}>No records</div>}
-        </Card>
+        </div>
+      </Card>
 
-        {selected ? (
-          <Card>
-            <div style={{ background: T.accent, borderRadius: T.radiusSm, padding: "18px 20px", marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>Payment Slip</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", marginTop: 2 }}>{selected.month}</div>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.6)" }}>{user?.name || "Employee"}</div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>{user?.department || "—"}</div>
-              </div>
+      <Card title="Task Completion">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10, marginBottom: 14 }}>
+          {[["Total", totalTasks, T.accent], ["Done", doneTasks, T.success], ["In Progress", inProgTasks, T.accent], ["High Priority", highPri, T.danger]].map(([lbl, val, color]) => (
+            <div key={lbl} style={{ background: T.bg, borderRadius: T.radiusSm, padding: "12px 10px", textAlign: "center", border: `1px solid ${T.border}` }}>
+              <div style={{ fontSize: 18, fontWeight: 900, color }}>{val}</div>
+              <div style={{ fontSize: 10, color: T.textMuted, fontWeight: 700, marginTop: 3 }}>{lbl}</div>
             </div>
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: T.textFaint, textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>Earnings</div>
-              {[["Basic Salary", selected.basic], ["HRA", selected.hra], ["Allowances", selected.allowances]].map(([k, v]) => (
-                <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: `1px solid ${T.border}` }}>
-                  <span style={{ fontSize: 13, color: T.textMuted }}>{k}</span>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{fmt(v)}</span>
-                </div>
-              ))}
-              <div style={{ display: "flex", justifyContent: "space-between", padding: "10px", background: T.successBg, borderRadius: T.radiusSm, marginTop: 6, border: `1px solid ${T.successBorder}` }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: T.success }}>Gross Earnings</span>
-                <span style={{ fontSize: 13, fontWeight: 800, color: T.success }}>{fmt((selected.basic || 0) + (selected.hra || 0) + (selected.allowances || 0))}</span>
-              </div>
-            </div>
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: T.textFaint, textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>Deductions</div>
-              <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: `1px solid ${T.border}` }}>
-                <span style={{ fontSize: 13, color: T.textMuted }}>PF + Tax + Others</span>
-                <span style={{ fontSize: 13, fontWeight: 600, color: T.danger }}>- {fmt(selected.deductions)}</span>
-              </div>
-            </div>
-            <div style={{ background: T.accent, borderRadius: T.radiusSm, padding: "14px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.6)", fontWeight: 600, letterSpacing: 1 }}>NET PAYMENT</div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>Paid on {selected.paidOn || "—"}</div>
-              </div>
-              <div style={{ fontSize: 24, fontWeight: 900, color: "#fff" }}>{fmt(selected.net)}</div>
-            </div>
-            <button onClick={() => window.print()} style={{ marginTop: 12, width: "100%", padding: "10px", background: T.bg, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, fontSize: 13, color: T.text, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
-              Print / Download Slip
-            </button>
-          </Card>
+          ))}
+        </div>
+        <ProgressBar pct={totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0} />
+        <div style={{ fontSize: 11, color: T.textMuted, marginTop: 6 }}>
+          {totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0}% of assigned tasks completed
+        </div>
+      </Card>
+
+      <Card title="Project Reports">
+        {projectRows.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "2rem", color: T.textFaint, fontSize: 13 }}>No projects assigned</div>
         ) : (
-          <Card><div style={{ textAlign: "center", padding: "3rem", color: T.textFaint, fontSize: 13 }}>Select a month to view</div></Card>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {projectRows.map((p, i) => (
+              <div key={i} style={{ background: T.bg, borderRadius: T.radiusSm, border: `1px solid ${T.border}`, padding: "13px 16px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>{p.name}</div>
+                  <Badge label={p.status} />
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <ProgressBar pct={p.pct} />
+                  <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, minWidth: 34 }}>{p.pct}%</span>
+                </div>
+                <div style={{ fontSize: 11, color: T.textFaint, marginTop: 6 }}>{p.done} of {p.total} tasks completed</div>
+              </div>
+            ))}
+          </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }
@@ -2231,6 +2247,7 @@ export default function EmployeeDashboard({ user, setUser }) {
             {page === "tasks" && <TasksPage tasks={tasks} onToggle={handleToggleTask} />}
             {page === "attendance" && <AttendancePage attendance={attendance} setAttendance={setAttendance} empName={empName} notify={notify} />}
             {(page === "salary" || page === "payments") && <SalaryPage salary={salary} user={resolvedUser} />}
+            {page === "reports" && <ReportsPage projects={projects} tasks={tasks} attendance={attendance} />}
             {page === "calendar" && (
               <CalendarPage
                 projects={projects}

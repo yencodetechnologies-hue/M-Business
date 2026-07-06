@@ -450,6 +450,17 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const [proposals, setProposals] = useState([]);
   const [quotations, setQuotations] = useState([]);
   const [notifs, setNotifs] = useState([]);
+  const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
+  useEffect(() => {
+    if (!notifDropdownOpen) return;
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('[data-notif-anchor="true"]') && !e.target.closest('[data-notif-panel="true"]')) {
+        setNotifDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [notifDropdownOpen]);
   const [docs, setDocs] = useState([]);
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -937,7 +948,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     icon: "ti-file-type-pdf",
     bg: C.redBg,
     col: C.red,
-    raw: d
+    raw: d,
+    isLetterhead: true
   }));
 
   const allFilesBase = [...docCards, ...(projects.flatMap(p => p.files || []))
@@ -1427,9 +1439,42 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             <button className={`tn-item ${active === "messages" ? "active" : ""}`} onClick={() => setActive("messages")}>Messages</button>
           </div>
           <div className="tn-right">
-            <div className="tn-notif" onClick={() => setActive("dashboard")}>
-              <i className="ti ti-bell"></i>
-              {totalUnreadNotifs > 0 && <span className="tn-notif-dot"></span>}
+            <div style={{ position: "relative" }} data-notif-anchor="true">
+              <div className="tn-notif" onClick={() => {
+                setNotifDropdownOpen(v => !v);
+                if (!notifDropdownOpen && notifs.some(n => !n.isRead)) {
+                  setNotifs(prev => prev.map(n => ({ ...n, isRead: true })));
+                  const userId = user?._id || user?.id;
+                  if (userId) {
+                    axios.patch(`${BASE_URL}/api/notifications/read-all/${userId}`, {}, {
+                      headers: { "x-company-id": user?.companyId || "" }
+                    }).catch(err => console.error("Failed to mark notifications read:", err));
+                  }
+                }
+              }}>
+                <i className="ti ti-bell"></i>
+                {totalUnreadNotifs > 0 && <span className="tn-notif-dot"></span>}
+              </div>
+              {notifDropdownOpen && (
+                <div data-notif-panel="true" style={{ position: "absolute", top: 46, right: 0, width: 320, background: "#fff", border: "1.5px solid " + C.border, borderRadius: 14, boxShadow: "0 8px 32px rgba(0,0,0,0.12)", zIndex: 1000, overflow: "hidden" }}>
+                  <div style={{ padding: "13px 16px", borderBottom: "1px solid " + C.border, background: C.surface2, fontSize: 13, fontWeight: 800, color: C.text, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <span>Notifications</span>
+                    <button onClick={() => setNotifDropdownOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, color: C.text3, padding: 0, lineHeight: 1 }}>✕</button>
+                  </div>
+                  <div style={{ maxHeight: 360, overflowY: "auto" }}>
+                    {notifs.length === 0 ? (
+                      <div style={{ padding: "30px 16px", textAlign: "center", color: C.text3, fontSize: 12 }}>No notifications yet.</div>
+                    ) : (
+                      notifs.map((n, i) => (
+                        <div key={n._id || i} style={{ padding: "12px 16px", borderBottom: i < notifs.length - 1 ? "1px solid " + C.border : "none", background: !n.isRead ? C.tealLighter : "#fff" }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: C.text }}>{n.text || "Notification"}</div>
+                          <div style={{ fontSize: 10, color: C.text3, marginTop: 4 }}>{n.createdAt ? new Date(n.createdAt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : ""}</div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
             <div className="tn-client-chip" onClick={() => setProfileOpen(!profileOpen)}>
               <div className="tn-avatar">{initials}</div>
@@ -1680,6 +1725,19 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
   // Render Files panel
   function renderFilesComponent() {
+    if (selectedDoc) {
+      return (
+        <div style={{ display: "flex", flexDirection: "column", height: "100%", background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", padding: 20 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+            <button onClick={() => setSelectedDoc(null)} style={{ background: C.bg, border: "1px solid " + C.border, color: C.text2, padding: "8px 16px", borderRadius: 8, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 700 }}>
+              <i className="ti ti-arrow-left"></i> Back to Files
+            </button>
+            <div style={{ fontSize: 15, fontWeight: 800, color: C.text }}>{selectedDoc.docType ? selectedDoc.docType.toUpperCase() : "Document"} Preview</div>
+          </div>
+          <div style={{ flex: 1, background: "#fff", borderRadius: 12, padding: "20px", overflowY: "auto", border: "1px solid " + C.border, minHeight: 350, color: "#333", fontSize: 13, lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent || `<p>No preview available.</p>` }} />
+        </div>
+      );
+    }
     return (
       <div className="files-panel">
         <div className="files-toolbar">
@@ -1706,7 +1764,17 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               }}><i className="ti ti-eye"></i></div>
               <div className="fc-download" title="Download" onClick={(e) => {
                 e.stopPropagation();
-                downloadSingleFile(file);
+                if (file.isLetterhead && file.raw?.htmlContent) {
+                  const blob = new Blob([file.raw.htmlContent], { type: "text/html" });
+                  const blobUrl = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = blobUrl;
+                  a.download = (file.name || "document").replace(/\.pdf$/i, ".html");
+                  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                  setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+                } else {
+                  downloadSingleFile(file);
+                }
               }}><i className="ti ti-download"></i></div>
               <div className="fc-icon" style={{ background: file.bg, color: file.col }}><i className={`ti ${file.icon}`}></i></div>
               <div className="fc-name">{file.name}</div>
@@ -2106,7 +2174,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           }))
       ),
       ...notifs.map(n => ({
-        text: n.message || n.title || 'New notification',
+        text: n.text || 'New notification',
         date: n.createdAt ? new Date(n.createdAt) : null,
         icon: 'ti-bell',
         color: C.purple,
@@ -2228,7 +2296,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       }));
     const notifItems = notifs.slice(0, 3).map((n, i) => ({
       id: 'notif-' + i,
-      title: n.message || n.title || 'Notification',
+      title: n.text || 'Notification',
       time: n.createdAt ? new Date(n.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
       icon: 'ti-bell'
     }));

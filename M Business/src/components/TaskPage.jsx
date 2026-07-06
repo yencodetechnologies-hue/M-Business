@@ -85,8 +85,8 @@ const VIEW_LIST = [
   { id: "table", icon: "+", label: "Main table", color: "var(--app-accent)" },
   { id: "chart", icon: "o", label: "Chart", color: "var(--app-accent)" },
   { id: "gantt", icon: "-", label: "Gantt", color: "var(--app-accent)" },
-  { id: "calendar", icon: "Date", label: "Calendar", color: "#e2445c" },
-  { id: "kanban", icon: "x", label: "Kanban", color: "#00c875" },
+  { id: "calendar", icon: "📅", label: "Calendar", color: "var(--app-accent)" },
+  { id: "kanban", icon: "x", label: "Kanban", color: "var(--app-accent)" }
 ];
 
 /* ----------------------------------------------------------
@@ -519,7 +519,7 @@ const MI = ({ onClick, icon, title, sub, active, danger }) => (
       <div style={{ fontWeight: active || sub ? 600 : 400 }}>{title}</div>
       {sub && <div style={{ fontSize: 11, color: P.muted, marginTop: 1 }}>{sub}</div>}
     </div>
-    {active && <span style={{ color: P.accent, fontSize: 12, flexShrink: 0 }}>Yes</span>}
+    {active}
   </div>
 );
 
@@ -576,7 +576,7 @@ function ViewSwitcherDropdown({ anchor, currentView, onSelect, onClose }) {
           onMouseLeave={e => { e.currentTarget.style.background = currentView === v.id ? "#e8f4fd" : "transparent"; }}>
           <div style={{ width: 28, height: 28, borderRadius: 7, background: `${v.color}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, color: v.color }}>{v.icon}</div>
           <span style={{ fontSize: 13, color: P.text, fontWeight: currentView === v.id ? 700 : 400, flex: 1 }}>{v.label}</span>
-          {currentView === v.id && <span style={{ color: "var(--app-accent)", fontSize: 13 }}>Yes</span>}
+          {currentView === v.id}
         </div>
       ))}
     </div>
@@ -765,25 +765,34 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
         <div style={{ padding: "12px 12px 6px" }}>
           <div style={{
             display: "flex", alignItems: "center", gap: 6,
-            border: `1px solid #0073ea`, borderRadius: 6,
+            border: "none", borderRadius: 6,
             padding: "8px 12px"
           }}>
-            <span style={{ fontSize: 14, color: P.muted }}></span>
-            <input
-              ref={inputRef}
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Search employee..."
-              onKeyDown={e => {
-                if (e.key === "Enter" && search.trim()) {
-                  handleSelect(search.trim(), e);
-                }
-              }}
-              style={{
-                border: "none", outline: "none", background: "transparent",
-                fontSize: 13, color: P.text, fontFamily: "inherit", flex: 1
-              }}
-            />
+            <div style={{
+              display: "flex", alignItems: "center", gap: 6,
+              border: `2px solid #0073ea`, borderRadius: 6,
+              padding: "8px 12px", width: "100%", boxSizing: "border-box"
+            }}>
+              <span style={{ fontSize: 14, color: P.muted }}></span>
+              <input
+                ref={inputRef}
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search employee..."
+                onKeyDown={e => {
+                  if (e.key === "Enter" && search.trim()) {
+                    handleSelect(search.trim(), e);
+                  }
+                }}
+                onFocus={e => { e.target.style.boxShadow = "none"; e.target.style.outline = "none"; }}
+                style={{
+                  border: "none", outline: "none", background: "transparent",
+                  fontSize: 13, color: P.text, fontFamily: "inherit", flex: 1,
+                  boxShadow: "none"
+                }}
+              />
+            </div>
+
             {search && (
               <span
                 onClick={() => setSearch("")}
@@ -1235,7 +1244,7 @@ function ShareModal({ onClose }) {
    INTEGRATE MODAL
 ---------------------------------------------------------- */
 function IntegrateModal({ onClose, showToast }) {
-  const integrations = [{ icon: "", name: "Gmail", desc: "Email notifications on status change", badge: "Popular" }, { icon: "💬", name: "Slack", desc: "Post updates to Slack channels", badge: "Popular" }, { icon: "Date", name: "Google Calendar", desc: "Sync due dates with your calendar", badge: null }, { icon: "", name: "GitHub", desc: "Link commits and PRs to tasks", badge: null }, { icon: "", name: "Zapier", desc: "Connect to 5000+ apps via Zapier", badge: "New" }];
+  const integrations = [{ icon: "", name: "Gmail", desc: "Email notifications on status change", badge: "Popular" }, { icon: "💬", name: "Slack", desc: "Post updates to Slack channels", badge: "Popular" }, { icon: "📅", name: "Google Calendar", desc: "Sync due dates with your calendar", badge: null }, { icon: "", name: "GitHub", desc: "Link commits and PRs to tasks", badge: null }, { icon: "", name: "Zapier", desc: "Connect to 5000+ apps via Zapier", badge: "New" }];
   const [connecting, setConnecting] = useState(null);
 
   const handleConnect = (name) => {
@@ -1284,7 +1293,7 @@ function IntegrateModal({ onClose, showToast }) {
    AUTOMATE MODAL
 ---------------------------------------------------------- */
 function AutomateModal({ onClose }) {
-  const automations = [{ icon: "Action", title: "Status Change Alert", desc: "When status changes  notify assignee", active: true }, { icon: "Date", title: "Due Date Reminder", desc: "1 day before due date  send reminder", active: false }, { icon: "Success", title: "Mark Done on Check", desc: "When all sub-tasks done  mark parent Done", active: true }];
+  const automations = [{ icon: "Action", title: "Status Change Alert", desc: "When status changes  notify assignee", active: true }, { icon: "📅", title: "Due Date Reminder", desc: "1 day before due date  send reminder", active: false }, { icon: "Success", title: "Mark Done on Check", desc: "When all sub-tasks done  mark parent Done", active: true }];
   const [states, setStates] = useState(Object.fromEntries(automations.map(a => [a.title, a.active])));
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(30,10,60,0.45)", zIndex: 8000, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
@@ -1355,7 +1364,7 @@ function FilterMenu({ anchor, onClose, groups, filters, onToggle, onClear }) {
 ---------------------------------------------------------- */
 function HideMenu({ anchor, onClose, extraCols, hiddenCols, onToggleHide }) {
   const ref = useRef(); const [pos, setPos] = useState({ top: 0, left: 0 }); const [search, setSearch] = useState("");
-  const builtins = [{ id: "person", label: "Employee", bg: "var(--app-accent)", icon: "Profile" }, { id: "status", label: "Status", bg: "#00c875", icon: "-" }, { id: "date", label: "Due date", bg: "var(--app-accent)", icon: "Date" }];
+  const builtins = [{ id: "person", label: "Employee", bg: "var(--app-accent)", icon: "👤" }, { id: "status", label: "Status", bg: "#00c875", icon: "-" }, { id: "date", label: "Due date", bg: "var(--app-accent)", icon: "📅" }];
   const allCols = [...builtins, ...(extraCols || []).map(ec => ({ id: ec.id, label: ec.label, bg: P.accent, icon: "Edit" }))];
   const filtered = allCols.filter(c => !search || c.label.toLowerCase().includes(search.toLowerCase()));
   useEffect(() => { const calc = () => { if (anchor?.current) { const r = anchor.current.getBoundingClientRect(); let left = r.left; if (left + 290 > window.innerWidth - 8) left = window.innerWidth - 298; setPos({ top: r.bottom + 4, left }); } }; calc(); window.addEventListener('scroll', calc, true); window.addEventListener('resize', calc); return () => { window.removeEventListener('scroll', calc, true); window.removeEventListener('resize', calc); }; }, [anchor]);
@@ -1424,7 +1433,7 @@ function GrpByMenu({ anchor, groupBy, onGroupBy, onClose }) {
 const COLUMN_TYPES = [
   { type: "text", icon: "Edit", label: "Text", desc: "Add notes or free text" },
   { type: "number", icon: "", label: "Numbers", desc: "Track progress, budget" },
-  { type: "date2", icon: "Date", label: "Date", desc: "Set another date" },
+  { type: "date2", icon: "📅", label: "Date", desc: "Set another date" },
   { type: "link", icon: "", label: "Link", desc: "Add a URL" },
   { type: "timeline", icon: "Metrics", label: "Timeline", desc: "Start date  end date" },
   { type: "rating", icon: "Featured", label: "Rating", desc: "Rate 1–5 stars" },
@@ -2271,7 +2280,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
   const S_LIST = config?.taskStatuses || STATUS_LIST;
   const P_LIST = config?.taskPriorities || PRIORITY_LIST;
   const [groups, setGroups] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [projOpen, setProjOpen] = useState(false);
   const projRef = useRef();
   const [toast, setToast] = useState(null);
@@ -2639,14 +2648,14 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
                   <div style={{ padding: "10px 14px 6px", fontSize: 11, fontWeight: 700, color: P.muted, letterSpacing: .8, textTransform: "uppercase" }}>
                     Select Project
                   </div>
-                  <MI icon="Web" title="All Projects (General)" active={!selectedProjectId} onClick={() => { onSelectProject(null); setProjOpen(false); }} />
+                  <MI title="All Projects" active={!selectedProjectId} onClick={() => { onSelectProject(null); setProjOpen(false); }} />
                   <Sep />
                   <div style={{ maxHeight: 300, overflowY: "auto" }}>
                     {projects.length === 0 ? (
                       <div style={{ padding: "12px 14px", fontSize: 12, color: P.muted, fontStyle: "italic" }}>No projects found</div>
                     ) : (
                       projects.map(p => (
-                        <MI key={p._id || p.id} icon="Folder" title={p.name} sub={p.client} active={selectedProjectId === (p._id || p.id)} onClick={() => { onSelectProject(p); setProjOpen(false); }} />
+                        <MI key={p._id || p.id} icon="📂" title={p.name} sub={p.client} active={selectedProjectId === (p._id || p.id)} onClick={() => { onSelectProject(p); setProjOpen(false); }} />
                       ))
                     )}
                   </div>
@@ -2704,8 +2713,8 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
             {grpByOpen && <GrpByMenu anchor={grpByRef} groupBy={groupBy} onGroupBy={setGroupBy} onClose={() => setGrpByOpen(false)} />}
             <TB ref={moreRef} icon="···" onClick={() => { closeAll(); setMoreOpen(v => !v); }} />
             {moreOpen && (<DD anchor={moreRef} onClose={() => setMoreOpen(false)} w={200}>
-              <MI icon="Import" title="Import" sub="CSV or Excel" onClick={() => { setShowImport(true); setMoreOpen(false); }} />
-              <MI icon="Export" title="Export" sub="Download as CSV" onClick={() => {
+              <MI title="Import" sub="CSV or Excel" onClick={() => { setShowImport(true); setMoreOpen(false); }} />
+              <MI title="Export" sub="Download as CSV" onClick={() => {
                 const allT = groups.flatMap(g => (g.tasks || []).map(t => ({ ...t, groupName: g.label })));
                 const headers = ["Task", "Group", "Owner", "Status", "Due Date", "Priority"];
                 const rows = allT.map(t => [`"${(t.title || '').replace(/"/g, '""')}"`, `"${(t.groupName || '').replace(/"/g, '""')}"`, `"${(t.assignTo || '')}"`, "\"" + t.status + "\"", `"${t.date || ''}"`, `"${t.priority || ''}"`].join(","));
@@ -2726,12 +2735,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
 
           {/* TABLE VIEW */}
           {currentView === "table" && (
-            loading ? (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 80, gap: 16 }}>
-                <div style={{ width: 34, height: 34, border: `3px solid ${P.border}`, borderTop: `3px solid ${P.accent}`, borderRadius: "50%", animation: "spin .8s linear infinite" }} />
-                <div style={{ fontSize: 13, color: P.muted, fontWeight: 500 }}>Loading board...</div>
-              </div>
-            ) : (
+            (
               <div style={{ padding: "16px 18px" }}>
                 {displayGroups.length === 0 && (<div style={{ textAlign: "center", padding: 60 }}><div style={{ fontSize: 44, marginBottom: 10 }}>📂</div><div style={{ fontSize: 15, fontWeight: 700, color: P.text, marginBottom: 5 }}>No tasks found</div><div style={{ fontSize: 13, color: P.muted }}>Clear filters or add a new task</div></div>)}
                 {displayGroups.map(g => (

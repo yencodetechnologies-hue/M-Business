@@ -24,7 +24,13 @@ router.post('/', async (req, res) => {
             employeeId: employeeId || ""
         });
 
-        const savedDoc = await newDoc.save();
+        let savedDoc;
+        try {
+            savedDoc = await newDoc.save();
+        } catch (saveErr) {
+            console.error("Document save error:", saveErr);
+            return res.status(500).json({ msg: saveErr.message, details: saveErr.errors || null });
+        }
 
         if (sendTo === "client" && clientId) {
             try {

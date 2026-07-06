@@ -353,7 +353,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
               <div className="mpc-form-group">
                 <label>Client *</label>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  {prefillClient ? (
+                  {(prefillClient || editProject?._fromClientPage) ? (
                     <div style={{
                       flex: 1,
                       padding: '11px 14px',
@@ -381,7 +381,14 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                     </div>
                   ) : (
                     <select
-                      value={client}
+                      value={
+                        clients.find(c => (c.clientName || c.name) === client)
+                          ? client
+                          : (clients.find(c => (c._id || c.id) === clientId)?.clientName ||
+                            clients.find(c => (c._id || c.id) === clientId)?.name ||
+                            client ||
+                            '')
+                      }
                       onChange={e => {
                         const selectedName = e.target.value;
                         if (selectedName === '__add_client__') {

@@ -1026,7 +1026,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const CSS = `
   .cp-root {
       --teal:  var(--app-accent, var(--app-accent, #00BCD4));
-      --teal2var(--app-accent2, var(--app-accent2, #00ACC1));
+--teal2: var(--app-accent2, var(--app-accent2, #00ACC1));
       --teal3: #006E7F;
       --teal-light: var(--teal-light, var(--teal-light, #E0F7FA));
       --teal-lighter: var(--teal-lighter, #F0FDFE);
@@ -1939,7 +1939,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               const timeStr = !isNaN(meetDate) ? meetDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : (meet.time || '—');
               const dateStr = !isNaN(meetDate) ? meetDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '';
               return (
-                <div key={meet._id || i} className="meeting-item" onClick={() => meet.meetLink ? window.open(meet.meetLink, '_blank') : alert(`Meeting: ${meet.title || meet.subject}`)}>
+                <div key={meet._id || i} className="meeting-item" onClick={() => meet.meetLink ? window.open(meet.meetLink, '_blank') : alert(`Meeting: ${meet.title || meet.subject || 'Meeting'}`)}>
                   <div className="mi-time-col">
                     <div className="mi-time">{timeStr}</div>
                     <div className="mi-dur">{meet.duration || '1h'}</div>

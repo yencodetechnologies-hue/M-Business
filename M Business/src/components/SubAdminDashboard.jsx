@@ -1951,11 +1951,52 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
     if (activeTab === "portal") return renderPortal();
 
+    if (activeTab === "feedback") return renderFeedback();
+
     return <div style={{ padding: 40, textAlign: "center", color: "#A0B8BE" }}>Coming soon...</div>;
 
   };
 
+  const [clientFeedback, setClientFeedback] = useState([]);
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
 
+  useEffect(() => {
+    if (activeTab === "feedback" && activeClientId) {
+      const activeC = clients.find(c => c._id === activeClientId);
+      if (!activeC) return;
+      setFeedbackLoading(true);
+      const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+      axios.get(`${BASE_URL}/api/clients/feedback`, {
+        headers: { 'x-company-id': currentUser.companyId || "" }
+      }).then(res => {
+        const clientName = activeC.clientName || activeC.name;
+        const filtered = (res.data || []).filter(f => f.clientName === clientName);
+        setClientFeedback(filtered);
+      }).catch(err => console.error(err))
+        .finally(() => setFeedbackLoading(false));
+    }
+  }, [activeTab, activeClientId]);
+
+  const renderFeedback = () => {
+    return (
+      <div style={{ padding: 24 }}>
+        <div style={{ fontSize: 15, fontWeight: 800, color: "#1A2332", marginBottom: 16 }}>Client Feedback</div>
+        {feedbackLoading ? (
+          <div style={{ color: "#A0B8BE", textAlign: "center", padding: 30 }}>Loading...</div>
+        ) : clientFeedback.length === 0 ? (
+          <div style={{ color: "#A0B8BE", textAlign: "center", padding: 30 }}>No feedback submitted yet.</div>
+        ) : (
+          clientFeedback.map((fb, i) => (
+            <div key={fb._id || i} style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 12, padding: 16, marginBottom: 12 }}>
+
+              <div style={{ fontSize: 13, color: "#4A5568", marginBottom: 8 }}>{fb.message || "—"}</div>
+              <div style={{ fontSize: 11, color: "#A0B8BE" }}>{fb.createdAt ? new Date(fb.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : ''}</div>
+            </div>
+          ))
+        )}
+      </div>
+    );
+  };
 
   const st = getStatusCfg(activeClient?.status);
 
@@ -2209,6 +2250,8 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
               { key: "portal", icon: "ti-globe", label: "Portal" },
 
               { key: "activity", icon: "ti-history", label: "Activity" },
+
+              { key: "feedback", icon: "ti-star", label: "Feedback" },
 
             ].map(tab => (
 

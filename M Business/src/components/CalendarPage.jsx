@@ -281,11 +281,11 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
       mf = x.date === selectedDate;
     } else {
       mf =
-        filter === "All" ? true :
+        filter === "All" ? x.date === today :
           filter === "Today" ? x.date === today :
             filter === "Upcoming" ? x.date > today :
               filter === "Past" ? x.date < today :
-                (x.type || "Meeting") === filter;
+                (x.type || "Meeting") === filter && x.date === today;
     }
     return ms && mf;
   };

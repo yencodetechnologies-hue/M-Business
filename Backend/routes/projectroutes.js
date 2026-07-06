@@ -82,14 +82,13 @@ router.get("/employee/:employeeName", async (req, res) => {
   try {
     const companyId = req.companyId || "";
     if (!companyId) return res.json([]);
-    const name = decodeURIComponent(req.params.employeeName).trim();
-    const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const safeName = escapeRegExp(name);
-    const projects = await Project.find({
-      companyId,
-      assignedTo: { $regex: new RegExp(`^\\s*${safeName}\\s*$`, "i") }
-    }).sort({ createdAt: -1 });
-    res.json(projects);
+    const name = decodeURIComponent(req.params.employeeName).trim().toLowerCase();
+    const projects = await Project.find({ companyId }).sort({ createdAt: -1 });
+    const filtered = projects.filter(p => {
+      const assigned = Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []);
+      return assigned.some(a => String(a).trim().toLowerCase() === name);
+    });
+    res.json(filtered);
   } catch (err) {
     console.error("GET projects by employee error:", err.message);
     res.status(500).json({ msg: "Server error", error: err.message });

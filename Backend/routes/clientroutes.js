@@ -234,4 +234,12 @@ router.post("/feedback", async (req, res) => {
   }
 });
 
+router.get("/feedback", async (req, res) => {
+  try {
+    const feedbacks = await Feedback.find({ companyId: req.companyId || "" }).sort({ createdAt: -1 });
+    res.json(feedbacks);
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+});
 module.exports = router;

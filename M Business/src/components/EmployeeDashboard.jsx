@@ -380,16 +380,20 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
         const displayName = (user?.name || "").trim().toLowerCase();
         const empId = String(user?._id || user?.id || "").trim();
         const [docsRes, projRes] = await Promise.all([
-          axios.get(`${BASE_URL}/api/documents?sendTo=employee${empId ? `&employeeId=${empId}` : ""}`),
+          axios.get(`${BASE_URL}/api/documents${empId ? `?employeeId=${empId}` : ""}`),
           axios.get(`${BASE_URL}/api/projects`)
         ]);
         const allDocs = Array.isArray(docsRes.data) ? docsRes.data : (docsRes.data?.value || []);
         const norm = (s) => (s || "").trim().toLowerCase().replace(/\s+/g, " ");
         const myDocs = allDocs.filter(d => {
           if (empId && String(d.employeeId || "").trim() === empId) return true;
+          if (!empId && String(d.employeeId || "").trim() === "") {
+            const docClient = norm(d.client);
+            if (docClient === "employee" || docClient === "") return true;
+          }
           const docClient = norm(d.client);
           const dn = norm(displayName);
-          return d.sendTo === "employee" && !!dn && (docClient === dn || docClient.includes(dn) || dn.includes(docClient));
+          return !!dn && (docClient === dn || docClient.includes(dn) || dn.includes(docClient));
         });
         const empName = user?.name || user?.employeeName || '';
         const projFiles = (Array.isArray(projRes.data) ? projRes.data : []).flatMap(p =>

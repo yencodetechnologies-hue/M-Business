@@ -498,6 +498,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   // A file can only be shown inline (image/PDF) — anything else the browser
   // will always try to download, so we don't offer a fake "view" for those.
   const isPreviewableFile = (file) => {
+    if (file?.isLetterhead && file?.raw?.htmlContent) return "html";
     const mime = (file?.type || "").toLowerCase();
     const name = (file?.name || "").toLowerCase();
     if (mime.includes("pdf") || name.endsWith(".pdf")) return "pdf";
@@ -1734,7 +1735,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             </button>
             <div style={{ fontSize: 15, fontWeight: 800, color: C.text }}>{selectedDoc.docType ? selectedDoc.docType.toUpperCase() : "Document"} Preview</div>
           </div>
-          <div style={{ flex: 1, background: "#fff", borderRadius: 12, padding: "20px", overflowY: "auto", border: "1px solid " + C.border, minHeight: 350, color: "#333", fontSize: 13, lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent || `<p>No preview available.</p>` }} />
+          <div style={{ flex: 1, background: "#fff", borderRadius: 12, padding: "20px", overflowY: "auto", border: "1px solid " + C.border, minHeight: 350, maxHeight: "70vh", color: "#333", fontSize: 13, lineHeight: 1.6, whiteSpace: "pre-wrap" }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent || `<p>No preview available.</p>` }} />
         </div>
       );
     }
@@ -1747,22 +1748,28 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             </button>
           ))}
         </div>
-        <div className="files-grid">
+        <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden" }}>
           {filteredFiles.map((file, idx) => (
-            <div key={idx} className="file-card" onClick={() => {
-              if (file.url) {
-                isPreviewableFile(file) ? setPreviewFile(file) : window.open(file.url, "_blank", "noopener");
-              } else if (file.raw) {
-                setSelectedDoc(file.raw);
-              }
+            <div key={idx} className="invoice-item" onClick={() => {
+              if (file.isLetterhead && file.raw?.htmlContent) { setSelectedDoc(file.raw); }
+              else if (isPreviewableFile(file)) { setPreviewFile(file); }
+              else if (file.url) { window.open(file.url, "_blank", "noopener"); }
             }}>
-              {file.badge && <span className="fc-new-badge">{file.badge}</span>}
-              <div className="fc-download" title="View" style={{ right: 42 }} onClick={(e) => {
+              <div className="inv-icon" style={{ background: file.bg, color: file.col }}><i className={`ti ${file.icon}`}></i></div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="inv-id" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.name}</div>
+                <div className="inv-desc" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.description || file.meta}</div>
+              </div>
+              <div style={{ textAlign: "right", marginRight: 10 }}>
+                <div className="inv-date">{file.date}</div>
+              </div>
+              <div className="inv-dl" title="View" onClick={(e) => {
                 e.stopPropagation();
-                if (!file.url) return;
-                isPreviewableFile(file) ? setPreviewFile(file) : window.open(file.url, "_blank", "noopener");
+                if (file.isLetterhead && file.raw?.htmlContent) { setSelectedDoc(file.raw); return; }
+                if (!isPreviewableFile(file)) return;
+                setPreviewFile(file);
               }}><i className="ti ti-eye"></i></div>
-              <div className="fc-download" title="Download" onClick={(e) => {
+              <div className="inv-dl" title="Download" onClick={(e) => {
                 e.stopPropagation();
                 if (file.isLetterhead && file.raw?.htmlContent) {
                   const blob = new Blob([file.raw.htmlContent], { type: "text/html" });
@@ -1776,15 +1783,10 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                   downloadSingleFile(file);
                 }
               }}><i className="ti ti-download"></i></div>
-              <div className="fc-icon" style={{ background: file.bg, color: file.col }}><i className={`ti ${file.icon}`}></i></div>
-              <div className="fc-name">{file.name}</div>
-              {file.description && <div style={{ fontSize: 10, color: C.text3, marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.3 }}>{file.description}</div>}
-              <div className="fc-meta">{file.meta}</div>
-              <div className="fc-date">{file.date}</div>
             </div>
           ))}
           {filteredFiles.length === 0 && (
-            <div style={{ gridColumn: "1 / -1", padding: 40, textAlign: "center", color: C.text3 }}>No files found.</div>
+            <div style={{ padding: 40, textAlign: "center", color: C.text3 }}>No files found.</div>
           )}
         </div>
       </div>
@@ -1796,13 +1798,28 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   // grid used on the dedicated Files tab.
   function renderFilesOverviewComponent() {
     const recentFiles = allFiles.slice(0, 6);
+    if (selectedDoc) {
+      return (
+        <div style={{ display: "flex", flexDirection: "column", background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", padding: 20 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+            <button onClick={() => setSelectedDoc(null)} style={{ background: C.bg, border: "1px solid " + C.border, color: C.text2, padding: "8px 16px", borderRadius: 8, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 700 }}>
+              <i className="ti ti-arrow-left"></i> Back
+            </button>
+            <div style={{ fontSize: 15, fontWeight: 800, color: C.text }}>{selectedDoc.docType ? selectedDoc.docType.toUpperCase() : "Document"} Preview</div>
+          </div>
+          <div style={{ background: "#fff", borderRadius: 12, padding: "20px", overflowY: "auto", border: "1px solid " + C.border, minHeight: 350, maxHeight: 500, color: "#333", fontSize: 13, lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent || `<p>No preview available.</p>` }} />
+        </div>
+      );
+    }
     return (
       <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden" }}>
         <div style={{ maxHeight: 268, overflowY: "auto" }}>
           {recentFiles.map((file, idx) => (
             <div key={idx} className="invoice-item" onClick={() => {
               if (file.url) {
-                isPreviewableFile(file) ? setPreviewFile(file) : window.open(file.url, "_blank", "noopener");
+                if (file.isLetterhead && file.raw?.htmlContent) { setSelectedDoc(file.raw); }
+                else if (isPreviewableFile(file)) { setPreviewFile(file); }
+                else if (file.url) { window.open(file.url, "_blank", "noopener"); }
               } else if (file.raw) {
                 setSelectedDoc(file.raw);
               }
@@ -1818,11 +1835,23 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               <div className="inv-dl" title="View" onClick={(e) => {
                 e.stopPropagation();
                 if (!file.url) return;
-                isPreviewableFile(file) ? setPreviewFile(file) : window.open(file.url, "_blank", "noopener");
+                if (file.isLetterhead && file.raw?.htmlContent) { setSelectedDoc(file.raw); }
+                else if (isPreviewableFile(file)) { setPreviewFile(file); }
+                else if (file.url) { window.open(file.url, "_blank", "noopener"); }
               }}><i className="ti ti-eye"></i></div>
               <div className="inv-dl" title="Download" style={{ marginLeft: 6 }} onClick={(e) => {
                 e.stopPropagation();
-                downloadSingleFile(file);
+                if (file.isLetterhead && file.raw?.htmlContent) {
+                  const blob = new Blob([file.raw.htmlContent], { type: "text/html" });
+                  const blobUrl = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = blobUrl;
+                  a.download = (file.name || "document").replace(/\.pdf$/i, ".html");
+                  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                  setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+                } else {
+                  downloadSingleFile(file);
+                }
               }}><i className="ti ti-download"></i></div>
             </div>
           ))}

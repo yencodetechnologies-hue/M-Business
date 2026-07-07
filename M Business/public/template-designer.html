@@ -24,7 +24,7 @@
 
     :root {
       --teal: var(--app-accent, var(--app-accent, #00BCD4));
-      --teal2var(--app-accent2, var(--app-accent2, #00ACC1));
+      --teal2: var(--app-accent2, var(--app-accent2, #00ACC1));
       --teal3: #26D0CE;
       --teal4: #006E7F;
       --teal-light: var(--teal-light, #E0F7FA);
@@ -3823,7 +3823,8 @@
   <script>
     // ── SAFE RENDER WRAPPER ──
     window._renderReady = false;
-    function safeRender() { if (window._renderReady) render(); }
+    window.safeRender = function () { if (window._renderReady && typeof render === 'function') render(); };
+    function safeRender() { window.safeRender(); }
 
     // ── STATE ──
     let docType = 'lh';
@@ -3994,7 +3995,20 @@
       };
       return map[bgKey] || map.white;
     }
-
+    // ── HEX TO RGBA (with opacity) ──
+    function h2r(hex, alpha) {
+      if (!hex || typeof hex !== 'string' || !hex.startsWith('#')) {
+        // fallback for CSS var() strings or invalid input
+        return `rgba(0,188,212,${alpha})`;
+      }
+      let c = hex.substring(1);
+      if (c.length === 3) c = c.split('').map(x => x + x).join('');
+      const num = parseInt(c, 16);
+      const r = (num >> 16) & 255;
+      const g = (num >> 8) & 255;
+      const b = num & 255;
+      return `rgba(${r},${g},${b},${alpha})`;
+    }
     // ── DIVIDER ──
     function dividerEl(style) {
       if (style === 'solid') return `<div style="height:2px;background:${color}"></div>`;
@@ -5054,7 +5068,7 @@
         if (e.data.company) {
           const co = e.data.company;
           if (co.name) {
-            const coEl = document.getElementById('f-co');
+            const coEl = document.getElementById('f-company');
             if (coEl && !coEl.value) coEl.value = co.name;
           }
           if (co.email) {
@@ -5180,6 +5194,7 @@
     }
 
     window._renderReady = true;
+    render();
     // ── SEND FROM LETTERHEAD ──
     function sendFromLetterhead() {
       const nameEl0 = document.getElementById('lh-recipient-name');
@@ -5197,19 +5212,17 @@
 
       const paperClone = document.getElementById('mainPaper').cloneNode(true);
 
-      // Clean up editor inside clone
       const editors = paperClone.querySelectorAll('.lb-editor');
       editors.forEach(ed => {
         ed.removeAttribute('contenteditable');
         ed.removeAttribute('data-ph');
-        ed.style.minHeight = '0'; // Remove huge gap when empty
+        ed.style.minHeight = '0';
         ed.style.outline = 'none';
         if (!ed.innerHTML.replace(/<br\s*\/?>/gi, '').trim()) {
-          ed.style.display = 'none'; // Completely hide if empty
+          ed.style.display = 'none';
         }
       });
 
-      // Inject styles to ensure it looks perfect in EmployeeDashboard
       const styleTag = document.createElement('style');
       styleTag.textContent = `
     @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
@@ -5246,22 +5259,20 @@
         recipientEmail: email,
         htmlContent: finalHtml,
         dateSent: new Date().toISOString()
+      };
 
-      // Save to localStorage
       const existing = JSON.parse(localStorage.getItem('client_documents') || '[]');
-        data.id = 'DOC' + Date.now();
-        existing.unshift(data);
-        localStorage.setItem('client_documents', JSON.stringify(existing));
+      data.id = 'DOC' + Date.now();
+      existing.unshift(data);
+      localStorage.setItem('client_documents', JSON.stringify(existing));
 
-        // Also send to React parent
-        window.parent.postMessage({ type: 'SEND_DOCUMENT', payload: data }, '*');
+      window.parent.postMessage({ type: 'SEND_DOCUMENT', payload: data }, '*');
 
-        // Toast
-        const t = document.createElement('div');
-        t.style.cssText = "position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#26C281, var(--app-accent, var(--app-accent, #00BCD4)));color:#fff;padding:14px 22px;border-radius:12px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.15);font-size:13px;display:flex;align-items:center;gap:8px;";
-        t.innerHTML = '<i class="ti ti-circle-check" style="font-size:18px;"></i> Letterhead sent to ' + name + '!';
-        document.body.appendChild(t);
-        setTimeout(() => { t.style.transition = 'opacity 0.4s'; t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 3000);
+      const t = document.createElement('div');
+      t.style.cssText = "position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#26C281, var(--app-accent, var(--app-accent, #00BCD4)));color:#fff;padding:14px 22px;border-radius:12px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.15);font-size:13px;display:flex;align-items:center;gap:8px;";
+      t.innerHTML = '<i class="ti ti-circle-check" style="font-size:18px;"></i> Letterhead sent to ' + name + '!';
+      document.body.appendChild(t);
+      setTimeout(() => { t.style.transition = 'opacity 0.4s'; t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 3000);
     }
 
     // ── SEND MODAL ──
@@ -5293,6 +5304,7 @@
     applyHash();
     window.addEventListener('DOMContentLoaded', applyHash);
     window.addEventListener('hashchange', applyHash);
+
 
 
     // ── HELPER: get value from template-designer input by id ──
@@ -5768,11 +5780,11 @@
     }
 
     function fillClient() {
-      window._tdv('f-prop-client') = 'STA Corporation';
-      window._tdv('f-prop-cperson') = 'STA Admin';
-      window._tdv('f-prop-cemail') = 'sta@example.com';
-      window._tdv('f-prop-cphone') = '+91 98765 43210';
-      window._tdv('f-prop-caddr') = 'Chennai, Tamil Nadu, India';
+      document.getElementById('f-prop-client').value = 'STA Corporation';
+      document.getElementById('f-prop-cperson').value = 'STA Admin';
+      document.getElementById('f-prop-cemail').value = 'sta@example.com';
+      document.getElementById('f-prop-cphone').value = '+91 98765 43210';
+      document.getElementById('f-prop-caddr').value = 'Chennai, Tamil Nadu, India';
       propUp();
     }
 

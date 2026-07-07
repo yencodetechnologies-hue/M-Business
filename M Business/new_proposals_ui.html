@@ -1948,8 +1948,8 @@
               style="font-size:10px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">
               Our Details</div>
             <div class="form-row">
-              <div class="fg"><label class="fl">Company Name</label><input class="fi" type="text" id="fromComp"
-                  value="YENCODE Technologies" oninput="up()"></div>
+              <div class="fg"><label class="fl">Company Name</label><input class="fi" type="text" id="fromComp" value=""
+                  oninput="up()"></div>
               <div class="fg"><label class="fl">Contact Person</label><input class="fi" type="text" id="fromPerson"
                   value="Prabhu R" oninput="up()"></div>
             </div>
@@ -2557,7 +2557,7 @@
             <div class="fg"><label class="fl">Closing Statement</label>
               <textarea class="ta" id="closing" oninput="up()">We are excited about the opportunity to work with you on this project. Our team is ready to begin immediately upon your acceptance.
 
-YENCODE Technologies |  | +91 89254 33533</textarea>
+</textarea>
             </div>
             <div class="fg"><label class="fl">Terms & Conditions</label>
               <textarea class="ta" id="terms" style="min-height:90px">1. 50% advance payment required before project commencement.
@@ -2604,7 +2604,7 @@ YENCODE Technologies |  | +91 89254 33533</textarea>
               <div class="p-logo">YT</div>
               <div class="p-label">Project Proposal</div>
               <div class="p-title" id="pv-title">— Proposal Title —</div>
-              <div class="p-subtitle" id="pv-sub">Prepared by YENCODE Technologies</div>
+              <div class="p-subtitle" id="pv-sub"></div>
               <div class="p-meta">
                 <div class="p-meta-i"><i class="ti ti-calendar" style="font-size:11px"></i><span id="pv-date">01 Jun
                     2026</span></div>
@@ -2623,7 +2623,7 @@ YENCODE Technologies |  | +91 89254 33533</textarea>
                 <div class="party-b">
                   <div class="pb-lbl">Prepared By</div>
                   <div class="pb-name" id="pv-from">Prabhu R</div>
-                  <div class="pb-detail" id="pv-from-d">YENCODE Technologies<br></div>
+                  <div class="pb-detail" id="pv-from-d"><br></div>
                 </div>
                 <div class="party-b">
                   <div class="pb-lbl">Prepared For</div>
@@ -2742,7 +2742,7 @@ YENCODE Technologies |  | +91 89254 33533</textarea>
                 <div class="sob">
                   <div class="sob-line"></div>
                   <div class="sob-name" id="pv-sig1">Prabhu R</div>
-                  <div class="sob-role">YENCODE Technologies</div>
+                  <div class="sob-role"></div>
                 </div>
                 <div class="sob">
                   <div class="sob-line" style="background:var(--amber)"></div>
@@ -2794,7 +2794,7 @@ YENCODE Technologies |  | +91 89254 33533</textarea>
       document.getElementById('pv-title').textContent = t || '— Proposal Title —';
       document.getElementById('pv-title').style.color = t ? '#fff' : 'rgba(255,255,255,.45)';
       const tc = document.getElementById('toComp').value;
-      document.getElementById('pv-sub').textContent = tc ? 'Prepared for ' + tc + ' by YENCODE Technologies' : 'Prepared by YENCODE Technologies';
+      document.getElementById('pv-sub').textContent = tc ? 'Prepared for ' + tc + ' ' : '';
       document.getElementById('pv-date').textContent = fmtDate(document.getElementById('propDate').value);
       document.getElementById('pv-type').textContent = document.getElementById('propType').value;
       document.getElementById('pv-expiry').textContent = 'Expires ' + fmtDate(document.getElementById('propExpiry').value);

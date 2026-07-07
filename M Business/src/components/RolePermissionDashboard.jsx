@@ -7,9 +7,9 @@ import { toast } from "react-toastify";
 
 
 const PERMISSION_KEYS = [
-  "dashboard", "clients", "subadmins", "employees", "managers", 
-  "projects", "quotations", "proposals", "invoices", "tracking", 
-  "tasks", "calendar", "accounts", "interviews", "reports", 
+  "dashboard", "clients", "subadmins", "employees", "managers",
+  "projects", "quotations", "proposals", "invoices", "tracking",
+  "tasks", "calendar", "accounts", "interviews", "reports",
   "mysubscriptions", "packages", "payments", "vendors", "rolePermissions"
 ];
 
@@ -17,6 +17,7 @@ const RolePermissionDashboard = () => {
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     fetchRoles();
@@ -38,6 +39,7 @@ const RolePermissionDashboard = () => {
       toast.error("Failed to fetch roles");
     } finally {
       setLoading(false);
+      setInitialized(true);
     }
   };
 
@@ -46,7 +48,7 @@ const RolePermissionDashboard = () => {
     const role = updatedRoles[roleIndex];
     role.permissions[permKey] = !role.permissions[permKey];
     setRoles(updatedRoles);
-    
+
     // Auto-save
     try {
       await axios.post(`${BASE_URL}/api/role-permissions`, role);
@@ -69,14 +71,25 @@ const RolePermissionDashboard = () => {
       setSaving(false);
     }
   };
+  if (loading) {
+    return (
+      <div style={{ padding: 40, textAlign: "center", color: T.muted, minHeight: 200 }}></div>
+    );
+  }
 
-  if (loading) return <div style={{ padding: 40, textAlign: "center", color: T.muted }}>Loading permissions...</div>;
+  if (!loading && roles.length === 0) {
+    return (
+      <div style={{ padding: 40, textAlign: "center", color: T.muted }}>
+        No roles found. <button onClick={fetchRoles} style={{ marginLeft: 8, background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 8, padding: "6px 14px", cursor: "pointer", fontWeight: 700 }}>Retry</button>
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20, padding: "10px" }}>
       <div style={{ background: "#fff", borderRadius: 16, padding: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)", border: `1px solid ${T.border}` }}>
-       
-   
+
+
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: "0 10px" }}>
             <thead>
@@ -84,17 +97,18 @@ const RolePermissionDashboard = () => {
                 <th style={{ textAlign: "left", padding: "10px 15px", color: T.muted, fontSize: 12, fontWeight: 700, textTransform: "uppercase" }}>Module / Feature</th>
                 {roles.map(r => (
                   <th key={r.role} style={{ padding: "10px 15px", textAlign: "center" }}>
-                    <div style={{ 
-                      background: "linear-gradient(135deg, var(--app-accent), var(--app-accent))", 
-                      color: "#fff", 
-                      padding: "6px 16px", 
-                      borderRadius: 10, 
-                      fontSize: 12, 
+                    <div style={{
+                      background: "linear-gradient(135deg, var(--app-accent), var(--app-accent))",
+                      color: "#fff",
+                      padding: "6px 16px",
+                      borderRadius: 10,
+                      fontSize: 12,
                       fontWeight: 800,
                       textTransform: "uppercase",
                       boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.2)",
-                        width: "fit-content",
-                         margin: "0 auto"                     }}>
+                      width: "fit-content",
+                      margin: "0 auto"
+                    }}>
                       {r.role}
                     </div>
                   </th>
@@ -104,12 +118,12 @@ const RolePermissionDashboard = () => {
             <tbody>
               {PERMISSION_KEYS.map(key => (
                 <tr key={key} style={{ background: "#fcfaff", borderBottom: `1px solid ${T.border}` }}>
-                  <td style={{ 
-                    padding: "16px 15px", 
-                    fontSize: 14, 
-                    fontWeight: 600, 
-                    color: T.text, 
-                    borderTopLeftRadius: 12, 
+                  <td style={{
+                    padding: "16px 15px",
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: T.text,
+                    borderTopLeftRadius: 12,
                     borderBottomLeftRadius: 12,
                     textTransform: "capitalize"
                   }}>
@@ -117,16 +131,16 @@ const RolePermissionDashboard = () => {
                   </td>
                   {roles.map((r, idx) => (
                     <td key={`${r.role}-${key}`} style={{ padding: "16px 15px", textAlign: "center" }}>
-                      <label style={{ 
-                        position: "relative", 
-                        display: "inline-block", 
-                        width: 44, 
-                        height: 24, 
-                        cursor: "pointer" 
+                      <label style={{
+                        position: "relative",
+                        display: "inline-block",
+                        width: 44,
+                        height: 24,
+                        cursor: "pointer"
                       }}>
-                        <input 
-                          type="checkbox" 
-                          checked={r.permissions[key] || false} 
+                        <input
+                          type="checkbox"
+                          checked={r.permissions[key] || false}
                           onChange={() => togglePermission(idx, key)}
                           style={{ opacity: 0, width: 0, height: 0 }}
                         />

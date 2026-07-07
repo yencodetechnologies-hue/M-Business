@@ -7568,14 +7568,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   // Redirect to mysubscriptions if no plan selected yet (new user) OR trial expired
   const hasRedirected = useRef(false);
+  const [subscriptionChecked, setSubscriptionChecked] = useState(false);
 
   useEffect(() => {
-    if (!subLoading && subscription === null && !hasRedirected.current) {
+    if (subscriptionChecked && subscription === null && !hasRedirected.current) {
       hasRedirected.current = true;
       setForceUpgradeTab(false);
       setActive("mysubscriptions");
     }
-  }, [subscription, subLoading]);
+  }, [subscription, subscriptionChecked]);
 
   // Process PayU payment silently on dashboard load — no need to show subscriptions page
   useEffect(() => {
@@ -7648,6 +7649,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
         setSubscription(res.data.subscription);
         setSubLoading(false);
+        setSubscriptionChecked(true);
 
         return res.data.subscription; // return fresh data for immediate use
 
@@ -7655,6 +7657,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
         setSubscription(null);
         setSubLoading(false);
+        setSubscriptionChecked(true);
 
         return null;
 
@@ -7666,37 +7669,26 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       setSubscription(null);
       setSubLoading(false);
+      setSubscriptionChecked(true);
 
       return null;
 
     } finally {
-
-      // Fetch updated user to get the latest limits (clientLimit, employeeLimit, etc.)
-
-      try {
-
-        const id = resolveSubadminId();
-
-        if (id) {
-
-          const userRes = await axios.get(`${BASE_URL}/api/users/${id}`);
-
-          if (userRes.data) {
-
-            localStorage.setItem("user", JSON.stringify(userRes.data));
-
+      // Fetch updated user limits in the background — don't block callers on this
+      (async () => {
+        try {
+          const id = resolveSubadminId();
+          if (id) {
+            const userRes = await axios.get(`${BASE_URL}/api/users/${id}`);
+            if (userRes.data) {
+              localStorage.setItem("user", JSON.stringify(userRes.data));
+            }
           }
-
+        } catch (e) {
+          console.error("Failed to update local user limits:", e);
         }
-
-      } catch (e) {
-
-        console.error("Failed to update local user limits:", e);
-
-      }
-
+      })();
     }
-
   };
 
   const fetchInvoices = async () => {

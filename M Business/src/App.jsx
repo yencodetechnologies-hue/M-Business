@@ -103,7 +103,7 @@ export default function App() {
 
     if (role === "subadmin") {
       console.log("Security Routing to Main Dashboard (Subadmin logic)");
-      return <Dashboard user={user} setUser={handleSetUser} />;
+      return <Dashboard key={user.email || user.id} user={user} setUser={handleSetUser} />;
     }
 
     if (role === "client")

@@ -64,12 +64,21 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
       const userData = res.data.user || res.data;
       const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
 
-      // Clear ALL stale cached data before setting new user session
-      // This ensures a re-created client never sees deleted account's data
-      const keysToKeep = ["accounts"];
-      Object.keys(localStorage).forEach(key => {
-        if (!keysToKeep.includes(key)) localStorage.removeItem(key);
-      });
+      // Clear cached data only if it belongs to a DIFFERENT logged-in account.
+      const prevUserRaw = localStorage.getItem("user");
+      let isSameAccount = false;
+      if (prevUserRaw) {
+        try {
+          const prevUser = JSON.parse(prevUserRaw);
+          isSameAccount = prevUser?.email === userWithLogo.email;
+        } catch (e) { }
+      }
+      if (!isSameAccount) {
+        const keysToKeep = ["accounts"];
+        Object.keys(localStorage).forEach(key => {
+          if (!keysToKeep.includes(key)) localStorage.removeItem(key);
+        });
+      }
       // Also clear the accounts cache entry for this email so stale data is gone
       try {
         let accs = JSON.parse(localStorage.getItem("accounts") || "[]");

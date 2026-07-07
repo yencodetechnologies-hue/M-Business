@@ -4968,13 +4968,15 @@
       } else {
         data.forEach(item => {
           const opt = document.createElement('option');
-          opt.value = item;
-          opt.textContent = item;
+          const name = (typeof item === 'string') ? item : item.name;
+          const id = (typeof item === 'string') ? '' : (item.id || '');
+          opt.value = name;
+          opt.textContent = name;
+          opt.dataset.recipientId = id;
           list.appendChild(opt);
         });
       }
     }
-
     function updateLhRecipientList() {
       const sendTo = document.getElementById('lh-recipient-type')?.value;
       const list = document.getElementById('lh-recipient-name');
@@ -4983,8 +4985,11 @@
       const data = sendTo === 'client' ? appClients : appEmployees;
       data.forEach(item => {
         const opt = document.createElement('option');
-        opt.value = item;
-        opt.textContent = item;
+        const name = (typeof item === 'string') ? item : item.name;
+        const id = (typeof item === 'string') ? '' : (item.id || '');
+        opt.value = name;
+        opt.textContent = name;
+        opt.dataset.recipientId = id;
         list.appendChild(opt);
       });
     }

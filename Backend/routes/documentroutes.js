@@ -53,16 +53,13 @@ router.post('/', async (req, res) => {
 
 router.get('/', async (req, res) => {
     try {
-        const { companyId, client, sendTo } = req.query;
-        if (!companyId && !sendTo && !client) {
+        const { companyId, client, sendTo, employeeId, clientId } = req.query;
+        if (!companyId && !sendTo && !client && !employeeId && !clientId) {
             return res.status(400).json({ msg: "Company ID or specific filter required" });
         }
 
         let query = {};
         if (companyId) query.companyId = companyId;
-
-        const clientId = req.query.clientId || "";
-        const employeeId = req.query.employeeId || "";
 
         if (employeeId) {
             query.employeeId = employeeId;

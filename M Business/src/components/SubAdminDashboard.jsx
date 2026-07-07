@@ -7527,6 +7527,20 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             senderCompany: companyNameStr,
             companyId
           });
+
+          if (sendTo === "employee" && resolvedEmployeeId) {
+            try {
+              await axios.post(`${BASE_URL}/api/notifications`, {
+                userId: resolvedEmployeeId,
+                type: "document",
+                icon: "ti-files",
+                text: `A new document has been shared with you`,
+              });
+            } catch (notifErr) {
+              console.error("Failed to notify employee:", notifErr);
+            }
+          }
+
           toast.success(`Document sent to ${payload.client || "Client"} successfully!`);
         } catch (err) {
           console.error("Failed to send document:", err);
@@ -11318,9 +11332,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                         type: 'SET_DATA',
 
-                        clients: clients.map(c => c.clientName || c.name),
+                        clients: clients.map(c => ({ name: c.clientName || c.name, id: c._id || c.id })),
 
-                        employees: employees.map(emp => emp.name),
+                        employees: employees.map(emp => ({ name: emp.name, id: emp._id || emp.id })),
 
                         company: {
 

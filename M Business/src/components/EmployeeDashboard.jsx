@@ -430,6 +430,7 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
             .emp-doc-view .lh-wrap { max-width: 760px; margin: 0 auto; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; border: 1px solid #eaeaea; font-family: 'Nunito', sans-serif; overflow: hidden; }
             .emp-doc-view .lb-editor { min-height: 0 !important; }
             .emp-doc-view .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1A2E35; flex: 1; }
+            .emp-doc-view .lb-editor { white-space: pre-wrap; word-wrap: break-word; }
             .emp-doc-view .lb-recip { display: block !important; }
             .emp-doc-view .lb-ref { display: block !important; }
             .emp-doc-view .lb-subj { display: block !important; }

@@ -1764,7 +1764,27 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             </button>
             <div style={{ fontSize: 15, fontWeight: 800, color: C.text }}>{selectedDoc.docType ? selectedDoc.docType.toUpperCase() : "Document"} Preview</div>
           </div>
-          <div style={{ flex: 1, background: "#fff", borderRadius: 12, padding: "20px", overflowY: "auto", border: "1px solid " + C.border, minHeight: 350, maxHeight: "70vh", color: "#333", fontSize: 13, lineHeight: 1.6, whiteSpace: "pre-wrap" }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent || `<p>No preview available.</p>` }} />
+          <style>{`
+            .lh-wrap { max-width: 760px; margin: 0 auto; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; border: 1px solid #eaeaea; font-family: 'Nunito', sans-serif; overflow: hidden; }
+            .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1A2E35; flex: 1; }
+            .lb-date{color:#607D86;margin-bottom:14px;font-size:11.5px}
+            .lb-recip{margin-bottom:14px;display:block}
+            .lb-recip-name{font-weight:800;font-size:12.5px}
+            .lb-recip-sub{color:#607D86;font-size:11.5px}
+            .lb-ref{font-size:11px;color:#607D86;margin-bottom:10px;display:block}
+            .lb-subj{margin-bottom:14px;padding-bottom:8px;border-bottom:1.5px solid #E0EEF0;display:block}
+            .lb-subj-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#A0B8BE;margin-bottom:2px}
+            .lb-subj-val{font-size:13px;font-weight:800}
+            .lb-salute{font-weight:600;margin-bottom:12px}
+            .lb-editor{color:#1A2E35;line-height:1.8;font-size:12.5px;white-space:pre-wrap;word-wrap:break-word;min-height:0}
+            .lb-closing{margin-top:28px}
+            .lb-close-text{margin-bottom:28px}
+            .lb-sig-line{display:none}
+            .lb-sig-name{font-weight:800;font-size:13px}
+            .lb-sig-role{color:#607D86;font-size:11px;margin-top:2px}
+            .lb-sig-dept{color:#A0B8BE;font-size:10px;margin-top:1px}
+          `}</style>
+          <div style={{ flex: 1, background: "#fff", borderRadius: 12, padding: "20px", overflowY: "auto", border: "1px solid " + C.border, minHeight: 350, maxHeight: "70vh", color: "#333", fontSize: 13, lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent || `<p>No preview available.</p>` }} />
         </div>
       );
     }
@@ -1836,6 +1856,26 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             </button>
             <div style={{ fontSize: 15, fontWeight: 800, color: C.text }}>{selectedDoc.docType ? selectedDoc.docType.toUpperCase() : "Document"} Preview</div>
           </div>
+          <style>{`
+            .lh-wrap { max-width: 760px; margin: 0 auto; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; border: 1px solid #eaeaea; font-family: 'Nunito', sans-serif; overflow: hidden; }
+            .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1A2E35; flex: 1; }
+            .lb-date{color:#607D86;margin-bottom:14px;font-size:11.5px}
+            .lb-recip{margin-bottom:14px;display:block}
+            .lb-recip-name{font-weight:800;font-size:12.5px}
+            .lb-recip-sub{color:#607D86;font-size:11.5px}
+            .lb-ref{font-size:11px;color:#607D86;margin-bottom:10px;display:block}
+            .lb-subj{margin-bottom:14px;padding-bottom:8px;border-bottom:1.5px solid #E0EEF0;display:block}
+            .lb-subj-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#A0B8BE;margin-bottom:2px}
+            .lb-subj-val{font-size:13px;font-weight:800}
+            .lb-salute{font-weight:600;margin-bottom:12px}
+            .lb-editor{color:#1A2E35;line-height:1.8;font-size:12.5px;white-space:pre-wrap;word-wrap:break-word;min-height:0}
+            .lb-closing{margin-top:28px}
+            .lb-close-text{margin-bottom:28px}
+            .lb-sig-line{display:none}
+            .lb-sig-name{font-weight:800;font-size:13px}
+            .lb-sig-role{color:#607D86;font-size:11px;margin-top:2px}
+            .lb-sig-dept{color:#A0B8BE;font-size:10px;margin-top:1px}
+          `}</style>
           <div style={{ background: "#fff", borderRadius: 12, padding: "20px", overflowY: "auto", border: "1px solid " + C.border, minHeight: 350, maxHeight: 500, color: "#333", fontSize: 13, lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent || `<p>No preview available.</p>` }} />
         </div>
       );
@@ -1974,6 +2014,26 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             </button>
             <div style={{ fontSize: 15, fontWeight: 800, color: C.text }}>{selectedDoc.docType ? selectedDoc.docType.toUpperCase() : "Document"} Preview</div>
           </div>
+          <style>{`
+            .lh-wrap { max-width: 760px; margin: 0 auto; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; border: 1px solid #eaeaea; font-family: 'Nunito', sans-serif; overflow: hidden; }
+            .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1A2E35; flex: 1; }
+            .lb-date{color:#607D86;margin-bottom:14px;font-size:11.5px}
+            .lb-recip{margin-bottom:14px;display:block}
+            .lb-recip-name{font-weight:800;font-size:12.5px}
+            .lb-recip-sub{color:#607D86;font-size:11.5px}
+            .lb-ref{font-size:11px;color:#607D86;margin-bottom:10px;display:block}
+            .lb-subj{margin-bottom:14px;padding-bottom:8px;border-bottom:1.5px solid #E0EEF0;display:block}
+            .lb-subj-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#A0B8BE;margin-bottom:2px}
+            .lb-subj-val{font-size:13px;font-weight:800}
+            .lb-salute{font-weight:600;margin-bottom:12px}
+            .lb-editor{color:#1A2E35;line-height:1.8;font-size:12.5px;white-space:pre-wrap;word-wrap:break-word;min-height:0}
+            .lb-closing{margin-top:28px}
+            .lb-close-text{margin-bottom:28px}
+            .lb-sig-line{display:none}
+            .lb-sig-name{font-weight:800;font-size:13px}
+            .lb-sig-role{color:#607D86;font-size:11px;margin-top:2px}
+            .lb-sig-dept{color:#A0B8BE;font-size:10px;margin-top:1px}
+          `}</style>
           <div style={{ flex: 1, background: "#fff", borderRadius: 12, padding: "20px", overflowY: "auto", border: "1px solid " + C.border, minHeight: 350, color: "#333", fontSize: 13, lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent || `<p>No HTML preview available. Standard attachment file: <b>${selectedDoc.fileName || "document.pdf"}</b></p>` }} />
         </div>
       );

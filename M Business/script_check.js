@@ -1,6 +1,6 @@
 
 // ── STATE ──
-let docType = 'lh';
+let docType = 'letterhead';
 let color = ' var(--app-accent, var(--app-accent, #00BCD4))';
 let font = 'Nunito, sans-serif';
 let logoUrl = null;

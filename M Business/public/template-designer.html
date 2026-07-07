@@ -3793,7 +3793,7 @@
     function safeRender() { window.safeRender(); }
 
     // ── STATE ──
-    let docType = 'lh';
+    let docType = 'letterhead';
     let color = '#00BCD4';
     let font = 'Nunito, sans-serif';
     let logoUrl = null;
@@ -3986,7 +3986,7 @@
 
     // ══════════════ RENDER ══════════════
     function render() {
-      if (docType === 'lh') renderLH();
+      if (docType === 'letterhead') renderLH();
       else if (docType === 'quo') renderQuo();
       else if (docType === 'inv') renderInv();
       else renderProp();
@@ -4569,7 +4569,7 @@
 
       // Pre-fill client name from the tab's own client field (used as default text option)
       let existingName = '';
-      if (hash === 'lh') existingName = document.getElementById('lh-recipient-name') ? document.getElementById('lh-recipient-name').value : '';
+      if (hash === 'letterhead') existingName = document.getElementById('lh-recipient-name') ? document.getElementById('lh-recipient-name').value : '';
       else if (hash === 'inv') existingName = document.getElementById('f-inv-client') ? document.getElementById('f-inv-client').value : '';
       else if (hash === 'quo') existingName = document.getElementById('f-quo-client') ? document.getElementById('f-quo-client').value : '';
       else if (hash === 'prop') existingName = document.getElementById('f-prop-client') ? document.getElementById('f-prop-client').value : '';
@@ -5184,14 +5184,14 @@
     // Auto-select tab based on hash (Run immediately and on load)
     function applyHash() {
       const hash = window.location.hash.substring(1);
-      if (hash && ['lh', 'quo', 'inv', 'prop'].includes(hash)) {
+      if (hash && ['letterhead', 'quo', 'inv', 'prop'].includes(hash)) {
         // Click the correct tab button
         const tabBtn = document.querySelector(`.dt[onclick*="'${hash}'"]`);
         if (tabBtn) tabBtn.click();
         else {
           // Manually switch
           docType = hash;
-          ['lh', 'quo', 'inv', 'prop'].forEach(t => {
+          ['letterhead', 'quo', 'inv', 'prop'].forEach(t => {
             const el = document.getElementById('ctrl-' + t);
             if (el) el.style.display = t === hash ? '' : 'none';
           });
@@ -5205,7 +5205,7 @@
         }
 
         // Update the preview title
-        const titles = { lh: 'Letterhead', quo: 'Quotation', prop: 'Proposal', inv: 'Invoice' };
+        const titles = { letterhead: 'Letterhead', quo: 'Quotation', prop: 'Proposal', inv: 'Invoice' };
         const prevTitle = document.getElementById('prevTitle');
         if (prevTitle && titles[hash]) prevTitle.textContent = titles[hash] + ' Preview';
       }
@@ -5256,7 +5256,7 @@
     .lh-wrap .lb-subj-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#A0B8BE;margin-bottom:2px}
     .lh-wrap .lb-subj-val{font-size:13px;font-weight:800}
     .lh-wrap .lb-salute{font-weight:600;margin-bottom:12px}
-    .lh-wrap .lb-editor{color:#1A2E35;line-height:1.8;font-size:12.5px}
+    .lh-wrap .lb-editor{color:#1A2E35;line-height:1.8;font-size:12.5px;white-space:pre-wrap;word-wrap:break-word}
     .lh-wrap .lb-closing{margin-top:28px}
     .lh-wrap .lb-close-text{margin-bottom:28px}
     .lh-wrap .lb-sig-line{width:90px;height:1.5px;margin-bottom:6px}
@@ -5269,7 +5269,7 @@
       const finalHtml = '<div class="lh-wrap">' + paperClone.innerHTML + '</div>';
 
       const data = {
-        docType: 'lh',
+        docType: 'letterhead',
         sendTo: type,
         client: name,
         employeeId: type === 'employee' ? recipientId : '',

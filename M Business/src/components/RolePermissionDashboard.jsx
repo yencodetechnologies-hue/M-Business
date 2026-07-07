@@ -4,8 +4,6 @@ import { T } from "../index";
 import { BASE_URL } from "../config";
 import { toast } from "react-toastify";
 
-
-
 const PERMISSION_KEYS = [
   "dashboard", "clients", "subadmins", "employees", "managers",
   "projects", "quotations", "proposals", "invoices", "tracking",

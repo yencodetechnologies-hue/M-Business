@@ -2708,69 +2708,15 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
           onDelete={() => setDeleteTarget(viewEmp)}
 
           onActivate={async () => {
-
             if (!window.confirm(`Are you sure you want to activate ${viewEmp.name}?`)) return;
-
             try {
-
               await axios.put(`${BASE_URL}/api/employees/status/${viewEmp._id}`, { status: "Approved" });
-
               setViewEmp(prev => ({ ...prev, status: "Approved" }));
-
               setEmployees(prev => prev.map(e => e._id === viewEmp._id ? { ...e, status: "Approved" } : e));
-
               showToast("✅ Employee activated!");
-
             } catch (err) {
-
               showToast("Failed to activate employee", "error");
-
             }
-
-          }}
-
-          onActivate={async () => {
-
-            if (!window.confirm(`Are you sure you want to activate ${viewEmp.name}?`)) return;
-
-            try {
-
-              await axios.put(`${BASE_URL}/api/employees/status/${viewEmp._id}`, { status: "Approved" });
-
-              setViewEmp(prev => ({ ...prev, status: "Approved" }));
-
-              setEmployees(prev => prev.map(e => e._id === viewEmp._id ? { ...e, status: "Approved" } : e));
-
-              showToast("✅ Employee activated!");
-
-            } catch (err) {
-
-              showToast("Failed to activate employee", "error");
-
-            }
-
-          }}
-
-          onActivate={async () => {
-
-            if (!window.confirm(`Are you sure you want to activate ${viewEmp.name}?`)) return;
-
-            try {
-
-              await axios.put(`${BASE_URL}/api/employees/status/${viewEmp._id}`, { status: "Approved" });
-
-              setViewEmp(prev => ({ ...prev, status: "Approved" }));
-
-              setEmployees(prev => prev.map(e => e._id === viewEmp._id ? { ...e, status: "Approved" } : e));
-
-              showToast("✅ Employee activated!");
-
-            } catch (err) {
-
-              showToast("Failed to activate employee", "error");
-
-            }
-
           }}
 
           onDeactivate={async () => {
@@ -8994,7 +8940,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   // New users: no subscription AND not in free trial = must pick a plan first
   // hasSelectedPlan = they have either activated free trial OR have a paid subscription
   const hasSelectedPlan = subscription !== null || isInFreeTrial();
-  let enforceMySubscriptions = !subLoading && !hasSelectedPlan;
+  let enforceMySubscriptions = (!subLoading && !hasSelectedPlan) || (subLoading && !isInFreeTrial() && !user?.createdAt);
 
   const rawNavItems = getNavForRole(user?.role);
 
@@ -13392,49 +13338,53 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
 
                   <button onClick={() => { setUploadFileTarget(null); setUploadTargetUser(""); }} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: "var(--app-text)", borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
-
                   <button disabled={!uploadTargetUser || uploadIsSending} onClick={async () => {
-
                     setUploadIsSending(true);
-
                     try {
-
                       const reader = new FileReader();
-
                       reader.readAsDataURL(uploadFileTarget);
-
                       reader.onload = async () => {
-
                         const base64Data = reader.result;
-
                         const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
 
-
+                        let resolvedClientId = "";
+                        let resolvedEmployeeId = "";
+                        if (uploadTargetRole === "client") {
+                          const match = clients.find(c => (c.clientName || c.name) === uploadTargetUser);
+                          resolvedClientId = match?._id || match?.id || "";
+                        } else if (uploadTargetRole === "employee") {
+                          const match = employees.find(e => e.name === uploadTargetUser);
+                          resolvedEmployeeId = match?._id || match?.id || "";
+                        }
 
                         await axios.post(`${BASE_URL}/api/documents`, {
-
                           docType: "upload",
-
                           sendTo: uploadTargetRole,
-
                           client: uploadTargetUser,
-
+                          clientId: resolvedClientId,
+                          employeeId: resolvedEmployeeId,
                           recipientEmail: "",
-
                           htmlContent: base64Data,
-
                           senderCompany: companyNameStr,
-
                           companyId
-
                         });
 
+                        if (uploadTargetRole === "employee" && resolvedEmployeeId) {
+                          try {
+                            await axios.post(`${BASE_URL}/api/notifications`, {
+                              userId: resolvedEmployeeId,
+                              type: "document",
+                              icon: "ti-files",
+                              text: `A new document has been shared with you`,
+                            });
+                          } catch (notifErr) {
+                            console.error("Failed to notify employee:", notifErr);
+                          }
+                        }
+
                         toast.success("File uploaded successfully!");
-
                         setUploadFileTarget(null);
-
                         setUploadTargetUser("");
-
                       };
 
                     } catch (err) {

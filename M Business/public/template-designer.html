@@ -2806,40 +2806,6 @@
             </div>
           </div>
 
-          <!-- SEND TO SECTION - inside ctrl-lh -->
-          <div id="sendToSection" style="margin-top:6px;">
-            <div class="acc-item">
-              <div class="acc-hdr" onclick="toggleAcc(this)">
-                <div class="acc-icon" style="background:#E8FAF3;color:#26C281"><i class="ti ti-send"></i></div>
-                <div class="acc-title">Send Document To</div>
-                <i class="ti ti-chevron-up acc-arrow open"></i>
-              </div>
-              <div class="acc-body open">
-                <div class="fg">
-                  <label class="fl">Recipient Type</label>
-                  <select class="fi" id="lh-recipient-type" onchange="updateLhRecipientList()">
-                    <option value="client">Client</option>
-                    <option value="employee">Employee</option>
-                  </select>
-                </div>
-                <div class="fg">
-                  <label class="fl">Recipient Name</label>
-                  <select class="fi" id="lh-recipient-name" style="width:100%;">
-                    <option value="">-- Select --</option>
-                  </select>
-                </div>
-                <div class="fg">
-                  <label class="fl">Email (optional)</label>
-                  <input class="fi" id="lh-recipient-email" placeholder="email@example.com" type="email">
-                </div>
-                <button onclick="sendFromLetterhead()"
-                  style="width:100%;padding:10px;background:linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),var(--app-accent2, #00ACC1));border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;">
-                  <i class="ti ti-send" style="font-size:15px;"></i>Send Letterhead
-                </button>
-              </div>
-            </div>
-          </div>
-
         </div>
 
         <!-- ═══════════ QUOTATION CONTROLS ═══════════ -->
@@ -3746,6 +3712,7 @@
             </div><!-- /acc-body -->
           </div><!-- /acc-item -->
 
+
         </div><!-- /ctrl-inv -->
 
       </div><!-- /cp-scroll -->
@@ -4596,38 +4563,74 @@
       }
     }
 
-    // ── SEND ──
+    // ── SEND (opens popup) ──
     function sendDoc() {
       const hash = window.location.hash.substring(1) || docType;
-      let clientName = '';
-      let sendTo = 'client';
-      let recipientId = '';
 
       if (hash === 'lh') {
-        const nameEl = document.getElementById('lh-recipient-name');
-        clientName = nameEl ? nameEl.value : '';
-        sendTo = document.getElementById('lh-recipient-type') ? document.getElementById('lh-recipient-type').value : 'client';
-        const selectedOpt = nameEl && nameEl.selectedIndex >= 0 ? nameEl.options[nameEl.selectedIndex] : null;
-        recipientId = selectedOpt ? (selectedOpt.dataset.recipientId || '') : '';
-      } else if (hash === 'inv') {
-        const nameEl = document.getElementById('f-inv-client');
-        clientName = nameEl ? nameEl.value : '';
-      } else if (hash === 'quo') {
-        const nameEl = document.getElementById('f-quo-client');
-        clientName = nameEl ? nameEl.value : '';
-      } else if (hash === 'prop') {
-        const nameEl = document.getElementById('f-prop-client');
-        clientName = nameEl ? nameEl.value : '';
+        // Letterhead keeps its own direct-send flow (no popup)
+        sendFromLetterhead();
+        return;
       }
 
-      if (!clientName) {
-        let highlightEl = null;
-        if (hash === 'lh') highlightEl = document.getElementById('lh-recipient-name');
-        else if (hash === 'inv') highlightEl = document.getElementById('f-inv-client');
-        else if (hash === 'quo') highlightEl = document.getElementById('f-quo-client');
-        else if (hash === 'prop') highlightEl = document.getElementById('f-prop-client');
+      // Pre-fill client name from the tab's own client field (used as default text option)
+      let existingName = '';
+      if (hash === 'inv') existingName = document.getElementById('f-inv-client') ? document.getElementById('f-inv-client').value : '';
+      else if (hash === 'quo') existingName = document.getElementById('f-quo-client') ? document.getElementById('f-quo-client').value : '';
+      else if (hash === 'prop') existingName = document.getElementById('f-prop-client') ? document.getElementById('f-prop-client').value : '';
 
-        if (highlightEl) { highlightEl.style.borderColor = '#F05C5C'; highlightEl.focus(); setTimeout(() => highlightEl.style.borderColor = '', 2000); }
+      window._sendModalHash = hash;
+      window._sendModalExistingClient = existingName;
+
+      document.getElementById('sendModalType').value = 'client';
+      updateSendModalRecipients();
+      document.getElementById('sendModal').style.display = 'flex';
+    }
+
+    function closeSendModal() {
+      document.getElementById('sendModal').style.display = 'none';
+    }
+
+    // Populate Recipient Name dropdown based on Send To Type selection
+    function updateSendModalRecipients() {
+      const type = document.getElementById('sendModalType').value;
+      const list = document.getElementById('sendModalName');
+      list.innerHTML = '';
+      const data = type === 'client' ? appClients : appEmployees;
+      const existingName = window._sendModalExistingClient || '';
+
+      // If it's a client send and the tab already has a typed client name not in appClients, keep it as an option
+      if (type === 'client' && existingName && !data.some(d => (typeof d === 'string' ? d : d.name) === existingName)) {
+        const opt = document.createElement('option');
+        opt.value = existingName;
+        opt.textContent = existingName;
+        list.appendChild(opt);
+      }
+
+      data.forEach(item => {
+        const opt = document.createElement('option');
+        const name = (typeof item === 'string') ? item : item.name;
+        const id = (typeof item === 'string') ? '' : (item.id || '');
+        opt.value = name;
+        opt.textContent = name;
+        opt.dataset.recipientId = id;
+        list.appendChild(opt);
+      });
+    }
+
+    // "Send Now" inside the popup — reads the popup's own selections and sends
+    function confirmSendFromModal() {
+      const hash = window._sendModalHash || docType;
+      const sendTo = document.getElementById('sendModalType').value;
+      const nameEl = document.getElementById('sendModalName');
+      const clientName = nameEl.value;
+      const selectedOpt = nameEl.selectedIndex >= 0 ? nameEl.options[nameEl.selectedIndex] : null;
+      const recipientId = selectedOpt ? (selectedOpt.dataset.recipientId || '') : '';
+
+      if (!clientName) {
+        nameEl.style.borderColor = '#F05C5C';
+        nameEl.focus();
+        setTimeout(() => nameEl.style.borderColor = '', 2000);
         return;
       }
 
@@ -4646,6 +4649,8 @@
         data.amount = grandEl ? parseFloat(grandEl.textContent.replace(/[^0-9.-]+/g, "")) : 0;
       }
 
+      closeSendModal();
+
       // Show toast
       const t = document.createElement('div');
       t.style.cssText = "position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#26C281, var(--app-accent, var(--app-accent, #00BCD4)));color:#fff;padding:14px 22px;border-radius:12px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.15);font-size:13px;display:flex;align-items:center;gap:8px;";
@@ -4656,6 +4661,16 @@
       // Send to React parent
       window.parent.postMessage({ type: 'SEND_DOCUMENT', payload: data }, '*');
     }
+
+    // Close modal on backdrop click
+    window.addEventListener('DOMContentLoaded', function () {
+      const sendModal = document.getElementById('sendModal');
+      if (sendModal) {
+        sendModal.addEventListener('click', function (e) {
+          if (e.target === this) closeSendModal();
+        });
+      }
+    });
 
     // ── PRINT ──
     function printDoc() {
@@ -5793,7 +5808,44 @@
     updateRisksPreview();
 
   </script>
+  <!-- SEND MODAL -->
+  <div id="sendModal"
+    style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+    <div
+      style="background:#fff;border-radius:18px;padding:32px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,0.25);position:relative;">
+      <div style="font-size:17px;font-weight:800;color:#1A2E35;margin-bottom:6px;">Send Document</div>
+      <div style="font-size:12px;color:#607D86;margin-bottom:20px;">Choose who to send this document to</div>
 
+      <div style="margin-bottom:14px;">
+        <label
+          style="font-size:10px;font-weight:700;color:#1A2E35;text-transform:uppercase;letter-spacing:.7px;display:block;margin-bottom:6px;">Send
+          To</label>
+        <select id="sendModalType" onchange="updateSendModalRecipients()"
+          style="width:100%;padding:9px 12px;border:1.5px solid #E0EEF0;border-radius:8px;font-size:13px;font-family:inherit;color:#1A2E35;background:#fff;outline:none;">
+          <option value="client">Client</option>
+          <option value="employee">Employee</option>
+        </select>
+      </div>
+
+      <div style="margin-bottom:20px;">
+        <label
+          style="font-size:10px;font-weight:700;color:#1A2E35;text-transform:uppercase;letter-spacing:.7px;display:block;margin-bottom:6px;">Recipient
+          Name</label>
+        <select id="sendModalName"
+          style="width:100%;padding:9px 12px;border:1.5px solid #E0EEF0;border-radius:8px;font-size:13px;font-family:inherit;color:#1A2E35;outline:none;background:#fff;">
+        </select>
+      </div>
+
+      <div style="display:flex;gap:10px;">
+        <button onclick="closeSendModal()"
+          style="flex:1;padding:10px;border:1.5px solid #E0EEF0;border-radius:8px;background:#fff;font-size:13px;font-weight:600;color:#607D86;cursor:pointer;font-family:inherit;">Cancel</button>
+        <button onclick="confirmSendFromModal()"
+          style="flex:2;padding:10px;border:none;border-radius:8px;background:linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),var(--app-accent2, #00ACC1));font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;">
+          <i class="ti ti-send" style="margin-right:6px;"></i>Send Now
+        </button>
+      </div>
+    </div>
+  </div>
 
 </body>
 

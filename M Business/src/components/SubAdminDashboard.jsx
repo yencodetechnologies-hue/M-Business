@@ -9051,7 +9051,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           clients: clients.map(c => c.clientName || c.name),
 
-          employees: employees.map(emp => emp.name),
+          employees: employees.map(emp => ({ name: emp.name, id: emp._id || emp.id })),
 
           quotations: quotations,
 
@@ -11260,7 +11260,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                       clients: clients.map(c => c.clientName || c.name),
 
-                      employees: employees.map(emp => emp.name),
+                      employees: employees.map(emp => ({ name: emp.name, id: emp._id || emp.id })),
 
                       quotations: quotations,
 

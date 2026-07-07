@@ -6605,7 +6605,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     if (params && params.get("payment")) return "mysubscriptions";
 
     const saved = localStorage.getItem("activeTab_subadmin") || "dashboard";
-    if (["create-project", "edit-project"].includes(saved)) return "projects";
+    // Never trust a stale "mysubscriptions" tab from a previous session/account
+    // as the initial screen — it causes the Upgrade Plan page to flash before
+    // the real subscription check (fetchSubscription) redirects appropriately.
+    // Start on "dashboard" instead; the subscription-gate effect will still
+    // send the user to mysubscriptions if they genuinely need to pick a plan.
+    if (saved === "mysubscriptions" || ["create-project", "edit-project"].includes(saved)) return "dashboard";
     return saved;
   });
 
@@ -7674,20 +7679,24 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       return null;
 
     } finally {
-      // Fetch updated user limits in the background — don't block callers on this
-      (async () => {
-        try {
-          const id = resolveSubadminId();
-          if (id) {
-            const userRes = await axios.get(`${BASE_URL}/api/users/${id}`);
-            if (userRes.data) {
-              localStorage.setItem("user", JSON.stringify(userRes.data));
+      // Fetch updated user limits in the background — don't block callers on this,
+      // and delay it slightly so it never competes with the initial dashboard
+      // render/data calls right after login.
+      setTimeout(() => {
+        (async () => {
+          try {
+            const id = resolveSubadminId();
+            if (id) {
+              const userRes = await axios.get(`${BASE_URL}/api/users/${id}`);
+              if (userRes.data) {
+                localStorage.setItem("user", JSON.stringify(userRes.data));
+              }
             }
+          } catch (e) {
+            console.error("Failed to update local user limits:", e);
           }
-        } catch (e) {
-          console.error("Failed to update local user limits:", e);
-        }
-      })();
+        })();
+      }, 1500);
     }
   };
 

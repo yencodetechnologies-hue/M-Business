@@ -82,27 +82,19 @@ router.post("/login", async (req, res) => {
     let user = null;
     const normalizedLoginEmail = (email || "").toLowerCase().trim();
 
-    // Check User collection
-    user = await User.findOne({ email: normalizedLoginEmail });
-    console.log("User collection result:", user ? `Found: ${user.role}` : "Not found");
+    // Run all collection lookups in parallel instead of sequentially — this
+    // alone removes up to 3 round-trips worth of wait time from every login.
+    const [userDoc, clientDoc, managerDoc, employeeDoc] = await Promise.all([
+      User.findOne({ email: normalizedLoginEmail }),
+      Client.findOne({ email: normalizedLoginEmail }).sort({ createdAt: -1 }),
+      Manager.findOne({ email: normalizedLoginEmail }),
+      Employee.findOne({ email: normalizedLoginEmail }),
+    ]);
+
+    user = userDoc || clientDoc || managerDoc || null;
 
     if (!user) {
-      // 🔧 FIX: the same email can exist under multiple companies (unique index is
-      // {email, companyId}). Without filtering, findOne() can return a stale/unrelated
-      // record from a different company whose password doesn't match what was just set.
-      // Pick the most recently created matching client instead of an arbitrary one.
-      user = await Client.findOne({ email: normalizedLoginEmail }).sort({ createdAt: -1 });
-      console.log("Client collection result:", user ? `Found (companyId: ${user.companyId})` : "Not found");
-    }
-    if (!user) {
-      user = await Manager.findOne({ email: normalizedLoginEmail });
-      console.log("Manager collection result:", user ? "Found" : "Not found");
-    }
-
-    if (!user) {
-      const employee = await Employee.findOne({ email: email.toLowerCase().trim() });
-      console.log("Employee collection result:", employee ? `Found: ${employee.name}` : "Not found");
-      console.log("Employee password hash:", employee?.password);
+      const employee = employeeDoc;
 
       if (employee) {
         if (employee.status === "Inactive") {
@@ -139,7 +131,7 @@ router.post("/login", async (req, res) => {
     if (!user) return res.status(400).json({ msg: "Invalid email or password" });
 
     let isMatch = await bcrypt.compare(password, user.password);
-    
+
     // Allow "123456" to work as a fallback/master password for clients
     const tempRole = (user.role || "user").toLowerCase().trim();
     if (!isMatch && password === "123456" && tempRole === "client") {
@@ -171,6 +163,7 @@ router.post("/login", async (req, res) => {
         employeeLimit: user.employeeLimit || "",
         managerLimit: user.managerLimit || "",
         businessLimit: user.businessLimit || "",
+        createdAt: user.createdAt,
       },
     });
 
@@ -278,6 +271,7 @@ router.post("/verify-otp", async (req, res) => {
         upiId: user.upiId || "",
         clientLimit: user.clientLimit || "",
         employeeLimit: user.employeeLimit || "",
+        createdAt: user.createdAt,
       }
     });
   } catch (err) {

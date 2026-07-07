@@ -1333,7 +1333,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .feedback-input:focus { border-color: var(--teal); background: #fff; }
     .cp-root .feedback-input::placeholder { color: var(--text3); }
     .cp-root .feedback-submit { width: 100%; margin-top: 10px; padding: 11px; background: var(--teal); color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background .15s; box-shadow: 0 3px 10px rgba(0,188,212,.25); }
-    .cp-root .feedback-submit:hover { background: var(--teal2); }
+    .cp-root .feedback-submit:hover { background: var(--app-accent-dark, #0097A7); color: #fff; }
 
     /* ── CONTACT CARD ── */
     .cp-root .contact-card { background: linear-gradient(135deg, #004D5E, var(--teal)); border-radius: var(--radius); padding: 22px; color: #fff; }
@@ -3030,15 +3030,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                   </div>
                 </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", border: "1.5px solid " + C.border, borderRadius: 10, cursor: "pointer", opacity: 0.6 }} onClick={() => alert("Credit Card payment option is simulated. Please use Google Pay/UPI.")}>
-                  <i className="ti ti-credit-card" style={{ fontSize: 20, color: C.text2 }}></i>
-                  <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: C.text }}>Credit / Debit Card</div>
-                </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", border: "1.5px solid " + C.border, borderRadius: 10, cursor: "pointer", opacity: 0.6 }} onClick={() => alert("Net Banking payment option is simulated. Please use Google Pay/UPI.")}>
-                  <i className="ti ti-building-bank" style={{ fontSize: 20, color: C.text2 }}></i>
-                  <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: C.text }}>Net Banking</div>
-                </div>
               </div>
 
               <button onClick={executePayment} disabled={paymentProcessing} style={{ width: "100%", padding: "12px", background: C.teal, color: "#fff", border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: "700", cursor: "pointer", marginTop: 8, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
@@ -3097,6 +3089,21 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 <button onClick={() => window.print()} style={{ flex: 1, padding: "11px", background: C.surface2, color: C.text, border: "1px solid " + C.border, borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
                   <i className="ti ti-printer"></i> Print
                 </button>
+                <style>{`
+                  @media print {
+                    body * { visibility: hidden; }
+                    #receipt-print-area, #receipt-print-area * { visibility: visible; }
+                    #receipt-print-area {
+                      position: fixed;
+                      left: 0;
+                      top: 0;
+                      width: 100%;
+                      margin: 0;
+                      border: none !important;
+                      box-shadow: none !important;
+                    }
+                  }
+                `}</style>
                 <button onClick={() => downloadReceiptPdf(receiptInvoice, clientName, agencyName)} style={{ flex: 1, padding: "11px", background: C.teal, color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
                   <i className="ti ti-download"></i> Download PDF
                 </button>

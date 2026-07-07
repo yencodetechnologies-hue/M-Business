@@ -59,8 +59,7 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
     if (Object.keys(errs).length) { setLoginErr(errs); return; }
     try {
       setLoading(true); setError("");
-      console.log("Sending:", loginData);
-      const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData);
+      const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData, { timeout: 15000 });
       const userData = res.data.user || res.data;
       const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
 
@@ -73,21 +72,36 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
           isSameAccount = prevUser?.email === userWithLogo.email;
         } catch (e) { }
       }
-      if (!isSameAccount) {
-        const keysToKeep = ["accounts"];
-        Object.keys(localStorage).forEach(key => {
-          if (!keysToKeep.includes(key)) localStorage.removeItem(key);
-        });
-      }
-      // Also clear the accounts cache entry for this email so stale data is gone
-      try {
-        let accs = JSON.parse(localStorage.getItem("accounts") || "[]");
-        accs = accs.filter(a => a.email !== userWithLogo.email);
-        localStorage.setItem("accounts", JSON.stringify(accs));
-      } catch (e) { }
 
+      // Update the user + accounts cache first, then hand off to the app
+      // immediately so the "Signing in..." spinner clears without waiting
+      // on cache-cleanup work.
       localStorage.setItem("user", JSON.stringify(userWithLogo));
+
+      if (!isSameAccount) {
+        // Also reset the per-user "last tab" so a stale tab (e.g. "mysubscriptions"
+        // left over from a previous account) can't flash before the correct
+        // dashboard renders.
+        localStorage.removeItem("activeTab_subadmin");
+      }
+
       setUser(userWithLogo);
+
+      // Do the heavier cache cleanup after the UI has already switched away
+      // from the login screen — none of this needs to block sign-in.
+      setTimeout(() => {
+        if (!isSameAccount) {
+          const keysToKeep = ["accounts", "user", "activeTab_subadmin"];
+          Object.keys(localStorage).forEach(key => {
+            if (!keysToKeep.includes(key)) localStorage.removeItem(key);
+          });
+        }
+        try {
+          let accs = JSON.parse(localStorage.getItem("accounts") || "[]");
+          accs = accs.filter(a => a.email !== userWithLogo.email);
+          localStorage.setItem("accounts", JSON.stringify(accs));
+        } catch (e) { }
+      }, 0);
     } catch (e) {
       if (e.response?.data?.requiresOTP) {
         setVerifyEmail(e.response.data.email);

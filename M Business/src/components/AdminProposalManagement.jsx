@@ -458,7 +458,7 @@ function CompanyDropdown({ clients, value, onChange, error }) {
                         <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>
                       )}
                     </div>
-                    {isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>Yes</span>}
+
                   </div>
                 );
               })

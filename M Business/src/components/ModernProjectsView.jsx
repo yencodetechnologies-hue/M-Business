@@ -568,7 +568,7 @@ export default function ModernProjectsView({
                     {/* Budget */}
                     {p.budget && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4, fontSize: 11, color: '#059669', fontWeight: 700 }}>
-                        <i className="ti ti-currency-rupee" style={{ fontSize: 12 }} />
+
                         Budget: {p.currency || '₹'}{Number(p.budget).toLocaleString('en-IN')}
                       </div>
                     )}

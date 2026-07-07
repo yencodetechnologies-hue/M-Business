@@ -379,22 +379,17 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
         const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
         const displayName = (user?.name || "").trim().toLowerCase();
         const empId = String(user?._id || user?.id || "").trim();
+        const params = new URLSearchParams();
+        if (empId) params.set("employeeId", empId);
+        if (displayName) params.set("client", user?.name || user?.employeeName || "");
         const [docsRes, projRes] = await Promise.all([
-          axios.get(`${BASE_URL}/api/documents${empId ? `?employeeId=${empId}` : ""}`),
+          axios.get(`${BASE_URL}/api/documents${params.toString() ? `?${params.toString()}` : ""}`),
           axios.get(`${BASE_URL}/api/projects`)
         ]);
         const allDocs = Array.isArray(docsRes.data) ? docsRes.data : (docsRes.data?.value || []);
-        const norm = (s) => (s || "").trim().toLowerCase().replace(/\s+/g, " ");
-        const myDocs = allDocs.filter(d => {
-          if (empId && String(d.employeeId || "").trim() === empId) return true;
-          if (!empId && String(d.employeeId || "").trim() === "") {
-            const docClient = norm(d.client);
-            if (docClient === "employee" || docClient === "") return true;
-          }
-          const docClient = norm(d.client);
-          const dn = norm(displayName);
-          return !!dn && (docClient === dn || docClient.includes(dn) || dn.includes(docClient));
-        });
+        // The backend query already filters by employeeId + client name via $or,
+        // so we trust the API response directly.
+        const myDocs = allDocs;
         const empName = user?.name || user?.employeeName || '';
         const projFiles = (Array.isArray(projRes.data) ? projRes.data : []).flatMap(p =>
           (p.files || [])

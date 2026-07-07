@@ -2565,8 +2565,7 @@
               <div class="fg">
                 <label class="fl">Brand Color</label>
                 <div class="cswatches" id="cswatches">
-                  <div class="csw sel" style="background: var(--app-accent, var(--app-accent, #00BCD4))"
-                    data-c=" var(--app-accent, var(--app-accent, #00BCD4))" onclick="pickColor(this)"></div>
+                  <div class="csw sel" style="background:#00BCD4" data-c="#00BCD4" onclick="pickColor(this)"></div>
                   <div class="csw" style="background:#006E7F" data-c="#006E7F" onclick="pickColor(this)"></div>
                   <div class="csw" style="background:#26C281" data-c="#26C281" onclick="pickColor(this)"></div>
                   <div class="csw" style="background:#7C5CFC" data-c="#7C5CFC" onclick="pickColor(this)"></div>
@@ -4619,7 +4618,8 @@
       }
 
       if (!clientName) {
-        alert('Please select a recipient first.');
+        const highlightEl = (hash === 'lh') ? document.getElementById('lh-recipient-name') : document.getElementById('f-clientName');
+        if (highlightEl) { highlightEl.style.borderColor = '#F05C5C'; highlightEl.focus(); setTimeout(() => highlightEl.style.borderColor = '', 2000); }
         return;
       }
 

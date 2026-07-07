@@ -61,12 +61,21 @@ router.get('/', async (req, res) => {
         let query = {};
         if (companyId) query.companyId = companyId;
 
-        if (employeeId) {
-            query.employeeId = employeeId;
+        if (employeeId && client) {
+            // When both employeeId and client name are provided, use $or so we find
+            // documents that were saved with either the proper employeeId OR by
+            // matching the recipient name (handles docs saved before the fix).
+            query.$or = [
+                { employeeId: String(employeeId).trim() },
+                { client: new RegExp(`^${client.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i'), sendTo: "employee" },
+                { client: new RegExp(`^${client.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i'), employeeId: { $in: ["", null] } }
+            ];
+        } else if (employeeId) {
+            query.employeeId = String(employeeId).trim();
         } else if (clientId) {
-            query.clientId = clientId;
+            query.clientId = String(clientId).trim();
         } else if (client) {
-            query.client = new RegExp(`^${client}$`, 'i');
+            query.client = new RegExp(`^${client.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
         }
 
         if (sendTo) {

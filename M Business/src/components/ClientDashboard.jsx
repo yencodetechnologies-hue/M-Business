@@ -5,6 +5,26 @@ import SettingsPage from "./SettingsPage";
 import ModernProjectDetails from "./ModernProjectDetails";
 import { PROPOSAL_PREVIEW_CSS } from "./ProposalPreviewStyles";
 import { printProposal, shareProposalAsPDF } from "./proposalPrintUtils";
+import html2pdf from "html2pdf.js";
+
+// Renders the receipt for a paid invoice into a PDF and triggers a download.
+async function downloadReceiptPdf(invoice, clientName, agencyName) {
+  const el = document.getElementById("receipt-print-area");
+  if (!el) return;
+  const opt = {
+    margin: 10,
+    filename: `Receipt-${invoice.invoiceNo || "invoice"}.pdf`,
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2, backgroundColor: "#ffffff" },
+    jsPDF: { unit: "mm", format: "a5", orientation: "portrait" },
+  };
+  try {
+    await html2pdf().set(opt).from(el).save();
+  } catch (err) {
+    console.error("Receipt PDF generation failed:", err);
+    alert("Could not generate the PDF receipt. Please try again.");
+  }
+}
 // ── Teal Theme Colors --------------------      ----------------------
 const C = {
   bg: "#F3F8F9",
@@ -518,6 +538,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const clientPointsRef = React.useRef([]);
   const [paymentInvoice, setPaymentInvoice] = useState(null);
   const [paymentProcessing, setPaymentProcessing] = useState(false);
+  const [receiptInvoice, setReceiptInvoice] = useState(null); // invoice object to show receipt for
 
   const clientName = user?.clientName || user?.name || "Client";
   const agencyName = localStorage.getItem("portalAgencyName") || user?.agencyName || "Our Company";
@@ -873,15 +894,23 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         transactionId: txnId
       });
       if (res.data?.success || res.status === 200) {
+        const updatedInvoice = {
+          ...paymentInvoice,
+          status: "paid",
+          amountPaid: paymentInvoice.total,
+          paymentMode: "GPay",
+          paymentDate: new Date().toISOString().split("T")[0],
+          transactionId: txnId,
+        };
         setInvoices(invoices.map(inv => {
           if (inv.id === paymentInvoice.id || inv._id === paymentInvoice._id) {
-            return { ...inv, status: "paid", amountPaid: inv.total };
+            return { ...inv, ...updatedInvoice };
           }
           return inv;
         }));
         setPayModalOpen(false);
         setPaymentInvoice(null);
-        alert("✅ Payment of ₹" + remainingAmount.toLocaleString("en-IN") + " marked as paid!\nTransaction ID: " + txnId);
+        setReceiptInvoice(updatedInvoice); // open receipt right after payment
       }
     } catch (err) {
       console.error("Payment update failed:", err);
@@ -1893,7 +1922,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               if (inv.status !== "paid") {
                 startPayment(inv);
               } else {
-                alert("This invoice is already paid!");
+                setReceiptInvoice(inv);
               }
             }}>
               <div className="inv-icon" style={{ background: inv.status === "paid" ? C.greenBg : C.amberBg, color: inv.status === "paid" ? C.green : C.amber }}>
@@ -1910,8 +1939,11 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 <div className="inv-date">{inv.status === "paid" ? inv.date : `Due ${inv.dueDate}`}</div>
               </div>
               <span className={`badge ${inv.status}`}>{inv.status}</span>
-              <div className="inv-dl" style={{ marginLeft: "8px" }} onClick={(e) => { e.stopPropagation(); }}>
-                <i className="ti ti-download"></i>
+              <div className="inv-dl" title={inv.status === "paid" ? "Download Receipt" : "Not yet paid"} style={{ marginLeft: "8px" }} onClick={(e) => {
+                e.stopPropagation();
+                if (inv.status === "paid") setReceiptInvoice(inv);
+              }}>
+                <i className={inv.status === "paid" ? "ti ti-receipt" : "ti ti-download"}></i>
               </div>
             </div>
           ))}
@@ -2101,7 +2133,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
                 {viewApprovalApp.fileUrl && (() => {
                   const fname = (viewApprovalApp.fileName || viewApprovalApp.fileUrl || "").toLowerCase();
-                  const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/.test(fname);
+                  const isImage = /\.(jpg|jpeg|png|gif|webp)$/.test(fname);
                   const isPdf = /\.pdf$/.test(fname);
                   return (
                     <div style={{ marginTop: 10, border: "1.5px solid " + C.border, borderRadius: 12, overflow: "hidden", background: C.surface2 }}>
@@ -2956,6 +2988,59 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                   <>Confirm & Pay ₹{(paymentInvoice.total - (paymentInvoice.amountPaid || 0)).toLocaleString("en-IN")}</>
                 )}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* RECEIPT MODAL */}
+      {receiptInvoice && (
+        <div className="modal-overlay" onClick={() => setReceiptInvoice(null)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 480 }}>
+            <div className="modal-header">
+              <span className="modal-title">Payment Receipt</span>
+              <button className="modal-close" onClick={() => setReceiptInvoice(null)}>&times;</button>
+            </div>
+            <div className="modal-body">
+              <div id="receipt-print-area" style={{ background: "#fff", border: "1px solid " + C.border, borderRadius: 12, padding: 24 }}>
+                <div style={{ textAlign: "center", marginBottom: 16 }}>
+                  <div style={{ width: 44, height: 44, borderRadius: "50%", background: C.greenBg, color: C.green, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px" }}>
+                    <i className="ti ti-circle-check" style={{ fontSize: 22 }}></i>
+                  </div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: C.green }}>Payment Successful</div>
+                </div>
+
+                <div style={{ textAlign: "center", marginBottom: 16, paddingBottom: 16, borderBottom: "1px dashed " + C.border }}>
+                  <div style={{ fontSize: 12, color: C.text3, fontWeight: 700 }}>{agencyName}</div>
+                  <div style={{ fontSize: 22, fontWeight: 900, color: C.text, margin: "4px 0" }}>
+                    ₹{(receiptInvoice.amountPaid || receiptInvoice.total).toLocaleString("en-IN")}
+                  </div>
+                </div>
+
+                {[
+                  ["Client", clientName],
+                  ["Invoice No.", receiptInvoice.invoiceNo],
+                  ["Project", receiptInvoice.project || receiptInvoice.desc || "-"],
+                  ["Payment Method", receiptInvoice.paymentMode || "GPay"],
+                  ["Transaction ID", receiptInvoice.transactionId || "-"],
+                  ["Payment Date", receiptInvoice.paymentDate || receiptInvoice.date || "-"],
+                  ["Status", "Paid"],
+                ].map(([label, val]) => (
+                  <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", fontSize: 13 }}>
+                    <span style={{ color: C.text3, fontWeight: 600 }}>{label}</span>
+                    <span style={{ color: C.text, fontWeight: 700 }}>{val}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
+                <button onClick={() => window.print()} style={{ flex: 1, padding: "11px", background: C.surface2, color: C.text, border: "1px solid " + C.border, borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                  <i className="ti ti-printer"></i> Print
+                </button>
+                <button onClick={() => downloadReceiptPdf(receiptInvoice, clientName, agencyName)} style={{ flex: 1, padding: "11px", background: C.teal, color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                  <i className="ti ti-download"></i> Download PDF
+                </button>
+              </div>
             </div>
           </div>
         </div>

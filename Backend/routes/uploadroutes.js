@@ -53,10 +53,16 @@ router.post("/", upload.single("file"), async (req, res) => {
     return res.status(400).json({ msg: "No file uploaded" });
   }
 
+  // Cloudinary blocks inline delivery of SVGs uploaded as resource_type "image"
+  // for security reasons (they render as a broken image instead of showing).
+  // Uploading them as "raw" instead makes the URL load/preview correctly.
+  const isSvg = req.file.mimetype === "image/svg+xml" || /\.svg$/i.test(req.file.originalname || "");
+  const resourceType = isSvg ? "raw" : "auto";
+
   const uploadStream = cloudinary.uploader.upload_stream(
     {
       folder: "mbusiness/uploads",
-      resource_type: "auto",
+      resource_type: resourceType,
     },
     async (error, result) => {
       if (error) {

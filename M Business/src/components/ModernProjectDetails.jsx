@@ -1661,7 +1661,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
                 {viewProjectApproval.fileUrl && (() => {
                   const fname = (viewProjectApproval.fileName || viewProjectApproval.fileUrl || '').toLowerCase();
-                  const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/.test(fname);
+                  const isImage = /\.(jpg|jpeg|png|gif|webp)$/.test(fname);
                   return (
                     <div style={{ marginTop: 14, border: `1.5px solid ${P.border}`, borderRadius: 12, overflow: 'hidden', background: P.bg }}>
                       {isImage ? (

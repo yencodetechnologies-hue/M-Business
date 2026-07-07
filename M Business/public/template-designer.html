@@ -4567,15 +4567,10 @@
     function sendDoc() {
       const hash = window.location.hash.substring(1) || docType;
 
-      if (hash === 'lh') {
-        // Letterhead keeps its own direct-send flow (no popup)
-        sendFromLetterhead();
-        return;
-      }
-
       // Pre-fill client name from the tab's own client field (used as default text option)
       let existingName = '';
-      if (hash === 'inv') existingName = document.getElementById('f-inv-client') ? document.getElementById('f-inv-client').value : '';
+      if (hash === 'lh') existingName = document.getElementById('lh-recipient-name') ? document.getElementById('lh-recipient-name').value : '';
+      else if (hash === 'inv') existingName = document.getElementById('f-inv-client') ? document.getElementById('f-inv-client').value : '';
       else if (hash === 'quo') existingName = document.getElementById('f-quo-client') ? document.getElementById('f-quo-client').value : '';
       else if (hash === 'prop') existingName = document.getElementById('f-prop-client') ? document.getElementById('f-prop-client').value : '';
 

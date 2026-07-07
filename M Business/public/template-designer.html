@@ -4600,16 +4600,36 @@
     // ── SEND ──
     function sendDoc() {
       const hash = window.location.hash.substring(1) || docType;
-      const lhName = document.getElementById('lh-recipient-name') ? document.getElementById('lh-recipient-name').value : '';
-      const modalName = document.getElementById('f-clientName') ? document.getElementById('f-clientName').value : '';
-      const clientName = lhName || modalName || 'Client';
-      const lhType = document.getElementById('lh-recipient-type') ? document.getElementById('lh-recipient-type').value : 'client';
-      const sendTo = lhType || (document.getElementById('sendTo') ? document.getElementById('sendTo').value : 'client');
+      let clientName = '';
+      let sendTo = 'client';
+      let recipientId = '';
+
+      if (hash === 'lh') {
+        const nameEl = document.getElementById('lh-recipient-name');
+        clientName = nameEl ? nameEl.value : '';
+        sendTo = document.getElementById('lh-recipient-type') ? document.getElementById('lh-recipient-type').value : 'client';
+        const selectedOpt = nameEl ? nameEl.options[nameEl.selectedIndex] : null;
+        recipientId = selectedOpt ? (selectedOpt.dataset.recipientId || '') : '';
+      } else {
+        const nameEl = document.getElementById('f-clientName');
+        clientName = nameEl ? nameEl.value : '';
+        sendTo = document.getElementById('sendTo') ? document.getElementById('sendTo').value : 'client';
+        const selectedOpt = nameEl ? nameEl.options[nameEl.selectedIndex] : null;
+        recipientId = selectedOpt ? (selectedOpt.dataset.recipientId || '') : '';
+      }
+
+      if (!clientName) {
+        alert('Please select a recipient first.');
+        return;
+      }
+
       const data = {
         docType: hash,
         sendTo: sendTo,
         htmlContent: document.getElementById('mainPaper').innerHTML,
         client: clientName,
+        employeeId: sendTo === 'employee' ? recipientId : '',
+        clientId: sendTo === 'client' ? recipientId : '',
       };
 
       if (hash === 'inv') {

@@ -7701,12 +7701,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       if (res.data.hasSubscription) {
 
         setSubscription(res.data.subscription);
+        setSubLoading(false);
 
         return res.data.subscription; // return fresh data for immediate use
 
       } else {
 
         setSubscription(null);
+        setSubLoading(false);
 
         return null;
 
@@ -7717,12 +7719,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       console.error("Subscription fetch error:", err);
 
       setSubscription(null);
+      setSubLoading(false);
 
       return null;
 
     } finally {
-
-      setSubLoading(false);
 
       // Fetch updated user to get the latest limits (clientLimit, employeeLimit, etc.)
 
@@ -11364,7 +11365,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} initialTab={forceUpgradeTab || enforceMySubscriptions ? "upgrade" : "overview"} preloadedSubscription={subscription} onTabChange={() => setForceUpgradeTab(false)} packagesList={packages} />}
+            {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={async () => { await fetchSubscription(); setForceUpgradeTab(false); setActive("dashboard"); }} initialTab={forceUpgradeTab || enforceMySubscriptions ? "upgrade" : "overview"} preloadedSubscription={subscription} onTabChange={() => setForceUpgradeTab(false)} packagesList={packages} />}
 
             {validActive === "reports" && <ReportsPage THEME={currentTheme} clients={clients} projects={projects} employees={employees} managers={managers} income={income} expenses={expenses} />}
 

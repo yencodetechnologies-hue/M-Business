@@ -420,6 +420,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         const index = (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo);
         if (index === -1) return;
         const updatedList = (currProject.invoices || []).filter((_, i) => i !== index);
+        setCurrProject(prev => ({ ...prev, invoices: updatedList }));
         await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { invoices: updatedList });
       }
       loadLatest();
@@ -773,7 +774,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   // Auto-calculate Total Budget = ALL Invoices (local + global) + Additional Charges + Milestone Payments
   const billedGlobal = projectInvoices.reduce((sum, inv) => sum + parseAmt(inv.total), 0);
-  const billedLocal = (currProject.invoices || []).reduce((sum, inv) => {
+  const billedLocal = (currProject.invoices || []).filter(Boolean).reduce((sum, inv) => {
     const invAmount = parseAmt(inv.amount) || parseAmt(inv.total);
     const taxPercent = parseAmt(inv.taxPercent);
     const taxAmt = inv.taxType === 'inclusive' ? 0 : Math.round(invAmount * (taxPercent / 100));

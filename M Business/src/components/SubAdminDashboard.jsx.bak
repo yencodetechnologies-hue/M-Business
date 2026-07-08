@@ -2392,7 +2392,7 @@ function PackagesPage({ packages, onViewPackage, onEditPackage }) {
 // ═══════════════════════════════════════════════════════════
 // VENDORS PAGE
 // ═══════════════════════════════════════════════════════════
-function VendorsPage({ vendors, setVendors }) {
+function VendorsPage({ vendors, setVendors, onAddVendorClick }) {
   const [search, setSearch] = useState("");
   const [viewVendor, setViewVendor] = useState(null);
   const [editVendor, setEditVendor] = useState(null);
@@ -3625,7 +3625,7 @@ const handleEditPackage = (pkg) => {
           {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} />}
           {validActive === "reports" && <ReportsPage clients={clients} projects={projects} employees={employees} managers={managers} />}
           {validActive === "packages" && <PackagesPage packages={packages} onViewPackage={handleViewPackage} onEditPackage={(user?.role !== "subadmin" && user?.role !== "sub_admin" && user?.role !== "sub-admin") ? handleEditPackage : undefined} />}
-          {validActive === "vendors" && <VendorsPage vendors={vendors} setVendors={setVendors} />}
+          {validActive === "vendors" && <VendorsPage vendors={vendors} setVendors={setVendors} onAddVendorClick={() => { setNvError({}); setModal("vendor_add"); }} />}
           {validActive === "rolePermissions" && <RolePermissionDashboard />}
         </div>
       </div>

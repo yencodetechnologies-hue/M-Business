@@ -321,13 +321,7 @@ export default function ModernProjectsView({
 
       {/* ── KPI Cards ── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          {onAddProject && (
-            <button className="create-btn" onClick={onAddProject} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <i className="ti ti-plus"></i> New Project
-            </button>
-          )}
-        </div>
+
         <div className="mpv-kpi-grid">
           {KPI_ITEMS.map(k => (
             <div

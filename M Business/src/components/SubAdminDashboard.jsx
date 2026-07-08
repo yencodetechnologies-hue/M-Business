@@ -5922,7 +5922,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
             )}
           </div>
           <div>
-            <div className="profile-name">{user?.name || "Admin"}</div>
+            <div className="profile-name">{user?.companyName || user?.name || "Admin"}</div>
 
 
 

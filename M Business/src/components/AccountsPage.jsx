@@ -355,14 +355,13 @@ export default function AccountsPage({
   }, [propIncome, propExpenses]);
 
   const tabStyle = (on) => ({
-    padding: "12px 28px", borderRadius: 12, fontSize: 16, fontWeight: 900,
+    padding: "8px 16px", borderRadius: 10, fontSize: 12, fontWeight: 800,
     cursor: "pointer", border: "none",
     background: on ? THEME.accent : "transparent",
     color: on ? "#fff" : THEME.muted,
     transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
     boxShadow: on ? "0 4px 12px rgba(99,102,241,0.25)" : "none"
   });
-
   if (loading) return <div style={{ textAlign: "center", padding: 100, color: THEME.muted, fontWeight: 800 }}>Action Generating Financial Dashboard...</div>;
 
   return (

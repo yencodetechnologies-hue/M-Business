@@ -2027,37 +2027,41 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
           <i className="ti ti-plus"></i> New Client
         </button>
       </div>
-      {/* SUMMARY CARDS */}
+
+      {/* STAT PILLS — matches Projects page style */}
       <div style={{ display: "flex", gap: 16, marginBottom: 20, flexWrap: "wrap" }}>
         <div onClick={() => setFilterMode("all")} style={{ cursor: "pointer", flex: "1 1 200px", minWidth: 200, background: "#fff", border: filterMode === "all" ? "2px solid var(--app-accent)" : "1.5px solid #E0EEF0", borderRadius: 14, padding: "16px 18px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-users" /></div>
-          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{totalClients}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Total Clients</div></div>
+          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{totalClients}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>All Clients</div></div>
         </div>
         <div onClick={() => setFilterMode("active")} style={{ cursor: "pointer", flex: "1 1 200px", minWidth: 200, background: "#fff", border: filterMode === "active" ? "2px solid #16a34a" : "1.5px solid #E0EEF0", borderRadius: 14, padding: "16px 18px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-user-check" /></div>
-          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{activeClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Active Clients</div></div>
+          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{activeClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Active</div></div>
         </div>
         <div onClick={() => setFilterMode("inactive")} style={{ cursor: "pointer", flex: "1 1 200px", minWidth: 200, background: "#fff", border: filterMode === "inactive" ? "2px solid #dc2626" : "1.5px solid #E0EEF0", borderRadius: 14, padding: "16px 18px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-user-off" /></div>
-          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{inactiveClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Inactive Clients</div></div>
+          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{inactiveClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Inactive</div></div>
         </div>
       </div>
 
-      {/* SEARCH + FILTER BAR (moved below cards) */}
-      <div style={{ display: "flex", gap: 10, marginBottom: 18, flexWrap: "wrap", alignItems: "center" }}>
-        <div style={{ position: "relative", flex: "1 1 320px", maxWidth: 420 }}>
-          <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "#A0B8BE", fontSize: 15 }} />
-          <input type="text" placeholder="Search clients or company..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "10px 14px 10px 38px", border: "1.5px solid #E0EEF0", borderRadius: 10, fontSize: 13, outline: "none", background: "#fff", color: "#1A2E35", boxSizing: "border-box" }} />
+      {/* SEARCH + FILTER BAR — search/dropdowns left, count right, same row as Projects page */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
+        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+          <div style={{ position: "relative", width: 260 }}>
+            <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "#A0B8BE", fontSize: 15 }} />
+            <input type="text" placeholder="Search clients or company..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "10px 14px 10px 38px", border: "1.5px solid #E0EEF0", borderRadius: 10, fontSize: 13, outline: "none", background: "#fff", color: "#1A2E35", boxSizing: "border-box" }} />
+          </div>
+          <select value={filterMode} onChange={e => setFilterMode(e.target.value)} style={{ padding: "10px 32px 10px 12px", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 10, fontSize: 13, color: "#1A2E35", outline: "none", cursor: "pointer", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          <select value={sortMode} onChange={e => setSortMode(e.target.value)} style={{ padding: "10px 32px 10px 12px", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 10, fontSize: 13, color: "#1A2E35", outline: "none", cursor: "pointer", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+          </select>
         </div>
-        <select value={filterMode} onChange={e => setFilterMode(e.target.value)} style={{ padding: "10px 32px 10px 12px", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 10, fontSize: 13, color: "#1A2E35", outline: "none", cursor: "pointer", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
-          <option value="all">All Status</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
-        <select value={sortMode} onChange={e => setSortMode(e.target.value)} style={{ padding: "10px 32px 10px 12px", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 10, fontSize: 13, color: "#1A2E35", outline: "none", cursor: "pointer", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
-          <option value="newest">Newest</option>
-          <option value="oldest">Oldest</option>
-        </select>
+        <div style={{ fontSize: 13, color: "#607D86", fontWeight: 700 }}>{filtered.length} of {clients.length} clients</div>
       </div>
 
 

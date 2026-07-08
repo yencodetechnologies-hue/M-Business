@@ -944,7 +944,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         // to round-trip to the server.
         const created = createRes?.data?.task || createRes?.data;
         if (created && created._id) {
-          setCurrTasks(prev => [created, ...prev]);
+          setCurrTasks(prev => [...prev, created]);
         }
       }
 

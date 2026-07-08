@@ -5863,26 +5863,6 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
 
       <aside className={`sidebar ${open ? 'open' : ''}`} style={{ transform: open ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1)" }}>
 
-        <div className="logo" style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
-
-          {companyLogo ? (
-
-            <img onClick={onLogoUploadClick} src={companyLogo} alt="logo" style={{ height: 64, width: "100%", maxWidth: 180, objectFit: "contain", flexShrink: 0, cursor: "pointer" }} />
-
-          ) : (
-
-            <span className="logo-mark" onClick={onLogoUploadClick} style={{ cursor: "pointer" }}>
-              {(companyName && /^[\x20-\x7E\u00C0-\u024F]+$/.test(companyName)) ? companyName : "M Business"}
-            </span>
-
-          )}
-
-          <span className="logo-badge" style={{ position: "absolute", bottom: 2, right: 10, width: 20, height: 20, borderRadius: "50%", background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#fff", cursor: "pointer", border: "2px solid #fff", boxShadow: "0 2px 5px rgba(0,0,0,0.2)" }} onClick={onLogoUploadClick}>+</span>
-
-          <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--text3)", cursor: "pointer", marginLeft: "auto", fontSize: 16 }} className="sidebar-close">✕</button>
-
-        </div>
-
 
 
         <div className="profile-area">

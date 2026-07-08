@@ -955,6 +955,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const [search, setSearch] = useState("");
 
   const [filterMode, setFilterMode] = useState("all");
+  const [sortMode, setSortMode] = useState("newest");
 
   const [activeClientId, setActiveClientId] = useState(() => clients?.[0]?._id || null);
   const [isLoading, setIsLoading] = useState(false);
@@ -1002,6 +1003,10 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
     return matchQ && matchF;
 
+  }).sort((a, b) => {
+    const da = new Date(a.createdAt || 0).getTime();
+    const db = new Date(b.createdAt || 0).getTime();
+    return sortMode === "newest" ? db - da : da - db;
   });
 
 
@@ -2008,197 +2013,309 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
 
+  const totalClients = clients.length;
+  const activeClientsCount = clients.filter(c => (c.status || "Active").toLowerCase() === "active").length;
+  const inactiveClientsCount = clients.filter(c => (c.status || "").toLowerCase() === "inactive").length;
+
   return (
-    <div style={{ display: "flex", height: "100%", overflow: "hidden", background: "#F5FAFA" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "auto", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 100%)", padding: "24px 28px" }}>
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
-      {/* ── LEFT CLIENT LIST ── */}
-      <div style={{ width: 260, minWidth: 260, borderRight: "1.5px solid #E0EEF0", display: "flex", flexDirection: "column", background: "#fff", overflow: "hidden" }}>
-
-        {/* Search + Add */}
-        <div style={{ padding: "14px 12px 8px", borderBottom: "1px solid #E0EEF0", flexShrink: 0 }}>
-          <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-            <div style={{ position: "relative", flex: 1 }}>
-              <i className="ti ti-search" style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "#A0B8BE" }} />
-              <input
-                type="text"
-                placeholder="Search clients..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                style={{ width: "100%", padding: "8px 10px 8px 30px", border: "1.5px solid #E0EEF0", borderRadius: 9, fontSize: 12, outline: "none", background: "#F5FAFA", color: "#1A2E35", boxSizing: "border-box" }}
-              />
-            </div>
-            <button
-              onClick={onAddClient}
-              style={{ background: "var(--app-accent)", border: "none", borderRadius: 9, width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}
-            >
-              <i className="ti ti-plus" style={{ color: "#fff", fontSize: 16 }} />
-            </button>
-          </div>
-
-          {/* Filter tabs */}
-          <div style={{ display: "flex", gap: 4 }}>
-            {["all", "active", "inactive"].map(f => (
-              <button
-                key={f}
-                onClick={() => setFilterMode(f)}
-                style={{ flex: 1, padding: "5px 4px", borderRadius: 7, border: "none", fontSize: 10, fontWeight: 700, cursor: "pointer", background: filterMode === f ? "var(--app-accent)" : "var(--teal-lighter, #F0FDFE)", color: filterMode === f ? "#fff" : "#607D86", textTransform: "capitalize" }}
-              >
-                {f === "all" ? `All (${clients.length})` : f === "active" ? `Active (${clients.filter(c => (c.status || "Active").toLowerCase() === "active").length})` : `Inactive (${clients.filter(c => (c.status || "").toLowerCase() === "inactive").length})`}
-              </button>
-            ))}
-          </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1A2332", margin: 0 }}>Clients</h1>
+        <button className="create-btn" onClick={onAddClient} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <i className="ti ti-plus"></i> New Client
+        </button>
+      </div>
+      {/* SUMMARY CARDS */}
+      <div style={{ display: "flex", gap: 16, marginBottom: 20, flexWrap: "wrap" }}>
+        <div onClick={() => setFilterMode("all")} style={{ cursor: "pointer", flex: "1 1 200px", minWidth: 200, background: "#fff", border: filterMode === "all" ? "2px solid var(--app-accent)" : "1.5px solid #E0EEF0", borderRadius: 14, padding: "16px 18px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-users" /></div>
+          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{totalClients}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Total Clients</div></div>
         </div>
-
-        {/* Client List */}
-        <div style={{ flex: 1, overflowY: "auto" }}>
-          {isLoading ? (
-            <div style={{ padding: 20, textAlign: "center", color: "#A0B8BE", fontSize: 12 }}>Loading...</div>
-          ) : filtered.length === 0 ? (
-            <div style={{ padding: 30, textAlign: "center" }}>
-              <div style={{ fontSize: 28, marginBottom: 8 }}>👥</div>
-              <div style={{ fontSize: 12, color: "#A0B8BE", fontWeight: 600 }}>No clients found</div>
-              <button onClick={onAddClient} style={{ marginTop: 12, background: "var(--app-accent)", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 11, color: "#fff", cursor: "pointer", fontWeight: 700 }}>+ Add Client</button>
-            </div>
-          ) : (
-            <>
-              {activeSection.length > 0 && (
-                <>
-                  <div style={{ padding: "8px 14px 4px", fontSize: 9, fontWeight: 800, color: "#A0B8BE", letterSpacing: 1, textTransform: "uppercase" }}>Active ({activeSection.length})</div>
-                  {activeSection.map(c => renderClientItem(c))}
-                </>
-              )}
-              {otherSection.length > 0 && (
-                <>
-                  <div style={{ padding: "8px 14px 4px", fontSize: 9, fontWeight: 800, color: "#A0B8BE", letterSpacing: 1, textTransform: "uppercase" }}>Others ({otherSection.length})</div>
-                  {otherSection.map(c => renderClientItem(c))}
-                </>
-              )}
-            </>
-          )}
+        <div onClick={() => setFilterMode("active")} style={{ cursor: "pointer", flex: "1 1 200px", minWidth: 200, background: "#fff", border: filterMode === "active" ? "2px solid #16a34a" : "1.5px solid #E0EEF0", borderRadius: 14, padding: "16px 18px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-user-check" /></div>
+          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{activeClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Active Clients</div></div>
         </div>
+        <div onClick={() => setFilterMode("inactive")} style={{ cursor: "pointer", flex: "1 1 200px", minWidth: 200, background: "#fff", border: filterMode === "inactive" ? "2px solid #dc2626" : "1.5px solid #E0EEF0", borderRadius: 14, padding: "16px 18px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-user-off" /></div>
+          <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{inactiveClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Inactive Clients</div></div>
+        </div>
+      </div>
+
+      {/* SEARCH + FILTER BAR (moved below cards) */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 18, flexWrap: "wrap", alignItems: "center" }}>
+        <div style={{ position: "relative", flex: "1 1 320px", maxWidth: 420 }}>
+          <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "#A0B8BE", fontSize: 15 }} />
+          <input type="text" placeholder="Search clients or company..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "10px 14px 10px 38px", border: "1.5px solid #E0EEF0", borderRadius: 10, fontSize: 13, outline: "none", background: "#fff", color: "#1A2E35", boxSizing: "border-box" }} />
+        </div>
+        <select value={filterMode} onChange={e => setFilterMode(e.target.value)} style={{ padding: "10px 32px 10px 12px", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 10, fontSize: 13, color: "#1A2E35", outline: "none", cursor: "pointer", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
+          <option value="all">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+        <select value={sortMode} onChange={e => setSortMode(e.target.value)} style={{ padding: "10px 32px 10px 12px", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 10, fontSize: 13, color: "#1A2E35", outline: "none", cursor: "pointer", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+        </select>
       </div>
 
 
 
-
-
-
-      {/* ── DETAIL PANEL ── */}
-
-      {activeClient ? (
-
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
-
-
-
-          {/* HERO */}
-
-          <div style={{ background: "#fff", borderBottom: "1.5px solid #E0EEF0", padding: "20px 28px", flexShrink: 0 }}>
-
-            <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 16 }}>
-
-              <div style={{ width: 64, height: 64, borderRadius: "50%", background: activeClient.logoUrl ? "#f1f5f9" : `linear-gradient(135deg,${acColor},${acColor}bb)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 900, color: "#fff", flexShrink: 0, position: "relative", boxShadow: "0 4px 14px rgba(0,0,0,.15)", overflow: "hidden" }}>
-
-                {activeClient.logoUrl ? <img src={activeClient.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : getAvatar(activeClient)}
-
-                <div style={{ position: "absolute", bottom: 2, right: 2, width: 16, height: 16, borderRadius: "50%", background: st.dot, border: "2px solid #fff" }} />
-
+      {/* CLIENT LIST/GRID */}
+      {filtered.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "60px 0", color: "#94a3b8" }}>
+          <div style={{ fontSize: 15, fontWeight: 700 }}>No clients found</div>
+        </div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 16 }}>
+          {filtered.map(c => {
+            const st = getStatusCfg(c.status);
+            const color = getAvatarColor(c);
+            return (
+              <div key={c._id} onClick={() => { setActiveClientId(c._id); setViewClientModal(true); }} style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: 18, cursor: "pointer", display: "flex", flexDirection: "column", gap: 10 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 42, height: 42, borderRadius: "50%", background: `linear-gradient(135deg,${color},${color}bb)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800, color: "#fff", flexShrink: 0 }}>
+                    {c.logoUrl ? <img src={c.logoUrl} alt="" style={{ width: 42, height: 42, borderRadius: "50%", objectFit: "contain", background: "#fff" }} /> : getAvatar(c)}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "#1A2332", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.clientName || c.name || "—"}</div>
+                    <div style={{ fontSize: 11, color: "#94a3b8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.companyName || c.company || "—"}</div>
+                  </div>
+                  <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 800, background: st.bg, color: st.color, flexShrink: 0 }}>{st.label}</span>
+                </div>
+                <div style={{ fontSize: 12, color: "#607D86", display: "flex", flexDirection: "column", gap: 4 }}>
+                  <div><i className="ti ti-mail" style={{ marginRight: 6 }} />{c.email || "—"}</div>
+                  <div><i className="ti ti-phone" style={{ marginRight: 6 }} />{c.phone || "—"}</div>
+                </div>
+                <div style={{ display: "flex", gap: 8, marginTop: 4 }} onClick={e => e.stopPropagation()}>
+                  <button onClick={() => { setActiveClientId(c._id); setViewClientModal(true); }} style={{ flex: 1, background: "var(--teal-light,#E0F7FA)", border: "none", borderRadius: 8, padding: "7px 0", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer" }}>View</button>
+                  <button onClick={() => openEdit(c)} style={{ flex: 1, background: "#FFF7ED", border: "none", borderRadius: 8, padding: "7px 0", fontSize: 11, color: "#F59E0B", fontWeight: 700, cursor: "pointer" }}>Edit</button>
+                  <button onClick={() => setDeleteTarget(c)} style={{ flex: 1, background: "#FEF2F2", border: "none", borderRadius: 8, padding: "7px 0", fontSize: 11, color: "#EF4444", fontWeight: 700, cursor: "pointer" }}>Delete</button>
+                </div>
               </div>
+            );
+          })}
+        </div>
+      )}
 
-              <div style={{ flex: 1, minWidth: 0 }}>
+      {/* OLD LEFT-PANEL WRAPPER BELOW IS NO LONGER USED FOR MAIN LAYOUT — kept hidden to preserve modal logic */}
+      <div style={{ display: "none" }}>
+        <div style={{ width: 260, minWidth: 260, borderRight: "1.5px solid #E0EEF0", display: "flex", flexDirection: "column", background: "#fff", overflow: "hidden" }}>
 
-                <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
+          {/* Search + Add */}
+          <div style={{ padding: "14px 12px 8px", borderBottom: "1px solid #E0EEF0", flexShrink: 0 }}>
+            <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+              <div style={{ position: "relative", flex: 1 }}>
+                <i className="ti ti-search" style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "#A0B8BE" }} />
+                <input
+                  type="text"
+                  placeholder="Search clients..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  style={{ width: "100%", padding: "8px 10px 8px 30px", border: "1.5px solid #E0EEF0", borderRadius: 9, fontSize: 12, outline: "none", background: "#F5FAFA", color: "#1A2E35", boxSizing: "border-box" }}
+                />
+              </div>
+              <button
+                onClick={onAddClient}
+                style={{ background: "var(--app-accent)", border: "none", borderRadius: 9, width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}
+              >
+                <i className="ti ti-plus" style={{ color: "#fff", fontSize: 16 }} />
+              </button>
+            </div>
 
-                  <div style={{ fontSize: 20, fontWeight: 900, color: "#1A2E35", letterSpacing: "-.3px" }}>{activeClient.clientName || activeClient.name || "—"}</div>
+            {/* Filter tabs */}
+            <div style={{ display: "flex", gap: 4 }}>
+              {["all", "active", "inactive"].map(f => (
+                <button
+                  key={f}
+                  onClick={() => setFilterMode(f)}
+                  style={{ flex: 1, padding: "5px 4px", borderRadius: 7, border: "none", fontSize: 10, fontWeight: 700, cursor: "pointer", background: filterMode === f ? "var(--app-accent)" : "var(--teal-lighter, #F0FDFE)", color: filterMode === f ? "#fff" : "#607D86", textTransform: "capitalize" }}
+                >
+                  {f === "all" ? `All (${clients.length})` : f === "active" ? `Active (${clients.filter(c => (c.status || "Active").toLowerCase() === "active").length})` : `Inactive (${clients.filter(c => (c.status || "").toLowerCase() === "inactive").length})`}
+                </button>
+              ))}
+            </div>
+          </div>
 
-                  {/* Status badge with dropdown */}
+          {/* Client List */}
+          <div style={{ flex: 1, overflowY: "auto" }}>
+            {isLoading ? (
+              <div style={{ padding: 20, textAlign: "center", color: "#A0B8BE", fontSize: 12 }}>Loading...</div>
+            ) : filtered.length === 0 ? (
+              <div style={{ padding: 30, textAlign: "center" }}>
+                <div style={{ fontSize: 28, marginBottom: 8 }}>👥</div>
+                <div style={{ fontSize: 12, color: "#A0B8BE", fontWeight: 600 }}>No clients found</div>
+                <button onClick={onAddClient} style={{ marginTop: 12, background: "var(--app-accent)", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 11, color: "#fff", cursor: "pointer", fontWeight: 700 }}>+ Add Client</button>
+              </div>
+            ) : (
+              <>
+                {activeSection.length > 0 && (
+                  <>
+                    <div style={{ padding: "8px 14px 4px", fontSize: 9, fontWeight: 800, color: "#A0B8BE", letterSpacing: 1, textTransform: "uppercase" }}>Active ({activeSection.length})</div>
+                    {activeSection.map(c => renderClientItem(c))}
+                  </>
+                )}
+                {otherSection.length > 0 && (
+                  <>
+                    <div style={{ padding: "8px 14px 4px", fontSize: 9, fontWeight: 800, color: "#A0B8BE", letterSpacing: 1, textTransform: "uppercase" }}>Others ({otherSection.length})</div>
+                    {otherSection.map(c => renderClientItem(c))}
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        </div>
 
-                  <div style={{ position: "relative" }} ref={statusDropRef}>
 
-                    <button onClick={() => setStatusDropOpen(v => !v)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 11px 5px 9px", background: st.bg, border: `1.5px solid ${st.dot}`, borderRadius: 20, fontSize: 11, fontWeight: 800, color: st.color, cursor: "pointer", fontFamily: "inherit" }}>
 
-                      <span style={{ width: 7, height: 7, borderRadius: "50%", background: st.dot, display: "inline-block" }} />
 
-                      {st.label}
 
-                      <i className="ti ti-chevron-down" style={{ fontSize: 11, opacity: .7 }} />
 
+        {/* ── DETAIL PANEL ── */}
+
+        {activeClient ? (
+
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
+
+
+
+            {/* HERO */}
+
+            <div style={{ background: "#fff", borderBottom: "1.5px solid #E0EEF0", padding: "20px 28px", flexShrink: 0 }}>
+
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 16 }}>
+
+                <div style={{ width: 64, height: 64, borderRadius: "50%", background: activeClient.logoUrl ? "#f1f5f9" : `linear-gradient(135deg,${acColor},${acColor}bb)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 900, color: "#fff", flexShrink: 0, position: "relative", boxShadow: "0 4px 14px rgba(0,0,0,.15)", overflow: "hidden" }}>
+
+                  {activeClient.logoUrl ? <img src={activeClient.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : getAvatar(activeClient)}
+
+                  <div style={{ position: "absolute", bottom: 2, right: 2, width: 16, height: 16, borderRadius: "50%", background: st.dot, border: "2px solid #fff" }} />
+
+                </div>
+
+                <div style={{ flex: 1, minWidth: 0 }}>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
+
+                    <div style={{ fontSize: 20, fontWeight: 900, color: "#1A2E35", letterSpacing: "-.3px" }}>{activeClient.clientName || activeClient.name || "—"}</div>
+
+                    {/* Status badge with dropdown */}
+
+                    <div style={{ position: "relative" }} ref={statusDropRef}>
+
+                      <button onClick={() => setStatusDropOpen(v => !v)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 11px 5px 9px", background: st.bg, border: `1.5px solid ${st.dot}`, borderRadius: 20, fontSize: 11, fontWeight: 800, color: st.color, cursor: "pointer", fontFamily: "inherit" }}>
+
+                        <span style={{ width: 7, height: 7, borderRadius: "50%", background: st.dot, display: "inline-block" }} />
+
+                        {st.label}
+
+                        <i className="ti ti-chevron-down" style={{ fontSize: 11, opacity: .7 }} />
+
+                      </button>
+
+                      {statusDropOpen && (
+
+                        <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,.12)", zIndex: 100, minWidth: 160, overflow: "hidden" }}>
+
+                          <div style={{ padding: "6px 12px 4px", fontSize: 9, fontWeight: 700, color: "#A0B8BE", textTransform: "uppercase", letterSpacing: .7, background: "#F8FAFB", borderBottom: "1px solid #E0EEF0" }}>Set Client Status</div>
+
+                          {["Active", "Inactive"].map(s => {
+
+                            const sc = getStatusCfg(s);
+
+                            const isCurrentStatus = (activeClient.status || "Active") === s;
+
+                            return (
+
+                              <div key={s} onClick={() => updateStatus(activeClient, s)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", fontSize: 12, fontWeight: 700, color: sc.color, background: isCurrentStatus ? sc.bg : "transparent", transition: "background .12s" }} onMouseEnter={e => e.currentTarget.style.background = sc.bg} onMouseLeave={e => e.currentTarget.style.background = isCurrentStatus ? sc.bg : "transparent"}>
+
+                                <span style={{ width: 9, height: 9, borderRadius: "50%", background: sc.dot, display: "inline-block" }} />
+
+                                <span style={{ flex: 1 }}>{s}</span>
+
+                                {isCurrentStatus && <i className="ti ti-check" style={{ fontSize: 13, opacity: .8 }} />}
+
+                              </div>
+
+                            );
+
+                          })}
+
+                        </div>
+
+                      )}
+
+                    </div>
+                    <button
+                      onClick={() => {
+                        const portalUrl = `${window.location.origin}/client-portal/${activeClient._id}`;
+                        window.open(portalUrl, "_blank");
+                      }}
+                      style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "var(--teal-light, var(--teal-light, #E0F7FA))", border: "1.5px solid  var(--app-accent, var(--app-accent, #00BCD4))", borderRadius: 20, fontSize: 11, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }}
+                      onMouseEnter={e => { e.currentTarget.style.background = "var(--app-accent)"; e.currentTarget.style.color = "#fff"; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = "rgba(var(--app-accent-rgb),0.1)"; e.currentTarget.style.color = "var(--app-accent)"; }}
+                    >
+                      <i className="ti ti-world" style={{ fontSize: 12 }} />Portal
+                    </button>
+                    <button
+                      onClick={() => setViewClientModal(true)}
+                      style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "none", border: "1.5px solid #E0EEF0", borderRadius: 20, fontSize: 11, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = " var(--app-accent, var(--app-accent, #00BCD4))"; e.currentTarget.style.color = " var(--app-accent, var(--app-accent, #00BCD4))"; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}
+                    >
+                      <i className="ti ti-eye" style={{ fontSize: 12 }} />View
                     </button>
 
-                    {statusDropOpen && (
 
-                      <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,.12)", zIndex: 100, minWidth: 160, overflow: "hidden" }}>
 
-                        <div style={{ padding: "6px 12px 4px", fontSize: 9, fontWeight: 700, color: "#A0B8BE", textTransform: "uppercase", letterSpacing: .7, background: "#F8FAFB", borderBottom: "1px solid #E0EEF0" }}>Set Client Status</div>
-
-                        {["Active", "Inactive"].map(s => {
-
-                          const sc = getStatusCfg(s);
-
-                          const isCurrentStatus = (activeClient.status || "Active") === s;
-
-                          return (
-
-                            <div key={s} onClick={() => updateStatus(activeClient, s)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", fontSize: 12, fontWeight: 700, color: sc.color, background: isCurrentStatus ? sc.bg : "transparent", transition: "background .12s" }} onMouseEnter={e => e.currentTarget.style.background = sc.bg} onMouseLeave={e => e.currentTarget.style.background = isCurrentStatus ? sc.bg : "transparent"}>
-
-                              <span style={{ width: 9, height: 9, borderRadius: "50%", background: sc.dot, display: "inline-block" }} />
-
-                              <span style={{ flex: 1 }}>{s}</span>
-
-                              {isCurrentStatus && <i className="ti ti-check" style={{ fontSize: 13, opacity: .8 }} />}
-
-                            </div>
-
-                          );
-
-                        })}
-
-                      </div>
-
-                    )}
 
                   </div>
-                  <button
-                    onClick={() => {
-                      const portalUrl = `${window.location.origin}/client-portal/${activeClient._id}`;
-                      window.open(portalUrl, "_blank");
-                    }}
-                    style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "var(--teal-light, var(--teal-light, #E0F7FA))", border: "1.5px solid  var(--app-accent, var(--app-accent, #00BCD4))", borderRadius: 20, fontSize: 11, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "var(--app-accent)"; e.currentTarget.style.color = "#fff"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(var(--app-accent-rgb),0.1)"; e.currentTarget.style.color = "var(--app-accent)"; }}
-                  >
-                    <i className="ti ti-world" style={{ fontSize: 12 }} />Portal
-                  </button>
-                  <button
-                    onClick={() => setViewClientModal(true)}
-                    style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "none", border: "1.5px solid #E0EEF0", borderRadius: 20, fontSize: 11, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = " var(--app-accent, var(--app-accent, #00BCD4))"; e.currentTarget.style.color = " var(--app-accent, var(--app-accent, #00BCD4))"; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}
-                  >
-                    <i className="ti ti-eye" style={{ fontSize: 12 }} />View
-                  </button>
 
+                  <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
 
+                    {activeClient.address && <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "var(--teal-light, var(--teal-light, #E0F7FA))", color: " var(--app-accent, var(--app-accent, #00BCD4))" }}><i className="ti ti-map-pin" style={{ fontSize: 10, marginRight: 2 }} />{activeClient.address}</span>}
 
+                    <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#F8FAFB", color: "#A0B8BE" }}><i className="ti ti-clock" style={{ fontSize: 10, marginRight: 2 }} />Joined {activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—"}</span>
+
+                  </div>
 
                 </div>
 
-                <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+                <div style={{ display: "flex", gap: 6, flexShrink: 0, flexWrap: "wrap" }}>
 
-                  {activeClient.address && <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "var(--teal-light, var(--teal-light, #E0F7FA))", color: " var(--app-accent, var(--app-accent, #00BCD4))" }}><i className="ti ti-map-pin" style={{ fontSize: 10, marginRight: 2 }} />{activeClient.address}</span>}
+                  <button onClick={() => openEdit(activeClient)} style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E0EEF0", background: "#F5FAFA", color: "#607D86" }} onMouseEnter={e => { e.currentTarget.style.borderColor = " var(--app-accent, var(--app-accent, #00BCD4))"; e.currentTarget.style.color = " var(--app-accent, var(--app-accent, #00BCD4))"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}><i className="ti ti-edit" style={{ fontSize: 13 }} />Edit</button>
 
-                  <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#F8FAFB", color: "#A0B8BE" }}><i className="ti ti-clock" style={{ fontSize: 10, marginRight: 2 }} />Joined {activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—"}</span>
+                  <button onClick={() => setDeleteTarget(activeClient)} style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E0EEF0", background: "#F5FAFA", color: "#607D86" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#F05C5C"; e.currentTarget.style.color = "#F05C5C"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}><i className="ti ti-trash" style={{ fontSize: 13 }} />Delete</button>
 
                 </div>
 
               </div>
 
-              <div style={{ display: "flex", gap: 6, flexShrink: 0, flexWrap: "wrap" }}>
 
-                <button onClick={() => openEdit(activeClient)} style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E0EEF0", background: "#F5FAFA", color: "#607D86" }} onMouseEnter={e => { e.currentTarget.style.borderColor = " var(--app-accent, var(--app-accent, #00BCD4))"; e.currentTarget.style.color = " var(--app-accent, var(--app-accent, #00BCD4))"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}><i className="ti ti-edit" style={{ fontSize: 13 }} />Edit</button>
 
-                <button onClick={() => setDeleteTarget(activeClient)} style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E0EEF0", background: "#F5FAFA", color: "#607D86" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#F05C5C"; e.currentTarget.style.color = "#F05C5C"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}><i className="ti ti-trash" style={{ fontSize: 13 }} />Delete</button>
+              {/* Stats bar */}
+
+              <div style={{ display: "flex", gap: 0, background: "#F5FAFA", border: "1.5px solid #E0EEF0", borderRadius: 10, overflow: "hidden" }}>
+
+                {[
+
+                  { val: cRevenue ? "Rs." + Number(cRevenue).toLocaleString("en-IN") : "Rs.0", label: "Total Revenue", color: " var(--app-accent, var(--app-accent, #00BCD4))" },
+                  { val: clientProjects.length, label: "Projects" },
+                  { val: invoices.filter(inv => (inv.clientId === activeClient?._id) || (inv.clientName === (activeClient?.clientName || activeClient?.name))).length, label: "Invoices" },
+                  { val: (activeClient?.documents?.length || 0), label: "Documents" },
+
+                ].map((s, i, arr) => (
+
+                  <div key={i} style={{ flex: 1, padding: "10px 14px", textAlign: "center", borderRight: i < arr.length - 1 ? "1px solid #E0EEF0" : "none" }}>
+
+                    <div style={{ fontSize: 17, fontWeight: 900, color: s.color || "#1A2E35", letterSpacing: "-.3px" }}>{s.val}</div>
+
+                    <div style={{ fontSize: 10, color: "#A0B8BE", fontWeight: 600, marginTop: 2, textTransform: "uppercase", letterSpacing: .4 }}>{s.label}</div>
+
+                  </div>
+
+                ))}
 
               </div>
 
@@ -2206,103 +2323,75 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
 
-            {/* Stats bar */}
+            {/* TABS */}
 
-            <div style={{ display: "flex", gap: 0, background: "#F5FAFA", border: "1.5px solid #E0EEF0", borderRadius: 10, overflow: "hidden" }}>
+            <div style={{ background: "#fff", borderBottom: "1.5px solid #E0EEF0", padding: "0 28px", display: "flex", flexShrink: 0, overflowX: "auto" }}>
 
               {[
 
-                { val: cRevenue ? "Rs." + Number(cRevenue).toLocaleString("en-IN") : "Rs.0", label: "Total Revenue", color: " var(--app-accent, var(--app-accent, #00BCD4))" },
-                { val: clientProjects.length, label: "Projects" },
-                { val: invoices.filter(inv => (inv.clientId === activeClient?._id) || (inv.clientName === (activeClient?.clientName || activeClient?.name))).length, label: "Invoices" },
-                { val: (activeClient?.documents?.length || 0), label: "Documents" },
+                { key: "overview", icon: "ti-layout-dashboard", label: "Overview" },
 
-              ].map((s, i, arr) => (
+                { key: "projects", icon: "ti-briefcase", label: "Projects" },
 
-                <div key={i} style={{ flex: 1, padding: "10px 14px", textAlign: "center", borderRight: i < arr.length - 1 ? "1px solid #E0EEF0" : "none" }}>
+                { key: "documents", icon: "ti-files", label: "Documents" },
 
-                  <div style={{ fontSize: 17, fontWeight: 900, color: s.color || "#1A2E35", letterSpacing: "-.3px" }}>{s.val}</div>
+                { key: "portal", icon: "ti-globe", label: "Portal" },
 
-                  <div style={{ fontSize: 10, color: "#A0B8BE", fontWeight: 600, marginTop: 2, textTransform: "uppercase", letterSpacing: .4 }}>{s.label}</div>
+                { key: "activity", icon: "ti-history", label: "Activity" },
 
-                </div>
+                { key: "feedback", icon: "ti-star", label: "Feedback" },
+
+              ].map(tab => (
+
+                <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{ padding: "12px 16px", fontSize: 12, fontWeight: 700, color: activeTab === tab.key ? " var(--app-accent, var(--app-accent, #00BCD4))" : "#607D86", cursor: "pointer", border: "none", background: "none", fontFamily: "inherit", borderBottom: `2.5px solid ${activeTab === tab.key ? " var(--app-accent, var(--app-accent, #00BCD4))" : "transparent"}`, transition: "all .15s", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 5 }}>
+
+                  <i className={`ti ${tab.icon}`} style={{ fontSize: 14 }} />{tab.label}
+
+                </button>
 
               ))}
 
             </div>
 
+
+
+            {/* TAB CONTENT */}
+
+            <div style={{ flex: 1, overflowY: "auto", padding: "20px 28px" }}>
+
+              {renderTabContent()}
+
+            </div>
+
           </div>
-
-
-
-          {/* TABS */}
-
-          <div style={{ background: "#fff", borderBottom: "1.5px solid #E0EEF0", padding: "0 28px", display: "flex", flexShrink: 0, overflowX: "auto" }}>
-
-            {[
-
-              { key: "overview", icon: "ti-layout-dashboard", label: "Overview" },
-
-              { key: "projects", icon: "ti-briefcase", label: "Projects" },
-
-              { key: "documents", icon: "ti-files", label: "Documents" },
-
-              { key: "portal", icon: "ti-globe", label: "Portal" },
-
-              { key: "activity", icon: "ti-history", label: "Activity" },
-
-              { key: "feedback", icon: "ti-star", label: "Feedback" },
-
-            ].map(tab => (
-
-              <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{ padding: "12px 16px", fontSize: 12, fontWeight: 700, color: activeTab === tab.key ? " var(--app-accent, var(--app-accent, #00BCD4))" : "#607D86", cursor: "pointer", border: "none", background: "none", fontFamily: "inherit", borderBottom: `2.5px solid ${activeTab === tab.key ? " var(--app-accent, var(--app-accent, #00BCD4))" : "transparent"}`, transition: "all .15s", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 5 }}>
-
-                <i className={`ti ${tab.icon}`} style={{ fontSize: 14 }} />{tab.label}
-
+        ) : isLoading ? (
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--app-bg)", minWidth: 0 }}>
+            <div style={{ textAlign: "center", padding: 40 }}>
+              <div style={{ width: 48, height: 48, border: "4px solid #E0EEF0", borderTop: "4px solid  var(--app-accent, var(--app-accent, #00BCD4))", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
+              <div style={{ fontSize: 13, color: "#A0B8BE", fontWeight: 600 }}>Loading clients...</div>
+              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            </div>
+          </div>
+        ) : (
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--app-bg)", minWidth: 0 }}>
+            <div style={{ textAlign: "center", padding: 40 }}>
+              <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(var(--app-accent-rgb), 0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px" }}>
+                <i className="ti ti-users" style={{ color: "var(--app-accent)", fontSize: 32 }} />
+              </div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "var(--app-text)", marginBottom: 8 }}></div>
+              <div style={{ fontSize: 13, color: "var(--app-muted)", marginBottom: 24, lineHeight: 1.6 }}>
+                Add your first client to get started.
+              </div>
+              <button onClick={onAddClient} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 22px", background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+                <i className="ti ti-plus" style={{ fontSize: 14 }} /> Add Client
               </button>
-
-            ))}
-
-          </div>
-
-
-
-          {/* TAB CONTENT */}
-
-          <div style={{ flex: 1, overflowY: "auto", padding: "20px 28px" }}>
-
-            {renderTabContent()}
-
-          </div>
-
-        </div>
-      ) : isLoading ? (
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--app-bg)", minWidth: 0 }}>
-          <div style={{ textAlign: "center", padding: 40 }}>
-            <div style={{ width: 48, height: 48, border: "4px solid #E0EEF0", borderTop: "4px solid  var(--app-accent, var(--app-accent, #00BCD4))", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
-            <div style={{ fontSize: 13, color: "#A0B8BE", fontWeight: 600 }}>Loading clients...</div>
-            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-          </div>
-        </div>
-      ) : (
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--app-bg)", minWidth: 0 }}>
-          <div style={{ textAlign: "center", padding: 40 }}>
-            <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(var(--app-accent-rgb), 0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px" }}>
-              <i className="ti ti-users" style={{ color: "var(--app-accent)", fontSize: 32 }} />
             </div>
-            <div style={{ fontSize: 16, fontWeight: 800, color: "var(--app-text)", marginBottom: 8 }}></div>
-            <div style={{ fontSize: 13, color: "var(--app-muted)", marginBottom: 24, lineHeight: 1.6 }}>
-              Add your first client to get started.
-            </div>
-            <button onClick={onAddClient} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 22px", background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
-              <i className="ti ti-plus" style={{ fontSize: 14 }} /> Add Client
-            </button>
           </div>
-        </div>
-      )}
+        )}
 
 
 
+      </div>
       {/* Edit Modal */}
 
       {editClient && (
@@ -4317,8 +4406,7 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
 
       {/* ── Page header ── */}
-
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
 
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
 
@@ -4336,6 +4424,16 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
         </div>
 
+        <button
+          className="create-btn"
+          onClick={() => {
+            setJumpProject(null);
+            if (setActive) setActive("create-project");
+          }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+        >
+          <i className="ti ti-plus"></i> New Project
+        </button>
 
       </div>
 
@@ -5862,6 +5960,8 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
       {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 998, display: "block" }} className="mob-overlay" />}
 
       <aside className={`sidebar ${open ? 'open' : ''}`} style={{ transform: open ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1)" }}>
+
+
 
 
 

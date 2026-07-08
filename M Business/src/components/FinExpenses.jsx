@@ -129,18 +129,22 @@ export default function FinExpenses({ expenses: propExpenses, setExpenses: propS
             <i className="ti ti-plus" /> Add Expense
           </button>
         </div>
-
         {/* KPI CARDS */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 16, marginBottom: 22 }}>
-          <div style={{ background: '#fff', borderRadius: 14, padding: '18px 20px', boxShadow: '0 2px 12px rgba(0,188,212,.08)', border: '1px solid var(--app-border)', display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 11, background: '#EF444415', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>💰</div>
-            <div><div style={{ fontSize: 10, fontWeight: 700, color: '#718096', letterSpacing: 0.5 }}>TOTAL EXPENSES</div><div style={{ fontSize: 24, fontWeight: 800, color: '#1A2332' }}>{fmt(total)}</div></div>
+        <div style={{ display: 'flex', gap: 16, marginBottom: 22, flexWrap: 'wrap' }}>
+          <div style={{ cursor: 'default', flex: '1 1 200px', minWidth: 200, background: '#fff', border: '1.5px solid #E0EEF0', borderRadius: 14, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+            <div style={{ width: 40, height: 40, borderRadius: 10, background: '#EF44441a', color: '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}><i className="ti ti-receipt" /></div>
+            <div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: '#1A2332' }}>{fmt(total)}</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#607D86' }}>Total Expenses</div>
+            </div>
           </div>
           {byCategory.map(c => (
-            <div key={c.name} style={{ background: '#fff', borderRadius: 14, padding: '18px 20px', boxShadow: '0 2px 12px rgba(0,188,212,.08)', borderLeft: '4px solid  var(--app-accent, var(--app-accent, #00BCD4))' }}>
-              <div style={{ fontSize: 11, fontWeight: 800, color: '#718096', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 }}>{c.name}</div>
-              <div style={{ fontSize: 24, fontWeight: 900, color: '#1A2332' }}>{fmt(c.total)}</div>
-              <div style={{ fontSize: 12, color: '#718096', marginTop: 4 }}>{total > 0 ? Math.round(c.total / total * 100) : 0}% of expenses</div>
+            <div key={c.name} style={{ cursor: 'default', flex: '1 1 200px', minWidth: 200, background: '#fff', border: '1.5px solid #E0EEF0', borderRadius: 14, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(0,188,212,0.1)', color: 'var(--app-accent, #00BCD4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}><i className="ti ti-category" /></div>
+              <div>
+                <div style={{ fontSize: 24, fontWeight: 800, color: '#1A2332' }}>{fmt(c.total)}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#607D86' }}>{c.name}</div>
+              </div>
             </div>
           ))}
         </div>

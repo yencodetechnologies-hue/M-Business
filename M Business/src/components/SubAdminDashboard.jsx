@@ -9369,29 +9369,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               {/* Dynamic Action Buttons based on validActive */}
               {validActive === "clients" && (
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <button
 
-                    className="create-btn"
-
-                    title={isUsageAtLimit("client", clients.length) ? `Plan limit reached` : "Add new client"}
-
-                    onClick={() => {
-                      const limit = getSubscriptionLimit("client", subscription);
-                      if (limit !== Infinity && clients.length >= limit) {
-                        setLimitModal({ type: "client", limit });
-                        return;
-                      }
-                      setActive("addClient");
-                      fetchSubscription(); // refresh in background, don't block opening the form
-                    }}
-
-                    style={{ opacity: isUsageAtLimit("client", clients.length) ? 0.5 : 1 }}
-
-                  >
-
-                    <i className="ti ti-plus"></i> Add Client
-
-                  </button>
 
                 </div>
 

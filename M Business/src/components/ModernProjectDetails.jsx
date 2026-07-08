@@ -2302,7 +2302,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
                 {/* ── PAYMENTS TAB ── */}
                 <div className={`mpd-tab-pane ${activeTab === 'payments' ? 'mpd-active' : ''}`}>
-                  <div style={{ padding: '18px 20px', overflow: 'visible' }}>
+                  <div style={{ padding: '18px 0', overflow: 'visible' }}>
 
                     {/* STATS ROW */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 10, marginBottom: 20 }}>
@@ -2391,7 +2391,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       <div style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
                         <i className="ti ti-file-invoice" style={{ color: '#3B82F6', fontSize: 15, marginRight: 8 }}></i>
                         <span style={{ fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>Invoices</span>
-                        <span style={{ background: 'rgba(59,130,246,.1)', color: '#3B82F6', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{(currProject.invoices || []).length}</span>
+                        <span style={{ background: 'rgba(59,130,246,.1)', color: '#3B82F6', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{mergedInvoices.length}</span>
                       </div>
                       <div style={{ overflowX: 'auto' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>

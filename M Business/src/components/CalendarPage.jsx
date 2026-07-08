@@ -357,390 +357,412 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
         }}>{toast}</div>
       )}
 
-      {/* Stats Row */}
-      <div className="cal-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16 }}>
-        {stats.map(({ t, v, c, i }) => {
-          const filterKey = t === "Total" ? "All" : t;
-          const isActive = filter === filterKey;
-          return (
-            <div key={t}
-              onClick={() => { setFilter(filterKey); setSelectedDate(null); }}
-              style={{
-                background: isActive ? (c.startsWith('var') ? `rgba(var(--app-accent-rgb), 0.08)` : `${c}12`) : finalTheme.card,
-                borderRadius: 14,
-                padding: "18px 20px",
-                boxShadow: "0 2px 10px rgba(0,0,0,0.02)",
-                border: isActive ? `2px solid ${c}` : `1.5px solid ${finalTheme.border}`,
-                transition: "all 0.15s",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: 12
-              }}
-            >
-              <div style={{
-                width: 40, height: 40, borderRadius: 10, background: c.startsWith('var') ? `rgba(var(--app-accent-rgb), 0.1)` : `${c}15`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 18, flexShrink: 0, color: c
-              }}>{i}</div>
-              <div>
-                <div style={{ fontSize: 24, fontWeight: 800, color: isActive ? c : (finalTheme.text || "var(--app-text)") }}>{v}</div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: isActive ? c : finalTheme.muted }}>{t.toUpperCase()}</div>
-              </div>
-            </div>
-          );
-        })}
+      {/* ── PAGE HEADER (screenshot template) ------------------------- */}
+      <div style={{
+        background: finalTheme.card, borderRadius: 16, padding: "16px 20px",
+        boxShadow: finalTheme.shadow || "var(--app-shadow)", border: `1px solid ${finalTheme.border}`,
+        display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap"
+      }}>
+        <div style={{
+          width: 44, height: 44, borderRadius: 12, background: finalTheme.gradient || finalTheme.accent,
+          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0
+        }}>
+          <i className="ti ti-calendar" style={{ fontSize: 20, color: "#fff" }} />
+        </div>
+        <div style={{ flex: 1, minWidth: 160 }}>
+          <div style={{ fontSize: 18, fontWeight: 900, color: finalTheme.text || "var(--app-text)" }}>Calendar</div>
+          <div style={{ fontSize: 12, color: finalTheme.muted, marginTop: 1 }}>
+            Home <span style={{ margin: "0 4px" }}>›</span> <span style={{ color: finalTheme.accent, fontWeight: 700 }}>Calendar</span>
+          </div>
+        </div>
+        {!isClient && !isEmployee && (
+          <button onClick={() => openAdd(selectedDate || "")} style={Btn}>
+            + Add Event
+          </button>
+        )}
       </div>
 
-      {/* ── MAIN SPLIT LAYOUT --------------------------------------- */}
-      <div className="cal-split-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, alignItems: "start", maxWidth: 1200, margin: "0 auto", width: "100%" }}>
+      {/* ── FILTER BAR (screenshot "Godown" style filter card) --------- */}
+      <div style={{
+        background: finalTheme.card, borderRadius: 16, padding: "16px 20px",
+        boxShadow: finalTheme.shadow || "var(--app-shadow)", border: `1px solid ${finalTheme.border}`,
+        display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap"
+      }}>
+        <input placeholder="Search events…" value={search}
+          onChange={e => { setSearch(e.target.value); setSelectedDate(null); }}
+          style={{ ...inp(false), maxWidth: 260, padding: "8px 12px", boxSizing: "border-box" }} />
+        {["All", "Today", "Upcoming", "Past", ...TYPES].map((fil, fi) => (
+          <button key={`filter-${fi}`}
+            onClick={() => { setFilter(fil); setSelectedDate(null); }}
+            style={{
+              padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700,
+              cursor: "pointer", border: "1.5px solid",
+              borderColor: !selectedDate && filter === fil ? finalTheme.accent : finalTheme.border,
+              background: !selectedDate && filter === fil ? finalTheme.accent : finalTheme.card,
+              color: !selectedDate && filter === fil ? "#fff" : finalTheme.muted
+            }}>{fil}</button>
+        ))}
+      </div>
 
-        {/* ── LEFT: CALENDAR ---------------------------------------- */}
-        <div style={{
-          background: finalTheme.card, borderRadius: 16, padding: 20,
-          boxShadow: finalTheme.shadow || "var(--app-shadow)", border: `1px solid ${finalTheme.border}`,
-          position: "sticky", top: 16
-        }}>
-
-          {/* Month navigation */}
-          <div style={{
-            display: "flex", justifyContent: "space-between",
-            alignItems: "center", marginBottom: 14
-          }}>
-            <button onClick={prevMonth} style={{
-              background: finalTheme.bg,
-              border: `1px solid ${finalTheme.border}`, borderRadius: 8, width: 32, height: 32,
-              cursor: "pointer", fontSize: 15, color: finalTheme.accent, fontWeight: 700
-            }}>‹</button>
-
-            <div style={{ textAlign: "center" }}>
+      {/* ── MONTH CARD (screenshot "July 2026" card with stat pills) --- */}
+      <div style={{
+        background: finalTheme.card, borderRadius: 16, padding: 20,
+        boxShadow: finalTheme.shadow || "var(--app-shadow)", border: `1px solid ${finalTheme.border}`
+      }}>
+        {/* Month header row with icon + deliveries/month-style stat pills */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 6 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{
+              width: 40, height: 40, borderRadius: 10, background: finalTheme.gradient || finalTheme.accent,
+              display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0
+            }}>
+              <i className="ti ti-calendar-event" style={{ fontSize: 18, color: "#fff" }} />
+            </div>
+            <div>
               <div style={{ fontSize: 15, fontWeight: 800, color: finalTheme.text || "var(--app-text)" }}>
                 {FULL_MONTHS[calMonth]} {calYear}
               </div>
-              {selectedDate && (
-                <div style={{ fontSize: 10, color: finalTheme.muted, marginTop: 2 }}>
-                  {selectedDate}
-                  <span onClick={() => setSelectedDate(null)}
-                    style={{
-                      marginLeft: 6, cursor: "pointer", color: finalTheme.accent,
-                      textDecoration: "underline"
-                    }}>CloseClear</span>
-                </div>
-              )}
-            </div>
-
-            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-              <button onClick={() => { setCalYear(now.getFullYear()); setCalMonth(now.getMonth()); setSelectedDate(null); }}
-                style={{
-                  background: finalTheme.bg, border: `1px solid ${finalTheme.border}`,
-                  borderRadius: 8, padding: "4px 10px", cursor: "pointer",
-                  fontSize: 10, color: finalTheme.accent, fontWeight: 700
-                }}>Today</button>
-              <button onClick={nextMonth} style={{
-                background: finalTheme.bg,
-                border: `1px solid ${finalTheme.border}`, borderRadius: 8, width: 32, height: 32,
-                cursor: "pointer", fontSize: 15, color: finalTheme.accent, fontWeight: 700
-              }}>›</button>
+              <div style={{ fontSize: 11, color: finalTheme.muted }}>Events overview</div>
             </div>
           </div>
 
-          {/* Day headers */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2, marginBottom: 4 }}>
-            {DAYS.map(d => (
-              <div key={d} style={{
-                textAlign: "center", fontSize: 9, fontWeight: 700,
-                color: finalTheme.muted, letterSpacing: 0.5, padding: "3px 0"
-              }}>
-                {d.toUpperCase()}
-              </div>
-            ))}
-          </div>
-
-          {/* Calendar cells */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2 }}>
-            {calendarDays.map((cell, idx) => {
-              const ds = cell.curr ? dateStr(cell.day) : null;
-              const dayEvents = cell.curr ? eventsOnDay(cell.day) : [];
-              const isToday = ds === today;
-              const isSelected = ds === selectedDate;
-
+          <div className="cal-stats-grid" style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            {stats.map(({ t, v, c }) => {
+              const filterKey = t === "Total" ? "All" : t;
+              const isActive = filter === filterKey;
               return (
-                <div key={idx}
-                  onClick={() => {
-                    if (!cell.curr) return;
-                    setSelectedDate(prev => prev === ds ? null : ds);
-                    setFilter("All");
-                    setSearch("");
-                  }}
+                <div key={t}
+                  onClick={() => { setFilter(filterKey); setSelectedDate(null); }}
                   style={{
-                    minHeight: 52,
-                    borderRadius: 9,
-                    padding: "5px 4px 4px",
-                    cursor: cell.curr ? "pointer" : "default",
-                    background: isSelected ? `${finalTheme.accent}33` : isToday ? `${finalTheme.accent}1a` : cell.curr ? finalTheme.card : finalTheme.bg,
-                    border: isSelected ? `2px solid ${finalTheme.accent}` : isToday ? `1.5px solid ${finalTheme.accent}4d` : `1px solid ${finalTheme.border}`,
-                    opacity: cell.curr ? 1 : 0.4,
-                    transition: "all 0.15s",
-                    position: "relative",
-                    boxSizing: "border-box",
-                  }}>
-
-                  <div style={{
-                    width: 22, height: 22, borderRadius: "50%",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 11, fontWeight: isToday || isSelected ? 800 : 600,
-                    color: isSelected ? finalTheme.accent : isToday ? finalTheme.accent : cell.curr ? (finalTheme.text || "var(--app-text)") : finalTheme.border,
-                    background: isToday && !isSelected ? finalTheme.border : "transparent",
-                    marginBottom: 3,
-                  }}>{cell.day}</div>
-
-                  {dayEvents.length > 0 && (
-                    <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                      {dayEvents.slice(0, 2).map((ev, ei) => {
-                        const tc = TYPE_COLORS[ev.type || "Meeting"] || finalTheme.accent;
-                        return (
-                          <div key={ei} style={{
-                            background: `${tc}22`,
-                            borderRadius: 3, padding: "1px 3px",
-                            fontSize: 8, color: tc,
-                            fontWeight: 700, overflow: "hidden",
-                            whiteSpace: "nowrap", textOverflow: "ellipsis",
-                          }}>{ev.name}</div>
-                        );
-                      })}
-                      {dayEvents.length > 2 && (
-                        <div style={{
-                          fontSize: 8, color: finalTheme.muted, fontWeight: 600,
-                          paddingLeft: 2
-                        }}>+{dayEvents.length - 2}</div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Quick add on hover */}
-                  {cell.curr && !isClient && !isEmployee && (
-                    <div
-                      onClick={e => { e.stopPropagation(); openAdd(ds); }}
-                      title="Add event"
-                      style={{
-                        position: "absolute", top: 3, right: 3,
-                        width: 14, height: 14, borderRadius: "50%",
-                        background: finalTheme.border, color: finalTheme.accent,
-                        fontSize: 11, fontWeight: 800,
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        cursor: "pointer", opacity: 0, transition: "opacity 0.15s",
-                      }}
-                      onMouseEnter={e => e.currentTarget.style.opacity = "1"}
-                      onMouseLeave={e => e.currentTarget.style.opacity = "0"}
-                    >+</div>
-                  )}
+                    background: isActive ? (c.startsWith('var') ? `rgba(var(--app-accent-rgb), 0.08)` : `${c}12`) : finalTheme.bg,
+                    borderRadius: 10, padding: "6px 14px", textAlign: "center",
+                    border: isActive ? `1.5px solid ${c}` : `1px solid ${finalTheme.border}`,
+                    cursor: "pointer", minWidth: 74
+                  }}
+                >
+                  <div style={{ fontSize: 9, fontWeight: 700, color: finalTheme.muted, letterSpacing: 0.5 }}>{t.toUpperCase()}</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: isActive ? c : (finalTheme.text || "var(--app-text)") }}>{v}</div>
                 </div>
               );
             })}
           </div>
-
-          {/* Legend */}
-          <div style={{ display: "flex", gap: 10, marginTop: 12, flexWrap: "wrap" }}>
-            {Object.entries(TYPE_COLORS).map(([type, color]) => (
-              <div key={type} style={{
-                display: "flex", alignItems: "center", gap: 4,
-                fontSize: 9, color: finalTheme.muted, fontWeight: 600
-              }}>
-                <div style={{ width: 7, height: 7, borderRadius: 2, background: color }} />
-                {type}
-              </div>
-            ))}
-          </div>
         </div>
 
-        {/* ── RIGHT: EVENT LIST ------------------------------------- */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        {/* Month navigation */}
+        <div style={{
+          display: "flex", justifyContent: "center",
+          alignItems: "center", gap: 14, margin: "14px 0 10px"
+        }}>
+          <button onClick={prevMonth} style={{
+            background: finalTheme.bg,
+            border: `1px solid ${finalTheme.border}`, borderRadius: 8, width: 32, height: 32,
+            cursor: "pointer", fontSize: 15, color: finalTheme.accent, fontWeight: 700
+          }}>‹</button>
 
-          {/* ── EVENT LIST ----------------------------------------- */}
-          <div style={{
-            background: finalTheme.card, borderRadius: 16, padding: 20,
-            boxShadow: finalTheme.shadow || "var(--app-shadow)", border: `1px solid ${finalTheme.border}`
-          }}>
+          <div style={{ textAlign: "center", minWidth: 140 }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: finalTheme.text || "var(--app-text)" }}>
+              {FULL_MONTHS[calMonth]} {calYear}
+            </div>
+            {selectedDate && (
+              <div style={{ fontSize: 10, color: finalTheme.muted, marginTop: 2 }}>
+                {selectedDate}
+                <span onClick={() => setSelectedDate(null)}
+                  style={{
+                    marginLeft: 6, cursor: "pointer", color: finalTheme.accent,
+                    textDecoration: "underline"
+                  }}>CloseClear</span>
+              </div>
+            )}
+          </div>
 
-            {/* Toolbar */}
-            <div style={{
-              display: "flex", justifyContent: "space-between",
-              alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 14
+          <button onClick={nextMonth} style={{
+            background: finalTheme.bg,
+            border: `1px solid ${finalTheme.border}`, borderRadius: 8, width: 32, height: 32,
+            cursor: "pointer", fontSize: 15, color: finalTheme.accent, fontWeight: 700
+          }}>›</button>
+
+          <button onClick={() => { setCalYear(now.getFullYear()); setCalMonth(now.getMonth()); setSelectedDate(null); }}
+            style={{
+              background: finalTheme.bg, border: `1px solid ${finalTheme.border}`,
+              borderRadius: 8, padding: "5px 12px", cursor: "pointer",
+              fontSize: 11, color: finalTheme.accent, fontWeight: 700, marginLeft: 6
+            }}>Today</button>
+        </div>
+
+        {/* Day headers */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2, marginBottom: 4 }}>
+          {DAYS.map(d => (
+            <div key={d} style={{
+              textAlign: "center", fontSize: 9, fontWeight: 700,
+              color: finalTheme.muted, letterSpacing: 0.5, padding: "3px 0"
             }}>
-              <h3 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: finalTheme.text || "var(--app-text)" }}>
-                {selectedDate
-                  ? `Events on ${selectedDate} (${shown.length})`
-                  : `All Events (${shown.length})`}
-              </h3>
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <div style={{ position: "relative" }}>
+              {d.toUpperCase()}
+            </div>
+          ))}
+        </div>
 
-                  <input placeholder="Search…" value={search}
-                    onChange={e => { setSearch(e.target.value); setSelectedDate(null); }}
-                    style={{ ...inp(false), paddingLeft: 30, width: "100%", minWidth: 120, padding: "7px 10px 7px 30px", boxSizing: "border-box" }} />
-                </div>
-                {!isClient && !isEmployee && (
-                  <button onClick={() => openAdd(selectedDate || "")} style={Btn}>
-                    + Add Event
-                  </button>
+        {/* Calendar cells */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2 }}>
+          {calendarDays.map((cell, idx) => {
+            const ds = cell.curr ? dateStr(cell.day) : null;
+            const dayEvents = cell.curr ? eventsOnDay(cell.day) : [];
+            const isToday = ds === today;
+            const isSelected = ds === selectedDate;
+
+            return (
+              <div key={idx}
+                onClick={() => {
+                  if (!cell.curr) return;
+                  setSelectedDate(prev => prev === ds ? null : ds);
+                  setFilter("All");
+                  setSearch("");
+                }}
+                style={{
+                  minHeight: 52,
+                  borderRadius: 9,
+                  padding: "5px 4px 4px",
+                  cursor: cell.curr ? "pointer" : "default",
+                  background: isSelected ? `${finalTheme.accent}33` : isToday ? `${finalTheme.accent}1a` : cell.curr ? finalTheme.card : finalTheme.bg,
+                  border: isSelected ? `2px solid ${finalTheme.accent}` : isToday ? `1.5px solid ${finalTheme.accent}4d` : `1px solid ${finalTheme.border}`,
+                  opacity: cell.curr ? 1 : 0.4,
+                  transition: "all 0.15s",
+                  position: "relative",
+                  boxSizing: "border-box",
+                }}>
+
+                <div style={{
+                  width: 22, height: 22, borderRadius: "50%",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 11, fontWeight: isToday || isSelected ? 800 : 600,
+                  color: isSelected ? finalTheme.accent : isToday ? finalTheme.accent : cell.curr ? (finalTheme.text || "var(--app-text)") : finalTheme.border,
+                  background: isToday && !isSelected ? finalTheme.border : "transparent",
+                  marginBottom: 3,
+                }}>{cell.day}</div>
+
+                {dayEvents.length > 0 && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                    {dayEvents.slice(0, 2).map((ev, ei) => {
+                      const tc = TYPE_COLORS[ev.type || "Meeting"] || finalTheme.accent;
+                      return (
+                        <div key={ei} style={{
+                          background: `${tc}22`,
+                          borderRadius: 3, padding: "1px 3px",
+                          fontSize: 8, color: tc,
+                          fontWeight: 700, overflow: "hidden",
+                          whiteSpace: "nowrap", textOverflow: "ellipsis",
+                        }}>{ev.name}</div>
+                      );
+                    })}
+                    {dayEvents.length > 2 && (
+                      <div style={{
+                        fontSize: 8, color: finalTheme.muted, fontWeight: 600,
+                        paddingLeft: 2
+                      }}>+{dayEvents.length - 2}</div>
+                    )}
+                  </div>
+                )}
+
+                {/* Quick add on hover */}
+                {cell.curr && !isClient && !isEmployee && (
+                  <div
+                    onClick={e => { e.stopPropagation(); openAdd(ds); }}
+                    title="Add event"
+                    style={{
+                      position: "absolute", top: 3, right: 3,
+                      width: 14, height: 14, borderRadius: "50%",
+                      background: finalTheme.border, color: finalTheme.accent,
+                      fontSize: 11, fontWeight: 800,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      cursor: "pointer", opacity: 0, transition: "opacity 0.15s",
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.opacity = "1"}
+                    onMouseLeave={e => e.currentTarget.style.opacity = "0"}
+                  >+</div>
                 )}
               </div>
+            );
+          })}
+        </div>
+
+        {/* Legend */}
+        <div style={{ display: "flex", gap: 10, marginTop: 12, flexWrap: "wrap" }}>
+          {Object.entries(TYPE_COLORS).map(([type, color]) => (
+            <div key={type} style={{
+              display: "flex", alignItems: "center", gap: 4,
+              fontSize: 9, color: finalTheme.muted, fontWeight: 600
+            }}>
+              <div style={{ width: 7, height: 7, borderRadius: 2, background: color }} />
+              {type}
             </div>
+          ))}
+        </div>
 
-            {/* Filter chips */}
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
-              {["All", "Today", "Upcoming", "Past", ...TYPES].map((fil, fi) => (
-                <button key={`filter-${fi}`}
-                  onClick={() => { setFilter(fil); setSelectedDate(null); }}
-                  style={{
-                    padding: "5px 10px", borderRadius: 7, fontSize: 10, fontWeight: 700,
-                    cursor: "pointer", border: "1.5px solid",
-                    borderColor: !selectedDate && filter === fil ? finalTheme.accent : finalTheme.border,
-                    background: !selectedDate && filter === fil ? finalTheme.accent : finalTheme.card,
-                    color: !selectedDate && filter === fil ? "#fff" : finalTheme.muted
-                  }}>{fil}</button>
-              ))}
+        {/* Footer hint, matching screenshot's bottom caption row */}
+        <div style={{
+          display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 6,
+          marginTop: 14, paddingTop: 10, borderTop: `1px solid ${finalTheme.border}`,
+          fontSize: 10, color: finalTheme.muted
+        }}>
+          <span>Tap a date to view events below; tap a row to open its details.</span>
+          <span>Live event scheduling overview</span>
+        </div>
+      </div>
+
+      {/* ── EVENT LIST (below month card, screenshot-style single column) --- */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <div style={{
+          background: finalTheme.card, borderRadius: 16, padding: 20,
+          boxShadow: finalTheme.shadow || "var(--app-shadow)", border: `1px solid ${finalTheme.border}`
+        }}>
+
+          {/* Toolbar */}
+          <div style={{
+            display: "flex", justifyContent: "space-between",
+            alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 14
+          }}>
+            <h3 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: finalTheme.text || "var(--app-text)" }}>
+              {selectedDate
+                ? `Events on ${selectedDate} (${shown.length})`
+                : `All Events (${shown.length})`}
+            </h3>
+          </div>
+
+          {loading ? (
+            <div style={{ textAlign: "center", padding: 40, color: "var(--app-muted)" }}>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>Pending</div>
+              <div style={{ fontWeight: 600, fontSize: 13 }}>Loading events...</div>
             </div>
-
-            {loading ? (
-              <div style={{ textAlign: "center", padding: 40, color: "var(--app-muted)" }}>
-                <div style={{ fontSize: 28, marginBottom: 8 }}>Pending</div>
-                <div style={{ fontWeight: 600, fontSize: 13 }}>Loading events...</div>
+          ) : shown.length === 0 ? (
+            <div style={{ textAlign: "center", padding: 40 }}>
+              <div style={{ fontSize: 18, marginBottom: 10 }}>📅</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: finalTheme.text || "var(--app-text)" }}>
+                {search || selectedDate ? "No events found" : "No events yet!"}
               </div>
-            ) : shown.length === 0 ? (
-              <div style={{ textAlign: "center", padding: 40 }}>
-                <div style={{ fontSize: 18, marginBottom: 10 }}>📅</div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: finalTheme.text || "var(--app-text)" }}>
-                  {search || selectedDate ? "No events found" : "No events yet!"}
-                </div>
-                <div style={{ fontSize: 12, color: finalTheme.muted, marginTop: 4 }}>
-                  {search || selectedDate
-                    ? ""
-                    : "Add your first event using the form above"}
-                </div>
+              <div style={{ fontSize: 12, color: finalTheme.muted, marginTop: 4 }}>
+                {search || selectedDate
+                  ? ""
+                  : "Add your first event using the form above"}
               </div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {shown.map((ev, idx) => {
-                  const isValidDate = ev.date && !isNaN(new Date(ev.date + "T00:00:00").getTime());
-                  const d = isValidDate ? new Date(ev.date + "T00:00:00") : null;
-                  const day = d ? d.getDate() : "--";
-                  const mon = d ? (MONTHS[d.getMonth()] || "---") : "---";
-                  const c = TC[ev.type || "Meeting"] || "var(--app-accent)";
-                  const past = ev.date && ev.date < today;
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {shown.map((ev, idx) => {
+                const isValidDate = ev.date && !isNaN(new Date(ev.date + "T00:00:00").getTime());
+                const d = isValidDate ? new Date(ev.date + "T00:00:00") : null;
+                const day = d ? d.getDate() : "--";
+                const mon = d ? (MONTHS[d.getMonth()] || "---") : "---";
+                const c = TC[ev.type || "Meeting"] || "var(--app-accent)";
+                const past = ev.date && ev.date < today;
 
-                  return (
-                    <div key={ev._id || idx} style={{
-                      background: past ? finalTheme.bg : finalTheme.card,
-                      borderRadius: 12, padding: "12px 14px",
-                      border: `1px solid ${finalTheme.border}`,
-                      display: "flex", gap: 12, alignItems: "center",
-                      flexWrap: "wrap", opacity: past ? 0.7 : 1,
-                      boxShadow: finalTheme.shadow || "var(--app-shadow)"
+                return (
+                  <div key={ev._id || idx} style={{
+                    background: past ? finalTheme.bg : finalTheme.card,
+                    borderRadius: 12, padding: "12px 14px",
+                    border: `1px solid ${finalTheme.border}`,
+                    display: "flex", gap: 12, alignItems: "center",
+                    flexWrap: "wrap", opacity: past ? 0.7 : 1,
+                    boxShadow: finalTheme.shadow || "var(--app-shadow)"
+                  }}>
+                    {/* Date badge */}
+                    <div style={{
+                      background: `${c}15`, border: `2px solid ${c}30`,
+                      borderRadius: 10, padding: "8px 12px", textAlign: "center",
+                      minWidth: 50, flexShrink: 0
                     }}>
-                      {/* Date badge */}
+                      <div style={{ fontSize: 20, fontWeight: 800, color: c, lineHeight: 1 }}>{day}</div>
                       <div style={{
-                        background: `${c}15`, border: `2px solid ${c}30`,
-                        borderRadius: 10, padding: "8px 12px", textAlign: "center",
-                        minWidth: 50, flexShrink: 0
-                      }}>
-                        <div style={{ fontSize: 20, fontWeight: 800, color: c, lineHeight: 1 }}>{day}</div>
-                        <div style={{
-                          fontSize: 8, color: finalTheme.muted, fontWeight: 700,
-                          letterSpacing: 1, marginTop: 2
-                        }}>{mon.toUpperCase()}</div>
-                      </div>
+                        fontSize: 8, color: finalTheme.muted, fontWeight: 700,
+                        letterSpacing: 1, marginTop: 2
+                      }}>{mon.toUpperCase()}</div>
+                    </div>
 
-                      {/* Details */}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{
-                          display: "flex", alignItems: "center",
-                          gap: 6, flexWrap: "wrap", marginBottom: 4
+                    {/* Details */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{
+                        display: "flex", alignItems: "center",
+                        gap: 6, flexWrap: "wrap", marginBottom: 4
+                      }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: finalTheme.text || "var(--app-text)" }}>
+                          {ev.name}
+                        </span>
+                        <span style={{
+                          background: `${c}18`, color: c,
+                          border: `1px solid ${c}33`, padding: "2px 8px",
+                          borderRadius: 20, fontSize: 10, fontWeight: 700
                         }}>
-                          <span style={{ fontSize: 13, fontWeight: 700, color: finalTheme.text || "var(--app-text)" }}>
-                            {ev.name}
-                          </span>
+                          {ev.type || "Meeting"}
+                        </span>
+                        {past && (
                           <span style={{
-                            background: `${c}18`, color: c,
-                            border: `1px solid ${c}33`, padding: "2px 8px",
-                            borderRadius: 20, fontSize: 10, fontWeight: 700
+                            background: finalTheme.border, color: finalTheme.muted,
+                            padding: "2px 7px", borderRadius: 20, fontSize: 9, fontWeight: 600
                           }}>
-                            {ev.type || "Meeting"}
+                            Past
                           </span>
-                          {past && (
-                            <span style={{
-                              background: finalTheme.border, color: finalTheme.muted,
-                              padding: "2px 7px", borderRadius: 20, fontSize: 9, fontWeight: 600
-                            }}>
-                              Past
-                            </span>
-                          )}
-                        </div>
-                        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                          {ev.project && <span style={{ color: finalTheme.muted, fontSize: 11 }}>Folder {ev.project}</span>}
-                          {ev.client && <span style={{ color: finalTheme.muted, fontSize: 11 }}>Profile {ev.client}</span>}
-                          {(ev.start || ev.end) && (
-                            <span style={{ color: finalTheme.muted, fontSize: 11 }}>
-                              {ev.start || "--"} – {ev.end || "--"}
-                            </span>
-                          )}
-                        </div>
-                        {ev.notes && (
-                          <div style={{
-                            color: finalTheme.muted, fontSize: 10,
-                            marginTop: 3, fontStyle: "italic"
-                          }}>Edit {ev.notes}</div>
                         )}
                       </div>
+                      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                        {ev.project && <span style={{ color: finalTheme.muted, fontSize: 11 }}>Folder {ev.project}</span>}
+                        {ev.client && <span style={{ color: finalTheme.muted, fontSize: 11 }}>Profile {ev.client}</span>}
+                        {(ev.start || ev.end) && (
+                          <span style={{ color: finalTheme.muted, fontSize: 11 }}>
+                            {ev.start || "--"} – {ev.end || "--"}
+                          </span>
+                        )}
+                      </div>
+                      {ev.notes && (
+                        <div style={{
+                          color: finalTheme.muted, fontSize: 10,
+                          marginTop: 3, fontStyle: "italic"
+                        }}>Edit {ev.notes}</div>
+                      )}
+                    </div>
 
-                      {/* Actions */}
-                      <div style={{ display: "flex", gap: 5, flexShrink: 0 }}>
-                        {(() => {
-                          let canEdit = true;
-                          if (!ev._type) {
-                            if (isClient) canEdit = false;
-                          }
-                          return canEdit ? (
-                            <>
-                              <button onClick={() => openEdit(ev)} style={{
-                                background: finalTheme.bg, border: `1px solid ${finalTheme.border}`,
-                                borderRadius: 7, padding: "5px 12px", fontSize: 11,
-                                color: finalTheme.accent, cursor: "pointer", fontWeight: 700
-                              }}>
-                                {ev._type ? "View" : "Edit"}
-                              </button>
-                              {!ev._type && (
-                                <button onClick={() => del(ev._id || ev.id)} style={{
-                                  background: "#fee2e2", border: "1px solid #fecaca",
-                                  borderRadius: 7, padding: "5px 12px", fontSize: 11,
-                                  color: "#ef4444", cursor: "pointer", fontWeight: 700
-                                }}>
-                                  Delete
-                                </button>
-                              )}
-                            </>
-                          ) : (
-                            <button onClick={() => openEdit(ev, true)} style={{
+                    {/* Actions */}
+                    <div style={{ display: "flex", gap: 5, flexShrink: 0 }}>
+                      {(() => {
+                        let canEdit = true;
+                        if (!ev._type) {
+                          if (isClient) canEdit = false;
+                        }
+                        return canEdit ? (
+                          <>
+                            <button onClick={() => openEdit(ev)} style={{
                               background: finalTheme.bg, border: `1px solid ${finalTheme.border}`,
                               borderRadius: 7, padding: "5px 12px", fontSize: 11,
                               color: finalTheme.accent, cursor: "pointer", fontWeight: 700
                             }}>
-                              View
+                              {ev._type ? "View" : "Edit"}
                             </button>
-                          );
-                        })()}
-                      </div>
+                            {!ev._type && (
+                              <button onClick={() => del(ev._id || ev.id)} style={{
+                                background: "#fee2e2", border: "1px solid #fecaca",
+                                borderRadius: 7, padding: "5px 12px", fontSize: 11,
+                                color: "#ef4444", cursor: "pointer", fontWeight: 700
+                              }}>
+                                Delete
+                              </button>
+                            )}
+                          </>
+                        ) : (
+                          <button onClick={() => openEdit(ev, true)} style={{
+                            background: finalTheme.bg, border: `1px solid ${finalTheme.border}`,
+                            borderRadius: 7, padding: "5px 12px", fontSize: 11,
+                            color: finalTheme.accent, cursor: "pointer", fontWeight: 700
+                          }}>
+                            View
+                          </button>
+                        );
+                      })()}
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
-        {/* END RIGHT COLUMN */}
-
       </div>
-      {/* END SPLIT LAYOUT */}
+      {/* END EVENT LIST */}
 
       {/* ── MODALS ------------------------------------------------- */}
       {modal === "project" && (

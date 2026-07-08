@@ -7,12 +7,20 @@ export default function FinDashboard() {
   const [selectedBank, setSelectedBank] = useState('');
   const [importedFile, setImportedFile] = useState(null);
   const mainScrollRef = useRef(null);
-  const [dashboardData, setDashboardData] = useState({ totalIncome: 0, totalExpenses: 0, netProfit: 0, profitMargin: 0, pendingReceivables: 0, pendingInvoices: 0, vendorPayables: 0, overdueVendors: 0 });
+  const [dashboardData, setDashboardData] = useState({ totalIncome: 0, totalExpenses: 0, netProfit: 0, profitMargin: 0, pendingReceivables: 0, pendingInvoices: 0, vendorPayables: 0, overdueVendors: 0, incomeChange: 0, expenseChange: 0 });
   const [transactions, setTransactions] = useState([]);
   const [bankAccounts, setBankAccounts] = useState([]);
   const [expenseBreakdown, setExpenseBreakdown] = useState([]);
-  const [cashflow, setCashflow] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [cashflow, setCashflow] = useState(() => {
+    const months = [];
+    const now = new Date();
+    for (let i = 4; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      months.push({ month: d.toLocaleString('en-US', { month: 'short' }), income: 0, expense: 0 });
+    }
+    return months;
+  });
+
   const [error, setError] = useState(null);
   const now = new Date();
   const currentMonthLabel = `This Month — ${now.toLocaleString('en-IN', { month: 'long' })} ${now.getFullYear()}`;
@@ -20,28 +28,31 @@ export default function FinDashboard() {
   const stepLabels = ['', 'Select Bank', 'Upload File', 'Map Columns', 'Review & Import'];
 
   const fetchDashboardData = async () => {
-    setLoading(true); setError(null);
-    try {
-      const [kpiRes, txRes, bankRes, expRes, cashflowRes] = await Promise.all([
-        axios.get(`${BASE_URL}/api/finance/kpis?period=${encodeURIComponent(selectedPeriod)}`).catch(() => null),
-        axios.get(`${BASE_URL}/api/finance/transactions?period=${encodeURIComponent(selectedPeriod)}`).catch(() => null),
-        axios.get(`${BASE_URL}/api/finance/bank-accounts`).catch(() => null),
-        axios.get(`${BASE_URL}/api/finance/expense-breakdown?period=${encodeURIComponent(selectedPeriod)}`).catch(() => null),
-        axios.get(`${BASE_URL}/api/finance/cashflow?period=${encodeURIComponent(selectedPeriod)}`).catch(() => null),
-      ]);
-      setDashboardData(kpiRes?.data || { totalIncome: 0, totalExpenses: 0, netProfit: 0, profitMargin: 0, pendingReceivables: 0, pendingInvoices: 0, vendorPayables: 0, overdueVendors: 0 });
-      if (txRes?.data) setTransactions(txRes.data);
-      if (bankRes?.data) {
-        setBankAccounts(bankRes.data);
-        if (bankRes.data.length > 0) setSelectedBank(bankRes.data[0].bank);
-      }
-      if (expRes?.data) setExpenseBreakdown(expRes.data);
-      if (cashflowRes?.data) setCashflow(cashflowRes.data);
-    } catch (err) {
-      setError('Failed to load dashboard data. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    setError(null);
+    axios.get(`${BASE_URL}/api/finance/kpis?period=${encodeURIComponent(selectedPeriod)}`)
+      .then(res => { if (res?.data) setDashboardData(res.data); })
+      .catch(() => setError('Failed to load dashboard data. Please try again.'));
+
+    axios.get(`${BASE_URL}/api/finance/transactions?period=${encodeURIComponent(selectedPeriod)}`)
+      .then(res => { if (res?.data) setTransactions(res.data); })
+      .catch(() => { });
+
+    axios.get(`${BASE_URL}/api/finance/bank-accounts`)
+      .then(res => {
+        if (res?.data) {
+          setBankAccounts(res.data);
+          if (res.data.length > 0) setSelectedBank(res.data[0].bank);
+        }
+      })
+      .catch(() => { });
+
+    axios.get(`${BASE_URL}/api/finance/expense-breakdown?period=${encodeURIComponent(selectedPeriod)}`)
+      .then(res => { if (res?.data) setExpenseBreakdown(res.data); })
+      .catch(() => { });
+
+    axios.get(`${BASE_URL}/api/finance/cashflow?period=${encodeURIComponent(selectedPeriod)}`)
+      .then(res => { if (res?.data) setCashflow(res.data); })
+      .catch(() => { });
   };
 
   useEffect(() => { fetchDashboardData(); }, [selectedPeriod]);
@@ -264,7 +275,7 @@ tr:hover td{background:#FAFCFE;}
               <button className="btn btn-sm" style={{ marginLeft: 'auto', background: 'var(--red-dark)', color: '#fff', border: 'none' }} onClick={fetchDashboardData}>Retry</button>
             </div>
           )}
-          {!loading && (
+          {(
             <>
               <div className="kpi-grid kpi-grid-5">
                 <div className="kpi income">

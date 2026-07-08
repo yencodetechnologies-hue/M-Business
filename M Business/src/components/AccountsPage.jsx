@@ -464,7 +464,7 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
   };
 
   const handleDelete = async (exp) => {
-    if (!window.confirm(`Delete expense "${exp.title}"? This cannot be undone.`)) return;
+    if (!window.confirm(`Delete expense "${exp.title}"?`)) return;
     setDeleting(exp._id);
     try {
       await axios.delete(`${EXPENSES_API}/${exp._id}`);
@@ -812,7 +812,7 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
   };
 
   const handleDelete = async (inc) => {
-    if (!window.confirm(`Delete payment "${inc.title || inc.client}"? This cannot be undone.`)) return;
+    if (!window.confirm(`Delete payment "${inc.title || inc.client}"?`)) return;
     setDeleting(inc._id);
     try {
       await axios.delete(`${INCOME_API}/${inc._id}`);

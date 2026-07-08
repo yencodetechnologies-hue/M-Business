@@ -1164,7 +1164,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
         </Mdl>
       )}
 
-      {deleteTarget && <ConfirmModal title="Delete Subadmin" message={`Delete "${deleteTarget.name}"? This cannot be undone.`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
+      {deleteTarget && <ConfirmModal title="Delete Subadmin" message={`Delete "${deleteTarget.name}"?`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
     </div>
   );
 }

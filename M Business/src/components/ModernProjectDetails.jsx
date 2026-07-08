@@ -620,7 +620,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   useEffect(() => { if (currProject?._id) loadProjectApprovals(); }, [currProject?._id]);
 
   const handleDeleteApproval = async (approvalId) => {
-    if (!confirm("Delete this approval request? This cannot be undone.")) return;
+    if (!confirm("Delete this approval request?")) return;
     try {
       await axios.delete(`${BASE_URL}/api/approvals/${approvalId}`);
       setProjectApprovals(prev => prev.filter(a => a._id !== approvalId));

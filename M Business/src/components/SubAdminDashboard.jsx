@@ -1453,7 +1453,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                       e.stopPropagation();
 
-                      if (!window.confirm(`Are you sure you want to delete "${p.name}"? This cannot be undone.`)) return;
+                      if (!window.confirm(`Are you sure you want to delete "${p.name}"?`)) return;
 
                       try {
 
@@ -1547,7 +1547,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               e.stopPropagation();
 
-              if (!window.confirm(`Are you sure you want to delete "${p.name}"? This cannot be undone.`)) return;
+              if (!window.confirm(`Are you sure you want to delete "${p.name}"?`)) return;
 
               try {
 
@@ -2861,7 +2861,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
               <div style={{ fontSize: 17, fontWeight: 900, color: "var(--text)", marginBottom: 12 }}>Delete Employee</div>
 
-              <div style={{ fontSize: 13, color: "var(--text-mid)" }}>Are you sure you want to delete {deleteTarget.name}? This action cannot be undone.</div>
+              <div style={{ fontSize: 13, color: "var(--text-mid)" }}>Are you sure you want to delete {deleteTarget.name}? </div>
 
               <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
 
@@ -3234,7 +3234,7 @@ ${onboardingLink}`;
 
             <div style={{ fontSize: 17, fontWeight: 900, color: "var(--text)", marginBottom: 12 }}>Delete Employee</div>
 
-            <div style={{ fontSize: 13, color: "var(--text-mid)" }}>Are you sure you want to delete {deleteTarget.name}? This action cannot be undone.</div>
+            <div style={{ fontSize: 13, color: "var(--text-mid)" }}>Are you sure you want to delete {deleteTarget.name}?</div>
 
             <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
 
@@ -4122,7 +4122,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
 
 
-      {deleteTarget && <ConfirmModal title="Delete Subadmin" message={`Delete "${deleteTarget.name}"? This cannot be undone.`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
+      {deleteTarget && <ConfirmModal title="Delete Subadmin" message={`Delete "${deleteTarget.name}"?`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
 
     </div>
 
@@ -6399,7 +6399,7 @@ function VendorsPage({ vendors, setVendors }) {
 
       setDeleteTarget(null);
 
-      showToast("Delete Vendor deleted!");
+      showToast(" Vendor deleted!");
 
     } catch {
 

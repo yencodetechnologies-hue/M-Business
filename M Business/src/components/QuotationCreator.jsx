@@ -1074,7 +1074,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                       className="qa-btn"
                       style={{ color: "#ef4444", borderColor: "#fca5a5" }}
                       onClick={() => {
-                        if (window.confirm(`Delete quotation ${entry.quoteNo}? This cannot be undone.`)) {
+                        if (window.confirm(`Delete quotation ${entry.quoteNo}?`)) {
                           axios.delete(`${BASE_URL}/api/quotations/${entry.id}`)
                             .then(() => { showToast("Quotation deleted."); fetchList(); })
                             .catch(() => {

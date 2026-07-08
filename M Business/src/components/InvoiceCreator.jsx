@@ -97,7 +97,7 @@ function ConfirmModal({ invoiceNo, onConfirm, onCancel }) {
         <div style={{ width: 64, height: 64, borderRadius: "50%", background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, margin: "0 auto 20px" }}>Delete</div>
         <h3 style={{ margin: "0 0 10px", fontSize: 18, fontWeight: 800, color: "#0f1c2e" }}>Delete Invoice?</h3>
         <p style={{ color: "#64748b", fontSize: 14, margin: "0 0 24px", lineHeight: 1.5 }}>
-          Are you sure you want to delete <strong style={{ color: "var(--app-accent)" }}>{invoiceNo}</strong>? This cannot be undone.
+          Are you sure you want to delete <strong style={{ color: "var(--app-accent)" }}>{invoiceNo}</strong>?
         </p>
         <div style={{ display: "flex", gap: 12 }}>
           <button onClick={onCancel} style={{ flex: 1, padding: "12px", background: "var(--app-surface)", border: "1px solid var(--app-border)", borderRadius: 12, fontSize: 14, fontWeight: 700, color: "#0f1c2e", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>

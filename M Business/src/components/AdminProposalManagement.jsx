@@ -1513,7 +1513,7 @@ export default function AdminProposalManagement() {
               fontSize: 13,
               margin: "0 0 22px"
             }}>
-              Are you sure you want to delete "{deleteTarget.title || 'this proposal'}"? This cannot be undone.
+              Are you sure you want to delete "{deleteTarget.title || 'this proposal'}"?
             </p>
             <div style={{ display: "flex", gap: 10 }}>
               <button

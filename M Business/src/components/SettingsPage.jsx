@@ -568,8 +568,8 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
               <div className="dz-sub">These actions are irreversible. Please proceed with caution. All data will be permanently deleted and cannot be recovered.</div>
               <div className="dz-actions">
                 <button className="dz-btn"><i className="ti ti-download" style={{ fontSize: 13 }} /> Export All Data</button>
-                <button className="dz-btn" onClick={() => { if (window.confirm('Delete all projects? This cannot be undone.')) showToast('Projects deleted', 'error'); }}><i className="ti ti-trash" style={{ fontSize: 13 }} /> Delete All Projects</button>
-                <button className="dz-btn" onClick={() => { if (window.confirm('Delete your account? This cannot be undone.')) { } }}><i className="ti ti-user-x" style={{ fontSize: 13 }} /> Delete Account</button>
+                <button className="dz-btn" onClick={() => { if (window.confirm('Delete all projects?')) showToast('Projects deleted', 'error'); }}><i className="ti ti-trash" style={{ fontSize: 13 }} /> Delete All Projects</button>
+                <button className="dz-btn" onClick={() => { if (window.confirm('Delete your account?')) { } }}><i className="ti ti-user-x" style={{ fontSize: 13 }} /> Delete Account</button>
               </div>
             </div>
           )}

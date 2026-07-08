@@ -283,7 +283,7 @@ const res = await fetch(`/api/tasks?person=${encodeURIComponent(user.name)}`, {
         <div style={{ position: "fixed", inset: 0, background: "rgba(15,28,46,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200, backdropFilter: "blur(4px)" }}>
           <div style={{ background: "#fff", borderRadius: 16, padding: "28px 32px", width: 400, boxShadow: "0 24px 80px rgba(0,0,0,0.18)", border: "1px solid var(--border)" }}>
             <div style={{ fontSize: 17, fontWeight: 900, color: "var(--text)", marginBottom: 12 }}>Delete Employee</div>
-            <div style={{ fontSize: 13, color: "var(--text-mid)" }}>Are you sure you want to delete {deleteTarget.name}? This action cannot be undone.</div>
+            <div style={{ fontSize: 13, color: "var(--text-mid)" }}>Are you sure you want to delete {deleteTarget.name}?</div>
             <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
               <button onClick={() => setDeleteTarget(null)} style={{ background: "#f1f5f9", color: "var(--text-mid)", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
               <button onClick={doDelete} style={{ background: "#dc2626", color: "#fff", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Delete</button>

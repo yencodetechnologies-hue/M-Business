@@ -477,7 +477,7 @@ export default function ModernProjectsView({
                                 if (onDelete) {
                                   onDelete(p);
                                 } else {
-                                  if (window.confirm(`Delete project "${p.name}"? This cannot be undone.`)) {
+                                  if (window.confirm(`Delete project "${p.name}"?`)) {
                                     alert('Please pass an onDelete prop to ModernProjectsView to handle deletion.');
                                   }
                                 }

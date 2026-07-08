@@ -2044,67 +2044,14 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
         </div>
       </div>
 
-      {/* SEARCH + FILTER BAR — search/dropdowns left, count right, same row as Projects page */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
-        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-          <div style={{ position: "relative", width: 260 }}>
-            <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "#A0B8BE", fontSize: 15 }} />
-            <input type="text" placeholder="Search clients or company..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "10px 14px 10px 38px", border: "1.5px solid #E0EEF0", borderRadius: 10, fontSize: 13, outline: "none", background: "#fff", color: "#1A2E35", boxSizing: "border-box" }} />
-          </div>
-          <select value={filterMode} onChange={e => setFilterMode(e.target.value)} style={{ padding: "10px 32px 10px 12px", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 10, fontSize: 13, color: "#1A2E35", outline: "none", cursor: "pointer", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-          <select value={sortMode} onChange={e => setSortMode(e.target.value)} style={{ padding: "10px 32px 10px 12px", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 10, fontSize: 13, color: "#1A2E35", outline: "none", cursor: "pointer", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-          </select>
-        </div>
-        <div style={{ fontSize: 13, color: "#607D86", fontWeight: 700 }}>{filtered.length} of {clients.length} clients</div>
-      </div>
 
 
 
-      {/* CLIENT LIST/GRID */}
-      {filtered.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "60px 0", color: "#94a3b8" }}>
-          <div style={{ fontSize: 15, fontWeight: 700 }}>No clients found</div>
-        </div>
-      ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 16 }}>
-          {filtered.map(c => {
-            const st = getStatusCfg(c.status);
-            const color = getAvatarColor(c);
-            return (
-              <div key={c._id} onClick={() => { setActiveClientId(c._id); setViewClientModal(true); }} style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: 18, cursor: "pointer", display: "flex", flexDirection: "column", gap: 10 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ width: 42, height: 42, borderRadius: "50%", background: `linear-gradient(135deg,${color},${color}bb)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800, color: "#fff", flexShrink: 0 }}>
-                    {c.logoUrl ? <img src={c.logoUrl} alt="" style={{ width: 42, height: 42, borderRadius: "50%", objectFit: "contain", background: "#fff" }} /> : getAvatar(c)}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: "#1A2332", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.clientName || c.name || "—"}</div>
-                    <div style={{ fontSize: 11, color: "#94a3b8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.companyName || c.company || "—"}</div>
-                  </div>
-                  <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 800, background: st.bg, color: st.color, flexShrink: 0 }}>{st.label}</span>
-                </div>
-                <div style={{ fontSize: 12, color: "#607D86", display: "flex", flexDirection: "column", gap: 4 }}>
-                  <div><i className="ti ti-mail" style={{ marginRight: 6 }} />{c.email || "—"}</div>
-                  <div><i className="ti ti-phone" style={{ marginRight: 6 }} />{c.phone || "—"}</div>
-                </div>
-                <div style={{ display: "flex", gap: 8, marginTop: 4 }} onClick={e => e.stopPropagation()}>
-                  <button onClick={() => { setActiveClientId(c._id); setViewClientModal(true); }} style={{ flex: 1, background: "var(--teal-light,#E0F7FA)", border: "none", borderRadius: 8, padding: "7px 0", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer" }}>View</button>
-                  <button onClick={() => openEdit(c)} style={{ flex: 1, background: "#FFF7ED", border: "none", borderRadius: 8, padding: "7px 0", fontSize: 11, color: "#F59E0B", fontWeight: 700, cursor: "pointer" }}>Edit</button>
-                  <button onClick={() => setDeleteTarget(c)} style={{ flex: 1, background: "#FEF2F2", border: "none", borderRadius: 8, padding: "7px 0", fontSize: 11, color: "#EF4444", fontWeight: 700, cursor: "pointer" }}>Delete</button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
 
-      {/* OLD LEFT-PANEL WRAPPER BELOW IS NO LONGER USED FOR MAIN LAYOUT — kept hidden to preserve modal logic */}
-      <div style={{ display: "none" }}>
+
+
+      {/* LEFT-PANEL + DETAIL VIEW (always visible, embedded below stat cards) */}
+      <div style={{ display: "flex", position: "relative", flex: 1, minHeight: 500, background: "#fff", marginTop: 4, border: "1.5px solid #E0EEF0", borderRadius: 14, overflow: "hidden" }}>
         <div style={{ width: 260, minWidth: 260, borderRight: "1.5px solid #E0EEF0", display: "flex", flexDirection: "column", background: "#fff", overflow: "hidden" }}>
 
           {/* Search + Add */}
@@ -2382,13 +2329,9 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
               <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(var(--app-accent-rgb), 0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px" }}>
                 <i className="ti ti-users" style={{ color: "var(--app-accent)", fontSize: 32 }} />
               </div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: "var(--app-text)", marginBottom: 8 }}></div>
-              <div style={{ fontSize: 13, color: "var(--app-muted)", marginBottom: 24, lineHeight: 1.6 }}>
-                Add your first client to get started.
-              </div>
-              <button onClick={onAddClient} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 22px", background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
-                <i className="ti ti-plus" style={{ fontSize: 14 }} /> Add Client
-              </button>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "var(--app-text)", marginBottom: 8 }}>No clients found</div>
+
+
             </div>
           </div>
         )}
@@ -2396,6 +2339,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
       </div>
+
       {/* Edit Modal */}
 
       {editClient && (

@@ -408,7 +408,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
             <div className="settings-section">
               <div className="ss-header">
                 <div className="ss-header-icon" style={{ background: '#dcfce7', color: '#16a34a' }}><i className="ti ti-shield-lock" /></div>
-                <div><div className="ss-title">Security</div><div className="ss-sub">Manage your password, 2FA and active sessions</div></div>
+                <div><div className="ss-title">Security</div><div className="ss-sub">Manage your password</div></div>
               </div>
               <div className="ss-body">
                 <div className="security-item">
@@ -420,16 +420,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                   <div className="form-group"><label className="form-label">New Password</label><input className="form-input" type="password" value={passwords.new} onChange={e => setPasswords(p => ({ ...p, new: e.target.value }))} placeholder="Min 6 characters" /><div className="form-hint">Must be at least 6 characters.</div></div>
                   <div className="form-group"><label className="form-label">Confirm New Password</label><input className="form-input" type="password" value={passwords.confirm} onChange={e => setPasswords(p => ({ ...p, confirm: e.target.value }))} placeholder="Repeat password" /></div>
                 </div>
-                <div className="security-item" style={{ marginTop: 16 }}>
-                  <div className="sec-icon" style={{ background: '#dcfce7', color: '#16a34a' }}><i className="ti ti-shield-check" /></div>
-                  <div><div style={{ fontSize: 13, fontWeight: 700, color: 'var(--app-text)' }}>Two-Factor Authentication</div><div style={{ fontSize: 11, color: 'var(--app-muted)' }}>Add an extra layer of security</div></div>
-                  <div className="sec-action"><span className="sec-status sec-status-off">Disabled</span><button className="sec-btn">Enable 2FA</button></div>
-                </div>
-                <div className="security-item">
-                  <div className="sec-icon" style={{ background: '#eff4ff', color: '#2563EB' }}><i className="ti ti-device-laptop" /></div>
-                  <div><div style={{ fontSize: 13, fontWeight: 700, color: 'var(--app-text)' }}>Active Sessions</div><div style={{ fontSize: 11, color: 'var(--app-muted)' }}>Manage your active login sessions</div></div>
-                  <div className="sec-action"><span className="sec-status sec-status-on">1 Active</span><button className="sec-btn">Manage</button></div>
-                </div>
+
                 <div className="section-save">
                   <button className="sec-cancel-btn" onClick={() => setPasswords({ current: '', new: '', confirm: '' })}>Cancel</button>
                   <button className="sec-save-btn" onClick={savePassword} disabled={securitySaving}><i className="ti ti-lock" style={{ fontSize: 14 }} /> {securitySaving ? 'Updating...' : 'Update Password'}</button>

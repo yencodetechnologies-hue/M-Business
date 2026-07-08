@@ -1040,11 +1040,16 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         ? Math.round((doneM / totalM) * 100)
         : (currProject.progress || 0);
 
+      // Update local state immediately so the status color changes right away,
+      // instead of waiting for the server round-trip.
+      setCurrProject(prev => ({ ...prev, milestones: updatedMilestones, progress: newProgress }));
+
       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
         milestones: updatedMilestones,
         progress: newProgress,
       });
       loadLatest();
+      if (fetchTasks) fetchTasks();
       if (onUpdate) onUpdate();
     } catch (err) {
       console.error("Failed to toggle milestone:", err);
@@ -1065,6 +1070,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
         milestones: updatedMilestones
       });
+
+      // Update local state immediately so the new milestone shows up right away,
+      // instead of waiting for loadLatest()'s server round-trip.
+      setCurrProject(prev => ({ ...prev, milestones: updatedMilestones }));
 
       setNewMilestoneName('');
       setNewMilestoneDate('');

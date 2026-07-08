@@ -398,21 +398,19 @@ router.post("/reset-password", async (req, res) => {
 router.post("/change-password", async (req, res) => {
   try {
     const { userId, oldPassword, newPassword } = req.body;
+    const user = await User.findById(userId); // or whatever model lookup you have
 
-    let user = await User.findById(userId);
-    if (!user) user = await Client.findById(userId);
-    if (!user) user = await Manager.findById(userId);
-    if (!user) user = await Employee.findById(userId);
-
-    if (!user) return res.status(404).json({ msg: "User not found" });
-
-    // For hardcoded users, we don't allow password change or we bypass bcrypt
-    if (userId === "admin-hardcoded-id" || userId === "subadmin-hardcoded-id" || userId === "client-hardcoded-id") {
-      return res.status(400).json({ msg: "Password change is disabled for demo accounts" });
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
     }
 
-    const isMatch = await bcrypt.compare(oldPassword, user.password);
-    if (!isMatch) return res.status(400).json({ msg: "Incorrect current password" });
+    // Only verify old password if it was actually provided
+    if (oldPassword) {
+      const isMatch = await bcrypt.compare(oldPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ msg: "Old password is incorrect" });
+      }
+    }
 
     const hashed = await bcrypt.hash(newPassword, 10);
     user.password = hashed;

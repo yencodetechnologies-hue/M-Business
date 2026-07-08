@@ -41,7 +41,8 @@ function ReportCard({ THEME, r, idx, RPT_COLORS }) {
     <div style={{
       background: THEME.card, borderRadius: 24, padding: 28,
       boxShadow: THEME.shadow, border: `1.5px solid rgba(0,0,0,0.1)`,
-      position: "relative", overflow: "hidden"
+      position: "relative", overflow: "hidden",
+      width: "100%", display: "flex", flexDirection: "column"
     }}>
 
       {/* BG decoration removed */}
@@ -219,10 +220,10 @@ export default function ReportsPage({ THEME, clients = [], projects = [], employ
         <button onClick={fetchReports} style={{ background: THEME.accent, color: "#fff", border: "none", borderRadius: 12, padding: "12px 24px", fontWeight: 800, fontSize: 14, cursor: "pointer", boxShadow: "0 4px 12px rgba(99,102,241,0.2)", display: "flex", alignItems: "center", gap: 8 }}><i className="ti ti-refresh"></i> Refresh Reports</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))", gap: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))", gap: 24, alignItems: "stretch" }}>
         {loading ? [1, 2, 3, 4].map(i => <div key={i} style={{ height: 300, background: THEME.surface, borderRadius: 24, animation: "pulse 1.5s infinite" }} />)
           : reports.map((r, i) => (
-            <div key={r.id} onClick={() => setSelectedReport(r.type)} style={{ cursor: "pointer" }}>
+            <div key={r.id} onClick={() => setSelectedReport(r.type)} style={{ cursor: "pointer", height: "100%", display: "flex" }}>
               <ReportCard THEME={THEME} r={r} idx={i} RPT_COLORS={RPT_COLORS} />
             </div>
           ))}

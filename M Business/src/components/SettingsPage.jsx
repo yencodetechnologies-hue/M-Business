@@ -117,7 +117,8 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
   // Profile state
   const [profile, setProfile] = useState({
     name: user?.name || '', email: user?.email || '', phone: user?.phone || '',
-    role: user?.role || '', companyName: user?.companyName || '', bio: ''
+    role: user?.role || '', companyName: user?.companyName || '', bio: '',
+    companyType: user?.companyType || 'IT', employeeCount: user?.employeeCount || '0-10'
   });
   const [avatarUrl, setAvatarUrl] = useState(user?.logoUrl || '');
   const [profileSaving, setProfileSaving] = useState(false);
@@ -139,7 +140,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
   });
 
   // Security state
-  const [passwords, setPasswords] = useState({ current: '', new: '', confirm: '' });
+  const [passwords, setPasswords] = useState({ new: '', confirm: '' });
   const [securitySaving, setSecuritySaving] = useState(false);
 
   // Invoicing state
@@ -151,7 +152,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
   const [invoiceSaving, setInvoiceSaving] = useState(false);
 
   // Bank state
-  const [bank, setBank] = useState({ bankName: '', accountNo: '', ifscCode: '', upiId: '' });
+  const [bank, setBank] = useState({ bankName: '', accountNo: '', ifscCode: '', upiId: '', branchName: '' });
   const [bankSaving, setBankSaving] = useState(false);
 
   const showToast = (msg, type = 'success') => {
@@ -178,7 +179,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
         const d = res.data;
         setCompany(c => ({ ...c, gst: d.gstNumber || '', pan: d.panNumber || '', address: d.address || '' }));
         setInvoicing(i => ({ ...i, prefix: d.invoicePrefix || i.prefix, dueDays: d.defaultDueDays || i.dueDays, currency: d.currency || i.currency, taxRate: d.taxRate || i.taxRate, notes: d.invoiceNotes || i.notes }));
-        setBank({ bankName: d.bankName || '', accountNo: d.accountNumber || '', ifscCode: d.ifscCode || '', upiId: d.upiId || '' });
+        setBank({ bankName: d.bankName || '', accountNo: d.accountNumber || '', ifscCode: d.ifscCode || '', upiId: d.upiId || '', branchName: d.branchName || '' });
       }
     }).catch(() => { });
   }, [user]);
@@ -187,8 +188,8 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
     setProfileSaving(true);
     try {
       const companyId = user?.companyId || user?._id || user?.id;
-      await axios.put(`${BASE_URL}/api/subadmins/${companyId}`, { name: profile.name, phone: profile.phone, companyName: profile.companyName });
-      if (onProfileUpdate) onProfileUpdate({ ...user, name: profile.name, phone: profile.phone, companyName: profile.companyName });
+      await axios.put(`${BASE_URL}/api/subadmins/${companyId}`, { name: profile.name, phone: profile.phone, companyName: profile.companyName, companyType: profile.companyType, employeeCount: profile.employeeCount });
+      if (onProfileUpdate) onProfileUpdate({ ...user, name: profile.name, phone: profile.phone, companyName: profile.companyName, companyType: profile.companyType, employeeCount: profile.employeeCount });
       showToast('Profile saved successfully!');
     } catch { showToast('Failed to save profile', 'error'); }
     finally { setProfileSaving(false); }
@@ -210,8 +211,8 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
     setSecuritySaving(true);
     try {
       const userId = user?._id || user?.id;
-      await axios.post(`${BASE_URL}/api/auth/change-password`, { userId, oldPassword: passwords.current, newPassword: passwords.new });
-      setPasswords({ current: '', new: '', confirm: '' });
+      await axios.post(`${BASE_URL}/api/auth/change-password`, { userId, newPassword: passwords.new });
+      setPasswords({ new: '', confirm: '' });
       showToast('Password updated successfully!');
     } catch (e) { showToast(e.response?.data?.msg || 'Failed to update password', 'error'); }
     finally { setSecuritySaving(false); }
@@ -231,7 +232,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
     setBankSaving(true);
     try {
       const companyId = user?.companyId || user?._id || user?.id;
-      await axios.post(`${BASE_URL}/api/config/${companyId}`, { bankName: bank.bankName, accountNumber: bank.accountNo, ifscCode: bank.ifscCode, upiId: bank.upiId });
+      await axios.post(`${BASE_URL}/api/config/${companyId}`, { bankName: bank.bankName, accountNumber: bank.accountNo, ifscCode: bank.ifscCode, upiId: bank.upiId, branchName: bank.branchName });
       showToast('Bank details saved!');
     } catch { showToast('Failed to save bank details', 'error'); }
     finally { setBankSaving(false); }
@@ -319,9 +320,21 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                   <div className="form-group"><label className="form-label">Email Address</label><input className="form-input" value={profile.email} disabled style={{ opacity: 0.6 }} /></div>
                   <div className="form-group"><label className="form-label">Company Name</label><input className="form-input" value={profile.companyName} onChange={e => setProfile(p => ({ ...p, companyName: e.target.value }))} placeholder="Your company name" /></div>
                 </div>
-                <div className="form-group"><label className="form-label">Bio</label><textarea className="form-textarea" value={profile.bio} onChange={e => setProfile(p => ({ ...p, bio: e.target.value }))} placeholder="Tell us a bit about yourself…" /></div>
+                <div className="form-row-2">
+                  <div className="form-group"><label className="form-label">Company Type</label>
+                    <select className="form-select" value={profile.companyType} onChange={e => setProfile(p => ({ ...p, companyType: e.target.value }))}>
+                      {['IT', 'Software', 'Services', 'Consulting', 'Other'].map(o => <option key={o} value={o}>{o}</option>)}
+                    </select>
+                  </div>
+                  <div className="form-group"><label className="form-label">No. of Employees</label>
+                    <select className="form-select" value={profile.employeeCount} onChange={e => setProfile(p => ({ ...p, employeeCount: e.target.value }))}>
+                      {['0-10', '11-50', '51-100', '100+'].map(o => <option key={o} value={o}>{o}</option>)}
+                    </select>
+                  </div>
+                </div>
+
                 <div className="section-save">
-                  <button className="sec-cancel-btn" onClick={() => setProfile({ name: user?.name || '', email: user?.email || '', phone: user?.phone || '', role: user?.role || '', companyName: user?.companyName || '', bio: '' })}>Cancel</button>
+                  <button className="sec-cancel-btn" onClick={() => setProfile({ name: user?.name || '', email: user?.email || '', phone: user?.phone || '', role: user?.role || '', companyName: user?.companyName || '', bio: '', companyType: user?.companyType || 'IT', employeeCount: user?.employeeCount || '0-10' })}>Cancel</button>
                   <button className="sec-save-btn" onClick={saveProfile} disabled={profileSaving}><i className="ti ti-device-floppy" style={{ fontSize: 14 }} /> {profileSaving ? 'Saving...' : 'Save Profile'}</button>
                 </div>
               </div>
@@ -416,13 +429,12 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                   <div><div style={{ fontSize: 13, fontWeight: 700, color: 'var(--app-text)' }}>Change Password</div><div style={{ fontSize: 11, color: 'var(--app-muted)' }}>Update your account password</div></div>
                 </div>
                 <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 400 }}>
-                  <div className="form-group"><label className="form-label">Current Password</label><input className="form-input" type="password" value={passwords.current} onChange={e => setPasswords(p => ({ ...p, current: e.target.value }))} placeholder="••••••••" /></div>
                   <div className="form-group"><label className="form-label">New Password</label><input className="form-input" type="password" value={passwords.new} onChange={e => setPasswords(p => ({ ...p, new: e.target.value }))} placeholder="Min 6 characters" /><div className="form-hint">Must be at least 6 characters.</div></div>
                   <div className="form-group"><label className="form-label">Confirm New Password</label><input className="form-input" type="password" value={passwords.confirm} onChange={e => setPasswords(p => ({ ...p, confirm: e.target.value }))} placeholder="Repeat password" /></div>
                 </div>
 
                 <div className="section-save">
-                  <button className="sec-cancel-btn" onClick={() => setPasswords({ current: '', new: '', confirm: '' })}>Cancel</button>
+                  <button className="sec-cancel-btn" onClick={() => setPasswords({ new: '', confirm: '' })}>Cancel</button>
                   <button className="sec-save-btn" onClick={savePassword} disabled={securitySaving}><i className="ti ti-lock" style={{ fontSize: 14 }} /> {securitySaving ? 'Updating...' : 'Update Password'}</button>
                 </div>
               </div>
@@ -542,6 +554,9 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                 </div>
                 <div className="form-row-2">
                   <div className="form-group"><label className="form-label">IFSC Code</label><input className="form-input" value={bank.ifscCode} onChange={e => setBank(b => ({ ...b, ifscCode: e.target.value }))} placeholder="e.g. HDFC0001234" /></div>
+                  <div className="form-group"><label className="form-label">Bank Branch</label><input className="form-input" value={bank.branchName} onChange={e => setBank(b => ({ ...b, branchName: e.target.value }))} placeholder="e.g. MG Road Branch" /></div>
+                </div>
+                <div className="form-row-2">
                   <div className="form-group"><label className="form-label">UPI ID</label><input className="form-input" value={bank.upiId} onChange={e => setBank(b => ({ ...b, upiId: e.target.value }))} placeholder="e.g. name@okaxis" /></div>
                 </div>
                 <div className="section-save">

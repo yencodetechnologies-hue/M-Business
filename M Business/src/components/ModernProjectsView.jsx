@@ -265,16 +265,18 @@ export default function ModernProjectsView({
   // KPI counts
   const counts = useMemo(() => {
     const all = projects.length;
-    let active = 0, hold = 0, completed = 0, overdue = 0, totalBudget = 0;
+    let active = 0, hold = 0, completed = 0, overdue = 0;
+    const budgetByCurrency = {};
     projects.forEach(p => {
       const { cls } = normaliseStatus(p.status);
       if (cls === 'active') active++;
       else if (cls === 'hold') hold++;
       else if (cls === 'completed') completed++;
       else if (cls === 'overdue') overdue++;
-      totalBudget += Number(p.budget) || 0;
+      const curr = p.currency || '₹';
+      budgetByCurrency[curr] = (budgetByCurrency[curr] || 0) + (Number(p.budget) || 0);
     });
-    return { all, active, hold, completed, overdue, totalBudget };
+    return { all, active, hold, completed, overdue, budgetByCurrency };
   }, [projects]);
 
   // Filter + Sort
@@ -310,7 +312,7 @@ export default function ModernProjectsView({
     { key: 'hold', label: 'On Hold', count: counts.hold, icon: 'ti-player-pause', iconBg: P.orangeLight, iconColor: P.orange },
     { key: 'completed', label: 'Completed', count: counts.completed, icon: 'ti-circle-check', iconBg: '#DBEAFE', iconColor: '#2563EB' },
     { key: 'overdue', label: 'Overdue', count: counts.overdue, icon: 'ti-alert-triangle', iconBg: P.redLight, iconColor: P.red },
-    { key: 'budget', label: 'Overall Value', count: counts.totalBudget, icon: 'ti-currency-rupee', iconBg: P.purpleLight, iconColor: P.purple, isCurrency: true },
+    { key: 'budget', label: 'Overall Value', budgetByCurrency: counts.budgetByCurrency, icon: 'ti-currency-rupee', iconBg: P.purpleLight, iconColor: P.purple, isCurrency: true },
   ];
 
   return (
@@ -337,18 +339,25 @@ export default function ModernProjectsView({
               <div className="mpv-kpi-icon" style={{ background: k.iconBg }}>
                 <i className={`ti ${k.icon}`} style={{ color: k.iconColor }} />
               </div>
-              <div>
-                <div className="mpv-kpi-num" style={{ fontSize: k.isCurrency && k.count >= 100000 ? 13 : undefined }}>
-                  {k.isCurrency
-                    ? `₹${k.count >= 10000000
-                      ? (k.count / 10000000).toFixed(1) + 'Cr'
-                      : k.count >= 100000
-                        ? (k.count / 100000).toFixed(1) + 'L'
-                        : k.count.toLocaleString('en-IN')}`
-                    : k.count}
+              {k.isCurrency ? (
+                <div>
+                  {Object.entries(k.budgetByCurrency || {}).map(([currency, amount]) => (
+                    <div key={currency} className="mpv-kpi-num" style={{ fontSize: 18, lineHeight: 1.3 }}>
+                      {`${currency}${amount >= 10000000
+                        ? (amount / 10000000).toFixed(1) + 'Cr'
+                        : amount >= 100000
+                          ? (amount / 100000).toFixed(1) + 'L'
+                          : amount.toLocaleString('en-IN')}`}
+                    </div>
+                  ))}
+                  <div className="mpv-kpi-lbl">{k.label}</div>
                 </div>
-                <div className="mpv-kpi-lbl">{k.label}</div>
-              </div>
+              ) : (
+                <div>
+                  <div className="mpv-kpi-num">{k.count}</div>
+                  <div className="mpv-kpi-lbl">{k.label}</div>
+                </div>
+              )}
             </div>
           ))}
         </div>

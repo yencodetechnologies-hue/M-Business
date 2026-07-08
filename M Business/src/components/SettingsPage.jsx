@@ -351,15 +351,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                 <div><div className="ss-title">Company Information</div><div className="ss-sub">Your company details used in invoices and documents</div></div>
               </div>
               <div className="ss-body">
-                <div className="logo-upload-area" onClick={() => fileInputRef.current?.click()}>
-                  {avatarUrl ? (
-                    <img src={avatarUrl} alt="Company Logo" style={{ maxHeight: 60, maxWidth: '100%', objectFit: 'contain', marginBottom: 6 }} />
-                  ) : (
-                    <div style={{ fontSize: 28, color: 'var(--app-muted)', marginBottom: 6 }}><i className="ti ti-photo" /></div>
-                  )}
-                  <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--app-text)' }}>Upload Company Logo</div>
-                  <div style={{ fontSize: 10, color: 'var(--app-muted)', marginTop: 2 }}>SVG, PNG or JPG · Max 2MB · Recommended 200×80px</div>
-                </div>
+
                 <div className="form-row-2">
                   <div className="form-group"><label className="form-label">Company Name</label><input className="form-input" value={company.companyName} onChange={e => setCompany(c => ({ ...c, companyName: e.target.value }))} placeholder="Your company name" /></div>
                   <div className="form-group"><label className="form-label">Official Email</label><input className="form-input" value={company.email} onChange={e => setCompany(c => ({ ...c, email: e.target.value }))} placeholder="company@email.com" /></div>

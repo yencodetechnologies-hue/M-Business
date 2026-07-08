@@ -1520,7 +1520,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                   <div className="si-count">{enriched.filter(e => e.status === "overdue").length} invoice overdue</div>
                 </div>
               </div>
-              <div className="si-amount" style={{ color: "var(--red)" }}>{formatCurrency(0, inv.currency)}</div>
+              <div className="si-amount" style={{ color: "var(--red)" }}>{formatCurrency(enriched.filter(e => e.status === "overdue").reduce((s, e) => s + (parseFloat(e.total) || 0), 0), inv.currency)}</div>
             </div>
             <div className="summary-item">
               <div className="si-left">
@@ -1530,33 +1530,43 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                   <div className="si-count">{draftCnt} not yet sent</div>
                 </div>
               </div>
-              <div className="si-amount" style={{ color: "var(--text3)" }}>{formatCurrency(0, inv.currency)}</div>
+              <div className="si-amount" style={{ color: "var(--text3)" }}>{formatCurrency(enriched.filter(e => e.status === "draft").reduce((s, e) => s + (parseFloat(e.total) || 0), 0), inv.currency)}</div>
             </div>
             {/* mini bar chart */}
             <div style={{ marginTop: 4 }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text2)", marginBottom: 10 }}>Revenue Breakdown</div>
-              <div style={{ display: "flex", gap: 3, height: 60, alignItems: "flex-end" }}>
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                  <div style={{ width: "100%", background: "var(--teal)", borderRadius: "4px 4px 0 0", height: 60, opacity: .9 }}></div>
-                  <div style={{ fontSize: 9, color: "var(--text3)", fontWeight: 600 }}>May</div>
-                </div>
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                  <div style={{ width: "100%", background: "var(--green)", borderRadius: "4px 4px 0 0", height: 42 }}></div>
-                  <div style={{ fontSize: 9, color: "var(--text3)", fontWeight: 600 }}>Apr</div>
-                </div>
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                  <div style={{ width: "100%", background: "var(--amber)", borderRadius: "4px 4px 0 0", height: 30 }}></div>
-                  <div style={{ fontSize: 9, color: "var(--text3)", fontWeight: 600 }}>Mar</div>
-                </div>
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                  <div style={{ width: "100%", background: "var(--border)", borderRadius: "4px 4px 0 0", height: 20 }}></div>
-                  <div style={{ fontSize: 9, color: "var(--text3)", fontWeight: 600 }}>Feb</div>
-                </div>
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                  <div style={{ width: "100%", background: "var(--border)", borderRadius: "4px 4px 0 0", height: 36 }}></div>
-                  <div style={{ fontSize: 9, color: "var(--text3)", fontWeight: 600 }}>Jan</div>
-                </div>
-              </div>
+              {(() => {
+                const months = [];
+                const now = new Date();
+                for (let i = 4; i >= 0; i--) {
+                  const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                  months.push({ key: `${d.getFullYear()}-${d.getMonth()}`, label: d.toLocaleString("en-US", { month: "short" }), total: 0 });
+                }
+                enriched.forEach(e => {
+                  const raw = e.date || e.qt?.date || e.createdAt;
+                  if (!raw) return;
+                  const d = new Date(raw);
+                  if (isNaN(d)) return;
+                  const key = `${d.getFullYear()}-${d.getMonth()}`;
+                  const m = months.find(mo => mo.key === key);
+                  if (m) m.total += parseFloat(e.total) || 0;
+                });
+                const max = Math.max(1, ...months.map(m => m.total));
+                const hasData = months.some(m => m.total > 0);
+                if (!hasData) {
+                  return <div style={{ fontSize: 12, color: "var(--text3)", fontWeight: 600, padding: "16px 0", textAlign: "center" }}>No data available</div>;
+                }
+                return (
+                  <div style={{ display: "flex", gap: 3, height: 60, alignItems: "flex-end" }}>
+                    {months.map(m => (
+                      <div key={m.key} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                        <div style={{ width: "100%", background: m.total > 0 ? "var(--teal)" : "var(--border)", borderRadius: "4px 4px 0 0", height: Math.max(4, Math.round((m.total / max) * 60)), opacity: .9 }}></div>
+                        <div style={{ fontSize: 9, color: "var(--text3)", fontWeight: 600 }}>{m.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
           </div>
 

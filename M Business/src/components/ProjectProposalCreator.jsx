@@ -1774,10 +1774,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
               ) : filtered.length === 0 ? (
                 <div className="add-card" onClick={openNewModal}>
                   <div style={{ width: 52, height: 52, borderRadius: 14, background: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, color: "#fff", boxShadow: "0 4px 12px rgba(0,188,212,.3)", flexShrink: 0 }}><i className="ti ti-plus"></i></div>
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))" }}>{propTab === "all" && !propSearch ? "Create Your First Proposal" : "No proposals found"}</div>
-                    <div style={{ fontSize: 12, color: "var(--text3,#A0B8BE)", marginTop: 3 }}>Build a professional proposal with scope, timeline and pricing</div>
-                  </div>
+
                 </div>
               ) : (
                 <>
@@ -1875,14 +1872,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                     );
                   })}
 
-                  {/* Add new card */}
-                  <div className="add-card" onClick={openNewModal}>
-                    <div style={{ width: 52, height: 52, borderRadius: 14, background: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, color: "#fff", boxShadow: "0 4px 12px rgba(0,188,212,.3)", flexShrink: 0 }}><i className="ti ti-plus"></i></div>
-                    <div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))" }}>Create New Proposal</div>
-                      <div style={{ fontSize: 12, color: "var(--text3,#A0B8BE)", marginTop: 3 }}>Build a professional proposal with scope, timeline and pricing</div>
-                    </div>
-                  </div>
+
                 </>
               )}
             </div>

@@ -529,9 +529,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       mountedId.current = project._id;
       setCurrProject(project);   // sync immediately, no waiting
       setPortalLinkUrl('');      // discard any portal link cached for the old project
-      if (!project?._restoring) loadLatest();
+      loadLatest();
     }
-  }, [project?._id, project?._restoring]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [project?._id]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (autoOpenInvoice) {
       setActiveTab('payments');

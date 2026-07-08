@@ -7571,12 +7571,20 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  // Redirect to mysubscriptions if no plan selected yet (new user) OR trial expired
+  // Redirect to mysubscriptions only when the trial has actually expired
+  // (i.e. no subscription AND no free trial days left). While the user is
+  // still within their free trial, subscription is legitimately null and
+  // they should stay on the Dashboard — not be bounced to "Choose your Plan".
   const hasRedirected = useRef(false);
   const [subscriptionChecked, setSubscriptionChecked] = useState(false);
 
   useEffect(() => {
-    if (subscriptionChecked && subscription === null && !hasRedirected.current) {
+    if (
+      subscriptionChecked &&
+      subscription === null &&
+      !isInFreeTrial() &&
+      !hasRedirected.current
+    ) {
       hasRedirected.current = true;
       setForceUpgradeTab(false);
       setActive("mysubscriptions");

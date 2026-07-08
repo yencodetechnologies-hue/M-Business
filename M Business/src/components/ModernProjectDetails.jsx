@@ -791,10 +791,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const autoAdditionalTotal = (currProject.additionalCharges || []).reduce((sum, a) => sum + parseAmt(a.amount), 0);
   const autoMilestoneTotal = (currProject.milestonePayments || []).reduce((sum, m) => sum + parseAmt(m.amount), 0);
   const autoBudgetAmt = billed + autoAdditionalTotal + autoMilestoneTotal;
-  const manualBudget = currProject.budget !== undefined && currProject.budget !== null && currProject.budget !== ''
+  const manualBudget = currProject.budget !== undefined && currProject.budget !== null && currProject.budget !== '' && Number(currProject.budget) > 0
     ? Number(currProject.budget)
     : 0;
-  const budgetAmt = currProject.budget !== undefined && currProject.budget !== null && currProject.budget !== ''
+  const budgetAmt = manualBudget > 0
     ? manualBudget
     : autoBudgetAmt;
   // Fall back to manually entered received value if no payments recorded

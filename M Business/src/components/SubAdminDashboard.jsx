@@ -5913,15 +5913,15 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
 
 
 
-
         <div className="profile-area">
-
-          <div className="profile-avatar">
-            {(initials && /^[A-Z]{1,2}$/.test(initials)) ? initials : "MB"}
+          <div className="profile-avatar" style={{ overflow: "hidden" }}>
+            {companyLogo ? (
+              <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+            ) : (
+              (initials && /^[A-Z]{1,2}$/.test(initials)) ? initials : "MB"
+            )}
           </div>
-
           <div>
-
             <div className="profile-name">{user?.name || "Admin"}</div>
 
 
@@ -9571,8 +9571,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               <span style={{ position: "absolute", top: 5, right: 6, width: 8, height: 8, borderRadius: "50%", background: "#ff4d6d", boxShadow: "0 0 0 2px #0f0a29" }}></span>
                             )}
                           </div>
-                          <div onClick={() => setShowProfile(true)} style={{ width: 42, height: 42, borderRadius: 14, background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 13, boxShadow: "0 6px 18px rgba(0,188,212,0.4)" }}>
-                            {(user?.name || "PR").substring(0, 2).toUpperCase()}
+                          <div onClick={() => setShowProfile(true)} style={{ width: 42, height: 42, borderRadius: 14, background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 13, boxShadow: "0 6px 18px rgba(0,188,212,0.4)", overflow: "hidden" }}>
+                            {companyLogo ? (
+                              <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                            ) : (
+                              (user?.name || "PR").substring(0, 2).toUpperCase()
+                            )}
                           </div>
                         </div>
                       </div>

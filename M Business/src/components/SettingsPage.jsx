@@ -242,10 +242,10 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
     const file = e.target.files?.[0];
     if (!file) return;
     if (triggerCrop) {
-      triggerCrop(e, (img) => { setAvatarUrl(img); if (onLogoChange) onLogoChange(img); });
+      triggerCrop(e, (img) => { setAvatarUrl(img); onLogoChange && onLogoChange(img); });
     } else {
       const reader = new FileReader();
-      reader.onload = r => { setAvatarUrl(r.target.result); if (onLogoChange) onLogoChange(r.target.result); };
+      reader.onload = r => { setAvatarUrl(r.target.result); onLogoChange && onLogoChange(r.target.result); };
       reader.readAsDataURL(file);
     }
   };

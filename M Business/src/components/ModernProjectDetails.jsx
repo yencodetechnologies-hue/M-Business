@@ -772,24 +772,24 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     return isNaN(num) ? 0 : num;
   };
 
-  // Auto-calculate Total Budget = ALL Invoices (local + global) + Additional Charges + Milestone Payments
-  const billedGlobal = projectInvoices.reduce((sum, inv) => sum + parseAmt(inv.total), 0);
-  const billedLocal = (currProject.invoices || []).filter(Boolean).reduce((sum, inv) => {
+  // Auto-calculate Total Budget = ALL Invoices (via mergedInvoices, which already
+  // reflects instant local deletes/edits) + Additional Charges + Milestone Payments
+  const billedFromInvoices = mergedInvoices.filter(Boolean).reduce((sum, inv) => {
     const invAmount = parseAmt(inv.amount) || parseAmt(inv.total);
     const taxPercent = parseAmt(inv.taxPercent);
     const taxAmt = inv.taxType === 'inclusive' ? 0 : Math.round(invAmount * (taxPercent / 100));
     return sum + invAmount + taxAmt;
   }, 0);
-  const billedFromInvoices = billedGlobal + billedLocal;
   // Only fall back to manually entered billed value if the project has
   // never had any invoices at all (not just zero after deletion)
   const manualBilled = parseAmt(currProject.billed);
   const hasAnyInvoices = mergedInvoices.length > 0;
   const billed = hasAnyInvoices ? billedFromInvoices : manualBilled;
-  window.debugBudget = { billedGlobal, billedLocal, billedFromInvoices, manualBilled, billed, mergedInvoices, projectInvoices, currProjectInvoices: currProject.invoices };
+  window.debugBudget = { billedFromInvoices, manualBilled, billed, mergedInvoices, projectInvoices, currProjectInvoices: currProject.invoices };
 
   const autoAdditionalTotal = (currProject.additionalCharges || []).reduce((sum, a) => sum + parseAmt(a.amount), 0);
   const autoMilestoneTotal = (currProject.milestonePayments || []).reduce((sum, m) => sum + parseAmt(m.amount), 0);
+  const autoAdvanceTotal = (currProject.advances || []).reduce((sum, a) => sum + parseAmt(a.amount), 0);
   const autoBudgetAmt = billed + autoAdditionalTotal + autoMilestoneTotal;
   const manualBudget = currProject.budget !== undefined && currProject.budget !== null && currProject.budget !== '' && Number(currProject.budget) > 0
     ? Number(currProject.budget)
@@ -2688,7 +2688,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <span className="mpd-lbl">Total Budget <span style={{ fontSize: 9, color: '#94A3B8', fontWeight: 600, marginLeft: 4 }}>(auto)</span></span>
             <span className="mpd-val">{currency}{budgetAmt.toLocaleString()}</span>
           </div>
-          {[['Billed', 'billed', billed, ''], ['Received', 'received', received, 'mpd-g']].map(([lbl, key, val, cls]) => (
+          {[['Billed', 'billed', billed, ''], ['Advance Paid', 'advance', autoAdvanceTotal, 'mpd-p'], ['Received', 'received', received, 'mpd-g']].map(([lbl, key, val, cls]) => (
             <div key={key} className="mpd-brow">
               <span className="mpd-lbl">{lbl}</span>
               <span className={`mpd-val ${cls}`}>{currency}{val.toLocaleString()}</span>

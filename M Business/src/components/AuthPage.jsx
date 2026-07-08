@@ -59,49 +59,26 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
     if (Object.keys(errs).length) { setLoginErr(errs); return; }
     try {
       setLoading(true); setError("");
-      const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData, { timeout: 15000 });
+      console.log("Sending:", loginData);
+      const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData);
       const userData = res.data.user || res.data;
       const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
 
-      // Clear cached data only if it belongs to a DIFFERENT logged-in account.
-      const prevUserRaw = localStorage.getItem("user");
-      let isSameAccount = false;
-      if (prevUserRaw) {
-        try {
-          const prevUser = JSON.parse(prevUserRaw);
-          isSameAccount = prevUser?.email === userWithLogo.email;
-        } catch (e) { }
-      }
+      // Clear ALL stale cached data before setting new user session
+      // This ensures a re-created client never sees deleted account's data
+      const keysToKeep = ["accounts"];
+      Object.keys(localStorage).forEach(key => {
+        if (!keysToKeep.includes(key)) localStorage.removeItem(key);
+      });
+      // Also clear the accounts cache entry for this email so stale data is gone
+      try {
+        let accs = JSON.parse(localStorage.getItem("accounts") || "[]");
+        accs = accs.filter(a => a.email !== userWithLogo.email);
+        localStorage.setItem("accounts", JSON.stringify(accs));
+      } catch (e) { }
 
-      // Update the user + accounts cache first, then hand off to the app
-      // immediately so the "Signing in..." spinner clears without waiting
-      // on cache-cleanup work.
       localStorage.setItem("user", JSON.stringify(userWithLogo));
-
-      if (!isSameAccount) {
-        // Also reset the per-user "last tab" so a stale tab (e.g. "mysubscriptions"
-        // left over from a previous account) can't flash before the correct
-        // dashboard renders.
-        localStorage.removeItem("activeTab_subadmin");
-      }
-
       setUser(userWithLogo);
-
-      // Do the heavier cache cleanup after the UI has already switched away
-      // from the login screen — none of this needs to block sign-in.
-      setTimeout(() => {
-        if (!isSameAccount) {
-          const keysToKeep = ["accounts", "user", "activeTab_subadmin"];
-          Object.keys(localStorage).forEach(key => {
-            if (!keysToKeep.includes(key)) localStorage.removeItem(key);
-          });
-        }
-        try {
-          let accs = JSON.parse(localStorage.getItem("accounts") || "[]");
-          accs = accs.filter(a => a.email !== userWithLogo.email);
-          localStorage.setItem("accounts", JSON.stringify(accs));
-        } catch (e) { }
-      }, 0);
     } catch (e) {
       if (e.response?.data?.requiresOTP) {
         setVerifyEmail(e.response.data.email);
@@ -387,40 +364,31 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
               {success && <Alert type="success" msg={success} />}
               {error && <Alert type="error" msg={error} />}
 
-              <Field label="Full Name" err={regErr.name}>
+              <Field label="Company Name">
                 <div style={{ position: "relative" }}>
-                  <input value={regData.name}
-                    onChange={e => { setRegData(p => ({ ...p, name: e.target.value })); setRegErr(p => ({ ...p, name: "" })); }}
-                    placeholder="Your full name" style={inp(regErr.name)} />
-                  <Icon>Profile</Icon>
-                  {errMsg(regErr.name)}
+                  <input value={regData.companyName}
+                    onChange={e => setRegData(p => ({ ...p, companyName: e.target.value }))}
+                    placeholder="Your company name" style={inp(false)} />
+
                 </div>
               </Field>
 
-              <Field label="Role">
-                <select value={regData.role} onChange={e => setRegData(p => ({ ...p, role: e.target.value }))} style={selectSty}>
-                  <option value="employee">Employee</option>
-                  <option value="manager">Manager</option>
-                  <option value="Subadmin">Admin</option>
-                </select>
-              </Field>
-
               <div className="grid2">
-                <Field label="Email" err={regErr.email}>
-                  <div style={{ position: "relative" }}>
-                    <input type="email" value={regData.email}
-                      onChange={e => { setRegData(p => ({ ...p, email: e.target.value })); setRegErr(p => ({ ...p, email: "" })); }}
-                      placeholder="you@email.com" style={inp(regErr.email)} />
-                    <Icon>Mail</Icon>
-                    {errMsg(regErr.email)}
-                  </div>
-                </Field>
-                <Field label="Phone">
+                <Field label="Mobile">
                   <div style={{ position: "relative" }}>
                     <input value={regData.phone}
                       onChange={e => setRegData(p => ({ ...p, phone: e.target.value }))}
                       placeholder="+91 98765 43210" style={inp(false)} />
                     <Icon></Icon>
+                  </div>
+                </Field>
+                <Field label="Email" err={regErr.email}>
+                  <div style={{ position: "relative" }}>
+                    <input type="email" value={regData.email}
+                      onChange={e => { setRegData(p => ({ ...p, email: e.target.value })); setRegErr(p => ({ ...p, email: "" })); }}
+                      placeholder="you@email.com" style={inp(regErr.email)} />
+
+                    {errMsg(regErr.email)}
                   </div>
                 </Field>
               </div>
@@ -446,28 +414,18 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
                 </Field>
               </div>
 
-              {regData.role === "Subadmin" && <>
-                <Field label="Company Name">
-                  <div style={{ position: "relative" }}>
-                    <input value={regData.companyName}
-                      onChange={e => setRegData(p => ({ ...p, companyName: e.target.value }))}
-                      placeholder="Your company name" style={inp(false)} />
-                    <Icon>Company</Icon>
-                  </div>
+              <div className="grid2">
+                <Field label="Company Type">
+                  <select value={regData.companyType} onChange={e => setRegData(p => ({ ...p, companyType: e.target.value }))} style={selectSty}>
+                    {["IT", "Software", "Services", "Consulting", "Other"].map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
                 </Field>
-                <div className="grid2">
-                  <Field label="Company Type">
-                    <select value={regData.companyType} onChange={e => setRegData(p => ({ ...p, companyType: e.target.value }))} style={selectSty}>
-                      {["IT", "Software", "Services", "Consulting", "Other"].map(t => <option key={t} value={t}>{t}</option>)}
-                    </select>
-                  </Field>
-                  <Field label="No. of Employees">
-                    <select value={regData.employeeCount} onChange={e => setRegData(p => ({ ...p, employeeCount: e.target.value }))} style={selectSty}>
-                      {["0-10", "11-50", "51-100", "100+"].map(ec => <option key={ec} value={ec}>{ec}</option>)}
-                    </select>
-                  </Field>
-                </div>
-              </>}
+                <Field label="No. of Employees">
+                  <select value={regData.employeeCount} onChange={e => setRegData(p => ({ ...p, employeeCount: e.target.value }))} style={selectSty}>
+                    {["0-10", "11-50", "51-100", "100+"].map(ec => <option key={ec} value={ec}>{ec}</option>)}
+                  </select>
+                </Field>
+              </div>
 
               <button className="purple-btn" onClick={handleRegister} disabled={loading}>
                 {loading ? <><span className="spinner" />Creating account...</> : "Sign Up"}

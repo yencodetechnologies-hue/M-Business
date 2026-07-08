@@ -8047,28 +8047,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   };
 
-  const onLogoChange = async (logo) => {
-
+  const onLogoChange = (logo) => {
     setCompanyLogo(logo || fixedLogo);
-
     const updatedUser = { ...user, logoUrl: logo || "" };
-
     localStorage.setItem("user", JSON.stringify(updatedUser));
-
     setUser(updatedUser);
-
-    try {
-
-      await axios.post(BASE_URL + "/api/auth/save-logo", { userId: user._id || user.id, logoUrl: logo || "" });
-
-    } catch (e) {
-
-      console.log(e);
-
-    }
-
+    axios.post(BASE_URL + "/api/auth/save-logo", { userId: user._id || user.id, logoUrl: logo || "" }).catch(e => console.log(e));
   };
-
 
   const fetchClients = async () => { try { const res = await axios.get(BASE_URL + "/api/clients"); setClients(res.data); try { localStorage.setItem("cached_clients", JSON.stringify(res.data)); } catch { } } catch (e) { console.log(e); } };
 

@@ -121,6 +121,8 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
     companyType: user?.companyType || 'IT', employeeCount: user?.employeeCount || '0-10'
   });
   const [avatarUrl, setAvatarUrl] = useState(user?.logoUrl || '');
+
+  useEffect(() => { setAvatarUrl(user?.logoUrl || ''); }, [user?.logoUrl]);
   const [profileSaving, setProfileSaving] = useState(false);
 
   // Company state
@@ -350,7 +352,11 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
               </div>
               <div className="ss-body">
                 <div className="logo-upload-area" onClick={() => fileInputRef.current?.click()}>
-                  <div style={{ fontSize: 28, color: 'var(--app-muted)', marginBottom: 6 }}><i className="ti ti-photo" /></div>
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="Company Logo" style={{ maxHeight: 60, maxWidth: '100%', objectFit: 'contain', marginBottom: 6 }} />
+                  ) : (
+                    <div style={{ fontSize: 28, color: 'var(--app-muted)', marginBottom: 6 }}><i className="ti ti-photo" /></div>
+                  )}
                   <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--app-text)' }}>Upload Company Logo</div>
                   <div style={{ fontSize: 10, color: 'var(--app-muted)', marginTop: 2 }}>SVG, PNG or JPG · Max 2MB · Recommended 200×80px</div>
                 </div>

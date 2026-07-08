@@ -9,25 +9,13 @@ import axios from "axios";
 import { BASE_URL } from "../config";
 const API = `${BASE_URL}/api/reports`;
 
-function StatCard({ THEME, icon, label, value, color, sub }) {
+function StatCard({ icon, label, value, color }) {
   return (
-    <div style={{
-      background: THEME.card, borderRadius: 16, padding: "18px 16px",
-      boxShadow: THEME.shadow, border: `1.5px solid rgba(0,0,0,0.1)`,
-
-      position: "relative", overflow: "hidden"
-    }}>
-      <div style={{
-        width: 40, height: 40, borderRadius: 11, background: `${color}15`,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 19, marginBottom: 10, color
-      }}><i className={`ti ${icon}`}></i></div>
-      <div style={{
-        fontSize: 10, color: THEME.muted, fontWeight: 800,
-        letterSpacing: 1, marginBottom: 4, textTransform: "uppercase"
-      }}>{label}</div>
-      <div style={{ fontSize: 28, fontWeight: 900, color: color, lineHeight: 1 }}>{value}</div>
-      {sub && <div style={{ fontSize: 11, color: THEME.muted, marginTop: 6, fontWeight: 600 }}>{sub}</div>}
+    <div className="stat-card">
+      <div className="stat-card-inner">
+        <div className="stat-icon" style={{ background: `${color}15`, color }}><i className={`ti ${icon}`}></i></div>
+        <div><div className="stat-num">{value}</div><div className="stat-label">{label}</div></div>
+      </div>
     </div>
   );
 }
@@ -126,17 +114,28 @@ export default function ReportsPage({ THEME, clients = [], projects = [], employ
   const [lastSync, setLastSync] = useState(null);
   const RPT_COLORS = [THEME.accent, THEME.accent, THEME.muted, "#f59e0b"];
 
-  useEffect(() => { fetchReports(); }, []);
+  useEffect(() => {
+    // Show data instantly from what we already have in memory — no network
+    // wait needed, since clients/projects/employees/managers/income/expenses
+    // are already loaded as props by the time this page renders.
+    buildLocalReports();
+    setLoading(false);
+    // Then reconcile with the server in the background; only swap in the
+    // API's numbers if they actually arrive, so the page never sits blank
+    // or spinning while waiting on a slow/hanging request.
+    fetchReports();
+  }, []);
 
   const fetchReports = async () => {
     try {
-      setLoading(true);
-      const res = await axios.get(API);
-      setReports(res.data);
-      setLastSync(new Date());
+      const res = await axios.get(API, { timeout: 8000 });
+      if (res.data && res.data.length) {
+        setReports(res.data);
+        setLastSync(new Date());
+      }
     } catch {
-      buildLocalReports();
-    } finally { setLoading(false); }
+      // Already showing locally-built reports — nothing else to do.
+    }
   };
 
   const buildLocalReports = () => {
@@ -206,10 +205,10 @@ export default function ReportsPage({ THEME, clients = [], projects = [], employ
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');`}</style>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 20, marginBottom: 32 }}>
-        <StatCard THEME={THEME} icon="ti-currency-rupee" label="Total Revenue" value="₹12.4L" color="#10b981" sub="+14% from last month" />
-        <StatCard THEME={THEME} icon="ti-folder" label="Active Projects" value={projects.length} color={THEME.accent} sub="Across 8 categories" />
-        <StatCard THEME={THEME} icon="ti-users" label="Total Clients" value={clients.length} color="#f59e0b" sub="Active partnerships" />
-        <StatCard THEME={THEME} icon="ti-users-group" label="Team Size" value={employees.length + managers.length} color="#6366f1" sub="Talented professionals" />
+        <StatCard THEME={THEME} icon="ti-currency-rupee" label="Total Revenue" value={(() => { const n = income.reduce((s, x) => s + (Number(x.amount) || 0), 0); return n >= 100000 ? `₹${(n / 100000).toFixed(2)}L` : `₹${n.toLocaleString("en-IN")}`; })()} color="#10b981" />
+        <StatCard THEME={THEME} icon="ti-folder" label="Active Projects" value={projects.filter(p => (p.status || "").toLowerCase() !== "completed").length} color={THEME.accent} />
+        <StatCard THEME={THEME} icon="ti-users" label="Total Clients" value={clients.length} color="#f59e0b" />
+        <StatCard THEME={THEME} icon="ti-users-group" label="Team Size" value={employees.length + managers.length} color="#6366f1" />
       </div>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>

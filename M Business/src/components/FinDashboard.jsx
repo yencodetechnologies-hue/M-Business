@@ -138,15 +138,13 @@ a { text-decoration: none; color: inherit; }
 .kpi-grid{display:grid;gap:16px;margin-bottom:22px;}
 .kpi-grid-4{grid-template-columns:repeat(4,1fr);}
 .kpi-grid-5{grid-template-columns:repeat(5,1fr);}
-.kpi{background:var(--white);border-radius:var(--radius);padding:14px 18px;box-shadow:var(--shadow);border-left:4px solid transparent;height:96px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;overflow:hidden;}
-.kpi.income{border-left-color:var(--green);}
-.kpi.expense{border-left-color:var(--red);}
-.kpi.profit{border-left-color:var(--primary);}
-.kpi.pending{border-left-color:var(--orange);}
-.kpi.vendor{border-left-color:var(--purple);}
-.kpi-label{font-size:10px;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px;white-space:nowrap;}
-.kpi-value{font-size:20px;font-weight:900;color:var(--text-dark);margin-bottom:3px;line-height:1.1;}
-.kpi-sub{font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px;white-space:nowrap;}
+.kpi{background:var(--white);border:1.5px solid #E0EEF0;border-radius:14px;padding:14px 16px;box-shadow:0 2px 10px rgba(0,0,0,0.02);height:96px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:2px;overflow:hidden;}
+.kpi-label{font-size:10px;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kpi-value{font-size:19px;font-weight:900;color:var(--text-dark);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kpi-sub{font-size:10px;font-weight:600;display:flex;align-items:center;gap:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kpi-label{font-size:10px;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kpi-value{font-size:19px;font-weight:900;color:var(--text-dark);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kpi-sub{font-size:10px;font-weight:600;display:flex;align-items:center;gap:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .kpi-sub.up{color:var(--green);}
 .kpi-sub.down{color:var(--red);}
 .kpi-sub.neutral{color:var(--text-light);}

@@ -6,30 +6,30 @@ import axios from 'axios';
 const planIcons = {
   trial: (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
     </svg>
   ),
   starter: (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
     </svg>
   ),
   professional: (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <circle cx="12" cy="8" r="6"/><path d="M8 14l-4 7h16l-4-7"/>
+      <circle cx="12" cy="8" r="6" /><path d="M8 14l-4 7h16l-4-7" />
     </svg>
   ),
   enterprise: (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <rect x="2" y="7" width="20" height="14" rx="2"/>
-      <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+      <rect x="2" y="7" width="20" height="14" rx="2" />
+      <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
     </svg>
   )
 };
 
 const CheckIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#3B6D11" strokeWidth="2" style={{flexShrink: 0}}>
-    <polyline points="2,8 6,12 14,4"/>
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#3B6D11" strokeWidth="2" style={{ flexShrink: 0 }}>
+    <polyline points="2,8 6,12 14,4" />
   </svg>
 );
 

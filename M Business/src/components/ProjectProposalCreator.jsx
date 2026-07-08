@@ -1772,10 +1772,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
               {loading ? (
                 <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--text3,#A0B8BE)", fontSize: 14 }}></div>
               ) : filtered.length === 0 ? (
-                <div className="add-card" onClick={openNewModal}>
-                  <div style={{ width: 52, height: 52, borderRadius: 14, background: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, color: "#fff", boxShadow: "0 4px 12px rgba(0,188,212,.3)", flexShrink: 0 }}><i className="ti ti-plus"></i></div>
-
-                </div>
+                <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--text3,#A0B8BE)", fontSize: 14 }}>No proposals found</div>
               ) : (
                 <>
                   {filtered.map(p => {

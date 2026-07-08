@@ -7,7 +7,7 @@ export default function FinDashboard() {
   const [selectedBank, setSelectedBank] = useState('');
   const [importedFile, setImportedFile] = useState(null);
   const mainScrollRef = useRef(null);
-  const [dashboardData, setDashboardData] = useState(null);
+  const [dashboardData, setDashboardData] = useState({ totalIncome: 0, totalExpenses: 0, netProfit: 0, profitMargin: 0, pendingReceivables: 0, pendingInvoices: 0, vendorPayables: 0, overdueVendors: 0 });
   const [transactions, setTransactions] = useState([]);
   const [bankAccounts, setBankAccounts] = useState([]);
   const [expenseBreakdown, setExpenseBreakdown] = useState([]);
@@ -29,7 +29,7 @@ export default function FinDashboard() {
         axios.get(`${BASE_URL}/api/finance/expense-breakdown?period=${encodeURIComponent(selectedPeriod)}`).catch(() => null),
         axios.get(`${BASE_URL}/api/finance/cashflow?period=${encodeURIComponent(selectedPeriod)}`).catch(() => null),
       ]);
-      if (kpiRes?.data) setDashboardData(kpiRes.data);
+      setDashboardData(kpiRes?.data || { totalIncome: 0, totalExpenses: 0, netProfit: 0, profitMargin: 0, pendingReceivables: 0, pendingInvoices: 0, vendorPayables: 0, overdueVendors: 0 });
       if (txRes?.data) setTransactions(txRes.data);
       if (bankRes?.data) {
         setBankAccounts(bankRes.data);
@@ -256,13 +256,7 @@ tr:hover td{background:#FAFCFE;}
         </div>
 
         <div className="content" ref={mainScrollRef}>
-          {loading && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ width: '44px', height: '44px', border: '4px solid var(--primary-mid)', borderTop: '4px solid var(--primary)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></div>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-light)' }}>Loading dashboard data...</div>
-              <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-            </div>
-          )}
+
           {error && (
             <div style={{ background: 'var(--red-light)', border: '1.5px solid #FCA5A5', borderRadius: '12px', padding: '16px 20px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <i className="ti ti-alert-circle" style={{ color: 'var(--red-dark)', fontSize: '20px' }}></i>
@@ -270,7 +264,7 @@ tr:hover td{background:#FAFCFE;}
               <button className="btn btn-sm" style={{ marginLeft: 'auto', background: 'var(--red-dark)', color: '#fff', border: 'none' }} onClick={fetchDashboardData}>Retry</button>
             </div>
           )}
-          {!loading && dashboardData && (
+          {!loading && (
             <>
               <div className="kpi-grid kpi-grid-5">
                 <div className="kpi income">

@@ -1104,10 +1104,10 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                 <div className="funnel-step">
                   <span className="fs-label">Created</span>
                   <div className="fs-bar-wrap">
-                    <div className="fs-bar" style={{ width: "100%", background: "var(--teal)" }}>{totalQuotes} quotes</div>
+                    <div className="fs-bar" style={{ width: totalQuotes > 0 ? "100%" : "0%", background: "var(--teal)" }}>{totalQuotes > 0 ? `${totalQuotes} quotes` : ""}</div>
                   </div>
                   <span className="fs-count">{totalQuotes}</span>
-                  <span className="fs-pct">100%</span>
+                  <span className="fs-pct">{totalQuotes > 0 ? "100%" : "0%"}</span>
                 </div>
                 <div className="funnel-step">
                   <span className="fs-label">Sent</span>

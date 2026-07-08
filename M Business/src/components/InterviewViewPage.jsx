@@ -256,6 +256,7 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
       <div style={{ background: "linear-gradient(135deg,var(--app-text),#2d1057)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.22)" }}>
         <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}></div>
         <div style={{ flex: 1, minWidth: 0 }}>
+
           <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Candidate Application Link — share with applicants</div>
           <div style={{ fontSize: 12, color: "var(--app-muted)", fontFamily: "monospace", wordBreak: "break-all" }}>{applyLink}</div>
         </div>

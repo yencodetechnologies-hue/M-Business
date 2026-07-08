@@ -928,7 +928,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           status: newTaskStatus
         }, companyHeaders);
       } else {
-        await axios.post(`${BASE_URL}/api/tasks`, {
+        const createRes = await axios.post(`${BASE_URL}/api/tasks`, {
           title: newTaskTitle.trim(),
           description: newTaskDesc.trim(),
           priority: newTaskPriority,
@@ -939,6 +939,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           projectId: currProject._id,
           status: newTaskStatus
         }, companyHeaders);
+
+        // Show the new task immediately instead of waiting on loadLatest()/fetchTasks()
+        // to round-trip to the server.
+        const created = createRes?.data?.task || createRes?.data;
+        if (created && created._id) {
+          setCurrTasks(prev => [created, ...prev]);
+        }
       }
 
       setShowAddTaskModal(false);

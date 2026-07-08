@@ -2372,6 +2372,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
                     {/* INVOICE TABLE */}
                     <div data-paytab="inv" style={{ display: 'block', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'visible', marginBottom: 20 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
+                        <i className="ti ti-file-invoice" style={{ color: '#3B82F6', fontSize: 15, marginRight: 8 }}></i>
+                        <span style={{ fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>Invoices</span>
+                        <span style={{ background: 'rgba(59,130,246,.1)', color: '#3B82F6', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{(currProject.invoices || []).length}</span>
+                      </div>
                       <div style={{ overflowX: 'auto' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
                           <thead><tr style={{ background: '#F8FAFC' }}>{['', 'Invoice #', 'Description', 'Amount', 'Due Date', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>

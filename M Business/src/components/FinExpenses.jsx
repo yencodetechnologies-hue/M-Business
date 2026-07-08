@@ -132,10 +132,9 @@ export default function FinExpenses({ expenses: propExpenses, setExpenses: propS
 
         {/* KPI CARDS */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 16, marginBottom: 22 }}>
-          <div style={{ background: '#fff', borderRadius: 14, padding: '18px 20px', boxShadow: '0 2px 12px rgba(0,188,212,.08)', borderLeft: '4px solid #EF4444' }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: '#718096', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 }}>Total Expenses</div>
-            <div style={{ fontSize: 24, fontWeight: 900, color: '#1A2332' }}>{fmt(total)}</div>
-            <div style={{ fontSize: 12, color: '#718096', marginTop: 4 }}>{expenses.length} records</div>
+          <div style={{ background: '#fff', borderRadius: 14, padding: '18px 20px', boxShadow: '0 2px 12px rgba(0,188,212,.08)', border: '1px solid var(--app-border)', display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 11, background: '#EF444415', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>💰</div>
+            <div><div style={{ fontSize: 10, fontWeight: 700, color: '#718096', letterSpacing: 0.5 }}>TOTAL EXPENSES</div><div style={{ fontSize: 24, fontWeight: 800, color: '#1A2332' }}>{fmt(total)}</div></div>
           </div>
           {byCategory.map(c => (
             <div key={c.name} style={{ background: '#fff', borderRadius: 14, padding: '18px 20px', boxShadow: '0 2px 12px rgba(0,188,212,.08)', borderLeft: '4px solid  var(--app-accent, var(--app-accent, #00BCD4))' }}>

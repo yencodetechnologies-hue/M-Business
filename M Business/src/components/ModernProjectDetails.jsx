@@ -398,6 +398,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       if (arrayName === 'expenses') {
         updatePayload.spent = updatedList.reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
       }
+      // Update local state immediately so the row disappears right away,
+      // instead of waiting for loadLatest()'s server round-trip.
+      setCurrProject(prev => ({ ...prev, ...updatePayload }));
       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, updatePayload);
       loadLatest();
     } catch (err) {
@@ -2936,7 +2939,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         project={currProject}
         modalsState={paymentModalsState}
         setModalsState={(newState) => { setPaymentModalsState(newState); }}
-        onSaveSuccess={() => { loadLatest(); fetchProjectInvoices(); if (onUpdate) onUpdate(); }}
+        onSaveSuccess={(updatedFields) => { if (updatedFields) setCurrProject(prev => ({ ...prev, ...updatedFields })); loadLatest(); fetchProjectInvoices(); if (onUpdate) onUpdate(); }}
       />
 
       {/* Send to Client Popup */}

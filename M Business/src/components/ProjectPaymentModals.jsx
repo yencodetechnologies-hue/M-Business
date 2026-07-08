@@ -268,7 +268,7 @@ export default function ProjectPaymentModals({
 
       await axios.put(`${BASE_URL}/api/projects/${project._id}`, updatePayload);
 
-      onSaveSuccess();
+      onSaveSuccess({ [arrayName]: updatedList });
       closeModals();
     } catch (err) {
       console.error(`Failed to save ${type}:`, err);

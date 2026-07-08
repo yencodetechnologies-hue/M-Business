@@ -2482,7 +2482,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 }
 
-function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], setActive, setJumpProject, user, clients = [] }) {
+function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], setActive, setJumpProject, user, clients = [], onAddEmployeeClick }) {
 
   const [search, setSearch] = useState("");
 
@@ -2935,6 +2935,13 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
       {toast && <div className="toast show"><i className="ti ti-check"></i> {toast}</div>}
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+        <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1A2332", margin: 0 }}>Employees</h1>
+        <button className="create-btn" onClick={onAddEmployeeClick} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <i className="ti ti-plus"></i> Add Employee
+        </button>
+      </div>
 
 
 
@@ -9389,28 +9396,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   )}
 
-                  <button
 
-                    className="create-btn"
-
-                    title={isUsageAtLimit("employee", employees.length) ? `Plan limit reached` : "Add new employee"}
-
-                    onClick={() => {
-                      const limit = getSubscriptionLimit("employee", subscription);
-                      if (limit !== Infinity && employees.length >= limit) {
-                        setLimitModal({ type: "employee", limit });
-                        return;
-                      }
-                      setNeError({}); setModal("employee");
-                      fetchSubscription(); // refresh in background, don't block opening the form
-                    }}
-                    style={{ opacity: isUsageAtLimit("employee", employees.length) ? 0.5 : 1 }}
-
-                  >
-
-                    <i className="ti ti-plus"></i> Add Employee
-
-                  </button>
 
                 </div>
 
@@ -11076,7 +11062,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projectsWithProgress} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} user={user} clients={clients} />}
+            {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projectsWithProgress} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} user={user} clients={clients} onAddEmployeeClick={() => {
+              const limit = getSubscriptionLimit("employee", subscription);
+              if (limit !== Infinity && employees.length >= limit) {
+                setLimitModal({ type: "employee", limit });
+                return;
+              }
+              setNeError({}); setModal("employee");
+              fetchSubscription();
+            }} />}
 
             {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
 
@@ -12507,120 +12501,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   }}
 
                 />
-
-              </div>
-
-              <div style={{ marginBottom: 14 }}>
-
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
-
-                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 0 }}>ASSIGN EMPLOYEES <span style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 400 }}></span></label>
-
-                  <button
-
-                    onClick={() => {
-                      const limit = getSubscriptionLimit("employee");
-                      if (subscription && employees.length >= limit) {
-                        setLimitModal({ type: "employee", limit });
-                        return;
-                      }
-                      setReturnToModal(modal);
-                      setModal("employee");
-                      fetchSubscription(); // refresh in background, don't block opening the form
-                    }}
-                    style={{ background: "none", border: "none", color: "var(--app-accent)", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
-
-                  >
-
-                    <span style={{ fontSize: 14 }}>+</span> Add Employee
-
-                  </button>
-
-                </div>
-
-                <div style={{ border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "12px", background: "var(--app-bg)", maxHeight: 200, overflowY: "auto" }}>
-
-                  {employees.length === 0 ? <div style={{ color: "var(--app-muted)", fontSize: 13, textAlign: "center", padding: "20px" }}>No employees available</div>
-
-                    : employees.map(e => (
-
-                      <div key={e._id || e.email} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: "1px solid var(--app-bg)" }}>
-
-                        <input type="checkbox"
-
-                          id={`emp-${e._id || e.email}`}
-
-                          checked={np.assignedTo.includes(e.name)}
-
-                          onChange={evt => {
-
-                            if (evt.target.checked) {
-
-                              setNp(prev => ({ ...prev, assignedTo: [...prev.assignedTo, e.name] }));
-
-                            } else {
-
-                              setNp(prev => ({ ...prev, assignedTo: prev.assignedTo.filter(n => n !== e.name) }));
-
-                            }
-
-                          }}
-
-                          style={{ width: 16, height: 16, cursor: "pointer" }}
-
-                        />
-
-                        <label htmlFor={`emp-${e._id || e.email}`} style={{ flex: 1, cursor: "pointer", fontSize: 13, color: "var(--app-sidebar)", display: "flex", alignItems: "center", gap: 8 }}>
-
-                          <span>{e.name}</span>
-
-                          {e.department && <span style={{ fontSize: 11, color: "#a78bba", background: "var(--app-border)", padding: "2px 6px", borderRadius: 4 }}>{e.department}</span>}
-
-                        </label>
-
-                      </div>
-
-                    ))}
-
-                </div>
-
-                {np.assignedTo.length > 0 && (
-
-                  <div style={{ marginTop: 12 }}>
-
-                    <label style={{ display: "block", fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>SELECTED EMPLOYEES ({np.assignedTo.length})</label>
-
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-
-                      {np.assignedTo.map(name => (
-
-                        <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--app-border)", border: "1px solid #ddd6fe", borderRadius: 8, padding: "4px 10px" }}>
-
-                          <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
-
-                          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--app-muted)" }}>{name}</span>
-
-                          <button
-
-                            onClick={(e) => { e.stopPropagation(); setNp(prev => ({ ...prev, assignedTo: prev.assignedTo.filter(n => n !== name) })); }}
-
-                            style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
-
-                          >
-
-                            Ã—
-
-                          </button>
-
-                        </div>
-
-                      ))}
-
-                    </div>
-
-                  </div>
-
-                )}
 
               </div>
 

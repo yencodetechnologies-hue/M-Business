@@ -10027,11 +10027,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   </div>
 
-                                  <div style={{ background: "#e6fbf9", color: "#0097A7", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                  {totalIncome > 0 && (
+                                    <div style={{ background: "#e6fbf9", color: "#0097A7", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
 
-                                    <i className="ti ti-trending-up"></i> 12%
+                                      <i className="ti ti-trending-up"></i> Active
 
-                                  </div>
+                                    </div>
+                                  )}
 
                                 </div>
 
@@ -10059,11 +10061,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   </div>
 
-                                  <div style={{ background: "#dcfce7", color: "#166534", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                  {clients.length > 0 && (
+                                    <div style={{ background: "#dcfce7", color: "#166534", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
 
-                                    <i className="ti ti-trending-up"></i> 3 new
+                                      <i className="ti ti-trending-up"></i> {clients.filter(c => (c.status || "").toLowerCase() === "active").length} active
 
-                                  </div>
+                                    </div>
+                                  )}
 
                                 </div>
 
@@ -10093,11 +10097,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   </div>
 
-                                  <div style={{ background: "#f1f5f9", color: "#64748b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                  {activeProjCount > 0 && (
+                                    <div style={{ background: "#f1f5f9", color: "#64748b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
 
-                                    — same
+                                      Active
 
-                                  </div>
+                                    </div>
+                                  )}
 
                                 </div>
 
@@ -10109,7 +10115,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                 <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Active Projects</div>
 
-                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>2 due this week</div>
+                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>
+                                  {(() => {
+                                    const now = new Date();
+                                    const weekAhead = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+                                    const dueThisWeek = projects.filter(p => p.deadline && new Date(p.deadline) >= now && new Date(p.deadline) <= weekAhead).length;
+                                    return dueThisWeek > 0 ? `${dueThisWeek} due this week` : "No deadlines this week";
+                                  })()}
+                                </div>
 
                               </div>
 
@@ -10127,11 +10140,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   </div>
 
-                                  <div style={{ background: "#fef2f2", color: "#991b1b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                  {pendingInvCount > 0 && (
+                                    <div style={{ background: "#fef2f2", color: "#991b1b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
 
-                                    <i className="ti ti-trending-down"></i> overdue
+                                      <i className="ti ti-trending-down"></i> {invoices.filter(i => (i.status || "").toLowerCase() === "overdue").length > 0 ? "overdue" : "pending"}
 
-                                  </div>
+                                    </div>
+                                  )}
 
                                 </div>
 
@@ -10161,11 +10176,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   </div>
 
-                                  <div style={{ background: "#f3e8ff", color: "#6b21a8", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                  {employees.length > 0 && (
+                                    <div style={{ background: "#f3e8ff", color: "#6b21a8", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
 
-                                    <i className="ti ti-trending-up"></i> 2 new
+                                      <i className="ti ti-trending-up"></i> {employees.length}
 
-                                  </div>
+                                    </div>
+                                  )}
 
                                 </div>
 
@@ -10177,7 +10194,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                 <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Employees</div>
 
-                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>Active staff</div>
+                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>
+                                  {employees.filter(e => (e.status || "").toLowerCase() === "active").length} active staff
+                                </div>
 
                               </div>
 

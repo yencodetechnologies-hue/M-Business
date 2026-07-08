@@ -1093,11 +1093,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               );
             })}
 
-            <div className="add-quote-card" onClick={() => { clearForm(); if (onNewQuotation) { onNewQuotation(); } else { setStep("form"); } }}>
-              <div className="add-icon"><i className="ti ti-plus"></i></div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--teal)" }}>Create New Quotation</div>
-              <div style={{ fontSize: 11, color: "var(--text3)", fontWeight: 600, textAlign: "center", maxWidth: 140 }}>Build and send professional quotes to clients</div>
-            </div>
+
           </div>
 
           <div className="bottom-row">

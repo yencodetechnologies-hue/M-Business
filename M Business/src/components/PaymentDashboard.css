@@ -501,8 +501,13 @@
 }
 
 .stat-label {
-  font-size: 14px;
-  opacity: 0.9;
+  font-size: 11px;
+  color: var(--app-muted);
+  font-weight: 600;
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .no-payments {

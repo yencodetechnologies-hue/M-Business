@@ -8941,7 +8941,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   // New users: no subscription AND not in free trial = must pick a plan first
   // hasSelectedPlan = they have either activated free trial OR have a paid subscription
   const hasSelectedPlan = subscription !== null || isInFreeTrial();
-  let enforceMySubscriptions = (!subLoading && !hasSelectedPlan) || (subLoading && !isInFreeTrial() && !user?.createdAt);
+  // Never force the upgrade/packages screen while subscription data is still
+  // loading — that's exactly what caused the "Choose your Plan" page to flash
+  // briefly right after login, before fetchSubscription() had resolved.
+  let enforceMySubscriptions = !subLoading && !hasSelectedPlan;
 
   const rawNavItems = getNavForRole(user?.role);
 
@@ -10222,19 +10225,31 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   <div style={{ height: 180, display: "flex", alignItems: "flex-end", gap: 12, paddingBottom: 10 }}>
 
-                                    {/* Dummy chart bars matching the screenshot aesthetic */}
+                                    {totalIncome > 0 ? (
+                                      [30, 45, 35, 60, 40, 75].map((h, i) => (
 
-                                    {[30, 45, 35, 60, 40, 75].map((h, i) => (
+                                        <div key={i} style={{ flex: 1, display: "flex", gap: 4, height: "100%", alignItems: "flex-end", padding: "0 4px" }}>
 
-                                      <div key={i} style={{ flex: 1, display: "flex", gap: 4, height: "100%", alignItems: "flex-end", padding: "0 4px" }}>
+                                          <div style={{ flex: 1, background: "var(--app-accent)", height: `${h}%`, borderRadius: "4px 4px 0 0" }}></div>
 
-                                        <div style={{ flex: 1, background: "var(--app-accent)", height: `${h}%`, borderRadius: "4px 4px 0 0" }}></div>
+                                          <div style={{ flex: 1, background: "rgba(var(--app-accent-rgb,0,188,212),0.2)", height: `${h * 0.4}%`, borderRadius: "4px 4px 0 0" }}></div>
 
-                                        <div style={{ flex: 1, background: "rgba(var(--app-accent-rgb,0,188,212),0.2)", height: `${h * 0.4}%`, borderRadius: "4px 4px 0 0" }}></div>
+                                        </div>
 
-                                      </div>
+                                      ))
+                                    ) : (
+                                      [0, 0, 0, 0, 0, 0].map((h, i) => (
 
-                                    ))}
+                                        <div key={i} style={{ flex: 1, display: "flex", gap: 4, height: "100%", alignItems: "flex-end", padding: "0 4px" }}>
+
+                                          <div style={{ flex: 1, background: "rgba(15,28,46,0.06)", height: "2px", borderRadius: "4px 4px 0 0" }}></div>
+
+                                          <div style={{ flex: 1, background: "rgba(15,28,46,0.03)", height: "2px", borderRadius: "4px 4px 0 0" }}></div>
+
+                                        </div>
+
+                                      ))
+                                    )}
 
                                   </div>
 

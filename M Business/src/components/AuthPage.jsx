@@ -92,7 +92,7 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
 
   const handleRegister = async () => {
     const errs = {};
-    if (!regData.name.trim()) errs.name = "Name is required";
+    if (!regData.companyName.trim()) errs.companyName = "Company name is required";
     if (!regData.email.trim()) errs.email = "Email is required";
     if (!regData.password.trim()) errs.password = "Password is required";
     else if (regData.password.length < 6) errs.password = "Minimum 6 characters";
@@ -101,14 +101,12 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
     try {
       setLoading(true); setError("");
       const payload = {
-        name: regData.name, email: regData.email,
-        password: regData.password, role: regData.role, phone: regData.phone
+        name: regData.companyName, email: regData.email,
+        password: regData.password, role: "Subadmin", phone: regData.phone,
+        companyName: regData.companyName,
+        companyType: regData.companyType,
+        employeeCount: regData.employeeCount
       };
-      if (regData.role === "Subadmin") {
-        payload.companyName = regData.companyName;
-        payload.companyType = regData.companyType;
-        payload.employeeCount = regData.employeeCount;
-      }
       await axios.post(`${BASE_URL}/api/auth/signup`, payload, { timeout: 15000 });
       setSuccess("Account created successfully! Please login.");
       setRegData({ name: "", email: "", phone: "", password: "", confirm: "", role: "Subadmin", companyName: "", companyType: "IT", employeeCount: "0-10" });

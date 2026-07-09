@@ -384,7 +384,7 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
                   <div style={{ position: "relative" }}>
                     <input type="email" value={regData.email}
                       onChange={e => { setRegData(p => ({ ...p, email: e.target.value })); setRegErr(p => ({ ...p, email: "" })); }}
-                      placeholder="you@email.com" style={inp(regErr.email)} />
+                      placeholder="@email.com" style={inp(regErr.email)} />
 
                     {errMsg(regErr.email)}
                   </div>
@@ -442,12 +442,12 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
               {success && <Alert type="success" msg={success} />}
               {error && <Alert type="error" msg={error} />}
 
-              <Field label="Username" err={loginErr.email}>
+              <Field label="EMail" err={loginErr.email}>
                 <div style={{ position: "relative" }}>
                   <input type="email" value={loginData.email}
                     onChange={e => { setLoginData(p => ({ ...p, email: e.target.value })); setLoginErr(p => ({ ...p, email: "" })); }}
                     placeholder="you@email.com" style={inp(loginErr.email)} />
-                  <Icon>Profile</Icon>
+
                   {errMsg(loginErr.email)}
                 </div>
               </Field>

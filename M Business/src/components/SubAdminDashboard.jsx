@@ -6805,7 +6805,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
+  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(false);
 
   const [companyLogo, setCompanyLogo] = useState(user?.logoUrl ? user.logoUrl : (fixedLogo || null));
 

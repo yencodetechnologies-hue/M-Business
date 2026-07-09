@@ -206,6 +206,53 @@
       z-index: 40;
     }
 
+    /* ── HAMBURGER MENU TOGGLE ── */
+    .menu-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--ink2);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .menu-toggle:hover {
+      background: var(--surface);
+    }
+
+    /* Sidebar hidden by default off-screen */
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.28s ease;
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    /* Main content always full width now (sidebar overlays, doesn't push) */
+    .main {
+      margin-left: 0;
+    }
+
+    /* Overlay behind sidebar when open (click to close) */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      z-index: 90;
+    }
+
+    .sidebar-overlay.show {
+      display: block;
+    }
+
     .tb-search {
       display: flex;
       align-items: center;
@@ -1251,7 +1298,7 @@
 </head>
 
 <body>
-
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sb-profile">
@@ -1286,6 +1333,7 @@
   <!-- MAIN -->
   <div class="main">
     <header class="topbar">
+      <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()"><i class="ti ti-menu-2"></i></button>
       <div class="tb-search"><i class="ti ti-search"></i><input type="text" placeholder="Search payments, invoices…" />
       </div>
       <div class="tb-space"></div>
@@ -1489,6 +1537,12 @@
     }
     function bgClick(e) {
       if (e.target.id === 'modalBg') closeModal();
+    }
+  </script>
+  <script>
+    function toggleSidebar() {
+      document.querySelector('.sidebar').classList.toggle('open');
+      document.getElementById('sidebarOverlay').classList.toggle('show');
     }
   </script>
 </body>

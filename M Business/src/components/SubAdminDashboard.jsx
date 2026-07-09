@@ -9561,13 +9561,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           <div className="content">
 
-            {isInFreeTrial() && (
+            {subscriptionChecked && isInFreeTrial() && (
               <div style={{ background: 'linear-gradient(90deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097A7)', color: '#fff', padding: '10px 20px', borderRadius: 10, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
                 <span><i className="ti ti-gift" style={{ marginRight: 8 }}></i>Free Trial Active — {getTrialDaysRemaining()} day{getTrialDaysRemaining() !== 1 ? 's' : ''} remaining (up to {FREE_TRIAL_LIMITS.client} clients, {FREE_TRIAL_LIMITS.employee} employees, {FREE_TRIAL_LIMITS.manager} managers)</span>
                 <button onClick={() => { setForceUpgradeTab(true); setActive('mysubscriptions'); }} style={{ background: '#fff', color: '#0097A7', border: 'none', borderRadius: 8, padding: '5px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>Upgrade Now</button>
               </div>
             )}
-            {!subLoading && !isInFreeTrial() && !subscription && (
+            {subscriptionChecked && !isInFreeTrial() && !subscription && (
               <div style={{ background: '#FEE2E2', color: '#DC2626', padding: '10px 20px', borderRadius: 10, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
                 <span><i className="ti ti-alert-circle" style={{ marginRight: 8 }}></i>Choose a subscription plan to continue.</span>
                 <button onClick={() => { setForceUpgradeTab(true); setActive('mysubscriptions'); }} style={{ background: '#DC2626', color: '#fff', border: 'none', borderRadius: 8, padding: '5px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>Upgrade Now</button>

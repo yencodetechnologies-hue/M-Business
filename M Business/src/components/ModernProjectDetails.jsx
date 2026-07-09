@@ -205,7 +205,7 @@ function DetailField({ label, value, fullWidth }) {
   );
 }
 
-export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions, onNext, onNewInvoice, onViewInvoice, onNewProposal, onNewQuotation, autoOpenInvoice, onAutoOpenInvoiceDone, fromClientContext = false }) {
+export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions, onNext, onNewInvoice, onViewInvoice, onNewProposal, onNewQuotation, autoOpenInvoice, onAutoOpenInvoiceDone, fromClientContext = false, onAddEmployeeClick }) {
   const [activeTab, setActiveTab] = useState(() => {
     try {
       const saved = localStorage.getItem('project_tabs_order');
@@ -2902,11 +2902,22 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           <div style={{ position: 'fixed', inset: 0, zIndex: 99996, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ background: '#fff', borderRadius: P.radius, width: 380, padding: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
               <h3 style={{ margin: '0 0 16px', fontSize: 16, color: P.textDark }}>Add Team Member</h3>
-              <select value={selectedNewMember} onChange={e => setSelectedNewMember(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none', marginBottom: 16 }}>
+              <select value={selectedNewMember} onChange={e => {
+                if (e.target.value === '__add_new_employee__') {
+                  setShowAddMemberModal(false);
+                  if (onAddEmployeeClick) onAddEmployeeClick();
+                  return;
+                }
+                setSelectedNewMember(e.target.value);
+              }} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none', marginBottom: 16 }}>
                 <option value="">-- Select Employee --</option>
+                {onAddEmployeeClick && (
+                  <option value="__add_new_employee__" style={{ fontWeight: 700, color: P.purple }}>+ Add Employee</option>
+                )}
                 {(employees || []).filter(emp => !assigned.includes(emp.name || emp.employeeName)).map(emp => (
                   <option key={emp._id} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName} ({emp.role || 'Employee'})</option>
                 ))}
+
               </select>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                 <button className="mpd-btn mpd-btn-outline" onClick={() => { setShowAddMemberModal(false); setSelectedNewMember(''); }}>Cancel</button>

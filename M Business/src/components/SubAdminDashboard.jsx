@@ -10949,6 +10949,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 scrollContainerRef={mainScrollRef}
 
+                onAddEmployeeClick={() => {
+                  const limit = getSubscriptionLimit("employee", subscription);
+                  if (limit !== Infinity && employees.length >= limit) {
+                    setLimitModal({ type: "employee", limit });
+                    return;
+                  }
+                  setNeError({}); setModal("employee");
+                }}
+
                 autoOpenInvoice={autoOpenInvoice}
 
                 onAutoOpenInvoiceDone={() => setAutoOpenInvoice(false)}

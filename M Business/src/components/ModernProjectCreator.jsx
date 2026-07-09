@@ -730,6 +730,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                           updateMilestone(idx, 'isCustom', false);
                         }
                       }}
+                      style={{ minWidth: 320, height: 46, fontSize: 15, padding: '10px 14px' }}
                     >
                       <option value="">Select milestone...</option>
                       {customMilestoneOptions.map(opt => (

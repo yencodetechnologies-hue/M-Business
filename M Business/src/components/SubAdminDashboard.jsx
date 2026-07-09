@@ -9312,7 +9312,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         {/* Desktop Topbar (hamburger toggle) */}
         {!enforceMySubscriptions && (
           <div className="desktop-topbar no-print" style={{ display: "none", alignItems: "center", height: 56, padding: "8px 24px ", background: "var(--app-bg)", position: "sticky", top: 0, zIndex: 90 }}>
-            <button onClick={() => setDesktopSidebarOpen(v => !v)} style={{ background: "none", border: "none", width: 38, height: 38, fontSize: 22, cursor: "pointer", color: "var(--app-muted)", display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1, marginTop: "0px" }}>☰</button>
+            <button onClick={() => setDesktopSidebarOpen(v => !v)} style={{ background: "none", border: "none", width: 38, height: 38, fontSize: 22, cursor: "pointer", color: "var(--app-muted)", display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1, marginTop: "110px", alignSelf: "center" }}>☰</button>
           </div>
         )}
 

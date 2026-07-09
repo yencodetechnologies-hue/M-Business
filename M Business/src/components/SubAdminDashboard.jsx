@@ -2562,16 +2562,13 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
   const getInitials = (n) => n ? n.split(' ').map(x => x[0]).join('').toUpperCase().slice(0, 2) : "?";
 
-
-
   const openEdit = (e) => {
 
-    setEditForm({ name: e.name || "", email: e.email || "", phone: e.phone || "", role: e.role || "Employee", department: e.department || "", salary: e.salary || "", dateOfBirth: e.dateOfBirth ? e.dateOfBirth.substring(0, 10) : "", joiningDate: e.joiningDate ? e.joiningDate.substring(0, 10) : "", maritalStatus: e.maritalStatus || "Unmarried", status: e.status || "Pending", address: e.address || "", bankName: e.bankName || e.bankDetails?.bankName || "", ifscCode: e.ifscCode || e.bankDetails?.ifscCode || "", accountNumber: e.accountNumber || e.bankDetails?.accountNumber || "" });
+    setEditForm({ name: e.name || "", email: e.email || "", phone: e.phone || "", role: e.role || "Employee", department: e.department || "", salary: e.salary || "", dateOfBirth: e.dateOfBirth ? e.dateOfBirth.substring(0, 10) : "", joiningDate: e.joiningDate ? e.joiningDate.substring(0, 10) : "", maritalStatus: e.maritalStatus || "Unmarried", status: e.status || "Pending", address: e.address || "", bankName: e.bankName || e.bankDetails?.bankName || "", ifscCode: e.ifscCode || e.bankDetails?.ifscCode || "", accountNumber: e.accountNumber || e.bankDetails?.accountNumber || "", branchName: e.branchName || e.bankDetails?.branchName || "" });
 
     setEditErr({}); setEditEmp(e);
 
   };
-
   const saveEdit = async () => {
 
     const errs = {};
@@ -2580,15 +2577,29 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
     if (!editForm.email?.trim()) errs.email = "Email required";
 
+    if (editForm.password || editForm.confirmPassword) {
+
+      if (editForm.password.length < 6) errs.password = "Min 6 characters";
+
+      if (editForm.password !== editForm.confirmPassword) errs.confirmPassword = "Passwords do not match";
+
+    }
+
     if (Object.keys(errs).length) { setEditErr(errs); return; }
 
     try {
 
       setSaving(true);
 
-      const res = await axios.put(`${BASE_URL}/api/employees/${editEmp._id}`, editForm);
+      const payload = { ...editForm };
 
-      const updated = { ...editEmp, ...(res.data || editForm) };
+      if (!payload.password) { delete payload.password; }
+
+      delete payload.confirmPassword;
+
+      const res = await axios.put(`${BASE_URL}/api/employees/${editEmp._id}`, payload);
+
+      const updated = { ...editEmp, ...(res.data || payload) };
 
       setEmployees(prev => prev.map(e => e._id === editEmp._id ? updated : e));
 
@@ -2602,7 +2613,13 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
     } catch {
 
-      const updated = { ...editEmp, ...editForm };
+      const payload = { ...editForm };
+
+      delete payload.password;
+
+      delete payload.confirmPassword;
+
+      const updated = { ...editEmp, ...payload };
 
       setEmployees(prev => prev.map(e => e._id === editEmp._id ? updated : e));
 
@@ -2866,6 +2883,48 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
                 <Fld label="IFSC Code" value={editForm.ifscCode} onChange={v => setEditForm(p => ({ ...p, ifscCode: v }))} />
 
                 <Fld label="Account Number" value={editForm.accountNumber} onChange={v => setEditForm(p => ({ ...p, accountNumber: v }))} />
+
+                <Fld label="Branch Name" value={editForm.branchName} onChange={v => setEditForm(p => ({ ...p, branchName: v }))} />
+
+              </div>
+
+            </div>
+
+            <div style={{ marginTop: 14 }}>
+
+              <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🔒 CHANGE PASSWORD (optional)</div>
+
+              <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+
+                <div style={{ marginBottom: 14 }}>
+
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>NEW PASSWORD</label>
+
+                  <div style={{ position: "relative" }}>
+
+                    <input type={showEditEmpPass ? "text" : "password"} value={editForm.password || ""} onChange={e => { setEditForm(p => ({ ...p, password: e.target.value })); setEditErr(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Leave blank to keep current password" />
+
+                    <button type="button" onClick={() => setShowEditEmpPass(!showEditEmpPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEditEmpPass ? "HIDE" : "SHOW"}</button>
+
+                  </div>
+
+                  {editErr.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {editErr.password}</div>}
+
+                </div>
+
+                <div style={{ marginBottom: 14 }}>
+
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CONFIRM PASSWORD</label>
+
+                  <div style={{ position: "relative" }}>
+
+                    <input type={showEditEmpPass ? "text" : "password"} value={editForm.confirmPassword || ""} onChange={e => { setEditForm(p => ({ ...p, confirmPassword: e.target.value })); setEditErr(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.confirmPassword ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter new password" />
+
+                  </div>
+
+                  {editErr.confirmPassword && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {editErr.confirmPassword}</div>}
+
+                </div>
 
               </div>
 
@@ -8515,7 +8574,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           ifscCode: ne.ifscCode,
 
-          accountNumber: ne.accountNumber
+          accountNumber: ne.accountNumber,
+
+          branchName: ne.branchName
 
         }
 
@@ -9995,7 +10056,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                         return (
 
-                          <div style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: 24, fontFamily: "'Nunito', sans-serif" }}>
+                          <div style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: 12, fontFamily: "'Nunito', sans-serif" }}>
 
 
 
@@ -10502,15 +10563,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             {/* SECONDARY CONTENT AREA */}
 
 
-                            <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "start" }}>
-
+                            <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "start", marginTop: "-12px" }}>
 
 
                               {/* LEFT COLUMN 2 */}
-
-                              <div style={{ display: "flex", flexDirection: "column", gap: 24, alignSelf: "start" }}>
-
-
+                              <div style={{ display: "flex", flexDirection: "column", gap: 8, alignSelf: "start" }}>
 
 
 
@@ -12312,6 +12369,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   <Fld label="IFSC Code" value={ne.ifscCode} onChange={v => setNe({ ...ne, ifscCode: v })} />
 
                   <Fld label="Account Number" value={ne.accountNumber} onChange={v => setNe({ ...ne, accountNumber: v })} />
+
+                  <Fld label="Branch Name" value={ne.branchName} onChange={v => setNe({ ...ne, branchName: v })} />
 
                 </div>
 

@@ -20,7 +20,7 @@ const { checkResourceLimit } = require("../middleware/subscriptionMiddleware");
 // ADD employee
 router.post("/add", checkResourceLimit('employee'), async (req, res) => {
   try {
-    const { name, email, phone, role, department, salary, status, password, profilePhoto, bankDetails, dateOfBirth, maritalStatus, address } = req.body;
+    const { name, email, phone, role, department, salary, status, password, profilePhoto, bankDetails, branchName, dateOfBirth, maritalStatus, address } = req.body;
 
     if (!name || !email) return res.status(400).json({ msg: "Name and Email required" });
     if (!password || password.trim().length < 4) return res.status(400).json({ msg: "Password required (min 4 chars)" });
@@ -39,7 +39,9 @@ router.post("/add", checkResourceLimit('employee'), async (req, res) => {
       name, email, phone: phone || "", role: role || "Employee", department: department || "",
       salary: salary || "", status: "Pending", password: hashedPassword,
       companyId: req.body.companyId || req.companyId || "", profilePhoto: profilePhoto || "",
-      bankDetails: bankDetails || { bankName: "", accountNumber: "", ifscCode: "" },
+      bankDetails: bankDetails
+        ? { ...bankDetails, branchName: bankDetails.branchName || branchName || "" }
+        : { bankName: "", accountNumber: "", ifscCode: "", branchName: branchName || "" },
       dateOfBirth: dateOfBirth || "", maritalStatus: maritalStatus || "Unmarried", address: address || ""
     });
 
@@ -58,11 +60,12 @@ router.put("/:id", async (req, res) => {
     const updateData = { ...req.body };
 
     // Handle nested bank details if sent flat
-    if (req.body.bankName || req.body.accountNumber || req.body.ifscCode) {
+    if (req.body.bankName || req.body.accountNumber || req.body.ifscCode || req.body.branchName) {
       updateData.bankDetails = {
         bankName: req.body.bankName || "",
         accountNumber: req.body.accountNumber || "",
-        ifscCode: req.body.ifscCode || ""
+        ifscCode: req.body.ifscCode || "",
+        branchName: req.body.branchName || ""
       };
     }
 

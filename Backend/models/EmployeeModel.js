@@ -14,7 +14,8 @@ const employeeSchema = new mongoose.Schema({
   bankDetails: {
     bankName: { type: String, default: "" },
     accountNumber: { type: String, default: "" },
-    ifscCode: { type: String, default: "" }
+    ifscCode: { type: String, default: "" },
+    branchName: { type: String, default: "" }
   },
   otp: { type: String, default: "" },
   otpExpires: { type: Date },

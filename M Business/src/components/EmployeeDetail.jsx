@@ -639,7 +639,11 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
             {emp.dateOfBirth && <div className="ed-info-item"><div className="lbl">Date of Birth</div><div className="val">{new Date(emp.dateOfBirth).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div></div>}
             {emp.maritalStatus && <div className="ed-info-item"><div className="lbl">Marital Status</div><div className="val">{emp.maritalStatus}</div></div>}
             {(emp.bankName || emp.bankDetails?.bankName) && <div className="ed-info-item"><div className="lbl">Bank Name</div><div className="val">{emp.bankName || emp.bankDetails?.bankName}</div></div>}
+
+            {(emp.branchName || emp.bankDetails?.branchName) && <div className="ed-info-item"><div className="lbl">Branch Name</div><div className="val">{emp.branchName || emp.bankDetails?.branchName}</div></div>}
+
             {(emp.accountNumber || emp.bankDetails?.accountNumber) && <div className="ed-info-item"><div className="lbl">Account Number</div><div className="val">{emp.accountNumber || emp.bankDetails?.accountNumber}</div></div>}
+
             {(emp.ifscCode || emp.bankDetails?.ifscCode) && <div className="ed-info-item"><div className="lbl">IFSC Code</div><div className="val">{emp.ifscCode || emp.bankDetails?.ifscCode}</div></div>}
           </div>
         </div>

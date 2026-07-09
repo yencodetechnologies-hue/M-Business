@@ -104,7 +104,34 @@ function getAvatarColor(name) {
   if (!name) return colors[0];
   return colors[name.charCodeAt(0) % colors.length];
 }
-
+const MILESTONE_OPTIONS = [
+  "Project Kickoff",
+  "Requirement Gathering",
+  "Scope Approval",
+  "Design Approval",
+  "UI/UX Completion",
+  "Prototype Approval",
+  "Development Started",
+  "Development Completed",
+  "Internal Testing",
+  "QA Testing",
+  "UAT (User Acceptance Testing)",
+  "Bug Fixes Completed",
+  "Client Review",
+  "Client Approval",
+  "Security Testing",
+  "Performance Testing",
+  "Documentation Completed",
+  "Training Completed",
+  "Deployment to Staging",
+  "Deployment to Production",
+  "Go-Live",
+  "Project Handover",
+  "Warranty Support Started",
+  "Warranty Support Completed",
+  "Project Closure",
+  "Custom"
+];
 export default function ModernProjectCreator({ onBack, clients = [], employees = [], onSuccess, editProject, prefillClient, onAddEmployeeClick }) {
   const [loading, setLoading] = useState(false);
   const [showAddClient, setShowAddClient] = useState(false);
@@ -170,6 +197,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
     return list.map(m => ({
       name: m?.name || '',
       date: safeDate(m?.date),
+      isCustom: m?.name ? !MILESTONE_OPTIONS.includes(m.name) : false,
     }));
   };
 
@@ -243,7 +271,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   };
 
   const addMilestone = () => {
-    setMilestones([...milestones, { name: '', date: '' }]);
+    setMilestones([...milestones, { name: '', date: '', isCustom: false }]);
   };
 
   const updateMilestone = (idx, field, val) => {
@@ -259,7 +287,6 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   const handleCreate = async () => {
     if (!name.trim()) return alert("Project Name is required.");
     if (!client) return alert("Client is required.");
-
     const isEdit = !!editProject;
 
     setLoading(true);
@@ -683,13 +710,44 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
           <div className="mpc-section-card">
             <div className="mpc-section-heading"><i className="ti ti-flag" /> Milestones</div>
             <div className="mpc-milestone-list">
-              {milestones.map((m, idx) => (
-                <div key={idx} className="mpc-milestone-row">
-                  <input type="text" placeholder="Milestone name, e.g. Design Approval" value={m.name} onChange={e => updateMilestone(idx, 'name', e.target.value)} />
-                  <input type="date" value={m.date} onChange={e => updateMilestone(idx, 'date', e.target.value)} />
-                  <span className="mpc-remove-ms" onClick={() => removeMilestone(idx)}><i className="ti ti-trash" /></span>
-                </div>
-              ))}
+              {milestones.map((m, idx) => {
+                const isPredefinedValue = MILESTONE_OPTIONS.includes(m.name) && m.name !== "Custom";
+                const isCustomMode = m.isCustom || (m.name !== "" && !isPredefinedValue);
+                const selectValue = isCustomMode ? "Custom" : (isPredefinedValue ? m.name : "");
+                return (
+                  <div key={idx} className="mpc-milestone-row">
+                    <select
+                      value={selectValue}
+                      onChange={e => {
+                        const val = e.target.value;
+                        if (val === "Custom") {
+                          updateMilestone(idx, 'name', '');
+                          updateMilestone(idx, 'isCustom', true);
+                        } else {
+                          updateMilestone(idx, 'name', val);
+                          updateMilestone(idx, 'isCustom', false);
+                        }
+                      }}
+                    >
+                      <option value="">Select milestone...</option>
+                      {MILESTONE_OPTIONS.map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                    {isCustomMode && (
+                      <input
+                        type="text"
+                        placeholder="Enter custom milestone name"
+                        value={m.name}
+                        onChange={e => updateMilestone(idx, 'name', e.target.value)}
+                        style={{ marginTop: 6 }}
+                      />
+                    )}
+                    <input type="date" value={m.date} onChange={e => updateMilestone(idx, 'date', e.target.value)} />
+                    <span className="mpc-remove-ms" onClick={() => removeMilestone(idx)}><i className="ti ti-trash" /></span>
+                  </div>
+                );
+              })}
             </div>
             <button className="mpc-btn mpc-btn-outline" style={{ marginTop: 16, fontSize: 12, padding: '8px 16px' }} onClick={addMilestone}>
               <i className="ti ti-plus" /> Add Milestone

@@ -1566,10 +1566,12 @@ td.exp-name {
 /* Responsive & Mobile Layout Fixes */
 @media(min-width: 769px) {
   .sidebar {
-    transform: translateX(0) !important;
-    position: sticky !important;
+    position: fixed !important;
     top: 0 !important;
+    left: 0 !important;
     width: 250px !important;
+    height: 100vh !important;
+    z-index: 1000 !important;
   }
 
   .sidebar-Close {
@@ -1584,8 +1586,8 @@ td.exp-name {
     display: none !important;
   }
 
-  .sidebar-spacer {
-    display: none !important;
+  .desktop-topbar {
+    display: flex !important;
   }
 }
 

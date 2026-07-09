@@ -105,7 +105,7 @@ function getAvatarColor(name) {
   return colors[name.charCodeAt(0) % colors.length];
 }
 
-export default function ModernProjectCreator({ onBack, clients = [], employees = [], onSuccess, editProject, prefillClient }) {
+export default function ModernProjectCreator({ onBack, clients = [], employees = [], onSuccess, editProject, prefillClient, onAddEmployeeClick }) {
   const [loading, setLoading] = useState(false);
   const [showAddClient, setShowAddClient] = useState(false);
 
@@ -545,7 +545,15 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
 
                   <select
                     value={selectedEmpToAdd}
-                    onChange={e => setSelectedEmpToAdd(e.target.value)}
+                    onChange={e => {
+                      if (e.target.value === '__add_new_employee__') {
+                        setShowAddEmployee(false);
+                        setSelectedEmpToAdd('');
+                        onAddEmployeeClick && onAddEmployeeClick();
+                        return;
+                      }
+                      setSelectedEmpToAdd(e.target.value);
+                    }}
                     style={{
                       width: '100%', padding: '11px 14px',
                       border: '1.5px solid #E2E8F0', borderRadius: 10,
@@ -564,6 +572,9 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                         </option>
                       ))
                     }
+                    {typeof onAddEmployeeClick === 'function' && (
+                      <option value="__add_new_employee__">+ Add New Employee...</option>
+                    )}
                   </select>
 
                   <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>

@@ -3073,31 +3073,18 @@ ${onboardingLink}`;
 
 
 
-      <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
-
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: "1px solid var(--border)" }}>
-
-          <div style={{ fontSize: 14, fontWeight: 900, color: "var(--text)" }}>All Employees</div>
-
-          <div style={{ background: "rgba(var(--app-accent-rgb,0,188,212),0.08)", color: "var(--app-accent)", fontSize: 11, fontWeight: 800, padding: "3px 12px", borderRadius: 20 }}>{filtered.length} employees</div>
-
+      <div style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+        <div style={{ padding: "18px 20px 12px" }}>
+          <div style={{ fontSize: 14, fontWeight: 900, color: "#1A2332", marginBottom: 14 }}>All Employees ({filtered.length})</div>
         </div>
 
         <div style={{ overflowX: "auto" }}>
-
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700 }}>
-
-            <thead style={{ background: "#fafbfc" }}><tr>
-
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 900 }}>
+            <thead><tr style={{ background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
               {["Employee", "Role", "Department", "Email", "Joined", "Status", "Actions"].map(h => (
-
-                <th key={h} style={{ padding: "11px 16px", textAlign: "left", fontSize: 10, fontWeight: 900, color: "var(--text-soft)", letterSpacing: 1.5, textTransform: "uppercase", borderBottom: "1px solid var(--border)" }}>{h}</th>
-
+                <th key={h} style={{ padding: "10px 14px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)", whiteSpace: "nowrap" }}>{h.toUpperCase()}</th>
               ))}
-
-            </tr></thead>
-
-            <tbody>
+            </tr></thead>          <tbody>
 
               {filtered.map((e, i) => {
 
@@ -11889,7 +11876,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     >
 
-                      ✕
+                      Close
 
                     </button>
 
@@ -12220,7 +12207,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
 
-                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Search’ Portal Access</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Search Portal Access</div>
 
                     <div style={{ position: 'relative', marginBottom: 4 }}>
 

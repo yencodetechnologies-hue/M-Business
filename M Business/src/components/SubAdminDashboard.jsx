@@ -8015,7 +8015,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  const handleLogout = () => { localStorage.removeItem("user"); setUser(null); };
+  const handleLogout = () => { localStorage.removeItem("user"); localStorage.removeItem("accounts"); setUser(null); setAccounts([]); };
 
   const handleAuthSetUser = (userData) => {
 
@@ -9440,7 +9440,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
               {validActive === "subadmins" && <button className="create-btn" onClick={() => { setNsError({}); setShowSubPass(false); setModal("subadmin"); }}><i className="ti ti-plus"></i> Add Partner</button>}
 
-              {validActive === "vendors" && <button className="create-btn" onClick={() => { setNvError({}); setModal("vendor_add"); }}><i className="ti ti-plus"></i> Add Vendor</button>}
+
 
 
 
@@ -10852,6 +10852,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     setActive("project-details");
                   }
 
+                }}
+
+                onAddEmployeeClick={() => {
+                  const limit = getSubscriptionLimit("employee", subscription);
+                  if (limit !== Infinity && employees.length >= limit) {
+                    setLimitModal({ type: "employee", limit });
+                    return;
+                  }
+                  setNeError({}); setModal("employee");
+                  fetchSubscription();
                 }}
 
               />

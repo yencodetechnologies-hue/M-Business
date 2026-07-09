@@ -176,6 +176,44 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   const [milestones, setMilestones] = useState(() => normalizeMilestones(editProject?.milestones));
   const [showAddEmployee, setShowAddEmployee] = useState(false);
   const [selectedEmpToAdd, setSelectedEmpToAdd] = useState('');
+  const [showQuickAddEmployee, setShowQuickAddEmployee] = useState(false);
+  const [quickEmpName, setQuickEmpName] = useState('');
+  const [quickEmpEmail, setQuickEmpEmail] = useState('');
+  const [quickEmpPassword, setQuickEmpPassword] = useState('');
+  const [quickEmpRole, setQuickEmpRole] = useState('');
+  const [quickAddSaving, setQuickAddSaving] = useState(false);
+  const [localEmployees, setLocalEmployees] = useState(employees);
+
+  useEffect(() => { setLocalEmployees(employees); }, [employees]);
+
+  const handleQuickAddEmployee = async () => {
+    if (!quickEmpName.trim() || !quickEmpEmail.trim() || !quickEmpPassword.trim()) {
+      return alert('Name, Email and Password are required.');
+    }
+    if (quickEmpPassword.trim().length < 4) {
+      return alert('Password must be at least 4 characters.');
+    }
+    setQuickAddSaving(true);
+    try {
+      const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+      const res = await axios.post(`${BASE_URL}/api/employees/add`, {
+        name: quickEmpName.trim(),
+        email: quickEmpEmail.trim(),
+        password: quickEmpPassword.trim(),
+        role: quickEmpRole.trim() || 'Employee',
+        companyId: currentUser.companyId || ''
+      });
+      const newEmp = res.data.employee;
+      setLocalEmployees(prev => [newEmp, ...prev]);
+      setSelectedEmpToAdd(newEmp.name || newEmp.employeeName || '');
+      setShowQuickAddEmployee(false);
+      setQuickEmpName(''); setQuickEmpEmail(''); setQuickEmpPassword(''); setQuickEmpRole('');
+    } catch (err) {
+      alert(err.response?.data?.msg || 'Failed to add employee');
+    } finally {
+      setQuickAddSaving(false);
+    }
+  };
   const [portalOpts, setPortalOpts] = useState(() => {
     const ps = editProject?.portalSettings || editProject?.portalOpts;
     if (!ps || typeof ps !== 'object') return { ...defaultPortalOpts };
@@ -277,7 +315,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
       // Fire-and-forget notifications (don't block on these)
       if (!editProject && assigned.length > 0) {
         assigned.forEach(empName => {
-          const emp = employees.find(e => (e.name || e.employeeName || "").toLowerCase() === empName.toLowerCase());
+          const emp = localEmployees.find(e => (e.name || e.employeeName || "").toLowerCase() === empName.toLowerCase());
           if (emp && (emp._id || emp.id)) {
             axios.post(`${BASE_URL}/api/notifications`, {
               userId: emp._id || emp.id,
@@ -495,7 +533,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
             {/* Already assigned members list */}
             <div className="mpc-team-selector">
 
-              {employees
+              {localEmployees
                 .filter(emp => assigned.includes(emp.name || emp.employeeName || ''))
                 .map(emp => {
                   const empName = emp.name || emp.employeeName || 'Unknown';
@@ -542,7 +580,6 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                   <div style={{ fontSize: 18, fontWeight: 800, color: P.textDark, marginBottom: 20 }}>
                     Add Team Member
                   </div>
-
                   <select
                     value={selectedEmpToAdd}
                     onChange={e => {
@@ -596,6 +633,8 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                       Add
                     </button>
                   </div>
+
+
                 </div>
               </div>
             )}

@@ -323,6 +323,35 @@ router.delete("/:id", async (req, res) => {
       console.error("Auto-delete ProjectStatus error:", err.message);
     }
 
+    // Cascade-delete all data linked to this project
+    try {
+      const Task = mongoose.models.Task;
+      if (Task) await Task.deleteMany({ projectId: project._id });
+    } catch (err) {
+      console.error("Cascade-delete Tasks error:", err.message);
+    }
+
+    try {
+      const Approval = mongoose.models.Approval;
+      if (Approval) await Approval.deleteMany({ projectId: String(project._id) });
+    } catch (err) {
+      console.error("Cascade-delete Approvals error:", err.message);
+    }
+
+    try {
+      const Invoice = mongoose.models.Invoice;
+      if (Invoice) await Invoice.deleteMany({ project: project.name, companyId });
+    } catch (err) {
+      console.error("Cascade-delete Invoices error:", err.message);
+    }
+
+    try {
+      const Event = mongoose.models.Event;
+      if (Event) await Event.deleteMany({ project: project.name, companyId });
+    } catch (err) {
+      console.error("Cascade-delete Events error:", err.message);
+    }
+
     res.json({ msg: "Project deleted" });
   } catch (err) {
     console.error("DELETE project error:", err.message);

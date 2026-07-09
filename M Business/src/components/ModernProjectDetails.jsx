@@ -984,6 +984,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
       const updatedUpdates = [newUpdate, ...(currProject.updates || [])];
 
+      setCurrProject(prev => ({ ...prev, updates: updatedUpdates }));
+
       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
         updates: updatedUpdates
       });
@@ -991,7 +993,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       setUpdateText('');
       setUpdateType('general');
       setComposerOpen(false);
-      loadLatest();
       if (onUpdate) onUpdate();
     } catch (err) {
       console.error("Failed to post update:", err);
@@ -1129,6 +1130,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         ));
       }
 
+      setCurrProject(prev => ({ ...prev, milestones: updatedMilestones }));
+
       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
         milestones: updatedMilestones
       });
@@ -1136,7 +1139,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       setEditingMilestoneIdx(null);
       setEditMilestoneName('');
       setEditMilestoneDate('');
-      loadLatest();
       if (onUpdate) onUpdate();
       if (fetchTasks) fetchTasks();
     } catch (err) {
@@ -1333,6 +1335,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         } catch (approvalErr) {
           console.error('Failed to create approval entry for update:', approvalErr);
         }
+      }
+      if (payload.updates) {
+        setCurrProject(prev => ({ ...prev, ...payload }));
       }
       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, payload);
       setShowUploadModal(false);
@@ -1834,8 +1839,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               const ms = (currProject.milestones || []).filter((_, i) => i !== idx);
                               const doneM = ms.filter(x => x.done).length;
                               const newProgress = ms.length > 0 ? Math.round((doneM / ms.length) * 100) : 0;
+                              setCurrProject(prev => ({ ...prev, milestones: ms, progress: newProgress }));
                               await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms, progress: newProgress });
-                              loadLatest();
                               if (onUpdate) onUpdate();
                               if (fetchTasks) fetchTasks();
                             } catch (err) { console.error('Failed to delete milestone:', err); }
@@ -1897,8 +1902,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                             const ms = (currProject.milestones || []).filter((_, i) => i !== idx);
                             const doneM = ms.filter(x => x.done).length;
                             const newProgress = ms.length > 0 ? Math.round((doneM / ms.length) * 100) : 0;
+                            setCurrProject(prev => ({ ...prev, milestones: ms, progress: newProgress }));
+                            setCurrTasks(prev => prev.filter(tk => !linkedTasks.some(lt => lt._id === tk._id)));
                             await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms, progress: newProgress });
-                            loadLatest();
                             if (onUpdate) onUpdate();
                             if (fetchTasks) fetchTasks();
                           } catch (err) { console.error('Failed to delete milestone:', err); }

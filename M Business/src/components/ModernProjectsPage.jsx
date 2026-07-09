@@ -665,56 +665,7 @@ export default function ModernProjectsPage({ user }) {
                 );
               })}
 
-              {/* ── ADD PROJECT CARD ── */}
-              <div
-                onClick={openCreate}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  height: '100%',
-                  minHeight: 320,
-                  border: '2.5px dashed  var(--app-accent, var(--app-accent, #00BCD4))',
-                  borderRadius: 16,
-                  background: '#fff',
-                  cursor: 'pointer',
-                  transition: 'all 0.22s',
-                  gap: 14,
-                  boxShadow: '0 2px 12px rgba(0,188,212,0.07)',
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = 'var(--teal-light, var(--teal-light, #E0F7FA))';
-                  e.currentTarget.style.transform = 'translateY(-4px)';
-                  e.currentTarget.style.boxShadow = '0 10px 32px rgba(0,188,212,0.18)';
-                  e.currentTarget.style.borderColor = '#0097A7';
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = '#fff';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,188,212,0.07)';
-                  e.currentTarget.style.borderColor = ' var(--app-accent, var(--app-accent, #00BCD4))';
-                }}
-              >
-                {/* Big plus circle */}
-                <div style={{
-                  width: 72, height: 72, borderRadius: '50%',
-                  background: 'linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097A7)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: '0 8px 24px rgba(0,188,212,0.38)',
-                  fontSize: 36, color: '#fff',
-                  fontWeight: 900,
-                  lineHeight: 1,
-                }}>
-                  +
-                </div>
-                <div style={{ fontSize: 16, fontWeight: 900, color: '#0097A7', marginTop: 4 }}>
-                  Add New Project
-                </div>
-                <div style={{ fontSize: 12, color: '#94A3B8', fontWeight: 600 }}>
-                  Click to create a new project
-                </div>
-              </div>
+
 
               {/* Empty state */}
               {filtered.length === 0 && !loading && (

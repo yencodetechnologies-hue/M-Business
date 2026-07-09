@@ -237,7 +237,18 @@ const res = await fetch(`/api/tasks?person=${encodeURIComponent(user.name)}`, {
                     <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
                       <div style={{ display: "flex", gap: 6 }}>
                         <button onClick={(ev) => { ev.stopPropagation(); setViewEmp(e); loadEmpDocs(e); }} style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "rgba(var(--app-accent-rgb,0,188,212),0.08)", color: "var(--app-accent)" }}><i className="ti ti-eye"></i></button>
-                        <button onClick={(ev) => { ev.stopPropagation(); openEdit(e); }} style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "#dbeafe", color: "#2563eb" }}><i className="ti ti-pencil"></i></button>
+                        <button
+                          type="button"
+                          onClick={(ev) => {
+                            ev.preventDefault();
+                            ev.stopPropagation();
+                            console.log("Edit clicked for employee:", e);
+                            openEdit(e);
+                          }}
+                          style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "#dbeafe", color: "#2563eb", position: "relative", zIndex: 5 }}
+                        >
+                          <i className="ti ti-pencil" style={{ pointerEvents: "none" }}></i>
+                        </button>
                         <button onClick={(ev) => { ev.stopPropagation(); setDeleteTarget(e); }} style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "#fee2e2", color: "#dc2626" }}><i className="ti ti-trash"></i></button>
                       </div>
                     </td>

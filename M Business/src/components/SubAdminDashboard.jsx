@@ -3237,67 +3237,7 @@ ${onboardingLink}`;
 
 
 
-      {editEmp && (
 
-        <Mdl title="Edit Employee" onClose={() => setEditEmp(null)}>
-
-          <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-
-            <Fld label="Full Name *" value={editForm.name} onChange={v => setEditForm(p => ({ ...p, name: v }))} error={editErr.name} />
-
-            <Fld label="Email *" value={editForm.email} onChange={v => { setEditForm(p => ({ ...p, email: v })); setEditErr(p => ({ ...p, email: "" })); }} type="email" error={editErr.email} />
-
-            <Fld label="Phone Number" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
-
-            <Fld label="Role / Position" value={editForm.role} onChange={v => setEditForm(p => ({ ...p, role: v }))} options={["Manager", "Developer", "Tech", "Others"]} />
-
-            <Fld label="Department" value={editForm.department} onChange={v => setEditForm(p => ({ ...p, department: v }))} />
-
-            <Fld label="Salary" value={editForm.salary} onChange={v => setEditForm(p => ({ ...p, salary: v }))} />
-
-            <Fld label="Date of Birth" value={editForm.dateOfBirth} onChange={v => setEditForm(p => ({ ...p, dateOfBirth: v }))} type="date" />
-
-            <Fld label="Joining Date" value={editForm.joiningDate} onChange={v => setEditForm(p => ({ ...p, joiningDate: v }))} type="date" />
-
-            <Fld label="Marital Status" value={editForm.maritalStatus} onChange={v => setEditForm(p => ({ ...p, maritalStatus: v }))} options={["Unmarried", "Married"]} />
-
-            <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Pending", "Approved", "Rejected"]} />
-
-          </div>
-
-          <Fld label="Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
-
-
-
-          <div style={{ marginTop: 14 }}>
-
-            <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
-
-            <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-
-              <Fld label="Bank Name" value={editForm.bankName} onChange={v => setEditForm(p => ({ ...p, bankName: v }))} />
-
-              <Fld label="IFSC Code" value={editForm.ifscCode} onChange={v => setEditForm(p => ({ ...p, ifscCode: v }))} />
-
-              <Fld label="Account Number" value={editForm.accountNumber} onChange={v => setEditForm(p => ({ ...p, accountNumber: v }))} />
-
-            </div>
-
-          </div>
-
-
-
-          <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
-
-            <button onClick={() => setEditEmp(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-
-            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes "}</button>
-
-          </div>
-
-        </Mdl>
-
-      )}
 
 
 
@@ -8487,6 +8427,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
     if (!ne.password.trim()) errors.password = "Password is required";
 
+    if (ne.password && ne.password.length < 4) errors.password = "Min 4 characters";
+
+    if (ne.password !== ne.confirmPassword) errors.confirmPassword = "Passwords do not match";
+
+    if (ne.password && ne.password.length < 4) errors.password = "Min 4 characters";
+
+    if (ne.password !== ne.confirmPassword) errors.confirmPassword = "Passwords do not match";
+
 
 
     // Subscription Limit Check - Fetch latest before check to catch admin updates
@@ -8550,9 +8498,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       setEmpSaveLoading(true);
 
+      const { confirmPassword, ...neWithoutConfirm } = ne;
+
       const payload = {
 
-        ...ne,
+        ...neWithoutConfirm,
 
         role: ne.role || "employee",
 
@@ -8576,7 +8526,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       setEmployees(prev => [res.data.employee, ...prev]);
 
-      setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Pending", password: "", dateOfBirth: "", maritalStatus: "", address: "", bankName: "", ifscCode: "", accountNumber: "" });
+      setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Pending", password: "", confirmPassword: "", dateOfBirth: "", maritalStatus: "", address: "", bankName: "", ifscCode: "", accountNumber: "" });
 
       setShowEmpPass(false);
 
@@ -12357,13 +12307,22 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
               </div>
 
-              <div style={{ marginBottom: 14 }}>
-                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
-                <div style={{ position: "relative" }}>
-                  <input type={showEmpPass ? "text" : "password"} value={ne.password} onChange={e => { setNe({ ...ne, password: e.target.value }); setNeError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set employee login password" />
-                  <button type="button" onClick={() => setShowEmpPass(!showEmpPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEmpPass ? "HIDE" : "SHOW"}</button>
+              <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
+                  <div style={{ position: "relative" }}>
+                    <input type={showEmpPass ? "text" : "password"} value={ne.password} onChange={e => { setNe({ ...ne, password: e.target.value }); setNeError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set employee login password" />
+                    <button type="button" onClick={() => setShowEmpPass(!showEmpPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEmpPass ? "HIDE" : "SHOW"}</button>
+                  </div>
+                  {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.password}</div>}
                 </div>
-                {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.password}</div>}
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CONFIRM PASSWORD *</label>
+                  <div style={{ position: "relative" }}>
+                    <input type={showEmpPass ? "text" : "password"} value={ne.confirmPassword || ""} onChange={e => { setNe({ ...ne, confirmPassword: e.target.value }); setNeError(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.confirmPassword ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter password" />
+                  </div>
+                  {neError.confirmPassword && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.confirmPassword}</div>}
+                </div>
               </div>
 
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6, flexWrap: "wrap" }}>

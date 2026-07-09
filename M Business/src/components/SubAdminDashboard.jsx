@@ -10588,7 +10588,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                             {/* SECONDARY CONTENT AREA */}
 
-                            <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "start", marginTop: 24 }}>
+                            <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "start", marginTop: 0 }}>
 
 
                               {/* LEFT COLUMN 2 */}
@@ -10924,15 +10924,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   await fetchProjects();
 
-                  if (sidebarOverride === "clients") {
-                    setSidebarOverride(null);
-                    setJumpProject(null);
-                    setActive("clients");
-                  } else {
-                    setJumpProject(saved);
-                    setFromEditProject(false);
-                    setActive("project-details");
-                  }
+                  setSidebarOverride(null);
+                  setJumpProject(saved);
+                  setFromEditProject(false);
+                  setActive("project-details");
 
                 }}
 

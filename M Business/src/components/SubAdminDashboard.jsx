@@ -3276,6 +3276,59 @@ ${onboardingLink}`;
 
 
 
+      {editEmp && editForm && (
+        <Mdl title="Edit Employee" onClose={() => setEditEmp(null)}>
+          <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+            <Fld label="Full Name *" value={editForm.name} onChange={v => setEditForm(p => ({ ...p, name: v }))} error={editErr.name} />
+            <Fld label="Email *" value={editForm.email} onChange={v => { setEditForm(p => ({ ...p, email: v })); setEditErr(p => ({ ...p, email: "" })); }} type="email" error={editErr.email} />
+            <Fld label="Phone Number" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
+            <Fld label="Role / Position" value={editForm.role} onChange={v => setEditForm(p => ({ ...p, role: v }))} options={["Manager", "Developer", "Tech", "Others"]} />
+            <Fld label="Department" value={editForm.department} onChange={v => setEditForm(p => ({ ...p, department: v }))} />
+            <Fld label="Salary" value={editForm.salary} onChange={v => setEditForm(p => ({ ...p, salary: v }))} />
+            <Fld label="Date of Birth" value={editForm.dateOfBirth} onChange={v => setEditForm(p => ({ ...p, dateOfBirth: v }))} type="date" />
+            <Fld label="Joining Date" value={editForm.joiningDate} onChange={v => setEditForm(p => ({ ...p, joiningDate: v }))} type="date" />
+            <Fld label="Marital Status" value={editForm.maritalStatus} onChange={v => setEditForm(p => ({ ...p, maritalStatus: v }))} options={["Unmarried", "Married"]} />
+            <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Pending", "Approved", "Rejected"]} />
+          </div>
+          <Fld label="Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
+
+          <div style={{ marginTop: 14 }}>
+            <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
+            <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+              <Fld label="Bank Name" value={editForm.bankName} onChange={v => setEditForm(p => ({ ...p, bankName: v }))} />
+              <Fld label="IFSC Code" value={editForm.ifscCode} onChange={v => setEditForm(p => ({ ...p, ifscCode: v }))} />
+              <Fld label="Account Number" value={editForm.accountNumber} onChange={v => setEditForm(p => ({ ...p, accountNumber: v }))} />
+              <Fld label="Branch Name" value={editForm.branchName} onChange={v => setEditForm(p => ({ ...p, branchName: v }))} />
+            </div>
+          </div>
+          <div style={{ marginTop: 14 }}>
+            <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🔒 CHANGE PASSWORD</div>
+            <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}> PASSWORD</label>
+                <div style={{ position: "relative" }}>
+                  <input type={showEditEmpPass ? "text" : "password"} value={editForm.password || ""} onChange={e => { setEditForm(p => ({ ...p, password: e.target.value })); setEditErr(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Leave blank to keep current password" />
+                  <button type="button" onClick={() => setShowEditEmpPass(!showEditEmpPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEditEmpPass ? "HIDE" : "SHOW"}</button>
+                </div>
+                {editErr.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {editErr.password}</div>}
+              </div>
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CONFIRM PASSWORD</label>
+                <div style={{ position: "relative" }}>
+                  <input type={showEditEmpPass ? "text" : "password"} value={editForm.confirmPassword || ""} onChange={e => { setEditForm(p => ({ ...p, confirmPassword: e.target.value })); setEditErr(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.confirmPassword ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter new password" />
+                </div>
+                {editErr.confirmPassword && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {editErr.confirmPassword}</div>}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
+            <button onClick={() => setEditEmp(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes "}</button>
+          </div>
+        </Mdl>
+      )}
+
       {deleteTarget && (
 
         <div style={{ position: "fixed", inset: 0, background: "rgba(15,28,46,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200, backdropFilter: "blur(4px)" }}>
@@ -5795,6 +5848,13 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, companyLogo, onLogoChange, enforceMySubscriptions, onLogoUploadClick, setSelectedProjectForTasks, desktopOpen }) {
   const items = navItems || NAV;
 
+  const [isDesktopWidth, setIsDesktopWidth] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 769);
+  useEffect(() => {
+    const onResize = () => setIsDesktopWidth(window.innerWidth >= 769);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
   const companyName = user?.companyName || "";
 
   const initials = (companyName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
@@ -5913,7 +5973,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
 
       {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 998, display: "block" }} className="mob-overlay" />}
 
-      <aside className={`sidebar ${open ? 'open' : ''}`} style={{ transform: `translateX(${(open || (typeof window !== 'undefined' && window.innerWidth >= 769 && desktopOpen)) ? '0' : (window.innerWidth >= 769 ? '-100%' : '-100%')})`, transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1)" }}>
+      <aside className={`sidebar ${open ? 'open' : ''}`} style={{ transform: `translateX(${(open || (isDesktopWidth && desktopOpen)) ? '0' : '-100%'})`, transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1)" }}>
 
 
 
@@ -6780,7 +6840,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(false);
+  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
 
   const [companyLogo, setCompanyLogo] = useState(user?.logoUrl ? user.logoUrl : (fixedLogo || null));
 
@@ -9251,8 +9311,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
         {/* Desktop Topbar (hamburger toggle) */}
         {!enforceMySubscriptions && (
-          <div className="desktop-topbar no-print" style={{ display: "none", alignItems: "center", padding: "12px 16px", background: "#fff", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 90 }}>
-            <button onClick={() => setDesktopSidebarOpen(v => !v)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)", padding: "2px 6px", lineHeight: 1 }}>☰</button>
+          <div className="desktop-topbar no-print" style={{ display: "none", alignItems: "flex-start", height: 68, padding: "16px 24px 0", background: "var(--app-bg)", position: "sticky", top: 0, zIndex: 90 }}>
+            <button onClick={() => setDesktopSidebarOpen(v => !v)} style={{ background: "none", border: "none", width: 38, height: 38, fontSize: 22, cursor: "pointer", color: "var(--app-muted)", display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1, marginTop: "60px" }}>☰</button>
           </div>
         )}
 
@@ -10528,8 +10588,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                             {/* SECONDARY CONTENT AREA */}
 
-
-                            <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "start", marginTop: "-12px" }}>
+                            <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "start", marginTop: 24 }}>
 
 
                               {/* LEFT COLUMN 2 */}

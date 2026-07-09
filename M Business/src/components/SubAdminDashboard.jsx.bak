@@ -569,7 +569,7 @@ function EmployeesPage({ employees, setEmployees }) {
   const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const openEdit = (e) => {
-    setEditForm({ name: e.name || "", email: e.email || "", phone: e.phone || "", role: e.role || "", department: e.department || "", salary: e.salary || "", status: e.status || "Active" });
+    setEditForm({ name: e.name || "", email: e.email || "", phone: e.phone || "", role: e.role || "", department: e.department || "", salary: e.salary || "", status: e.status || "Active", branchName: e.branchName || e.bankDetails?.branchName || "", password: "", confirmPassword: "" });
     setEditErr({});
     setEditEmp(e);
   };

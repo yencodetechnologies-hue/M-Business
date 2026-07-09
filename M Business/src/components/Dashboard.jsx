@@ -640,11 +640,36 @@ function EmployeesPage({ employees, setEmployees }) {
   const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const openEdit = (e) => {
-    setEditForm({ name: e.name || "", email: e.email || "", phone: e.phone || "", role: e.role || "", department: e.department || "", salary: e.salary || "", status: e.status || "Active" });
+    setEditForm({ name: e.name || "", email: e.email || "", phone: e.phone || "", role: e.role || "", department: e.department || "", salary: e.salary || "", status: e.status || "Active", branchName: e.branchName || e.bankDetails?.branchName || "", password: "", confirmPassword: "" });
     setEditErr({});
     setEditEmp(e);
   };
 
+  const saveEdit = async () => {
+    const errs = {};
+    if (!editForm.name?.trim()) errs.name = "Name required";
+    if (!editForm.email?.trim()) errs.email = "Email required";
+    if (editForm.password || editForm.confirmPassword) {
+      if (editForm.password.length < 6) errs.password = "Min 6 characters";
+      if (editForm.password !== editForm.confirmPassword) errs.confirmPassword = "Passwords do not match";
+    }
+    if (Object.keys(errs).length) { setEditErr(errs); return; }
+    try {
+      setSaving(true);
+      const payload = { ...editForm };
+      if (!payload.password) { delete payload.password; }
+      delete payload.confirmPassword;
+      const res = await axios.put(`${BASE_URL}/api/employees/${editEmp._id}`, payload);
+      const updated = { ...editEmp, ...(res.data || payload) };
+      setEmployees(prev => prev.map(e => e._id === editEmp._id ? updated : e));
+      setEditEmp(null);
+      showToast("Employee updated!");
+    } catch (err) {
+      showToast("Failed to update employee");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const doDelete = async () => {
     try {
@@ -785,6 +810,22 @@ function EmployeesPage({ employees, setEmployees }) {
             <Fld label="Department" value={editForm.department} onChange={v => setEditForm(p => ({ ...p, department: v }))} />
             <Fld label="Salary" value={editForm.salary} onChange={v => setEditForm(p => ({ ...p, salary: v }))} />
             <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Active", "Inactive"]} />
+            <Fld label="Branch Name" value={editForm.branchName} onChange={v => setEditForm(p => ({ ...p, branchName: v }))} />
+          </div>
+          <div style={{ marginTop: 14 }}>
+            <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>CHANGE PASSWORD (optional)</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD</label>
+                <input type="password" value={editForm.password || ""} onChange={e => { setEditForm(p => ({ ...p, password: e.target.value })); setEditErr(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Leave blank to keep current password" />
+                {editErr.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>{editErr.password}</div>}
+              </div>
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CONFIRM PASSWORD</label>
+                <input type="password" value={editForm.confirmPassword || ""} onChange={e => { setEditForm(p => ({ ...p, confirmPassword: e.target.value })); setEditErr(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.confirmPassword ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter new password" />
+                {editErr.confirmPassword && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>{editErr.confirmPassword}</div>}
+              </div>
+            </div>
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditEmp(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>

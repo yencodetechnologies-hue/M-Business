@@ -731,7 +731,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                           updateMilestone(idx, 'isCustom', false);
                         }
                       }}
-                      style={{ minWidth: 320, height: 46, fontSize: 15, padding: '10px 14px' }}
+                      style={isCustomMode ? { minWidth: 320, height: 46, fontSize: 15, padding: '10px 14px', display: 'none' } : { minWidth: 320, height: 46, fontSize: 15, padding: '10px 14px' }}
                     >
                       <option value="">Select milestone...</option>
                       {customMilestoneOptions.map(opt => (
@@ -739,34 +739,38 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                       ))}
                     </select>
                     {isCustomMode && (
-                      <div style={{ display: 'flex', gap: 8, marginTop: 6, alignItems: 'center' }}>
-                        <input
-                          type="text"
-                          placeholder="Enter custom milestone name"
-                          value={m.name}
-                          onChange={e => updateMilestone(idx, 'name', e.target.value)}
-                          style={{ flex: 1 }}
-                        />
-                        <button
-                          type="button"
-                          className="mpc-btn mpc-btn-outline"
-                          style={{ fontSize: 12, padding: '8px 16px', whiteSpace: 'nowrap' }}
-                          disabled={!m.name.trim()}
-                          onClick={() => {
+                      <input
+                        type="text"
+                        placeholder="Enter custom milestone name"
+                        value={m.name}
+                        autoFocus
+                        onChange={e => updateMilestone(idx, 'name', e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
                             const finalName = m.name.trim();
-                            updateMilestone(idx, 'name', finalName);
-                            updateMilestone(idx, 'isCustom', false);
+                            if (!finalName) return;
                             if (!customMilestoneOptions.includes(finalName)) {
                               setCustomMilestoneOptions(prev => [...prev, finalName]);
                             }
-                          }}
-                        >
-                          Add
-                        </button>
-                      </div>
+                            updateMilestone(idx, 'name', '');
+                            updateMilestone(idx, 'isCustom', false);
+                          }
+                        }}
+                        onBlur={() => {
+                          const finalName = m.name.trim();
+                          if (!finalName) return;
+                          if (!customMilestoneOptions.includes(finalName)) {
+                            setCustomMilestoneOptions(prev => [...prev, finalName]);
+                          }
+                          updateMilestone(idx, 'name', '');
+                          updateMilestone(idx, 'isCustom', false);
+                        }}
+                        style={{ minWidth: 320, height: 46, fontSize: 15, padding: '10px 14px', boxSizing: 'border-box' }}
+                      />
                     )}
                     <input type="date" value={m.date} onChange={e => updateMilestone(idx, 'date', e.target.value)} />
-                    <span className="mpc-remove-ms" onClick={() => removeMilestone(idx)}><i className="ti ti-trash" /></span>
+
                   </div>
                 );
               })}

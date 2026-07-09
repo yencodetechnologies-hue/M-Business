@@ -383,6 +383,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [newMilestoneName, setNewMilestoneName] = useState('');
   const [newMilestoneDate, setNewMilestoneDate] = useState('');
   const [showAddMilestone, setShowAddMilestone] = useState(false);
+  const [isCustomMilestoneMode, setIsCustomMilestoneMode] = useState(false);
   const [editingMilestoneIdx, setEditingMilestoneIdx] = useState(null);
   const [editMilestoneName, setEditMilestoneName] = useState('');
   const [editMilestoneDate, setEditMilestoneDate] = useState('');
@@ -1118,6 +1119,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
       setNewMilestoneName('');
       setNewMilestoneDate('');
+      setIsCustomMilestoneMode(false);
       setShowAddMilestone(false);
       loadLatest();
       if (onUpdate) onUpdate();
@@ -1967,21 +1969,42 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           {showAddMilestone && (
             <form onSubmit={handleAddMilestone} style={{ background: P.bg, padding: 14, borderRadius: 10, marginTop: 12 }}>
               <div style={{ marginBottom: 8 }}>
-                <select
-                  value={MILESTONE_OPTIONS.filter(o => o !== "Custom").includes(newMilestoneName) ? newMilestoneName : (newMilestoneName ? "Custom" : "")}
-                  onChange={e => {
-                    const val = e.target.value;
-                    setNewMilestoneName(val === "Custom" ? "" : val);
-                  }}
-                  style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', marginBottom: 8 }}
-                >
-                  <option value="">Select milestone...</option>
-                  {MILESTONE_OPTIONS.map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-                {(newMilestoneName === '' ? false : !MILESTONE_OPTIONS.filter(o => o !== "Custom").includes(newMilestoneName)) && (
-                  <input type="text" value={newMilestoneName} onChange={e => setNewMilestoneName(e.target.value)} placeholder="Enter custom milestone name" required style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', boxSizing: 'border-box' }} />
+                {!isCustomMilestoneMode ? (
+                  <select
+                    value={MILESTONE_OPTIONS.filter(o => o !== "Custom").includes(newMilestoneName) ? newMilestoneName : ""}
+                    onChange={e => {
+                      const val = e.target.value;
+                      if (val === "Custom") {
+                        setNewMilestoneName('');
+                        setIsCustomMilestoneMode(true);
+                      } else {
+                        setNewMilestoneName(val);
+                      }
+                    }}
+                    style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none' }}
+                  >
+                    <option value="">Select milestone...</option>
+                    {MILESTONE_OPTIONS.map(opt => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    value={newMilestoneName}
+                    autoFocus
+                    onChange={e => setNewMilestoneName(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (!newMilestoneName.trim()) return;
+                        setIsCustomMilestoneMode(false);
+                      }
+                    }}
+                    placeholder="Enter custom milestone name"
+                    required
+                    style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', boxSizing: 'border-box' }}
+                  />
                 )}
               </div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -2005,7 +2028,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 />
 
                 <button type="submit" className="mpd-btn mpd-btn-primary" style={{ padding: '6px 12px', fontSize: 11 }}>Add</button>
-                <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMilestone(false)} style={{ padding: '6px 12px', fontSize: 11 }}>✕</button>
+                <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => { setShowAddMilestone(false); setIsCustomMilestoneMode(false); }} style={{ padding: '6px 12px', fontSize: 11 }}>✕</button>
               </div>
             </form>
           )}

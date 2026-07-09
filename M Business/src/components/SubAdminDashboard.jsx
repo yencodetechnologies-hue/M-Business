@@ -2565,7 +2565,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
       if (!v) return "";
       try { return String(v).substring(0, 10); } catch { return ""; }
     };
-    setEditForm({
+    const formData = {
       name: emp.name || "",
       email: emp.email || "",
       phone: emp.phone || "",
@@ -2583,7 +2583,8 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
       branchName: emp.branchName || emp.bankDetails?.branchName || "",
       password: "",
       confirmPassword: ""
-    });
+    };
+    setEditForm(formData);
     setEditErr({});
     setEditEmp(emp);
   };
@@ -2854,7 +2855,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
         />
 
-        {editEmp && (
+        {editEmp && editForm && (
 
           <Mdl title="Edit Employee" onClose={() => setEditEmp(null)}>
 
@@ -3236,14 +3237,13 @@ ${onboardingLink}`;
                       <div style={{ display: "flex", gap: 6 }}>
 
                         <button onClick={(ev) => { ev.stopPropagation(); setViewEmp(e); loadEmpDocs(e); }} style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "rgba(var(--app-accent-rgb,0,188,212),0.08)", color: "var(--app-accent)" }}><i className="ti ti-eye"></i></button>
-
                         <button
                           type="button"
                           onClick={(ev) => {
                             ev.preventDefault();
                             ev.stopPropagation();
-                            console.log("Edit clicked for employee:", e);
-                            openEdit(e);
+                            const empData = employees.find(emp => (emp._id || emp.id) === (e._id || e.id)) || e;
+                            openEdit(empData);
                           }}
                           style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "#dbeafe", color: "#2563eb", position: "relative", zIndex: 5 }}
                         >

@@ -242,8 +242,8 @@ const res = await fetch(`/api/tasks?person=${encodeURIComponent(user.name)}`, {
                           onClick={(ev) => {
                             ev.preventDefault();
                             ev.stopPropagation();
-                            console.log("Edit clicked for employee:", e);
-                            openEdit(e);
+                            const empData = employees.find(emp => (emp._id || emp.id) === (e._id || e.id)) || e;
+                            openEdit(empData);
                           }}
                           style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "#dbeafe", color: "#2563eb", position: "relative", zIndex: 5 }}
                         >

@@ -2559,9 +2559,33 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
   const getInitials = (n) => n ? n.split(' ').map(x => x[0]).join('').toUpperCase().slice(0, 2) : "?";
 
-  const openEdit = (e) => {
-    setEditForm({ name: e.name || "", email: e.email || "", phone: e.phone || "", role: e.role || "Employee", department: e.department || "", salary: e.salary || "", dateOfBirth: e.dateOfBirth ? e.dateOfBirth.substring(0, 10) : "", joiningDate: e.joiningDate ? e.joiningDate.substring(0, 10) : "", maritalStatus: e.maritalStatus || "Unmarried", status: e.status || "Pending", address: e.address || "", bankName: e.bankName || e.bankDetails?.bankName || "", ifscCode: e.ifscCode || e.bankDetails?.ifscCode || "", accountNumber: e.accountNumber || e.bankDetails?.accountNumber || "", branchName: e.branchName || e.bankDetails?.branchName || "", password: "", confirmPassword: "" });
-    setEditErr({}); setEditEmp(e);
+  const openEdit = (emp) => {
+    if (!emp) return;
+    const safeDate = (v) => {
+      if (!v) return "";
+      try { return String(v).substring(0, 10); } catch { return ""; }
+    };
+    setEditForm({
+      name: emp.name || "",
+      email: emp.email || "",
+      phone: emp.phone || "",
+      role: emp.role || "Employee",
+      department: emp.department || "",
+      salary: emp.salary || "",
+      dateOfBirth: safeDate(emp.dateOfBirth),
+      joiningDate: safeDate(emp.joiningDate),
+      maritalStatus: emp.maritalStatus || "Unmarried",
+      status: emp.status || "Pending",
+      address: emp.address || "",
+      bankName: emp.bankName || emp.bankDetails?.bankName || "",
+      ifscCode: emp.ifscCode || emp.bankDetails?.ifscCode || "",
+      accountNumber: emp.accountNumber || emp.bankDetails?.accountNumber || "",
+      branchName: emp.branchName || emp.bankDetails?.branchName || "",
+      password: "",
+      confirmPassword: ""
+    });
+    setEditErr({});
+    setEditEmp(emp);
   };
   const saveEdit = async () => {
 

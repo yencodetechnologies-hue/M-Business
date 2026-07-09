@@ -442,7 +442,7 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
               {success && <Alert type="success" msg={success} />}
               {error && <Alert type="error" msg={error} />}
 
-              <Field label="EMail" err={loginErr.email}>
+              <Field label="Email" err={loginErr.email}>
                 <div style={{ position: "relative" }}>
                   <input type="email" value={loginData.email}
                     onChange={e => { setLoginData(p => ({ ...p, email: e.target.value })); setLoginErr(p => ({ ...p, email: "" })); }}

@@ -5817,8 +5817,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
 
 
-function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, companyLogo, onLogoChange, enforceMySubscriptions, onLogoUploadClick, setSelectedProjectForTasks }) {
-
+function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, companyLogo, onLogoChange, enforceMySubscriptions, onLogoUploadClick, setSelectedProjectForTasks, desktopOpen }) {
   const items = navItems || NAV;
 
   const companyName = user?.companyName || "";
@@ -5939,7 +5938,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
 
       {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 998, display: "block" }} className="mob-overlay" />}
 
-      <aside className={`sidebar ${open ? 'open' : ''}`} style={{ transform: open ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1)" }}>
+      <aside className={`sidebar ${open ? 'open' : ''}`} style={{ transform: `translateX(${(open || (typeof window !== 'undefined' && window.innerWidth >= 769 && desktopOpen)) ? '0' : (window.innerWidth >= 769 ? '-100%' : '-100%')})`, transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1)" }}>
 
 
 
@@ -6040,8 +6039,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
 
       </aside>
 
-      <div className="sidebar-spacer" style={{ width: 210, minWidth: 210, flexShrink: 0 }} />
-
+      <div className="sidebar-spacer" style={{ width: desktopOpen ? 210 : 0, minWidth: desktopOpen ? 210 : 0, flexShrink: 0, transition: "width 0.28s ease, min-width 0.28s ease" }} />
     </>
 
   );
@@ -6806,6 +6804,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [accountAuthTab, setAccountAuthTab] = useState("register");
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
 
   const [companyLogo, setCompanyLogo] = useState(user?.logoUrl ? user.logoUrl : (fixedLogo || null));
 
@@ -9192,7 +9192,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
         button,input,select,textarea{font-family:inherit}
 
-        @media(min-width:769px){.sidebar{transform:translateX(0)!important;position:sticky!important;top:0!important;}.sidebar-close{display:none!important;}.mob-overlay{display:none!important;}.mob-topbar{display:none!important;}.sidebar-spacer{display:none!important;}}
+@media(min-width:769px){.sidebar{position:sticky!important;top:0!important;}.sidebar-close{display:none!important;}.mob-overlay{display:none!important;}.mob-topbar{display:none!important;}.sidebar-spacer{display:none!important;}.desktop-topbar{display:flex!important;}}
+@media(max-width:768px){.desktop-topbar{display:none!important;}}
 
         @media(max-width:768px){.sidebar-spacer{display:none!important;}.mob-topbar-hide{display:none!important;}.main-content{padding:12px!important;}.dash-stats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}.dash-2col{grid-template-columns:1fr!important;}.modal-2col{grid-template-columns:1fr!important;}.page-header{flex-wrap:wrap;gap:8px;}.header-actions{flex-wrap:wrap;gap:8px;}}
 
@@ -9215,41 +9216,24 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       {!enforceMySubscriptions && (
 
         <div className="no-print" style={{ display: "contents" }}>
-
           <Sidebar
-
             user={user}
-
             active={
-
               sidebarOverride ? sidebarOverride :
-
                 ["projects", "edit-project", "project-details"].includes(validActive) ? "projects" :
-
                   validActive
-
             }
-
             setActive={(val) => { setSidebarOverride(null); setActive(val); }}
-
             onLogout={handleLogout}
-
             open={sidebarOpen}
-
             onClose={() => setSidebarOpen(false)}
-
             navItems={navItems}
-
             companyLogo={companyLogo}
-
             onLogoChange={onLogoChange}
-
             enforceMySubscriptions={enforceMySubscriptions}
-
             onLogoUploadClick={() => headerLogoRef.current?.click()}
-
             setSelectedProjectForTasks={setSelectedProjectForTasks}
-
+            desktopOpen={desktopSidebarOpen}
           />
 
         </div>
@@ -9279,6 +9263,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
+
+        {/* Desktop Topbar (hamburger toggle) */}
+        {!enforceMySubscriptions && (
+          <div className="desktop-topbar no-print" style={{ display: "none", alignItems: "center", padding: "12px 16px", background: "#fff", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 90 }}>
+            <button onClick={() => setDesktopSidebarOpen(v => !v)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)", padding: "2px 6px", lineHeight: 1 }}>☰</button>
+          </div>
+        )}
 
         {/* Mobile Topbar */}
 

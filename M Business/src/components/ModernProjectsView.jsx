@@ -589,7 +589,6 @@ export default function ModernProjectsView({
               </div>
             );
           })}
-
         </div>
       )}
 

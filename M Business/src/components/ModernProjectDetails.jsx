@@ -4,6 +4,35 @@ import { BASE_URL } from '../config';
 import ModernEmployeeProjectDetails from './ModernEmployeeProjectDetails';
 import ProjectPaymentModals from './ProjectPaymentModals';
 
+const MILESTONE_OPTIONS = [
+  "Custom",
+  "Project Kickoff",
+  "Requirement Gathering",
+  "Scope Approval",
+  "Design Approval",
+  "UI/UX Completion",
+  "Prototype Approval",
+  "Development Started",
+  "Development Completed",
+  "Internal Testing",
+  "QA Testing",
+  "UAT (User Acceptance Testing)",
+  "Bug Fixes Completed",
+  "Client Review",
+  "Client Approval",
+  "Security Testing",
+  "Performance Testing",
+  "Documentation Completed",
+  "Training Completed",
+  "Deployment to Staging",
+  "Deployment to Production",
+  "Go-Live",
+  "Project Handover",
+  "Warranty Support Started",
+  "Warranty Support Completed",
+  "Project Closure"
+];
+
 // ── Shared Colors ──
 const P = {
   primary: ' var(--app-accent, var(--app-accent, #00BCD4))', primaryDark: '#0097A7', primaryLight: 'var(--teal-light, var(--teal-light, #E0F7FA))', primaryMid: '#B2EBF2',
@@ -1938,7 +1967,22 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           {showAddMilestone && (
             <form onSubmit={handleAddMilestone} style={{ background: P.bg, padding: 14, borderRadius: 10, marginTop: 12 }}>
               <div style={{ marginBottom: 8 }}>
-                <input type="text" value={newMilestoneName} onChange={e => setNewMilestoneName(e.target.value)} placeholder="Milestone name..." required style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none' }} />
+                <select
+                  value={MILESTONE_OPTIONS.filter(o => o !== "Custom").includes(newMilestoneName) ? newMilestoneName : (newMilestoneName ? "Custom" : "")}
+                  onChange={e => {
+                    const val = e.target.value;
+                    setNewMilestoneName(val === "Custom" ? "" : val);
+                  }}
+                  style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', marginBottom: 8 }}
+                >
+                  <option value="">Select milestone...</option>
+                  {MILESTONE_OPTIONS.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+                {(newMilestoneName === '' ? false : !MILESTONE_OPTIONS.filter(o => o !== "Custom").includes(newMilestoneName)) && (
+                  <input type="text" value={newMilestoneName} onChange={e => setNewMilestoneName(e.target.value)} placeholder="Enter custom milestone name" required style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', boxSizing: 'border-box' }} />
+                )}
               </div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 <input

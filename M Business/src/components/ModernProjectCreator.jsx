@@ -105,6 +105,7 @@ function getAvatarColor(name) {
   return colors[name.charCodeAt(0) % colors.length];
 }
 const MILESTONE_OPTIONS = [
+  "Custom",
   "Project Kickoff",
   "Requirement Gathering",
   "Scope Approval",
@@ -129,8 +130,7 @@ const MILESTONE_OPTIONS = [
   "Project Handover",
   "Warranty Support Started",
   "Warranty Support Completed",
-  "Project Closure",
-  "Custom"
+  "Project Closure"
 ];
 export default function ModernProjectCreator({ onBack, clients = [], employees = [], onSuccess, editProject, prefillClient, onAddEmployeeClick }) {
   const [loading, setLoading] = useState(false);
@@ -202,6 +202,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   };
 
   const [milestones, setMilestones] = useState(() => normalizeMilestones(editProject?.milestones));
+  const [customMilestoneOptions, setCustomMilestoneOptions] = useState(() => MILESTONE_OPTIONS);
   const [showAddEmployee, setShowAddEmployee] = useState(false);
   const [selectedEmpToAdd, setSelectedEmpToAdd] = useState('');
   const [showQuickAddEmployee, setShowQuickAddEmployee] = useState(false);
@@ -711,9 +712,10 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
             <div className="mpc-section-heading"><i className="ti ti-flag" /> Milestones</div>
             <div className="mpc-milestone-list">
               {milestones.map((m, idx) => {
-                const isPredefinedValue = MILESTONE_OPTIONS.includes(m.name) && m.name !== "Custom";
-                const isCustomMode = m.isCustom || (m.name !== "" && !isPredefinedValue);
-                const selectValue = isCustomMode ? "Custom" : (isPredefinedValue ? m.name : "");
+                const isPredefinedValue = customMilestoneOptions.includes(m.name) && m.name !== "Custom";
+                const isCustomMode = m.isCustom === true;
+                const isFinalizedCustom = !isCustomMode && m.name !== "" && !isPredefinedValue;
+                const selectValue = isCustomMode ? "Custom" : (isPredefinedValue || isFinalizedCustom ? m.name : "");
                 return (
                   <div key={idx} className="mpc-milestone-row">
                     <select
@@ -730,18 +732,36 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                       }}
                     >
                       <option value="">Select milestone...</option>
-                      {MILESTONE_OPTIONS.map(opt => (
+                      {customMilestoneOptions.map(opt => (
                         <option key={opt} value={opt}>{opt}</option>
                       ))}
                     </select>
                     {isCustomMode && (
-                      <input
-                        type="text"
-                        placeholder="Enter custom milestone name"
-                        value={m.name}
-                        onChange={e => updateMilestone(idx, 'name', e.target.value)}
-                        style={{ marginTop: 6 }}
-                      />
+                      <div style={{ display: 'flex', gap: 8, marginTop: 6, alignItems: 'center' }}>
+                        <input
+                          type="text"
+                          placeholder="Enter custom milestone name"
+                          value={m.name}
+                          onChange={e => updateMilestone(idx, 'name', e.target.value)}
+                          style={{ flex: 1 }}
+                        />
+                        <button
+                          type="button"
+                          className="mpc-btn mpc-btn-outline"
+                          style={{ fontSize: 12, padding: '8px 16px', whiteSpace: 'nowrap' }}
+                          disabled={!m.name.trim()}
+                          onClick={() => {
+                            const finalName = m.name.trim();
+                            updateMilestone(idx, 'name', finalName);
+                            updateMilestone(idx, 'isCustom', false);
+                            if (!customMilestoneOptions.includes(finalName)) {
+                              setCustomMilestoneOptions(prev => [...prev, finalName]);
+                            }
+                          }}
+                        >
+                          Add
+                        </button>
+                      </div>
                     )}
                     <input type="date" value={m.date} onChange={e => updateMilestone(idx, 'date', e.target.value)} />
                     <span className="mpc-remove-ms" onClick={() => removeMilestone(idx)}><i className="ti ti-trash" /></span>

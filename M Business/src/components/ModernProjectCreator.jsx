@@ -203,6 +203,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
 
   const [milestones, setMilestones] = useState(() => normalizeMilestones(editProject?.milestones));
   const [customMilestoneOptions, setCustomMilestoneOptions] = useState(() => MILESTONE_OPTIONS);
+
   const [showAddEmployee, setShowAddEmployee] = useState(false);
   const [selectedEmpToAdd, setSelectedEmpToAdd] = useState('');
   const [showQuickAddEmployee, setShowQuickAddEmployee] = useState(false);

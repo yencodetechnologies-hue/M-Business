@@ -133,7 +133,11 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
   const submitForm = async () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = 'Client / display name is required';
+    if (!formData.company.trim()) newErrors.company = 'Company name is required';
     if (!formData.email.trim()) newErrors.email = 'Email address is required';
+    if (!formData.contactPersonName.trim()) newErrors.contactPersonName = 'Contact person name is required';
+    if (!formData.phone.trim()) newErrors.phone = 'Office phone is required';
+    if (!formData.address.trim()) newErrors.address = 'Address is required';
     if (formData.password && formData.password !== confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
@@ -141,6 +145,18 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       toast.error('Please fill in all required fields correctly.');
+      // Scroll to and focus the first field with an error, in form order
+      const fieldOrder = ['name', 'company', 'email', 'contactPersonName', 'phone', 'address', 'confirmPassword'];
+      const firstErrorField = fieldOrder.find(f => newErrors[f]);
+      if (firstErrorField) {
+        setTimeout(() => {
+          const el = document.querySelector(`[name="${firstErrorField}"]`);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.focus();
+          }
+        }, 50);
+      }
       return;
     }
 
@@ -176,7 +192,8 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
         creditLimit: formData.creditLimit,
         PaymentMode: formData.PaymentMode,
         internalNotes: formData.notes,
-        sendCredentials: !isEdit && !!formData.sendCredentials
+        sendCredentials: !isEdit && !!formData.sendCredentials,
+        companyId: user?.companyId || user?.company || user?._id || user?.id || ""
       };
 
       if (isEdit) {
@@ -279,10 +296,12 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Client / display name <span style={{ color: '#EF5350' }}>*</span></label>
                   <input name="name" value={formData.name} onChange={handleChange} placeholder="e.g. Acme Corp or Raj Kumar" style={{ width: '100%', height: 42, padding: '0 14px', border: `1.5px solid ${errors.name ? '#EF5350' : '#E0E6EA'}`, borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} />
+                  {errors.name && <div style={{ fontSize: 11, color: '#EF5350', marginTop: 4 }}>{errors.name}</div>}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Company name </label>
-                  <input name="company" value={formData.company} onChange={handleChange} placeholder="Registered company name" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} />
+                  <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Company name <span style={{ color: '#EF5350' }}>*</span></label>
+                  <input name="company" value={formData.company} onChange={handleChange} placeholder="Registered company name" style={{ width: '100%', height: 42, padding: '0 14px', border: `1.5px solid ${errors.company ? '#EF5350' : '#E0E6EA'}`, borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} />
+                  {errors.company && <div style={{ fontSize: 11, color: '#EF5350', marginTop: 4 }}>{errors.company}</div>}
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -352,12 +371,12 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
 
             </div>
             <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Contact person name</label><input name="contactPersonName" value={formData.contactPersonName} onChange={handleChange} placeholder="Full name" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Contact person name <span style={{ color: '#EF5350' }}>*</span></label><input name="contactPersonName" value={formData.contactPersonName} onChange={handleChange} placeholder="Full name" style={{ width: '100%', height: 42, padding: '0 14px', border: `1.5px solid ${errors.contactPersonName ? '#EF5350' : '#E0E6EA'}`, borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} />{errors.contactPersonName && <div style={{ fontSize: 11, color: '#EF5350', marginTop: 4 }}>{errors.contactPersonName}</div>}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Designation</label><input name="designation" value={formData.designation} onChange={handleChange} placeholder="e.g. CEO, Project Manager" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Email address <span style={{ color: '#EF5350' }}>*</span></label><input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="contact@company.com" style={{ width: '100%', height: 42, padding: '0 14px', border: `1.5px solid ${errors.email ? '#EF5350' : '#E0E6EA'}`, borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Alt. email</label><input type="email" name="altEmail" value={formData.altEmail} onChange={handleChange} placeholder="Secondary email" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Contact person mobile</label><input name="contactPersonNo" value={formData.contactPersonNo} onChange={handleChange} placeholder="+91 98765 43210" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Office phone</label><input name="phone" value={formData.phone} onChange={handleChange} placeholder="+91 44 1234 5678" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Office phone <span style={{ color: '#EF5350' }}>*</span></label><input name="phone" value={formData.phone} onChange={handleChange} placeholder="+91 44 1234 5678" style={{ width: '100%', height: 42, padding: '0 14px', border: `1.5px solid ${errors.phone ? '#EF5350' : '#E0E6EA'}`, borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} />{errors.phone && <div style={{ fontSize: 11, color: '#EF5350', marginTop: 4 }}>{errors.phone}</div>}</div>
             </div>
           </div>
 
@@ -368,7 +387,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Address</div><div style={{ fontSize: 12, color: '#94A3B0' }}>Billing and office location</div></div>
             </div>
             <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-              <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Street / building address</label><input name="address" value={formData.address} onChange={handleChange} placeholder="Flat no, building name, street" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
+              <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Street / building address <span style={{ color: '#EF5350' }}>*</span></label><input name="address" value={formData.address} onChange={handleChange} placeholder="Flat no, building name, street" style={{ width: '100%', height: 42, padding: '0 14px', border: `1.5px solid ${errors.address ? '#EF5350' : '#E0E6EA'}`, borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} />{errors.address && <div style={{ fontSize: 11, color: '#EF5350', marginTop: 4 }}>{errors.address}</div>}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>City</label><input name="city" value={formData.city} onChange={handleChange} placeholder="Chennai" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>State / province</label><input name="state" value={formData.state} onChange={handleChange} placeholder="Tamil Nadu" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pincode / ZIP</label><input name="pincode" value={formData.pincode} onChange={handleChange} placeholder="600001" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>

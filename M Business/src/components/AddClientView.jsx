@@ -47,13 +47,13 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
     city: editData?.city || '',
     state: editData?.state || '',
     pincode: editData?.pincode || '',
-    country: editData?.country || 'India',
+    country: editData?.country || '',
     website: editData?.websiteUrl || editData?.website || '',
     linkedin: editData?.linkedinUrl || editData?.linkedin || '',
-    billingCurrency: editData?.billingCurrency || 'INR — Indian Rupee',
+    billingCurrency: editData?.billingCurrency || '',
     paymentTerms: editData?.paymentTerms || '',
     creditLimit: editData?.creditLimit || '',
-    preferredPaymentMode: editData?.preferredPaymentMode || '',
+    PaymentMode: editData?.PaymentMode || '',
     password: '',
     notes: editData?.internalNotes || editData?.notes || '',
     logoUrl: editData?.logoUrl || '',
@@ -73,7 +73,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
     source: false,
     country: false,
     paymentTerms: false,
-    preferredPaymentMode: false,
+    PaymentMode: false,
     billingCurrency: false
   });
 
@@ -92,7 +92,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
         source: (editData.clientSource || editData.source) && !predefinedSources.includes(editData.clientSource || editData.source),
         country: editData.country && !predefinedCountries.includes(editData.country),
         paymentTerms: editData.paymentTerms && !predefinedTerms.includes(editData.paymentTerms),
-        preferredPaymentMode: editData.preferredPaymentMode && !predefinedModes.includes(editData.preferredPaymentMode)
+        PaymentMode: editData.PaymentMode && !predefinedModes.includes(editData.PaymentMode)
       });
     }
   }, [isEdit, editData]);
@@ -174,7 +174,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
         billingCurrency: formData.billingCurrency,
         paymentTerms: formData.paymentTerms,
         creditLimit: formData.creditLimit,
-        preferredPaymentMode: formData.preferredPaymentMode,
+        PaymentMode: formData.PaymentMode,
         internalNotes: formData.notes,
         sendCredentials: !isEdit && !!formData.sendCredentials
       };
@@ -272,7 +272,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                   <input name="name" value={formData.name} onChange={handleChange} placeholder="e.g. Acme Corp or Raj Kumar" style={{ width: '100%', height: 42, padding: '0 14px', border: `1.5px solid ${errors.name ? '#EF5350' : '#E0E6EA'}`, borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-
+                  <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Company name </label>
                   <input name="company" value={formData.company} onChange={handleChange} placeholder="Registered company name" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} />
                 </div>
 
@@ -286,12 +286,12 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                   ) : (
                     <select name="category" value={formData.category} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
                       <option value="">Select a category</option>
+                      <option value="__custom__">+ Custom</option>
                       <option value="Web Development">Web Development</option><option value="Mobile App Development">Mobile App Development</option><option value="UI/UX Design">UI/UX Design</option><option value="Digital Marketing">Digital Marketing</option><option value="IT Consulting">IT Consulting</option><option value="E-commerce">E-commerce</option><option value="Healthcare">Healthcare</option><option value="Education">Education</option><option value="Finance">Finance</option><option value="Real Estate">Real Estate</option><option value="Manufacturing">Manufacturing</option><option value="Retail">Retail</option><option value="Logistics">Logistics</option><option value="Media & Entertainment">Media & Entertainment</option>
                       {customCats.map(c => <option key={c} value={c}>{c}</option>)}
                       {formData.category && !['Web Development', 'Mobile App Development', 'UI/UX Design', 'Digital Marketing', 'IT Consulting', 'E-commerce', 'Healthcare', 'Education', 'Finance', 'Real Estate', 'Manufacturing', 'Retail', 'Logistics', 'Media & Entertainment'].includes(formData.category) && !customCats.includes(formData.category) && (
                         <option value={formData.category}>{formData.category}</option>
                       )}
-                      <option value="__custom__">+ Custom</option>
                     </select>
                   )}
                 </div>
@@ -309,13 +309,13 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                     </div>
                   ) : (
                     <select name="source" value={formData.source} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
-                      <option value="">How did they find you?</option>
+                      <option value="">Select Client Source</option>
+                      <option value="__custom__">+ Custom</option>
                       <option value="Referral">Referral</option><option value="Website / Organic">Website / Organic</option><option value="Social Media">Social Media</option><option value="Cold Outreach">Cold Outreach</option><option value="LinkedIn">LinkedIn</option><option value="Event / Conference">Event / Conference</option><option value="Google Ads">Google Ads</option><option value="Word of Mouth">Word of Mouth</option>
                       {customSources.map(s => <option key={s} value={s}>{s}</option>)}
                       {formData.source && !['Referral', 'Website / Organic', 'Social Media', 'Cold Outreach', 'LinkedIn', 'Event / Conference', 'Google Ads', 'Word of Mouth'].includes(formData.source) && !customSources.includes(formData.source) && (
                         <option value={formData.source}>{formData.source}</option>
                       )}
-                      <option value="__custom__">+ Custom</option>
                     </select>
                   )}
                 </div>
@@ -372,12 +372,13 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                   </div>
                 ) : (
                   <select name="country" value={formData.country} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
-                    <option>India</option><option>United States</option><option>United Kingdom</option><option>United Arab Emirates</option><option>Singapore</option><option>Australia</option><option>Canada</option><option>Germany</option><option>France</option>
+                    <option value="">Select Country</option>
+                    <option value="__custom__">+ Custom</option>
+                    <option value="India">India</option><option value="United States">United States</option><option value="United Kingdom">United Kingdom</option><option value="United Arab Emirates">United Arab Emirates</option><option value="Singapore">Singapore</option><option value="Australia">Australia</option><option value="Canada">Canada</option><option value="Germany">Germany</option><option value="France">France</option>
                     {customCountries.map(c => <option key={c} value={c}>{c}</option>)}
                     {formData.country && !['India', 'United States', 'United Kingdom', 'United Arab Emirates', 'Singapore', 'Australia', 'Canada', 'Germany', 'France'].includes(formData.country) && !customCountries.includes(formData.country) && (
                       <option value={formData.country}>{formData.country}</option>
                     )}
-                    <option value="__custom__">Custom</option>
                   </select>
                 )}
               </div>
@@ -412,12 +413,13 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                   </div>
                 ) : (
                   <select name="billingCurrency" value={formData.billingCurrency} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
-                    <option>INR — Indian Rupee</option><option>USD — US Dollar</option><option>GBP — British Pound</option><option>EUR — Euro</option><option>AED — UAE Dirham</option><option>SGD — Singapore Dollar</option><option>AUD — Australian Dollar</option>
+                    <option value="">Select Billing Currency</option>
+                    <option value="__custom__">+ Custom</option>
+                    <option value="INR — Indian Rupee">INR — Indian Rupee</option><option value="USD — US Dollar">USD — US Dollar</option><option value="GBP — British Pound">GBP — British Pound</option><option value="EUR — Euro">EUR — Euro</option><option value="AED — UAE Dirham">AED — UAE Dirham</option><option value="SGD — Singapore Dollar">SGD — Singapore Dollar</option><option value="AUD — Australian Dollar">AUD — Australian Dollar</option>
                     {customCurrencies.map(c => <option key={c} value={c}>{c}</option>)}
                     {formData.billingCurrency && !['INR — Indian Rupee', 'USD — US Dollar', 'GBP — British Pound', 'EUR — Euro', 'AED — UAE Dirham', 'SGD — Singapore Dollar', 'AUD — Australian Dollar'].includes(formData.billingCurrency) && !customCurrencies.includes(formData.billingCurrency) && (
                       <option value={formData.billingCurrency}>{formData.billingCurrency}</option>
                     )}
-                    <option value="__custom__">Custom</option>
                   </select>
                 )}
               </div>
@@ -430,31 +432,33 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                   </div>
                 ) : (
                   <select name="paymentTerms" value={formData.paymentTerms} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
-                    <option value="">Select terms</option><option>Due on receipt</option><option>Net 7</option><option>Net 15</option><option>Net 30</option><option>Net 45</option><option>Net 60</option><option>50% Advance + 50% on delivery</option>
+                    <option value="">Select Payment Terms</option>
+                    <option value="__custom__">+ Custom</option>
+                    <option value="Due on receipt">Due on receipt</option><option value="Net 7">Net 7</option><option value="Net 15">Net 15</option><option value="Net 30">Net 30</option><option value="Net 45">Net 45</option><option value="Net 60">Net 60</option><option value="50% Advance + 50% on delivery">50% Advance + 50% on delivery</option>
                     {customPaymentTerms.map(t => <option key={t} value={t}>{t}</option>)}
                     {formData.paymentTerms && !['Due on receipt', 'Net 7', 'Net 15', 'Net 30', 'Net 45', 'Net 60', '50% Advance + 50% on delivery'].includes(formData.paymentTerms) && !customPaymentTerms.includes(formData.paymentTerms) && (
                       <option value={formData.paymentTerms}>{formData.paymentTerms}</option>
                     )}
-                    <option value="__custom__">Custom</option>
                   </select>
                 )}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Credit limit</label><input type="number" name="creditLimit" value={formData.creditLimit} onChange={handleChange} placeholder="e.g. 50000" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Preferred payment mode</label>
-                {customInputMode.preferredPaymentMode ? (
+                <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Payment mode</label>
+                {customInputMode.PaymentMode ? (
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <input name="preferredPaymentMode" value={formData.preferredPaymentMode} onChange={handleChange} placeholder="Type custom mode..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.preferredPaymentMode) { setCustomPaymentModes(prev => { const next = Array.from(new Set([...prev, formData.preferredPaymentMode])); try { localStorage.setItem('mb_customPaymentModes', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, preferredPaymentMode: false })); } }} />
-                    <button type="button" onClick={() => { if (formData.preferredPaymentMode) { setCustomPaymentModes(prev => { const next = Array.from(new Set([...prev, formData.preferredPaymentMode])); try { localStorage.setItem('mb_customPaymentModes', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, preferredPaymentMode: false })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</button>
+                    <input name="PaymentMode" value={formData.PaymentMode} onChange={handleChange} placeholder="Type custom mode..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.PaymentMode) { setCustomPaymentModes(prev => { const next = Array.from(new Set([...prev, formData.PaymentMode])); try { localStorage.setItem('mb_customPaymentModes', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, PaymentMode: false })); } }} />
+                    <button type="button" onClick={() => { if (formData.PaymentMode) { setCustomPaymentModes(prev => { const next = Array.from(new Set([...prev, formData.PaymentMode])); try { localStorage.setItem('mb_customPaymentModes', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, PaymentMode: false })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</button>
                   </div>
                 ) : (
-                  <select name="preferredPaymentMode" value={formData.preferredPaymentMode} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
-                    <option value="">Select mode</option><option>Bank Transfer / NEFT</option><option>UPI</option><option>Cheque</option><option>Credit Card</option><option>Cash</option><option>PayPal</option><option>Stripe</option>
+                  <select name="PaymentMode" value={formData.PaymentMode} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
+                    <option value="">Select Payment Mode</option>
+                    <option value="__custom__">+ Custom</option>
+                    <option value="Bank Transfer / NEFT">Bank Transfer / NEFT</option><option value="UPI">UPI</option><option value="Cheque">Cheque</option><option value="Credit Card">Credit Card</option><option value="Cash">Cash</option><option value="PayPal">PayPal</option><option value="Stripe">Stripe</option>
                     {customPaymentModes.map(m => <option key={m} value={m}>{m}</option>)}
-                    {formData.preferredPaymentMode && !['Bank Transfer / NEFT', 'UPI', 'Cheque', 'Credit Card', 'Cash', 'PayPal', 'Stripe'].includes(formData.preferredPaymentMode) && !customPaymentModes.includes(formData.preferredPaymentMode) && (
-                      <option value={formData.preferredPaymentMode}>{formData.preferredPaymentMode}</option>
+                    {formData.PaymentMode && !['Bank Transfer / NEFT', 'UPI', 'Cheque', 'Credit Card', 'Cash', 'PayPal', 'Stripe'].includes(formData.PaymentMode) && !customPaymentModes.includes(formData.PaymentMode) && (
+                      <option value={formData.PaymentMode}>{formData.PaymentMode}</option>
                     )}
-                    <option value="__custom__">Custom</option>
                   </select>
                 )}
               </div>

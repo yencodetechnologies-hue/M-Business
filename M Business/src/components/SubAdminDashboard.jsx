@@ -595,7 +595,7 @@ function Fld({ label, value, onChange, options, type = "text", error, placeholde
 
             <div style={{ display: "flex", gap: 10 }}>
 
-              <select value={selectValue} onChange={e => { const v = e.target.value; if (v === "Custom") { setIsCustomMode(true); onChange(""); } else { setIsCustomMode(false); onChange(v); } }} style={{ ...s, flex: 1 }} disabled={disabled}>{options.map(o => <option key={o} value={o}>{o || "Select option..."}</option>)}<option value="Custom">Custom...</option></select>
+              <select value={selectValue} onChange={e => { const v = e.target.value; if (v === "Custom") { setIsCustomMode(true); onChange(""); } else { setIsCustomMode(false); onChange(v); } }} style={{ ...s, flex: 1 }} disabled={disabled}><option value="Custom">Custom...</option>{options.map(o => <option key={o} value={o}>{o || "Select option..."}</option>)}</select>
 
               {isCustomMode && <input type="text" placeholder={`Type custom ${label.toLowerCase()}...`} value={value || ""} onChange={e => onChange(e.target.value)} style={sCustom} disabled={disabled} autoFocus />}
 

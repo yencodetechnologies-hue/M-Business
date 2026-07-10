@@ -2350,15 +2350,6 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
       {viewClientModal && activeClient && (
 
-        <AddClientView
-          editData={activeClient}
-          readOnly={true}
-          onBack={() => setViewClientModal(false)}
-          user={user}
-        />
-      )}
-      {false && viewClientModal && activeClient && (
-
         <Mdl title="Client Details" onClose={() => setViewClientModal(false)} maxWidth={600}>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -2385,21 +2376,33 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               { icon: "ti-user", label: "Client Name", val: activeClient.clientName || activeClient.name || "—" },
 
+              { icon: "ti-category", label: "Client Type", val: activeClient.clientType ? (activeClient.clientType === "b2b" ? "B2B" : activeClient.clientType === "b2c" ? "B2C" : "Freelancer") : "—" },
+
               { icon: "ti-building", label: "Company Name", val: activeClient.companyName || activeClient.company || "—" },
-
-              { icon: "ti-mail", label: "Email", val: activeClient.email || "—" },
-
-              { icon: "ti-phone", label: "Phone", val: activeClient.phone || "—" },
-
-              { icon: "ti-user-circle", label: "Contact Person", val: activeClient.contactPersonName || "—" },
-
-              { icon: "ti-phone-call", label: "Contact No", val: activeClient.contactPersonNo || "—" },
 
               { icon: "ti-tag", label: "Category", val: activeClient.category || "—" },
 
               { icon: "ti-building-bank", label: "GST Number", val: activeClient.gstNumber || "—" },
 
-              { icon: "ti-map-pin", label: "Address", val: activeClient.address || "—" },
+              { icon: "ti-source", label: "Client Source", val: activeClient.source || "—" },
+
+              { icon: "ti-calendar-event", label: "Onboarded On", val: activeClient.onboardedOn ? new Date(activeClient.onboardedOn).toLocaleDateString("en-IN") : "—" },
+
+              { icon: "ti-toggle-right", label: "Status", val: activeClient.status || "Active" },
+
+              { icon: "ti-user-circle", label: "Contact Person", val: activeClient.contactPersonName || "—" },
+
+              { icon: "ti-briefcase", label: "Designation", val: activeClient.designation || "—" },
+
+              { icon: "ti-mail", label: "Email", val: activeClient.email || "—" },
+
+              { icon: "ti-mail-forward", label: "Alt. Email", val: activeClient.altEmail || "—" },
+
+              { icon: "ti-phone-call", label: "Contact Person Mobile", val: activeClient.contactPersonNo || "—" },
+
+              { icon: "ti-phone", label: "Office Phone", val: activeClient.phone || "—" },
+
+              { icon: "ti-map-pin", label: "Street / Building Address", val: activeClient.address || "—" },
 
               { icon: "ti-map", label: "City", val: activeClient.city || "—" },
 
@@ -2419,15 +2422,11 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               { icon: "ti-wallet", label: "Credit Limit", val: activeClient.creditLimit || "—" },
 
-              { icon: "ti-cash", label: "Preferred Payment", val: activeClient.preferredPaymentMode || "—" },
-
-              { icon: "ti-source", label: "Client Source", val: activeClient.source || "—" },
-
-              { icon: "ti-toggle-right", label: "Status", val: activeClient.status || "Active" },
+              { icon: "ti-cash", label: "Preferred Payment Mode", val: activeClient.preferredPaymentMode || "—" },
 
               { icon: "ti-calendar", label: "Joined", val: activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—" },
 
-              { icon: "ti-notes", label: "Notes", val: activeClient.notes || "—" },
+              { icon: "ti-notes", label: "Internal Notes", val: activeClient.notes || "—" },
 
             ].filter(row => row.val && row.val !== "—").map((row, i) => (
 
@@ -2454,10 +2453,6 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
           </div>
 
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 16 }}>
-
-            <button onClick={() => { setViewClientModal(false); openEdit(activeClient); }} style={{ padding: "9px 18px", background: " var(--app-accent, var(--app-accent, #00BCD4))", border: "none", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
-
-            <button onClick={() => setViewClientModal(false)} style={{ padding: "9px 18px", background: "#F5FAFA", border: "1px solid #E0EEF0", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
 
           </div>
 

@@ -8006,6 +8006,24 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       return [];
     }
   });
+  const CURRENCY_STORAGE_KEY = `customCurrencies_${resolveSubadminId() || "default"}`;
+  const [customCurrencies, setCustomCurrencies] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(CURRENCY_STORAGE_KEY) || "[]");
+    } catch (e) {
+      return [];
+    }
+  });
+  const saveCustomCurrency = (value) => {
+    const v = (value || "").trim();
+    if (!v) return;
+    setCustomCurrencies(prev => {
+      if (prev.some(c => c.toLowerCase() === v.toLowerCase())) return prev;
+      const next = [...prev, v];
+      try { localStorage.setItem(CURRENCY_STORAGE_KEY, JSON.stringify(next)); } catch (e) { }
+      return next;
+    });
+  };
   const saveCustomCategory = (value) => {
     const v = (value || "").trim();
     if (!v) return;
@@ -12321,7 +12339,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
 
-                      <Fld label="Billing Currency" value={nc.billingCurrency} onChange={v => setNc({ ...nc, billingCurrency: v })} options={['INR — Indian Rupee', 'USD — US Dollar', 'GBP — British Pound', 'EUR — Euro', 'AED — UAE Dirham', 'SGD — Singapore Dollar', 'AUD — Australian Dollar']} />
+                      <Fld label="Billing Currency" value={nc.billingCurrency} onChange={v => { setNc({ ...nc, billingCurrency: v }); saveCustomCurrency(v); }} options={['INR — Indian Rupee', 'USD — US Dollar', 'GBP — British Pound', 'EUR — Euro', 'AED — UAE Dirham', 'SGD — Singapore Dollar', 'AUD — Australian Dollar', ...customCurrencies]} allowCustom={true} />
 
                       <Fld label="Payment Terms" value={nc.paymentTerms} onChange={v => setNc({ ...nc, paymentTerms: v })} options={['', 'Due on receipt', 'Net 7', 'Net 15', 'Net 30', 'Net 45', 'Net 60', '50% Advance + 50% on delivery']} allowCustom={true} />
 

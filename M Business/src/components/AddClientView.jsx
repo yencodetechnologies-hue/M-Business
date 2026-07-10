@@ -15,6 +15,18 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
   const [customSources, setCustomSources] = useState(() => {
     try { return JSON.parse(localStorage.getItem('mb_customSources') || '[]'); } catch { return []; }
   });
+  const [customCountries, setCustomCountries] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('mb_customCountries') || '[]'); } catch { return []; }
+  });
+  const [customPaymentTerms, setCustomPaymentTerms] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('mb_customPaymentTerms') || '[]'); } catch { return []; }
+  });
+  const [customPaymentModes, setCustomPaymentModes] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('mb_customPaymentModes') || '[]'); } catch { return []; }
+  });
+  const [customCurrencies, setCustomCurrencies] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('mb_customCurrencies') || '[]'); } catch { return []; }
+  });
 
   const [formData, setFormData] = useState({
     clientType: editData?.clientType || 'b2b',
@@ -61,7 +73,8 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
     source: false,
     country: false,
     paymentTerms: false,
-    preferredPaymentMode: false
+    preferredPaymentMode: false,
+    billingCurrency: false
   });
 
   const fileInputRef = useRef(null);
@@ -214,7 +227,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: `linear-gradient(90deg, ${TC_LIGHT} 0%, #ffffff 100%)` }}>
               <div style={{ width: 36, height: 36, background: TC, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📷</div>
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Client Logo</div><div style={{ fontSize: 12, color: '#94A3B0' }}>Upload a company logo or avatar</div></div>
-              <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 20, background: '#F4F6F8', color: '#94A3B0', border: '1px solid #E0E6EA' }}>Optional</span>
+
             </div>
             <div style={{ padding: 20 }}>
               <div onClick={() => fileInputRef.current.click()} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: 24, border: '2px dashed #E0E6EA', borderRadius: 12, background: '#F4F6F8', cursor: 'pointer' }}>
@@ -259,7 +272,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                   <input name="name" value={formData.name} onChange={handleChange} placeholder="e.g. Acme Corp or Raj Kumar" style={{ width: '100%', height: 42, padding: '0 14px', border: `1.5px solid ${errors.name ? '#EF5350' : '#E0E6EA'}`, borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Company name <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 10, background: '#F4F6F8', border: '1px solid #E0E6EA', marginLeft: 5 }}>Optional</span></label>
+
                   <input name="company" value={formData.company} onChange={handleChange} placeholder="Registered company name" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} />
                 </div>
 
@@ -267,8 +280,8 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                   <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Category / industry</label>
                   {customInputMode.category ? (
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <input name="category" value={formData.category} onChange={handleChange} placeholder="Type custom category..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.category) { saveCustomCategory(formData.category); } setCustomInputMode(prev => ({ ...prev, category: false })); } }} />
-                      <button type="button" onClick={() => { if (formData.category) { saveCustomCategory(formData.category); } setCustomInputMode(prev => ({ ...prev, category: false })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</button>
+                      <input name="category" value={formData.category} onChange={handleChange} placeholder="Type custom category..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.category) { setCustomCats(prev => { const next = Array.from(new Set([...prev, formData.category])); try { localStorage.setItem('mb_customCategories', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, category: false })); } }} />
+                      <button type="button" onClick={() => { if (formData.category) { setCustomCats(prev => { const next = Array.from(new Set([...prev, formData.category])); try { localStorage.setItem('mb_customCategories', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, category: false })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</button>
                     </div>
                   ) : (
                     <select name="category" value={formData.category} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
@@ -291,8 +304,8 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                   <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Client source</label>
                   {customInputMode.source ? (
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <input name="source" value={formData.source} onChange={handleChange} placeholder="Type custom source..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.source) { setCustomSources(prev => Array.from(new Set([...prev, formData.source]))); } setCustomInputMode(prev => ({ ...prev, source: false })); } }} />
-                      <button type="button" onClick={() => { if (formData.source) { setCustomSources(prev => Array.from(new Set([...prev, formData.source]))); } setCustomInputMode(prev => ({ ...prev, source: false })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</button>
+                      <input name="source" value={formData.source} onChange={handleChange} placeholder="Type custom source..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.source) { setCustomSources(prev => { const next = Array.from(new Set([...prev, formData.source])); try { localStorage.setItem('mb_customSources', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, source: false })); } }} />
+                      <button type="button" onClick={() => { if (formData.source) { setCustomSources(prev => { const next = Array.from(new Set([...prev, formData.source])); try { localStorage.setItem('mb_customSources', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, source: false })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</button>
                     </div>
                   ) : (
                     <select name="source" value={formData.source} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
@@ -327,7 +340,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: `linear-gradient(90deg, ${TC_LIGHT} 0%, #ffffff 100%)` }}>
               <div style={{ width: 36, height: 36, background: TC, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📞</div>
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Primary Contact</div><div style={{ fontSize: 12, color: '#94A3B0' }}>Main point of contact at this client</div></div>
-              <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 20, background: 'var(--teal-light, var(--teal-light, #E0F7FA))', color: '#0097A7' }}>Core</span>
+
             </div>
             <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Contact person name</label><input name="contactPersonName" value={formData.contactPersonName} onChange={handleChange} placeholder="Full name" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
@@ -346,7 +359,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Address</div><div style={{ fontSize: 12, color: '#94A3B0' }}>Billing and office location</div></div>
             </div>
             <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-              <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Street / building address</label><input name="address" value={formData.address} onChange={handleChange} placeholder="Flat no., building name, street" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
+              <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Street / building address</label><input name="address" value={formData.address} onChange={handleChange} placeholder="Flat no, building name, street" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>City</label><input name="city" value={formData.city} onChange={handleChange} placeholder="Chennai" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>State / province</label><input name="state" value={formData.state} onChange={handleChange} placeholder="Tamil Nadu" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pincode / ZIP</label><input name="pincode" value={formData.pincode} onChange={handleChange} placeholder="600001" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
@@ -354,12 +367,17 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                 <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Country</label>
                 {customInputMode.country ? (
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <input name="country" value={formData.country} onChange={handleChange} placeholder="Type custom country..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus />
-                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, country: false })); setFormData(prev => ({ ...prev, country: 'India' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                    <input name="country" value={formData.country} onChange={handleChange} placeholder="Type custom country..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.country) { setCustomCountries(prev => { const next = Array.from(new Set([...prev, formData.country])); try { localStorage.setItem('mb_customCountries', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, country: false })); } }} />
+                    <button type="button" onClick={() => { if (formData.country) { setCustomCountries(prev => { const next = Array.from(new Set([...prev, formData.country])); try { localStorage.setItem('mb_customCountries', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, country: false })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</button>
                   </div>
                 ) : (
                   <select name="country" value={formData.country} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
-                    <option>India</option><option>United States</option><option>United Kingdom</option><option>United Arab Emirates</option><option>Singapore</option><option>Australia</option><option>Canada</option><option>Germany</option><option>France</option><option value="__custom__">Custom</option>
+                    <option>India</option><option>United States</option><option>United Kingdom</option><option>United Arab Emirates</option><option>Singapore</option><option>Australia</option><option>Canada</option><option>Germany</option><option>France</option>
+                    {customCountries.map(c => <option key={c} value={c}>{c}</option>)}
+                    {formData.country && !['India', 'United States', 'United Kingdom', 'United Arab Emirates', 'Singapore', 'Australia', 'Canada', 'Germany', 'France'].includes(formData.country) && !customCountries.includes(formData.country) && (
+                      <option value={formData.country}>{formData.country}</option>
+                    )}
+                    <option value="__custom__">Custom</option>
                   </select>
                 )}
               </div>
@@ -385,17 +403,39 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Billing & Terms</div></div>
             </div>
             <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Billing currency</label><select name="billingCurrency" value={formData.billingCurrency} onChange={handleChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}><option>INR — Indian Rupee</option><option>USD — US Dollar</option><option>GBP — British Pound</option><option>EUR — Euro</option><option>AED — UAE Dirham</option><option>SGD — Singapore Dollar</option><option>AUD — Australian Dollar</option></select></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Billing currency</label>
+                {customInputMode.billingCurrency ? (
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input name="billingCurrency" value={formData.billingCurrency} onChange={handleChange} placeholder="Type custom currency..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.billingCurrency) { setCustomCurrencies(prev => { const next = Array.from(new Set([...prev, formData.billingCurrency])); try { localStorage.setItem('mb_customCurrencies', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, billingCurrency: false })); } }} />
+                    <button type="button" onClick={() => { if (formData.billingCurrency) { setCustomCurrencies(prev => { const next = Array.from(new Set([...prev, formData.billingCurrency])); try { localStorage.setItem('mb_customCurrencies', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, billingCurrency: false })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</button>
+                  </div>
+                ) : (
+                  <select name="billingCurrency" value={formData.billingCurrency} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
+                    <option>INR — Indian Rupee</option><option>USD — US Dollar</option><option>GBP — British Pound</option><option>EUR — Euro</option><option>AED — UAE Dirham</option><option>SGD — Singapore Dollar</option><option>AUD — Australian Dollar</option>
+                    {customCurrencies.map(c => <option key={c} value={c}>{c}</option>)}
+                    {formData.billingCurrency && !['INR — Indian Rupee', 'USD — US Dollar', 'GBP — British Pound', 'EUR — Euro', 'AED — UAE Dirham', 'SGD — Singapore Dollar', 'AUD — Australian Dollar'].includes(formData.billingCurrency) && !customCurrencies.includes(formData.billingCurrency) && (
+                      <option value={formData.billingCurrency}>{formData.billingCurrency}</option>
+                    )}
+                    <option value="__custom__">Custom</option>
+                  </select>
+                )}
+              </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Payment terms</label>
                 {customInputMode.paymentTerms ? (
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <input name="paymentTerms" value={formData.paymentTerms} onChange={handleChange} placeholder="Type custom terms..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus />
-                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, paymentTerms: false })); setFormData(prev => ({ ...prev, paymentTerms: '' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                    <input name="paymentTerms" value={formData.paymentTerms} onChange={handleChange} placeholder="Type custom terms..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.paymentTerms) { setCustomPaymentTerms(prev => { const next = Array.from(new Set([...prev, formData.paymentTerms])); try { localStorage.setItem('mb_customPaymentTerms', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, paymentTerms: false })); } }} />
+                    <button type="button" onClick={() => { if (formData.paymentTerms) { setCustomPaymentTerms(prev => { const next = Array.from(new Set([...prev, formData.paymentTerms])); try { localStorage.setItem('mb_customPaymentTerms', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, paymentTerms: false })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</button>
                   </div>
                 ) : (
                   <select name="paymentTerms" value={formData.paymentTerms} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
-                    <option value="">Select terms</option><option>Due on receipt</option><option>Net 7</option><option>Net 15</option><option>Net 30</option><option>Net 45</option><option>Net 60</option><option>50% Advance + 50% on delivery</option><option value="__custom__">Custom</option>
+                    <option value="">Select terms</option><option>Due on receipt</option><option>Net 7</option><option>Net 15</option><option>Net 30</option><option>Net 45</option><option>Net 60</option><option>50% Advance + 50% on delivery</option>
+                    {customPaymentTerms.map(t => <option key={t} value={t}>{t}</option>)}
+                    {formData.paymentTerms && !['Due on receipt', 'Net 7', 'Net 15', 'Net 30', 'Net 45', 'Net 60', '50% Advance + 50% on delivery'].includes(formData.paymentTerms) && !customPaymentTerms.includes(formData.paymentTerms) && (
+                      <option value={formData.paymentTerms}>{formData.paymentTerms}</option>
+                    )}
+                    <option value="__custom__">Custom</option>
                   </select>
                 )}
               </div>
@@ -404,12 +444,17 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                 <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Preferred payment mode</label>
                 {customInputMode.preferredPaymentMode ? (
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <input name="preferredPaymentMode" value={formData.preferredPaymentMode} onChange={handleChange} placeholder="Type custom mode..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus />
-                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, preferredPaymentMode: false })); setFormData(prev => ({ ...prev, preferredPaymentMode: '' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                    <input name="preferredPaymentMode" value={formData.preferredPaymentMode} onChange={handleChange} placeholder="Type custom mode..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (formData.preferredPaymentMode) { setCustomPaymentModes(prev => { const next = Array.from(new Set([...prev, formData.preferredPaymentMode])); try { localStorage.setItem('mb_customPaymentModes', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, preferredPaymentMode: false })); } }} />
+                    <button type="button" onClick={() => { if (formData.preferredPaymentMode) { setCustomPaymentModes(prev => { const next = Array.from(new Set([...prev, formData.preferredPaymentMode])); try { localStorage.setItem('mb_customPaymentModes', JSON.stringify(next)); } catch (err) { } return next; }); } setCustomInputMode(prev => ({ ...prev, preferredPaymentMode: false })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</button>
                   </div>
                 ) : (
                   <select name="preferredPaymentMode" value={formData.preferredPaymentMode} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
-                    <option value="">Select mode</option><option>Bank Transfer / NEFT</option><option>UPI</option><option>Cheque</option><option>Credit Card</option><option>Cash</option><option>PayPal</option><option>Stripe</option><option value="__custom__">Custom</option>
+                    <option value="">Select mode</option><option>Bank Transfer / NEFT</option><option>UPI</option><option>Cheque</option><option>Credit Card</option><option>Cash</option><option>PayPal</option><option>Stripe</option>
+                    {customPaymentModes.map(m => <option key={m} value={m}>{m}</option>)}
+                    {formData.preferredPaymentMode && !['Bank Transfer / NEFT', 'UPI', 'Cheque', 'Credit Card', 'Cash', 'PayPal', 'Stripe'].includes(formData.preferredPaymentMode) && !customPaymentModes.includes(formData.preferredPaymentMode) && (
+                      <option value={formData.preferredPaymentMode}>{formData.preferredPaymentMode}</option>
+                    )}
+                    <option value="__custom__">Custom</option>
                   </select>
                 )}
               </div>
@@ -438,7 +483,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                 </div>
                 {errors.confirmPassword && <div style={{ fontSize: 11, color: '#EF5350' }}>{errors.confirmPassword}</div>}
               </div>
-          
+
             </div>
           </div>
 

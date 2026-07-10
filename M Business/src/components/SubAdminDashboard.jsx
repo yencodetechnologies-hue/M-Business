@@ -7995,6 +7995,28 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   };
 
+  // Persist any custom "Category / Industry" values the user types into the
+  // Add Client form, scoped per company, so they survive a page refresh and
+  // show up in the dropdown for future clients too.
+  const CATEGORY_STORAGE_KEY = `customCategories_${resolveSubadminId() || "default"}`;
+  const [customCategories, setCustomCategories] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(CATEGORY_STORAGE_KEY) || "[]");
+    } catch (e) {
+      return [];
+    }
+  });
+  const saveCustomCategory = (value) => {
+    const v = (value || "").trim();
+    if (!v) return;
+    setCustomCategories(prev => {
+      if (prev.some(c => c.toLowerCase() === v.toLowerCase())) return prev;
+      const next = [...prev, v];
+      try { localStorage.setItem(CATEGORY_STORAGE_KEY, JSON.stringify(next)); } catch (e) { }
+      return next;
+    });
+  };
+
 
 
   // Dashboard.jsx-à®²à¯ à®‡à®°à¯à®•à¯à®•à¯à®®à¯ parseLimit function-à® à®‡à®¤à®¾à®• à®®à®¾à®¤à¯à®¤à¯à®™à¯à®•:
@@ -12208,7 +12230,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                       <Fld label="Company Name" value={nc.company} onChange={v => setNc({ ...nc, company: v })} />
 
-                      <Fld label="Category / Industry" value={nc.category} onChange={v => setNc({ ...nc, category: v })} options={['', 'Web Development', 'Mobile App Development', 'UI/UX Design', 'Digital Marketing', 'IT Consulting', 'E-commerce', 'Healthcare', 'Education', 'Finance', 'Real Estate', 'Manufacturing', 'Retail', 'Logistics', 'Media & Entertainment']} allowCustom={true} />
+                      <Fld label="Category / Industry" value={nc.category} onChange={v => { setNc({ ...nc, category: v }); saveCustomCategory(v); }} options={['', 'Web Development', 'Mobile App Development', 'UI/UX Design', 'Digital Marketing', 'IT Consulting', 'E-commerce', 'Healthcare', 'Education', 'Finance', 'Real Estate', 'Manufacturing', 'Retail', 'Logistics', 'Media & Entertainment', ...customCategories]} allowCustom={true} />
 
                       <Fld label="Company Tax / GST No." value={nc.gstNumber} onChange={v => setNc({ ...nc, gstNumber: v })} />
 

@@ -64,11 +64,14 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
       const userData = res.data.user || res.data;
       const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
 
-      // Clear ALL stale cached data before setting new user session
-      // This ensures a re-created client never sees deleted account's data
-      const keysToKeep = ["accounts"];
+      // Clear stale cached data before setting new user session (so a
+      // re-created client never sees a deleted account's data), but keep
+      // "accounts" and any pending "justRegistered:*" trial-toast flags —
+      // those must survive this login to trigger the one-time Dashboard toast.
       Object.keys(localStorage).forEach(key => {
-        if (!keysToKeep.includes(key)) localStorage.removeItem(key);
+        if (key !== "accounts" && !key.startsWith("justRegistered:")) {
+          localStorage.removeItem(key);
+        }
       });
       // Also clear the accounts cache entry for this email so stale data is gone
       try {

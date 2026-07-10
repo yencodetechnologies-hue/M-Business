@@ -34,8 +34,12 @@ export default function App() {
       } catch {
         localStorage.removeItem("user");
       }
+      return null;
     }
-    // After PayU redirect, session may be lost — restore from accounts list using uid param
+    // After PayU redirect, session may be lost — restore from accounts list using uid param.
+    // Only do this if the user hasn't explicitly logged out (no "user" key means either
+    // "never logged in" or "logged out" — the loggedOut flag disambiguates the two).
+    if (localStorage.getItem("loggedOut") === "1") return null;
     try {
       const params = new URLSearchParams(window.location.search);
       if (params.get('payment') === 'success') {
@@ -47,6 +51,7 @@ export default function App() {
         if (match) {
           const normalized = { ...match, role: (match.role || '').toLowerCase().trim() };
           localStorage.setItem('user', JSON.stringify(normalized));
+          localStorage.removeItem("loggedOut");
           return normalized;
         }
       }
@@ -62,6 +67,7 @@ export default function App() {
         role: (userData.role || "").toLowerCase().trim(),
       };
       localStorage.setItem("user", JSON.stringify(normalized));
+      localStorage.removeItem("loggedOut");
 
       // Save to accounts list for multi-account support
       try {
@@ -75,6 +81,7 @@ export default function App() {
       setUser(normalized);
     } else {
       localStorage.removeItem("user");
+      localStorage.setItem("loggedOut", "1");
       setUser(null);
     }
   };

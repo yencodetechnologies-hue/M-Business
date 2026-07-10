@@ -6,18 +6,17 @@ const User = require("../models/UserModels");
 
 // "3" → 3, "10 Employees" → 10, "Unlimited" → Infinity, "" → 10
 const parseLimit = (limitStr) => {
-  if (limitStr === undefined || limitStr === null || limitStr === "") return 10;
+  if (limitStr === undefined || limitStr === null || limitStr === "") return Infinity;
   const s = String(limitStr).toLowerCase().trim();
   if (s.includes("unlimited") || s.includes("infinity")) return Infinity;
   const m = s.match(/\d+/);
   if (m) return parseInt(m[0]);
-  return 10;
+  return Infinity;
 };
-
 // Returns { limit, hasValue } so callers can tell "no limit configured"
 // apart from "limit legitimately parses to 10".
 const getSubscriptionLimit = (type, sub) => {
-  if (!sub) return { limit: 10, hasValue: false };
+  if (!sub) return { limit: Infinity, hasValue: false };
   const map = {
     client: sub.clientLimit,
     employee: sub.employeeLimit,

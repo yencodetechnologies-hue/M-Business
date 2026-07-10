@@ -2853,7 +2853,7 @@ useEffect(() => {
 
   const subStatus = getSubStatus();
 
-  const handleLogout = () => { localStorage.removeItem("user"); setUser(null); };
+  const handleLogout = () => { localStorage.removeItem("user"); localStorage.setItem("loggedOut", "1"); setUser(null); };
   const handleAuthSetUser = (userData) => {
     setAccountAuthOpen(false);
     setProfileDropdownOpen(false);

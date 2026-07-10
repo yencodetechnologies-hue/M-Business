@@ -913,7 +913,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 
   return (
 
-    <div style={{ position: "relative", zIndex: open ? 1000 : 1 }}>
+    <div style={{ position: "relative", zIndex: open ? 1005 : 1 }}>
       <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
 
         {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "var(--app-muted)" }}>({selected.companyName})</span>}</div>) : "-- Select Client --"}
@@ -1326,7 +1326,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               <span onClick={() => setViewClientModal(true)} style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer" }}>View</span>
 
-              <span onClick={() => openEdit(activeClient)} style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer" }}>Edit</span>
+
 
             </div>
 
@@ -2196,25 +2196,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                       )}
 
                     </div>
-                    <button
-                      onClick={() => {
-                        const portalUrl = `${window.location.origin}/client-portal/${activeClient._id}`;
-                        window.open(portalUrl, "_blank");
-                      }}
-                      style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "var(--teal-light, var(--teal-light, #E0F7FA))", border: "1.5px solid  var(--app-accent, var(--app-accent, #00BCD4))", borderRadius: 20, fontSize: 11, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }}
-                      onMouseEnter={e => { e.currentTarget.style.background = "var(--app-accent)"; e.currentTarget.style.color = "#fff"; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = "rgba(var(--app-accent-rgb),0.1)"; e.currentTarget.style.color = "var(--app-accent)"; }}
-                    >
-                      <i className="ti ti-world" style={{ fontSize: 12 }} />Portal
-                    </button>
-                    <button
-                      onClick={() => setViewClientModal(true)}
-                      style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "none", border: "1.5px solid #E0EEF0", borderRadius: 20, fontSize: 11, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }}
-                      onMouseEnter={e => { e.currentTarget.style.borderColor = " var(--app-accent, var(--app-accent, #00BCD4))"; e.currentTarget.style.color = " var(--app-accent, var(--app-accent, #00BCD4))"; }}
-                      onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}
-                    >
-                      <i className="ti ti-eye" style={{ fontSize: 12 }} />View
-                    </button>
+
 
 
 
@@ -2367,6 +2349,15 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       {deleteTarget && <ConfirmModal title="Delete Client" message={`Are you sure you want to delete "${deleteTarget.clientName || deleteTarget.name}"?`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
 
       {viewClientModal && activeClient && (
+
+        <AddClientView
+          editData={activeClient}
+          readOnly={true}
+          onBack={() => setViewClientModal(false)}
+          user={user}
+        />
+      )}
+      {false && viewClientModal && activeClient && (
 
         <Mdl title="Client Details" onClose={() => setViewClientModal(false)} maxWidth={600}>
 
@@ -8158,7 +8149,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  const handleLogout = () => { localStorage.removeItem("user"); localStorage.removeItem("accounts"); setUser(null); setAccounts([]); };
+  const handleLogout = () => { localStorage.removeItem("user"); localStorage.setItem("loggedOut", "1"); setUser(null); setAccounts([]); };
 
   const handleAuthSetUser = (userData) => {
 

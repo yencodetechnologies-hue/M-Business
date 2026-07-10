@@ -287,8 +287,8 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   };
 
   const handleCreate = async () => {
-    if (!name.trim()) return alert("Project Name is required.");
-    if (!client) return alert("Client is required.");
+    if (!name.trim()) { toast.error("Project Name is required."); return; }
+    if (!client) { toast.error("Client is required."); return; }
     const isEdit = !!editProject;
 
     setLoading(true);

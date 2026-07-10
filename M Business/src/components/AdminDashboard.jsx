@@ -388,6 +388,7 @@ export default function AdminDashboard({ user, setUser }) {
   };
   const handleLogout = () => {
     localStorage.removeItem("user");
+    localStorage.setItem("loggedOut", "1");
     setUser(null);
   };
 

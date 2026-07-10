@@ -2,10 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { BASE_URL } from '../config';
-
-export default function AddClientView({ onBack, onClientAdded, onClientUpdated, user, editData, themeColor = ' var(--app-accent, var(--app-accent, #00BCD4))' }) {
+export default function AddClientView({ onBack, onClientAdded, onClientUpdated, user, editData, readOnly = false, themeColor = ' var(--app-accent, var(--app-accent, #00BCD4))' }) {
   const TC = themeColor; // shorthand
-  const TC_LIGHT = `${themeColor}18`; // ~10% opacity tint
+  const TC_LIGHT = `${themeColor}18`; // ~10% opacity tin
   const isEdit = !!editData;
   const today = new Date().toISOString().split('T')[0];
 
@@ -144,9 +143,9 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      toast.error('Please fill in all required fields correctly.');
+
       // Scroll to and focus the first field with an error, in form order
-      const fieldOrder = ['name', 'company', 'email', 'contactPersonName', 'phone', 'address', 'confirmPassword'];
+      const fieldOrder = ['name', 'company', 'contactPersonName', 'email', 'phone', 'address', 'confirmPassword'];
       const firstErrorField = fieldOrder.find(f => newErrors[f]);
       if (firstErrorField) {
         setTimeout(() => {
@@ -373,7 +372,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
             <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Contact person name <span style={{ color: '#EF5350' }}>*</span></label><input name="contactPersonName" value={formData.contactPersonName} onChange={handleChange} placeholder="Full name" style={{ width: '100%', height: 42, padding: '0 14px', border: `1.5px solid ${errors.contactPersonName ? '#EF5350' : '#E0E6EA'}`, borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} />{errors.contactPersonName && <div style={{ fontSize: 11, color: '#EF5350', marginTop: 4 }}>{errors.contactPersonName}</div>}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Designation</label><input name="designation" value={formData.designation} onChange={handleChange} placeholder="e.g. CEO, Project Manager" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Email address <span style={{ color: '#EF5350' }}>*</span></label><input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="contact@company.com" style={{ width: '100%', height: 42, padding: '0 14px', border: `1.5px solid ${errors.email ? '#EF5350' : '#E0E6EA'}`, borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Email address <span style={{ color: '#EF5350' }}>*</span></label><input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="contact@company.com" style={{ width: '100%', height: 42, padding: '0 14px', border: `1.5px solid ${errors.email ? '#EF5350' : '#E0E6EA'}`, borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} />{errors.email && <div style={{ fontSize: 11, color: '#EF5350', marginTop: 4 }}>{errors.email}</div>}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Alt. email</label><input type="email" name="altEmail" value={formData.altEmail} onChange={handleChange} placeholder="Secondary email" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Contact person mobile</label><input name="contactPersonNo" value={formData.contactPersonNo} onChange={handleChange} placeholder="+91 98765 43210" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} /></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Office phone <span style={{ color: '#EF5350' }}>*</span></label><input name="phone" value={formData.phone} onChange={handleChange} placeholder="+91 44 1234 5678" style={{ width: '100%', height: 42, padding: '0 14px', border: `1.5px solid ${errors.phone ? '#EF5350' : '#E0E6EA'}`, borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} />{errors.phone && <div style={{ fontSize: 11, color: '#EF5350', marginTop: 4 }}>{errors.phone}</div>}</div>
@@ -544,7 +543,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
 
                     {isEdit ? 'Updating' : 'Saving'}
                   </span>
-                ) : (isEdit ? '✅ Update Client' : '👤 Add Client')}
+                ) : (readOnly ? '👁 View Only' : (isEdit ? '✅ Update Client' : '👤 Add Client'))}
               </button>
             </div>
           </div>

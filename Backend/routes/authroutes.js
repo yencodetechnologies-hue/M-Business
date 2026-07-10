@@ -26,7 +26,7 @@ router.post("/login", async (req, res) => {
 
 
     // Hardcoded bypass for the specific admin user requested
-    if (email === "input:focus { border-bottom-color: rgba(255,255,255,0.2) !important; outline: none; box-shadow: none; }gmail.com" && password === "admin1234") {
+    if (email === "admin@gmail.com" && password === "admin1234") {
       const u = await User.findOne({ email });
       if (!u) return res.status(400).json({ msg: "Invalid email or password" });
       console.log("✅ Admin Login Succesful!");
@@ -34,7 +34,7 @@ router.post("/login", async (req, res) => {
         user: {
           id: u._id,
           name: u.name || "Super Admin",
-          email: "input:focus { border-bottom-color: rgba(255,255,255,0.2) !important; outline: none; box-shadow: none; }gmail.com",
+          email: "admin@gmail.com",
           role: "admin",
           companyId: u.companyId || "admin-company-id",
           logoUrl: u.logoUrl || "",

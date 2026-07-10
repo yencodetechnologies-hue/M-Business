@@ -241,14 +241,10 @@ router.post("/signup", async (req, res) => {
           });
           await trialSubscription.save();
 
-          if (newUser.email) {
-            try {
-              await sendTrialWelcome(newUser.email, newUser.name || "User", trialEndDate);
-            } catch (mailErr) {
-              console.log("Trial welcome email failed:", mailErr.message);
-            }
-          } else {
-            console.log("Trial welcome email skipped: no email on newUser");
+          try {
+            await sendTrialWelcome(newUser.email, newUser.name || "User", trialEndDate);
+          } catch (mailErr) {
+            console.log("Trial welcome email failed:", mailErr.message);
           }
         }
       } catch (trialErr) {

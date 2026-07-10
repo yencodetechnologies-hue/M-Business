@@ -9564,17 +9564,23 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <div className="content">
 
             {trialToast && (
-              <div style={{ position: "fixed", top: 20, right: 20, zIndex: 9999, background: "#fff", border: "1.5px solid #00BCD4", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#0097A7", boxShadow: "0 8px 24px rgba(0,0,0,0.15)", display: "flex", alignItems: "center", gap: 8, animation: "fadeIn 0.3s ease" }}>
-                <i className="ti ti-circle-check" style={{ fontSize: 16 }}></i> Free Trial Activated
+              <div style={{ position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)", zIndex: 9999, background: "#fff", border: "1.5px solid #00BCD4", borderRadius: 14, padding: "14px 26px", fontSize: 14, fontWeight: 800, color: "#0097A7", boxShadow: "0 10px 32px rgba(0,188,212,0.25), 0 4px 12px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", gap: 10, animation: "fadeIn 0.3s ease" }}>
+                <i className="ti ti-circle-check" style={{ fontSize: 18, color: "#00BCD4" }}></i> Free Trial Activated
               </div>
             )}
-            {subscriptionChecked && (isInFreeTrial() || subscription?.isTrial || subscription?.status === "trial") && !trialToastShown.current && (trialToastShown.current = true, setTimeout(() => { setTrialToast(true); setTimeout(() => setTrialToast(false), 4000); }, 0), null)}
-            {subscriptionChecked && (isInFreeTrial() || subscription?.isTrial || subscription?.status === "trial") && (
-              <div style={{ background: 'linear-gradient(90deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097A7)', color: '#fff', padding: '10px 20px', borderRadius: 10, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
-                <span><i className="ti ti-gift" style={{ marginRight: 8 }}></i>Free Trial Active — {subscription?.isTrial || subscription?.status === "trial" ? Math.max(0, Math.ceil((new Date(subscription.endDate) - new Date()) / (1000 * 60 * 60 * 24))) : getTrialDaysRemaining()} day{(subscription?.isTrial || subscription?.status === "trial" ? Math.max(0, Math.ceil((new Date(subscription.endDate) - new Date()) / (1000 * 60 * 60 * 24))) : getTrialDaysRemaining()) !== 1 ? 's' : ''} remaining (up to {FREE_TRIAL_LIMITS.client} clients, {FREE_TRIAL_LIMITS.employee} employees, {FREE_TRIAL_LIMITS.manager} managers)</span>
-                <button onClick={() => { setForceUpgradeTab(true); setActive('mysubscriptions'); }} style={{ background: '#fff', color: '#0097A7', border: 'none', borderRadius: 8, padding: '5px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>Upgrade Now</button>
-              </div>
-            )}
+            {subscriptionChecked && !trialToastShown.current && (() => {
+              const flagKey = user?.email ? `justRegistered:${user.email}` : null;
+              const isFirstTimeAfterSignup = flagKey && localStorage.getItem(flagKey) === "1";
+              const trialIsActive = isInFreeTrial() || subscription?.isTrial || subscription?.status === "trial";
+              if (isFirstTimeAfterSignup && trialIsActive) {
+                trialToastShown.current = true;
+                localStorage.removeItem(flagKey);
+                setTimeout(() => setTrialToast(true), 0);
+                setTimeout(() => setTrialToast(false), 4000);
+              }
+              return null;
+            })()}
+
             {subscriptionChecked && !isInFreeTrial() && !subscription && (
               <div style={{ background: '#FEE2E2', color: '#DC2626', padding: '10px 20px', borderRadius: 10, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
                 <span><i className="ti ti-alert-circle" style={{ marginRight: 8 }}></i>Choose a subscription plan to continue.</span>

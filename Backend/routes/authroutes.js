@@ -178,10 +178,12 @@ router.post("/signup", async (req, res) => {
     const { name, email, password, role, phone, companyName } = req.body;
 
     // Ensure email is unique across all collections
-    const existUser = await User.findOne({ email });
-    const existClient = await Client.findOne({ email });
-    const existManager = await Manager.findOne({ email });
-    const existEmployee = await Employee.findOne({ email });
+    const [existUser, existClient, existManager, existEmployee] = await Promise.all([
+      User.findOne({ email }),
+      Client.findOne({ email }),
+      Manager.findOne({ email }),
+      Employee.findOne({ email }),
+    ]);
 
     if (existUser || existClient || existManager || existEmployee) {
       return res.status(400).json({ msg: "Email already exists" });
@@ -203,55 +205,55 @@ router.post("/signup", async (req, res) => {
       const newUser = new User({ name, email, password: hashed, role: "subadmin", phone, companyName: companyName || "", isVerified: true });
       await newUser.save();
 
-      const token = jwt.sign({ id: newUser._id, role: newUser.role }, process.env.JWT_SECRET || "secret", { expiresIn: "7d" });
-      const userObj = { _id: newUser._id, id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role, phone: newUser.phone, companyName: newUser.companyName, logoUrl: newUser.logoUrl || "" };
+      // Respond immediately — trial activation runs in the background below
+      res.status(201).json({ msg: "Account created successfully!", requiresOTP: false });
 
-      // ── Auto-activate 30-day Free Trial on account creation ──────────────
-      try {
-        const existingTrial = await Subscription.findOne({
-          $or: [
-            { userId: newUser._id.toString(), isTrial: true },
-            { userEmail: newUser.email, isTrial: true },
-          ],
-        });
-
-        if (!existingTrial) {
-          const trialEndDate = new Date();
-          trialEndDate.setDate(trialEndDate.getDate() + 30);
-
-          const trialSubscription = new Subscription({
-            userId: newUser._id.toString(),
-            userEmail: newUser.email,
-            userName: newUser.name,
-            planName: "Free Trial",
-            planPrice: 0,
-            billingCycle: "trial",
-            status: "active",
-            isTrial: true,
-            startDate: new Date(),
-            endDate: trialEndDate,
-            features: ["30 Days Free Trial", "5 Projects", "5 Invoices", "Single business manage", "Managers: 1", "Clients: 5", "Employees: 20"],
-            companyId: newUser._id.toString(),
-            isFullyPaid: true,
-            clientLimit: "5 Clients",
-            employeeLimit: "20 Employees",
-            managerLimit: "1 Managers",
-            businessLimit: "1 Business",
-            notes: "Free 30-day trial auto-activated on signup",
+      // ── Auto-activate 30-day Free Trial on account creation (non-blocking) ──
+      (async () => {
+        try {
+          const existingTrial = await Subscription.findOne({
+            $or: [
+              { userId: newUser._id.toString(), isTrial: true },
+              { userEmail: newUser.email, isTrial: true },
+            ],
           });
-          await trialSubscription.save();
 
-          try {
-            await sendTrialWelcome(newUser.email, newUser.name || "User", trialEndDate);
-          } catch (mailErr) {
-            console.log("Trial welcome email failed:", mailErr.message);
+          if (!existingTrial) {
+            const trialEndDate = new Date();
+            trialEndDate.setDate(trialEndDate.getDate() + 30);
+
+            const trialSubscription = new Subscription({
+              userId: newUser._id.toString(),
+              userEmail: newUser.email,
+              userName: newUser.name,
+              planName: "Free Trial",
+              planPrice: 0,
+              billingCycle: "trial",
+              status: "active",
+              isTrial: true,
+              startDate: new Date(),
+              endDate: trialEndDate,
+              features: ["30 Days Free Trial", "5 Projects", "5 Invoices", "Single business manage", "Managers: 1", "Clients: 5", "Employees: 20"],
+              companyId: newUser._id.toString(),
+              isFullyPaid: true,
+              clientLimit: "5 Clients",
+              employeeLimit: "20 Employees",
+              managerLimit: "1 Managers",
+              businessLimit: "1 Business",
+              notes: "Free 30-day trial auto-activated on signup",
+            });
+            await trialSubscription.save();
+
+            sendTrialWelcome(newUser.email, newUser.name || "User", trialEndDate).catch(mailErr => {
+              console.log("Trial welcome email failed:", mailErr.message);
+            });
           }
+        } catch (trialErr) {
+          console.error("Auto trial activation error:", trialErr);
         }
-      } catch (trialErr) {
-        console.error("Auto trial activation error:", trialErr);
-      }
+      })();
 
-      return res.status(201).json({ msg: "Account created successfully!", requiresOTP: false });
+      return;
 
     } else {
       const newUser = new User({ name, email, password: hashed, role: "admin", phone });

@@ -108,8 +108,32 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
         employeeCount: regData.employeeCount
       };
       await axios.post(`${BASE_URL}/api/auth/signup`, payload, { timeout: 15000 });
-      setSuccess("Account created successfully! Please login.");
+      setSuccess("Account created successfully! Free Trial activated.");
       setRegData({ name: "", email: "", phone: "", password: "", confirm: "", role: "Subadmin", companyName: "", companyType: "IT", employeeCount: "0-10" });
+
+      // Auto-login right after signup so the user lands straight on the
+      // dashboard and sees the Free Trial Activated toast immediately —
+      // no separate login step, no page refresh.
+      try {
+        const loginRes = await axios.post(`${BASE_URL}/api/auth/login`, {
+          email: payload.email,
+          password: payload.password,
+        });
+        const userData = loginRes.data?.user;
+        if (userData) {
+          const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
+          localStorage.setItem("user", JSON.stringify(userWithLogo));
+          // Mark this account as "just registered" so the dashboard shows
+          // the one-time "Free Trial Activated" toast, then never again.
+          if (userWithLogo.email) {
+            localStorage.setItem(`justRegistered:${userWithLogo.email}`, "1");
+          }
+          setUser(userWithLogo);
+          return;
+        }
+      } catch (autoLoginErr) {
+        console.log("Auto-login after signup failed:", autoLoginErr.message);
+      }
       setTimeout(() => switchTab("login"), 1500);
     } catch (e) {
       if (e.code === "ECONNABORTED") setError("Server slow. Please try again.");

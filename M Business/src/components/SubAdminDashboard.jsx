@@ -1017,17 +1017,20 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
   useEffect(() => {
     setIsLoading(false);
-    if (filtered.length > 0) {
-      if (!activeClientId) {
-        setActiveClientId(filtered[0]._id);
-      } else {
-        const still = filtered.find(c => c._id === activeClientId);
-        if (!still) setActiveClientId(filtered[0]._id);
-      }
-    } else if (!search && filterMode === "all") {
-      setActiveClientId(null);
+    // Only auto-select a client when none is selected yet (e.g. right after
+    // the client list first loads), or when the currently selected client
+    // was removed entirely from `clients`. Changing the card/tab filter
+    // should narrow the visible list without touching which client's
+    // details are currently shown.
+    if (!activeClientId) {
+      if (filtered.length > 0) setActiveClientId(filtered[0]._id);
+      return;
     }
-  }, [clients, search, filterMode]);
+    const stillExists = clients.some(c => c._id === activeClientId);
+    if (!stillExists) {
+      setActiveClientId(filtered.length > 0 ? filtered[0]._id : null);
+    }
+  }, [clients]);
 
   // Restore exact client active before navigating to create/edit project
   useEffect(() => {
@@ -2030,15 +2033,15 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
       {/* STAT PILLS — matches Projects page style */}
       <div style={{ display: "flex", gap: 16, marginBottom: 20, flexWrap: "wrap" }}>
-        <div onClick={() => setFilterMode("all")} style={{ cursor: "pointer", flex: "1 1 200px", minWidth: 200, background: "#fff", border: filterMode === "all" ? "2px solid var(--app-accent)" : "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+        <div onClick={() => setFilterMode("all")} style={{ cursor: "pointer", flex: "1 1 200px", minWidth: 200, background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-users" /></div>
           <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{totalClients}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>All Clients</div></div>
         </div>
-        <div onClick={() => setFilterMode("active")} style={{ cursor: "pointer", flex: "1 1 200px", minWidth: 200, background: "#fff", border: filterMode === "active" ? "2px solid #16a34a" : "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+        <div onClick={() => setFilterMode("active")} style={{ cursor: "pointer", flex: "1 1 200px", minWidth: 200, background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-user-check" /></div>
           <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{activeClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Active</div></div>
         </div>
-        <div onClick={() => setFilterMode("inactive")} style={{ cursor: "pointer", flex: "1 1 200px", minWidth: 200, background: "#fff", border: filterMode === "inactive" ? "2px solid #dc2626" : "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+        <div onClick={() => setFilterMode("inactive")} style={{ cursor: "pointer", flex: "1 1 200px", minWidth: 200, background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-user-off" /></div>
           <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{inactiveClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Inactive</div></div>
         </div>
@@ -2076,7 +2079,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                 <button
                   key={f}
                   onClick={() => setFilterMode(f)}
-                  style={{ flex: 1, padding: "5px 4px", borderRadius: 7, border: "none", fontSize: 10, fontWeight: 700, cursor: "pointer", background: filterMode === f ? "var(--app-accent)" : "var(--teal-lighter, #F0FDFE)", color: filterMode === f ? "#fff" : "#607D86", textTransform: "capitalize" }}
+                  style={{ flex: 1, padding: "5px 4px", borderRadius: 7, border: "none", fontSize: 10, fontWeight: 700, cursor: "pointer", background: "var(--teal-lighter, #F0FDFE)", color: "#607D86", textTransform: "capitalize" }}
                 >
                   {f === "all" ? `All (${clients.length})` : f === "active" ? `Active (${clients.filter(c => (c.status || "Active").toLowerCase() === "active").length})` : `Inactive (${clients.filter(c => (c.status || "").toLowerCase() === "inactive").length})`}
                 </button>
@@ -2132,7 +2135,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 16 }}>
 
-                <div style={{ width: 64, height: 64, borderRadius: "50%", background: activeClient.logoUrl ? "#f1f5f9" : `linear-gradient(135deg,${acColor},${acColor}bb)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 900, color: "#fff", flexShrink: 0, position: "relative", boxShadow: "0 4px 14px rgba(0,0,0,.15)", overflow: "hidden" }}>
+                <div style={{ width: 64, height: 64, borderRadius: "50%", background: activeClient.logoUrl ? "#f1f5f9" : `linear-gradient(135deg,${acColor || "#00BCD4"},${acColor || "#0097A7"})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 900, color: "#fff", flexShrink: 0, position: "relative", boxShadow: "0 4px 14px rgba(0,0,0,.15)", overflow: "hidden" }}>
 
                   {activeClient.logoUrl ? <img src={activeClient.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : getAvatar(activeClient)}
 
@@ -7709,6 +7712,20 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [subscriptionChecked, setSubscriptionChecked] = useState(false);
 
   useEffect(() => {
+    if (!subscriptionChecked || trialToastShown.current) return;
+    const flagKey = user?.email ? `justRegistered:${user.email}` : null;
+    const isFirstTimeAfterSignup = flagKey && localStorage.getItem(flagKey) === "1";
+    const trialIsActive = isInFreeTrial() || subscription?.isTrial || subscription?.status === "trial";
+    if (isFirstTimeAfterSignup && trialIsActive) {
+      trialToastShown.current = true;
+      localStorage.removeItem(flagKey);
+      setTrialToast(true);
+      const hideTimer = setTimeout(() => setTrialToast(false), 4000);
+      return () => clearTimeout(hideTimer);
+    }
+  }, [subscriptionChecked, subscription]);
+
+  useEffect(() => {
     if (
       subscriptionChecked &&
       subscription === null &&
@@ -9604,22 +9621,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <div className="content">
 
             {trialToast && (
-              <div style={{ position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)", zIndex: 9999, background: "#fff", border: "1.5px solid #00BCD4", borderRadius: 14, padding: "14px 26px", fontSize: 14, fontWeight: 800, color: "#0097A7", boxShadow: "0 10px 32px rgba(0,188,212,0.25), 0 4px 12px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", gap: 10, animation: "fadeIn 0.3s ease" }}>
+              <div style={{ position: "fixed", top: 24, left: "50%", width: "max-content", marginLeft: "auto", marginRight: "auto", right: 0, zIndex: 9999, background: "#fff", border: "1.5px solid #00BCD4", borderRadius: 14, padding: "14px 26px", fontSize: 14, fontWeight: 800, color: "#0097A7", boxShadow: "0 10px 32px rgba(0,188,212,0.25), 0 4px 12px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", gap: 10 }}>
                 <i className="ti ti-circle-check" style={{ fontSize: 18, color: "#00BCD4" }}></i> Free Trial Activated
               </div>
             )}
-            {subscriptionChecked && !trialToastShown.current && (() => {
-              const flagKey = user?.email ? `justRegistered:${user.email}` : null;
-              const isFirstTimeAfterSignup = flagKey && localStorage.getItem(flagKey) === "1";
-              const trialIsActive = isInFreeTrial() || subscription?.isTrial || subscription?.status === "trial";
-              if (isFirstTimeAfterSignup && trialIsActive) {
-                trialToastShown.current = true;
-                localStorage.removeItem(flagKey);
-                setTimeout(() => setTrialToast(true), 0);
-                setTimeout(() => setTrialToast(false), 4000);
-              }
-              return null;
-            })()}
+            {/* Trial toast trigger runs once via useEffect below, not inline during render */}
 
             {subscriptionChecked && !isInFreeTrial() && !subscription && (
               <div style={{ background: '#FEE2E2', color: '#DC2626', padding: '10px 20px', borderRadius: 10, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
@@ -11158,7 +11164,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             )}
 
-            {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client) => { setClients(prev => [...prev, client]); setActive("clients"); }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || accentColor} />}
+            {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client, replaceTempId) => {
+              setClients(prev => {
+                if (replaceTempId) {
+                  // Server-confirmed client arrived — swap out the optimistic temp record
+                  return prev.map(c => c._id === replaceTempId ? client : c);
+                }
+                // First call: either the optimistic temp client, or (in older flows)
+                // the final client directly — append only if it isn't already present.
+                if (prev.some(c => c._id === client._id)) return prev;
+                return [...prev, client];
+              });
+              setActive("clients");
+            }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || accentColor} />}
 
             {validActive === "clients" && <ClientsPage key={clients.length > 0 ? "loaded" : "empty"} clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
 

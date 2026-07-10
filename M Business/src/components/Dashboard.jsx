@@ -2356,7 +2356,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
           {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
           {validActive === "reports" && <ReportsPage clients={clients} projects={projects} employees={employees} managers={managers} />}
-          {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client) => { setClients(prev => [...prev, client]); setActive("clients"); }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || accentColor} />}
+          {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client, replaceTempId) => {
+            setClients(prev => {
+              if (replaceTempId) {
+                // Server-confirmed client arrived — swap out the optimistic temp record
+                return prev.map(c => c._id === replaceTempId ? client : c);
+              }
+              // First call: either the optimistic temp client, or (in older flows)
+              // the final client directly — append only if it isn't already present.
+              if (prev.some(c => c._id === client._id)) return prev;
+              return [...prev, client];
+            });
+            setActive("clients");
+          }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || accentColor} />}
         </div>
       </div>
 

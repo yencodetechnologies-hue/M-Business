@@ -193,13 +193,22 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           console.error('Client update failed:', err);
         });
       } else {
-        const res = await axios.post(`${BASE_URL}/api/clients/add`, payload, {
-          headers: { Authorization: `Bearer ${user?.token || ""}` }
-        });
+        // Optimistic add — show the client immediately with a temporary id,
+        // then swap in the real saved record once the server responds.
+        const tempId = `temp_${Date.now()}`;
+        const optimisticClient = { ...payload, _id: tempId, name: payload.clientName };
+        if (onClientAdded) onClientAdded(optimisticClient);
         toast.success('Client added successfully!');
-        // Pass new client to parent BEFORE navigating back so it can select it
-        if (onClientAdded) onClientAdded(res.data.client);
-        // Do NOT call onBack() — onClientAdded handler will handle navigation
+
+        axios.post(`${BASE_URL}/api/clients/add`, payload, {
+          headers: { Authorization: `Bearer ${user?.token || ""}` }
+        }).then(res => {
+          // Swap the temp client for the server-confirmed one, if the caller supports it
+          if (onClientAdded && res.data?.client) onClientAdded(res.data.client, tempId);
+        }).catch(err => {
+          toast.error('Failed to save client. Please try again.');
+          console.error('Client add failed:', err);
+        });
       }
     } catch (err) {
       toast.error(err.response?.data?.message || `Failed to ${isEdit ? 'update' : 'save'} client`);
@@ -507,9 +516,9 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           </div>
 
           <div style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-            <div style={{ fontSize: 13, color: '#94A3B0', display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ color: TC }}>Security</span> All data is saved securely.</div>
+            <div style={{ fontSize: 13, color: '#94A3B0', display: 'flex', alignItems: 'center', gap: 6 }}></div>
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={onBack} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 22px', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer', background: '#F4F6F8', color: '#5A6A7A', border: '1.5px solid #E0E6EA' }}>Cancel</button>
+
               <button onClick={submitForm} disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 22px', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', background: saving ? '#80DEEA' : ' var(--app-accent, var(--app-accent, #00BCD4))', color: 'white', border: '1.5px solid  var(--app-accent, var(--app-accent, #00BCD4))', opacity: saving ? 0.8 : 1, transition: 'all 0.2s' }}>
                 {saving ? (
                   <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

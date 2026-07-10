@@ -2350,15 +2350,6 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
       {viewClientModal && activeClient && (
 
-        <AddClientView
-          editData={activeClient}
-          readOnly={true}
-          onBack={() => setViewClientModal(false)}
-          user={user}
-        />
-      )}
-      {false && viewClientModal && activeClient && (
-
         <Mdl title="Client Details" onClose={() => setViewClientModal(false)} maxWidth={600}>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

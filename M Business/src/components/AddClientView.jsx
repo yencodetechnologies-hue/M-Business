@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { BASE_URL } from '../config';
-export default function AddClientView({ onBack, onClientAdded, onClientUpdated, user, editData, readOnly = false, themeColor = ' var(--app-accent, var(--app-accent, #00BCD4))' }) {
+export default function AddClientView({ onBack, onClientAdded, onClientUpdated, user, editData, themeColor = ' var(--app-accent, var(--app-accent, #00BCD4))' }) {
   const TC = themeColor; // shorthand
   const TC_LIGHT = `${themeColor}18`; // ~10% opacity tin
   const isEdit = !!editData;
@@ -533,20 +533,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
             </div>
           </div>
 
-          <div style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-            <div style={{ fontSize: 13, color: '#94A3B0', display: 'flex', alignItems: 'center', gap: 6 }}></div>
-            <div style={{ display: 'flex', gap: 10 }}>
 
-              <button onClick={submitForm} disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 22px', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', background: saving ? '#80DEEA' : ' var(--app-accent, var(--app-accent, #00BCD4))', color: 'white', border: '1.5px solid  var(--app-accent, var(--app-accent, #00BCD4))', opacity: saving ? 0.8 : 1, transition: 'all 0.2s' }}>
-                {saving ? (
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-
-                    {isEdit ? 'Updating' : 'Saving'}
-                  </span>
-                ) : (readOnly ? '👁 View Only' : (isEdit ? '✅ Update Client' : '👤 Add Client'))}
-              </button>
-            </div>
-          </div>
 
         </div>
       </div>

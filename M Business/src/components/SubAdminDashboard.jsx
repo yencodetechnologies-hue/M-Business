@@ -458,6 +458,11 @@ function getNavForRole(role) {
 
 const sc = s => ({ Active: "#22C55E", Inactive: "#EF4444", "In Progress": "var(--app-accent)", Pending: "#F59E0B", Completed: "#22C55E", "On Hold": "var(--app-accent)", Sent: "var(--app-accent)", Approved: "#22C55E", Rejected: "#EF4444", Paid: "#22C55E", Overdue: "#EF4444", Company: "var(--app-accent)", Employee: "var(--app-accent)", Manager: "#f59e0b", pending: "#F59E0B", hired: "#22C55E", rejected: "#EF4444" }[s] || "var(--app-accent)");
 
+// Single source of truth for department names, shared by the "All Departments"
+// filter dropdown and the Add/Edit Employee "Role / Position" dropdown, so both
+// stay in sync — adding a department here updates both automatically.
+const DEPARTMENT_OPTIONS = ["Development", "Design", "Marketing", "HR"];
+
 
 
 function Badge({ label }) {
@@ -2376,7 +2381,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               { icon: "ti-user", label: "Client Name", val: activeClient.clientName || activeClient.name || "—" },
 
-              { icon: "ti-category", label: "Client Type", val: activeClient.clientType ? (activeClient.clientType === "b2b" ? "B2B" : activeClient.clientType === "b2c" ? "B2C" : "Freelancer") : "—" },
+              { icon: "ti-category", label: "Client Type", val: activeClient.clientType ? (activeClient.clientType === "b2b" ? "B2B — Company / Business" : activeClient.clientType === "b2c" ? "B2C — Individual Person" : "Freelancer — Consultant / Solo") : "—" },
 
               { icon: "ti-building", label: "Company Name", val: activeClient.companyName || activeClient.company || "—" },
 
@@ -2428,7 +2433,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               { icon: "ti-notes", label: "Internal Notes", val: activeClient.notes || "—" },
 
-            ].filter(row => row.val && row.val !== "—").map((row, i) => (
+            ].map((row, i) => (
 
               <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px", background: "#F5FAFA", borderRadius: 9, border: "1px solid #E0EEF0" }}>
 
@@ -2483,6 +2488,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
   const [editErr, setEditErr] = useState({});
   const [saving, setSaving] = useState(false);
   const [showEditEmpPass, setShowEditEmpPass] = useState(false);
+  const [showEditEmpConfirmPass, setShowEditEmpConfirmPass] = useState(false);
 
   const [toast, setToast] = useState("");
 
@@ -2856,7 +2862,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
               <Fld label="Phone Number" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
 
-              <Fld label="Role / Position" value={editForm.role} onChange={v => setEditForm(p => ({ ...p, role: v }))} options={["Manager", "Developer", "Tech", "Others"]} />
+              <Fld label="Role / Position" value={editForm.role} onChange={v => setEditForm(p => ({ ...p, role: v }))} options={DEPARTMENT_OPTIONS} />
 
               <Fld label="Department" value={editForm.department} onChange={v => setEditForm(p => ({ ...p, department: v }))} />
 
@@ -2868,7 +2874,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
               <Fld label="Marital Status" value={editForm.maritalStatus} onChange={v => setEditForm(p => ({ ...p, maritalStatus: v }))} options={["Unmarried", "Married"]} />
 
-              <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Pending", "Approved", "Rejected"]} />
+              <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Active", "Inactive", "On Leave"]} />
 
             </div>
 
@@ -2922,7 +2928,8 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
                   <div style={{ position: "relative" }}>
 
-                    <input type={showEditEmpPass ? "text" : "password"} value={editForm.confirmPassword || ""} onChange={e => { setEditForm(p => ({ ...p, confirmPassword: e.target.value })); setEditErr(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.confirmPassword ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter new password" />
+                    <input type={showEditEmpConfirmPass ? "text" : "password"} value={editForm.confirmPassword || ""} onChange={e => { setEditForm(p => ({ ...p, confirmPassword: e.target.value })); setEditErr(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.confirmPassword ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter new password" />
+                    <button type="button" onClick={() => setShowEditEmpConfirmPass(!showEditEmpConfirmPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEditEmpConfirmPass ? "HIDE" : "SHOW"}</button>
 
                   </div>
 
@@ -3054,7 +3061,7 @@ ${onboardingLink}`;
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
 
-        <div onClick={() => setStatusFilter("All Status")} style={{ background: statusFilter === "All Status" ? "var(--teal-light, var(--teal-light, #E0F7FA))" : "#fff", border: `1px solid ${statusFilter === "All Status" ? " var(--app-accent, var(--app-accent, #00BCD4))" : "var(--border)"}`, borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
+        <div onClick={() => setStatusFilter("All Status")} style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
 
           <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "rgba(var(--app-accent-rgb,0,188,212),0.08)", color: "var(--app-accent)" }}><i className="ti ti-users"></i></div>
 
@@ -3062,7 +3069,7 @@ ${onboardingLink}`;
 
         </div>
 
-        <div onClick={() => setStatusFilter("Active")} style={{ background: statusFilter === "Active" ? "#dcfce7" : "#fff", border: `1px solid ${statusFilter === "Active" ? "#16a34a" : "var(--border)"}`, borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
+        <div onClick={() => setStatusFilter("Active")} style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
 
           <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#dcfce7", color: "#16a34a" }}><i className="ti ti-check"></i></div>
 
@@ -3070,7 +3077,7 @@ ${onboardingLink}`;
 
         </div>
 
-        <div onClick={() => setStatusFilter("On Leave")} style={{ background: statusFilter === "On Leave" ? "#fef3c7" : "#fff", border: `1px solid ${statusFilter === "On Leave" ? "#d97706" : "var(--border)"}`, borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
+        <div onClick={() => setStatusFilter("On Leave")} style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
 
           <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#fef3c7", color: "#d97706" }}><i className="ti ti-clock"></i></div>
 
@@ -3078,7 +3085,7 @@ ${onboardingLink}`;
 
         </div>
 
-        <div onClick={() => setStatusFilter("Inactive")} style={{ background: statusFilter === "Inactive" ? "#fee2e2" : "#fff", border: `1px solid ${statusFilter === "Inactive" ? "#dc2626" : "var(--border)"}`, borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
+        <div onClick={() => setStatusFilter("Inactive")} style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
 
           <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#fee2e2", color: "#dc2626" }}><i className="ti ti-user-off"></i></div>
 
@@ -3104,13 +3111,7 @@ ${onboardingLink}`;
 
           <option>All Departments</option>
 
-          <option>Development</option>
-
-          <option>Design</option>
-
-          <option>Marketing</option>
-
-          <option>HR</option>
+          {DEPARTMENT_OPTIONS.map(d => <option key={d}>{d}</option>)}
 
         </select>
 
@@ -3120,15 +3121,13 @@ ${onboardingLink}`;
 
           <option value="Active">Active</option>
 
-          <option value="Approved">Approved</option>
-
-          <option value="Pending">Pending</option>
+          <option value="Inactive">Inactive</option>
 
           <option value="On Leave">On Leave</option>
 
-          <option value="Inactive">Inactive</option>
 
-          <option value="Rejected">Rejected</option>
+
+
 
         </select>
 
@@ -3271,13 +3270,13 @@ ${onboardingLink}`;
             <Fld label="Full Name *" value={editForm.name} onChange={v => setEditForm(p => ({ ...p, name: v }))} error={editErr.name} />
             <Fld label="Email *" value={editForm.email} onChange={v => { setEditForm(p => ({ ...p, email: v })); setEditErr(p => ({ ...p, email: "" })); }} type="email" error={editErr.email} />
             <Fld label="Phone Number" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
-            <Fld label="Role / Position" value={editForm.role} onChange={v => setEditForm(p => ({ ...p, role: v }))} options={["Manager", "Developer", "Tech", "Others"]} />
+            <Fld label="Role / Position" value={editForm.role} onChange={v => setEditForm(p => ({ ...p, role: v }))} options={DEPARTMENT_OPTIONS} />
             <Fld label="Department" value={editForm.department} onChange={v => setEditForm(p => ({ ...p, department: v }))} />
             <Fld label="Salary" value={editForm.salary} onChange={v => setEditForm(p => ({ ...p, salary: v }))} />
             <Fld label="Date of Birth" value={editForm.dateOfBirth} onChange={v => setEditForm(p => ({ ...p, dateOfBirth: v }))} type="date" />
             <Fld label="Joining Date" value={editForm.joiningDate} onChange={v => setEditForm(p => ({ ...p, joiningDate: v }))} type="date" />
             <Fld label="Marital Status" value={editForm.maritalStatus} onChange={v => setEditForm(p => ({ ...p, maritalStatus: v }))} options={["Unmarried", "Married"]} />
-            <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Pending", "Approved", "Rejected"]} />
+            <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Active", "Inactive", "On Leave"]} />
           </div>
           <Fld label="Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
 
@@ -3304,7 +3303,8 @@ ${onboardingLink}`;
               <div style={{ marginBottom: 14 }}>
                 <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CONFIRM PASSWORD</label>
                 <div style={{ position: "relative" }}>
-                  <input type={showEditEmpPass ? "text" : "password"} value={editForm.confirmPassword || ""} onChange={e => { setEditForm(p => ({ ...p, confirmPassword: e.target.value })); setEditErr(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.confirmPassword ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter new password" />
+                  <input type={showEditEmpConfirmPass ? "text" : "password"} value={editForm.confirmPassword || ""} onChange={e => { setEditForm(p => ({ ...p, confirmPassword: e.target.value })); setEditErr(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${editErr.confirmPassword ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter new password" />
+                  <button type="button" onClick={() => setShowEditEmpConfirmPass(!showEditEmpConfirmPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEditEmpConfirmPass ? "HIDE" : "SHOW"}</button>
                 </div>
                 {editErr.confirmPassword && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {editErr.confirmPassword}</div>}
               </div>
@@ -3312,7 +3312,7 @@ ${onboardingLink}`;
           </div>
 
           <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
-            <button onClick={() => setEditEmp(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+
             <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes "}</button>
           </div>
         </Mdl>
@@ -7195,6 +7195,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [ne, setNe] = useState({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Pending", password: "" });
 
   const [showEmpPass, setShowEmpPass] = useState(false);
+  const [showEmpConfirmPass, setShowEmpConfirmPass] = useState(false);
 
   const [neError, setNeError] = useState({});
 
@@ -12425,7 +12426,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <Fld label="Phone Number" value={ne.phone} onChange={v => setNe({ ...ne, phone: v })} />
 
-                <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v })} options={["Manager", "Developer", "Tech", "Others"]} />
+                <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v })} options={DEPARTMENT_OPTIONS} />
 
                 <Fld label="Department" value={ne.department} onChange={v => setNe({ ...ne, department: v })} />
 
@@ -12437,7 +12438,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <Fld label="Marital Status" value={ne.maritalStatus} onChange={v => setNe({ ...ne, maritalStatus: v })} options={["Unmarried", "Married"]} />
 
-                <Fld label="Status" value={ne.status} onChange={v => setNe({ ...ne, status: v })} options={["Pending", "Approved", "Rejected"]} />
+                <Fld label="Status" value={ne.status} onChange={v => setNe({ ...ne, status: v })} options={["Active", "Inactive", "On Leave"]} />
 
               </div>
 
@@ -12475,7 +12476,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 <div style={{ marginBottom: 14 }}>
                   <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CONFIRM PASSWORD *</label>
                   <div style={{ position: "relative" }}>
-                    <input type={showEmpPass ? "text" : "password"} value={ne.confirmPassword || ""} onChange={e => { setNe({ ...ne, confirmPassword: e.target.value }); setNeError(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.confirmPassword ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter password" />
+                    <input type={showEmpConfirmPass ? "text" : "password"} value={ne.confirmPassword || ""} onChange={e => { setNe({ ...ne, confirmPassword: e.target.value }); setNeError(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.confirmPassword ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter password" />
+                    <button type="button" onClick={() => setShowEmpConfirmPass(!showEmpConfirmPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEmpConfirmPass ? "HIDE" : "SHOW"}</button>
                   </div>
                   {neError.confirmPassword && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.confirmPassword}</div>}
                 </div>
@@ -12483,23 +12485,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6, flexWrap: "wrap" }}>
 
-                <button onClick={() => {
-
-                  const link = `${window.location.origin}/employee-onboarding?company=${encodeURIComponent(user?.companyName || "Our Company")}`;
-
-                  const text = `Hi,\n\nPlease fill in your onboarding details at the following link to join our team at ${user?.companyName || "Our Company"}:\n\n${link}`;
-
-                  const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-
-                  window.open(wpUrl, "_blank");
-
-                }} style={{ background: "#dcfce7", border: "1.5px solid #bbf7d0", color: "#16a34a", borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 700, fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}>
-
-                  <span>💬</span> Share Link
-
-                </button>
-
-                <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
 
                 <button onClick={addEmployee} disabled={empSaveLoading} style={{ ...B("var(--app-accent)"), opacity: empSaveLoading ? 0.7 : 1 }}>{empSaveLoading ? "Saving..." : "Add Employee"}</button>
 

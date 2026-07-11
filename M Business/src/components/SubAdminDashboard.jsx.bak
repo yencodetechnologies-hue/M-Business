@@ -3961,7 +3961,7 @@ const handleEditPackage = (pkg) => {
           <Fld label="Full Name *" value={ne.name} onChange={v => setNe({ ...ne, name: v })} error={neError.name} />
           <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} />
           <Fld label="Phone Number" value={ne.phone} onChange={v => setNe({ ...ne, phone: v })} />
-          <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v })} options={["Manager", "Developer", "Tech", "Others"]} />
+          <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v })} options={DEPARTMENT_OPTIONS} />
           <Fld label="Department" value={ne.department} onChange={v => setNe({ ...ne, department: v })} />
           <Fld label="Salary" value={ne.salary} onChange={v => setNe({ ...ne, salary: v })} />
           <Fld label="Status" value={ne.status} onChange={v => setNe({ ...ne, status: v })} options={["Active", "Inactive"]} />

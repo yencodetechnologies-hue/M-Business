@@ -623,7 +623,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         <div className="ed-card">
           <div className="ed-card-header">
             <div className="ed-card-title"><i className="ti ti-user-square"></i> Personal Information</div>
-            <button className="ed-btn" style={{ padding: "6px 12px", fontSize: "11px", borderRadius: "8px" }} onClick={onEdit}><i className="ti ti-pencil"></i> Edit</button>
+
           </div>
           <div className="ed-info-grid">
             <div className="ed-info-item"><div className="lbl">Full Name</div><div className="val">{emp.name || "—"}</div></div>

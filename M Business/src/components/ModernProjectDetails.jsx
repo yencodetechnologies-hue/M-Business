@@ -1351,7 +1351,21 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         if (uploadSendToClient) visibleTo.push('client');
         const title = uploadHeading.trim() || uploadDescription.trim().slice(0, 60) || 'Update';
         const body = uploadDescription.trim() ? `${uploadHeading.trim() ? uploadHeading + ': ' : ''}${uploadDescription}`.trim() : uploadHeading.trim();
-        const newUpdate = { text: body, title, date: new Date().toISOString(), author: 'Admin', type: updateType, visibleTo: visibleTo.length > 0 ? visibleTo : ['team'], fileName: uploadFileObj ? uploadFileObj.name : '' };
+        const composerAttachments = postUpdateAttachments || [];
+        const allAttachments = [...composerAttachments, ...newlyUploaded.map(f => ({ name: f.name, url: f.url, type: f.type }))];
+        const primaryAttachment = allAttachments[0] || null;
+        const newUpdate = {
+          text: body,
+          title,
+          date: new Date().toISOString(),
+          author: 'Admin',
+          type: updateType,
+          visibleTo: visibleTo.length > 0 ? visibleTo : ['team'],
+          fileName: primaryAttachment ? primaryAttachment.name : (uploadFileObj ? uploadFileObj.name : ''),
+          fileUrl: primaryAttachment ? primaryAttachment.url : '',
+          fileType: primaryAttachment ? primaryAttachment.type : '',
+          attachments: allAttachments,
+        };
         payload.updates = [newUpdate, ...(currProject.updates || [])];
 
         // Also create an actionable approval for the client and/or team so they
@@ -1408,9 +1422,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       if (payload.updates) {
         setCurrProject(prev => ({ ...prev, ...payload }));
       }
-      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, payload);
+      const putRes = await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, payload);
+      console.log('Update saved, server response:', putRes.data);
+      await loadLatest();
+      if (onUpdate) onUpdate();
       setShowUploadModal(false);
       setUploadFiles([]);
+      setPostUpdateAttachments([]);
       setUploadFileError('');
       setUploadShareError('');
       setUploadHeading('');
@@ -2580,6 +2598,42 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                 <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 4, background: P.primaryLight, color: P.primary, fontSize: 10, fontWeight: 'bold', textTransform: 'uppercase', marginRight: 6 }}>{upd.type || 'general'}</span>
                                 {upd.text}
                               </div>
+                              {(upd.attachments && upd.attachments.length > 0) ? (
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
+                                  {upd.attachments.map((att, aidx) => (
+                                    att.type && att.type.startsWith('image/') ? (
+                                      <img
+                                        key={`${att.url}-${aidx}`}
+                                        src={att.url}
+                                        alt={att.name || 'attachment'}
+                                        onClick={() => window.open(att.url, '_blank')}
+                                        style={{ width: 140, height: 100, objectFit: 'cover', borderRadius: 8, border: `1.5px solid ${P.border}`, cursor: 'pointer' }}
+                                      />
+                                    ) : (
+                                      <a key={`${att.url}-${aidx}`} href={att.url} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#f8fafc', fontSize: 12, fontWeight: 700, color: P.textDark, textDecoration: 'none' }}>
+                                        <i className="ti ti-file" style={{ fontSize: 14, color: P.primary }} />
+                                        {att.name || 'Attachment'}
+                                      </a>
+                                    )
+                                  ))}
+                                </div>
+                              ) : upd.fileUrl ? (
+                                <div style={{ marginTop: 8 }}>
+                                  {upd.fileType && upd.fileType.startsWith('image/') ? (
+                                    <img
+                                      src={upd.fileUrl}
+                                      alt={upd.fileName || 'attachment'}
+                                      onClick={() => window.open(upd.fileUrl, '_blank')}
+                                      style={{ width: 140, height: 100, objectFit: 'cover', borderRadius: 8, border: `1.5px solid ${P.border}`, cursor: 'pointer' }}
+                                    />
+                                  ) : (
+                                    <a href={upd.fileUrl} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#f8fafc', fontSize: 12, fontWeight: 700, color: P.textDark, textDecoration: 'none', width: 'fit-content' }}>
+                                      <i className="ti ti-file" style={{ fontSize: 14, color: P.primary }} />
+                                      {upd.fileName || 'Attachment'}
+                                    </a>
+                                  )}
+                                </div>
+                              ) : null}
                             </div>
                           </div>
                         ))}

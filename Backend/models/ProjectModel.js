@@ -42,7 +42,20 @@ const projectSchema = new mongoose.Schema({
       type: { type: String, default: "general" },
       date: { type: Date, default: Date.now },
       author: { type: String, default: "System" },
-      visibleTo: { type: [String], default: ["team", "client"] }
+      visibleTo: { type: [String], default: ["team", "client"] },
+      // Legacy single-attachment fields (kept for backwards compatibility)
+      fileName: { type: String, default: "" },
+      fileUrl: { type: String, default: "" },
+      fileType: { type: String, default: "" },
+      // Full attachment list, so multiple images/files can be attached to one update
+      attachments: {
+        type: [{
+          name: { type: String, default: "" },
+          url: { type: String, default: "" },
+          type: { type: String, default: "" }
+        }],
+        default: []
+      }
     }],
     default: []
   },

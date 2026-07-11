@@ -1622,55 +1622,86 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           </div>
         </div>
 
-        {/* HEADER */}
-        <div className="mpd-proj-header">
-          <div className="mpd-ph-left">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-              <div className="mpd-proj-name">{projName}</div>
-              <span className={`mpd-status-badge ${badgeClass}`}>{currProject.status || 'Active'}</span>
-              <span className={`mpd-prio ${prioClass}`}>{priority.charAt(0).toUpperCase() + priority.slice(1)}</span>
+        {/* HEADER + CLIENT PORTAL — side by side, 50/50 */}
+        <div style={{ display: 'flex', gap: 20, alignItems: 'stretch' }}>
+          <div className="mpd-proj-header" style={{ flex: '1 1 50%', minWidth: 0 }}>
+            <div className="mpd-ph-left">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+                <div className="mpd-proj-name">{projName}</div>
+                <span className={`mpd-status-badge ${badgeClass}`}>{currProject.status || 'Active'}</span>
+                <span className={`mpd-prio ${prioClass}`}>{priority.charAt(0).toUpperCase() + priority.slice(1)}</span>
+              </div>
+              <div className="mpd-proj-desc">{currProject.description || "No description provided for this project."}</div>
+              <div className="mpd-ph-meta">
+                <div className="mpd-pm-item"><i className="ti ti-building"></i> Client: <strong>{clientName}</strong></div>
+                <div className="mpd-pm-item"><i className="ti ti-calendar"></i> Start: <strong>{startD}</strong></div>
+                <div className="mpd-pm-item"><i className="ti ti-calendar-due"></i> Deadline: <strong>{endD}</strong></div>
+                {(currProject.contactPersonName || clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonName) && (
+                  <div className="mpd-pm-item"><i className="ti ti-user"></i> Contact: <strong>{currProject.contactPersonName || clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonName}</strong></div>
+                )}
+                {(currProject.contactPersonNo || clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonNo) && (
+                  <div className="mpd-pm-item"><i className="ti ti-phone"></i> <strong>{currProject.contactPersonNo || clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonNo}</strong></div>
+                )}
+                <div className="mpd-pm-item"><i className="ti ti-tag"></i> <strong>{category}</strong></div>
+              </div>
             </div>
-            <div className="mpd-proj-desc">{currProject.description || "No description provided for this project."}</div>
-            <div className="mpd-ph-meta">
-              <div className="mpd-pm-item"><i className="ti ti-building"></i> Client: <strong>{clientName}</strong></div>
-              <div className="mpd-pm-item"><i className="ti ti-calendar"></i> Start: <strong>{startD}</strong></div>
-              <div className="mpd-pm-item"><i className="ti ti-calendar-due"></i> Deadline: <strong>{endD}</strong></div>
-              {(currProject.contactPersonName || clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonName) && (
-                <div className="mpd-pm-item"><i className="ti ti-user"></i> Contact: <strong>{currProject.contactPersonName || clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonName}</strong></div>
-              )}
-              {(currProject.contactPersonNo || clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonNo) && (
-                <div className="mpd-pm-item"><i className="ti ti-phone"></i> <strong>{currProject.contactPersonNo || clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonNo}</strong></div>
-              )}
-              <div className="mpd-pm-item"><i className="ti ti-tag"></i> <strong>{category}</strong></div>
+            <div className="mpd-ph-right">
+              <div className="mpd-budget-box">
+                <div className="mpd-lbl">Total Budget</div>
+                <div className="mpd-amt">{budgetAmt ? `${currency}${budgetAmt.toLocaleString()}` : '—'}</div>
+                {budgetAmt > 0 && <div className="mpd-sub">Spent {currency}{spent.toLocaleString()} &nbsp;·&nbsp; <span className="mpd-g">Rem {currency}{remaining.toLocaleString()}</span></div>}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+
+                {onNewQuotation && (
+                  <button className="mpd-btn mpd-btn-outline" onClick={() => onNewQuotation(currProject)}>
+                    + New Quotation
+                  </button>
+                )}
+
+                {!hideTopActions && (
+                  <button className="mpd-btn mpd-btn-primary" onClick={() => {
+                    setActiveTab('updates');
+                    setComposerOpen(true);
+                    setTimeout(() => {
+                      composerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                  }}>
+                    <i className="ti ti-speakerphone"></i> Post Update
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-          <div className="mpd-ph-right">
-            <div className="mpd-budget-box">
-              <div className="mpd-lbl">Total Budget</div>
-              <div className="mpd-amt">{budgetAmt ? `${currency}${budgetAmt.toLocaleString()}` : '—'}</div>
-              {budgetAmt > 0 && <div className="mpd-sub">Spent {currency}{spent.toLocaleString()} &nbsp;·&nbsp; <span className="mpd-g">Rem {currency}{remaining.toLocaleString()}</span></div>}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
 
-              {onNewQuotation && (
-                <button className="mpd-btn mpd-btn-outline" onClick={() => onNewQuotation(currProject)}>
-                  + New Quotation
+          {user?.role !== 'client' && (
+            <div style={{ background: `linear-gradient(135deg, #004D5E, ${P.primary})`, borderRadius: P.radius, padding: 22, color: '#fff', flex: '1 1 50%', minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 800, marginBottom: 14 }}>
+                <i className="ti ti-world" style={{ fontSize: 16 }}></i> Client Portal
+              </div>
+              <div style={{ fontSize: 12, opacity: 0.85, marginBottom: 6 }}>{clientName}</div>
+              <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: 9, padding: '9px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 16 }}>
+                <span style={{ fontSize: 11, fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {loadingPortalLink ? 'Generating link...' : (portalLinkUrl ? `/client-portal/${portalLinkUrl.split('/client-portal/')[1]?.split('?')[0]}` : 'Link not generated')}
+                </span>
+                <button onClick={copyPortalLink} style={{ flexShrink: 0, padding: '4px 10px', borderRadius: 6, border: 'none', background: 'rgba(255,255,255,0.25)', color: '#fff', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Copy</button>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <button onClick={async () => { const link = portalLinkUrl || await generatePortalLink(); if (link) window.open(link, '_blank'); }} style={{ padding: '10px', borderRadius: 9, border: 'none', background: '#fff', color: P.primaryDark, fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                  <i className="ti ti-external-link"></i> Open Portal
                 </button>
-              )}
-
-              {!hideTopActions && (
-                <button className="mpd-btn mpd-btn-primary" onClick={() => {
-                  setActiveTab('updates');
-                  setComposerOpen(true);
-                  setTimeout(() => {
-                    composerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }, 100);
-                }}>
-                  <i className="ti ti-speakerphone"></i> Post Update
+                <button onClick={copyPortalLink} style={{ padding: '10px', borderRadius: 9, border: '1.5px solid rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                  <i className="ti ti-copy"></i> Copy Link
                 </button>
-              )}
+                <button onClick={sharePortalLinkViaWhatsApp} style={{ padding: '10px', borderRadius: 9, border: 'none', background: '#25D366', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                  <i className="ti ti-brand-whatsapp"></i> WhatsApp
+                </button>
+                <button onClick={sharePortalLinkViaEmail} style={{ padding: '10px', borderRadius: 9, border: '1.5px solid rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                  <i className="ti ti-mail"></i> Email Link
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* PROGRESS */}
@@ -1794,6 +1825,26 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           <div className="mpd-kpi">
             <div className="mpd-kpi-icon" style={{ background: P.purpleLight }}><i className="ti ti-users" style={{ color: P.purple }}></i></div>
             <div><div className="mpd-kpi-val">{assigned.length}</div><div className="mpd-kpi-lbl">Team Members</div><div className="mpd-kpi-trend mpd-up">Assigned</div></div>
+          </div>
+        </div>
+
+        {/* BUDGET SUMMARY — 4 cards: Overall Budget, Spent, Remaining, Total */}
+        <div className="mpd-kpi-row">
+          <div className="mpd-kpi">
+            <div className="mpd-kpi-icon" style={{ background: P.primaryLight }}><i className="ti ti-wallet" style={{ color: P.primary }}></i></div>
+            <div><div className="mpd-kpi-val">{budgetAmt ? `${currency}${budgetAmt.toLocaleString()}` : '—'}</div><div className="mpd-kpi-lbl">Overall Budget</div></div>
+          </div>
+          <div className="mpd-kpi">
+            <div className="mpd-kpi-icon" style={{ background: '#FEE2E2' }}><i className="ti ti-arrow-up-right" style={{ color: '#DC2626' }}></i></div>
+            <div><div className="mpd-kpi-val">{currency}{spent.toLocaleString()}</div><div className="mpd-kpi-lbl">Spent Amount</div></div>
+          </div>
+          <div className="mpd-kpi">
+            <div className="mpd-kpi-icon" style={{ background: P.purpleLight }}><i className="ti ti-pig-money" style={{ color: P.purple }}></i></div>
+            <div><div className="mpd-kpi-val" style={{ color: remaining < 0 ? '#DC2626' : undefined }}>{remaining < 0 ? `-${currency}${Math.abs(remaining).toLocaleString()}` : `${currency}${remaining.toLocaleString()}`}</div><div className="mpd-kpi-lbl">Remaining Budget</div></div>
+          </div>
+          <div className="mpd-kpi">
+            <div className="mpd-kpi-icon" style={{ background: P.greenLight }}><i className="ti ti-cash" style={{ color: P.green }}></i></div>
+            <div><div className="mpd-kpi-val">{currency}{budgetAmt.toLocaleString()}</div><div className="mpd-kpi-lbl">Total Budget</div></div>
           </div>
         </div>
 
@@ -2954,39 +3005,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             )}
           </div>
 
-          {/* PORTAL LINK — staff-only. A client viewing a project inside their
-              OWN portal must never see this: generatePortalLink() looks the
-              client up by name as a fallback, and if another client has a
-              similar/duplicate name it can resolve to the WRONG client and
-              send this client into someone else's portal. */}
-          {user?.role !== 'client' && (
-            <div style={{ background: `linear-gradient(135deg, #004D5E, ${P.primary})`, borderRadius: P.radius, padding: 22, color: '#fff' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 800, marginBottom: 14 }}>
-                <i className="ti ti-world" style={{ fontSize: 16 }}></i> Client Portal
-              </div>
-              <div style={{ fontSize: 12, opacity: 0.85, marginBottom: 6 }}>{clientName}</div>
-              <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: 9, padding: '9px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 16 }}>
-                <span style={{ fontSize: 11, fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {loadingPortalLink ? 'Generating link...' : (portalLinkUrl ? `/client-portal/${portalLinkUrl.split('/client-portal/')[1]?.split('?')[0]}` : 'Link not generated')}
-                </span>
-                <button onClick={copyPortalLink} style={{ flexShrink: 0, padding: '4px 10px', borderRadius: 6, border: 'none', background: 'rgba(255,255,255,0.25)', color: '#fff', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Copy</button>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                <button onClick={async () => { const link = portalLinkUrl || await generatePortalLink(); if (link) window.open(link, '_blank'); }} style={{ padding: '10px', borderRadius: 9, border: 'none', background: '#fff', color: P.primaryDark, fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                  <i className="ti ti-external-link"></i> Open Portal
-                </button>
-                <button onClick={copyPortalLink} style={{ padding: '10px', borderRadius: 9, border: '1.5px solid rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                  <i className="ti ti-copy"></i> Copy Link
-                </button>
-                <button onClick={sharePortalLinkViaWhatsApp} style={{ padding: '10px', borderRadius: 9, border: 'none', background: '#25D366', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                  <i className="ti ti-brand-whatsapp"></i> WhatsApp
-                </button>
-                <button onClick={sharePortalLinkViaEmail} style={{ padding: '10px', borderRadius: 9, border: '1.5px solid rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                  <i className="ti ti-mail"></i> Email Link
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 

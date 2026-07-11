@@ -267,7 +267,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [postUpdateOnUpload, setPostUpdateOnUpload] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadFiles, setUploadFiles] = useState([]); // array of File objects (multi-select support)
-  const [postUpdateAttachment, setPostUpdateAttachment] = useState(null); // { name, url, type } for the Post Project Update panel
+  const [postUpdateAttachments, setPostUpdateAttachments] = useState([]); // [{ name, url, type }] for the Post Project Update panel
   const [postUpdateAttaching, setPostUpdateAttaching] = useState(false);
   const postUpdateFileInputRef = useRef(null);
   const [uploadFileError, setUploadFileError] = useState(''); // required-field validation message
@@ -392,7 +392,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   const [updateText, setUpdateText] = useState('');
   const [updateTitle, setUpdateTitle] = useState('');
-  const [updateType, setUpdateType] = useState('progress');
+  const [updateType, setUpdateType] = useState('');
   const [customUpdateTypes, setCustomUpdateTypes] = useState(() => {
     try { return JSON.parse(localStorage.getItem('mb_customUpdateTypes') || '[]'); } catch (e) { return []; }
   });
@@ -400,6 +400,20 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [customUpdateTypeInput, setCustomUpdateTypeInput] = useState('');
   const [sendToTeam, setSendToTeam] = useState(true);
   const [sendToClient, setSendToClient] = useState(true);
+  const [updateSelectedMembers, setUpdateSelectedMembers] = useState([]);
+  const [showUpdateMembersDropdown, setShowUpdateMembersDropdown] = useState(false);
+  const updateMembersDropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (!showUpdateMembersDropdown) return;
+    const handleClickOutside = (e) => {
+      if (updateMembersDropdownRef.current && !updateMembersDropdownRef.current.contains(e.target)) {
+        setShowUpdateMembersDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showUpdateMembersDropdown]);
   const [postingUpdate, setPostingUpdate] = useState(false);
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [selectedNewMember, setSelectedNewMember] = useState('');
@@ -2241,8 +2255,16 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               })}
 
               <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, paddingRight: 12, fontSize: 13, color: '#9CA3AF', userSelect: 'none', whiteSpace: 'nowrap' }}>
-                {tabOrder.indexOf(activeTab) > 0 && <span onClick={() => setActiveTab(tabOrder[tabOrder.indexOf(activeTab) - 1])} style={{ cursor: 'pointer', padding: '4px 8px', borderRadius: 6, background: '#F3F4F6', color: '#4B5563' }}><i className="ti ti-chevron-left"></i></span>}
-                {tabOrder.indexOf(activeTab) < tabOrder.length - 1 && <span onClick={() => setActiveTab(tabOrder[tabOrder.indexOf(activeTab) + 1])} style={{ cursor: 'pointer', padding: '4px 8px', borderRadius: 6, background: '#F3F4F6', color: '#4B5563' }}><i className="ti ti-chevron-right"></i></span>}
+                <span
+                  onClick={() => {
+                    const idx = tabOrder.indexOf(activeTab);
+                    const nextIdx = (idx + 1) % tabOrder.length;
+                    setActiveTab(tabOrder[nextIdx]);
+                  }}
+                  style={{ cursor: 'pointer', padding: '4px 8px', borderRadius: 6, background: '#F3F4F6', color: '#4B5563' }}
+                >
+                  <i className="ti ti-chevron-right"></i>
+                </span>
               </div>
             </div>
 
@@ -2277,23 +2299,49 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
                 <div className={`mpd-tab-pane ${activeTab === 'updates' ? 'mpd-active' : ''}`}>
                   {!hideTopActions && (
-                    <div ref={composerRef} className="mpd-upd-composer" style={{ overflow: 'hidden', marginBottom: composerOpen ? 20 : 0, display: activeTab === 'updates' ? 'block' : 'none' }}>
-                      <div className="mpd-uc-header" onClick={() => setComposerOpen(!composerOpen)} style={{ cursor: 'pointer' }}>
+                    <div ref={composerRef} className="mpd-upd-composer" style={{ overflow: 'hidden', marginBottom: 20, display: activeTab === 'updates' ? 'block' : 'none' }}>
+                      <div className="mpd-uc-header">
                         <h3><i className="ti ti-speakerphone"></i> Post Project Update</h3>
-                        <button className="mpd-uc-toggle" onClick={e => { e.stopPropagation(); setComposerOpen(!composerOpen); }}>{composerOpen ? 'Collapse ' : 'Expand '}</button>
                       </div>
-                      {composerOpen && (
+                      {(
                         <div style={{ padding: '18px 22px' }}>
                           {/* SEND TO */}
                           {updateType !== 'approval' && (
                             <div style={{ marginBottom: 14 }}>
-                              <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Share With</div>
-                              <div style={{ border: `1.5px solid ${sendToTeam ? P.purple : P.border}`, borderRadius: 10, padding: '12px 14px', background: sendToTeam ? P.purpleLight : '#fff', transition: 'all .15s' }}>
-                                <div onClick={() => setSendToTeam(!sendToTeam)} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-                                  <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${sendToTeam ? P.purple : P.border}`, background: sendToTeam ? P.purple : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{sendToTeam && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>Yes</span>}</div>
-                                  <i className="ti ti-users" style={{ color: P.purple, fontSize: 16 }}></i>
-                                  <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Team ({assigned.length} members)</span>
+                              <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Select Team Members</div>
+                              <div style={{ position: 'relative' }} ref={updateMembersDropdownRef}>
+                                <div
+                                  onClick={() => setShowUpdateMembersDropdown(v => !v)}
+                                  style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.purple}`, fontSize: 13, fontFamily: 'inherit', background: '#fff', color: updateSelectedMembers.length ? P.textDark : P.textLight, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxSizing: 'border-box' }}
+                                >
+                                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {updateSelectedMembers.length === 0 ? '-- Select Team Members --' : updateSelectedMembers.join(', ')}
+                                  </span>
+                                  <i className={`ti ${showUpdateMembersDropdown ? 'ti-chevron-up' : 'ti-chevron-down'}`} style={{ fontSize: 14, flexShrink: 0, marginLeft: 8 }} />
                                 </div>
+                                {showUpdateMembersDropdown && (
+                                  <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, background: '#fff', border: `1.5px solid ${P.purple}`, borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 20, maxHeight: 200, overflowY: 'auto' }}>
+                                    {(employees || []).filter(emp => assigned.includes(emp.name || emp.employeeName)).length === 0 && (
+                                      <div style={{ padding: '10px 12px', fontSize: 12, color: P.textLight }}>No employees assigned to this project.</div>
+                                    )}
+                                    {(employees || []).filter(emp => assigned.includes(emp.name || emp.employeeName)).map(emp => {
+                                      const name = emp.name || emp.employeeName || '';
+                                      const checked = updateSelectedMembers.includes(name);
+                                      return (
+                                        <label key={emp._id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: 13, color: P.textDark, cursor: 'pointer' }}>
+                                          <input
+                                            type="checkbox"
+                                            checked={checked}
+                                            onChange={() => {
+                                              setUpdateSelectedMembers(prev => checked ? prev.filter(n => n !== name) : [...prev, name]);
+                                            }}
+                                          />
+                                          {name}
+                                        </label>
+                                      );
+                                    })}
+                                  </div>
+                                )}
                               </div>
                             </div>
                           )}
@@ -2357,6 +2405,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   style={{ padding: '8px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: '#fff', color: P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 700, cursor: 'pointer', minWidth: 220 }}
                                 >
                                   <option value="" disabled>Select update type...</option>
+                                  <option value="__custom__" style={{ fontWeight: 700 }}>+ Custom</option>
 
                                   <option value="milestone">Milestone</option>
                                   <option value="general">General</option>
@@ -2432,7 +2481,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                 const formData = new FormData();
                                 formData.append('file', file);
                                 const res = await axios.post(`${BASE_URL}/api/upload`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-                                setPostUpdateAttachment({ name: file.name, url: res.data.url, type: file.type });
+                                setPostUpdateAttachments(prev => [...prev, { name: file.name, url: res.data.url, type: file.type }]);
                               } catch (err) {
                                 console.error('Attachment upload failed:', err);
                                 alert('Failed to upload attachment.');
@@ -2442,11 +2491,15 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               }
                             }}
                           />
-                          {postUpdateAttachment && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#f8fafc', marginBottom: 10, maxWidth: 320 }}>
-                              <i className={`ti ${postUpdateAttachment.type && postUpdateAttachment.type.startsWith('image/') ? 'ti-photo' : 'ti-file'}`} style={{ fontSize: 15, color: P.primary, flexShrink: 0 }} />
-                              <span style={{ fontSize: 12, fontWeight: 700, color: P.textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{postUpdateAttachment.name}</span>
-                              <button onClick={() => setPostUpdateAttachment(null)} title="Remove attachment" style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textLight, fontSize: 16, lineHeight: 1, padding: 2, flexShrink: 0 }}>×</button>
+                          {postUpdateAttachments.length > 0 && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 10 }}>
+                              {postUpdateAttachments.map((att, idx) => (
+                                <div key={`${att.name}-${idx}`} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#f8fafc', maxWidth: 320 }}>
+                                  <i className={`ti ${att.type && att.type.startsWith('image/') ? 'ti-photo' : 'ti-file'}`} style={{ fontSize: 15, color: P.primary, flexShrink: 0 }} />
+                                  <span style={{ fontSize: 12, fontWeight: 700, color: P.textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{att.name}</span>
+                                  <button onClick={() => setPostUpdateAttachments(prev => prev.filter((_, i) => i !== idx))} title="Remove attachment" style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textLight, fontSize: 16, lineHeight: 1, padding: 2, flexShrink: 0 }}>×</button>
+                                </div>
+                              ))}
                             </div>
                           )}
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
@@ -2497,14 +2550,15 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   setUploadHeading(updateTitle.trim());
                                   setUploadDescription(updateText.trim());
                                   setUploadSendToClient(sendToClient);
-                                  setUploadSendToEmployee(sendToTeam);
+                                  setUploadSendToEmployee(updateSelectedMembers.length > 0);
+                                  setUploadEmployeeName(updateSelectedMembers);
                                   setUploadClientName(sendToClient ? (currProject.client || clientName || '') : '');
                                   setPostUpdateOnUpload(true);
                                   setShowUploadModal(true);
                                 }}
                                 style={{ padding: '9px 22px', borderRadius: 10, background: P.primary, color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: 13, fontWeight: 800, cursor: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 'not-allowed' : 'pointer', opacity: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,188,212,.25)', transition: 'all .15s' }}>
                                 <i className="ti ti-send" style={{ fontSize: 15 }} />
-                                {postingUpdate ? 'Sending...' : updateType === 'approval' ? `Send Approval Request to ${approvalForm.recipientType === 'team' ? 'Team Member' : 'Client'}` : `Send to ${sendToTeam && sendToClient ? 'Team & Client' : sendToTeam ? 'Team' : 'Client Portal'}`}
+                                {postingUpdate ? 'Sending...' : updateType === 'approval' ? `Send Approval Request to ${approvalForm.recipientType === 'team' ? 'Team Member' : 'Client'}` : 'Send to Team'}
                               </button>
                             </div>
                           </div>

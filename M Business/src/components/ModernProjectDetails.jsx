@@ -558,11 +558,26 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       ]);
       const fetched = pRes.data;
       // Guard against a race with the backend: if the fetched project is
-      // missing its name/client (write not fully committed yet), don't let
-      // it clobber the good data we already have — this is what caused the
-      // "shows correctly once, then flickers to Unnamed Project" bug.
-      if (fetched && (fetched.name || fetched.client)) {
-        setCurrProject(fetched);
+      // missing its name/client (write not fully committed yet), or if the
+      // backend returned an array instead of a single project object
+      // (can happen if a route mismatch on the server returns a list),
+      // don't let it clobber the good data we already have.
+      const isValidProjectObject =
+        fetched &&
+        typeof fetched === 'object' &&
+        !Array.isArray(fetched) &&
+        (fetched.name || fetched.client);
+
+      if (isValidProjectObject) {
+        setCurrProject(prev => ({
+          ...fetched,
+          // Preserve existing updates if the fresh fetch somehow lacks them
+          updates: Array.isArray(fetched.updates) && fetched.updates.length > 0
+            ? fetched.updates
+            : (prev?.updates || fetched.updates || [])
+        }));
+      } else {
+        console.error('loadLatest: received invalid project payload from GET /api/projects/:id', fetched);
       }
       if (Array.isArray(tRes.data)) {
         setCurrTasks(tRes.data);
@@ -1695,14 +1710,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   </button>
                 )}
 
-                {!hideTopActions && (
-                  <button className="mpd-btn mpd-btn-primary" onClick={() => {
-                    setActiveTab('updates');
-                    setComposerOpen(true);
-                  }}>
-                    <i className="ti ti-speakerphone"></i> Post Update
-                  </button>
-                )}
+                <button className="mpd-btn mpd-btn-primary" onClick={() => {
+                  setActiveTab('updates');
+                  setComposerOpen(true);
+                }}>
+                  <i className="ti ti-speakerphone"></i> Post Update
+                </button>
               </div>
             </div>
           </div>
@@ -2314,7 +2327,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 </div>
 
                 <div className={`mpd-tab-pane ${activeTab === 'updates' ? 'mpd-active' : ''}`}>
-                  {!hideTopActions && composerOpen && (
+                  {composerOpen && (
                     <div style={{ position: 'fixed', inset: 0, zIndex: 99998, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
                       <div ref={composerRef} className="mpd-upd-composer" style={{ overflow: 'hidden', width: '100%', maxWidth: 560, maxHeight: '88vh', overflowY: 'auto', margin: 0 }}>
                         <div className="mpd-uc-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

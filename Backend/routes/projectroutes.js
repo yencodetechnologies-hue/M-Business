@@ -15,6 +15,40 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET single project by ID
+// IMPORTANT: this must come before "/:employeeName" — otherwise Express
+// matches a project's Mongo _id against that route instead, and the
+// real single-project handler is never reached.
+router.get("/:id", async (req, res) => {
+  try {
+    const companyId = req.companyId || "";
+    const project = await Project.findOne({ _id: req.params.id, companyId });
+    if (!project) return res.status(404).json({ msg: "Project not found" });
+    res.json(project);
+  } catch (err) {
+    console.error("GET project by ID error:", err.message);
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+});
+
+// GET single project by ID
+// MUST be registered before "/:employeeName" — otherwise Express matches
+// a project's Mongo _id against that route instead of this one, so
+// GET /api/projects/:id (used to load the Project Details page and its
+// Updates/Payments/Activity Logs tabs) never reaches the real handler
+// and returns an empty/wrong array instead of the project document.
+router.get("/:id", async (req, res) => {
+  try {
+    const companyId = req.companyId || "";
+    const project = await Project.findOne({ _id: req.params.id, companyId });
+    if (!project) return res.status(404).json({ msg: "Project not found" });
+    res.json(project);
+  } catch (err) {
+    console.error("GET project by ID error:", err.message);
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+});
+
 // GET projects assigned to an employee
 router.get("/:employeeName", async (req, res) => {
   try {
@@ -95,18 +129,7 @@ router.get("/employee/:employeeName", async (req, res) => {
   }
 });
 
-// GET single project by ID
-router.get("/:id", async (req, res) => {
-  try {
-    const companyId = req.companyId || "";
-    const project = await Project.findOne({ _id: req.params.id, companyId });
-    if (!project) return res.status(404).json({ msg: "Project not found" });
-    res.json(project);
-  } catch (err) {
-    console.error("GET project by ID error:", err.message);
-    res.status(500).json({ msg: "Server error", error: err.message });
-  }
-});
+
 
 // POST add project
 router.post("/add", async (req, res) => {

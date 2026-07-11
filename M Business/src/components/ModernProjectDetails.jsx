@@ -128,7 +128,7 @@ const CSS = `
 .mpd-kpi-trend.mpd-down { color:${P.red}; }
 
 /* PROGRESS — 4 separate equal-width summary cards */
-.mpd-prog-card { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px; }
+.mpd-prog-card { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:20px; margin-bottom:20px; }
 .mpd-prog-item { background:#fff; border-radius:16px; padding:18px 20px; box-shadow:0 2px 12px rgba(0,0,0,.07); border:1px solid rgba(0,0,0,.05); min-width:0; }
 .mpd-prog-item .mpd-progress-bg { width:100%; }
 @media (max-width: 900px) { .mpd-prog-card { grid-template-columns:repeat(2,1fr); } }
@@ -154,7 +154,8 @@ const CSS = `
 .mpd-uc-body.mpd-open { display:block; animation:fadeIn .2s ease; }
 
 /* GRID LAYOUT */
-.mpd-grid-main-side { display:grid; grid-template-columns:1fr 340px; gap:22px; align-items:start; }
+.mpd-grid-main-side { display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start; }
+@media (max-width: 900px) { .mpd-grid-main-side { grid-template-columns:1fr; } }
 
 /* TASKS LIST */
 .mpd-task-filters { display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap; }
@@ -2198,50 +2199,52 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 )}
               </div>
             </div>
+          </div>
 
+          {/* RIGHT COL — TABS (Payments / Updates / Activity Logs) */}
+          <div>
             {/* TABS - draggable scroll */}
-            <div className="mpd-card">
-              <div className="mpd-tabs"
-                ref={tabsRef}
-                style={{ overflowX: 'auto', scrollbarWidth: 'none' }}
-              >
-                {tabOrder.map(tab => {
-                  let lbl = '', icon = null;
-                  if (tab === 'updates') lbl = 'Updates';
-                  if (tab === 'activity') lbl = 'Activity Logs';
-                  if (tab === 'payments') { lbl = 'Payments'; icon = 'ti-arrows-exchange'; }
-                  return (
-                    <button
-                      key={tab}
-                      draggable
-                      onDragStart={(e) => { setDraggingTab(tab); e.dataTransfer.effectAllowed = "move"; }}
-                      onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; }}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        if (!draggingTab || draggingTab === tab) return;
-                        const oldIdx = tabOrder.indexOf(draggingTab);
-                        const newIdx = tabOrder.indexOf(tab);
-                        const newOrder = [...tabOrder];
-                        newOrder.splice(oldIdx, 1);
-                        newOrder.splice(newIdx, 0, draggingTab);
-                        setTabOrder(newOrder);
-                        setDraggingTab(null);
-                      }}
-                      onDragEnd={() => setDraggingTab(null)}
-                      className={`mpd-tab-btn ${activeTab === tab ? 'mpd-active' : ''}`}
-                      onClick={() => setActiveTab(tab)}
-                      style={{ opacity: draggingTab === tab ? 0.4 : 1, cursor: 'grab', transition: 'all 0.2s' }}
-                    >
-                      {icon && <i className={`ti ${icon}`} style={{ marginRight: 5 }}></i>}{lbl}
-                    </button>
-                  );
-                })}
+            <div className="mpd-card">          <div className="mpd-tabs"
+              ref={tabsRef}
+              style={{ overflowX: 'auto', scrollbarWidth: 'none' }}
+            >
+              {tabOrder.map(tab => {
+                let lbl = '', icon = null;
+                if (tab === 'updates') lbl = 'Updates';
+                if (tab === 'activity') lbl = 'Activity Logs';
+                if (tab === 'payments') { lbl = 'Payments'; icon = 'ti-arrows-exchange'; }
+                return (
+                  <button
+                    key={tab}
+                    draggable
+                    onDragStart={(e) => { setDraggingTab(tab); e.dataTransfer.effectAllowed = "move"; }}
+                    onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (!draggingTab || draggingTab === tab) return;
+                      const oldIdx = tabOrder.indexOf(draggingTab);
+                      const newIdx = tabOrder.indexOf(tab);
+                      const newOrder = [...tabOrder];
+                      newOrder.splice(oldIdx, 1);
+                      newOrder.splice(newIdx, 0, draggingTab);
+                      setTabOrder(newOrder);
+                      setDraggingTab(null);
+                    }}
+                    onDragEnd={() => setDraggingTab(null)}
+                    className={`mpd-tab-btn ${activeTab === tab ? 'mpd-active' : ''}`}
+                    onClick={() => setActiveTab(tab)}
+                    style={{ opacity: draggingTab === tab ? 0.4 : 1, cursor: 'grab', transition: 'all 0.2s' }}
+                  >
+                    {icon && <i className={`ti ${icon}`} style={{ marginRight: 5 }}></i>}{lbl}
+                  </button>
+                );
+              })}
 
-                <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, paddingRight: 12, fontSize: 13, color: '#9CA3AF', userSelect: 'none', whiteSpace: 'nowrap' }}>
-                  {tabOrder.indexOf(activeTab) > 0 && <span onClick={() => setActiveTab(tabOrder[tabOrder.indexOf(activeTab) - 1])} style={{ cursor: 'pointer', padding: '4px 8px', borderRadius: 6, background: '#F3F4F6', color: '#4B5563' }}><i className="ti ti-chevron-left"></i></span>}
-                  {tabOrder.indexOf(activeTab) < tabOrder.length - 1 && <span onClick={() => setActiveTab(tabOrder[tabOrder.indexOf(activeTab) + 1])} style={{ cursor: 'pointer', padding: '4px 8px', borderRadius: 6, background: '#F3F4F6', color: '#4B5563' }}><i className="ti ti-chevron-right"></i></span>}
-                </div>
+              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, paddingRight: 12, fontSize: 13, color: '#9CA3AF', userSelect: 'none', whiteSpace: 'nowrap' }}>
+                {tabOrder.indexOf(activeTab) > 0 && <span onClick={() => setActiveTab(tabOrder[tabOrder.indexOf(activeTab) - 1])} style={{ cursor: 'pointer', padding: '4px 8px', borderRadius: 6, background: '#F3F4F6', color: '#4B5563' }}><i className="ti ti-chevron-left"></i></span>}
+                {tabOrder.indexOf(activeTab) < tabOrder.length - 1 && <span onClick={() => setActiveTab(tabOrder[tabOrder.indexOf(activeTab) + 1])} style={{ cursor: 'pointer', padding: '4px 8px', borderRadius: 6, background: '#F3F4F6', color: '#4B5563' }}><i className="ti ti-chevron-right"></i></span>}
               </div>
+            </div>
 
               <div ref={tabContentRef} style={{ userSelect: 'none', overflow: 'visible', minHeight: 0 }}>
                 <div className={`mpd-tab-pane ${activeTab === 'activity' ? 'mpd-active' : ''}`}>
@@ -2867,137 +2870,105 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           </div>
         </div>{/* end mpd-grid-main-side */}
 
-        {/* TEAM SIDEBAR */}
-        <div className="mpd-card">
-          <div className="mpd-card-header">
-            <div className="mpd-card-title"><i className="ti ti-users"></i> Team</div>
-            {!hideTopActions && (
-              <button className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMemberModal(true)} style={{ padding: '5px 10px', fontSize: 11 }}>
-                <i className="ti ti-plus"></i> Add
-              </button>
-            )}
-          </div>
-          {assigned.length === 0 ? <div style={{ fontSize: 12, color: P.textLight }}>No team members assigned.</div> : null}
-          {assigned.map((a, i) => (
-            <div key={i} className="mpd-member-row" style={{ display: 'flex', alignItems: 'center' }}>
-              <div className="mpd-av mpd-av-sm" style={{ background: getAvatarColor(a) }}>{getInitials(a)}</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>{a}</div>
-                <div style={{ fontSize: 11, color: P.textLight }}>{employees.find(e => (e.name || e.employeeName) === a)?.role || 'Member'}</div>
-              </div>
-              {user?.role !== 'employee' && !hideTopActions && (
-                <button onClick={async () => {
-                  if (!window.confirm('Remove ' + a + ' from team?')) return;
-                  const updated = (currProject.assignedTo || []).filter((_, idx) => idx !== i);
-                  await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated });
-                  try {
-                    const tasksRes = await axios.get(`${BASE_URL}/api/tasks`, { headers: { 'x-company-id': currProject.companyId || '' } });
-                    const allTasks = Array.isArray(tasksRes.data) ? tasksRes.data : [];
-                    const projectTasks = allTasks.filter(t =>
-                      (t.projectId === currProject._id || t.projectId?._id === currProject._id) &&
-                      t.assignTo && t.assignTo !== 'Unassigned' &&
-                      t.assignTo.split(', ').map(n => n.trim()).includes(a)
-                    );
-                    await Promise.all(projectTasks.map(t => {
-                      const names = t.assignTo.split(', ').map(n => n.trim()).filter(Boolean);
-                      const updatedNames = names.filter(n => n !== a);
-                      return axios.put(`${BASE_URL}/api/tasks/${t._id}`, { assignTo: updatedNames.length > 0 ? updatedNames.join(', ') : 'Unassigned' }, { headers: { 'x-company-id': currProject.companyId || '' } });
-                    }));
-                  } catch (e) { console.error('Failed to unassign tasks:', e); }
-                  loadLatest();
-                }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 14, padding: '4px 6px' }} title="Remove">Delete</button>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* BUDGET */}
-        <div className="mpd-card">
-          <div className="mpd-card-header">
-            <div className="mpd-card-title"><i className="ti ti-wallet"></i> Budget</div>
-          </div>
-          {budgetExceeded && (
-            <div style={{ background: '#FEE2E2', border: '1px solid #FECACA', borderRadius: 8, padding: '8px 12px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 7 }}>
-              <i className="ti ti-alert-triangle" style={{ color: '#DC2626', fontSize: 16 }}></i>
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 800, color: '#DC2626' }}>Budget Exceeded!</div>
-                <div style={{ fontSize: 10, color: '#991B1B', fontWeight: 600 }}>Over by {currency}{overageAmt.toLocaleString()}</div>
-              </div>
-            </div>
-          )}
-          <div className="mpd-brow">
-            <span className="mpd-lbl">Total Budget <span style={{ fontSize: 9, color: '#94A3B8', fontWeight: 600, marginLeft: 4 }}>(auto)</span></span>
-            <span className="mpd-val">{currency}{budgetAmt.toLocaleString()}</span>
-          </div>
-          {[['Billed', 'billed', billed, ''], ['Advance Paid', 'advance', autoAdvanceTotal, 'mpd-p'], ['Received', 'received', received, 'mpd-g']].map(([lbl, key, val, cls]) => (
-            <div key={key} className="mpd-brow">
-              <span className="mpd-lbl">{lbl}</span>
-              <span className={`mpd-val ${cls}`}>{currency}{val.toLocaleString()}</span>
-            </div>
-          ))}
-          <div className="mpd-brow">
-            <span className="mpd-lbl">Pending</span>
-            <span className="mpd-val mpd-r">{currency}{pending.toLocaleString()}</span>
-          </div>
-          <div className="mpd-brow">
-            <span className="mpd-lbl">Spent (Expenses)</span>
-            <span className="mpd-val" style={{ color: budgetExceeded ? '#DC2626' : undefined, fontWeight: budgetExceeded ? 800 : 700 }}>{currency}{spent.toLocaleString()}</span>
-          </div>
-          {budgetAmt > 0 && (
-            <div className="mpd-brow">
-              <span className="mpd-lbl">Remaining Budget</span>
-              <span className="mpd-val" style={{ color: remaining < 0 ? '#DC2626' : '#7C3AED', fontWeight: 800 }}>
-                {remaining < 0 ? `-${currency}${Math.abs(remaining).toLocaleString()}` : `${currency}${remaining.toLocaleString()}`}
-              </span>
-            </div>
-          )}
-          {budgetAmt > 0 && (
-            <div style={{ marginTop: 10 }}>
-              <div className="mpd-progress-bg">
-                <div className="mpd-progress-fill" style={{ width: `${Math.min(budgetUsedPct, 100)}%`, background: budgetExceeded ? '#EF4444' : budgetUsedPct > 80 ? '#F97316' : '#8B5CF6' }}></div>
-              </div>
-              <div style={{ fontSize: 11, color: budgetExceeded ? '#DC2626' : P.textLight, marginTop: 4, fontWeight: budgetExceeded ? 800 : 600 }}>
-                {budgetUsedPct}% used · {currency}{spent.toLocaleString()} of {currency}{budgetAmt.toLocaleString()}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* FILES + PORTAL LINK — side by side */}
+        {/* TEAM + BUDGET — side by side */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
-          {/* FILES */}
+          {/* TEAM SIDEBAR */}
           <div className="mpd-card" style={{ marginBottom: 0 }}>
             <div className="mpd-card-header">
-              <div className="mpd-card-title"><i className="ti ti-paperclip"></i> Files</div>
+              <div className="mpd-card-title"><i className="ti ti-users"></i> Team</div>
               {!hideTopActions && (
-                <button className="mpd-btn mpd-btn-outline" onClick={() => setShowUploadModal(true)} style={{ padding: '5px 10px', fontSize: 11 }}>
-                  <i className="ti ti-upload"></i> Upload
+                <button className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMemberModal(true)} style={{ padding: '5px 10px', fontSize: 11 }}>
+                  <i className="ti ti-plus"></i> Add
                 </button>
               )}
             </div>
-            <input type="file" ref={fileInputRef} onChange={handleFileUpload} style={{ display: 'none' }} accept="image/*" />
-            {(!currProject.files || currProject.files.length === 0) ? (
-              <div style={{ fontSize: 12, color: P.textLight, textAlign: 'center', padding: '10px 0' }}>No files attached.</div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {currProject.files.map((file) => (
-                  <div key={file._id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px', border: `1.5px solid ${P.border}`, borderRadius: 8 }}>
-                    <button
-                      onClick={() => setPreviewProjectFile(file)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: P.primary, textAlign: 'left', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180, padding: 0 }}
-                    >
-                      <i className="ti ti-file" style={{ marginRight: 6 }}></i>{file.name}
-                    </button>
-                    {!hideTopActions && (
-                      <button onClick={() => handleDeleteFile(file._id)} style={{ background: 'transparent', border: 'none', color: P.red, cursor: 'pointer', fontSize: 14 }}>✕</button>
-                    )}
-                  </div>
-                ))}
+            {assigned.length === 0 ? <div style={{ fontSize: 12, color: P.textLight }}>No team members assigned.</div> : null}
+            {assigned.map((a, i) => (
+              <div key={i} className="mpd-member-row" style={{ display: 'flex', alignItems: 'center' }}>
+                <div className="mpd-av mpd-av-sm" style={{ background: getAvatarColor(a) }}>{getInitials(a)}</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>{a}</div>
+                  <div style={{ fontSize: 11, color: P.textLight }}>{employees.find(e => (e.name || e.employeeName) === a)?.role || 'Member'}</div>
+                </div>
+                {user?.role !== 'employee' && !hideTopActions && (
+                  <button onClick={async () => {
+                    if (!window.confirm('Remove ' + a + ' from team?')) return;
+                    const updated = (currProject.assignedTo || []).filter((_, idx) => idx !== i);
+                    await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated });
+                    try {
+                      const tasksRes = await axios.get(`${BASE_URL}/api/tasks`, { headers: { 'x-company-id': currProject.companyId || '' } });
+                      const allTasks = Array.isArray(tasksRes.data) ? tasksRes.data : [];
+                      const projectTasks = allTasks.filter(t =>
+                        (t.projectId === currProject._id || t.projectId?._id === currProject._id) &&
+                        t.assignTo && t.assignTo !== 'Unassigned' &&
+                        t.assignTo.split(', ').map(n => n.trim()).includes(a)
+                      );
+                      await Promise.all(projectTasks.map(t => {
+                        const names = t.assignTo.split(', ').map(n => n.trim()).filter(Boolean);
+                        const updatedNames = names.filter(n => n !== a);
+                        return axios.put(`${BASE_URL}/api/tasks/${t._id}`, { assignTo: updatedNames.length > 0 ? updatedNames.join(', ') : 'Unassigned' }, { headers: { 'x-company-id': currProject.companyId || '' } });
+                      }));
+                    } catch (e) { console.error('Failed to unassign tasks:', e); }
+                    loadLatest();
+                  }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 14, padding: '4px 6px' }} title="Remove">Delete</button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* BUDGET */}
+          <div className="mpd-card" style={{ marginBottom: 0 }}>
+            <div className="mpd-card-header">
+              <div className="mpd-card-title"><i className="ti ti-wallet"></i> Budget</div>
+            </div>
+            {budgetExceeded && (
+              <div style={{ background: '#FEE2E2', border: '1px solid #FECACA', borderRadius: 8, padding: '8px 12px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 7 }}>
+                <i className="ti ti-alert-triangle" style={{ color: '#DC2626', fontSize: 16 }}></i>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: '#DC2626' }}>Budget Exceeded!</div>
+                  <div style={{ fontSize: 10, color: '#991B1B', fontWeight: 600 }}>Over by {currency}{overageAmt.toLocaleString()}</div>
+                </div>
+              </div>
+            )}
+            <div className="mpd-brow">
+              <span className="mpd-lbl">Total Budget <span style={{ fontSize: 9, color: '#94A3B8', fontWeight: 600, marginLeft: 4 }}>(auto)</span></span>
+              <span className="mpd-val">{currency}{budgetAmt.toLocaleString()}</span>
+            </div>
+            {[['Billed', 'billed', billed, ''], ['Advance Paid', 'advance', autoAdvanceTotal, 'mpd-p'], ['Received', 'received', received, 'mpd-g']].map(([lbl, key, val, cls]) => (
+              <div key={key} className="mpd-brow">
+                <span className="mpd-lbl">{lbl}</span>
+                <span className={`mpd-val ${cls}`}>{currency}{val.toLocaleString()}</span>
+              </div>
+            ))}
+            <div className="mpd-brow">
+              <span className="mpd-lbl">Pending</span>
+              <span className="mpd-val mpd-r">{currency}{pending.toLocaleString()}</span>
+            </div>
+            <div className="mpd-brow">
+              <span className="mpd-lbl">Spent (Expenses)</span>
+              <span className="mpd-val" style={{ color: budgetExceeded ? '#DC2626' : undefined, fontWeight: budgetExceeded ? 800 : 700 }}>{currency}{spent.toLocaleString()}</span>
+            </div>
+            {budgetAmt > 0 && (
+              <div className="mpd-brow">
+                <span className="mpd-lbl">Remaining Budget</span>
+                <span className="mpd-val" style={{ color: remaining < 0 ? '#DC2626' : '#7C3AED', fontWeight: 800 }}>
+                  {remaining < 0 ? `-${currency}${Math.abs(remaining).toLocaleString()}` : `${currency}${remaining.toLocaleString()}`}
+                </span>
+              </div>
+            )}
+            {budgetAmt > 0 && (
+              <div style={{ marginTop: 10 }}>
+                <div className="mpd-progress-bg">
+                  <div className="mpd-progress-fill" style={{ width: `${Math.min(budgetUsedPct, 100)}%`, background: budgetExceeded ? '#EF4444' : budgetUsedPct > 80 ? '#F97316' : '#8B5CF6' }}></div>
+                </div>
+                <div style={{ fontSize: 11, color: budgetExceeded ? '#DC2626' : P.textLight, marginTop: 4, fontWeight: budgetExceeded ? 800 : 600 }}>
+                  {budgetUsedPct}% used · {currency}{spent.toLocaleString()} of {currency}{budgetAmt.toLocaleString()}
+                </div>
               </div>
             )}
           </div>
-
         </div>
+
       </div>
 
       {previewProjectFile && (() => {

@@ -61,7 +61,6 @@ const CSS = `
   .mpd-topbar-actions button { flex: 1 1 auto; min-width: 0; font-size: 12px; padding: 8px 10px; }
   .mpd-proj-header { flex-direction: column; }
   .mpd-ph-right { width: 100%; align-items: flex-start; }
-  .mpd-prog-card { flex-direction: column; }
   .mpd-prog-divider { display: none; }
   .mpd-card-header { flex-wrap: wrap; gap: 10px; }
 }
@@ -128,9 +127,12 @@ const CSS = `
 .mpd-kpi-trend.mpd-up { color:${P.green}; }
 .mpd-kpi-trend.mpd-down { color:${P.red}; }
 
-/* PROGRESS */
-.mpd-prog-card { background:#fff; border-radius:16px; padding:18px 24px; box-shadow:0 2px 12px rgba(0,0,0,.07); margin-bottom:20px; display:flex; gap:28px; flex-wrap:wrap; border:1px solid rgba(0,0,0,.05); }
-.mpd-prog-item { flex:1; min-width:150px; }
+/* PROGRESS — 4 separate equal-width summary cards */
+.mpd-prog-card { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px; }
+.mpd-prog-item { background:#fff; border-radius:16px; padding:18px 20px; box-shadow:0 2px 12px rgba(0,0,0,.07); border:1px solid rgba(0,0,0,.05); min-width:0; }
+.mpd-prog-item .mpd-progress-bg { width:100%; }
+@media (max-width: 900px) { .mpd-prog-card { grid-template-columns:repeat(2,1fr); } }
+@media (max-width: 480px) { .mpd-prog-card { grid-template-columns:1fr; } }
 .mpd-prog-num { font-size:22px; font-weight:900; color:${P.textDark}; letter-spacing:-.3px; }
 .mpd-prog-lbl { font-size:11px; color:${P.textLight}; font-weight:700; text-transform:uppercase; letter-spacing:.6px; margin-bottom:8px; }
 .mpd-progress-bg { background:${P.bg}; border-radius:20px; height:8px; overflow:hidden; }
@@ -1704,20 +1706,29 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           )}
         </div>
 
-        {/* PROGRESS */}
+        {/* PROGRESS + SUMMARY — single row, 4 equal-width cards */}
         <div className="mpd-prog-card">
           <div className="mpd-prog-item">
             <div className="mpd-prog-num">{progressPct}%</div>
-            <div className="mpd-prog-lbl">Overall</div>
+            <div className="mpd-prog-lbl">Overall Milestones</div>
             <div className="mpd-progress-bg"><div className="mpd-progress-fill" style={{ width: `${progressPct}%` }}></div></div>
             <div className="mpd-prog-sub">{doneMilestones} of {totalMilestones} milestones</div>
           </div>
-          <div className="mpd-prog-divider"></div>
           <div className="mpd-prog-item">
             <div className="mpd-prog-num">{budgetUsedPct}%</div>
             <div className="mpd-prog-lbl">Budget Used</div>
             <div className="mpd-progress-bg"><div className="mpd-progress-fill mpd-purple" style={{ width: `${budgetUsedPct}%` }}></div></div>
             <div className="mpd-prog-sub">{currency}{spent.toLocaleString()} of {currency}{budgetAmt.toLocaleString()}</div>
+          </div>
+          <div className="mpd-prog-item">
+            <div className="mpd-kpi-icon" style={{ background: '#FEE2E2', marginBottom: 8 }}><i className="ti ti-arrow-up-right" style={{ color: '#EF4444' }}></i></div>
+            <div className="mpd-prog-num">{currency}{spent.toLocaleString()}</div>
+            <div className="mpd-prog-lbl">Spent Amount</div>
+          </div>
+          <div className="mpd-prog-item">
+            <div className="mpd-kpi-icon" style={{ background: P.purpleLight, marginBottom: 8 }}><i className="ti ti-pig-money" style={{ color: P.purple }}></i></div>
+            <div className="mpd-prog-num" style={{ color: remaining < 0 ? '#DC2626' : undefined }}>{remaining < 0 ? `-${currency}${Math.abs(remaining).toLocaleString()}` : `${currency}${remaining.toLocaleString()}`}</div>
+            <div className="mpd-prog-lbl">Remaining Budget</div>
           </div>
         </div>
 
@@ -1828,25 +1839,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           </div>
         </div>
 
-        {/* SUMMARY — 4 cards: Overall Milestones, Total Budget, Spent Amount, Remaining Budget */}
-        <div className="mpd-kpi-row">
-          <div className="mpd-kpi">
-            <div className="mpd-kpi-icon" style={{ background: P.primaryLight }}><i className="ti ti-flag" style={{ color: P.primary }}></i></div>
-            <div><div className="mpd-kpi-val">{doneMilestones}/{totalMilestones}</div><div className="mpd-kpi-lbl">Overall Milestones</div></div>
-          </div>
-          <div className="mpd-kpi">
-            <div className="mpd-kpi-icon" style={{ background: P.greenLight }}><i className="ti ti-cash" style={{ color: P.green }}></i></div>
-            <div><div className="mpd-kpi-val">{currency}{budgetAmt.toLocaleString()}</div><div className="mpd-kpi-lbl">Total Budget</div></div>
-          </div>
-          <div className="mpd-kpi">
-            <div className="mpd-kpi-icon" style={{ background: '#FEE2E2' }}><i className="ti ti-arrow-up-right" style={{ color: '#dc2626' }}></i></div>
-            <div><div className="mpd-kpi-val">{currency}{spent.toLocaleString()}</div><div className="mpd-kpi-lbl">Spent Amount</div></div>
-          </div>
-          <div className="mpd-kpi">
-            <div className="mpd-kpi-icon" style={{ background: P.purpleLight }}><i className="ti ti-pig-money" style={{ color: P.purple }}></i></div>
-            <div><div className="mpd-kpi-val" style={{ color: remaining < 0 ? '#dc2626' : undefined }}>{remaining < 0 ? `-${currency}${Math.abs(remaining).toLocaleString()}` : `${currency}${remaining.toLocaleString()}`}</div><div className="mpd-kpi-lbl">Remaining Budget</div></div>
-          </div>
-        </div>
 
 
         {/* MILESTONES STANDALONE CARD */}

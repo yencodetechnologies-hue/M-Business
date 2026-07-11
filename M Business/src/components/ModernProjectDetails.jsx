@@ -1626,7 +1626,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         </div>
 
         {/* HEADER + CLIENT PORTAL — side by side, 50/50 */}
-        <div style={{ display: 'flex', gap: 20, alignItems: 'stretch' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch' }}>
           <div className="mpd-proj-header" style={{ flex: '1 1 50%', minWidth: 0 }}>
             <div className="mpd-ph-left">
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
@@ -1678,12 +1678,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           </div>
 
           {user?.role !== 'client' && (
-            <div style={{ background: `linear-gradient(135deg, #004D5E, ${P.primary})`, borderRadius: P.radius, padding: 22, color: '#fff', flex: '1 1 50%', minWidth: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 800, marginBottom: 14 }}>
+            <div style={{ background: `linear-gradient(135deg, #004D5E, ${P.primary})`, borderRadius: P.radius, padding: '16px 22px', color: '#fff', flex: '1 1 50%', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 800, marginBottom: 8 }}>
                 <i className="ti ti-world" style={{ fontSize: 16 }}></i> Client Portal
               </div>
-              <div style={{ fontSize: 12, opacity: 0.85, marginBottom: 6 }}>{clientName}</div>
-              <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: 9, padding: '9px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 16 }}>
+              <div style={{ fontSize: 12, opacity: 0.85, marginBottom: 4 }}>{clientName}</div>
+              <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: 9, padding: '7px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 10 }}>
                 <span style={{ fontSize: 11, fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {loadingPortalLink ? 'Generating link...' : (portalLinkUrl ? `/client-portal/${portalLinkUrl.split('/client-portal/')[1]?.split('?')[0]}` : 'Link not generated')}
                 </span>

@@ -253,6 +253,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [selectedPaymentItems, setSelectedPaymentItems] = useState([]);
   const [activePayTab, setActivePayTab] = useState('inv');
   const [composerOpen, setComposerOpen] = useState(false);
+  const [showSendConfirmModal, setShowSendConfirmModal] = useState(false);
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [approvalForm, setApprovalForm] = useState({ recipientType: 'client', teamMemberId: '', clientId: '', title: '', desc: '', icon: 'ti-file-text', approveLabel: 'Approve', rejectLabel: 'Review' });
   const [submittingApproval, setSubmittingApproval] = useState(false);
@@ -279,7 +280,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [uploadSendToEmployee, setUploadSendToEmployee] = useState(false);
   const [uploadClientName, setUploadClientName] = useState('');
   const [uploadEmployeeName, setUploadEmployeeName] = useState([]);
-  const [showUploadEmpDropdown, setShowUploadEmpDropdown] = useState(false);
+  const [showUploadEmpDropdown, setShowUploadEmpDropdown] = useState(true);
   const [uploadingModal, setUploadingModal] = useState(false);
   const [taskFilter, setTaskFilter] = useState('all');
 
@@ -1680,9 +1681,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   <button className="mpd-btn mpd-btn-primary" onClick={() => {
                     setActiveTab('updates');
                     setComposerOpen(true);
-                    setTimeout(() => {
-                      composerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 100);
                   }}>
                     <i className="ti ti-speakerphone"></i> Post Update
                   </button>
@@ -2298,69 +2296,87 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 </div>
 
                 <div className={`mpd-tab-pane ${activeTab === 'updates' ? 'mpd-active' : ''}`}>
-                  {!hideTopActions && (
-                    <div ref={composerRef} className="mpd-upd-composer" style={{ overflow: 'hidden', marginBottom: 20, display: activeTab === 'updates' ? 'block' : 'none' }}>
-                      <div className="mpd-uc-header">
-                        <h3><i className="ti ti-speakerphone"></i> Post Project Update</h3>
-                      </div>
-                      {(
-                        <div style={{ padding: '18px 22px' }}>
-                          {/* SEND TO */}
-                          {updateType !== 'approval' && (
-                            <div style={{ marginBottom: 14 }}>
-                              <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Select Team Members</div>
-                              <div style={{ position: 'relative' }} ref={updateMembersDropdownRef}>
-                                <div
-                                  onClick={() => setShowUpdateMembersDropdown(v => !v)}
-                                  style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.purple}`, fontSize: 13, fontFamily: 'inherit', background: '#fff', color: updateSelectedMembers.length ? P.textDark : P.textLight, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxSizing: 'border-box' }}
-                                >
-                                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                    {updateSelectedMembers.length === 0 ? '-- Select Team Members --' : updateSelectedMembers.join(', ')}
-                                  </span>
-                                  <i className={`ti ${showUpdateMembersDropdown ? 'ti-chevron-up' : 'ti-chevron-down'}`} style={{ fontSize: 14, flexShrink: 0, marginLeft: 8 }} />
-                                </div>
-                                {showUpdateMembersDropdown && (
-                                  <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, background: '#fff', border: `1.5px solid ${P.purple}`, borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 20, maxHeight: 200, overflowY: 'auto' }}>
-                                    {(employees || []).filter(emp => assigned.includes(emp.name || emp.employeeName)).length === 0 && (
-                                      <div style={{ padding: '10px 12px', fontSize: 12, color: P.textLight }}>No employees assigned to this project.</div>
-                                    )}
-                                    {(employees || []).filter(emp => assigned.includes(emp.name || emp.employeeName)).map(emp => {
-                                      const name = emp.name || emp.employeeName || '';
-                                      const checked = updateSelectedMembers.includes(name);
-                                      return (
-                                        <label key={emp._id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: 13, color: P.textDark, cursor: 'pointer' }}>
-                                          <input
-                                            type="checkbox"
-                                            checked={checked}
-                                            onChange={() => {
-                                              setUpdateSelectedMembers(prev => checked ? prev.filter(n => n !== name) : [...prev, name]);
-                                            }}
-                                          />
-                                          {name}
-                                        </label>
-                                      );
-                                    })}
+                  {!hideTopActions && composerOpen && (
+                    <div style={{ position: 'fixed', inset: 0, zIndex: 99998, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+                      <div ref={composerRef} className="mpd-upd-composer" style={{ overflow: 'hidden', width: '100%', maxWidth: 560, maxHeight: '88vh', overflowY: 'auto', margin: 0 }}>
+                        <div className="mpd-uc-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <h3><i className="ti ti-speakerphone"></i> Post Project Update</h3>
+                          <button onClick={() => setComposerOpen(false)} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>✕</button>
+                        </div>
+                        {(
+                          <div style={{ padding: '18px 22px' }}>
+                            {/* SEND TO */}
+                            {updateType !== 'approval' && (
+                              <div style={{ marginBottom: 14 }}>
+                                <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Select Team Members</div>
+                                <div style={{ position: 'relative' }} ref={updateMembersDropdownRef}>
+                                  <div
+                                    onClick={() => setShowUpdateMembersDropdown(v => !v)}
+                                    style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.purple}`, fontSize: 13, fontFamily: 'inherit', background: '#fff', color: updateSelectedMembers.length ? P.textDark : P.textLight, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxSizing: 'border-box' }}
+                                  >
+                                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                      {updateSelectedMembers.length === 0 ? '-- Select Team Members --' : updateSelectedMembers.join(', ')}
+                                    </span>
+                                    <i className={`ti ${showUpdateMembersDropdown ? 'ti-chevron-up' : 'ti-chevron-down'}`} style={{ fontSize: 14, flexShrink: 0, marginLeft: 8 }} />
                                   </div>
-                                )}
+                                  {showUpdateMembersDropdown && (
+                                    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, background: '#fff', border: `1.5px solid ${P.purple}`, borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 20, maxHeight: 200, overflowY: 'auto' }}>
+                                      {(employees || []).filter(emp => assigned.includes(emp.name || emp.employeeName)).length === 0 && (
+                                        <div style={{ padding: '10px 12px', fontSize: 12, color: P.textLight }}>No employees assigned to this project.</div>
+                                      )}
+                                      {(employees || []).filter(emp => assigned.includes(emp.name || emp.employeeName)).map(emp => {
+                                        const name = emp.name || emp.employeeName || '';
+                                        const checked = updateSelectedMembers.includes(name);
+                                        return (
+                                          <label key={emp._id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: 13, color: P.textDark, cursor: 'pointer' }}>
+                                            <input
+                                              type="checkbox"
+                                              checked={checked}
+                                              onChange={() => {
+                                                setUpdateSelectedMembers(prev => checked ? prev.filter(n => n !== name) : [...prev, name]);
+                                              }}
+                                            />
+                                            {name}
+                                          </label>
+                                        );
+                                      })}
+                                    </div>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          )}
-                          {/* UPDATE TYPE CHIPS */}
-                          <div style={{ marginBottom: 14 }}>
-                            <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Update Type</div>
-                            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-                              {isCustomUpdateTypeMode ? (
-                                <div style={{ display: 'flex', gap: 8, minWidth: 220 }}>
-                                  <input
-                                    type="text"
-                                    autoFocus
-                                    value={customUpdateTypeInput}
-                                    onChange={e => setCustomUpdateTypeInput(e.target.value)}
-                                    placeholder="Enter custom update type..."
-                                    style={{ flex: 1, padding: '8px 12px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 12, fontWeight: 700, color: P.textDark, fontFamily: 'inherit', outline: 'none' }}
-                                    onKeyDown={e => {
-                                      if (e.key === 'Enter') {
-                                        e.preventDefault();
+                            )}
+                            {/* UPDATE TYPE CHIPS */}
+                            <div style={{ marginBottom: 14 }}>
+                              <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Update Type</div>
+                              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                                {isCustomUpdateTypeMode ? (
+                                  <div style={{ display: 'flex', gap: 8, minWidth: 220 }}>
+                                    <input
+                                      type="text"
+                                      autoFocus
+                                      value={customUpdateTypeInput}
+                                      onChange={e => setCustomUpdateTypeInput(e.target.value)}
+                                      placeholder="Enter custom update type..."
+                                      style={{ flex: 1, padding: '8px 12px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 12, fontWeight: 700, color: P.textDark, fontFamily: 'inherit', outline: 'none' }}
+                                      onKeyDown={e => {
+                                        if (e.key === 'Enter') {
+                                          e.preventDefault();
+                                          const finalName = customUpdateTypeInput.trim();
+                                          if (!finalName) return;
+                                          setCustomUpdateTypes(prev => {
+                                            if (prev.includes(finalName)) return prev;
+                                            const next = [...prev, finalName];
+                                            try { localStorage.setItem('mb_customUpdateTypes', JSON.stringify(next)); } catch (err) { }
+                                            return next;
+                                          });
+                                          setUpdateType(finalName);
+                                          setIsCustomUpdateTypeMode(false);
+                                        }
+                                      }}
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => {
                                         const finalName = customUpdateTypeInput.trim();
                                         if (!finalName) return;
                                         setCustomUpdateTypes(prev => {
@@ -2371,202 +2387,179 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                         });
                                         setUpdateType(finalName);
                                         setIsCustomUpdateTypeMode(false);
+                                      }}
+                                      style={{ width: 38, borderRadius: 10, border: `1.5px solid ${P.primary}`, background: P.primary, color: '#fff', cursor: 'pointer', fontSize: 14, fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                    >✓</button>
+                                  </div>
+                                ) : (
+                                  <select
+                                    value={updateType === 'approval' ? '' : updateType}
+                                    onChange={e => {
+                                      if (e.target.value === '__custom__') {
+                                        setCustomUpdateTypeInput('');
+                                        setIsCustomUpdateTypeMode(true);
+                                      } else {
+                                        setUpdateType(e.target.value);
                                       }
                                     }}
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      const finalName = customUpdateTypeInput.trim();
-                                      if (!finalName) return;
-                                      setCustomUpdateTypes(prev => {
-                                        if (prev.includes(finalName)) return prev;
-                                        const next = [...prev, finalName];
-                                        try { localStorage.setItem('mb_customUpdateTypes', JSON.stringify(next)); } catch (err) { }
-                                        return next;
-                                      });
-                                      setUpdateType(finalName);
-                                      setIsCustomUpdateTypeMode(false);
-                                    }}
-                                    style={{ width: 38, borderRadius: 10, border: `1.5px solid ${P.primary}`, background: P.primary, color: '#fff', cursor: 'pointer', fontSize: 14, fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                                  >✓</button>
-                                </div>
-                              ) : (
-                                <select
-                                  value={updateType === 'approval' ? '' : updateType}
-                                  onChange={e => {
-                                    if (e.target.value === '__custom__') {
-                                      setCustomUpdateTypeInput('');
-                                      setIsCustomUpdateTypeMode(true);
-                                    } else {
-                                      setUpdateType(e.target.value);
-                                    }
-                                  }}
-                                  style={{ padding: '8px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: '#fff', color: P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 700, cursor: 'pointer', minWidth: 220 }}
-                                >
-                                  <option value="" disabled>Select update type...</option>
-                                  <option value="__custom__" style={{ fontWeight: 700 }}>+ Custom</option>
+                                    style={{ padding: '8px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: '#fff', color: P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 700, cursor: 'pointer', minWidth: 220 }}
+                                  >
+                                    <option value="" disabled>Select update type...</option>
+                                    <option value="__custom__" style={{ fontWeight: 700 }}>+ Custom</option>
 
-                                  <option value="milestone">Milestone</option>
-                                  <option value="general">General</option>
-                                  <option value="delivery">Delivery</option>
-                                  <option value="Project Kickoff">Project Kickoff</option>
-                                  <option value="Requirement Gathering">Requirement Gathering</option>
-                                  <option value="Scope Approval">Scope Approval</option>
-                                  <option value="Design Approval">Design Approval</option>
-                                  <option value="UI/UX Completion">UI/UX Completion</option>
-                                  <option value="Prototype Approval">Prototype Approval</option>
-                                  <option value="Development Started">Development Started</option>
-                                  <option value="Development Completed">Development Completed</option>
-                                  <option value="Internal Testing">Internal Testing</option>
-                                  <option value="QA Testing">QA Testing</option>
-                                  <option value="UAT (User Acceptance Testing)">UAT (User Acceptance Testing)</option>
-                                  <option value="Bug Fixes Completed">Bug Fixes Completed</option>
-                                  <option value="Client Review">Client Review</option>
-                                  <option value="Client Approval">Client Approval</option>
-                                  <option value="Security Testing">Security Testing</option>
-                                  <option value="Performance Testing">Performance Testing</option>
-                                  <option value="Documentation Completed">Documentation Completed</option>
-                                  <option value="Training Completed">Training Completed</option>
-                                  <option value="Deployment to Staging">Deployment to Staging</option>
-                                  <option value="Deployment to Production">Deployment to Production</option>
-                                  <option value="Go-Live">Go-Live</option>
-                                  <option value="Project Handover">Project Handover</option>
-                                  <option value="Warranty Support Started">Warranty Support Started</option>
-                                  <option value="Warranty Support Completed">Warranty Support Completed</option>
-                                  <option value="Project Closure">Project Closure</option>
-                                  {customUpdateTypes.map(t => <option key={t} value={t}>{t}</option>)}
+                                    <option value="milestone">Milestone</option>
+                                    <option value="general">General</option>
+                                    <option value="delivery">Delivery</option>
+                                    <option value="Project Kickoff">Project Kickoff</option>
+                                    <option value="Requirement Gathering">Requirement Gathering</option>
+                                    <option value="Scope Approval">Scope Approval</option>
+                                    <option value="Design Approval">Design Approval</option>
+                                    <option value="UI/UX Completion">UI/UX Completion</option>
+                                    <option value="Prototype Approval">Prototype Approval</option>
+                                    <option value="Development Started">Development Started</option>
+                                    <option value="Development Completed">Development Completed</option>
+                                    <option value="Internal Testing">Internal Testing</option>
+                                    <option value="QA Testing">QA Testing</option>
+                                    <option value="UAT (User Acceptance Testing)">UAT (User Acceptance Testing)</option>
+                                    <option value="Bug Fixes Completed">Bug Fixes Completed</option>
+                                    <option value="Client Review">Client Review</option>
+                                    <option value="Client Approval">Client Approval</option>
+                                    <option value="Security Testing">Security Testing</option>
+                                    <option value="Performance Testing">Performance Testing</option>
+                                    <option value="Documentation Completed">Documentation Completed</option>
+                                    <option value="Training Completed">Training Completed</option>
+                                    <option value="Deployment to Staging">Deployment to Staging</option>
+                                    <option value="Deployment to Production">Deployment to Production</option>
+                                    <option value="Go-Live">Go-Live</option>
+                                    <option value="Project Handover">Project Handover</option>
+                                    <option value="Warranty Support Started">Warranty Support Started</option>
+                                    <option value="Warranty Support Completed">Warranty Support Completed</option>
+                                    <option value="Project Closure">Project Closure</option>
+                                    {customUpdateTypes.map(t => <option key={t} value={t}>{t}</option>)}
 
-                                </select>
-                              )}
-                              <button onClick={() => setUpdateType('approval')} style={{ padding: '6px 14px', borderRadius: 20, border: `2px solid ${updateType === 'approval' ? P.primary : P.border}`, background: updateType === 'approval' ? P.primary : '#fff', color: updateType === 'approval' ? '#fff' : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all .15s' }}>
-                                <i className="ti ti-clipboard-check" style={{ fontSize: 13 }} />
-                                Approval Request
-                              </button>
-                            </div>
-                          </div>
-
-                          {/* UPDATE TITLE */}
-                          <div style={{ marginBottom: 12 }}>
-                            <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 }}>Update Title *</div>
-                            <input
-                              value={updateTitle}
-                              onChange={e => setUpdateTitle(e.target.value)}
-                              placeholder="e.g. Checkout flow 80% complete"
-                              style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }}
-                            />
-                          </div>
-
-                          {/* DETAILS */}
-                          <div style={{ marginBottom: 12 }}>
-                            <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 }}>Details</div>
-                            <textarea
-                              value={updateText}
-                              onChange={e => setUpdateText(e.target.value)}
-                              placeholder="What's done, what's next, any blockers or decisions needed..."
-                              style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'inherit', resize: 'vertical', minHeight: 90, outline: 'none', boxSizing: 'border-box', lineHeight: 1.6 }}
-                            />
-                          </div>
-
-                          {/* ATTACHMENTS ROW + RECIPIENT (approval mode) + SEND BUTTON */}
-                          <input
-                            type="file"
-                            ref={postUpdateFileInputRef}
-                            style={{ display: 'none' }}
-                            onChange={async (e) => {
-                              const file = e.target.files[0];
-                              if (!file) return;
-                              setPostUpdateAttaching(true);
-                              try {
-                                const formData = new FormData();
-                                formData.append('file', file);
-                                const res = await axios.post(`${BASE_URL}/api/upload`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-                                setPostUpdateAttachments(prev => [...prev, { name: file.name, url: res.data.url, type: file.type }]);
-                              } catch (err) {
-                                console.error('Attachment upload failed:', err);
-                                alert('Failed to upload attachment.');
-                              } finally {
-                                setPostUpdateAttaching(false);
-                                e.target.value = '';
-                              }
-                            }}
-                          />
-                          {postUpdateAttachments.length > 0 && (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 10 }}>
-                              {postUpdateAttachments.map((att, idx) => (
-                                <div key={`${att.name}-${idx}`} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#f8fafc', maxWidth: 320 }}>
-                                  <i className={`ti ${att.type && att.type.startsWith('image/') ? 'ti-photo' : 'ti-file'}`} style={{ fontSize: 15, color: P.primary, flexShrink: 0 }} />
-                                  <span style={{ fontSize: 12, fontWeight: 700, color: P.textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{att.name}</span>
-                                  <button onClick={() => setPostUpdateAttachments(prev => prev.filter((_, i) => i !== idx))} title="Remove attachment" style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textLight, fontSize: 16, lineHeight: 1, padding: 2, flexShrink: 0 }}>×</button>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-                            <div style={{ display: 'flex', gap: 10 }}>
-                              <button onClick={() => { postUpdateFileInputRef.current.accept = 'image/*'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
-                                <i className="ti ti-photo" style={{ fontSize: 15 }} /> {postUpdateAttaching ? 'Uploading...' : 'Image'}
-                              </button>
-                              <button onClick={() => { postUpdateFileInputRef.current.accept = '.pdf,.doc,.docx,.xls,.xlsx,.txt'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
-                                <i className="ti ti-file" style={{ fontSize: 15 }} /> {postUpdateAttaching ? 'Uploading...' : 'File/Doc'}
-                              </button>
-                              <button onClick={() => { postUpdateFileInputRef.current.accept = '*'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
-                                <i className="ti ti-paperclip" style={{ fontSize: 15 }} /> {postUpdateAttaching ? 'Uploading...' : 'Attach'}
-                              </button>
-                              <span style={{ fontSize: 11, color: P.textLight, alignSelf: 'center' }}>Drag &amp; drop supported</span>
-                            </div>
-
-                            {updateType === 'approval' && (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <div style={{ display: 'flex', borderRadius: 9, border: `1.5px solid ${P.border}`, overflow: 'hidden' }}>
-                                  <button type="button" onClick={() => setApprovalForm(f => ({ ...f, recipientType: 'client' }))} style={{ padding: '8px 14px', border: 'none', cursor: 'pointer', background: approvalForm.recipientType === 'client' ? P.primary : '#fff', color: approvalForm.recipientType === 'client' ? '#fff' : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 800 }}>Client</button>
-                                  <button type="button" onClick={() => setApprovalForm(f => ({ ...f, recipientType: 'team' }))} style={{ padding: '8px 14px', border: 'none', cursor: 'pointer', background: approvalForm.recipientType === 'team' ? P.primary : '#fff', color: approvalForm.recipientType === 'team' ? '#fff' : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 800 }}>Team</button>
-                                </div>
-                                {approvalForm.recipientType === 'client' ? (
-                                  <select value={approvalForm.clientId} onChange={e => setApprovalForm(f => ({ ...f, clientId: e.target.value }))} style={{ padding: '8px 10px', borderRadius: 9, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', background: '#fff', fontFamily: 'inherit', minWidth: 160 }}>
-                                    <option value="">-- Select client --</option>
-                                    {(clients || []).map(c => (<option key={c._id} value={c._id}>{c.clientName || c.name}</option>))}
-                                  </select>
-                                ) : (
-                                  <select value={approvalForm.teamMemberId} onChange={e => setApprovalForm(f => ({ ...f, teamMemberId: e.target.value }))} style={{ padding: '8px 10px', borderRadius: 9, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', background: '#fff', fontFamily: 'inherit', minWidth: 160 }}>
-                                    <option value="">-- Select team member --</option>
-                                    {(employees || []).map(emp => (<option key={emp._id} value={emp._id}>{emp.name || emp.employeeName}</option>))}
                                   </select>
                                 )}
+                                <button onClick={() => setUpdateType('approval')} style={{ padding: '6px 14px', borderRadius: 20, border: `2px solid ${updateType === 'approval' ? P.primary : P.border}`, background: updateType === 'approval' ? P.primary : '#fff', color: updateType === 'approval' ? '#fff' : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all .15s' }}>
+                                  <i className="ti ti-clipboard-check" style={{ fontSize: 13 }} />
+                                  Approval Request
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* UPDATE TITLE */}
+                            <div style={{ marginBottom: 12 }}>
+                              <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 }}>Update Title *</div>
+                              <input
+                                value={updateTitle}
+                                onChange={e => setUpdateTitle(e.target.value)}
+                                placeholder="e.g. Checkout flow 80% complete"
+                                style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }}
+                              />
+                            </div>
+
+                            {/* DETAILS */}
+                            <div style={{ marginBottom: 12 }}>
+                              <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 }}>Details</div>
+                              <textarea
+                                value={updateText}
+                                onChange={e => setUpdateText(e.target.value)}
+                                placeholder="What's done, what's next, any blockers or decisions needed..."
+                                style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'inherit', resize: 'vertical', minHeight: 90, outline: 'none', boxSizing: 'border-box', lineHeight: 1.6 }}
+                              />
+                            </div>
+
+                            {/* ATTACHMENTS ROW + RECIPIENT (approval mode) + SEND BUTTON */}
+                            <input
+                              type="file"
+                              ref={postUpdateFileInputRef}
+                              style={{ display: 'none' }}
+                              onChange={async (e) => {
+                                const file = e.target.files[0];
+                                if (!file) return;
+                                setPostUpdateAttaching(true);
+                                try {
+                                  const formData = new FormData();
+                                  formData.append('file', file);
+                                  const res = await axios.post(`${BASE_URL}/api/upload`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+                                  setPostUpdateAttachments(prev => [...prev, { name: file.name, url: res.data.url, type: file.type }]);
+                                } catch (err) {
+                                  console.error('Attachment upload failed:', err);
+                                  alert('Failed to upload attachment.');
+                                } finally {
+                                  setPostUpdateAttaching(false);
+                                  e.target.value = '';
+                                }
+                              }}
+                            />
+                            {postUpdateAttachments.length > 0 && (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 10 }}>
+                                {postUpdateAttachments.map((att, idx) => (
+                                  <div key={`${att.name}-${idx}`} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#f8fafc', maxWidth: 320 }}>
+                                    <i className={`ti ${att.type && att.type.startsWith('image/') ? 'ti-photo' : 'ti-file'}`} style={{ fontSize: 15, color: P.primary, flexShrink: 0 }} />
+                                    <span style={{ fontSize: 12, fontWeight: 700, color: P.textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{att.name}</span>
+                                    <button onClick={() => setPostUpdateAttachments(prev => prev.filter((_, i) => i !== idx))} title="Remove attachment" style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textLight, fontSize: 16, lineHeight: 1, padding: 2, flexShrink: 0 }}>×</button>
+                                  </div>
+                                ))}
                               </div>
                             )}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+                              <div style={{ display: 'flex', gap: 10 }}>
+                                <button onClick={() => { postUpdateFileInputRef.current.accept = 'image/*'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
+                                  <i className="ti ti-photo" style={{ fontSize: 15 }} /> {postUpdateAttaching ? 'Uploading...' : 'Image'}
+                                </button>
+                                <button onClick={() => { postUpdateFileInputRef.current.accept = '.pdf,.doc,.docx,.xls,.xlsx,.txt'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
+                                  <i className="ti ti-file" style={{ fontSize: 15 }} /> {postUpdateAttaching ? 'Uploading...' : 'File/Doc'}
+                                </button>
+                                <button onClick={() => { postUpdateFileInputRef.current.accept = '*'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
+                                  <i className="ti ti-paperclip" style={{ fontSize: 15 }} /> {postUpdateAttaching ? 'Uploading...' : 'Attach'}
+                                </button>
+                                <span style={{ fontSize: 11, color: P.textLight, alignSelf: 'center' }}>Drag &amp; drop supported</span>
+                              </div>
 
-                            <div style={{ display: 'flex', gap: 10 }}>
-                              <button onClick={() => setComposerOpen(false)} style={{ padding: '9px 18px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'inherit', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Draft</button>
-                              <button
-                                disabled={postingUpdate || (!updateTitle.trim() && !updateText.trim())}
-                                onClick={async () => {
-                                  const hasContent = updateTitle.trim() || updateText.trim();
-                                  if (!hasContent) return;
-                                  if (updateType === 'approval') {
-                                    await submitApprovalRequest();
-                                    return;
-                                  }
-                                  setUploadHeading(updateTitle.trim());
-                                  setUploadDescription(updateText.trim());
-                                  setUploadSendToClient(sendToClient);
-                                  setUploadSendToEmployee(updateSelectedMembers.length > 0);
-                                  setUploadEmployeeName(updateSelectedMembers);
-                                  setUploadClientName(sendToClient ? (currProject.client || clientName || '') : '');
-                                  setPostUpdateOnUpload(true);
-                                  setShowUploadModal(true);
-                                }}
-                                style={{ padding: '9px 22px', borderRadius: 10, background: P.primary, color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: 13, fontWeight: 800, cursor: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 'not-allowed' : 'pointer', opacity: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,188,212,.25)', transition: 'all .15s' }}>
-                                <i className="ti ti-send" style={{ fontSize: 15 }} />
-                                {postingUpdate ? 'Sending...' : updateType === 'approval' ? `Send Approval Request to ${approvalForm.recipientType === 'team' ? 'Team Member' : 'Client'}` : 'Send to Team'}
-                              </button>
+                              {updateType === 'approval' && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                  <div style={{ display: 'flex', borderRadius: 9, border: `1.5px solid ${P.border}`, overflow: 'hidden' }}>
+                                    <button type="button" onClick={() => setApprovalForm(f => ({ ...f, recipientType: 'client' }))} style={{ padding: '8px 14px', border: 'none', cursor: 'pointer', background: approvalForm.recipientType === 'client' ? P.primary : '#fff', color: approvalForm.recipientType === 'client' ? '#fff' : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 800 }}>Client</button>
+                                    <button type="button" onClick={() => setApprovalForm(f => ({ ...f, recipientType: 'team' }))} style={{ padding: '8px 14px', border: 'none', cursor: 'pointer', background: approvalForm.recipientType === 'team' ? P.primary : '#fff', color: approvalForm.recipientType === 'team' ? '#fff' : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 800 }}>Team</button>
+                                  </div>
+                                  {approvalForm.recipientType === 'client' ? (
+                                    <select value={approvalForm.clientId} onChange={e => setApprovalForm(f => ({ ...f, clientId: e.target.value }))} style={{ padding: '8px 10px', borderRadius: 9, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', background: '#fff', fontFamily: 'inherit', minWidth: 160 }}>
+                                      <option value="">-- Select client --</option>
+                                      {(clients || []).map(c => (<option key={c._id} value={c._id}>{c.clientName || c.name}</option>))}
+                                    </select>
+                                  ) : (
+                                    <select value={approvalForm.teamMemberId} onChange={e => setApprovalForm(f => ({ ...f, teamMemberId: e.target.value }))} style={{ padding: '8px 10px', borderRadius: 9, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', background: '#fff', fontFamily: 'inherit', minWidth: 160 }}>
+                                      <option value="">-- Select team member --</option>
+                                      {(employees || []).map(emp => (<option key={emp._id} value={emp._id}>{emp.name || emp.employeeName}</option>))}
+                                    </select>
+                                  )}
+                                </div>
+                              )}
+
+                              <div style={{ display: 'flex', gap: 10 }}>
+                                <button onClick={() => setComposerOpen(false)} style={{ padding: '9px 18px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'inherit', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Draft</button>
+                                <button
+                                  disabled={postingUpdate || (!updateTitle.trim() && !updateText.trim())}
+                                  onClick={async () => {
+                                    const hasContent = updateTitle.trim() || updateText.trim();
+                                    if (!hasContent) return;
+                                    if (updateType === 'approval') {
+                                      await submitApprovalRequest();
+                                      return;
+                                    }
+                                    setShowSendConfirmModal(true);
+                                  }}
+                                  style={{ padding: '9px 22px', borderRadius: 10, background: P.primary, color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: 13, fontWeight: 800, cursor: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 'not-allowed' : 'pointer', opacity: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,188,212,.25)', transition: 'all .15s' }}>
+                                  <i className="ti ti-send" style={{ fontSize: 15 }} />
+                                  {updateType === 'approval' ? `Send Approval Request to ${approvalForm.recipientType === 'team' ? 'Team Member' : 'Client'}` : 'Send to Team'}
+                                </button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
                   )}
-
                   {(!currProject.updates || currProject.updates.length === 0) ? (
                     <div style={{ padding: 20, textAlign: 'center', color: P.textLight, fontSize: 13 }}>No updates posted yet.</div>
                   ) : (() => {
@@ -3314,6 +3307,87 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           );
         })()
       }
+      {/* Send to Team Confirmation Modal */}
+      {
+        showSendConfirmModal && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+            <div style={{ background: '#fff', borderRadius: P.radius, width: '100%', maxWidth: 480, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', overflow: 'hidden' }}>
+              <div style={{ background: `linear-gradient(135deg,${P.primary},${P.primaryDark})`, padding: '16px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <i className="ti ti-send" style={{ color: '#fff', fontSize: 18 }}></i>
+                  <span style={{ color: '#fff', fontWeight: 800, fontSize: 15 }}>Confirm Send</span>
+                </div>
+                <button
+                  onClick={() => setShowSendConfirmModal(false)}
+                  style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div style={{ padding: '22px 24px' }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Select Team Members</div>
+                <div style={{ position: 'relative' }}>
+                  <div
+                    onClick={() => setShowUpdateMembersDropdown(v => !v)}
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.purple}`, fontSize: 13, fontFamily: 'inherit', background: '#fff', color: updateSelectedMembers.length ? P.textDark : P.textLight, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxSizing: 'border-box' }}
+                  >
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {updateSelectedMembers.length === 0 ? '-- Select Team Members --' : updateSelectedMembers.join(', ')}
+                    </span>
+                    <i className={`ti ${showUpdateMembersDropdown ? 'ti-chevron-up' : 'ti-chevron-down'}`} style={{ fontSize: 14, flexShrink: 0, marginLeft: 8 }} />
+                  </div>
+                  {showUpdateMembersDropdown && (
+                    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, background: '#fff', border: `1.5px solid ${P.purple}`, borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 20, maxHeight: 200, overflowY: 'auto' }}>
+                      {(employees || []).filter(emp => assigned.includes(emp.name || emp.employeeName)).length === 0 && (
+                        <div style={{ padding: '10px 12px', fontSize: 12, color: P.textLight }}>No employees assigned to this project.</div>
+                      )}
+                      {(employees || []).filter(emp => assigned.includes(emp.name || emp.employeeName)).map(emp => {
+                        const name = emp.name || emp.employeeName || '';
+                        const checked = updateSelectedMembers.includes(name);
+                        return (
+                          <label key={emp._id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: 13, color: P.textDark, cursor: 'pointer' }}>
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={() => {
+                                setUpdateSelectedMembers(prev => checked ? prev.filter(n => n !== name) : [...prev, name]);
+                              }}
+                            />
+                            {name}
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 22 }}>
+                  <button onClick={() => setShowSendConfirmModal(false)} style={{ padding: '9px 18px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'inherit', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
+                  <button
+                    disabled={updateSelectedMembers.length === 0 || postingUpdate}
+                    onClick={async () => {
+                      setUploadHeading(updateTitle.trim());
+                      setUploadDescription(updateText.trim());
+                      setUploadSendToClient(sendToClient);
+                      setUploadSendToEmployee(true);
+                      setUploadEmployeeName(updateSelectedMembers);
+                      setUploadClientName(sendToClient ? (currProject.client || clientName || '') : '');
+                      setPostUpdateOnUpload(true);
+                      setShowSendConfirmModal(false);
+                      setShowUploadModal(true);
+                    }}
+                    style={{ padding: '9px 22px', borderRadius: 10, background: P.primary, color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: 13, fontWeight: 800, cursor: updateSelectedMembers.length === 0 ? 'not-allowed' : 'pointer', opacity: updateSelectedMembers.length === 0 ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <i className="ti ti-send" style={{ fontSize: 15 }} />
+                    Confirm & Send
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
+
 
       {/* Upload File Modal */}
       {

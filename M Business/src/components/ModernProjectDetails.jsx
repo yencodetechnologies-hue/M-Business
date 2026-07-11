@@ -1828,23 +1828,23 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           </div>
         </div>
 
-        {/* BUDGET SUMMARY — 4 cards: Overall Budget, Spent, Remaining, Total */}
+        {/* SUMMARY — 4 cards: Overall Milestones, Total Budget, Spent Amount, Remaining Budget */}
         <div className="mpd-kpi-row">
           <div className="mpd-kpi">
-            <div className="mpd-kpi-icon" style={{ background: P.primaryLight }}><i className="ti ti-wallet" style={{ color: P.primary }}></i></div>
-            <div><div className="mpd-kpi-val">{budgetAmt ? `${currency}${budgetAmt.toLocaleString()}` : '—'}</div><div className="mpd-kpi-lbl">Overall Budget</div></div>
-          </div>
-          <div className="mpd-kpi">
-            <div className="mpd-kpi-icon" style={{ background: '#FEE2E2' }}><i className="ti ti-arrow-up-right" style={{ color: '#DC2626' }}></i></div>
-            <div><div className="mpd-kpi-val">{currency}{spent.toLocaleString()}</div><div className="mpd-kpi-lbl">Spent Amount</div></div>
-          </div>
-          <div className="mpd-kpi">
-            <div className="mpd-kpi-icon" style={{ background: P.purpleLight }}><i className="ti ti-pig-money" style={{ color: P.purple }}></i></div>
-            <div><div className="mpd-kpi-val" style={{ color: remaining < 0 ? '#DC2626' : undefined }}>{remaining < 0 ? `-${currency}${Math.abs(remaining).toLocaleString()}` : `${currency}${remaining.toLocaleString()}`}</div><div className="mpd-kpi-lbl">Remaining Budget</div></div>
+            <div className="mpd-kpi-icon" style={{ background: P.primaryLight }}><i className="ti ti-flag" style={{ color: P.primary }}></i></div>
+            <div><div className="mpd-kpi-val">{doneMilestones}/{totalMilestones}</div><div className="mpd-kpi-lbl">Overall Milestones</div></div>
           </div>
           <div className="mpd-kpi">
             <div className="mpd-kpi-icon" style={{ background: P.greenLight }}><i className="ti ti-cash" style={{ color: P.green }}></i></div>
             <div><div className="mpd-kpi-val">{currency}{budgetAmt.toLocaleString()}</div><div className="mpd-kpi-lbl">Total Budget</div></div>
+          </div>
+          <div className="mpd-kpi">
+            <div className="mpd-kpi-icon" style={{ background: '#FEE2E2' }}><i className="ti ti-arrow-up-right" style={{ color: '#dc2626' }}></i></div>
+            <div><div className="mpd-kpi-val">{currency}{spent.toLocaleString()}</div><div className="mpd-kpi-lbl">Spent Amount</div></div>
+          </div>
+          <div className="mpd-kpi">
+            <div className="mpd-kpi-icon" style={{ background: P.purpleLight }}><i className="ti ti-pig-money" style={{ color: P.purple }}></i></div>
+            <div><div className="mpd-kpi-val" style={{ color: remaining < 0 ? '#dc2626' : undefined }}>{remaining < 0 ? `-${currency}${Math.abs(remaining).toLocaleString()}` : `${currency}${remaining.toLocaleString()}`}</div><div className="mpd-kpi-lbl">Remaining Budget</div></div>
           </div>
         </div>
 

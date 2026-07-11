@@ -55,13 +55,7 @@ const InfoRow = ({ label, value, icon }) => {
 
 // ─── Plan Data ---------------------------------------------------------------
 const DEFAULT_PLANS = [
-  {
-    name: "Trial", price: 0, color: "var(--app-accent)", duration: 30, isTrial: true,
-    subtitle: "MONTHLY PLAN",
-    features: ["30 Days Free Trial", "5 Projects", "5 Invoices", "Single business manage", "Managers: 1", "Clients: 5", "Employees: 20"],
-    clientLimit: "5 Clients", employeeLimit: "20 Employees", managerLimit: "1 Manager manage",
-    btnLabel: "Start Free"
-  },
+
   {
     name: "Starter", price: 999, color: "var(--app-accent)", popular: true, duration: 30,
     subtitle: "MONTHLY PLAN",
@@ -590,39 +584,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
     }
   }, [paymentSuccessData, onSubscriptionSuccess]);
 
-  // ── Start Free Trial --------------------------------------------------------
-  const startTrial = async (targetPkg = null) => {
-    try {
-      setPayLoading("Trial");
-      const res = await axios.post(`${BASE_URL}/api/subscriptions/start-trial`, {
-        userId,
-        userEmail,
-        userName,
-        planName: targetPkg?.name || "Trial",
-        features: targetPkg?.features || ["30 Days Free Trial", "5 Projects", "5 Invoices", "Single business manage", "Managers: 1", "Clients: 5", "Employees: 20"],
-        clientLimit: targetPkg?.clientLimit || "5 Clients",
-        employeeLimit: targetPkg?.employeeLimit || "20 Employees",
-        managerLimit: targetPkg?.managerLimit || "1 Manager manage"
-      });
-      if (res.data.success) {
-        showToast("30-day free trial started successfully!");
-        await fetchData();
-        if (onSubscriptionSuccess) onSubscriptionSuccess();
-        else window.location.href = "/";
-      }
-    } catch (err) {
-      const msg = err.response?.data?.error || err.response?.data?.message || "Failed to start trial";
-      if (msg.includes("already used") || msg.includes("Trial already")) {
-        showToast("You have already used your free trial. Please choose a paid plan.");
-        setShowPlanPicker(false);
-        await fetchData();
-      } else {
-        showToast("Error: " + msg);
-      }
-    } finally {
-      setPayLoading(null);
-    }
-  };
+
 
   // ── Initiate PayU Payment ---------------------------------------------
   const startPayUPayment = async (plan) => {

@@ -1064,6 +1064,88 @@
       cursor: pointer;
     }
 
+    .team-select-box {
+      border: 2px solid var(--purple);
+      background: var(--purple-light);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+
+    .team-select-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #5B21B6;
+      margin-bottom: 10px;
+    }
+
+    .team-select-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border: 1.5px solid var(--purple);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-dark);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .team-select-trigger i {
+      color: var(--purple);
+      transition: transform .15s;
+    }
+
+    .team-select-trigger.open i {
+      transform: rotate(180deg);
+    }
+
+    .team-select-panel {
+      display: none;
+      background: #fff;
+      border: 1.5px solid var(--purple);
+      border-radius: 8px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+
+    .team-select-panel.open {
+      display: block;
+    }
+
+    .team-opt {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-dark);
+      cursor: pointer;
+      border-bottom: 1px solid var(--bg);
+    }
+
+    .team-opt:last-child {
+      border-bottom: none;
+    }
+
+    .team-opt:hover {
+      background: var(--purple-light);
+    }
+
+    .team-opt input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--purple);
+      cursor: pointer;
+    }
+
     .attach-btn:hover {
       border-color: var(--primary);
       color: var(--primary);
@@ -1688,12 +1770,26 @@
           <button class="uc-toggle" onclick="toggleComposer()" id="ucToggleBtn">Expand ↓</button>
         </div>
         <div class="uc-body" id="ucBody">
-          <div
-            style="font-size:11px;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;">
-            Send to</div>
+          <div class="team-select-box">
+            <div class="team-select-label"><i class="ti ti-users"></i>Send to Employee Portal</div>
+            <div class="team-select-trigger" id="teamTrigger" onclick="toggleTeamPanel()">
+              <span id="teamTriggerText">-- Select Team Members --</span>
+              <i class="ti ti-chevron-down"></i>
+            </div>
+            <div class="team-select-panel" id="teamPanel">
+              <label class="team-opt"><input type="checkbox" value="Vijay Kumar" onchange="updateTeamSelection()"> Vijay
+                Kumar</label>
+              <label class="team-opt"><input type="checkbox" value="Karthik Suresh" onchange="updateTeamSelection()">
+                Karthik Suresh</label>
+              <label class="team-opt"><input type="checkbox" value="Ananya Mehta" onchange="updateTeamSelection()">
+                Ananya Mehta</label>
+              <label class="team-opt"><input type="checkbox" value="Rahul Pillai" onchange="updateTeamSelection()">
+                Rahul Pillai</label>
+              <label class="team-opt"><input type="checkbox" value="Priya Nair" onchange="updateTeamSelection()"> Priya
+                Nair</label>
+            </div>
+          </div>
           <div class="aud-chips">
-            <div class="aud-chip sel-emp" id="empChip" onclick="this.classList.toggle('sel-emp');updateSendBtn()"><i
-                class="ti ti-users"></i>Team (6 members)</div>
             <div class="aud-chip sel-client" id="clientChip"
               onclick="this.classList.toggle('sel-client');updateSendBtn()"><i class="ti ti-building"></i>Client Portal
               — NovaMart</div>
@@ -1713,11 +1809,20 @@
           <div class="form-group"><label>Details</label><textarea id="updBody"
               placeholder="What's done, what's next, any blockers or decisions needed..."></textarea></div>
           <div class="attach-row">
-            <button class="attach-btn"><i class="ti ti-photo"></i>Image</button>
-            <button class="attach-btn"><i class="ti ti-file"></i>File/Doc</button>
-            <button class="attach-btn"><i class="ti ti-paperclip"></i>Attach</button>
+            <button class="attach-btn" onclick="document.getElementById('imgInput').click()"><i
+                class="ti ti-photo"></i>Image</button>
+            <button class="attach-btn" onclick="document.getElementById('docInput').click()"><i
+                class="ti ti-file"></i>File/Doc</button>
+            <button class="attach-btn" onclick="document.getElementById('genInput').click()"><i
+                class="ti ti-paperclip"></i>Attach</button>
 
+            <input type="file" id="imgInput" accept="image/*" multiple hidden
+              onchange="handleAttach(this.files,'image')">
+            <input type="file" id="docInput" accept=".pdf,.doc,.docx,.xls,.xlsx" multiple hidden
+              onchange="handleAttach(this.files,'doc')">
+            <input type="file" id="genInput" multiple hidden onchange="handleAttach(this.files,'file')">
           </div>
+          <div id="attachPreview" class="attach-preview"></div>
           <div class="uc-send">
             <button class="btn btn-outline" style="font-size:12px;"><i class="ti ti-device-floppy"></i>Draft</button>
             <button class="send-btn" id="sendBtn" onclick="sendUpdate()"><i class="ti ti-speakerphone"></i><span
@@ -2127,12 +2232,45 @@
       }, 50);
     }
 
+    let attachedFiles = []; // keeps ALL files from all 3 buttons
+
+    function handleAttach(fileList, type) {
+      Array.from(fileList).forEach(f => attachedFiles.push({ file: f, type }));
+      renderAttachPreview();
+    }
+
+    function renderAttachPreview() {
+      const box = document.getElementById('attachPreview');
+      box.innerHTML = attachedFiles.map((a, i) => `
+        <span class="attach-chip">
+          <i class="ti ti-${a.type === 'image' ? 'photo' : a.type === 'doc' ? 'file' : 'paperclip'}"></i>
+          ${a.file.name}
+          <i class="ti ti-x" onclick="removeAttach(${i})" style="cursor:pointer;margin-left:4px;"></i>
+        </span>
+      `).join('');
+    }
+
+    function removeAttach(i) {
+      attachedFiles.splice(i, 1);
+      renderAttachPreview();
+    }
+
     function setType(btn, t) {
       document.querySelectorAll('.tc').forEach(c => c.classList.remove('on'));
       btn.classList.add('on', t);
     }
+    function toggleTeamPanel() {
+      document.getElementById('teamPanel').classList.toggle('open');
+      document.getElementById('teamTrigger').classList.toggle('open');
+    }
+    function updateTeamSelection() {
+      const checked = Array.from(document.querySelectorAll('.team-opt input:checked')).map(c => c.value);
+      const txt = document.getElementById('teamTriggerText');
+      txt.textContent = checked.length ? checked.length + ' member(s) selected' : '-- Select Team Members --';
+      updateSendBtn();
+    }
     function updateSendBtn() {
-      const e = document.getElementById('empChip').classList.contains('sel-emp');
+      const e = document.querySelectorAll('.team-opt input:checked').length > 0;
       const c = document.getElementById('clientChip').classList.contains('sel-client');
       let txt = 'Send Update';
       if (e && c) txt = 'Send to Team & Client';
@@ -2146,6 +2284,8 @@
       toast('Update sent successfully!', 'success');
       document.getElementById('updTitle').value = '';
       document.getElementById('updBody').value = '';
+      attachedFiles = [];
+      document.getElementById('attachPreview').innerHTML = '';
       // collapses and stays in composer
       const b = document.getElementById('ucBody');
       const btn = document.getElementById('ucToggleBtn');

@@ -40,19 +40,7 @@ const PaymentDashboard = ({ userId, userEmail, userName }) => {
   const [paymentStats, setPaymentStats] = useState(null);
 
   const plans = [
-    {
-      id: 'trial',
-      name: 'Trial',
-      price: 0,
-      duration: '30 days',
-      description: 'Experience all professional features for 30 days — completely free.',
-      features: [
-        '30 Days Free Trial',
-        'Up to 5 Projects',
-        'Up to 5 Clients',
-        'Basic Email Support'
-      ]
-    },
+
     {
       id: 'starter',
       name: 'Starter',

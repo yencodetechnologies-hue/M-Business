@@ -2015,7 +2015,9 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
   const acColor = getAvatarColor(activeClient || {});
 
-  const cRevenue = activeClient?.totalRevenue || activeClient?.revenue || 0;
+  const cRevenue = (invoices || [])
+    .filter(inv => inv.client === activeClient?.clientName)
+    .reduce((sum, inv) => sum + (Number(inv.amountPaid) || 0), 0);
 
 
 
@@ -6076,13 +6078,6 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
 
 const DEFAULT_PLANS = [
 
-  {
-
-    title: "Trial", price: 0, icon: "🌱", type: "free",
-
-    features: ["30 Days Free Trial", "5 Projects", "5 Invoices", "Single business manage", "Managers: 1", "Clients: 5", "Employees: 20"]
-
-  },
 
   {
 

@@ -567,8 +567,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
           </div>
         </div>
         <div className="ed-actions">
-          <button className="ed-btn" onClick={onEdit}><i className="ti ti-edit"></i> Edit Details</button>
-          <button className="ed-btn warning" onClick={onChangeRole}><i className="ti ti-shield"></i> Change Role</button>
+
           {["active", "approved"].includes((emp.status || "").toLowerCase()) ? (
             <button className="ed-btn danger" onClick={onDeactivate}><i className="ti ti-user-x"></i> Deactivate</button>
           ) : (

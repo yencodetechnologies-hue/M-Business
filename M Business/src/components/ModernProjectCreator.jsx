@@ -753,7 +753,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                             if (!customMilestoneOptions.includes(finalName)) {
                               setCustomMilestoneOptions(prev => [...prev, finalName]);
                             }
-                            updateMilestone(idx, 'name', '');
+                            updateMilestone(idx, 'name', finalName);
                             updateMilestone(idx, 'isCustom', false);
                           }
                         }}
@@ -763,7 +763,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                           if (!customMilestoneOptions.includes(finalName)) {
                             setCustomMilestoneOptions(prev => [...prev, finalName]);
                           }
-                          updateMilestone(idx, 'name', '');
+                          updateMilestone(idx, 'name', finalName);
                           updateMilestone(idx, 'isCustom', false);
                         }}
                         style={{ minWidth: 320, height: 46, fontSize: 15, padding: '10px 14px', boxSizing: 'border-box' }}
@@ -859,7 +859,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
           Ensure all required fields are filled before launching.
         </div>
         <div style={{ display: "flex", gap: 12 }}>
-          {onBack && <button className="mpc-btn mpc-btn-outline" onClick={onBack}>Cancel</button>}
+
           <button className="mpc-btn mpc-btn-primary" onClick={handleCreate} disabled={loading} style={{ opacity: loading ? 0.7 : 1 }}>
             {loading ? <i className="ti ti-loader" style={{ animation: 'spin 1s linear infinite' }} /> : <i className="ti ti-rocket" />}
             {loading ? (editProject ? 'Updating...' : 'Launching...') : (editProject ? 'Update Project' : 'Save Project')}

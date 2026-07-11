@@ -264,6 +264,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [postUpdateOnUpload, setPostUpdateOnUpload] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadFiles, setUploadFiles] = useState([]); // array of File objects (multi-select support)
+  const [postUpdateAttachment, setPostUpdateAttachment] = useState(null); // { name, url, type } for the Post Project Update panel
+  const [postUpdateAttaching, setPostUpdateAttaching] = useState(false);
+  const postUpdateFileInputRef = useRef(null);
   const [uploadFileError, setUploadFileError] = useState(''); // required-field validation message
   const [uploadShareError, setUploadShareError] = useState(''); // "share with" required validation message
   const uploadFileObj = uploadFiles[0] || null; // kept for single-file flows (e.g. Send for Approval)
@@ -272,7 +275,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [uploadSendToClient, setUploadSendToClient] = useState(false);
   const [uploadSendToEmployee, setUploadSendToEmployee] = useState(false);
   const [uploadClientName, setUploadClientName] = useState('');
-  const [uploadEmployeeName, setUploadEmployeeName] = useState('');
+  const [uploadEmployeeName, setUploadEmployeeName] = useState([]);
+  const [showUploadEmpDropdown, setShowUploadEmpDropdown] = useState(false);
   const [uploadingModal, setUploadingModal] = useState(false);
   const [taskFilter, setTaskFilter] = useState('all');
 
@@ -284,6 +288,17 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       setCurrProject(project);
     }
   }, [project?._id, project?.name, project?.client]);
+
+  // Whenever a different project is opened (or this project is reopened),
+  // fetch the current server data so edits made in a previous session —
+  // like a saved custom milestone — are reflected immediately instead of
+  // showing whatever stale copy the parent list still has in memory.
+  useEffect(() => {
+    if (project?._id) {
+      loadLatest();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [project?._id]);
   const [currTasks, setCurrTasks] = useState(tasks);
   const [loadingProject, setLoadingProject] = useState(false);
 
@@ -375,6 +390,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [updateText, setUpdateText] = useState('');
   const [updateTitle, setUpdateTitle] = useState('');
   const [updateType, setUpdateType] = useState('progress');
+  const [customUpdateTypes, setCustomUpdateTypes] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('mb_customUpdateTypes') || '[]'); } catch (e) { return []; }
+  });
+  const [isCustomUpdateTypeMode, setIsCustomUpdateTypeMode] = useState(false);
+  const [customUpdateTypeInput, setCustomUpdateTypeInput] = useState('');
   const [sendToTeam, setSendToTeam] = useState(true);
   const [sendToClient, setSendToClient] = useState(true);
   const [postingUpdate, setPostingUpdate] = useState(false);
@@ -1296,7 +1316,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             type: fileObj.type,
             uploadedAt: new Date().toISOString(),
             sentToClient: uploadSendToClient ? (uploadClientName || currProject.client || clientName || 'client') : null,
-            sentToEmployee: uploadSendToEmployee ? uploadEmployeeName : null,
+            sentToEmployee: uploadSendToEmployee ? uploadEmployeeName : [],
           };
           newlyUploaded.push(newFileObj);
         }
@@ -2221,37 +2241,113 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           {/* SEND TO */}
                           {updateType !== 'approval' && (
                             <div style={{ marginBottom: 14 }}>
-                              <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Send To</div>
-                              <div style={{ display: 'flex', gap: 10 }}>
-                                <div onClick={() => setSendToTeam(!sendToTeam)} style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: `2px solid ${sendToTeam ? P.primary : P.border}`, background: sendToTeam ? P.primaryLight : '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: sendToTeam ? P.primaryDark : P.textMid, transition: 'all .15s' }}>
-                                  <i className="ti ti-users" style={{ fontSize: 16 }} />
-                                  Team ({assigned.length} members)
-                                </div>
-                                <div onClick={() => setSendToClient(!sendToClient)} style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: `2px solid ${sendToClient ? P.primary : P.border}`, background: sendToClient ? P.primaryLight : '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: sendToClient ? P.primaryDark : P.textMid, transition: 'all .15s' }}>
-                                  <i className="ti ti-building" style={{ fontSize: 16 }} />
-                                  Client Portal — {clientName}
+                              <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Share With</div>
+                              <div style={{ border: `1.5px solid ${sendToTeam ? P.purple : P.border}`, borderRadius: 10, padding: '12px 14px', background: sendToTeam ? P.purpleLight : '#fff', transition: 'all .15s' }}>
+                                <div onClick={() => setSendToTeam(!sendToTeam)} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                                  <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${sendToTeam ? P.purple : P.border}`, background: sendToTeam ? P.purple : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{sendToTeam && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>Yes</span>}</div>
+                                  <i className="ti ti-users" style={{ color: P.purple, fontSize: 16 }}></i>
+                                  <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Team ({assigned.length} members)</span>
                                 </div>
                               </div>
                             </div>
                           )}
-
                           {/* UPDATE TYPE CHIPS */}
                           <div style={{ marginBottom: 14 }}>
                             <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Update Type</div>
-                            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                              {[
-                                { key: 'progress', label: 'Progress', icon: 'ti-chart-bar' },
-                                { key: 'milestone', label: 'Milestone', icon: 'ti-flag' },
-                                { key: 'blocker', label: 'Blocker', icon: 'ti-alert-triangle' },
-                                { key: 'general', label: 'General', icon: 'ti-speakerphone' },
-                                { key: 'delivery', label: 'Delivery', icon: 'ti-package' },
-                                { key: 'approval', label: 'Approval Request', icon: 'ti-clipboard-check' },
-                              ].map(({ key, label, icon }) => (
-                                <button key={key} onClick={() => setUpdateType(key)} style={{ padding: '6px 14px', borderRadius: 20, border: `2px solid ${updateType === key ? P.primary : P.border}`, background: updateType === key ? P.primary : '#fff', color: updateType === key ? '#fff' : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all .15s' }}>
-                                  <i className={`ti ${icon}`} style={{ fontSize: 13 }} />
-                                  {label}
-                                </button>
-                              ))}
+                            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                              {isCustomUpdateTypeMode ? (
+                                <div style={{ display: 'flex', gap: 8, minWidth: 220 }}>
+                                  <input
+                                    type="text"
+                                    autoFocus
+                                    value={customUpdateTypeInput}
+                                    onChange={e => setCustomUpdateTypeInput(e.target.value)}
+                                    placeholder="Enter custom update type..."
+                                    style={{ flex: 1, padding: '8px 12px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 12, fontWeight: 700, color: P.textDark, fontFamily: 'inherit', outline: 'none' }}
+                                    onKeyDown={e => {
+                                      if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        const finalName = customUpdateTypeInput.trim();
+                                        if (!finalName) return;
+                                        setCustomUpdateTypes(prev => {
+                                          if (prev.includes(finalName)) return prev;
+                                          const next = [...prev, finalName];
+                                          try { localStorage.setItem('mb_customUpdateTypes', JSON.stringify(next)); } catch (err) { }
+                                          return next;
+                                        });
+                                        setUpdateType(finalName);
+                                        setIsCustomUpdateTypeMode(false);
+                                      }
+                                    }}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const finalName = customUpdateTypeInput.trim();
+                                      if (!finalName) return;
+                                      setCustomUpdateTypes(prev => {
+                                        if (prev.includes(finalName)) return prev;
+                                        const next = [...prev, finalName];
+                                        try { localStorage.setItem('mb_customUpdateTypes', JSON.stringify(next)); } catch (err) { }
+                                        return next;
+                                      });
+                                      setUpdateType(finalName);
+                                      setIsCustomUpdateTypeMode(false);
+                                    }}
+                                    style={{ width: 38, borderRadius: 10, border: `1.5px solid ${P.primary}`, background: P.primary, color: '#fff', cursor: 'pointer', fontSize: 14, fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                  >✓</button>
+                                </div>
+                              ) : (
+                                <select
+                                  value={updateType === 'approval' ? '' : updateType}
+                                  onChange={e => {
+                                    if (e.target.value === '__custom__') {
+                                      setCustomUpdateTypeInput('');
+                                      setIsCustomUpdateTypeMode(true);
+                                    } else {
+                                      setUpdateType(e.target.value);
+                                    }
+                                  }}
+                                  style={{ padding: '8px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: '#fff', color: P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 700, cursor: 'pointer', minWidth: 220 }}
+                                >
+                                  <option value="" disabled>Select update type...</option>
+
+                                  <option value="milestone">Milestone</option>
+                                  <option value="general">General</option>
+                                  <option value="delivery">Delivery</option>
+                                  <option value="Project Kickoff">Project Kickoff</option>
+                                  <option value="Requirement Gathering">Requirement Gathering</option>
+                                  <option value="Scope Approval">Scope Approval</option>
+                                  <option value="Design Approval">Design Approval</option>
+                                  <option value="UI/UX Completion">UI/UX Completion</option>
+                                  <option value="Prototype Approval">Prototype Approval</option>
+                                  <option value="Development Started">Development Started</option>
+                                  <option value="Development Completed">Development Completed</option>
+                                  <option value="Internal Testing">Internal Testing</option>
+                                  <option value="QA Testing">QA Testing</option>
+                                  <option value="UAT (User Acceptance Testing)">UAT (User Acceptance Testing)</option>
+                                  <option value="Bug Fixes Completed">Bug Fixes Completed</option>
+                                  <option value="Client Review">Client Review</option>
+                                  <option value="Client Approval">Client Approval</option>
+                                  <option value="Security Testing">Security Testing</option>
+                                  <option value="Performance Testing">Performance Testing</option>
+                                  <option value="Documentation Completed">Documentation Completed</option>
+                                  <option value="Training Completed">Training Completed</option>
+                                  <option value="Deployment to Staging">Deployment to Staging</option>
+                                  <option value="Deployment to Production">Deployment to Production</option>
+                                  <option value="Go-Live">Go-Live</option>
+                                  <option value="Project Handover">Project Handover</option>
+                                  <option value="Warranty Support Started">Warranty Support Started</option>
+                                  <option value="Warranty Support Completed">Warranty Support Completed</option>
+                                  <option value="Project Closure">Project Closure</option>
+                                  {customUpdateTypes.map(t => <option key={t} value={t}>{t}</option>)}
+
+                                </select>
+                              )}
+                              <button onClick={() => setUpdateType('approval')} style={{ padding: '6px 14px', borderRadius: 20, border: `2px solid ${updateType === 'approval' ? P.primary : P.border}`, background: updateType === 'approval' ? P.primary : '#fff', color: updateType === 'approval' ? '#fff' : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all .15s' }}>
+                                <i className="ti ti-clipboard-check" style={{ fontSize: 13 }} />
+                                Approval Request
+                              </button>
                             </div>
                           </div>
 
@@ -2278,16 +2374,45 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           </div>
 
                           {/* ATTACHMENTS ROW + RECIPIENT (approval mode) + SEND BUTTON */}
+                          <input
+                            type="file"
+                            ref={postUpdateFileInputRef}
+                            style={{ display: 'none' }}
+                            onChange={async (e) => {
+                              const file = e.target.files[0];
+                              if (!file) return;
+                              setPostUpdateAttaching(true);
+                              try {
+                                const formData = new FormData();
+                                formData.append('file', file);
+                                const res = await axios.post(`${BASE_URL}/api/upload`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+                                setPostUpdateAttachment({ name: file.name, url: res.data.url, type: file.type });
+                              } catch (err) {
+                                console.error('Attachment upload failed:', err);
+                                alert('Failed to upload attachment.');
+                              } finally {
+                                setPostUpdateAttaching(false);
+                                e.target.value = '';
+                              }
+                            }}
+                          />
+                          {postUpdateAttachment && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#f8fafc', marginBottom: 10, maxWidth: 320 }}>
+                              <i className={`ti ${postUpdateAttachment.type && postUpdateAttachment.type.startsWith('image/') ? 'ti-photo' : 'ti-file'}`} style={{ fontSize: 15, color: P.primary, flexShrink: 0 }} />
+                              <span style={{ fontSize: 12, fontWeight: 700, color: P.textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{postUpdateAttachment.name}</span>
+                              <button onClick={() => setPostUpdateAttachment(null)} title="Remove attachment" style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textLight, fontSize: 16, lineHeight: 1, padding: 2, flexShrink: 0 }}>×</button>
+                            </div>
+                          )}
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
                             <div style={{ display: 'flex', gap: 10 }}>
-                              <button onClick={triggerFileUpload} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
-                                <i className="ti ti-photo" style={{ fontSize: 15 }} /> Image
+                              <button onClick={() => { postUpdateFileInputRef.current.accept = 'image/*'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
+                                <i className="ti ti-photo" style={{ fontSize: 15 }} /> {postUpdateAttaching ? 'Uploading...' : 'Image'}
                               </button>
-                              <button onClick={triggerFileUpload} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
-                                <i className="ti ti-file" style={{ fontSize: 15 }} /> File/Doc
+                              <button onClick={() => { postUpdateFileInputRef.current.accept = '.pdf,.doc,.docx,.xls,.xlsx,.txt'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
+                                <i className="ti ti-file" style={{ fontSize: 15 }} /> {postUpdateAttaching ? 'Uploading...' : 'File/Doc'}
                               </button>
-                              <button onClick={triggerFileUpload} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
-                                <i className="ti ti-paperclip" style={{ fontSize: 15 }} /> Attach
+                              <button onClick={() => { postUpdateFileInputRef.current.accept = '*'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
+                                <i className="ti ti-paperclip" style={{ fontSize: 15 }} /> {postUpdateAttaching ? 'Uploading...' : 'Attach'}
                               </button>
                               <span style={{ fontSize: 11, color: P.textLight, alignSelf: 'center' }}>Drag &amp; drop supported</span>
                             </div>
@@ -2947,11 +3072,18 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   </div>
                 </div>
                 <div style={{ marginBottom: 16 }}>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Assign To</label>
-                  <select value={Array.isArray(newTaskAssignTo) && newTaskAssignTo.length > 0 ? newTaskAssignTo[0] : ''} onChange={e => setNewTaskAssignTo(e.target.value ? [e.target.value] : [])} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', fontSize: 13, color: P.textDark, background: '#fff', boxSizing: 'border-box' }}>
-                    <option value=''>-- Select Employee --</option>
-                    {(employees || []).map(emp => { const name = emp.name || emp.employeeName || ''; if (!name) return null; return (<option key={emp._id} value={name}>{name}</option>); })}
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Select Team Members</label>
+                  <select
+                    multiple
+                    value={Array.isArray(newTaskAssignTo) ? newTaskAssignTo : []}
+                    onChange={e => setNewTaskAssignTo(Array.from(e.target.selectedOptions, opt => opt.value))}
+                    style={{ width: '100%', minHeight: 100, padding: '8px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', fontSize: 13, color: P.textDark, background: '#fff', boxSizing: 'border-box' }}
+                  >
+                    {(employees || [])
+                      .filter(emp => assigned.includes(emp.name || emp.employeeName))
+                      .map(emp => { const name = emp.name || emp.employeeName || ''; if (!name) return null; return (<option key={emp._id} value={name}>{name}{emp.role ? ` (${emp.role})` : ''}</option>); })}
                   </select>
+                  <div style={{ fontSize: 11, color: P.textLight, marginTop: 4 }}>Hold Ctrl (Windows) or Cmd (Mac) to select multiple members.</div>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                   <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddTaskModal(false)}>Cancel</button>
@@ -3204,36 +3336,49 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   <textarea value={uploadDescription} onChange={e => setUploadDescription(e.target.value)} placeholder="Brief description of this file..." rows={2} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }} />
                 </div>
                 <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 10 }}>Share With</div>
-                <div style={{ border: `1.5px solid ${uploadSendToClient ? P.primary : P.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 10, background: uploadSendToClient ? P.primaryLight : '#fff', transition: 'all .15s' }}>
-                  <div onClick={() => { const newVal = !uploadSendToClient; setUploadSendToClient(newVal); setUploadClientName(newVal ? (currProject.client || clientName || '') : ''); if (newVal || uploadSendToEmployee) setUploadShareError(''); }} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-                    <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${uploadSendToClient ? P.primary : P.border}`, background: uploadSendToClient ? P.primary : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{uploadSendToClient && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>Yes</span>}</div>
-                    <i className="ti ti-building" style={{ color: P.primary, fontSize: 16 }}></i>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Client Portal</span>
-                  </div>
-                  {uploadSendToClient && (
-                    fromClientContext ? (
-                      <div style={{ marginTop: 10, padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.primary}`, background: '#fff', fontSize: 13, color: P.textDark, display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <i className="ti ti-user-check" style={{ color: P.primary, fontSize: 14 }}></i>
-                        {currProject.client || clientName || 'This client'}
-                      </div>
-                    ) : (
-                      <select value={uploadClientName} onChange={e => setUploadClientName(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.primary}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', background: '#fff', color: P.textDark, marginTop: 10 }}>
-                        <option value="">-- Select Client --</option>
-                        {currProject.client && <option value={currProject.client}>{currProject.client}</option>}
-                        {(clients || []).filter(c => (c.clientName || c.name) !== currProject.client).map(c => (
-                          <option key={c._id || c.clientName} value={c.clientName || c.name}>{c.clientName || c.name}</option>
-                        ))}
-                      </select>
-                    )
-                  )}
-                </div>
+
                 <div style={{ border: `1.5px solid ${uploadSendToEmployee ? P.purple : P.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 10, background: uploadSendToEmployee ? P.purpleLight : '#fff', transition: 'all .15s' }}>
                   <div onClick={() => { const newVal = !uploadSendToEmployee; setUploadSendToEmployee(newVal); setUploadEmployeeName(''); if (newVal || uploadSendToClient) setUploadShareError(''); }} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-                    <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${uploadSendToEmployee ? P.purple : P.border}`, background: uploadSendToEmployee ? P.purple : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{uploadSendToEmployee && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>Yes</span>}</div>
+
                     <i className="ti ti-users" style={{ color: P.purple, fontSize: 16 }}></i>
                     <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Employee Portal</span>
                   </div>
-                  {uploadSendToEmployee && (<select value={uploadEmployeeName} onChange={e => setUploadEmployeeName(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.purple}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', background: '#fff', color: P.textDark, marginTop: 10 }}><option value="">-- Select Employee --</option>{(employees || []).map(emp => (<option key={emp._id} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName}{emp.role ? ` (${emp.role})` : ''}</option>))}</select>)}
+                  {uploadSendToEmployee && (
+                    <div style={{ position: 'relative', marginTop: 10 }}>
+                      <div
+                        onClick={() => setShowUploadEmpDropdown(v => !v)}
+                        style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.purple}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', background: '#fff', color: uploadEmployeeName.length ? P.textDark : P.textLight, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxSizing: 'border-box' }}
+                      >
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {uploadEmployeeName.length === 0 ? '-- Select Employees --' : uploadEmployeeName.join(', ')}
+                        </span>
+                        <i className={`ti ${showUploadEmpDropdown ? 'ti-chevron-up' : 'ti-chevron-down'}`} style={{ fontSize: 14, flexShrink: 0, marginLeft: 8 }} />
+                      </div>
+                      {showUploadEmpDropdown && (
+                        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, background: '#fff', border: `1.5px solid ${P.purple}`, borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 20, maxHeight: 200, overflowY: 'auto' }}>
+                          {(employees || []).filter(emp => assigned.includes(emp.name || emp.employeeName)).length === 0 && (
+                            <div style={{ padding: '10px 12px', fontSize: 12, color: P.textLight }}>No employees assigned to this project.</div>
+                          )}
+                          {(employees || []).filter(emp => assigned.includes(emp.name || emp.employeeName)).map(emp => {
+                            const name = emp.name || emp.employeeName || '';
+                            const checked = uploadEmployeeName.includes(name);
+                            return (
+                              <label key={emp._id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: 13, color: P.textDark, cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={checked}
+                                  onChange={() => {
+                                    setUploadEmployeeName(prev => checked ? prev.filter(n => n !== name) : [...prev, name]);
+                                  }}
+                                />
+                                {name}{emp.role ? ` (${emp.role})` : ''}
+                              </label>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
                 {uploadShareError && (
                   <div style={{ fontSize: 11, fontWeight: 700, color: '#EF4444', marginBottom: 14, marginTop: -4, display: 'flex', alignItems: 'center', gap: 5 }}>

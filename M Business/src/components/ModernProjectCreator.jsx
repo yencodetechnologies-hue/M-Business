@@ -53,7 +53,9 @@ const CSS = `
 .mpc-milestone-row { display:grid; grid-template-columns:1fr auto auto; gap:12px; align-items:center; background:${P.bg}; border-radius:12px; padding:12px 14px; border:1.5px solid ${P.border}; }
 .mpc-milestone-row input { border:none; background:transparent; font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; color:${P.textDark}; outline:none; box-shadow:none; width:100%; padding:0; }
 .mpc-milestone-row input:focus { outline:none !important; box-shadow:none !important; }
-.mpc-milestone-row input[type="date"] { font-size:13px; color:${P.textMid}; font-weight:600; background:#fff; border:1.5px solid ${P.border}; border-radius:8px; padding:6px 10px; width:160px; cursor:pointer; }
+.mpc-milestone-row select { border-radius:10px; border:1.5px solid ${P.border}; background:#fff; }
+.mpc-milestone-row input[type="text"] { border-radius:10px; border:1.5px solid ${P.border}; background:#fff; }
+.mpc-milestone-row input[type="date"] { font-size:13px; color:${P.textMid}; font-weight:600; background:#fff; border:1.5px solid ${P.border}; border-radius:10px; padding:6px 10px; width:160px; cursor:pointer; }
 .mpc-milestone-row input[type="date"]:focus { border-color:${P.primary}; outline:none; }
 .mpc-remove-ms { color:${P.textLight}; cursor:pointer; font-size:18px; padding:4px; display:flex; align-items:center; transition:color .15s; }
 .mpc-remove-ms:hover { color:${P.red}; }

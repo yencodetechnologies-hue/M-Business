@@ -292,8 +292,23 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   };
 
   const handleCreate = async () => {
-    if (!name.trim()) { toast.error("Project Name is required."); return; }
-    if (!client) { toast.error("Client is required."); return; }
+    const errors = {};
+    if (!name.trim()) errors.name = true;
+    if (!client) errors.client = true;
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      const refMap = { name: nameRef, client: clientRef };
+      const firstKey = Object.keys(errors)[0];
+      const firstRef = refMap[firstKey];
+      if (firstRef?.current) {
+        firstRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstRef.current.focus();
+      }
+      toast.error(firstKey === 'name' ? "Project Name is required." : "Client is required.");
+      return;
+    }
+    setFieldErrors({});
     const isEdit = !!editProject;
 
     setLoading(true);
@@ -413,7 +428,17 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
 
             <div className="mpc-form-group">
               <label>Project Name *</label>
-              <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. E-Commerce Platform Redesign" autoFocus />
+              <input
+                ref={nameRef}
+                value={name}
+                onChange={e => { setName(e.target.value); if (fieldErrors.name) setFieldErrors(f => ({ ...f, name: false })); }}
+                placeholder="e.g. E-Commerce Platform Redesign"
+                autoFocus
+                style={fieldErrors.name ? { border: '1.5px solid #EF4444' } : undefined}
+              />
+              {fieldErrors.name && (
+                <div style={{ color: '#EF4444', fontSize: 12, fontWeight: 700, marginTop: 4 }}>Required</div>
+              )}
             </div>
 
             <div className="mpc-form-group">
@@ -424,7 +449,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
             <div className="mpc-form-2col">
               <div className="mpc-form-group">
                 <label>Client *</label>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <div ref={clientRef} tabIndex={-1} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   {(prefillClient || editProject?._fromClientPage) ? (
                     <div style={{
                       flex: 1,
@@ -468,6 +493,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                           return;
                         }
                         setClient(selectedName);
+                        if (fieldErrors.client) setFieldErrors(f => ({ ...f, client: false }));
                         const sel = clients.find(c => (c.clientName || c.name) === selectedName);
                         if (sel) {
                           setClientId(sel._id || sel.id || '');
@@ -481,7 +507,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                           setClientId('');
                         }
                       }}
-                      style={{ flex: 1 }}
+                      style={{ flex: 1, border: fieldErrors.client ? '1.5px solid #EF4444' : undefined }}
                     >
                       <option value="">Select client...</option>
                       <option value="__add_client__" style={{ color: "var(--app-accent)", fontWeight: 400 }}>➕ Add New Client</option>
@@ -489,6 +515,9 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                     </select>
                   )}
                 </div>
+                {fieldErrors.client && (
+                  <div style={{ color: '#EF4444', fontSize: 12, fontWeight: 700, marginTop: 4 }}>Required</div>
+                )}
 
                 {/* Inline Add Client Modal */}
                 {showAddClient && (

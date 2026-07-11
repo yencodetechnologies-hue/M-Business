@@ -5964,7 +5964,10 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
 
       {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 998, display: "block" }} className="mob-overlay" />}
 
-      <aside className={`sidebar ${open ? 'open' : ''}`} style={{ transform: `translateX(${(open || (isDesktopWidth && desktopOpen)) ? '0' : '-100%'})`, transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1)" }}>
+      <aside className={`sidebar ${open ? 'open' : ''} ${isDesktopWidth && !desktopOpen ? 'sidebar-collapsed' : ''}`} style={{
+        transform: `translateX(${(open || (isDesktopWidth && desktopOpen)) ? '0' : '-100%'})`,
+        transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1), width 0.28s ease, min-width 0.28s ease"
+      }}>
 
 
 
@@ -9363,7 +9366,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           {!enforceMySubscriptions ? (
 
-            <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)", padding: "2px 6px", lineHeight: 1 }}>☰</button>
+            <button onClick={() => { isDesktopWidth ? setDesktopSidebarOpen(v => !v) : setSidebarOpen(true); }} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)", padding: "2px 6px", lineHeight: 1 }}>☰</button>
 
           ) : (
 

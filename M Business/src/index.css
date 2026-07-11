@@ -1578,6 +1578,13 @@ td.exp-name {
     z-index: 1000 !important;
   }
 
+  .sidebar.sidebar-collapsed {
+    width: 0 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    border: none !important;
+  }
+
   .sidebar-Close {
     display: none !important;
   }

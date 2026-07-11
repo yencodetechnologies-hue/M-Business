@@ -2585,58 +2585,51 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     const totalPages = Math.ceil(currProject.updates.length / perPage);
                     const pageItems = currProject.updates.slice(updatesPage * perPage, updatesPage * perPage + perPage);
                     return (
-                      <div>
-                        {pageItems.map((upd, idx) => (
-                          <div key={idx} style={{ padding: '12px 14px', borderBottom: `1px solid ${P.bg}`, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                            <div style={{ background: P.primaryLight, color: P.primary, borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 13 }}>{getInitials(upd.author)}</div>
-                            <div style={{ flex: 1 }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                                <strong style={{ fontSize: 13, color: P.textDark }}>{upd.author}</strong>
-                                <span style={{ fontSize: 11, color: P.textLight }}>{new Date(upd.date).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '16px 0' }}>
+                        {pageItems.map((upd, idx) => {
+                          const attachments = (upd.attachments && upd.attachments.length > 0)
+                            ? upd.attachments
+                            : (upd.fileUrl ? [{ name: upd.fileName, url: upd.fileUrl, type: upd.fileType }] : []);
+                          return (
+                            <div key={idx} style={{ border: `1px solid ${P.border}`, borderRadius: 14, overflow: 'hidden', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+                              <div style={{ background: `linear-gradient(135deg,${P.primary},${P.primaryDark})`, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <i className="ti ti-speakerphone" style={{ color: '#fff', fontSize: 17 }} />
+                                <span style={{ color: '#fff', fontWeight: 800, fontSize: 14 }}>{upd.title || 'Project Update'}</span>
                               </div>
-                              <div style={{ fontSize: 13, color: P.textMid, lineHeight: 1.5 }}>
-                                <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 4, background: P.primaryLight, color: P.primary, fontSize: 10, fontWeight: 'bold', textTransform: 'uppercase', marginRight: 6 }}>{upd.type || 'general'}</span>
-                                {upd.text}
+                              <div style={{ padding: '16px 20px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                                  <div style={{ background: P.primaryLight, color: P.primary, borderRadius: '50%', width: 30, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 12, flexShrink: 0 }}>{getInitials(upd.author)}</div>
+                                  <strong style={{ fontSize: 13, color: P.textDark }}>{upd.author}</strong>
+                                  <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 4, background: P.primaryLight, color: P.primary, fontSize: 10, fontWeight: 'bold', textTransform: 'uppercase' }}>{upd.type || 'general'}</span>
+                                  <span style={{ fontSize: 11, color: P.textLight, marginLeft: 'auto' }}>{new Date(upd.date).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                                </div>
+                                {upd.text && (
+                                  <div style={{ fontSize: 13, color: P.textMid, lineHeight: 1.6, marginBottom: attachments.length > 0 ? 12 : 0 }}>{upd.text}</div>
+                                )}
+                                {attachments.length > 0 && (
+                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                                    {attachments.map((att, aidx) => (
+                                      att.type && att.type.startsWith('image/') ? (
+                                        <img
+                                          key={`${att.url}-${aidx}`}
+                                          src={att.url}
+                                          alt={att.name || 'attachment'}
+                                          onClick={() => window.open(att.url, '_blank')}
+                                          style={{ width: 200, height: 140, objectFit: 'cover', borderRadius: 10, border: `1.5px solid ${P.border}`, cursor: 'pointer' }}
+                                        />
+                                      ) : (
+                                        <a key={`${att.url}-${aidx}`} href={att.url} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#f8fafc', fontSize: 12, fontWeight: 700, color: P.textDark, textDecoration: 'none' }}>
+                                          <i className="ti ti-file" style={{ fontSize: 14, color: P.primary }} />
+                                          {att.name || 'Attachment'}
+                                        </a>
+                                      )
+                                    ))}
+                                  </div>
+                                )}
                               </div>
-                              {(upd.attachments && upd.attachments.length > 0) ? (
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
-                                  {upd.attachments.map((att, aidx) => (
-                                    att.type && att.type.startsWith('image/') ? (
-                                      <img
-                                        key={`${att.url}-${aidx}`}
-                                        src={att.url}
-                                        alt={att.name || 'attachment'}
-                                        onClick={() => window.open(att.url, '_blank')}
-                                        style={{ width: 140, height: 100, objectFit: 'cover', borderRadius: 8, border: `1.5px solid ${P.border}`, cursor: 'pointer' }}
-                                      />
-                                    ) : (
-                                      <a key={`${att.url}-${aidx}`} href={att.url} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#f8fafc', fontSize: 12, fontWeight: 700, color: P.textDark, textDecoration: 'none' }}>
-                                        <i className="ti ti-file" style={{ fontSize: 14, color: P.primary }} />
-                                        {att.name || 'Attachment'}
-                                      </a>
-                                    )
-                                  ))}
-                                </div>
-                              ) : upd.fileUrl ? (
-                                <div style={{ marginTop: 8 }}>
-                                  {upd.fileType && upd.fileType.startsWith('image/') ? (
-                                    <img
-                                      src={upd.fileUrl}
-                                      alt={upd.fileName || 'attachment'}
-                                      onClick={() => window.open(upd.fileUrl, '_blank')}
-                                      style={{ width: 140, height: 100, objectFit: 'cover', borderRadius: 8, border: `1.5px solid ${P.border}`, cursor: 'pointer' }}
-                                    />
-                                  ) : (
-                                    <a href={upd.fileUrl} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#f8fafc', fontSize: 12, fontWeight: 700, color: P.textDark, textDecoration: 'none', width: 'fit-content' }}>
-                                      <i className="ti ti-file" style={{ fontSize: 14, color: P.primary }} />
-                                      {upd.fileName || 'Attachment'}
-                                    </a>
-                                  )}
-                                </div>
-                              ) : null}
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                         {totalPages > 1 && (
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px', borderTop: `1px solid ${P.border}` }}>
                             <button onClick={() => setUpdatesPage(p => Math.max(0, p - 1))} disabled={updatesPage === 0} style={{ padding: '5px 14px', borderRadius: 6, border: `1px solid ${P.border}`, background: updatesPage === 0 ? P.bg : '#fff', color: updatesPage === 0 ? P.textLight : P.textDark, cursor: updatesPage === 0 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700 }}> Prev</button>
@@ -3421,15 +3414,44 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   <button
                     disabled={updateSelectedMembers.length === 0 || postingUpdate}
                     onClick={async () => {
-                      setUploadHeading(updateTitle.trim());
-                      setUploadDescription(updateText.trim());
-                      setUploadSendToClient(sendToClient);
-                      setUploadSendToEmployee(true);
-                      setUploadEmployeeName(updateSelectedMembers);
-                      setUploadClientName(sendToClient ? (currProject.client || clientName || '') : '');
-                      setPostUpdateOnUpload(true);
-                      setShowSendConfirmModal(false);
-                      setShowUploadModal(true);
+                      setPostingUpdate(true);
+                      try {
+                        const visibleTo = [];
+                        if (sendToClient) visibleTo.push('client');
+                        visibleTo.push('team');
+                        const title = updateTitle.trim() || updateText.trim().slice(0, 60) || 'Update';
+                        const attachments = postUpdateAttachments || [];
+                        const primaryAttachment = attachments[0] || null;
+                        const newUpdate = {
+                          text: updateText.trim(),
+                          title,
+                          date: new Date().toISOString(),
+                          author: 'Admin',
+                          type: updateType || 'general',
+                          visibleTo,
+                          fileName: primaryAttachment ? primaryAttachment.name : '',
+                          fileUrl: primaryAttachment ? primaryAttachment.url : '',
+                          fileType: primaryAttachment ? primaryAttachment.type : '',
+                          attachments,
+                        };
+                        const updatedUpdates = [newUpdate, ...(currProject.updates || [])];
+                        setCurrProject(prev => ({ ...prev, updates: updatedUpdates }));
+                        const putRes = await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { updates: updatedUpdates });
+                        console.log('Update saved:', putRes.data);
+                        await loadLatest();
+                        if (onUpdate) onUpdate();
+                        setUpdateText('');
+                        setUpdateTitle('');
+                        setPostUpdateAttachments([]);
+                        setUpdateSelectedMembers([]);
+                        setShowSendConfirmModal(false);
+                        setComposerOpen(false);
+                      } catch (err) {
+                        console.error('Failed to post update:', err.response?.data || err.message);
+                        alert('Failed to save update: ' + (err.response?.data?.msg || err.message));
+                      } finally {
+                        setPostingUpdate(false);
+                      }
                     }}
                     style={{ padding: '9px 22px', borderRadius: 10, background: P.primary, color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: 13, fontWeight: 800, cursor: updateSelectedMembers.length === 0 ? 'not-allowed' : 'pointer', opacity: updateSelectedMembers.length === 0 ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: 8 }}>
                     <i className="ti ti-send" style={{ fontSize: 15 }} />

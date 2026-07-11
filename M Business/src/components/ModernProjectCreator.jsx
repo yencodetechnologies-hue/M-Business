@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 import AddClientView from './AddClientView';
@@ -137,6 +137,9 @@ const MILESTONE_OPTIONS = [
 export default function ModernProjectCreator({ onBack, clients = [], employees = [], onSuccess, editProject, prefillClient, onAddEmployeeClick }) {
   const [loading, setLoading] = useState(false);
   const [showAddClient, setShowAddClient] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({}); // { name: true, client: true }
+  const nameRef = useRef(null);
+  const clientRef = useRef(null);
 
   // Form State
   const [name, setName] = useState(editProject?.name || '');

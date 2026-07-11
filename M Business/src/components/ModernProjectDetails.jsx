@@ -3386,25 +3386,28 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   </div>
                   {showUpdateMembersDropdown && (
                     <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, background: '#fff', border: `1.5px solid ${P.purple}`, borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 20, maxHeight: 200, overflowY: 'auto' }}>
-                      {(employees || []).filter(emp => assigned.includes(emp.name || emp.employeeName)).length === 0 && (
-                        <div style={{ padding: '10px 12px', fontSize: 12, color: P.textLight }}>No employees assigned to this project.</div>
-                      )}
-                      {(employees || []).filter(emp => assigned.includes(emp.name || emp.employeeName)).map(emp => {
-                        const name = emp.name || emp.employeeName || '';
-                        const checked = updateSelectedMembers.includes(name);
-                        return (
-                          <label key={emp._id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: 13, color: P.textDark, cursor: 'pointer' }}>
-                            <input
-                              type="checkbox"
-                              checked={checked}
-                              onChange={() => {
-                                setUpdateSelectedMembers(prev => checked ? prev.filter(n => n !== name) : [...prev, name]);
-                              }}
-                            />
-                            {name}
-                          </label>
-                        );
-                      })}
+                      {(() => {
+                        const assignedList = (employees || []).filter(emp => assigned.includes(emp.name || emp.employeeName));
+                        const listToShow = assignedList.length > 0 ? assignedList : (employees || []);
+                        return listToShow.length === 0 ? (
+                          <div style={{ padding: '10px 12px', fontSize: 12, color: P.textLight }}>No employees found. Add employees first.</div>
+                        ) : listToShow.map(emp => {
+                          const name = emp.name || emp.employeeName || '';
+                          const checked = updateSelectedMembers.includes(name);
+                          return (
+                            <label key={emp._id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: 13, color: P.textDark, cursor: 'pointer' }}>
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={() => {
+                                  setUpdateSelectedMembers(prev => checked ? prev.filter(n => n !== name) : [...prev, name]);
+                                }}
+                              />
+                              {name}
+                            </label>
+                          );
+                        });
+                      })()}
                     </div>
                   )}
                 </div>
@@ -3412,7 +3415,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 22 }}>
                   <button onClick={() => setShowSendConfirmModal(false)} style={{ padding: '9px 18px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'inherit', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
                   <button
-                    disabled={updateSelectedMembers.length === 0 || postingUpdate}
+                    disabled={postingUpdate}
                     onClick={async () => {
                       setPostingUpdate(true);
                       try {

@@ -431,10 +431,41 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
             </div>
             <div style={{ marginLeft: "auto" }}><Badge label={viewClient.status || "Active"} /></div>
           </div>
+          <InfoRow icon="" label="Client Type" value={viewClient.clientType ? (viewClient.clientType === "b2b" ? "B2B" : viewClient.clientType === "b2c" ? "B2C" : "Freelancer") : ""} />
+          <InfoRow icon="" label="Category / Industry" value={viewClient.category} />
+          <InfoRow icon="" label="GST Number" value={viewClient.gstNumber} />
+          <InfoRow icon="" label="Client Source" value={viewClient.clientSource || viewClient.source} />
+          <InfoRow icon="Date" label="Onboarded On" value={viewClient.onboardedOn ? new Date(viewClient.onboardedOn).toLocaleDateString() : ""} />
+          <InfoRow icon="" label="Status" value={viewClient.status || "Active"} />
+
+          <div style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginTop: 14, marginBottom: 8, textTransform: "uppercase" }}>Primary Contact</div>
+          <InfoRow icon="" label="Contact Person" value={viewClient.contactPersonName} />
+          <InfoRow icon="" label="Designation" value={viewClient.designation} />
           <InfoRow icon="" label="Email" value={viewClient.email} />
-          <InfoRow icon="" label="Phone" value={viewClient.phone} />
-          <InfoRow icon="Location" label="Address" value={viewClient.address} />
-          <InfoRow icon="Date" label="Joined" value={viewClient.createdAt ? new Date(viewClient.createdAt).toLocaleDateString() : "—"} />
+          <InfoRow icon="" label="Alt. Email" value={viewClient.altEmail} />
+          <InfoRow icon="" label="Contact Person Mobile" value={viewClient.contactPersonNo} />
+          <InfoRow icon="" label="Office Phone" value={viewClient.officePhone || viewClient.phone} />
+
+          <div style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginTop: 14, marginBottom: 8, textTransform: "uppercase" }}>Address</div>
+          <InfoRow icon="Location" label="Street / Building Address" value={viewClient.address} />
+          <InfoRow icon="" label="City" value={viewClient.city} />
+          <InfoRow icon="" label="State" value={viewClient.state} />
+          <InfoRow icon="" label="Pincode" value={viewClient.pincode} />
+          <InfoRow icon="" label="Country" value={viewClient.country} />
+
+          <div style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginTop: 14, marginBottom: 8, textTransform: "uppercase" }}>Online Presence</div>
+          <InfoRow icon="" label="Website" value={viewClient.websiteUrl || viewClient.website} />
+          <InfoRow icon="" label="LinkedIn" value={viewClient.linkedinUrl || viewClient.linkedin} />
+
+          <div style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginTop: 14, marginBottom: 8, textTransform: "uppercase" }}>Billing & Terms</div>
+          <InfoRow icon="" label="Billing Currency" value={viewClient.billingCurrency} />
+          <InfoRow icon="" label="Payment Terms" value={viewClient.paymentTerms} />
+          <InfoRow icon="" label="Credit Limit" value={viewClient.creditLimit} />
+          <InfoRow icon="" label="Payment Mode" value={viewClient.preferredPaymentMode || viewClient.PaymentMode} />
+
+          <div style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginTop: 14, marginBottom: 8, textTransform: "uppercase" }}>Other</div>
+          <InfoRow icon="Date" label="Joined" value={viewClient.createdAt ? new Date(viewClient.createdAt).toLocaleDateString() : ""} />
+          <InfoRow icon="" label="Internal Notes" value={viewClient.internalNotes || viewClient.notes} />
 
           <div style={{ marginTop: 18 }}>
             <div style={{ fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 10, textTransform: "uppercase" }}>Recent Projects</div>

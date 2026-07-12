@@ -2327,12 +2327,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 </div>
 
                 <div className={`mpd-tab-pane ${activeTab === 'updates' ? 'mpd-active' : ''}`}>
-                  {composerOpen && (
-                    <div style={{ position: 'fixed', inset: 0, zIndex: 99998, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-                      <div ref={composerRef} className="mpd-upd-composer" style={{ overflow: 'hidden', width: '100%', maxWidth: 560, maxHeight: '88vh', overflowY: 'auto', margin: 0 }}>
+                  {(
+                    <div style={{ marginBottom: 20 }}>
+                      <div ref={composerRef} className="mpd-upd-composer" style={{ overflow: 'hidden', width: '100%', margin: 0 }}>
                         <div className="mpd-uc-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                           <h3><i className="ti ti-speakerphone"></i> Post Project Update</h3>
-                          <button onClick={() => setComposerOpen(false)} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>✕</button>
                         </div>
                         {(
                           <div style={{ padding: '18px 22px' }}>
@@ -2502,32 +2501,45 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                             {/* ATTACHMENTS ROW + RECIPIENT (approval mode) + SEND BUTTON */}
                             <input
                               type="file"
+                              multiple
                               ref={postUpdateFileInputRef}
                               style={{ display: 'none' }}
                               onChange={async (e) => {
-                                const file = e.target.files[0];
-                                if (!file) return;
+                                const files = Array.from(e.target.files || []);
+                                if (files.length === 0) return;
                                 setPostUpdateAttaching(true);
-                                try {
-                                  const formData = new FormData();
-                                  formData.append('file', file);
-                                  const res = await axios.post(`${BASE_URL}/api/upload`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-                                  setPostUpdateAttachments(prev => [...prev, { name: file.name, url: res.data.url, type: file.type }]);
-                                } catch (err) {
-                                  console.error('Attachment upload failed:', err);
-                                  alert('Failed to upload attachment.');
-                                } finally {
-                                  setPostUpdateAttaching(false);
-                                  e.target.value = '';
-                                }
+                                await Promise.all(files.map(async (file) => {
+                                  const tempId = `${file.name}-${Date.now()}-${Math.random()}`;
+                                  setPostUpdateAttachments(prev => [...prev, { name: file.name, url: '', type: file.type, uploading: true, progress: 0, tempId }]);
+                                  try {
+                                    const formData = new FormData();
+                                    formData.append('file', file);
+                                    const res = await axios.post(`${BASE_URL}/api/upload`, formData, {
+                                      headers: { 'Content-Type': 'multipart/form-data' },
+                                      onUploadProgress: (evt) => {
+                                        const pct = evt.total ? Math.round((evt.loaded * 100) / evt.total) : 0;
+                                        setPostUpdateAttachments(prev => prev.map(a => a.tempId === tempId ? { ...a, progress: pct } : a));
+                                      }
+                                    });
+                                    setPostUpdateAttachments(prev => prev.map(a => a.tempId === tempId ? { name: file.name, url: res.data.url, type: file.type, uploading: false, progress: 100 } : a));
+                                  } catch (err) {
+                                    console.error('Attachment upload failed:', file.name, err);
+                                    setPostUpdateAttachments(prev => prev.filter(a => a.tempId !== tempId));
+                                    alert(`Failed to upload ${file.name}.`);
+                                  }
+                                }));
+                                setPostUpdateAttaching(false);
+                                e.target.value = '';
                               }}
                             />
                             {postUpdateAttachments.length > 0 && (
                               <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 10 }}>
                                 {postUpdateAttachments.map((att, idx) => (
-                                  <div key={`${att.name}-${idx}`} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#f8fafc', maxWidth: 320 }}>
+                                  <div key={att.tempId || `${att.name}-${idx}`} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#f8fafc', maxWidth: 320 }}>
                                     <i className={`ti ${att.type && att.type.startsWith('image/') ? 'ti-photo' : 'ti-file'}`} style={{ fontSize: 15, color: P.primary, flexShrink: 0 }} />
-                                    <span style={{ fontSize: 12, fontWeight: 700, color: P.textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{att.name}</span>
+                                    <span style={{ fontSize: 12, fontWeight: 700, color: P.textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                                      {att.name}{att.uploading ? ` (${att.progress || 0}%)` : ''}
+                                    </span>
                                     <button onClick={() => setPostUpdateAttachments(prev => prev.filter((_, i) => i !== idx))} title="Remove attachment" style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textLight, fontSize: 16, lineHeight: 1, padding: 2, flexShrink: 0 }}>×</button>
                                   </div>
                                 ))}
@@ -2535,16 +2547,16 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                             )}
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
                               <div style={{ display: 'flex', gap: 10 }}>
-                                <button onClick={() => { postUpdateFileInputRef.current.accept = 'image/*'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
-                                  <i className="ti ti-photo" style={{ fontSize: 15 }} /> {postUpdateAttaching ? 'Uploading...' : 'Image'}
+                                <button onClick={() => { setPostUpdateAttaching(false); postUpdateFileInputRef.current.value = ''; postUpdateFileInputRef.current.accept = 'image/*'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
+                                  <i className="ti ti-photo" style={{ fontSize: 15 }} /> Image
                                 </button>
-                                <button onClick={() => { postUpdateFileInputRef.current.accept = '.pdf,.doc,.docx,.xls,.xlsx,.txt'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
-                                  <i className="ti ti-file" style={{ fontSize: 15 }} /> {postUpdateAttaching ? 'Uploading...' : 'File/Doc'}
+                                <button onClick={() => { setPostUpdateAttaching(false); postUpdateFileInputRef.current.value = ''; postUpdateFileInputRef.current.accept = '.pdf,.doc,.docx,.xls,.xlsx,.txt'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
+                                  <i className="ti ti-file" style={{ fontSize: 15 }} /> File/Doc
                                 </button>
-                                <button onClick={() => { postUpdateFileInputRef.current.accept = '*'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
-                                  <i className="ti ti-paperclip" style={{ fontSize: 15 }} /> {postUpdateAttaching ? 'Uploading...' : 'Attach'}
+                                <button onClick={() => { setPostUpdateAttaching(false); postUpdateFileInputRef.current.value = ''; postUpdateFileInputRef.current.accept = '*'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
+                                  <i className="ti ti-paperclip" style={{ fontSize: 15 }} /> Attach
                                 </button>
-                                <span style={{ fontSize: 11, color: P.textLight, alignSelf: 'center' }}>Drag &amp; drop supported</span>
+
                               </div>
 
                               {updateType === 'approval' && (
@@ -2568,9 +2580,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               )}
 
                               <div style={{ display: 'flex', gap: 10 }}>
-                                <button onClick={() => setComposerOpen(false)} style={{ padding: '9px 18px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'inherit', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Draft</button>
+
                                 <button
-                                  disabled={postingUpdate || (!updateTitle.trim() && !updateText.trim())}
+                                  disabled={postingUpdate || (!updateTitle.trim() && !updateText.trim()) || updateSelectedMembers.length === 0}
                                   onClick={async () => {
                                     const hasContent = updateTitle.trim() || updateText.trim();
                                     if (!hasContent) return;
@@ -2578,7 +2590,44 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                       await submitApprovalRequest();
                                       return;
                                     }
-                                    setShowSendConfirmModal(true);
+                                    if (updateSelectedMembers.length === 0) return;
+                                    setPostingUpdate(true);
+                                    try {
+                                      const visibleTo = [];
+                                      if (sendToClient) visibleTo.push('client');
+                                      if (updateSelectedMembers.length > 0) visibleTo.push('team');
+                                      const title = updateTitle.trim() || updateText.trim().slice(0, 60) || 'Update';
+                                      const attachments = postUpdateAttachments || [];
+                                      const primaryAttachment = attachments[0] || null;
+                                      const newUpdate = {
+                                        text: updateText.trim(),
+                                        title,
+                                        date: new Date().toISOString(),
+                                        author: 'Admin',
+                                        type: updateType || 'general',
+                                        visibleTo,
+                                        recipients: updateSelectedMembers,
+                                        fileName: primaryAttachment ? primaryAttachment.name : '',
+                                        fileUrl: primaryAttachment ? primaryAttachment.url : '',
+                                        fileType: primaryAttachment ? primaryAttachment.type : '',
+                                        attachments,
+                                      };
+                                      const updatedUpdates = [newUpdate, ...(currProject.updates || [])];
+                                      setCurrProject(prev => ({ ...prev, updates: updatedUpdates }));
+                                      const putRes = await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { updates: updatedUpdates });
+                                      console.log('Update saved:', putRes.data);
+                                      await loadLatest();
+                                      if (onUpdate) onUpdate();
+                                      setUpdateText('');
+                                      setUpdateTitle('');
+                                      setPostUpdateAttachments([]);
+                                      setUpdateSelectedMembers([]);
+                                    } catch (err) {
+                                      console.error('Failed to post update:', err.response?.data || err.message);
+                                      alert('Failed to save update: ' + (err.response?.data?.msg || err.message));
+                                    } finally {
+                                      setPostingUpdate(false);
+                                    }
                                   }}
                                   style={{ padding: '9px 22px', borderRadius: 10, background: P.primary, color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: 13, fontWeight: 800, cursor: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 'not-allowed' : 'pointer', opacity: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,188,212,.25)', transition: 'all .15s' }}>
                                   <i className="ti ti-send" style={{ fontSize: 15 }} />
@@ -3434,7 +3483,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       try {
                         const visibleTo = [];
                         if (sendToClient) visibleTo.push('client');
-                        visibleTo.push('team');
+                        if (updateSelectedMembers.length > 0) visibleTo.push('team');
                         const title = updateTitle.trim() || updateText.trim().slice(0, 60) || 'Update';
                         const attachments = postUpdateAttachments || [];
                         const primaryAttachment = attachments[0] || null;
@@ -3445,6 +3494,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           author: 'Admin',
                           type: updateType || 'general',
                           visibleTo,
+                          recipients: updateSelectedMembers,
                           fileName: primaryAttachment ? primaryAttachment.name : '',
                           fileUrl: primaryAttachment ? primaryAttachment.url : '',
                           fileType: primaryAttachment ? primaryAttachment.type : '',

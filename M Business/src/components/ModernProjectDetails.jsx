@@ -1286,7 +1286,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      const uploadedUrl = res.data.url;
+      const uploadedUrl = res.data.url.startsWith('http') ? res.data.url : `${BASE_URL}${res.data.url}`;
       const newFileObj = {
         name: file.name,
         url: uploadedUrl,
@@ -1340,7 +1340,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           const res = await axios.post(`${BASE_URL}/api/upload`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
           });
-          const uploadedUrl = res.data.url;
+          const uploadedUrl = res.data.url.startsWith('http') ? res.data.url : `${BASE_URL}${res.data.url}`;
           // If multiple files share one heading, number them so titles stay unique
           const heading = uploadHeading
             ? (uploadFiles.length > 1 ? `${uploadHeading} (${i + 1})` : uploadHeading)
@@ -1780,7 +1780,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           </div>
         </div>
 
-        {projectApprovals.length > 0 && (
+        {user?.role !== 'client' && projectApprovals.length > 0 && (
           <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 14, padding: 18, marginBottom: 20 }}>
             <div style={{ fontSize: 13, fontWeight: 800, color: '#111827', marginBottom: 12 }}>Approval Requests</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

@@ -75,7 +75,6 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
   const canvasRef = React.useRef(null);
   const drawing = React.useRef(false);
   const points = React.useRef([]);
-
   React.useEffect(() => {
     if (sigMode !== "draw") return;
     const cv = canvasRef.current;
@@ -482,6 +481,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [notifDropdownOpen]);
   const [docs, setDocs] = useState([]);
+  const [clientDocuments, setClientDocuments] = useState([]);
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -661,14 +661,16 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       const myClientId = portalMode
         ? (portalClientId || user?._id || user?.id || "")
         : (user?._id || user?.id || "");
-      const [projRes, docRes] = await Promise.all([
+      const [projRes, docRes, clientRes] = await Promise.all([
         axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}&clientId=${encodeURIComponent(myClientId)}`, {
           headers: { 'x-company-id': user?.companyId || "" }
         }),
         axios.get(`${BASE_URL}/api/documents?companyId=${user?.companyId || ""}&client=${encodeURIComponent(clientName)}&sendTo=client&clientId=${encodeURIComponent(myClientId)}`).catch(() => ({ data: [] })),
+        axios.get(`${BASE_URL}/api/clients/${myClientId}`).catch(() => ({ data: {} })),
       ]);
       setProjects(projRes.data || []);
       setDocs(docRes.data || []);
+      setClientDocuments(clientRes.data?.documents || []);
     } catch (e) { console.error(e); }
     setRefreshing(false);
   };
@@ -982,7 +984,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     isLetterhead: true
   }));
 
-  const allFilesBase = [...docCards, ...(projects.flatMap(p => p.files || []))
+  const allFilesBase = [...docCards, ...(clientDocuments || []), ...(projects.flatMap(p => p.files || []))
     .filter(f => {
       // If sentToClient is not set at all, show the file (it belongs to this client's project)
       if (!f.sentToClient || f.sentToClient === null || f.sentToClient === "") return true;

@@ -611,9 +611,10 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                     <div className="epd2-uf-atts">
                       {upd.attachments.map((att, i) => {
                         const attName = (typeof att === 'string' ? att : (att?.name || att?.url || 'Attachment'));
-                        const attUrl = (typeof att === 'string' ? att : att?.url) || '';
+                        const rawUrl = (typeof att === 'string' ? att : att?.url) || '';
+                        const attUrl = rawUrl && !rawUrl.startsWith('http') ? `${BASE_URL}${rawUrl}` : rawUrl;
                         const attType = (typeof att === 'string' ? '' : att?.type) || '';
-                        const isImage = attType.startsWith('image/') || /\.(jpe?g|png|gif|webp|svg)$/i.test(attName);
+                        const isImage = attType.startsWith('image/') || /\.(jpe?g|png|gif|webp|svg)$/i.test(attName) || /\.(jpe?g|png|gif|webp|svg)$/i.test(attUrl);
                         return isImage && attUrl ? (
                           <a key={i} href={attUrl} target="_blank" rel="noopener noreferrer" className="epd2-uf-att-img-link">
                             <img src={attUrl} alt={attName} style={{ maxWidth: 260, maxHeight: 260, borderRadius: 8, display: 'block', marginBottom: 4, border: '1px solid #e2e8f0' }} />

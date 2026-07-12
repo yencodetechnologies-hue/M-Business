@@ -142,7 +142,8 @@ router.put("/:id", async (req, res) => {
       console.error("Project cascade-link after client edit failed:", cascadeErr.message);
     }
 
-    res.json({ success: true });
+const updatedClient = await Client.findById(req.params.id);
+    res.json({ success: true, client: updatedClient });
   } catch (err) {
     res.status(500).json({ msg: "Server error", error: err.message });
   }

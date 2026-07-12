@@ -2593,38 +2593,61 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                     if (updateSelectedMembers.length === 0) return;
                                     setPostingUpdate(true);
                                     try {
-                                      const visibleTo = [];
-                                      if (sendToClient) visibleTo.push('client');
-                                      if (updateSelectedMembers.length > 0) visibleTo.push('team');
+                                      const approvalCompanyId = user?.companyId || user?.company || user?._id || user?.id || currProject.companyId || '';
                                       const title = updateTitle.trim() || updateText.trim().slice(0, 60) || 'Update';
                                       const attachments = postUpdateAttachments || [];
                                       const primaryAttachment = attachments[0] || null;
-                                      const newUpdate = {
-                                        text: updateText.trim(),
-                                        title,
-                                        date: new Date().toISOString(),
-                                        author: 'Admin',
-                                        type: updateType || 'general',
-                                        visibleTo,
-                                        recipients: updateSelectedMembers,
-                                        fileName: primaryAttachment ? primaryAttachment.name : '',
-                                        fileUrl: primaryAttachment ? primaryAttachment.url : '',
-                                        fileType: primaryAttachment ? primaryAttachment.type : '',
-                                        attachments,
-                                      };
-                                      const updatedUpdates = [newUpdate, ...(currProject.updates || [])];
-                                      setCurrProject(prev => ({ ...prev, updates: updatedUpdates }));
-                                      const putRes = await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { updates: updatedUpdates });
-                                      console.log('Update saved:', putRes.data);
-                                      await loadLatest();
+                                      const selectedEmployees = (employees || []).filter(emp => updateSelectedMembers.includes(emp.name || emp.employeeName));
+
+                                      // One Approval doc per selected team member — each shows up individually
+                                      // in the Subadmin recipient list and the employee's own dashboard,
+                                      // starting as "Pending" until that employee approves it.
+                                      await Promise.all(selectedEmployees.map(emp =>
+                                        axios.post(`${BASE_URL}/api/approvals`, {
+                                          companyId: approvalCompanyId,
+                                          recipientType: 'team',
+                                          teamMemberId: emp._id,
+                                          senderName: user?.name || user?.clientName || 'Admin',
+                                          title,
+                                          desc: updateText.trim(),
+                                          icon: 'ti-speakerphone',
+                                          approveLabel: 'Approve',
+                                          rejectLabel: 'Review',
+                                          sourceType: 'projectUpdate',
+                                          projectId: currProject._id || '',
+                                          fileUrl: primaryAttachment ? primaryAttachment.url : '',
+                                          fileName: primaryAttachment ? primaryAttachment.name : '',
+                                        })
+                                      ));
+
+                                      // If also visible to the client, create a client-facing approval too.
+                                      if (sendToClient && (currProject.clientId || approvalForm.clientId)) {
+                                        await axios.post(`${BASE_URL}/api/approvals`, {
+                                          companyId: approvalCompanyId,
+                                          recipientType: 'client',
+                                          clientId: currProject.clientId || approvalForm.clientId,
+                                          senderName: user?.name || user?.clientName || 'Admin',
+                                          title,
+                                          desc: updateText.trim(),
+                                          icon: 'ti-speakerphone',
+                                          approveLabel: 'Approve',
+                                          rejectLabel: 'Review',
+                                          sourceType: 'projectUpdate',
+                                          projectId: currProject._id || '',
+                                          fileUrl: primaryAttachment ? primaryAttachment.url : '',
+                                          fileName: primaryAttachment ? primaryAttachment.name : '',
+                                        });
+                                      }
+
+                                      await loadProjectApprovals();
                                       if (onUpdate) onUpdate();
                                       setUpdateText('');
                                       setUpdateTitle('');
                                       setPostUpdateAttachments([]);
                                       setUpdateSelectedMembers([]);
                                     } catch (err) {
-                                      console.error('Failed to post update:', err.response?.data || err.message);
-                                      alert('Failed to save update: ' + (err.response?.data?.msg || err.message));
+                                      console.error('Failed to send update:', err.response?.data || err.message);
+                                      alert('Failed to send update: ' + (err.response?.data?.msg || err.message));
                                     } finally {
                                       setPostingUpdate(false);
                                     }

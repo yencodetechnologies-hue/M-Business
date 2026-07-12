@@ -962,7 +962,22 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const [filterMode, setFilterMode] = useState("all");
   const [sortMode, setSortMode] = useState("newest");
 
-  const [activeClientId, setActiveClientId] = useState(() => clients?.[0]?._id || null);
+  const [activeClientId, setActiveClientId] = useState(() => {
+    try {
+      const saved = localStorage.getItem("activeClientId_subadmin");
+      if (saved) return saved;
+    } catch { }
+    return clients?.[0]?._id || null;
+  });
+
+  // Keep the saved selection in sync so a page refresh (or re-login) reopens
+  // the same client instead of falling back to the first one in the list.
+  useEffect(() => {
+    try {
+      if (activeClientId) localStorage.setItem("activeClientId_subadmin", activeClientId);
+      else localStorage.removeItem("activeClientId_subadmin");
+    } catch { }
+  }, [activeClientId]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -7541,9 +7556,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
     hasFetched.current = true;
 
+    // Clients fetch runs first and alone so the Clients page (often the first
+    // thing opened after login) is never queued behind the other 14 parallel
+    // fetch calls below — it resolves and renders as fast as the backend allows.
+    fetchClients();
+
     fetchProfile();
 
-    fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); fetchInvoices(); fetchIncome(); fetchExpenses(); fetchTasks(); fetchConfig();
+    fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); fetchInvoices(); fetchIncome(); fetchExpenses(); fetchTasks(); fetchConfig();
 
     fetchPendingLeaves(); fetchEmployeeDocs();
 

@@ -68,7 +68,7 @@ const projectSchema = new mongoose.Schema({
       description: { type: String, default: "" },
       uploadedAt: { type: Date, default: Date.now },
       sentToClient: { type: String, default: null },
-      sentToEmployee: { type: String, default: null }
+      sentToEmployee: { type: mongoose.Schema.Types.Mixed, default: null }
     }],
     default: []
   },

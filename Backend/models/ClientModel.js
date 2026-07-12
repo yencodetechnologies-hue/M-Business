@@ -36,6 +36,17 @@ const ClientSchema = new mongoose.Schema({
   creditLimit: { type: String, default: "" },
   preferredPaymentMode: { type: String, default: "" },
   internalNotes: { type: String, default: "" },
+  documents: {
+    type: [{
+      name: { type: String, default: "" },
+      fileName: { type: String, default: "" },
+      type: { type: String, default: "" },
+      size: { type: String, default: "" },
+      url: { type: String, default: "" },
+      uploadedAt: { type: Date, default: Date.now }
+    }],
+    default: []
+  },
 }, { timestamps: true });
 
 ClientSchema.index({ email: 1, companyId: 1 }, { unique: true });

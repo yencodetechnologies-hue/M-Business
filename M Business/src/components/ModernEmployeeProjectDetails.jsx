@@ -611,8 +611,8 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                     <div className="epd2-uf-atts">
                       {upd.attachments.map((att, i) => (
                         <div key={i} className="epd2-uf-att">
-                          <i className={`ti ${att.endsWith('.pdf') ? 'ti-file-type-pdf' : att.endsWith('.fig') ? 'ti-photo' : 'ti-paperclip'}`}></i>
-                          {att}
+                          <i className={`ti ${(typeof att === 'string' ? att : (att?.url || att?.name || '')).endsWith('.pdf') ? 'ti-file-type-pdf' : (typeof att === 'string' ? att : (att?.url || att?.name || '')).endsWith('.fig') ? 'ti-photo' : 'ti-paperclip'}`}></i>
+                          {att.name || att.url}
                         </div>
                       ))}
                     </div>

@@ -727,6 +727,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     const approvalCompanyId = user?.companyId || user?.company || user?._id || user?.id || currProject.companyId || '';
     setPostingUpdate(true);
     try {
+      const primaryAttachment = (postUpdateAttachments || [])[0] || null;
       await axios.post(`${BASE_URL}/api/approvals`, {
         companyId: approvalCompanyId,
         clientId: isTeam ? '' : approvalForm.clientId,
@@ -740,10 +741,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         rejectLabel: 'Review',
         sourceType: 'project',
         projectId: currProject._id || '',
+        fileUrl: primaryAttachment ? primaryAttachment.url : '',
+        fileName: primaryAttachment ? primaryAttachment.name : '',
       });
       alert(`Approval request sent to ${isTeam ? 'the team member' : 'the client'}!`);
       setUpdateText(''); setUpdateTitle(''); setUpdateType('progress');
       setApprovalForm(f => ({ ...f, teamMemberId: '' }));
+      setPostUpdateAttachments([]);
       setComposerOpen(false);
       loadProjectApprovals();
     } catch (err) {

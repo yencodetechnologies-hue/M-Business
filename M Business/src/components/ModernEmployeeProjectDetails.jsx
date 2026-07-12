@@ -609,12 +609,22 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                   {/* Attachments */}
                   {Array.isArray(upd.attachments) && upd.attachments.length > 0 && (
                     <div className="epd2-uf-atts">
-                      {upd.attachments.map((att, i) => (
-                        <div key={i} className="epd2-uf-att">
-                          <i className={`ti ${(typeof att === 'string' ? att : (att?.url || att?.name || '')).endsWith('.pdf') ? 'ti-file-type-pdf' : (typeof att === 'string' ? att : (att?.url || att?.name || '')).endsWith('.fig') ? 'ti-photo' : 'ti-paperclip'}`}></i>
-                          {att.name || att.url}
-                        </div>
-                      ))}
+                      {upd.attachments.map((att, i) => {
+                        const attName = (typeof att === 'string' ? att : (att?.name || att?.url || 'Attachment'));
+                        const attUrl = (typeof att === 'string' ? att : att?.url) || '';
+                        const attType = (typeof att === 'string' ? '' : att?.type) || '';
+                        const isImage = attType.startsWith('image/') || /\.(jpe?g|png|gif|webp|svg)$/i.test(attName);
+                        return isImage && attUrl ? (
+                          <a key={i} href={attUrl} target="_blank" rel="noopener noreferrer" className="epd2-uf-att-img-link">
+                            <img src={attUrl} alt={attName} style={{ maxWidth: 260, maxHeight: 260, borderRadius: 8, display: 'block', marginBottom: 4, border: '1px solid #e2e8f0' }} />
+                          </a>
+                        ) : (
+                          <a key={i} href={attUrl || '#'} target="_blank" rel="noopener noreferrer" className="epd2-uf-att" style={{ textDecoration: 'none' }}>
+                            <i className={`ti ${/\.pdf$/i.test(attName) ? 'ti-file-type-pdf' : 'ti-paperclip'}`}></i>
+                            {attName}
+                          </a>
+                        );
+                      })}
                     </div>
                   )}
 

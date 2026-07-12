@@ -2521,7 +2521,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                         setPostUpdateAttachments(prev => prev.map(a => a.tempId === tempId ? { ...a, progress: pct } : a));
                                       }
                                     });
-                                    setPostUpdateAttachments(prev => prev.map(a => a.tempId === tempId ? { name: file.name, url: res.data.url, type: file.type, uploading: false, progress: 100 } : a));
+                                    const resolvedUrl = res.data.url && res.data.url.startsWith('http') ? res.data.url : `${BASE_URL}${res.data.url.startsWith('/') ? '' : '/'}${res.data.url}`;
+                                    setPostUpdateAttachments(prev => prev.map(a => a.tempId === tempId ? { name: file.name, url: resolvedUrl, type: file.type, uploading: false, progress: 100 } : a));
                                   } catch (err) {
                                     console.error('Attachment upload failed:', file.name, err);
                                     setPostUpdateAttachments(prev => prev.filter(a => a.tempId !== tempId));
@@ -2536,7 +2537,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 10 }}>
                                 {postUpdateAttachments.map((att, idx) => (
                                   <div key={att.tempId || `${att.name}-${idx}`} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#f8fafc', maxWidth: 320 }}>
-                                    <i className={`ti ${att.type && att.type.startsWith('image/') ? 'ti-photo' : 'ti-file'}`} style={{ fontSize: 15, color: P.primary, flexShrink: 0 }} />
+                                    <i className={`ti ${(att.type && att.type.startsWith('image/')) || /\.(jpe?g|png|gif|webp|svg)$/i.test(att.name || '') ? 'ti-photo' : 'ti-file'}`} style={{ fontSize: 15, color: P.primary, flexShrink: 0 }} />
                                     <span style={{ fontSize: 12, fontWeight: 700, color: P.textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
                                       {att.name}{att.uploading ? ` (${att.progress || 0}%)` : ''}
                                     </span>
@@ -2633,22 +2634,24 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                 )}
                                 {attachments.length > 0 && (
                                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-                                    {attachments.map((att, aidx) => (
-                                      att.type && att.type.startsWith('image/') ? (
+                                    {attachments.map((att, aidx) => {
+                                      const isImg = (att.type && att.type.startsWith('image/')) || /\.(jpe?g|png|gif|webp|svg)$/i.test(att.url || att.name || '');
+                                      return isImg ? (
                                         <img
                                           key={`${att.url}-${aidx}`}
                                           src={att.url}
                                           alt={att.name || 'attachment'}
                                           onClick={() => window.open(att.url, '_blank')}
-                                          style={{ width: 200, height: 140, objectFit: 'cover', borderRadius: 10, border: `1.5px solid ${P.border}`, cursor: 'pointer' }}
+                                          style={{ width: 200, height: 140, objectFit: 'cover', borderRadius: 10, border: `1.5px solid ${P.border}`, cursor: 'pointer', background: '#f8fafc' }}
+                                          onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = ''; e.currentTarget.style.display = 'none'; }}
                                         />
                                       ) : (
                                         <a key={`${att.url}-${aidx}`} href={att.url} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#f8fafc', fontSize: 12, fontWeight: 700, color: P.textDark, textDecoration: 'none' }}>
                                           <i className="ti ti-file" style={{ fontSize: 14, color: P.primary }} />
                                           {att.name || 'Attachment'}
                                         </a>
-                                      )
-                                    ))}
+                                      );
+                                    })}
                                   </div>
                                 )}
                               </div>

@@ -80,8 +80,19 @@ router.get("/", async (req, res) => {
 
 const { checkResourceLimit } = require("../middleware/subscriptionMiddleware");
 router.post("/add", checkResourceLimit('client'), addClient);
+router.get("/:id", async (req, res) => {
+  try {
+    const client = await Client.findById(req.params.id);
+    if (!client) return res.status(404).json({ msg: "Client not found" });
+    res.json(client);
+  } catch (err) {
+    console.error("Get client by id error:", err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
 
 router.put("/:id", async (req, res) => {
+
   try {
     const updateData = { ...req.body };
 

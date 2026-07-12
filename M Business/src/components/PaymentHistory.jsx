@@ -148,8 +148,8 @@ const PaymentHistory = ({ userId, userEmail }) => {
       <div className="payment-history-header">
         <h3>Payment History</h3>
         <div className="payment-filters">
-          <select 
-            value={filter} 
+          <select
+            value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="filter-select"
           >

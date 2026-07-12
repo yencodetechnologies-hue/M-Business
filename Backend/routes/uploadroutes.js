@@ -37,6 +37,23 @@ const upload = multer({
   },
 });
 
+// Serve a raw-uploaded file (e.g. SVG) with the correct Content-Type so
+// browsers render it inline instead of showing a blank/broken image.
+router.get("/raw/*splat", async (req, res) => {
+  try {
+    const publicId = Array.isArray(req.params.splat) ? req.params.splat.join("/") : req.params.splat;
+    const media = await Media.findOne({ public_id: publicId });
+    if (!media) return res.status(404).json({ msg: "Not found" });
+    const response = await require("axios").get(media.url, { responseType: "arraybuffer" });
+    res.set("Content-Type", media.type || "image/svg+xml");
+    res.set("Cache-Control", "public, max-age=31536000");
+    res.send(response.data);
+  } catch (err) {
+    console.error("❌ Raw media proxy error:", err);
+    res.status(500).json({ msg: "Failed to load file" });
+  }
+});
+
 // GET all uploaded media
 router.get("/", async (req, res) => {
   try {
@@ -79,7 +96,11 @@ router.post("/", upload.single("file"), async (req, res) => {
           type: req.file.mimetype,
         });
         await newMedia.save();
-        res.json(newMedia);
+        const responseMedia = newMedia.toObject();
+        if (isSvg) {
+          responseMedia.url = `${req.protocol}://${req.get("host")}/api/upload/raw/${result.public_id}`;
+        }
+        res.json(responseMedia);
       } catch (err) {
         res.status(500).json({ msg: "Error saving media to DB", error: err });
       }

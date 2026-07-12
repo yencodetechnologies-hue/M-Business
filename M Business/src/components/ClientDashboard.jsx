@@ -2284,7 +2284,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     const recentUpdates = [
       ...projects.flatMap(p =>
         (p.updates || [])
-          .filter(u => !u.visibleTo || u.visibleTo.includes('client'))
+          .filter(u => !u.visibleTo || u.visibleTo.includes('client') || u.visibleTo.includes('team'))
           .map(u => ({
             text: u.text || u.title || `Update on ${p.name}`,
             date: u.date ? new Date(u.date) : null,
@@ -2408,7 +2408,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     // Build from backend: project updates + notifications
     const proj = targetProject || projects[0];
     const projUpdates = (proj?.updates || [])
-      .filter(upd => !upd.visibleTo || upd.visibleTo.includes('client'))
+      .filter(upd => !upd.visibleTo || upd.visibleTo.includes('client') || upd.visibleTo.includes('team'))
       .slice(0, 3).map((upd, i) => ({
         id: 'upd-' + i,
         title: upd.text || upd.title || 'Project update posted',

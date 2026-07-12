@@ -1660,10 +1660,11 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
             await axios.put(
 
               `${BASE_URL}/api/clients/${activeClient._id}`,
-
               { documents: updatedDocs }
-
             );
+            const savedClient = res.data?.client;
+            setActiveClient(prev => savedClient ? savedClient : { ...prev, documents: updatedDocs });
+            setClients(prev => prev.map(c => c._id === activeClient._id ? (savedClient || { ...c, documents: updatedDocs }) : c));
 
           } catch (err) {
 
@@ -8185,7 +8186,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     axios.post(BASE_URL + "/api/auth/save-logo", { userId: user._id || user.id, logoUrl: logo || "" }).catch(e => console.log(e));
   };
 
-  const fetchClients = async () => { try { const res = await axios.get(BASE_URL + "/api/clients"); setClients(res.data); try { localStorage.setItem("cached_clients", JSON.stringify(res.data)); } catch { } } catch (e) { console.log(e); } };
+  const fetchClients = async () => {
+    try {
+      const cached = localStorage.getItem("cached_clients");
+      if (cached) { try { setClients(JSON.parse(cached)); } catch { } }
+    } catch { }
+    try {
+      const res = await axios.get(BASE_URL + "/api/clients?companyId=" + encodeURIComponent(user?.companyId || ""));
+      setClients(res.data);
+      try { localStorage.setItem("cached_clients", JSON.stringify(res.data)); } catch { }
+    } catch (e) { console.log(e); }
+  };
 
   const fetchEmployees = async () => { try { const res = await axios.get(BASE_URL + "/api/employees"); setEmployees(res.data); } catch (e) { console.log(e); } };
 

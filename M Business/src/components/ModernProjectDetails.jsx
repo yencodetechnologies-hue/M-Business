@@ -2582,7 +2582,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               <div style={{ display: 'flex', gap: 10 }}>
 
                                 <button
-                                  disabled={postingUpdate || (!updateTitle.trim() && !updateText.trim()) || updateSelectedMembers.length === 0}
+                                  disabled={postingUpdate || (!updateTitle.trim() && !updateText.trim())}
                                   onClick={async () => {
                                     const hasContent = updateTitle.trim() || updateText.trim();
                                     if (!hasContent) return;
@@ -2590,67 +2590,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                       await submitApprovalRequest();
                                       return;
                                     }
-                                    if (updateSelectedMembers.length === 0) return;
-                                    setPostingUpdate(true);
-                                    try {
-                                      const approvalCompanyId = user?.companyId || user?.company || user?._id || user?.id || currProject.companyId || '';
-                                      const title = updateTitle.trim() || updateText.trim().slice(0, 60) || 'Update';
-                                      const attachments = postUpdateAttachments || [];
-                                      const primaryAttachment = attachments[0] || null;
-                                      const selectedEmployees = (employees || []).filter(emp => updateSelectedMembers.includes(emp.name || emp.employeeName));
-
-                                      // One Approval doc per selected team member — each shows up individually
-                                      // in the Subadmin recipient list and the employee's own dashboard,
-                                      // starting as "Pending" until that employee approves it.
-                                      await Promise.all(selectedEmployees.map(emp =>
-                                        axios.post(`${BASE_URL}/api/approvals`, {
-                                          companyId: approvalCompanyId,
-                                          recipientType: 'team',
-                                          teamMemberId: emp._id,
-                                          senderName: user?.name || user?.clientName || 'Admin',
-                                          title,
-                                          desc: updateText.trim(),
-                                          icon: 'ti-speakerphone',
-                                          approveLabel: 'Approve',
-                                          rejectLabel: 'Review',
-                                          sourceType: 'projectUpdate',
-                                          projectId: currProject._id || '',
-                                          fileUrl: primaryAttachment ? primaryAttachment.url : '',
-                                          fileName: primaryAttachment ? primaryAttachment.name : '',
-                                        })
-                                      ));
-
-                                      // If also visible to the client, create a client-facing approval too.
-                                      if (sendToClient && (currProject.clientId || approvalForm.clientId)) {
-                                        await axios.post(`${BASE_URL}/api/approvals`, {
-                                          companyId: approvalCompanyId,
-                                          recipientType: 'client',
-                                          clientId: currProject.clientId || approvalForm.clientId,
-                                          senderName: user?.name || user?.clientName || 'Admin',
-                                          title,
-                                          desc: updateText.trim(),
-                                          icon: 'ti-speakerphone',
-                                          approveLabel: 'Approve',
-                                          rejectLabel: 'Review',
-                                          sourceType: 'projectUpdate',
-                                          projectId: currProject._id || '',
-                                          fileUrl: primaryAttachment ? primaryAttachment.url : '',
-                                          fileName: primaryAttachment ? primaryAttachment.name : '',
-                                        });
-                                      }
-
-                                      await loadProjectApprovals();
-                                      if (onUpdate) onUpdate();
-                                      setUpdateText('');
-                                      setUpdateTitle('');
-                                      setPostUpdateAttachments([]);
-                                      setUpdateSelectedMembers([]);
-                                    } catch (err) {
-                                      console.error('Failed to send update:', err.response?.data || err.message);
-                                      alert('Failed to send update: ' + (err.response?.data?.msg || err.message));
-                                    } finally {
-                                      setPostingUpdate(false);
-                                    }
+                                    setShowSendConfirmModal(true);
                                   }}
                                   style={{ padding: '9px 22px', borderRadius: 10, background: P.primary, color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: 13, fontWeight: 800, cursor: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 'not-allowed' : 'pointer', opacity: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,188,212,.25)', transition: 'all .15s' }}>
                                   <i className="ti ti-send" style={{ fontSize: 15 }} />
@@ -3522,6 +3462,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           fileUrl: primaryAttachment ? primaryAttachment.url : '',
                           fileType: primaryAttachment ? primaryAttachment.type : '',
                           attachments,
+                          status: updateType === 'approval' ? 'pending' : 'sent',
                         };
                         const updatedUpdates = [newUpdate, ...(currProject.updates || [])];
                         setCurrProject(prev => ({ ...prev, updates: updatedUpdates }));

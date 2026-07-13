@@ -144,7 +144,7 @@ const CSS = `
 .mpv-divider { height:1px; background:${P.bg}; margin:0 18px; }
 .mpv-card-bottom { padding:14px 18px; display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
 .mpv-card-meta { display:flex; flex-direction:column; gap:4px; min-width:0; }
-.mpv-card-meta-row { display:flex; align-items:center; gap:4px; font-size:11px; color:${P.textLight}; font-weight:600; white-space:nowrap; }
+.mpv-card-meta-row { display:flex; align-items:center; gap:4px; font-size:10px; color:${P.textLight}; font-weight:600; white-space:nowrap; }
 .mpv-card-meta-row i { color:${P.primary}; font-size:12px; flex-shrink:0; }
 .mpv-card-budget { color:#059669 !important; font-weight:700 !important; }
 .mpv-card-budget i { color:#059669 !important; }
@@ -154,8 +154,8 @@ const CSS = `
   background:${P.bg}; font-size:9px; font-weight:800; color:${P.textMid};
   display:flex; align-items:center; justify-content:center; }
 .mpv-deadline { text-align:right; flex-shrink:0; }
-.mpv-dl-lbl { font-size:10px; color:${P.textLight}; font-weight:600; text-transform:uppercase; }
-.mpv-dl-val { font-size:12px; font-weight:700; }
+.mpv-dl-lbl { font-size:9px; color:${P.textLight}; font-weight:600; text-transform:uppercase; }
+.mpv-dl-val { font-size:11px; font-weight:700; }
 .mpv-tasks { font-size:11px; color:${P.textLight}; display:flex; align-items:center; gap:4px; margin-top:5px; }
 .mpv-tasks i { color:${P.primary}; font-size:13px; }
 

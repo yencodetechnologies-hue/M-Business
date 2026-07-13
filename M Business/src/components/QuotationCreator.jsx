@@ -965,42 +965,40 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             </div>
           </div>
 
-          <div className="stats-row">
-            <div className="stat-card" onClick={() => setActiveTab("All")} style={{ cursor: "pointer", transition: "all 0.2s", position: "relative", border: activeTab === "All" ? "2px solid var(--teal)" : "2px solid transparent", borderRadius: 12 }}>
-              {activeTab === "All" && <div style={{ position: "absolute", top: 18, right: 20, fontSize: 10, color: "var(--teal)", fontWeight: 700 }}>● Active</div>}
-              <div className="stat-icon" style={{ background: "var(--teal-light)", color: "var(--teal)" }}><i className="ti ti-file-text"></i></div>
+          <div className="stats-row" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
+            <div className="stat-card" onClick={() => setActiveTab("All")} style={{ cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center", gap: 12, position: "relative", border: activeTab === "All" ? "2px solid var(--teal)" : "1.5px solid var(--border,#E0EEF0)", borderRadius: 16, background: "#fff", padding: "18px 20px" }}>
+              <div className="stat-icon" style={{ width: 44, height: 44, borderRadius: 12, background: "var(--teal-light)", color: "var(--teal)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}><i className="ti ti-file-text"></i></div>
               <div>
-                <div className="stat-num">{totalQuotes}</div>
-                <div className="stat-label">Total Quotes</div>
-                <div className="stat-sub" style={{ color: "var(--teal)" }}>₹{totalValue.toLocaleString("en-IN")} value</div>
-              </div>
-            </div>
-            <div className="stat-card" onClick={() => setActiveTab("Accepted")} style={{ cursor: "pointer", transition: "all 0.2s", position: "relative", border: activeTab === "Accepted" ? "2px solid var(--green)" : "2px solid transparent", borderRadius: 12 }}>
-              {activeTab === "Accepted" && <div style={{ position: "absolute", top: 18, right: 20, fontSize: 10, color: "var(--green)", fontWeight: 700 }}>● Active</div>}
-              <div className="stat-icon" style={{ background: "var(--green-bg)", color: "var(--green)" }}><i className="ti ti-circle-check"></i></div>
-              <div>
-                <div className="stat-num">{wonCount}</div>
-                <div className="stat-label">Accepted</div>
-                <div className="stat-sub" style={{ color: "var(--green)" }}>₹{wonValue.toLocaleString("en-IN")} won</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{totalQuotes}</div>
+                <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>Total Quotes</div>
+                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--teal)" }}>₹{totalValue.toLocaleString("en-IN")} value</div>
               </div>
             </div>
 
-            <div className="stat-card" onClick={() => setActiveTab("Sent")} style={{ cursor: "pointer", transition: "all 0.2s", position: "relative", border: activeTab === "Sent" ? "2px solid var(--amber)" : "2px solid transparent", borderRadius: 12 }}>
-              {activeTab === "Sent" && <div style={{ position: "absolute", top: 18, right: 20, fontSize: 10, color: "var(--amber)", fontWeight: 700 }}>● Active</div>}
-              <div className="stat-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-clock"></i></div>
+            <div className="stat-card" onClick={() => setActiveTab("Accepted")} style={{ cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center", gap: 12, position: "relative", border: activeTab === "Accepted" ? "2px solid var(--green)" : "1.5px solid var(--border,#E0EEF0)", borderRadius: 16, background: "#fff", padding: "18px 20px" }}>
+              <div className="stat-icon" style={{ width: 44, height: 44, borderRadius: 12, background: "var(--green-bg)", color: "var(--green)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}><i className="ti ti-circle-check"></i></div>
               <div>
-                <div className="stat-num">{pendingCount}</div>
-                <div className="stat-label">Pending</div>
-                <div className="stat-sub" style={{ color: "var(--amber)" }}>₹{pendingValue.toLocaleString("en-IN")} pending</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{wonCount}</div>
+                <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>Accepted</div>
+                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--green)" }}>₹{wonValue.toLocaleString("en-IN")} won</div>
               </div>
             </div>
 
-            <div className="stat-card" onClick={() => { setActiveTab("All"); setListSearch(""); }} style={{ cursor: "pointer", transition: "all 0.2s", position: "relative", border: "2px solid transparent", borderRadius: 12 }}>
-              <div className="stat-icon" style={{ background: "var(--purple-bg)", color: "var(--purple)" }}><i className="ti ti-percentage"></i></div>
+            <div className="stat-card" onClick={() => setActiveTab("Sent")} style={{ cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center", gap: 12, position: "relative", border: activeTab === "Sent" ? "2px solid var(--amber)" : "1.5px solid var(--border,#E0EEF0)", borderRadius: 16, background: "#fff", padding: "18px 20px" }}>
+              <div className="stat-icon" style={{ width: 44, height: 44, borderRadius: 12, background: "var(--amber-bg)", color: "var(--amber)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}><i className="ti ti-clock"></i></div>
               <div>
-                <div className="stat-num">{winRate}%</div>
-                <div className="stat-label">Win Rate</div>
-                <div className="stat-sub" style={{ color: "var(--purple)" }}>{wonCount} of {sentCount} sent</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{pendingCount}</div>
+                <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>Pending</div>
+                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--amber)" }}>₹{pendingValue.toLocaleString("en-IN")} pending</div>
+              </div>
+            </div>
+
+            <div className="stat-card" onClick={() => { setActiveTab("All"); setListSearch(""); }} style={{ cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center", gap: 12, position: "relative", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 16, background: "#fff", padding: "18px 20px" }}>
+              <div className="stat-icon" style={{ width: 44, height: 44, borderRadius: 12, background: "var(--purple-bg)", color: "var(--purple)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}><i className="ti ti-percentage"></i></div>
+              <div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{winRate}%</div>
+                <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>Win Rate</div>
+                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--purple)" }}>{wonCount} of {sentCount} sent</div>
               </div>
             </div>
           </div>

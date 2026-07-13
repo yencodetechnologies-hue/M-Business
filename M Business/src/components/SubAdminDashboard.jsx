@@ -7217,7 +7217,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState(() => { try { const c = localStorage.getItem("cached_projects"); return c ? JSON.parse(c) : []; } catch { return []; } });
 
   // Once the real projects list has loaded, swap the lightweight
   // placeholder set above (in jumpProject's initializer) for the actual
@@ -7562,277 +7562,266 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     // priority instead of just an earlier call in the same tick.
     (async () => {
       await fetchClients();
+      await fetchProjects();
 
       fetchProfile();
 
-      fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); fetchInvoices(); fetchIncome(); fetchExpenses(); fetchTasks(); fetchConfig();
+      fetchEmployees(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); fetchInvoices(); fetchIncome(); fetchExpenses(); fetchTasks(); fetchConfig();
 
       fetchPendingLeaves(); fetchEmployeeDocs();
     })();
-    }, []);
-    // Close notification panel when clicking outside
-    useEffect(() => {
-      const handleClickOutside = (e) => {
-        if (showNotifPanel && !e.target.closest('.topbar-icon')) {
-          setShowNotifPanel(false);
-        }
-      };
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [showNotifPanel]);
-
-
-    // ── Listen for SEND_DOCUMENT from template designer iframe ──
-
-    useEffect(() => {
-
-      const handleMessage = async (e) => {
-
-        if (e.data && e.data.type === "SEND_DOCUMENT") {
-          const payload = e.data.payload;
-          if (!payload) return;
-
-          const companyId = resolveSubadminId();
-          const sendTo = payload.sendTo || "client";
-
-          let resolvedClientId = payload.clientId || "";
-          if (!resolvedClientId && sendTo === "client") {
-            const match = clients.find(c => (c.clientName || c.name) === payload.client);
-            resolvedClientId = match?._id || match?.id || "";
-          }
-          let resolvedEmployeeId = payload.employeeId || "";
-          if (!resolvedEmployeeId && sendTo === "employee") {
-            const match = employees.find(emp => (emp.name || emp.employeeName) === payload.client);
-            resolvedEmployeeId = match?._id || match?.id || "";
-          }
-
-          try {
-            await axios.post(`${BASE_URL}/api/documents`, {
-              docType: payload.docType || "lh",
-              sendTo,
-              client: payload.client || (sendTo === "employee" ? "Employee" : "Client"),
-              clientId: sendTo === "client" ? resolvedClientId : "",
-              employeeId: sendTo === "employee" ? resolvedEmployeeId : "",
-              recipientEmail: payload.recipientEmail || "",
-              htmlContent: payload.htmlContent || "",
-              senderCompany: companyNameStr,
-              companyId
-            });
-
-            if (sendTo === "employee" && resolvedEmployeeId) {
-              try {
-                await axios.post(`${BASE_URL}/api/notifications`, {
-                  userId: resolvedEmployeeId,
-                  type: "document",
-                  icon: "ti-files",
-                  text: `A new document has been shared with you`,
-                });
-              } catch (notifErr) {
-                console.error("Failed to notify employee:", notifErr);
-              }
-            }
-
-            toast.success(`Document sent to ${payload.client || "Client"} successfully!`);
-          } catch (err) {
-            console.error("Failed to send document:", err);
-            toast.error("Failed to send document. Check connection.");
-          }
-        }
-
-        if (e.data && e.data.type === "SAVE_QUOTATION") {
-
-          const { qt, items } = e.data.payload;
-
-          if (!qt || !qt.quoteNo) return;
-
-
-
-          // 1. Save to backend API
-
-          try {
-
-            await axios.post(`${BASE_URL}/api/quotations`, { qt, items, status: "draft" });
-
-          } catch (err) {
-
-            console.error("API Save Error", err);
-
-          }
-
-
-
-          // 2. Save to local drafts to update the UI
-
-          try {
-
-            const LOCAL_KEY = "quotation_drafts";
-
-            const all = localStorage.getItem(LOCAL_KEY) ? JSON.parse(localStorage.getItem(LOCAL_KEY)) : [];
-
-            const id = qt.quoteNo;
-
-            const idx = all.findIndex((d) => d.id === id || (d.qt && d.qt.quoteNo === id));
-
-            const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
-
-            const total = subtotal * (1 + (qt.gstRate || 0) / 100);
-
-            const entry = { id, quoteNo: qt.quoteNo, client: qt.client || "—", total, savedAt: Date.now(), qt, items, status: "draft" };
-
-
-
-            if (idx >= 0) all[idx] = entry;
-
-            else all.unshift(entry);
-
-
-
-            localStorage.setItem(LOCAL_KEY, JSON.stringify(all.slice(0, 30)));
-
-            toast.success("Quotation saved successfully!");
-
-            fetchQuotations(); // Refresh list to update the Template Designer dropdown
-
-          } catch (err) {
-
-            toast.error("Failed to save quotation locally.");
-
-          }
-
-        }
-
-      };
-
-      window.addEventListener("message", handleMessage);
-
-      return () => window.removeEventListener("message", handleMessage);
-
-    }, [companyNameStr, user]);
-
-
-
-    // Redirect to mysubscriptions only when the trial has actually expired
-    // (i.e. no subscription AND no free trial days left). While the user is
-    // still within their free trial, subscription is legitimately null and
-    // they should stay on the Dashboard — not be bounced to "Choose your Plan".
-    const hasRedirected = useRef(false);
-    const [subscriptionChecked, setSubscriptionChecked] = useState(false);
-
-    useEffect(() => {
-      if (!subscriptionChecked || trialToastShown.current) return;
-      const flagKey = user?.email ? `justRegistered:${user.email}` : null;
-      const isFirstTimeAfterSignup = flagKey && localStorage.getItem(flagKey) === "1";
-      const trialIsActive = isInFreeTrial() || subscription?.isTrial || subscription?.status === "trial";
-      if (isFirstTimeAfterSignup && trialIsActive) {
-        trialToastShown.current = true;
-        localStorage.removeItem(flagKey);
-        setTrialToast(true);
-        const hideTimer = setTimeout(() => setTrialToast(false), 4000);
-        return () => clearTimeout(hideTimer);
+  }, []);
+  // Close notification panel when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showNotifPanel && !e.target.closest('.topbar-icon')) {
+        setShowNotifPanel(false);
       }
-    }, [subscriptionChecked, subscription]);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showNotifPanel]);
 
-    useEffect(() => {
-      if (
-        subscriptionChecked &&
-        subscription === null &&
-        !isInFreeTrial() &&
-        !hasRedirected.current
-      ) {
-        hasRedirected.current = true;
-        setForceUpgradeTab(false);
-        setActive("mysubscriptions");
-      }
-    }, [subscription, subscriptionChecked]);
 
-    // Process PayU payment silently on dashboard load — no need to show subscriptions page
-    useEffect(() => {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("payment") !== "success") return;
-      const subId = params.get("subId");
-      const txnid = params.get("txnid");
-      window.history.replaceState({}, document.title, window.location.pathname);
-      const activateAndRefresh = async () => {
+  // ── Listen for SEND_DOCUMENT from template designer iframe ──
+
+  useEffect(() => {
+
+    const handleMessage = async (e) => {
+
+      if (e.data && e.data.type === "SEND_DOCUMENT") {
+        const payload = e.data.payload;
+        if (!payload) return;
+
+        const companyId = resolveSubadminId();
+        const sendTo = payload.sendTo || "client";
+
+        let resolvedClientId = payload.clientId || "";
+        if (!resolvedClientId && sendTo === "client") {
+          const match = clients.find(c => (c.clientName || c.name) === payload.client);
+          resolvedClientId = match?._id || match?.id || "";
+        }
+        let resolvedEmployeeId = payload.employeeId || "";
+        if (!resolvedEmployeeId && sendTo === "employee") {
+          const match = employees.find(emp => (emp.name || emp.employeeName) === payload.client);
+          resolvedEmployeeId = match?._id || match?.id || "";
+        }
+
         try {
-          if (subId) {
-            await axios.post(`${BASE_URL}/api/subscriptions/activate-pending`, {
-              subscriptionId: subId, txnid
-            });
+          await axios.post(`${BASE_URL}/api/documents`, {
+            docType: payload.docType || "lh",
+            sendTo,
+            client: payload.client || (sendTo === "employee" ? "Employee" : "Client"),
+            clientId: sendTo === "client" ? resolvedClientId : "",
+            employeeId: sendTo === "employee" ? resolvedEmployeeId : "",
+            recipientEmail: payload.recipientEmail || "",
+            htmlContent: payload.htmlContent || "",
+            senderCompany: companyNameStr,
+            companyId
+          });
+
+          if (sendTo === "employee" && resolvedEmployeeId) {
+            try {
+              await axios.post(`${BASE_URL}/api/notifications`, {
+                userId: resolvedEmployeeId,
+                type: "document",
+                icon: "ti-files",
+                text: `A new document has been shared with you`,
+              });
+            } catch (notifErr) {
+              console.error("Failed to notify employee:", notifErr);
+            }
           }
-        } catch (e) { console.log("PayU activation:", e.message); }
-        await fetchSubscription();
-      };
-      activateAndRefresh();
-    }, []);
 
+          toast.success(`Document sent to ${payload.client || "Client"} successfully!`);
+        } catch (err) {
+          console.error("Failed to send document:", err);
+          toast.error("Failed to send document. Check connection.");
+        }
+      }
 
-    const fetchTasks = async () => {
+      if (e.data && e.data.type === "SAVE_QUOTATION") {
 
-      try {
+        const { qt, items } = e.data.payload;
 
-        const res = await axios.get(BASE_URL + "/api/tasks");
-
-        setTasks(res.data || []);
-
-      } catch (e) { console.log(e); }
-
-    };
+        if (!qt || !qt.quoteNo) return;
 
 
 
-    const fetchConfig = async () => {
+        // 1. Save to backend API
 
-      try {
+        try {
 
-        const cid = resolveSubadminId();
+          await axios.post(`${BASE_URL}/api/quotations`, { qt, items, status: "draft" });
 
-        if (!cid) return;
+        } catch (err) {
 
-        const res = await axios.get(`${BASE_URL}/api/config/${cid}`);
-
-        setConfig(res.data);
-
-      } catch (e) { console.log(e); }
-
-    };
-
-
-
-    const fetchSubscription = async () => {
-
-      try {
-
-        if (!subscription) setSubLoading(true);
-
-        const id = resolveSubadminId();
-
-        if (!id) return null;
-
-
-
-        const res = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
-
-        if (res.data.hasSubscription) {
-
-          setSubscription(res.data.subscription);
-          setSubLoading(false);
-          setSubscriptionChecked(true);
-
-          return res.data.subscription; // return fresh data for immediate use
-
-        } else {
-
-          setSubscription(null);
-          setSubLoading(false);
-          setSubscriptionChecked(true);
-
-          return null;
+          console.error("API Save Error", err);
 
         }
 
-      } catch (err) {
 
-        console.error("Subscription fetch error:", err);
+
+        // 2. Save to local drafts to update the UI
+
+        try {
+
+          const LOCAL_KEY = "quotation_drafts";
+
+          const all = localStorage.getItem(LOCAL_KEY) ? JSON.parse(localStorage.getItem(LOCAL_KEY)) : [];
+
+          const id = qt.quoteNo;
+
+          const idx = all.findIndex((d) => d.id === id || (d.qt && d.qt.quoteNo === id));
+
+          const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
+
+          const total = subtotal * (1 + (qt.gstRate || 0) / 100);
+
+          const entry = { id, quoteNo: qt.quoteNo, client: qt.client || "—", total, savedAt: Date.now(), qt, items, status: "draft" };
+
+
+
+          if (idx >= 0) all[idx] = entry;
+
+          else all.unshift(entry);
+
+
+
+          localStorage.setItem(LOCAL_KEY, JSON.stringify(all.slice(0, 30)));
+
+          toast.success("Quotation saved successfully!");
+
+          fetchQuotations(); // Refresh list to update the Template Designer dropdown
+
+        } catch (err) {
+
+          toast.error("Failed to save quotation locally.");
+
+        }
+
+      }
+
+    };
+
+    window.addEventListener("message", handleMessage);
+
+    return () => window.removeEventListener("message", handleMessage);
+
+  }, [companyNameStr, user]);
+
+
+
+  // Redirect to mysubscriptions only when the trial has actually expired
+  // (i.e. no subscription AND no free trial days left). While the user is
+  // still within their free trial, subscription is legitimately null and
+  // they should stay on the Dashboard — not be bounced to "Choose your Plan".
+  const hasRedirected = useRef(false);
+  const [subscriptionChecked, setSubscriptionChecked] = useState(false);
+
+  useEffect(() => {
+    if (!subscriptionChecked || trialToastShown.current) return;
+    const flagKey = user?.email ? `justRegistered:${user.email}` : null;
+    const isFirstTimeAfterSignup = flagKey && localStorage.getItem(flagKey) === "1";
+    const trialIsActive = isInFreeTrial() || subscription?.isTrial || subscription?.status === "trial";
+    if (isFirstTimeAfterSignup && trialIsActive) {
+      trialToastShown.current = true;
+      localStorage.removeItem(flagKey);
+      setTrialToast(true);
+      const hideTimer = setTimeout(() => setTrialToast(false), 4000);
+      return () => clearTimeout(hideTimer);
+    }
+  }, [subscriptionChecked, subscription]);
+
+  useEffect(() => {
+    if (
+      subscriptionChecked &&
+      subscription === null &&
+      !isInFreeTrial() &&
+      !hasRedirected.current
+    ) {
+      hasRedirected.current = true;
+      setForceUpgradeTab(false);
+      setActive("mysubscriptions");
+    }
+  }, [subscription, subscriptionChecked]);
+
+  // Process PayU payment silently on dashboard load — no need to show subscriptions page
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("payment") !== "success") return;
+    const subId = params.get("subId");
+    const txnid = params.get("txnid");
+    window.history.replaceState({}, document.title, window.location.pathname);
+    const activateAndRefresh = async () => {
+      try {
+        if (subId) {
+          await axios.post(`${BASE_URL}/api/subscriptions/activate-pending`, {
+            subscriptionId: subId, txnid
+          });
+        }
+      } catch (e) { console.log("PayU activation:", e.message); }
+      await fetchSubscription();
+    };
+    activateAndRefresh();
+  }, []);
+
+
+  const fetchTasks = async () => {
+
+    try {
+
+      const res = await axios.get(BASE_URL + "/api/tasks");
+
+      setTasks(res.data || []);
+
+    } catch (e) { console.log(e); }
+
+  };
+
+
+
+  const fetchConfig = async () => {
+
+    try {
+
+      const cid = resolveSubadminId();
+
+      if (!cid) return;
+
+      const res = await axios.get(`${BASE_URL}/api/config/${cid}`);
+
+      setConfig(res.data);
+
+    } catch (e) { console.log(e); }
+
+  };
+
+
+
+  const fetchSubscription = async () => {
+
+    try {
+
+      if (!subscription) setSubLoading(true);
+
+      const id = resolveSubadminId();
+
+      if (!id) return null;
+
+
+
+      const res = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
+
+      if (res.data.hasSubscription) {
+
+        setSubscription(res.data.subscription);
+        setSubLoading(false);
+        setSubscriptionChecked(true);
+
+        return res.data.subscription; // return fresh data for immediate use
+
+      } else {
 
         setSubscription(null);
         setSubLoading(false);
@@ -7840,1468 +7829,1490 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
         return null;
 
-      } finally {
-        // Fetch updated user limits in the background — don't block callers on this,
-        // and delay it slightly so it never competes with the initial dashboard
-        // render/data calls right after login.
-        setTimeout(() => {
-          (async () => {
-            try {
-              const id = resolveSubadminId();
-              if (id) {
-                const userRes = await axios.get(`${BASE_URL}/api/users/${id}`);
-                if (userRes.data) {
-                  localStorage.setItem("user", JSON.stringify(userRes.data));
-                }
+      }
+
+    } catch (err) {
+
+      console.error("Subscription fetch error:", err);
+
+      setSubscription(null);
+      setSubLoading(false);
+      setSubscriptionChecked(true);
+
+      return null;
+
+    } finally {
+      // Fetch updated user limits in the background — don't block callers on this,
+      // and delay it slightly so it never competes with the initial dashboard
+      // render/data calls right after login.
+      setTimeout(() => {
+        (async () => {
+          try {
+            const id = resolveSubadminId();
+            if (id) {
+              const userRes = await axios.get(`${BASE_URL}/api/users/${id}`);
+              if (userRes.data) {
+                localStorage.setItem("user", JSON.stringify(userRes.data));
               }
-            } catch (e) {
-              console.error("Failed to update local user limits:", e);
             }
-          })();
-        }, 1500);
-      }
-    };
+          } catch (e) {
+            console.error("Failed to update local user limits:", e);
+          }
+        })();
+      }, 1500);
+    }
+  };
 
-    const fetchInvoices = async () => {
+  const fetchInvoices = async () => {
 
-      try {
+    try {
 
-        const res = await axios.get(BASE_URL + "/api/invoices");
+      const res = await axios.get(BASE_URL + "/api/invoices");
 
-        setInvoices(res.data.invoices || []);
+      setInvoices(res.data.invoices || []);
 
-      } catch (e) {
+    } catch (e) {
 
-        console.log("Fetch invoices error:", e);
+      console.log("Fetch invoices error:", e);
 
-        setInvoices([]);
+      setInvoices([]);
 
-      }
+    }
 
-    };
+  };
 
 
 
-    const fetchPaymentHistory = async () => {
+  const fetchPaymentHistory = async () => {
 
-      try {
+    try {
 
-        const id = resolveSubadminId();
+      const id = resolveSubadminId();
 
-        if (!id) return;
+      if (!id) return;
 
-        const res = await axios.get(`${BASE_URL}/api/subscriptions/payments/${id}`);
+      const res = await axios.get(`${BASE_URL}/api/subscriptions/payments/${id}`);
 
-        setPaymentHistory(res.data || []);
+      setPaymentHistory(res.data || []);
 
-      } catch (err) {
+    } catch (err) {
 
-        console.error("Payment history fetch failed", err);
+      console.error("Payment history fetch failed", err);
 
-      }
+    }
 
-    };
+  };
 
 
 
-    const fetchIncome = async () => {
+  const fetchIncome = async () => {
 
-      try {
+    try {
 
-        const res = await axios.get(BASE_URL + "/api/income");
+      const res = await axios.get(BASE_URL + "/api/income");
 
-        setIncome(res.data || []);
+      setIncome(res.data || []);
 
-      } catch (e) {
+    } catch (e) {
 
-        console.log("Fetch income error:", e);
+      console.log("Fetch income error:", e);
 
-        setIncome([]);
+      setIncome([]);
 
-      }
+    }
 
-    };
+  };
 
 
 
-    const fetchExpenses = async () => {
+  const fetchExpenses = async () => {
 
-      try {
+    try {
 
-        const res = await axios.get(BASE_URL + "/api/expenses");
+      const res = await axios.get(BASE_URL + "/api/expenses");
 
-        setExpenses(res.data || []);
+      setExpenses(res.data || []);
 
-      } catch (e) {
+    } catch (e) {
 
-        console.log("Fetch expenses error:", e);
+      console.log("Fetch expenses error:", e);
 
-        setExpenses([]);
+      setExpenses([]);
 
-      }
+    }
 
-    };
+  };
 
 
 
-    // ── FREE TRIAL ──────────────────────────────────────────────────────────────
-    const FREE_TRIAL_DAYS = 30;
-    const FREE_TRIAL_LIMITS = { client: 5, employee: 10, manager: 2 };
+  // ── FREE TRIAL ──────────────────────────────────────────────────────────────
+  const FREE_TRIAL_DAYS = 30;
+  const FREE_TRIAL_LIMITS = { client: 5, employee: 10, manager: 2 };
 
-    const getTrialDaysRemaining = () => {
-      const created = user?.createdAt;
-      if (!created) return 0;
-      const diffMs = new Date(created).getTime() + FREE_TRIAL_DAYS * 86400000 - Date.now();
-      return Math.max(0, Math.ceil(diffMs / 86400000));
-    };
+  const getTrialDaysRemaining = () => {
+    const created = user?.createdAt;
+    if (!created) return 0;
+    const diffMs = new Date(created).getTime() + FREE_TRIAL_DAYS * 86400000 - Date.now();
+    return Math.max(0, Math.ceil(diffMs / 86400000));
+  };
 
-    const isInFreeTrial = () => !subscription && getTrialDaysRemaining() > 0;
-    // ────────────────────────────────────────────────────────────────────────────
+  const isInFreeTrial = () => !subscription && getTrialDaysRemaining() > 0;
+  // ────────────────────────────────────────────────────────────────────────────
 
-    const getSubStatus = () => {
+  const getSubStatus = () => {
 
-      // While subscription data is still loading, never block
+    // While subscription data is still loading, never block
 
-      if (!subscription) {
-        // Free trial — never block
-        if (isInFreeTrial()) return { blocked: false, alert: false, status: "trial", trialDays: getTrialDaysRemaining() };
-        // No subscription and trial expired
-        return { blocked: true, alert: false, status: "no_subscription" };
-      }
+    if (!subscription) {
+      // Free trial — never block
+      if (isInFreeTrial()) return { blocked: false, alert: false, status: "trial", trialDays: getTrialDaysRemaining() };
+      // No subscription and trial expired
+      return { blocked: true, alert: false, status: "no_subscription" };
+    }
 
 
 
-      const end = new Date(subscription.endDate);
+    const end = new Date(subscription.endDate);
 
-      const now = new Date();
+    const now = new Date();
 
-      const diffDays = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+    const diffDays = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
 
-      const isExpired = subscription.status === "expired" || diffDays <= 0;
+    const isExpired = subscription.status === "expired" || diffDays <= 0;
 
 
 
-      // If status is hidden or explicitly expired, or it's past the end date
+    // If status is hidden or explicitly expired, or it's past the end date
 
-      if (subscription.status === "hidden" || isExpired) {
+    if (subscription.status === "hidden" || isExpired) {
 
-        return { blocked: true, alert: false, status: subscription.status, days: diffDays };
+      return { blocked: true, alert: false, status: subscription.status, days: diffDays };
 
-      }
+    }
 
 
 
-      // 10 days before renewal -> plz renew your...
+    // 10 days before renewal -> plz renew your...
 
-      if (diffDays <= 10 && diffDays > 0) {
+    if (diffDays <= 10 && diffDays > 0) {
 
-        return { blocked: false, alert: true, days: diffDays, status: "active" };
+      return { blocked: false, alert: true, days: diffDays, status: "active" };
 
-      }
+    }
 
 
 
-      return { blocked: false, alert: false, status: "active" };
+    return { blocked: false, alert: false, status: "active" };
 
-    };
+  };
 
 
 
-    const subStatus = getSubStatus();
+  const subStatus = getSubStatus();
 
-    const resolveSubadminId = () => {
+  const resolveSubadminId = () => {
 
-      // Aggressively find the subadmin ID from any possible property
+    // Aggressively find the subadmin ID from any possible property
 
-      const id = user?._id || user?.id || user?.userId || user?.companyId || user?.company || "";
+    const id = user?._id || user?.id || user?.userId || user?.companyId || user?.company || "";
 
-      return String(id).trim();
+    return String(id).trim();
 
-    };
+  };
 
-    // Persist any custom "Category / Industry" values the user types into the
-    // Add Client form, scoped per company, so they survive a page refresh and
-    // show up in the dropdown for future clients too.
-    const CATEGORY_STORAGE_KEY = `customCategories_${resolveSubadminId() || "default"}`;
-    const [customCategories, setCustomCategories] = useState(() => {
-      try {
-        return JSON.parse(localStorage.getItem(CATEGORY_STORAGE_KEY) || "[]");
-      } catch (e) {
-        return [];
-      }
+  // Persist any custom "Category / Industry" values the user types into the
+  // Add Client form, scoped per company, so they survive a page refresh and
+  // show up in the dropdown for future clients too.
+  const CATEGORY_STORAGE_KEY = `customCategories_${resolveSubadminId() || "default"}`;
+  const [customCategories, setCustomCategories] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(CATEGORY_STORAGE_KEY) || "[]");
+    } catch (e) {
+      return [];
+    }
+  });
+  const CURRENCY_STORAGE_KEY = `customCurrencies_${resolveSubadminId() || "default"}`;
+  const [customCurrencies, setCustomCurrencies] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(CURRENCY_STORAGE_KEY) || "[]");
+    } catch (e) {
+      return [];
+    }
+  });
+  const saveCustomCurrency = (value) => {
+    const v = (value || "").trim();
+    if (!v) return;
+    setCustomCurrencies(prev => {
+      if (prev.some(c => c.toLowerCase() === v.toLowerCase())) return prev;
+      const next = [...prev, v];
+      try { localStorage.setItem(CURRENCY_STORAGE_KEY, JSON.stringify(next)); } catch (e) { }
+      return next;
     });
-    const CURRENCY_STORAGE_KEY = `customCurrencies_${resolveSubadminId() || "default"}`;
-    const [customCurrencies, setCustomCurrencies] = useState(() => {
-      try {
-        return JSON.parse(localStorage.getItem(CURRENCY_STORAGE_KEY) || "[]");
-      } catch (e) {
-        return [];
-      }
+  };
+  const saveCustomCategory = (value) => {
+    const v = (value || "").trim();
+    if (!v) return;
+    setCustomCategories(prev => {
+      if (prev.some(c => c.toLowerCase() === v.toLowerCase())) return prev;
+      const next = [...prev, v];
+      try { localStorage.setItem(CATEGORY_STORAGE_KEY, JSON.stringify(next)); } catch (e) { }
+      return next;
     });
-    const saveCustomCurrency = (value) => {
-      const v = (value || "").trim();
-      if (!v) return;
-      setCustomCurrencies(prev => {
-        if (prev.some(c => c.toLowerCase() === v.toLowerCase())) return prev;
-        const next = [...prev, v];
-        try { localStorage.setItem(CURRENCY_STORAGE_KEY, JSON.stringify(next)); } catch (e) { }
-        return next;
+  };
+
+
+
+  // Dashboard.jsx-à®²à¯ à®‡à®°à¯à®•à¯à®•à¯à®®à¯ parseLimit function-à® à®‡à®¤à®¾à®• à®®à®¾à®¤à¯à®¤à¯à®™à¯à®•:
+
+
+
+  const parseLimit = (limitStr) => {
+
+    if (limitStr === undefined || limitStr === null || limitStr === "") return 10;
+
+    const s = String(limitStr).toLowerCase().trim();
+
+    if (s.includes("unlimited") || s.includes("infinity")) return Infinity;
+
+    const m = s.match(/\d+/);
+
+    if (m) return parseInt(m[0]);
+
+    return 10;
+
+  };
+
+  const getSubscriptionLimit = (type, sub = subscription) => {
+
+    // 1. Try to get limit from the active subscription directly
+
+    let val = null;
+
+    if (sub) {
+
+      val = type === "client" ? sub.clientLimit : type === "employee" ? sub.employeeLimit : sub.managerLimit;
+
+
+
+      // If direct field is empty, search in features array
+
+      if ((!val || val === "") && sub.features && Array.isArray(sub.features)) {
+
+        const label = type === "client" ? "client" : type === "employee" ? "employee" : "manager";
+
+        const feat = sub.features.find(f => f.toLowerCase().includes(label));
+
+        if (feat) {
+
+          const match = feat.match(/\d+/);
+
+          if (match) val = match[0];
+
+          if (feat.toLowerCase().includes("unlimited")) val = "Infinity";
+
+        }
+
+      }
+
+    }
+
+
+
+    // 2. If subscription has a limit, parse and return it
+
+    if (val && String(val).trim() !== "" && String(val) !== "0") {
+
+      return parseLimit(val);
+
+    }
+
+
+
+    // 3. Fallback: Direct limit set by Admin on the user profile
+
+    const uLimit = type === "client" ? user?.clientLimit : type === "employee" ? user?.employeeLimit : user?.managerLimit;
+
+    if (uLimit && String(uLimit).trim() !== "" && String(uLimit) !== "0") {
+
+      return parseLimit(uLimit);
+
+    }
+
+
+
+    // 4. Free trial limits
+    if (isInFreeTrial()) {
+      return FREE_TRIAL_LIMITS[type] ?? 5;
+    }
+
+    // 5. Default fallback
+    return 10;
+
+  };
+
+
+
+  const isUsageAtLimit = (type, currentCount, sub = subscription) => {
+
+    const limit = getSubscriptionLimit(type, sub);
+
+    if (limit === Infinity) return false;
+
+    return currentCount >= limit;
+
+  };
+
+
+
+
+
+  const handleLogout = () => { localStorage.removeItem("user"); localStorage.setItem("loggedOut", "1"); setUser(null); setAccounts([]); };
+
+  const handleAuthSetUser = (userData) => {
+
+    setAccountAuthOpen(false);
+
+    setProfileDropdownOpen(false);
+
+    setShowProfile(false);
+
+    setUser(userData);
+
+  };
+
+  const onLogoChange = (logo) => {
+    setCompanyLogo(logo || fixedLogo);
+    const updatedUser = { ...user, logoUrl: logo || "" };
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    setUser(updatedUser);
+    axios.post(BASE_URL + "/api/auth/save-logo", { userId: user._id || user.id, logoUrl: logo || "" }).catch(e => console.log(e));
+  };
+
+  const fetchClients = async () => {
+    try {
+      const cached = localStorage.getItem("cached_clients");
+      if (cached) { try { setClients(JSON.parse(cached)); } catch { } }
+    } catch { }
+    try {
+      const res = await axios.get(BASE_URL + "/api/clients?companyId=" + encodeURIComponent(user?.companyId || ""));
+      setClients(res.data);
+      try { localStorage.setItem("cached_clients", JSON.stringify(res.data)); } catch { }
+    } catch (e) { console.log(e); }
+  };
+
+  const fetchEmployees = async () => { try { const res = await axios.get(BASE_URL + "/api/employees"); setEmployees(res.data); } catch (e) { console.log(e); } };
+
+  const fetchProjects = async () => {
+    try {
+      const cached = localStorage.getItem("cached_projects");
+      if (cached) { try { setProjects(JSON.parse(cached)); } catch { } }
+    } catch { }
+    try {
+      const res = await axios.get(BASE_URL + "/api/projects");
+      setProjects(res.data);
+      try { localStorage.setItem("cached_projects", JSON.stringify(res.data)); } catch { }
+    } catch (e) { console.log(e); }
+  };
+
+  const fetchManagers = async () => { try { const res = await axios.get(BASE_URL + "/api/managers"); setManagers(res.data); } catch (e) { console.log(e); } };
+
+  const fetchSubadmins = async () => { try { const res = await axios.get(BASE_URL + "/api/subadmins"); setSubadmins(res.data); } catch (e) { console.log(e); } };
+
+
+
+
+
+  // Re-fetch packages when navigating to Packages tab to show admin-added packages
+
+  // Also refresh subscription when visiting resource tabs to ensure latest limits
+
+  useEffect(() => {
+
+    if (active === "packages") {
+
+      fetchPackages();
+
+    }
+
+  }, [active]);
+
+  // Package view/edit handlers
+
+  const handleViewPackage = (pkg) => {
+
+    setViewPackage(pkg);
+
+  };
+
+
+
+  const handleEditPackage = (pkg) => {
+
+    setEditPackage(pkg);
+
+    setEditPkgForm({
+
+      title: pkg.title || "",
+
+      description: pkg.description || "",
+
+      icon: pkg.icon || "📦",
+
+      type: pkg.type || "paid",
+
+      price: pkg.price || "",
+
+      noOfDays: pkg.no_of_days || pkg.noOfDays || "",
+
+      planDuration: pkg.planDuration || "Monthly",
+
+      businessLimit: pkg.businessLimit || "",
+
+      managerLimit: pkg.managerLimit || "",
+
+      clientLimit: pkg.clientLimit || "3 Client manage",
+
+      status: pkg.status || "Active",
+
+      assignedSubadmins: pkg.assignedSubadmins || []
+
+    });
+
+  };
+
+  const savePackageEdit = async () => {
+
+    if (!editPackage) return;
+
+    try {
+
+      setPkgSaveLoading(true);
+
+      const packageData = {
+
+        title: editPkgForm.title,
+
+        description: editPkgForm.description,
+
+        icon: editPkgForm.icon,
+
+        type: editPkgForm.type,
+
+        price: parseFloat(editPkgForm.price) || 0,
+
+        no_of_days: parseInt(editPkgForm.noOfDays) || 30,
+
+        planDuration: editPkgForm.planDuration,
+
+        businessLimit: editPkgForm.businessLimit,
+
+        managerLimit: editPkgForm.managerLimit,
+
+        clientLimit: editPkgForm.clientLimit,
+
+        employeeLimit: editPkgForm.employeeLimit,
+
+        status: editPkgForm.status,
+
+        assignedSubadmins: editPkgForm.assignedSubadmins,
+
+        monthlyPrice: editPkgForm.type === "free" ? "Free" : editPkgForm.price,
+
+        quarterlyPrice: editPkgForm.type === "free" ? "Free" : Math.round((parseFloat(editPkgForm.price) || 0) * 3 * 0.9).toString(),
+
+        halfYearlyPrice: editPkgForm.type === "free" ? "Free" : Math.round((parseFloat(editPkgForm.price) || 0) * 6 * 0.85).toString(),
+
+        annualPrice: editPkgForm.type === "free" ? "Free" : Math.round((parseFloat(editPkgForm.price) || 0) * 12 * 0.8).toString(),
+
+        features: `${editPkgForm.planDuration} Plan\n${editPkgForm.businessLimit}\n${editPkgForm.managerLimit}\n${editPkgForm.clientLimit}\n${editPkgForm.employeeLimit}`
+
+      };
+
+      const res = await axios.put(`${BASE_URL}/api/packages/${editPackage._id}`, packageData);
+
+      setPackages(prev => prev.map(p => p._id === editPackage._id ? res.data : p));
+
+      setEditPackage(null);
+
+      toast.success("Package updated successfully!");
+
+    } catch (err) {
+
+      console.error(err);
+
+      toast.error("Failed to update package");
+
+    } finally {
+
+      setPkgSaveLoading(false);
+
+    }
+
+  };
+
+
+
+  const fetchQuotations = async () => {
+
+    try {
+
+      const res = await axios.get(BASE_URL + "/api/quotations");
+
+      let apiDocs = res.data?.quotations || res.data || [];
+
+      if (!Array.isArray(apiDocs)) apiDocs = [];
+
+      let localDocs = [];
+
+      try { const d = localStorage.getItem("quotation_drafts"); localDocs = d ? JSON.parse(d) : []; } catch (e) { }
+
+      // Combine avoiding duplicates by quoteNo
+
+      const combined = [...apiDocs];
+
+      localDocs.forEach(ld => {
+
+        if (!combined.some(c => (c.quoteNo || c.qt?.quoteNo) === (ld.quoteNo || ld.qt?.quoteNo))) combined.push(ld);
+
       });
-    };
-    const saveCustomCategory = (value) => {
-      const v = (value || "").trim();
-      if (!v) return;
-      setCustomCategories(prev => {
-        if (prev.some(c => c.toLowerCase() === v.toLowerCase())) return prev;
-        const next = [...prev, v];
-        try { localStorage.setItem(CATEGORY_STORAGE_KEY, JSON.stringify(next)); } catch (e) { }
-        return next;
-      });
-    };
+
+      setQuotations(combined);
+
+    } catch (e) {
+
+      console.log(e);
+
+      try { const d = localStorage.getItem("quotation_drafts"); setQuotations(d ? JSON.parse(d) : []); } catch (e) { }
+
+    }
+
+  };
+
+  const fetchVendors = async () => {
+
+    try {
+
+      console.log('Fetching vendors from:', BASE_URL + "/api/vendors");
+
+      const res = await axios.get(BASE_URL + "/api/vendors");
+
+      console.log('Vendors response:', res.data);
+
+      setVendors(res.data || []);
+
+    } catch (e) {
+
+      console.error('Fetch vendors error:', e);
+
+      console.error('Error status:', e.response?.status);
+
+      console.error('Error data:', e.response?.data);
+
+      setVendors([]); // Set empty array on error to prevent crashes
+
+    }
+
+  };
 
 
 
-    // Dashboard.jsx-à®²à¯ à®‡à®°à¯à®•à¯à®•à¯à®®à¯ parseLimit function-à® à®‡à®¤à®¾à®• à®®à®¾à®¤à¯à®¤à¯à®™à¯à®•:
+  const createNew = () => {
+
+    window.location.href = "/project-proposal?new=true";
+
+  };
 
 
 
-    const parseLimit = (limitStr) => {
+  const addClient = async () => {
 
-      if (limitStr === undefined || limitStr === null || limitStr === "") return 10;
+    const errors = {};
 
-      const s = String(limitStr).toLowerCase().trim();
+    if (!nc.name.trim()) errors.name = "Name is required";
 
-      if (s.includes("unlimited") || s.includes("infinity")) return Infinity;
-
-      const m = s.match(/\d+/);
-
-      if (m) return parseInt(m[0]);
-
-      return 10;
-
-    };
-
-    const getSubscriptionLimit = (type, sub = subscription) => {
-
-      // 1. Try to get limit from the active subscription directly
-
-      let val = null;
-
-      if (sub) {
-
-        val = type === "client" ? sub.clientLimit : type === "employee" ? sub.employeeLimit : sub.managerLimit;
+    if (!nc.email.trim()) errors.email = "Email is required";
 
 
 
-        // If direct field is empty, search in features array
+    // Subscription Limit Check - Fetch latest before check to catch admin updates
 
-        if ((!val || val === "") && sub.features && Array.isArray(sub.features)) {
+    try {
 
-          const label = type === "client" ? "client" : type === "employee" ? "employee" : "manager";
+      const id = resolveSubadminId();
 
-          const feat = sub.features.find(f => f.toLowerCase().includes(label));
+      if (id) {
 
-          if (feat) {
+        const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
 
-            const match = feat.match(/\d+/);
+        if (subRes.data.hasSubscription) {
 
-            if (match) val = match[0];
+          const latestSub = subRes.data.subscription;
 
-            if (feat.toLowerCase().includes("unlimited")) val = "Infinity";
+          setSubscription(latestSub);
+
+
+
+          if (isUsageAtLimit("client", clients.length)) {
+
+            setLimitModal({ type: "client", limit: getSubscriptionLimit("client") });
+
+            return;
 
           }
-
-        }
-
-      }
-
-
-
-      // 2. If subscription has a limit, parse and return it
-
-      if (val && String(val).trim() !== "" && String(val) !== "0") {
-
-        return parseLimit(val);
-
-      }
-
-
-
-      // 3. Fallback: Direct limit set by Admin on the user profile
-
-      const uLimit = type === "client" ? user?.clientLimit : type === "employee" ? user?.employeeLimit : user?.managerLimit;
-
-      if (uLimit && String(uLimit).trim() !== "" && String(uLimit) !== "0") {
-
-        return parseLimit(uLimit);
-
-      }
-
-
-
-      // 4. Free trial limits
-      if (isInFreeTrial()) {
-        return FREE_TRIAL_LIMITS[type] ?? 5;
-      }
-
-      // 5. Default fallback
-      return 10;
-
-    };
-
-
-
-    const isUsageAtLimit = (type, currentCount, sub = subscription) => {
-
-      const limit = getSubscriptionLimit(type, sub);
-
-      if (limit === Infinity) return false;
-
-      return currentCount >= limit;
-
-    };
-
-
-
-
-
-    const handleLogout = () => { localStorage.removeItem("user"); localStorage.setItem("loggedOut", "1"); setUser(null); setAccounts([]); };
-
-    const handleAuthSetUser = (userData) => {
-
-      setAccountAuthOpen(false);
-
-      setProfileDropdownOpen(false);
-
-      setShowProfile(false);
-
-      setUser(userData);
-
-    };
-
-    const onLogoChange = (logo) => {
-      setCompanyLogo(logo || fixedLogo);
-      const updatedUser = { ...user, logoUrl: logo || "" };
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-      setUser(updatedUser);
-      axios.post(BASE_URL + "/api/auth/save-logo", { userId: user._id || user.id, logoUrl: logo || "" }).catch(e => console.log(e));
-    };
-
-    const fetchClients = async () => {
-      try {
-        const cached = localStorage.getItem("cached_clients");
-        if (cached) { try { setClients(JSON.parse(cached)); } catch { } }
-      } catch { }
-      try {
-        const res = await axios.get(BASE_URL + "/api/clients?companyId=" + encodeURIComponent(user?.companyId || JSON.parse(localStorage.getItem("user") || "{}")?.companyId || ""));
-        setClients(res.data);
-        try { localStorage.setItem("cached_clients", JSON.stringify(res.data)); } catch { }
-      } catch (e) { console.log(e); }
-    };
-
-    const fetchEmployees = async () => { try { const res = await axios.get(BASE_URL + "/api/employees"); setEmployees(res.data); } catch (e) { console.log(e); } };
-
-    const fetchProjects = async () => { try { const res = await axios.get(BASE_URL + "/api/projects"); setProjects(res.data); } catch (e) { console.log(e); } };
-
-    const fetchManagers = async () => { try { const res = await axios.get(BASE_URL + "/api/managers"); setManagers(res.data); } catch (e) { console.log(e); } };
-
-    const fetchSubadmins = async () => { try { const res = await axios.get(BASE_URL + "/api/subadmins"); setSubadmins(res.data); } catch (e) { console.log(e); } };
-
-
-
-
-
-    // Re-fetch packages when navigating to Packages tab to show admin-added packages
-
-    // Also refresh subscription when visiting resource tabs to ensure latest limits
-
-    useEffect(() => {
-
-      if (active === "packages") {
-
-        fetchPackages();
-
-      }
-
-    }, [active]);
-
-    // Package view/edit handlers
-
-    const handleViewPackage = (pkg) => {
-
-      setViewPackage(pkg);
-
-    };
-
-
-
-    const handleEditPackage = (pkg) => {
-
-      setEditPackage(pkg);
-
-      setEditPkgForm({
-
-        title: pkg.title || "",
-
-        description: pkg.description || "",
-
-        icon: pkg.icon || "📦",
-
-        type: pkg.type || "paid",
-
-        price: pkg.price || "",
-
-        noOfDays: pkg.no_of_days || pkg.noOfDays || "",
-
-        planDuration: pkg.planDuration || "Monthly",
-
-        businessLimit: pkg.businessLimit || "",
-
-        managerLimit: pkg.managerLimit || "",
-
-        clientLimit: pkg.clientLimit || "3 Client manage",
-
-        status: pkg.status || "Active",
-
-        assignedSubadmins: pkg.assignedSubadmins || []
-
-      });
-
-    };
-
-    const savePackageEdit = async () => {
-
-      if (!editPackage) return;
-
-      try {
-
-        setPkgSaveLoading(true);
-
-        const packageData = {
-
-          title: editPkgForm.title,
-
-          description: editPkgForm.description,
-
-          icon: editPkgForm.icon,
-
-          type: editPkgForm.type,
-
-          price: parseFloat(editPkgForm.price) || 0,
-
-          no_of_days: parseInt(editPkgForm.noOfDays) || 30,
-
-          planDuration: editPkgForm.planDuration,
-
-          businessLimit: editPkgForm.businessLimit,
-
-          managerLimit: editPkgForm.managerLimit,
-
-          clientLimit: editPkgForm.clientLimit,
-
-          employeeLimit: editPkgForm.employeeLimit,
-
-          status: editPkgForm.status,
-
-          assignedSubadmins: editPkgForm.assignedSubadmins,
-
-          monthlyPrice: editPkgForm.type === "free" ? "Free" : editPkgForm.price,
-
-          quarterlyPrice: editPkgForm.type === "free" ? "Free" : Math.round((parseFloat(editPkgForm.price) || 0) * 3 * 0.9).toString(),
-
-          halfYearlyPrice: editPkgForm.type === "free" ? "Free" : Math.round((parseFloat(editPkgForm.price) || 0) * 6 * 0.85).toString(),
-
-          annualPrice: editPkgForm.type === "free" ? "Free" : Math.round((parseFloat(editPkgForm.price) || 0) * 12 * 0.8).toString(),
-
-          features: `${editPkgForm.planDuration} Plan\n${editPkgForm.businessLimit}\n${editPkgForm.managerLimit}\n${editPkgForm.clientLimit}\n${editPkgForm.employeeLimit}`
-
-        };
-
-        const res = await axios.put(`${BASE_URL}/api/packages/${editPackage._id}`, packageData);
-
-        setPackages(prev => prev.map(p => p._id === editPackage._id ? res.data : p));
-
-        setEditPackage(null);
-
-        toast.success("Package updated successfully!");
-
-      } catch (err) {
-
-        console.error(err);
-
-        toast.error("Failed to update package");
-
-      } finally {
-
-        setPkgSaveLoading(false);
-
-      }
-
-    };
-
-
-
-    const fetchQuotations = async () => {
-
-      try {
-
-        const res = await axios.get(BASE_URL + "/api/quotations");
-
-        let apiDocs = res.data?.quotations || res.data || [];
-
-        if (!Array.isArray(apiDocs)) apiDocs = [];
-
-        let localDocs = [];
-
-        try { const d = localStorage.getItem("quotation_drafts"); localDocs = d ? JSON.parse(d) : []; } catch (e) { }
-
-        // Combine avoiding duplicates by quoteNo
-
-        const combined = [...apiDocs];
-
-        localDocs.forEach(ld => {
-
-          if (!combined.some(c => (c.quoteNo || c.qt?.quoteNo) === (ld.quoteNo || ld.qt?.quoteNo))) combined.push(ld);
-
-        });
-
-        setQuotations(combined);
-
-      } catch (e) {
-
-        console.log(e);
-
-        try { const d = localStorage.getItem("quotation_drafts"); setQuotations(d ? JSON.parse(d) : []); } catch (e) { }
-
-      }
-
-    };
-
-    const fetchVendors = async () => {
-
-      try {
-
-        console.log('Fetching vendors from:', BASE_URL + "/api/vendors");
-
-        const res = await axios.get(BASE_URL + "/api/vendors");
-
-        console.log('Vendors response:', res.data);
-
-        setVendors(res.data || []);
-
-      } catch (e) {
-
-        console.error('Fetch vendors error:', e);
-
-        console.error('Error status:', e.response?.status);
-
-        console.error('Error data:', e.response?.data);
-
-        setVendors([]); // Set empty array on error to prevent crashes
-
-      }
-
-    };
-
-
-
-    const createNew = () => {
-
-      window.location.href = "/project-proposal?new=true";
-
-    };
-
-
-
-    const addClient = async () => {
-
-      const errors = {};
-
-      if (!nc.name.trim()) errors.name = "Name is required";
-
-      if (!nc.email.trim()) errors.email = "Email is required";
-
-
-
-      // Subscription Limit Check - Fetch latest before check to catch admin updates
-
-      try {
-
-        const id = resolveSubadminId();
-
-        if (id) {
-
-          const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
-
-          if (subRes.data.hasSubscription) {
-
-            const latestSub = subRes.data.subscription;
-
-            setSubscription(latestSub);
-
-
-
-            if (isUsageAtLimit("client", clients.length)) {
-
-              setLimitModal({ type: "client", limit: getSubscriptionLimit("client") });
-
-              return;
-
-            }
-
-          } else {
-
-            // No subscription — allow if still in free trial
-            if (!isInFreeTrial()) {
-              setForceUpgradeTab(true);
-              setActive("mysubscriptions");
-              return;
-            }
-
-          }
-
-        }
-
-      } catch (err) {
-
-        console.error("Failed to fetch latest subscription for limit check", err);
-
-        if (isUsageAtLimit("client", clients.length)) {
-
-          setLimitModal({ type: "client", limit: getSubscriptionLimit("client") });
-
-          return;
-
-        }
-
-      }
-
-
-
-      if (Object.keys(errors).length > 0) { setNcError(errors); return; }
-
-      try {
-
-        setSaveLoading(true);
-
-        const payload = {
-
-          clientName: nc.name,
-
-          companyName: nc.company,
-
-          email: nc.email,
-
-          phone: nc.phone,
-
-          address: nc.address,
-
-          password: nc.password,
-
-          status: nc.status,
-
-          role: nc.role || "client",
-
-          contactPersonName: nc.contactPersonName,
-
-          contactPersonNo: nc.contactPersonNo,
-
-          gstNumber: nc.gstNumber,
-
-          logoUrl: nc.logoUrl,
-
-          clientType: nc.clientType,
-
-          category: nc.category || "",
-
-          source: nc.source,
-
-          onboardedOn: nc.onboardedOn,
-
-          city: nc.city,
-
-          state: nc.state,
-
-          pincode: nc.pincode,
-
-          country: nc.country,
-
-          website: nc.website,
-
-          linkedin: nc.linkedin,
-
-          billingCurrency: nc.billingCurrency,
-
-          paymentTerms: nc.paymentTerms,
-
-          creditLimit: nc.creditLimit,
-
-          preferredPaymentMode: nc.preferredPaymentMode,
-
-          notes: nc.notes,
-
-          designation: nc.designation,
-
-          altEmail: nc.altEmail,
-
-          companyId: resolveSubadminId()
-
-        };
-
-        const res = await axios.post(BASE_URL + "/api/clients/add", payload);
-
-        setClients(prev => [res.data.client, ...prev]);
-
-        // Store credentials for the success screen
-
-        setClientSuccessData({ email: nc.email, password: nc.password, name: nc.name });
-
-        const todayStr = new Date().toISOString().split("T")[0];
-
-        setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", logoUrl: "", gstNumber: "", contactPersonName: "", contactPersonNo: "", category: "", clientType: "b2b", source: "", onboardedOn: todayStr, city: "", state: "", pincode: "", country: "India", website: "", linkedin: "", billingCurrency: "INR — Indian Rupee", paymentTerms: "", creditLimit: "", preferredPaymentMode: "", notes: "", designation: "", altEmail: "" });
-
-        setNcError({});
-
-        if (returnToModal) { setModal(returnToModal); setReturnToModal(null); }
-
-        // Don't Closemodal yet if no return - show success screen (this depends on existing logic)
-
-      } catch (err) {
-
-        if (err.response?.status === 403 && err.response?.data?.limitReached) {
-
-          setLimitModal({ type: "client", limit: err.response.data.limit });
 
         } else {
 
-          setNcError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" });
-
-        }
-
-      } finally {
-
-        setSaveLoading(false);
-
-      }
-
-    };
-
-
-
-    const addEmployee = async () => {
-
-      const errors = {};
-
-      if (!ne.name.trim()) errors.name = "Name is required";
-
-      if (!ne.email.trim()) errors.email = "Email required";
-
-      if (!ne.password.trim()) errors.password = "Password is required";
-
-      if (ne.password && ne.password.length < 4) errors.password = "Min 4 characters";
-
-      if (ne.password !== ne.confirmPassword) errors.confirmPassword = "Passwords do not match";
-
-      if (ne.password && ne.password.length < 4) errors.password = "Min 4 characters";
-
-      if (ne.password !== ne.confirmPassword) errors.confirmPassword = "Passwords do not match";
-
-
-
-      // Subscription Limit Check - Fetch latest before check to catch admin updates
-
-      try {
-
-        const id = resolveSubadminId();
-
-        if (id) {
-
-          const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
-
-          if (subRes.data.hasSubscription) {
-
-            const latestSub = subRes.data.subscription;
-
-            setSubscription(latestSub);
-
-
-
-            if (isUsageAtLimit("employee", employees.length)) {
-
-              setLimitModal({ type: "employee", limit: getSubscriptionLimit("employee") });
-
-              return;
-
-            }
-
-          } else {
-
-            // No subscription — allow if still in free trial
-            if (!isInFreeTrial()) {
-              setForceUpgradeTab(true);
-              setActive("mysubscriptions");
-              return;
-            }
-
+          // No subscription — allow if still in free trial
+          if (!isInFreeTrial()) {
+            setForceUpgradeTab(true);
+            setActive("mysubscriptions");
+            return;
           }
-
-        }
-
-      } catch (err) {
-
-        console.error("Failed to fetch latest subscription for employee limit check", err);
-
-        if (isUsageAtLimit("employee", employees.length)) {
-
-          setLimitModal({ type: "employee", limit: getSubscriptionLimit("employee") });
-
-          return;
 
         }
 
       }
 
+    } catch (err) {
 
+      console.error("Failed to fetch latest subscription for limit check", err);
 
-      if (Object.keys(errors).length > 0) { setNeError(errors); return; }
+      if (isUsageAtLimit("client", clients.length)) {
 
-      try {
-
-        setEmpSaveLoading(true);
-
-        const { confirmPassword, ...neWithoutConfirm } = ne;
-
-        const payload = {
-
-          ...neWithoutConfirm,
-
-          role: ne.role || "employee",
-
-          companyId: resolveSubadminId(),
-
-          bankDetails: {
-
-            bankName: ne.bankName,
-
-            ifscCode: ne.ifscCode,
-
-            accountNumber: ne.accountNumber,
-
-            branchName: ne.branchName
-
-          }
-
-        };
-
-        const res = await axios.post(BASE_URL + "/api/employees/add", payload);
-
-        setEmployees(prev => [res.data.employee, ...prev]);
-
-        setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Pending", password: "", confirmPassword: "", dateOfBirth: "", maritalStatus: "", address: "", bankName: "", ifscCode: "", accountNumber: "" });
-
-        setShowEmpPass(false);
-
-        setNeError({});
-
-        if (returnToModal) { setModal(returnToModal); setReturnToModal(null); } else { setModal(null); }
-
-      } catch (err) {
-
-        if (err.response?.status === 403 && err.response?.data?.limitReached) {
-
-          setLimitModal({ type: "employee", limit: err.response.data.limit });
-
-        } else {
-
-          const errMsg = err.response?.data?.message || err.response?.data?.msg || "Failed to save";
-
-          const isPasswordError = errMsg.toLowerCase().includes("password");
-
-          setNeError(isPasswordError ? { password: errMsg } : { email: errMsg });
-
-        }
-
-      } finally { setEmpSaveLoading(false); }
-
-    };
-
-
-
-    const addProject = async () => {
-
-      const errors = {};
-
-      if (!np.name.trim()) errors.name = "Project name is required";
-
-      if (!np.client.trim()) errors.client = "Client is required";
-
-      if (Object.keys(errors).length > 0) {
-
-        setNpError(errors);
+        setLimitModal({ type: "client", limit: getSubscriptionLimit("client") });
 
         return;
 
       }
 
+    }
 
 
-      const notifyAssigned = async (projectId, projectName, assignees) => {
 
-        try {
+    if (Object.keys(errors).length > 0) { setNcError(errors); return; }
 
-          for (const name of assignees) {
+    try {
 
-            const emp = employees.find(e => (e.name || e.employeeName || "").toLowerCase() === name.toLowerCase());
+      setSaveLoading(true);
 
-            if (emp && (emp._id || emp.id)) {
+      const payload = {
 
-              await axios.post(`${BASE_URL}/api/notifications`, {
+        clientName: nc.name,
 
-                userId: emp._id || emp.id,
+        companyName: nc.company,
 
-                type: 'project',
+        email: nc.email,
 
-                icon: '—ˆ',
+        phone: nc.phone,
 
-                text: `You have been assigned to a new project: "${projectName}"`,
+        address: nc.address,
 
-                link: 'projects'
+        password: nc.password,
 
-              });
+        status: nc.status,
 
-            }
+        role: nc.role || "client",
 
-          }
+        contactPersonName: nc.contactPersonName,
 
-        } catch (err) { console.error("Notification failed", err); }
+        contactPersonNo: nc.contactPersonNo,
+
+        gstNumber: nc.gstNumber,
+
+        logoUrl: nc.logoUrl,
+
+        clientType: nc.clientType,
+
+        category: nc.category || "",
+
+        source: nc.source,
+
+        onboardedOn: nc.onboardedOn,
+
+        city: nc.city,
+
+        state: nc.state,
+
+        pincode: nc.pincode,
+
+        country: nc.country,
+
+        website: nc.website,
+
+        linkedin: nc.linkedin,
+
+        billingCurrency: nc.billingCurrency,
+
+        paymentTerms: nc.paymentTerms,
+
+        creditLimit: nc.creditLimit,
+
+        preferredPaymentMode: nc.preferredPaymentMode,
+
+        notes: nc.notes,
+
+        designation: nc.designation,
+
+        altEmail: nc.altEmail,
+
+        companyId: resolveSubadminId()
 
       };
 
+      const res = await axios.post(BASE_URL + "/api/clients/add", payload);
 
+      setClients(prev => [res.data.client, ...prev]);
 
-      try {
+      // Store credentials for the success screen
 
-        setProjSaveLoading(true);
+      setClientSuccessData({ email: nc.email, password: nc.password, name: nc.name });
 
-        const res = await axios.post(BASE_URL + "/api/projects/add", np);
+      const todayStr = new Date().toISOString().split("T")[0];
 
-        await fetchProjects();
+      setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", logoUrl: "", gstNumber: "", contactPersonName: "", contactPersonNo: "", category: "", clientType: "b2b", source: "", onboardedOn: todayStr, city: "", state: "", pincode: "", country: "India", website: "", linkedin: "", billingCurrency: "INR — Indian Rupee", paymentTerms: "", creditLimit: "", preferredPaymentMode: "", notes: "", designation: "", altEmail: "" });
 
+      setNcError({});
 
+      if (returnToModal) { setModal(returnToModal); setReturnToModal(null); }
 
-        // Notify assigned employees
+      // Don't Closemodal yet if no return - show success screen (this depends on existing logic)
 
-        if (np.assignedTo && np.assignedTo.length > 0) {
+    } catch (err) {
 
-          notifyAssigned(res.data._id, np.name, np.assignedTo);
+      if (err.response?.status === 403 && err.response?.data?.limitReached) {
 
-        }
+        setLimitModal({ type: "client", limit: err.response.data.limit });
 
+      } else {
 
-
-        setNp({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "Rs.", team: "", status: "Active", progress: 0, assignedTo: [] });
-
-        setNpError({});
-
-        setModal(null);
-
-        toast.success("Yes Project created successfully!");
-
-      } catch (err) {
-
-        setNpError({ name: err.response?.data?.msg || "Failed to save project" });
-
-      } finally {
-
-        setProjSaveLoading(false);
+        setNcError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" });
 
       }
 
-    };
+    } finally {
+
+      setSaveLoading(false);
+
+    }
+
+  };
 
 
 
-    const addManager = async () => {
+  const addEmployee = async () => {
 
-      const errors = {};
+    const errors = {};
 
-      if (!nm.managerName.trim()) errors.managerName = "Name is required";
+    if (!ne.name.trim()) errors.name = "Name is required";
 
-      if (!nm.email.trim()) errors.email = "Email is required";
+    if (!ne.email.trim()) errors.email = "Email required";
 
-      if (!nm.password.trim()) errors.password = "Password is required";
+    if (!ne.password.trim()) errors.password = "Password is required";
 
+    if (ne.password && ne.password.length < 4) errors.password = "Min 4 characters";
 
+    if (ne.password !== ne.confirmPassword) errors.confirmPassword = "Passwords do not match";
 
-      // Subscription Limit Check - Fetch latest before check to catch admin updates
+    if (ne.password && ne.password.length < 4) errors.password = "Min 4 characters";
 
-      try {
-
-        const id = resolveSubadminId();
-
-        if (id) {
-
-          const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
-
-          if (subRes.data.hasSubscription) {
-
-            const latestSub = subRes.data.subscription;
-
-            setSubscription(latestSub);
+    if (ne.password !== ne.confirmPassword) errors.confirmPassword = "Passwords do not match";
 
 
 
-            if (isUsageAtLimit("manager", managers.length)) {
+    // Subscription Limit Check - Fetch latest before check to catch admin updates
 
-              setLimitModal({ type: "manager", limit: getSubscriptionLimit("manager") });
+    try {
 
-              return;
+      const id = resolveSubadminId();
 
-            }
+      if (id) {
 
-          } else {
+        const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
 
-            // No subscription — allow if still in free trial
-            if (!isInFreeTrial()) {
-              setForceUpgradeTab(true);
-              setActive("mysubscriptions");
-              return;
-            }
+        if (subRes.data.hasSubscription) {
+
+          const latestSub = subRes.data.subscription;
+
+          setSubscription(latestSub);
+
+
+
+          if (isUsageAtLimit("employee", employees.length)) {
+
+            setLimitModal({ type: "employee", limit: getSubscriptionLimit("employee") });
+
+            return;
 
           }
-
-        }
-
-      } catch (err) {
-
-        console.error("Failed to fetch latest subscription for manager limit check", err);
-
-        if (isUsageAtLimit("manager", managers.length)) {
-
-          setLimitModal({ type: "manager", limit: getSubscriptionLimit("manager") });
-
-          return;
-
-        }
-
-      }
-
-
-
-      if (Object.keys(errors).length > 0) { setNmError(errors); return; }
-
-      try {
-
-        setMgrSaveLoading(true);
-
-        const managerPayload = { ...nm, companyId: resolveSubadminId() };
-
-        const res = await axios.post(BASE_URL + "/api/managers/add", managerPayload);
-
-        setManagers(prev => [res.data.manager, ...prev]);
-
-        setNm({ managerName: "", email: "", phone: "", department: "", role: "Manager", address: "", password: "", status: "Active" });
-
-        setNmError({});
-
-        setModal(null);
-
-      } catch (err) {
-
-        if (err.response?.status === 403 && err.response?.data?.limitReached) {
-
-          setLimitModal({ type: "manager", limit: err.response.data.limit });
 
         } else {
 
-          setNmError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" });
+          // No subscription — allow if still in free trial
+          if (!isInFreeTrial()) {
+            setForceUpgradeTab(true);
+            setActive("mysubscriptions");
+            return;
+          }
 
         }
 
-      } finally {
+      }
 
-        setMgrSaveLoading(false);
+    } catch (err) {
+
+      console.error("Failed to fetch latest subscription for employee limit check", err);
+
+      if (isUsageAtLimit("employee", employees.length)) {
+
+        setLimitModal({ type: "employee", limit: getSubscriptionLimit("employee") });
+
+        return;
 
       }
 
-    };
+    }
 
 
 
-    const addSubadmin = async () => {
+    if (Object.keys(errors).length > 0) { setNeError(errors); return; }
 
-      const errors = {};
+    try {
 
-      if (!ns.name.trim()) errors.name = "Name is required";
+      setEmpSaveLoading(true);
 
-      if (!ns.email.trim()) errors.email = "Email is required";
+      const { confirmPassword, ...neWithoutConfirm } = ne;
 
-      if (!ns.password.trim()) errors.password = "Password is required";
+      const payload = {
 
-      if (Object.keys(errors).length > 0) { setNsError(errors); return; }
+        ...neWithoutConfirm,
 
-      try {
+        role: ne.role || "employee",
 
-        setSubSaveLoading(true);
+        companyId: resolveSubadminId(),
 
-        const res = await axios.post(BASE_URL + "/api/subadmins", ns);
+        bankDetails: {
 
-        setSubadmins(prev => [res.data.subadmin, ...prev]);
+          bankName: ne.bankName,
 
-        setNs({ name: "", email: "", phone: "", password: "", status: "Active", companyName: "", companyType: "IT", employeeCount: "0-10", clientLimit: "3", employeeLimit: "6" });
+          ifscCode: ne.ifscCode,
 
-        setNsError({});
+          accountNumber: ne.accountNumber,
 
-        setModal(null);
-
-      } catch (err) {
-
-        setNsError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" });
-
-      } finally {
-
-        setSubSaveLoading(false);
-
-      }
-
-    };
-
-
-
-    const addPackage = async () => {
-
-      const errors = {};
-
-      if (!npkg.title.trim()) errors.title = "Title is required";
-
-      if (!npkg.description.trim()) errors.description = "Description is required";
-
-      if (Object.keys(errors).length > 0) { setPkgError(errors); return; }
-
-      try {
-
-        setPkgSaveLoading(true);
-
-
-
-        // Format data for backend API
-
-        const packageData = {
-
-          title: npkg.title,
-
-          description: npkg.description,
-
-          icon: npkg.icon || "📦",
-
-          type: npkg.type || "paid",
-
-          no_of_days: parseInt(npkg.noOfDays) || 30,
-
-          price: parseFloat(npkg.price) || 0,
-
-          monthlyPrice: npkg.monthlyPrice || "0",
-
-          quarterlyPrice: npkg.quarterlyPrice || "0",
-
-          halfYearlyPrice: npkg.halfYearlyPrice || "0",
-
-          annualPrice: npkg.annualPrice || "0",
-
-
-
-          features: npkg.features ? npkg.features.split(',').map(f => f.trim()).filter(f => f) : [],
-
-          planDuration: npkg.planDuration || "Monthly",
-
-          businessLimit: npkg.businessLimit || "",
-
-          managerLimit: npkg.managerLimit || "",
-
-          clientLimit: npkg.clientLimit || "3 Client manage",
-
-          employeeLimit: npkg.employeeLimit || "",
-
-          status: "Active",
-
-          targetRole: "subadmin",
-
-          assignedSubadmins: npkg.assignedSubadmins || []
-
-        };
-
-
-
-        const res = await axios.post(BASE_URL + "/api/packages", packageData);
-
-        setPackages(prev => [...prev, res.data]);
-
-        setNpkg({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", employeeLimit: "", type: "paid", price: "", noOfDays: "", assignedSubadmins: [] });
-
-        setPkgError({});
-
-        setModal(null);
-
-        toast.success("Yes Package added!");
-
-      } catch (err) {
-
-        console.error("Add package error:", err);
-
-        toast.error("❌ Failed to add package: " + (err.response?.data?.msg || err.message));
-
-      } finally { setPkgSaveLoading(false); }
-
-    };
-
-
-
-    const addVendor = async () => {
-
-      const errors = {};
-
-      if (!nv.vendorName?.trim?.()) errors.vendorName = "Vendor Name is required";
-
-      if (!nv.vendorProduct?.trim?.()) errors.vendorProduct = "Product Name is required";
-
-      if (!nv.amountTaxGst || nv.amountTaxGst <= 0) errors.amountTaxGst = "Required";
-
-      if (!nv.paidAmount || nv.paidAmount <= 0) errors.paidAmount = "Required";
-
-      if (Object.keys(errors).length > 0) { setNvError(errors); return; }
-
-      try {
-
-        setVendorSaveLoading(true);
-
-        const resolvedCompanyId = user?.companyId || user?.company || user?._id || user?.id || "default";
-
-        const amt = parseFloat(nv.amountTaxGst) || 0;
-
-        const payload = {
-
-          vendorName: nv.vendorName,
-
-          vendorProduct: nv.vendorProduct,
-
-          amount: amt,
-
-          tax: amt,
-
-          gst: amt,
-
-          paidAmount: parseFloat(nv.paidAmount) || 0,
-
-          productDescription: nv.productDescription,
-
-          modeOfPayment: nv.modeOfPayment,
-
-          companyId: resolvedCompanyId
-
-        };
-
-        if (nv.date) payload.date = nv.date;
-
-        if (nv.dateOfPurchase) payload.dateOfPurchase = nv.dateOfPurchase;
-
-        const res = await axios.post(BASE_URL + "/api/vendors", payload);
-
-        setVendors(prev => [res.data, ...prev]);
-
-        setNv({ vendorName: "", vendorProduct: "", amountTaxGst: "", date: "", paidAmount: "", productDescription: "", dateOfPurchase: "", modeOfPayment: "Cash" });
-
-        setNvError({});
-
-        setModal(null);
-
-        toast.success("Yes Vendor Added Successfully!");
-
-      } catch (err) {
-
-        console.error('Add vendor error:', err);
-
-        toast.error("❌ Failed to add vendor: " + (err.response?.data?.message || err.message));
-
-      } finally { setVendorSaveLoading(false); }
-
-    };
-
-
-
-
-
-    // ── Subscription gate: subadmins must subscribe before accessing dashboard ──
-
-    const roleLower = (user?.role || "").toLowerCase().trim();
-
-    const isSubAdmin = roleLower === "subadmin" || roleLower === "sub_admin" || roleLower === "sub-admin";
-
-    const isAdmin = user?.email === "admin@gmail.com";
-
-
-
-    // Enforce subscription page when:
-
-    // (a) subadmin and still loading subscription data (prevent flash)
-
-    // (b) subadmin and no active subscription (blocked)
-
-    // Block sidebar until user selects a plan (free trial OR paid)
-    // New users: no subscription AND not in free trial = must pick a plan first
-    // hasSelectedPlan = they have either activated free trial OR have a paid subscription
-    const hasSelectedPlan = subscription !== null || isInFreeTrial();
-    // Never force the upgrade/packages screen while subscription data is still
-    // loading — that's exactly what caused the "Choose your Plan" page to flash
-    // briefly right after login, before fetchSubscription() had resolved.
-    let enforceMySubscriptions = !subLoading && !hasSelectedPlan;
-
-    const rawNavItems = getNavForRole(user?.role);
-
-    // When restricted, ONLY show My Subscriptions (no dashboard — must subscribe first)
-
-    const navItems = enforceMySubscriptions
-
-      ? rawNavItems.filter(n => ["mysubscriptions"].includes(n.key))
-
-      : rawNavItems;
-
-
-
-    // Helper to find item in flat or nested structure
-
-    const findNavItem = (key) => {
-
-      for (const item of navItems) {
-
-        if (item.key === key) return item;
-
-        if (item.type === "group" && item.items) {
-
-          const sub = item.items.find(i => i.key === key);
-
-          if (sub) return sub;
+          branchName: ne.branchName
 
         }
-
-      }
-
-      return null;
-
-    };
-
-
-
-    // Always land on mysubscriptions when enforced — never show dashboard
-
-    const validActive = enforceMySubscriptions
-
-      ? "mysubscriptions"
-
-      : ((findNavItem(active) || active === "addClient" || active === "tasks" || active === "create-project" || active === "edit-project" || active === "project-details" || active === "projects" || active === "invoices") ? active : navItems[0]?.key || "dashboard");
-
-
-
-    const page = findNavItem(validActive) || navItems[0];
-
-
-
-    // Note: removed setActive(validActive) here to prevent re-render loop
-
-
-
-    useEffect(() => {
-
-      if (validActive === "templates") {
-
-        const frame = document.getElementById('template-designer-frame');
-
-        if (frame && frame.contentWindow) {
-
-          // Send data if the frame is already loaded, otherwise onLoad will catch it later
-
-          frame.contentWindow.postMessage({
-
-            type: 'SET_DATA',
-
-            clients: clients.map(c => c.clientName || c.name),
-
-            employees: employees.map(emp => ({ name: emp.name, id: emp._id || emp.id })),
-
-            quotations: quotations,
-
-            company: {
-
-              name: user?.companyName || "",
-
-              logoUrl: user?.logoUrl || "",
-
-              email: user?.email || "",
-
-              phone: user?.phone || "",
-
-            }
-
-          }, '*');
-
-        }
-
-      }
-
-    }, [quotations, clients, employees, user, validActive]);
-
-
-
-    const displayName = companyNameStr;
-
-    const initials = (displayName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
-
-    const B = (color) => {
-
-      const isVar = color && color.startsWith("var");
-
-      return {
-
-        background: isVar ? `var(--app-accent-gradient, linear-gradient(135deg, ${color}, ${color}))` : `linear-gradient(135deg, ${color}, ${color}ee)`,
-
-        color: "#fff",
-
-        border: "none",
-
-        borderRadius: 12,
-
-        padding: "9px 18px",
-
-        fontWeight: 800,
-
-        fontSize: 13,
-
-        cursor: "pointer",
-
-        fontFamily: "inherit",
-
-        boxShadow: isVar ? `0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)` : `0 4px 12px ${color}40`,
-
-        textShadow: "0 1px 2px rgba(0,0,0,0.2)"
 
       };
 
+      const res = await axios.post(BASE_URL + "/api/employees/add", payload);
+
+      setEmployees(prev => [res.data.employee, ...prev]);
+
+      setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Pending", password: "", confirmPassword: "", dateOfBirth: "", maritalStatus: "", address: "", bankName: "", ifscCode: "", accountNumber: "" });
+
+      setShowEmpPass(false);
+
+      setNeError({});
+
+      if (returnToModal) { setModal(returnToModal); setReturnToModal(null); } else { setModal(null); }
+
+    } catch (err) {
+
+      if (err.response?.status === 403 && err.response?.data?.limitReached) {
+
+        setLimitModal({ type: "employee", limit: err.response.data.limit });
+
+      } else {
+
+        const errMsg = err.response?.data?.message || err.response?.data?.msg || "Failed to save";
+
+        const isPasswordError = errMsg.toLowerCase().includes("password");
+
+        setNeError(isPasswordError ? { password: errMsg } : { email: errMsg });
+
+      }
+
+    } finally { setEmpSaveLoading(false); }
+
+  };
+
+
+
+  const addProject = async () => {
+
+    const errors = {};
+
+    if (!np.name.trim()) errors.name = "Project name is required";
+
+    if (!np.client.trim()) errors.client = "Client is required";
+
+    if (Object.keys(errors).length > 0) {
+
+      setNpError(errors);
+
+      return;
+
+    }
+
+
+
+    const notifyAssigned = async (projectId, projectName, assignees) => {
+
+      try {
+
+        for (const name of assignees) {
+
+          const emp = employees.find(e => (e.name || e.employeeName || "").toLowerCase() === name.toLowerCase());
+
+          if (emp && (emp._id || emp.id)) {
+
+            await axios.post(`${BASE_URL}/api/notifications`, {
+
+              userId: emp._id || emp.id,
+
+              type: 'project',
+
+              icon: '—ˆ',
+
+              text: `You have been assigned to a new project: "${projectName}"`,
+
+              link: 'projects'
+
+            });
+
+          }
+
+        }
+
+      } catch (err) { console.error("Notification failed", err); }
+
     };
 
 
 
-    const companyId = user?.companyId || user?.company || user?._id || user?.id || "default";
+    try {
+
+      setProjSaveLoading(true);
+
+      const res = await axios.post(BASE_URL + "/api/projects/add", np);
+
+      await fetchProjects();
 
 
 
-    const roleDisplay = user?.role || "Admin";
+      // Notify assigned employees
+
+      if (np.assignedTo && np.assignedTo.length > 0) {
+
+        notifyAssigned(res.data._id, np.name, np.assignedTo);
+
+      }
 
 
 
-    return (
+      setNp({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "Rs.", team: "", status: "Active", progress: 0, assignedTo: [] });
 
-      <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 50%,var(--app-border) 100%)", fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+      setNpError({});
 
-        <style>{`
+      setModal(null);
+
+      toast.success("Yes Project created successfully!");
+
+    } catch (err) {
+
+      setNpError({ name: err.response?.data?.msg || "Failed to save project" });
+
+    } finally {
+
+      setProjSaveLoading(false);
+
+    }
+
+  };
+
+
+
+  const addManager = async () => {
+
+    const errors = {};
+
+    if (!nm.managerName.trim()) errors.managerName = "Name is required";
+
+    if (!nm.email.trim()) errors.email = "Email is required";
+
+    if (!nm.password.trim()) errors.password = "Password is required";
+
+
+
+    // Subscription Limit Check - Fetch latest before check to catch admin updates
+
+    try {
+
+      const id = resolveSubadminId();
+
+      if (id) {
+
+        const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
+
+        if (subRes.data.hasSubscription) {
+
+          const latestSub = subRes.data.subscription;
+
+          setSubscription(latestSub);
+
+
+
+          if (isUsageAtLimit("manager", managers.length)) {
+
+            setLimitModal({ type: "manager", limit: getSubscriptionLimit("manager") });
+
+            return;
+
+          }
+
+        } else {
+
+          // No subscription — allow if still in free trial
+          if (!isInFreeTrial()) {
+            setForceUpgradeTab(true);
+            setActive("mysubscriptions");
+            return;
+          }
+
+        }
+
+      }
+
+    } catch (err) {
+
+      console.error("Failed to fetch latest subscription for manager limit check", err);
+
+      if (isUsageAtLimit("manager", managers.length)) {
+
+        setLimitModal({ type: "manager", limit: getSubscriptionLimit("manager") });
+
+        return;
+
+      }
+
+    }
+
+
+
+    if (Object.keys(errors).length > 0) { setNmError(errors); return; }
+
+    try {
+
+      setMgrSaveLoading(true);
+
+      const managerPayload = { ...nm, companyId: resolveSubadminId() };
+
+      const res = await axios.post(BASE_URL + "/api/managers/add", managerPayload);
+
+      setManagers(prev => [res.data.manager, ...prev]);
+
+      setNm({ managerName: "", email: "", phone: "", department: "", role: "Manager", address: "", password: "", status: "Active" });
+
+      setNmError({});
+
+      setModal(null);
+
+    } catch (err) {
+
+      if (err.response?.status === 403 && err.response?.data?.limitReached) {
+
+        setLimitModal({ type: "manager", limit: err.response.data.limit });
+
+      } else {
+
+        setNmError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" });
+
+      }
+
+    } finally {
+
+      setMgrSaveLoading(false);
+
+    }
+
+  };
+
+
+
+  const addSubadmin = async () => {
+
+    const errors = {};
+
+    if (!ns.name.trim()) errors.name = "Name is required";
+
+    if (!ns.email.trim()) errors.email = "Email is required";
+
+    if (!ns.password.trim()) errors.password = "Password is required";
+
+    if (Object.keys(errors).length > 0) { setNsError(errors); return; }
+
+    try {
+
+      setSubSaveLoading(true);
+
+      const res = await axios.post(BASE_URL + "/api/subadmins", ns);
+
+      setSubadmins(prev => [res.data.subadmin, ...prev]);
+
+      setNs({ name: "", email: "", phone: "", password: "", status: "Active", companyName: "", companyType: "IT", employeeCount: "0-10", clientLimit: "3", employeeLimit: "6" });
+
+      setNsError({});
+
+      setModal(null);
+
+    } catch (err) {
+
+      setNsError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" });
+
+    } finally {
+
+      setSubSaveLoading(false);
+
+    }
+
+  };
+
+
+
+  const addPackage = async () => {
+
+    const errors = {};
+
+    if (!npkg.title.trim()) errors.title = "Title is required";
+
+    if (!npkg.description.trim()) errors.description = "Description is required";
+
+    if (Object.keys(errors).length > 0) { setPkgError(errors); return; }
+
+    try {
+
+      setPkgSaveLoading(true);
+
+
+
+      // Format data for backend API
+
+      const packageData = {
+
+        title: npkg.title,
+
+        description: npkg.description,
+
+        icon: npkg.icon || "📦",
+
+        type: npkg.type || "paid",
+
+        no_of_days: parseInt(npkg.noOfDays) || 30,
+
+        price: parseFloat(npkg.price) || 0,
+
+        monthlyPrice: npkg.monthlyPrice || "0",
+
+        quarterlyPrice: npkg.quarterlyPrice || "0",
+
+        halfYearlyPrice: npkg.halfYearlyPrice || "0",
+
+        annualPrice: npkg.annualPrice || "0",
+
+
+
+        features: npkg.features ? npkg.features.split(',').map(f => f.trim()).filter(f => f) : [],
+
+        planDuration: npkg.planDuration || "Monthly",
+
+        businessLimit: npkg.businessLimit || "",
+
+        managerLimit: npkg.managerLimit || "",
+
+        clientLimit: npkg.clientLimit || "3 Client manage",
+
+        employeeLimit: npkg.employeeLimit || "",
+
+        status: "Active",
+
+        targetRole: "subadmin",
+
+        assignedSubadmins: npkg.assignedSubadmins || []
+
+      };
+
+
+
+      const res = await axios.post(BASE_URL + "/api/packages", packageData);
+
+      setPackages(prev => [...prev, res.data]);
+
+      setNpkg({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", employeeLimit: "", type: "paid", price: "", noOfDays: "", assignedSubadmins: [] });
+
+      setPkgError({});
+
+      setModal(null);
+
+      toast.success("Yes Package added!");
+
+    } catch (err) {
+
+      console.error("Add package error:", err);
+
+      toast.error("❌ Failed to add package: " + (err.response?.data?.msg || err.message));
+
+    } finally { setPkgSaveLoading(false); }
+
+  };
+
+
+
+  const addVendor = async () => {
+
+    const errors = {};
+
+    if (!nv.vendorName?.trim?.()) errors.vendorName = "Vendor Name is required";
+
+    if (!nv.vendorProduct?.trim?.()) errors.vendorProduct = "Product Name is required";
+
+    if (!nv.amountTaxGst || nv.amountTaxGst <= 0) errors.amountTaxGst = "Required";
+
+    if (!nv.paidAmount || nv.paidAmount <= 0) errors.paidAmount = "Required";
+
+    if (Object.keys(errors).length > 0) { setNvError(errors); return; }
+
+    try {
+
+      setVendorSaveLoading(true);
+
+      const resolvedCompanyId = user?.companyId || user?.company || user?._id || user?.id || "default";
+
+      const amt = parseFloat(nv.amountTaxGst) || 0;
+
+      const payload = {
+
+        vendorName: nv.vendorName,
+
+        vendorProduct: nv.vendorProduct,
+
+        amount: amt,
+
+        tax: amt,
+
+        gst: amt,
+
+        paidAmount: parseFloat(nv.paidAmount) || 0,
+
+        productDescription: nv.productDescription,
+
+        modeOfPayment: nv.modeOfPayment,
+
+        companyId: resolvedCompanyId
+
+      };
+
+      if (nv.date) payload.date = nv.date;
+
+      if (nv.dateOfPurchase) payload.dateOfPurchase = nv.dateOfPurchase;
+
+      const res = await axios.post(BASE_URL + "/api/vendors", payload);
+
+      setVendors(prev => [res.data, ...prev]);
+
+      setNv({ vendorName: "", vendorProduct: "", amountTaxGst: "", date: "", paidAmount: "", productDescription: "", dateOfPurchase: "", modeOfPayment: "Cash" });
+
+      setNvError({});
+
+      setModal(null);
+
+      toast.success("Yes Vendor Added Successfully!");
+
+    } catch (err) {
+
+      console.error('Add vendor error:', err);
+
+      toast.error("❌ Failed to add vendor: " + (err.response?.data?.message || err.message));
+
+    } finally { setVendorSaveLoading(false); }
+
+  };
+
+
+
+
+
+  // ── Subscription gate: subadmins must subscribe before accessing dashboard ──
+
+  const roleLower = (user?.role || "").toLowerCase().trim();
+
+  const isSubAdmin = roleLower === "subadmin" || roleLower === "sub_admin" || roleLower === "sub-admin";
+
+  const isAdmin = user?.email === "admin@gmail.com";
+
+
+
+  // Enforce subscription page when:
+
+  // (a) subadmin and still loading subscription data (prevent flash)
+
+  // (b) subadmin and no active subscription (blocked)
+
+  // Block sidebar until user selects a plan (free trial OR paid)
+  // New users: no subscription AND not in free trial = must pick a plan first
+  // hasSelectedPlan = they have either activated free trial OR have a paid subscription
+  const hasSelectedPlan = subscription !== null || isInFreeTrial();
+  // Never force the upgrade/packages screen while subscription data is still
+  // loading — that's exactly what caused the "Choose your Plan" page to flash
+  // briefly right after login, before fetchSubscription() had resolved.
+  let enforceMySubscriptions = !subLoading && !hasSelectedPlan;
+
+  const rawNavItems = getNavForRole(user?.role);
+
+  // When restricted, ONLY show My Subscriptions (no dashboard — must subscribe first)
+
+  const navItems = enforceMySubscriptions
+
+    ? rawNavItems.filter(n => ["mysubscriptions"].includes(n.key))
+
+    : rawNavItems;
+
+
+
+  // Helper to find item in flat or nested structure
+
+  const findNavItem = (key) => {
+
+    for (const item of navItems) {
+
+      if (item.key === key) return item;
+
+      if (item.type === "group" && item.items) {
+
+        const sub = item.items.find(i => i.key === key);
+
+        if (sub) return sub;
+
+      }
+
+    }
+
+    return null;
+
+  };
+
+
+
+  // Always land on mysubscriptions when enforced — never show dashboard
+
+  const validActive = enforceMySubscriptions
+
+    ? "mysubscriptions"
+
+    : ((findNavItem(active) || active === "addClient" || active === "tasks" || active === "create-project" || active === "edit-project" || active === "project-details" || active === "projects" || active === "invoices") ? active : navItems[0]?.key || "dashboard");
+
+
+
+  const page = findNavItem(validActive) || navItems[0];
+
+
+
+  // Note: removed setActive(validActive) here to prevent re-render loop
+
+
+
+  useEffect(() => {
+
+    if (validActive === "templates") {
+
+      const frame = document.getElementById('template-designer-frame');
+
+      if (frame && frame.contentWindow) {
+
+        // Send data if the frame is already loaded, otherwise onLoad will catch it later
+
+        frame.contentWindow.postMessage({
+
+          type: 'SET_DATA',
+
+          clients: clients.map(c => c.clientName || c.name),
+
+          employees: employees.map(emp => ({ name: emp.name, id: emp._id || emp.id })),
+
+          quotations: quotations,
+
+          company: {
+
+            name: user?.companyName || "",
+
+            logoUrl: user?.logoUrl || "",
+
+            email: user?.email || "",
+
+            phone: user?.phone || "",
+
+          }
+
+        }, '*');
+
+      }
+
+    }
+
+  }, [quotations, clients, employees, user, validActive]);
+
+
+
+  const displayName = companyNameStr;
+
+  const initials = (displayName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+
+  const B = (color) => {
+
+    const isVar = color && color.startsWith("var");
+
+    return {
+
+      background: isVar ? `var(--app-accent-gradient, linear-gradient(135deg, ${color}, ${color}))` : `linear-gradient(135deg, ${color}, ${color}ee)`,
+
+      color: "#fff",
+
+      border: "none",
+
+      borderRadius: 12,
+
+      padding: "9px 18px",
+
+      fontWeight: 800,
+
+      fontSize: 13,
+
+      cursor: "pointer",
+
+      fontFamily: "inherit",
+
+      boxShadow: isVar ? `0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)` : `0 4px 12px ${color}40`,
+
+      textShadow: "0 1px 2px rgba(0,0,0,0.2)"
+
+    };
+
+  };
+
+
+
+  const companyId = user?.companyId || user?.company || user?._id || user?.id || "default";
+
+
+
+  const roleDisplay = user?.role || "Admin";
+
+
+
+  return (
+
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 50%,var(--app-border) 100%)", fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+
+      <style>{`
 
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
@@ -9334,331 +9345,331 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-        {!enforceMySubscriptions && (
+      {!enforceMySubscriptions && (
 
-          <div className="no-print" style={{ display: "contents" }}>
-            <Sidebar
-              user={user}
-              active={
-                sidebarOverride ? sidebarOverride :
-                  ["projects", "edit-project", "project-details"].includes(validActive) ? "projects" :
-                    validActive
-              }
-              setActive={(val) => { setSidebarOverride(null); setActive(val); }}
-              onLogout={handleLogout}
-              open={sidebarOpen}
-              onClose={() => setSidebarOpen(false)}
-              navItems={navItems}
-              companyLogo={companyLogo}
-              onLogoChange={onLogoChange}
-              enforceMySubscriptions={enforceMySubscriptions}
-              onLogoUploadClick={() => headerLogoRef.current?.click()}
-              setSelectedProjectForTasks={setSelectedProjectForTasks}
-              desktopOpen={desktopSidebarOpen}
-            />
-
-          </div>
-
-        )}
-
-
-
-        {showCropModal && (
-
-          <ImageCropModal
-
-            image={cropImage}
-
-            onCropComplete={handleCropComplete}
-
-            onCancel={() => setShowCropModal(false)}
-
-            aspect={cropAspect}
-
+        <div className="no-print" style={{ display: "contents" }}>
+          <Sidebar
+            user={user}
+            active={
+              sidebarOverride ? sidebarOverride :
+                ["projects", "edit-project", "project-details"].includes(validActive) ? "projects" :
+                  validActive
+            }
+            setActive={(val) => { setSidebarOverride(null); setActive(val); }}
+            onLogout={handleLogout}
+            open={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+            navItems={navItems}
+            companyLogo={companyLogo}
+            onLogoChange={onLogoChange}
+            enforceMySubscriptions={enforceMySubscriptions}
+            onLogoUploadClick={() => headerLogoRef.current?.click()}
+            setSelectedProjectForTasks={setSelectedProjectForTasks}
+            desktopOpen={desktopSidebarOpen}
           />
 
+        </div>
+
+      )}
+
+
+
+      {showCropModal && (
+
+        <ImageCropModal
+
+          image={cropImage}
+
+          onCropComplete={handleCropComplete}
+
+          onCancel={() => setShowCropModal(false)}
+
+          aspect={cropAspect}
+
+        />
+
+      )}
+
+
+
+
+
+      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
+
+        {/* Desktop Topbar (hamburger toggle) */}
+        {!enforceMySubscriptions && (
+          <div className="desktop-topbar no-print" style={{ display: "none", alignItems: "center", height: 36, padding: "0 24px", background: "var(--app-bg)", position: "sticky", top: 0, zIndex: 90, marginTop: 0 }}>
+            <button onClick={() => setDesktopSidebarOpen(v => !v)} style={{ background: "none", border: "none", width: 38, height: 38, fontSize: 22, cursor: "pointer", color: "var(--app-muted)", display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1, marginTop: "70px", alignSelf: "center" }}>☰</button>
+          </div>
         )}
 
+        {/* Mobile Topbar */}
 
+        <div className="mob-topbar no-print" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#fff", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)" }}>
 
+          {!enforceMySubscriptions ? (
 
+            <button onClick={() => { isDesktopWidth ? setDesktopSidebarOpen(v => !v) : setSidebarOpen(true); }} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)", padding: "2px 6px", lineHeight: 1 }}>☰</button>
 
-        <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
+          ) : (
 
-          {/* Desktop Topbar (hamburger toggle) */}
-          {!enforceMySubscriptions && (
-            <div className="desktop-topbar no-print" style={{ display: "none", alignItems: "center", height: 36, padding: "0 24px", background: "var(--app-bg)", position: "sticky", top: 0, zIndex: 90, marginTop: 0 }}>
-              <button onClick={() => setDesktopSidebarOpen(v => !v)} style={{ background: "none", border: "none", width: 38, height: 38, fontSize: 22, cursor: "pointer", color: "var(--app-muted)", display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1, marginTop: "70px", alignSelf: "center" }}>☰</button>
-            </div>
+            <div style={{ width: 40 }} />
+
           )}
 
-          {/* Mobile Topbar */}
+          <div style={{ fontWeight: 800, fontSize: 15, color: T.text }}>
 
-          <div className="mob-topbar no-print" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#fff", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)" }}>
-
-            {!enforceMySubscriptions ? (
-
-              <button onClick={() => { isDesktopWidth ? setDesktopSidebarOpen(v => !v) : setSidebarOpen(true); }} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)", padding: "2px 6px", lineHeight: 1 }}>☰</button>
-
-            ) : (
-
-              <div style={{ width: 40 }} />
-
-            )}
-
-            <div style={{ fontWeight: 800, fontSize: 15, color: T.text }}>
-
-              {page?.label}
-
-            </div>
-
-            {user?.email !== "admin@gmail.com" && (
-
-              <>
-
-                <input type="file" ref={headerLogoRef} onChange={handleHeaderLogoUpload} accept="image/*" style={{ display: "none" }} />
-
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-
-                  {enforceMySubscriptions && (
-
-                    <button onClick={handleLogout} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "6px 12px", color: "#ef4444", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Logout</button>
-
-                  )}
-
-                  <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} style={{ cursor: "pointer", position: "relative" }}>
-
-                    <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} title="Click to upload logo">
-
-                      {companyLogo ? (
-
-                        <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "100px", objectFit: "contain", flexShrink: 0, display: "block", borderRadius: 10, background: "#fff", border: "1.5px solid var(--app-border)" }} />
-
-                      ) : (
-
-                        <div style={{ width: 38, height: 38, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", fontWeight: 800, fontSize: 13 }}>{initials}</div>
-
-                      )}
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-              </>
-
-            )}
+            {page?.label}
 
           </div>
 
+          {user?.email !== "admin@gmail.com" && (
 
+            <>
 
-          <div className="main">
+              <input type="file" ref={headerLogoRef} onChange={handleHeaderLogoUpload} accept="image/*" style={{ display: "none" }} />
 
-            {/* Topbar */}
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
 
-            <div className="topbar no-print">
+                {enforceMySubscriptions && (
 
-              <div className="search-wrap">
-
-
-
-
-
-              </div>
-              <div className="topbar-right">
-
-                <div className="topbar-icon" onClick={() => { setShowNotifPanel(v => !v); fetchPendingLeaves(); }} style={{ position: 'relative', cursor: 'pointer' }}>
-                  <i className="ti ti-bell"></i>
-                  {pendingLeaves.length > 0 && (
-                    <span style={{ position: 'absolute', top: -4, right: -4, background: '#EF4444', color: '#fff', borderRadius: '50%', width: 16, height: 16, fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{pendingLeaves.length}</span>
-                  )}
-                  {showNotifPanel && (
-                    <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: 44, right: 0, width: 380, background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', border: '1px solid #E2E8F0', zIndex: 99999, overflow: 'hidden' }}>
-                      <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097A7)' }}>
-                        <div style={{ fontSize: 15, fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <i className="ti ti-bell"></i> Notifications
-                          {pendingLeaves.length > 0 && <span style={{ background: '#EF4444', color: '#fff', borderRadius: 20, padding: '2px 8px', fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length}</span>}
-                        </div>
-                        <button onClick={() => setShowNotifPanel(false)} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 26, height: 26, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
-                      </div>
-                      <div style={{ maxHeight: 420, overflowY: 'auto', padding: '12px 16px' }}>
-                        <div style={{ fontSize: 11, fontWeight: 800, color: '#718096', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 10 }}>
-                          <i className="ti ti-user-x" style={{ marginRight: 5, color: 'var(--app-accent)' }}></i> Leave Requests
-                        </div>
-                        {pendingLeaves.length === 0 ? (
-                          <div style={{ textAlign: 'center', padding: '20px 0', color: '#A0AEC0', fontSize: 13 }}>
-                            <i className="ti ti-bell-off" style={{ fontSize: 28, display: 'block', marginBottom: 8, opacity: 0.4 }}></i>
-                            No pending notifications
-                          </div>
-                        ) : (
-                          pendingLeaves.map((l, i) => {
-                            const initials = l.employeeName ? l.employeeName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'EE';
-                            const colors = ['#f59e0b', '#a855f7', '#0ea5e9', '#ec4899', '#22c55e'];
-                            const bg = colors[i % colors.length];
-                            const detail = `${l.type || 'Leave'} · ${l.from || ''} ${l.to ? '- ' + l.to : ''}`;
-                            return (
-                              <div key={l._id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: i === pendingLeaves.length - 1 ? 'none' : '1px solid #F0F4F8' }}>
-                                <div style={{ width: 38, height: 38, borderRadius: '50%', background: bg, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, flexShrink: 0 }}>{initials}</div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: '#1A2332' }}>{l.employeeName}</div>
-                                  <div style={{ fontSize: 11, color: '#718096', marginTop: 2 }}>{detail}</div>
-                                  <span style={{ display: 'inline-block', marginTop: 4, background: '#FEF3C7', color: '#D97706', borderRadius: 20, padding: '2px 8px', fontSize: 10, fontWeight: 800 }}>Pending</span>
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
-                                  <button onClick={() => handleApproveLeave(l._id)} style={{ background: '#DCFCE7', color: '#166534', border: 'none', padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-                                    <i className="ti ti-check"></i> Approve
-                                  </button>
-                                  <button onClick={() => handleRejectLeave(l._id)} style={{ background: '#FEF2F2', color: '#DC2626', border: 'none', padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-                                    <i className="ti ti-x"></i> Reject
-                                  </button>
-                                </div>
-                              </div>
-                            );
-                          })
-                        )}
-                      </div>
-                      <div style={{ padding: '12px 16px', borderTop: '1px solid #E2E8F0', textAlign: 'center' }}>
-                        <button onClick={() => setShowNotifPanel(false)} style={{ background: 'none', border: 'none', color: ' var(--app-accent, var(--app-accent, #00BCD4))', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
-                          ✕
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="topbar-icon" onClick={() => setActive("settings")}><i className="ti ti-settings"></i></div>
-
-                {/* Dynamic Action Buttons based on validActive */}
-                {validActive === "clients" && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-
-
-                  </div>
+                  <button onClick={handleLogout} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "6px 12px", color: "#ef4444", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Logout</button>
 
                 )}
 
-                {validActive === "employees" && (
+                <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} style={{ cursor: "pointer", position: "relative" }}>
 
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-
-                    {subscription && (
-
-                      <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)" }}>
-
-                        {employees.length} / {getSubscriptionLimit("employee") === Infinity ? "Unlimited" : getSubscriptionLimit("employee")} Used
-
-                      </span>
-
-                    )}
-
-
-
-                  </div>
-
-                )}
-
-                {/* New Project button moved above Overall Value card */}
-
-                {validActive === "managers" && (
-
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-
-                    {subscription && (
-
-                      <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)" }}>
-
-                        {managers.length} / {getSubscriptionLimit("manager") === Infinity ? "Unlimited" : getSubscriptionLimit("manager")} Used
-
-                      </span>
-
-                    )}
-
-                    <button
-
-                      className="create-btn"
-
-                      onClick={() => {
-                        const limit = getSubscriptionLimit("manager", subscription);
-                        if (limit !== Infinity && managers.length >= limit) {
-                          setLimitModal({ type: "manager", limit });
-                          return;
-                        }
-                        setNmError({}); setShowMgrPass(false); setModal("manager");
-                        fetchSubscription(); // refresh in background, don't block opening the form
-                      }}
-
-                      style={{ opacity: isUsageAtLimit("manager", managers.length) ? 0.5 : 1 }}
-
-                    >
-
-                      <i className="ti ti-plus"></i> Add Manager
-
-                    </button>
-
-                  </div>
-
-                )}
-
-                {validActive === "subadmins" && <button className="create-btn" onClick={() => { setNsError({}); setShowSubPass(false); setModal("subadmin"); }}><i className="ti ti-plus"></i> Add Partner</button>}
-
-
-
-
-
-                {/* Profile Toggle (re-using topbar logic) */}
-
-                <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} className="mob-topbar-hide" style={{ background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, padding: "6px 12px", display: "flex", alignItems: "center", gap: 8, cursor: "pointer", flexShrink: 0, marginLeft: 8 }}>
-
-                  <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} style={{ cursor: "pointer" }} title="Click to upload logo">
+                  <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} title="Click to upload logo">
 
                     {companyLogo ? (
 
-                      <img src={companyLogo} alt="logo" style={{ height: 28, width: "auto", objectFit: "contain", flexShrink: 0, borderRadius: 6 }} onError={() => setCompanyLogo(null)} />
+                      <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "100px", objectFit: "contain", flexShrink: 0, display: "block", borderRadius: 10, background: "#fff", border: "1.5px solid var(--app-border)" }} />
 
                     ) : (
 
-                      <div style={{ width: 28, height: 28, background: "var(--teal)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 10 }}>{initials}</div>
+                      <div style={{ width: 38, height: 38, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", fontWeight: 800, fontSize: 13 }}>{initials}</div>
 
                     )}
 
                   </div>
 
-                  <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text)" }}>{displayName}</span>
+                </div>
+
+              </div>
+
+            </>
+
+          )}
+
+        </div>
+
+
+
+        <div className="main">
+
+          {/* Topbar */}
+
+          <div className="topbar no-print">
+
+            <div className="search-wrap">
+
+
+
+
+
+            </div>
+            <div className="topbar-right">
+
+              <div className="topbar-icon" onClick={() => { setShowNotifPanel(v => !v); fetchPendingLeaves(); }} style={{ position: 'relative', cursor: 'pointer' }}>
+                <i className="ti ti-bell"></i>
+                {pendingLeaves.length > 0 && (
+                  <span style={{ position: 'absolute', top: -4, right: -4, background: '#EF4444', color: '#fff', borderRadius: '50%', width: 16, height: 16, fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{pendingLeaves.length}</span>
+                )}
+                {showNotifPanel && (
+                  <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: 44, right: 0, width: 380, background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', border: '1px solid #E2E8F0', zIndex: 99999, overflow: 'hidden' }}>
+                    <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097A7)' }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <i className="ti ti-bell"></i> Notifications
+                        {pendingLeaves.length > 0 && <span style={{ background: '#EF4444', color: '#fff', borderRadius: 20, padding: '2px 8px', fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length}</span>}
+                      </div>
+                      <button onClick={() => setShowNotifPanel(false)} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 26, height: 26, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                    </div>
+                    <div style={{ maxHeight: 420, overflowY: 'auto', padding: '12px 16px' }}>
+                      <div style={{ fontSize: 11, fontWeight: 800, color: '#718096', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 10 }}>
+                        <i className="ti ti-user-x" style={{ marginRight: 5, color: 'var(--app-accent)' }}></i> Leave Requests
+                      </div>
+                      {pendingLeaves.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '20px 0', color: '#A0AEC0', fontSize: 13 }}>
+                          <i className="ti ti-bell-off" style={{ fontSize: 28, display: 'block', marginBottom: 8, opacity: 0.4 }}></i>
+                          No pending notifications
+                        </div>
+                      ) : (
+                        pendingLeaves.map((l, i) => {
+                          const initials = l.employeeName ? l.employeeName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'EE';
+                          const colors = ['#f59e0b', '#a855f7', '#0ea5e9', '#ec4899', '#22c55e'];
+                          const bg = colors[i % colors.length];
+                          const detail = `${l.type || 'Leave'} · ${l.from || ''} ${l.to ? '- ' + l.to : ''}`;
+                          return (
+                            <div key={l._id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: i === pendingLeaves.length - 1 ? 'none' : '1px solid #F0F4F8' }}>
+                              <div style={{ width: 38, height: 38, borderRadius: '50%', background: bg, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, flexShrink: 0 }}>{initials}</div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: '#1A2332' }}>{l.employeeName}</div>
+                                <div style={{ fontSize: 11, color: '#718096', marginTop: 2 }}>{detail}</div>
+                                <span style={{ display: 'inline-block', marginTop: 4, background: '#FEF3C7', color: '#D97706', borderRadius: 20, padding: '2px 8px', fontSize: 10, fontWeight: 800 }}>Pending</span>
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
+                                <button onClick={() => handleApproveLeave(l._id)} style={{ background: '#DCFCE7', color: '#166534', border: 'none', padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                  <i className="ti ti-check"></i> Approve
+                                </button>
+                                <button onClick={() => handleRejectLeave(l._id)} style={{ background: '#FEF2F2', color: '#DC2626', border: 'none', padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                  <i className="ti ti-x"></i> Reject
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                    <div style={{ padding: '12px 16px', borderTop: '1px solid #E2E8F0', textAlign: 'center' }}>
+                      <button onClick={() => setShowNotifPanel(false)} style={{ background: 'none', border: 'none', color: ' var(--app-accent, var(--app-accent, #00BCD4))', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="topbar-icon" onClick={() => setActive("settings")}><i className="ti ti-settings"></i></div>
+
+              {/* Dynamic Action Buttons based on validActive */}
+              {validActive === "clients" && (
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+
 
                 </div>
+
+              )}
+
+              {validActive === "employees" && (
+
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+
+                  {subscription && (
+
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)" }}>
+
+                      {employees.length} / {getSubscriptionLimit("employee") === Infinity ? "Unlimited" : getSubscriptionLimit("employee")} Used
+
+                    </span>
+
+                  )}
+
+
+
+                </div>
+
+              )}
+
+              {/* New Project button moved above Overall Value card */}
+
+              {validActive === "managers" && (
+
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+
+                  {subscription && (
+
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)" }}>
+
+                      {managers.length} / {getSubscriptionLimit("manager") === Infinity ? "Unlimited" : getSubscriptionLimit("manager")} Used
+
+                    </span>
+
+                  )}
+
+                  <button
+
+                    className="create-btn"
+
+                    onClick={() => {
+                      const limit = getSubscriptionLimit("manager", subscription);
+                      if (limit !== Infinity && managers.length >= limit) {
+                        setLimitModal({ type: "manager", limit });
+                        return;
+                      }
+                      setNmError({}); setShowMgrPass(false); setModal("manager");
+                      fetchSubscription(); // refresh in background, don't block opening the form
+                    }}
+
+                    style={{ opacity: isUsageAtLimit("manager", managers.length) ? 0.5 : 1 }}
+
+                  >
+
+                    <i className="ti ti-plus"></i> Add Manager
+
+                  </button>
+
+                </div>
+
+              )}
+
+              {validActive === "subadmins" && <button className="create-btn" onClick={() => { setNsError({}); setShowSubPass(false); setModal("subadmin"); }}><i className="ti ti-plus"></i> Add Partner</button>}
+
+
+
+
+
+              {/* Profile Toggle (re-using topbar logic) */}
+
+              <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} className="mob-topbar-hide" style={{ background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, padding: "6px 12px", display: "flex", alignItems: "center", gap: 8, cursor: "pointer", flexShrink: 0, marginLeft: 8 }}>
+
+                <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} style={{ cursor: "pointer" }} title="Click to upload logo">
+
+                  {companyLogo ? (
+
+                    <img src={companyLogo} alt="logo" style={{ height: 28, width: "auto", objectFit: "contain", flexShrink: 0, borderRadius: 6 }} onError={() => setCompanyLogo(null)} />
+
+                  ) : (
+
+                    <div style={{ width: 28, height: 28, background: "var(--teal)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 10 }}>{initials}</div>
+
+                  )}
+
+                </div>
+
+                <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text)" }}>{displayName}</span>
 
               </div>
 
             </div>
 
-
-
-            <div className="content">
-
-              {trialToast && (
-                <div style={{ position: "fixed", top: 24, left: "50%", width: "max-content", marginLeft: "auto", marginRight: "auto", right: 0, zIndex: 9999, background: "#fff", border: "1.5px solid #00BCD4", borderRadius: 14, padding: "14px 26px", fontSize: 14, fontWeight: 800, color: "#0097A7", boxShadow: "0 10px 32px rgba(0,188,212,0.25), 0 4px 12px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", gap: 10 }}>
-                  <i className="ti ti-circle-check" style={{ fontSize: 18, color: "#00BCD4" }}></i> Free Trial Activated
-                </div>
-              )}
-              {/* Trial toast trigger runs once via useEffect below, not inline during render */}
-
-              {subscriptionChecked && !isInFreeTrial() && !subscription && (
-                <div style={{ background: '#FEE2E2', color: '#DC2626', padding: '10px 20px', borderRadius: 10, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
-                  <span><i className="ti ti-alert-circle" style={{ marginRight: 8 }}></i>Choose a subscription plan to continue.</span>
-                  <button onClick={() => { setForceUpgradeTab(true); setActive('mysubscriptions'); }} style={{ background: '#DC2626', color: '#fff', border: 'none', borderRadius: 8, padding: '5px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>Upgrade Now</button>
-                </div>
-              )}
-              <EmployeeSubscriptionWarning user={user} trigger={subscription?.updatedAt || subscription?._id} onRenew={() => { setForceUpgradeTab(true); setActive("mysubscriptions"); setTimeout(() => { const el = document.querySelector('.plan-card, .plans-grid, [class*="upgrade"]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 400); }} />
+          </div>
 
 
 
-              {/* ── Dashboard ── */}{validActive === "dashboard" && (
-                <>
-                  {/* MOBILE DASHBOARD (visible only under 768px) */}
-                  <div className="mobile-dashboard-view" style={{ display: "none" }}>
-                    <style>{`
+          <div className="content">
+
+            {trialToast && (
+              <div style={{ position: "fixed", top: 24, left: "50%", width: "max-content", marginLeft: "auto", marginRight: "auto", right: 0, zIndex: 9999, background: "#fff", border: "1.5px solid #00BCD4", borderRadius: 14, padding: "14px 26px", fontSize: 14, fontWeight: 800, color: "#0097A7", boxShadow: "0 10px 32px rgba(0,188,212,0.25), 0 4px 12px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", gap: 10 }}>
+                <i className="ti ti-circle-check" style={{ fontSize: 18, color: "#00BCD4" }}></i> Free Trial Activated
+              </div>
+            )}
+            {/* Trial toast trigger runs once via useEffect below, not inline during render */}
+
+            {subscriptionChecked && !isInFreeTrial() && !subscription && (
+              <div style={{ background: '#FEE2E2', color: '#DC2626', padding: '10px 20px', borderRadius: 10, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
+                <span><i className="ti ti-alert-circle" style={{ marginRight: 8 }}></i>Choose a subscription plan to continue.</span>
+                <button onClick={() => { setForceUpgradeTab(true); setActive('mysubscriptions'); }} style={{ background: '#DC2626', color: '#fff', border: 'none', borderRadius: 8, padding: '5px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>Upgrade Now</button>
+              </div>
+            )}
+            <EmployeeSubscriptionWarning user={user} trigger={subscription?.updatedAt || subscription?._id} onRenew={() => { setForceUpgradeTab(true); setActive("mysubscriptions"); setTimeout(() => { const el = document.querySelector('.plan-card, .plans-grid, [class*="upgrade"]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 400); }} />
+
+
+
+            {/* ── Dashboard ── */}{validActive === "dashboard" && (
+              <>
+                {/* MOBILE DASHBOARD (visible only under 768px) */}
+                <div className="mobile-dashboard-view" style={{ display: "none" }}>
+                  <style>{`
     @media (max-width: 768px) {
       .mobile-dashboard-view { display: block !important; }
       .desktop-dashboard-view { display: none !important; }
@@ -9673,1287 +9684,1285 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     }
   `}</style>
 
-                    {/* HERO HEADER — glass + gradient mesh */}
-                    <div style={{
-                      position: "relative",
-                      background: "radial-gradient(120% 120% at 15% 0%, #1e1b4b 0%, #0f0a29 45%, #05030f 100%)",
-                      borderRadius: "0 0 32px 32px",
-                      padding: "18px 18px 100px",
-                      color: "#fff",
-                      overflow: "hidden"
-                    }}>
-                      {/* decorative mesh blobs */}
-                      <div style={{ position: "absolute", top: -60, right: -40, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, var(--app-accent) 0%, transparent 70%)", opacity: 0.35, filter: "blur(10px)" }} />
-                      <div style={{ position: "absolute", bottom: -80, left: -30, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, #7c3aed 0%, transparent 70%)", opacity: 0.25, filter: "blur(14px)" }} />
+                  {/* HERO HEADER — glass + gradient mesh */}
+                  <div style={{
+                    position: "relative",
+                    background: "radial-gradient(120% 120% at 15% 0%, #1e1b4b 0%, #0f0a29 45%, #05030f 100%)",
+                    borderRadius: "0 0 32px 32px",
+                    padding: "18px 18px 100px",
+                    color: "#fff",
+                    overflow: "hidden"
+                  }}>
+                    {/* decorative mesh blobs */}
+                    <div style={{ position: "absolute", top: -60, right: -40, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, var(--app-accent) 0%, transparent 70%)", opacity: 0.35, filter: "blur(10px)" }} />
+                    <div style={{ position: "absolute", bottom: -80, left: -30, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, #7c3aed 0%, transparent 70%)", opacity: 0.25, filter: "blur(14px)" }} />
 
-                      <div style={{ position: "relative", zIndex: 2 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                          <div onClick={() => setSidebarOpen(true)} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.08)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <i className="ti ti-menu-2" style={{ fontSize: 18 }}></i>
-                          </div>
-                          <div style={{ textAlign: "center" }}>
-                            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", fontWeight: 700, letterSpacing: 1 }}>WELCOME BACK</div>
-                            <div style={{ fontSize: 14, fontWeight: 800 }}>{(user?.companyName || user?.name || "Business")}</div>
-                          </div>
-                          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                            <div onClick={() => { setShowNotifPanel(v => !v); fetchPendingLeaves(); }} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.08)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-                              <i className="ti ti-bell" style={{ fontSize: 17 }}></i>
-                              {pendingLeaves.length > 0 && (
-                                <span style={{ position: "absolute", top: 5, right: 6, width: 8, height: 8, borderRadius: "50%", background: "#ff4d6d", boxShadow: "0 0 0 2px #0f0a29" }}></span>
-                              )}
-                            </div>
-                            <div onClick={() => setShowProfile(true)} style={{ width: 42, height: 42, borderRadius: 14, background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 13, boxShadow: "0 6px 18px rgba(0,188,212,0.4)", overflow: "hidden" }}>
-                              {companyLogo ? (
-                                <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                              ) : (
-                                (user?.name || "PR").substring(0, 2).toUpperCase()
-                              )}
-                            </div>
-                          </div>
+                    <div style={{ position: "relative", zIndex: 2 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                        <div onClick={() => setSidebarOpen(true)} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.08)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <i className="ti ti-menu-2" style={{ fontSize: 18 }}></i>
                         </div>
-
-                        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-                          <i className="ti ti-sparkles" style={{ color: "var(--app-accent)" }}></i> Revenue this month
+                        <div style={{ textAlign: "center" }}>
+                          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", fontWeight: 700, letterSpacing: 1 }}>WELCOME BACK</div>
+                          <div style={{ fontSize: 14, fontWeight: 800 }}>{(user?.companyName || user?.name || "Business")}</div>
                         </div>
-                        <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 6 }}>
-                          <span style={{ fontSize: 42, fontWeight: 900, letterSpacing: -1, background: "linear-gradient(90deg,#fff,#c7d2fe)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                            Rs.{(totalRevenue || 0).toLocaleString()}
-                          </span>
-                          <span style={{ background: "rgba(74,222,128,0.15)", color: "#4ade80", fontSize: 12, fontWeight: 800, padding: "5px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 4 }}>
-                            <i className="ti ti-trending-up"></i> 12%
-                          </span>
-                        </div>
-
-                        <div style={{ height: 60, marginTop: 10 }}>
-                          <svg viewBox="0 0 300 60" width="100%" height="100%" preserveAspectRatio="none">
-                            <defs>
-                              <linearGradient id="mobAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="var(--app-accent)" stopOpacity="0.4" />
-                                <stop offset="100%" stopColor="var(--app-accent)" stopOpacity="0" />
-                              </linearGradient>
-                            </defs>
-                            <path d="M0,45 L50,40 L100,48 L150,18 L200,26 L250,12 L300,20 L300,60 L0,60 Z" fill="url(#mobAreaGrad)" />
-                            <polyline fill="none" stroke="var(--app-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points="0,45 50,40 100,48 150,18 200,26 250,12 300,20" />
-                          </svg>
+                        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                          <div onClick={() => { setShowNotifPanel(v => !v); fetchPendingLeaves(); }} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.08)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                            <i className="ti ti-bell" style={{ fontSize: 17 }}></i>
+                            {pendingLeaves.length > 0 && (
+                              <span style={{ position: "absolute", top: 5, right: 6, width: 8, height: 8, borderRadius: "50%", background: "#ff4d6d", boxShadow: "0 0 0 2px #0f0a29" }}></span>
+                            )}
+                          </div>
+                          <div onClick={() => setShowProfile(true)} style={{ width: 42, height: 42, borderRadius: 14, background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 13, boxShadow: "0 6px 18px rgba(0,188,212,0.4)", overflow: "hidden" }}>
+                            {companyLogo ? (
+                              <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                            ) : (
+                              (user?.name || "PR").substring(0, 2).toUpperCase()
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* FLOATING STAT STRIP */}
-                    <div style={{ margin: "-72px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
+                      <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                        <i className="ti ti-sparkles" style={{ color: "var(--app-accent)" }}></i> Revenue this month
+                      </div>
+                      <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 6 }}>
+                        <span style={{ fontSize: 42, fontWeight: 900, letterSpacing: -1, background: "linear-gradient(90deg,#fff,#c7d2fe)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                          Rs.{(totalRevenue || 0).toLocaleString()}
+                        </span>
+                        <span style={{ background: "rgba(74,222,128,0.15)", color: "#4ade80", fontSize: 12, fontWeight: 800, padding: "5px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 4 }}>
+                          <i className="ti ti-trending-up"></i> 12%
+                        </span>
+                      </div>
+
+                      <div style={{ height: 60, marginTop: 10 }}>
+                        <svg viewBox="0 0 300 60" width="100%" height="100%" preserveAspectRatio="none">
+                          <defs>
+                            <linearGradient id="mobAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="var(--app-accent)" stopOpacity="0.4" />
+                              <stop offset="100%" stopColor="var(--app-accent)" stopOpacity="0" />
+                            </linearGradient>
+                          </defs>
+                          <path d="M0,45 L50,40 L100,48 L150,18 L200,26 L250,12 L300,20 L300,60 L0,60 Z" fill="url(#mobAreaGrad)" />
+                          <polyline fill="none" stroke="var(--app-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points="0,45 50,40 100,48 150,18 200,26 250,12 300,20" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* FLOATING STAT STRIP */}
+                  <div style={{ margin: "-72px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
+                    {[
+                      { icon: "ti-users", label: "Clients", val: clients.length, grad: "linear-gradient(135deg,#7c3aed,#a78bfa)" },
+                      { icon: "ti-folder", label: "Projects", val: projects.length, grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+                      { icon: "ti-user-circle", label: "Team", val: employees.length, grad: "linear-gradient(135deg,#f59e0b,#fbbf24)" },
+                    ].map((s, i) => (
+                      <div key={i} className="mob-card" style={{ animationDelay: `${i * 60}ms`, background: "#fff", borderRadius: 18, padding: "14px 10px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)" }}>
+                        <div style={{ width: 34, height: 34, borderRadius: 11, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", color: "#fff", fontSize: 15, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
+                          <i className={`ti ${s.icon}`}></i>
+                        </div>
+                        <div style={{ fontSize: 19, fontWeight: 900, color: "#0f0a29" }}>{s.val}</div>
+                        <div style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 700, marginTop: 1 }}>{s.label}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* QUICK ACTIONS — pill scroller */}
+                  <div style={{ padding: "22px 16px 6px" }}>
+                    <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
                       {[
-                        { icon: "ti-users", label: "Clients", val: clients.length, grad: "linear-gradient(135deg,#7c3aed,#a78bfa)" },
-                        { icon: "ti-folder", label: "Projects", val: projects.length, grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
-                        { icon: "ti-user-circle", label: "Team", val: employees.length, grad: "linear-gradient(135deg,#f59e0b,#fbbf24)" },
-                      ].map((s, i) => (
-                        <div key={i} className="mob-card" style={{ animationDelay: `${i * 60}ms`, background: "#fff", borderRadius: 18, padding: "14px 10px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)" }}>
-                          <div style={{ width: 34, height: 34, borderRadius: 11, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", color: "#fff", fontSize: 15, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
-                            <i className={`ti ${s.icon}`}></i>
+                        { icon: "ti-file-invoice", label: "Invoice", color: "#0d9488", bg: "linear-gradient(135deg,#ccfbf1,#99f6e4)", action: () => { setSidebarOverride("dashboard"); setActive("invoices"); } },
+                        { icon: "ti-user-plus", label: "Client", color: "#7c3aed", bg: "linear-gradient(135deg,#ede9fe,#ddd6fe)", action: () => { setSidebarOverride("dashboard"); setActive("addClient"); } },
+                        { icon: "ti-folder-plus", label: "Project", color: "#d97706", bg: "linear-gradient(135deg,#fef3c7,#fde68a)", action: () => { setJumpProject(null); setActive("create-project"); } },
+                        { icon: "ti-clipboard-list", label: "Proposal", color: "#16a34a", bg: "linear-gradient(135deg,#dcfce7,#bbf7d0)", action: () => { setSidebarOverride("dashboard"); setActive("proposals"); } },
+                        { icon: "ti-receipt", label: "Quote", color: "#2563eb", bg: "linear-gradient(135deg,#dbeafe,#bfdbfe)", action: () => { setSidebarOverride("dashboard"); setActive("quotations"); } },
+                      ].map((a, i) => (
+                        <div key={i} onClick={a.action} style={{ flex: "0 0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 6, cursor: "pointer", minWidth: 68 }}>
+                          <div style={{ width: 52, height: 52, borderRadius: 16, background: a.bg, color: a.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 6px 16px rgba(0,0,0,0.06)" }}>
+                            <i className={`ti ${a.icon}`}></i>
                           </div>
-                          <div style={{ fontSize: 19, fontWeight: 900, color: "#0f0a29" }}>{s.val}</div>
-                          <div style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 700, marginTop: 1 }}>{s.label}</div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* QUICK ACTIONS — pill scroller */}
-                    <div style={{ padding: "22px 16px 6px" }}>
-                      <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
-                        {[
-                          { icon: "ti-file-invoice", label: "Invoice", color: "#0d9488", bg: "linear-gradient(135deg,#ccfbf1,#99f6e4)", action: () => { setSidebarOverride("dashboard"); setActive("invoices"); } },
-                          { icon: "ti-user-plus", label: "Client", color: "#7c3aed", bg: "linear-gradient(135deg,#ede9fe,#ddd6fe)", action: () => { setSidebarOverride("dashboard"); setActive("addClient"); } },
-                          { icon: "ti-folder-plus", label: "Project", color: "#d97706", bg: "linear-gradient(135deg,#fef3c7,#fde68a)", action: () => { setJumpProject(null); setActive("create-project"); } },
-                          { icon: "ti-clipboard-list", label: "Proposal", color: "#16a34a", bg: "linear-gradient(135deg,#dcfce7,#bbf7d0)", action: () => { setSidebarOverride("dashboard"); setActive("proposals"); } },
-                          { icon: "ti-receipt", label: "Quote", color: "#2563eb", bg: "linear-gradient(135deg,#dbeafe,#bfdbfe)", action: () => { setSidebarOverride("dashboard"); setActive("quotations"); } },
-                        ].map((a, i) => (
-                          <div key={i} onClick={a.action} style={{ flex: "0 0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 6, cursor: "pointer", minWidth: 68 }}>
-                            <div style={{ width: 52, height: 52, borderRadius: 16, background: a.bg, color: a.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 6px 16px rgba(0,0,0,0.06)" }}>
-                              <i className={`ti ${a.icon}`}></i>
-                            </div>
-                            <div style={{ fontSize: 10.5, fontWeight: 700, color: "#334155" }}>{a.label}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* PROJECTS — redesigned cards */}
-                    <div style={{ padding: "16px 16px 100px" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                        <div style={{ fontSize: 16, fontWeight: 900, color: "#0f0a29", display: "flex", alignItems: "center", gap: 8 }}>
-                          <span style={{ width: 6, height: 18, borderRadius: 4, background: "var(--app-accent)", display: "inline-block" }}></span>
-                          Active Projects
-                        </div>
-                        <div onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ fontSize: 12.5, fontWeight: 800, color: "var(--app-accent)", display: "flex", alignItems: "center", gap: 3 }}>
-                          View All <i className="ti ti-chevron-right" style={{ fontSize: 13 }}></i>
-                        </div>
-                      </div>
-
-                      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                        {projectsWithProgress.slice(0, 6).map((p, idx) => {
-                          const progress = p.progress || 0;
-                          const ringColor = progress >= 80 ? "#16a34a" : progress >= 40 ? "var(--app-accent)" : "#dc2626";
-                          const clientName = clients.find(c => c._id === p.clientId)?.clientName || p.client || "Internal";
-                          const isExpanded = expandedMobileProjectIdx === idx;
-                          return (
-                            <div
-                              key={p._id || idx}
-                              className="mob-card"
-                              style={{ animationDelay: `${idx * 40}ms`, background: "#fff", borderRadius: 20, padding: "16px 16px", boxShadow: isExpanded ? "0 14px 34px rgba(15,10,41,0.12)" : "0 4px 16px rgba(15,10,41,0.06)", border: `1px solid ${isExpanded ? "rgba(0,188,212,0.25)" : "rgba(0,0,0,0.04)"}`, cursor: "pointer", transition: "all .25s" }}
-                              onClick={() => setExpandedMobileProjectIdx(prev => prev === idx ? null : idx)}
-                            >
-                              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                                <div style={{ position: "relative", width: 50, height: 50, flexShrink: 0 }}>
-                                  <svg width="50" height="50" viewBox="0 0 50 50">
-                                    <circle cx="25" cy="25" r="21" fill="none" stroke="#f1f5f9" strokeWidth="5" />
-                                    <circle cx="25" cy="25" r="21" fill="none" stroke={ringColor} strokeWidth="5" strokeDasharray={`${(progress / 100) * 132} 132`} strokeLinecap="round" transform="rotate(-90 25 25)" style={{ transition: "stroke-dasharray .5s ease" }} />
-                                  </svg>
-                                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: ringColor }}>
-                                    {progress}%
-                                  </div>
-                                </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f0a29", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
-                                  <div style={{ fontSize: 11.5, color: "#94a3b8", marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
-                                    <i className="ti ti-building" style={{ fontSize: 12 }}></i>{clientName}
-                                  </div>
-                                  <div style={{ height: 6, background: "#f1f5f9", borderRadius: 3, marginTop: 9, overflow: "hidden" }}>
-                                    <div style={{ width: `${progress}%`, height: "100%", background: `linear-gradient(90deg, ${ringColor}, ${ringColor}cc)`, borderRadius: 3, transition: "width .5s ease" }}></div>
-                                  </div>
-                                </div>
-                                <i className={`ti ti-chevron-${isExpanded ? "up" : "down"}`} style={{ color: "#cbd5e1", fontSize: 18, flexShrink: 0 }}></i>
-                              </div>
-
-                              {isExpanded && (
-                                <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px dashed #e2e8f0", display: "flex", flexDirection: "column", gap: 10 }}>
-                                  {p.end && (
-                                    <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "linear-gradient(135deg,#ccfbf1,#a7f3d0)", color: "#0d9488", padding: "6px 12px", borderRadius: 20, fontSize: 11.5, fontWeight: 800, width: "fit-content" }}>
-                                      <i className="ti ti-clock"></i> Due in {Math.max(0, Math.ceil((new Date(p.end) - new Date()) / 86400000))} days
-                                    </div>
-                                  )}
-                                  <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "#64748b" }}>
-                                    <i className="ti ti-user" style={{ fontSize: 14 }}></i>
-                                    {Array.isArray(p.assignedTo) ? (p.assignedTo[0] || "Unassigned") : (p.assignedTo || "Unassigned")}
-                                  </div>
-                                  <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "#64748b" }}>
-                                    <i className="ti ti-currency-rupee" style={{ fontSize: 14 }}></i>
-                                    {formatCurrency(p.budget, p.currency)} budget
-                                  </div>
-                                  <button
-                                    onClick={(e) => { e.stopPropagation(); setJumpProject(p); setActive("project-details"); }}
-                                    style={{ marginTop: 4, background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 10, padding: "10px", fontSize: 12.5, fontWeight: 800, cursor: "pointer" }}
-                                  >
-                                    Open Project
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                        {projectsWithProgress.length === 0 && (
-                          <div style={{ textAlign: "center", padding: "30px 0", color: "#94a3b8", fontSize: 13 }}>No projects yet</div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* FLOATING BOTTOM NAV — glass pill */}
-                    <div style={{ position: "fixed", bottom: 14, left: 14, right: 14, background: "rgba(15,10,41,0.92)", backdropFilter: "blur(16px)", borderRadius: 24, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "10px 6px", zIndex: 4000, boxShadow: "0 12px 32px rgba(15,10,41,0.35)" }}>
-                      {[
-                        { icon: "ti-home", label: "Home", key: "dashboard" },
-                        { icon: "ti-folder", label: "Projects", key: "projects" },
-                        { icon: null, label: "", key: "add" },
-                        { icon: "ti-users", label: "Clients", key: "clients" },
-                        { icon: "ti-dots", label: "More", key: "settings" },
-                      ].map((n, i) => n.key === "add" ? (
-                        <div key={i} onClick={() => { setJumpProject(null); setActive("create-project"); }} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#26d0ce)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", border: "3px solid #0f0a29" }}>+</div>
-                      ) : (
-                        <div key={i} onClick={() => setActive(n.key)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: active === n.key ? "var(--app-accent)" : "rgba(255,255,255,0.5)", padding: "4px 10px" }}>
-                          <i className={`ti ${n.icon}`} style={{ fontSize: 19 }}></i>
-                          <span style={{ fontSize: 9.5, fontWeight: 700 }}>{n.label}</span>
+                          <div style={{ fontSize: 10.5, fontWeight: 700, color: "#334155" }}>{a.label}</div>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  <div className="desktop-dashboard-view">
+                  {/* PROJECTS — redesigned cards */}
+                  <div style={{ padding: "16px 16px 100px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                      <div style={{ fontSize: 16, fontWeight: 900, color: "#0f0a29", display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ width: 6, height: 18, borderRadius: 4, background: "var(--app-accent)", display: "inline-block" }}></span>
+                        Active Projects
+                      </div>
+                      <div onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ fontSize: 12.5, fontWeight: 800, color: "var(--app-accent)", display: "flex", alignItems: "center", gap: 3 }}>
+                        View All <i className="ti ti-chevron-right" style={{ fontSize: 13 }}></i>
+                      </div>
+                    </div>
 
-                    {/* Theme Picker - Dashboard Page */}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                      {projectsWithProgress.slice(0, 6).map((p, idx) => {
+                        const progress = p.progress || 0;
+                        const ringColor = progress >= 80 ? "#16a34a" : progress >= 40 ? "var(--app-accent)" : "#dc2626";
+                        const clientName = clients.find(c => c._id === p.clientId)?.clientName || p.client || "Internal";
+                        const isExpanded = expandedMobileProjectIdx === idx;
+                        return (
+                          <div
+                            key={p._id || idx}
+                            className="mob-card"
+                            style={{ animationDelay: `${idx * 40}ms`, background: "#fff", borderRadius: 20, padding: "16px 16px", boxShadow: isExpanded ? "0 14px 34px rgba(15,10,41,0.12)" : "0 4px 16px rgba(15,10,41,0.06)", border: `1px solid ${isExpanded ? "rgba(0,188,212,0.25)" : "rgba(0,0,0,0.04)"}`, cursor: "pointer", transition: "all .25s" }}
+                            onClick={() => setExpandedMobileProjectIdx(prev => prev === idx ? null : idx)}
+                          >
+                            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                              <div style={{ position: "relative", width: 50, height: 50, flexShrink: 0 }}>
+                                <svg width="50" height="50" viewBox="0 0 50 50">
+                                  <circle cx="25" cy="25" r="21" fill="none" stroke="#f1f5f9" strokeWidth="5" />
+                                  <circle cx="25" cy="25" r="21" fill="none" stroke={ringColor} strokeWidth="5" strokeDasharray={`${(progress / 100) * 132} 132`} strokeLinecap="round" transform="rotate(-90 25 25)" style={{ transition: "stroke-dasharray .5s ease" }} />
+                                </svg>
+                                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: ringColor }}>
+                                  {progress}%
+                                </div>
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f0a29", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
+                                <div style={{ fontSize: 11.5, color: "#94a3b8", marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
+                                  <i className="ti ti-building" style={{ fontSize: 12 }}></i>{clientName}
+                                </div>
+                                <div style={{ height: 6, background: "#f1f5f9", borderRadius: 3, marginTop: 9, overflow: "hidden" }}>
+                                  <div style={{ width: `${progress}%`, height: "100%", background: `linear-gradient(90deg, ${ringColor}, ${ringColor}cc)`, borderRadius: 3, transition: "width .5s ease" }}></div>
+                                </div>
+                              </div>
+                              <i className={`ti ti-chevron-${isExpanded ? "up" : "down"}`} style={{ color: "#cbd5e1", fontSize: 18, flexShrink: 0 }}></i>
+                            </div>
 
-                    <div style={{ position: "fixed", bottom: 28, right: 28, zIndex: 5000 }}>
+                            {isExpanded && (
+                              <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px dashed #e2e8f0", display: "flex", flexDirection: "column", gap: 10 }}>
+                                {p.end && (
+                                  <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "linear-gradient(135deg,#ccfbf1,#a7f3d0)", color: "#0d9488", padding: "6px 12px", borderRadius: 20, fontSize: 11.5, fontWeight: 800, width: "fit-content" }}>
+                                    <i className="ti ti-clock"></i> Due in {Math.max(0, Math.ceil((new Date(p.end) - new Date()) / 86400000))} days
+                                  </div>
+                                )}
+                                <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "#64748b" }}>
+                                  <i className="ti ti-user" style={{ fontSize: 14 }}></i>
+                                  {Array.isArray(p.assignedTo) ? (p.assignedTo[0] || "Unassigned") : (p.assignedTo || "Unassigned")}
+                                </div>
+                                <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "#64748b" }}>
+                                  <i className="ti ti-currency-rupee" style={{ fontSize: 14 }}></i>
+                                  {formatCurrency(p.budget, p.currency)} budget
+                                </div>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setJumpProject(p); setActive("project-details"); }}
+                                  style={{ marginTop: 4, background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 10, padding: "10px", fontSize: 12.5, fontWeight: 800, cursor: "pointer" }}
+                                >
+                                  Open Project
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                      {projectsWithProgress.length === 0 && (
+                        <div style={{ textAlign: "center", padding: "30px 0", color: "#94a3b8", fontSize: 13 }}>No projects yet</div>
+                      )}
+                    </div>
+                  </div>
 
-                      {showThemePicker && (
+                  {/* FLOATING BOTTOM NAV — glass pill */}
+                  <div style={{ position: "fixed", bottom: 14, left: 14, right: 14, background: "rgba(15,10,41,0.92)", backdropFilter: "blur(16px)", borderRadius: 24, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "10px 6px", zIndex: 4000, boxShadow: "0 12px 32px rgba(15,10,41,0.35)" }}>
+                    {[
+                      { icon: "ti-home", label: "Home", key: "dashboard" },
+                      { icon: "ti-folder", label: "Projects", key: "projects" },
+                      { icon: null, label: "", key: "add" },
+                      { icon: "ti-users", label: "Clients", key: "clients" },
+                      { icon: "ti-dots", label: "More", key: "settings" },
+                    ].map((n, i) => n.key === "add" ? (
+                      <div key={i} onClick={() => { setJumpProject(null); setActive("create-project"); }} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#26d0ce)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", border: "3px solid #0f0a29" }}>+</div>
+                    ) : (
+                      <div key={i} onClick={() => setActive(n.key)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: active === n.key ? "var(--app-accent)" : "rgba(255,255,255,0.5)", padding: "4px 10px" }}>
+                        <i className={`ti ${n.icon}`} style={{ fontSize: 19 }}></i>
+                        <span style={{ fontSize: 9.5, fontWeight: 700 }}>{n.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-                        <div style={{
+                <div className="desktop-dashboard-view">
 
-                          position: "absolute", bottom: 56, right: 0,
+                  {/* Theme Picker - Dashboard Page */}
 
-                          background: "#fff", borderRadius: 18, padding: 20,
+                  <div style={{ position: "fixed", bottom: 28, right: 28, zIndex: 5000 }}>
 
-                          boxShadow: "0 20px 60px rgba(0,0,0,0.18)", border: "1.5px solid var(--app-border)",
+                    {showThemePicker && (
 
-                          width: 300, maxHeight: "70vh", overflowY: "auto"
+                      <div style={{
 
-                        }}>
+                        position: "absolute", bottom: 56, right: 0,
 
-                          <div style={{ fontSize: 13, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 14 }}>
+                        background: "#fff", borderRadius: 18, padding: 20,
 
-                            Choose Theme
+                        boxShadow: "0 20px 60px rgba(0,0,0,0.18)", border: "1.5px solid var(--app-border)",
+
+                        width: 300, maxHeight: "70vh", overflowY: "auto"
+
+                      }}>
+
+                        <div style={{ fontSize: 13, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 14 }}>
+
+                          Choose Theme
+
+                        </div>
+
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
+
+                          {Object.entries(THEMES).map(([key, t]) => (
+
+                            <button key={key} onClick={() => { setAppTheme(key); setShowThemePicker(false); }}
+
+                              style={{
+
+                                border: appTheme === key ? `2.5px solid ${t.dot}` : "2px solid var(--app-border)",
+
+                                borderRadius: 12, padding: "10px 6px", background: appTheme === key ? `${t.dot}15` : "#fafafa",
+
+                                cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+
+                                fontFamily: "inherit", transition: "all 0.15s"
+
+                              }}>
+
+                              <div style={{ width: 28, height: 28, borderRadius: "50%", background: t.dot, boxShadow: `0 3px 8px ${t.dot}50` }} />
+
+                              <span style={{ fontSize: 10, fontWeight: 700, color: appTheme === key ? t.dot : "#64748b" }}>
+
+                                {t.label}
+
+                              </span>
+
+                            </button>
+
+                          ))}
+
+                        </div>
+
+
+
+                        {/* Custom Color Picker Section */}
+
+                        <div style={{ marginTop: 16, borderTop: "1.5px solid var(--app-border)", paddingTop: 14 }}>
+
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>
+
+                            🎯 Custom Color
 
                           </div>
 
-                          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
 
-                            {Object.entries(THEMES).map(([key, t]) => (
+                            <div style={{ position: "relative", flexShrink: 0 }}>
 
-                              <button key={key} onClick={() => { setAppTheme(key); setShowThemePicker(false); }}
+                              <div style={{
+
+                                width: 42, height: 42, borderRadius: 12,
+
+                                background: customColor,
+
+                                border: appTheme === "custom" ? `2.5px solid ${customColor}` : "2px solid var(--app-border)",
+
+                                boxShadow: `0 4px 12px ${customColor}40`,
+
+                                cursor: "pointer", transition: "all 0.2s",
+
+                                display: "flex", alignItems: "center", justifyContent: "center"
+
+                              }}
+
+                                onClick={() => document.getElementById("customColorInput")?.click()}
+
+                              >
+
+                                <span style={{ fontSize: 16 }}></span>
+
+                              </div>
+
+                              <input
+
+                                id="customColorInput"
+
+                                type="color"
+
+                                value={customColor}
+
+                                onChange={(e) => {
+
+                                  setCustomColor(e.target.value);
+
+                                  setAppTheme("custom");
+
+                                }}
 
                                 style={{
 
-                                  border: appTheme === key ? `2.5px solid ${t.dot}` : "2px solid var(--app-border)",
+                                  position: "absolute", top: 0, left: 0, width: 42, height: 42,
 
-                                  borderRadius: 12, padding: "10px 6px", background: appTheme === key ? `${t.dot}15` : "#fafafa",
+                                  opacity: 0, cursor: "pointer", border: "none"
 
-                                  cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+                                }}
 
-                                  fontFamily: "inherit", transition: "all 0.15s"
+                              />
 
-                                }}>
+                            </div>
 
-                                <div style={{ width: 28, height: 28, borderRadius: "50%", background: t.dot, boxShadow: `0 3px 8px ${t.dot}50` }} />
+                            <div style={{ flex: 1 }}>
 
-                                <span style={{ fontSize: 10, fontWeight: 700, color: appTheme === key ? t.dot : "#64748b" }}>
+                              <div style={{ fontSize: 12, fontWeight: 700, color: appTheme === "custom" ? customColor : "#64748b" }}>
 
-                                  {t.label}
+                                {appTheme === "custom" ? "Custom Active" : "Pick any color"}
 
-                                </span>
+                              </div>
 
-                              </button>
+                              <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
+
+                                {customColor.toUpperCase()}
+
+                              </div>
+
+                            </div>
+
+                            {appTheme === "custom" && (
+
+                              <div style={{
+
+                                width: 20, height: 20, borderRadius: "50%",
+                                background: "#22c55e", boxShadow: "0 0 6px #22c55e80",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                color: "#fff", fontSize: 12, fontWeight: 900, flexShrink: 0
+
+                              }}>✓</div>
+
+                            )}
+
+                          </div>
+
+
+
+                          {/* Quick custom color presets */}
+
+                          <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
+
+                            {["#2563eb", "#0891b2", "#059669", "#d97706", "#dc2626", "#db2777", "#7c2d12", "#4f46e5", "#0f766e", "#b91c1c"].map(c => (
+
+                              <div key={c} onClick={() => { setCustomColor(c); setAppTheme("custom"); setShowThemePicker(false); }}
+
+                                style={{
+
+                                  width: 22, height: 22, borderRadius: 6, background: c, cursor: "pointer",
+
+                                  border: customColor === c && appTheme === "custom" ? "2px solid #fff" : "2px solid transparent",
+
+                                  boxShadow: customColor === c && appTheme === "custom" ? `0 0 0 2px ${c}, 0 2px 8px ${c}50` : `0 1px 4px ${c}30`,
+
+                                  transition: "all 0.15s"
+
+                                }}
+
+                              />
 
                             ))}
 
                           </div>
 
-
-
-                          {/* Custom Color Picker Section */}
-
-                          <div style={{ marginTop: 16, borderTop: "1.5px solid var(--app-border)", paddingTop: 14 }}>
-
-                            <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>
-
-                              🎯 Custom Color
-
-                            </div>
-
-                            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-
-                              <div style={{ position: "relative", flexShrink: 0 }}>
-
-                                <div style={{
-
-                                  width: 42, height: 42, borderRadius: 12,
-
-                                  background: customColor,
-
-                                  border: appTheme === "custom" ? `2.5px solid ${customColor}` : "2px solid var(--app-border)",
-
-                                  boxShadow: `0 4px 12px ${customColor}40`,
-
-                                  cursor: "pointer", transition: "all 0.2s",
-
-                                  display: "flex", alignItems: "center", justifyContent: "center"
-
-                                }}
-
-                                  onClick={() => document.getElementById("customColorInput")?.click()}
-
-                                >
-
-                                  <span style={{ fontSize: 16 }}></span>
-
-                                </div>
-
-                                <input
-
-                                  id="customColorInput"
-
-                                  type="color"
-
-                                  value={customColor}
-
-                                  onChange={(e) => {
-
-                                    setCustomColor(e.target.value);
-
-                                    setAppTheme("custom");
-
-                                  }}
-
-                                  style={{
-
-                                    position: "absolute", top: 0, left: 0, width: 42, height: 42,
-
-                                    opacity: 0, cursor: "pointer", border: "none"
-
-                                  }}
-
-                                />
-
-                              </div>
-
-                              <div style={{ flex: 1 }}>
-
-                                <div style={{ fontSize: 12, fontWeight: 700, color: appTheme === "custom" ? customColor : "#64748b" }}>
-
-                                  {appTheme === "custom" ? "Custom Active" : "Pick any color"}
-
-                                </div>
-
-                                <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
-
-                                  {customColor.toUpperCase()}
-
-                                </div>
-
-                              </div>
-
-                              {appTheme === "custom" && (
-
-                                <div style={{
-
-                                  width: 20, height: 20, borderRadius: "50%",
-                                  background: "#22c55e", boxShadow: "0 0 6px #22c55e80",
-                                  display: "flex", alignItems: "center", justifyContent: "center",
-                                  color: "#fff", fontSize: 12, fontWeight: 900, flexShrink: 0
-
-                                }}>✓</div>
-
-                              )}
-
-                            </div>
-
-
-
-                            {/* Quick custom color presets */}
-
-                            <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
-
-                              {["#2563eb", "#0891b2", "#059669", "#d97706", "#dc2626", "#db2777", "#7c2d12", "#4f46e5", "#0f766e", "#b91c1c"].map(c => (
-
-                                <div key={c} onClick={() => { setCustomColor(c); setAppTheme("custom"); setShowThemePicker(false); }}
-
-                                  style={{
-
-                                    width: 22, height: 22, borderRadius: 6, background: c, cursor: "pointer",
-
-                                    border: customColor === c && appTheme === "custom" ? "2px solid #fff" : "2px solid transparent",
-
-                                    boxShadow: customColor === c && appTheme === "custom" ? `0 0 0 2px ${c}, 0 2px 8px ${c}50` : `0 1px 4px ${c}30`,
-
-                                    transition: "all 0.15s"
-
-                                  }}
-
-                                />
-
-                              ))}
-
-                            </div>
-
-                          </div>
-
-                        </div>
-
-                      )}
-
-                      <button onClick={() => setShowThemePicker(v => !v)}
-                        style={{
-                          width: 48, height: 48, borderRadius: "50%",
-                          background: appTheme === "custom"
-                            ? `linear-gradient(135deg, ${customColor}, ${customColor}dd)`
-                            : `linear-gradient(135deg, ${THEMES[appTheme]?.accent}, ${THEMES[appTheme]?.dot})`,
-                          border: "none", color: "#fff", fontSize: 20, cursor: "pointer",
-                          boxShadow: `0 6px 20px ${appTheme === "custom" ? customColor : (THEMES[appTheme]?.dot || "var(--app-accent)")}60`,
-                          display: "flex", alignItems: "center", justifyContent: "center",
-                          transition: "all 0.2s"
-                        }}>
-                        🎨
-                      </button>
-                      <button
-                        onClick={() => { const ph = (user?.phone || "").replace(/\D/g, ""); window.open(ph ? "https://wa.me/" + ph : "https://web.whatsapp.com/", "_blank"); }}
-                        title="Open WhatsApp"
-                        style={{
-                          width: 48, height: 48, borderRadius: "50%",
-                          background: "#25D366",
-                          border: "none", cursor: "pointer",
-                          boxShadow: "0 6px 20px rgba(37,211,102,0.6)",
-                          display: "flex", alignItems: "center", justifyContent: "center",
-                          transition: "all 0.2s", padding: 0,
-                          marginTop: 12
-                        }}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 32 32" fill="none">
-                          <path d="M16 1C7.7 1 1 7.7 1 16c0 2.7.7 5.2 2 7.4L1 31l7.9-2c2.1 1.1 4.5 1.8 7.1 1.8 8.3 0 15-6.7 15-15S24.3 1 16 1z" fill="#fff" />
-                          <path d="M16 3.5C9 3.5 3.5 9 3.5 16c0 2.5.7 4.8 1.9 6.8l.3.5-1.3 4.7 4.9-1.3.5.3C11.6 28.1 13.7 28.5 16 28.5c7 0 12.5-5.5 12.5-12.5S23 3.5 16 3.5z" fill="#25D366" />
-                          <path d="M11.5 9.5c-.3-.7-.6-.7-.9-.7h-.7c-.3 0-.7.1-1.1.5-.4.4-1.5 1.5-1.5 3.6s1.6 4.2 1.8 4.5c.2.3 3 4.7 7.4 6.4 3.7 1.4 4.4 1.1 5.2 1 .8 0 2.5-1 2.8-2 .4-1 .4-1.8.3-2-.1-.2-.4-.3-.8-.5-.4-.2-2.5-1.2-2.8-1.3-.4-.1-.6-.2-.9.2-.3.4-1 1.3-1.3 1.6-.2.3-.5.3-.8.1-.4-.2-1.6-.6-3-1.9-1.1-1-1.9-2.2-2.1-2.6-.2-.4 0-.6.2-.8.2-.2.4-.4.5-.7.2-.2.2-.4.4-.7.1-.2 0-.5-.1-.7-.2-.2-.9-2.2-1.2-3z" fill="#fff" />
-                        </svg>
-                      </button>
-                    </div>
-
-
-
-
-
-
-
-
-
-
-
-
-                    {dashTasksProj ? (
-
-                      <div style={{ display: "flex", flexDirection: "column", gap: "16px", height: "100%", marginTop: "10px" }}>
-
-                        <div>
-
-
-
-                        </div>
-
-                        <div style={{ flex: 1 }}>
-
-                          <ModernEmployeeProjectDetails
-
-                            project={dashTasksProj}
-
-                            tasks={tasks.filter(t => (t.project || t.projectId) === (dashTasksProj._id || dashTasksProj.id))}
-
-                            user={user}
-
-                            onBack={() => setDashTasksProj(null)}
-
-                            onMessageTeam={() => setActive("messaging")}
-
-                          />
-
                         </div>
 
                       </div>
 
-                    ) : (
+                    )}
 
-                      <>
+                    <button onClick={() => setShowThemePicker(v => !v)}
+                      style={{
+                        width: 48, height: 48, borderRadius: "50%",
+                        background: appTheme === "custom"
+                          ? `linear-gradient(135deg, ${customColor}, ${customColor}dd)`
+                          : `linear-gradient(135deg, ${THEMES[appTheme]?.accent}, ${THEMES[appTheme]?.dot})`,
+                        border: "none", color: "#fff", fontSize: 20, cursor: "pointer",
+                        boxShadow: `0 6px 20px ${appTheme === "custom" ? customColor : (THEMES[appTheme]?.dot || "var(--app-accent)")}60`,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        transition: "all 0.2s"
+                      }}>
+                      🎨
+                    </button>
+                    <button
+                      onClick={() => { const ph = (user?.phone || "").replace(/\D/g, ""); window.open(ph ? "https://wa.me/" + ph : "https://web.whatsapp.com/", "_blank"); }}
+                      title="Open WhatsApp"
+                      style={{
+                        width: 48, height: 48, borderRadius: "50%",
+                        background: "#25D366",
+                        border: "none", cursor: "pointer",
+                        boxShadow: "0 6px 20px rgba(37,211,102,0.6)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        transition: "all 0.2s", padding: 0,
+                        marginTop: 12
+                      }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <path d="M16 1C7.7 1 1 7.7 1 16c0 2.7.7 5.2 2 7.4L1 31l7.9-2c2.1 1.1 4.5 1.8 7.1 1.8 8.3 0 15-6.7 15-15S24.3 1 16 1z" fill="#fff" />
+                        <path d="M16 3.5C9 3.5 3.5 9 3.5 16c0 2.5.7 4.8 1.9 6.8l.3.5-1.3 4.7 4.9-1.3.5.3C11.6 28.1 13.7 28.5 16 28.5c7 0 12.5-5.5 12.5-12.5S23 3.5 16 3.5z" fill="#25D366" />
+                        <path d="M11.5 9.5c-.3-.7-.6-.7-.9-.7h-.7c-.3 0-.7.1-1.1.5-.4.4-1.5 1.5-1.5 3.6s1.6 4.2 1.8 4.5c.2.3 3 4.7 7.4 6.4 3.7 1.4 4.4 1.1 5.2 1 .8 0 2.5-1 2.8-2 .4-1 .4-1.8.3-2-.1-.2-.4-.3-.8-.5-.4-.2-2.5-1.2-2.8-1.3-.4-.1-.6-.2-.9.2-.3.4-1 1.3-1.3 1.6-.2.3-.5.3-.8.1-.4-.2-1.6-.6-3-1.9-1.1-1-1.9-2.2-2.1-2.6-.2-.4 0-.6.2-.8.2-.2.4-.4.5-.7.2-.2.2-.4.4-.7.1-.2 0-.5-.1-.7-.2-.2-.9-2.2-1.2-3z" fill="#fff" />
+                      </svg>
+                    </button>
+                  </div>
 
-                        {/* EXACT TEMPLATE LAYOUT - DYNAMIC */}
-
-                        {(() => {
-
-                          const activeProjCount = projects.filter(p => p.status === "Active" || p.status === "Pending").length;
-
-                          const pendingInvCount = invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length;
-
-                          const totalIncome = income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
-
-                          const totalInvAmt = invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").reduce((sum, i) => sum + (Number(i.grandTotal) || 0), 0);
 
 
 
-                          return (
-
-                            <div style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: 12, fontFamily: "'Nunito', sans-serif" }}>
 
 
 
-                              {/* TOP CARDS ROW */}
-
-                              <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 20 }}>
 
 
 
-                                {/* Revenue Card */}
 
-                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
 
-                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+                  {dashTasksProj ? (
 
-                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "#0097A7", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "16px", height: "100%", marginTop: "10px" }}>
 
-                                      <i className="ti ti-currency-rupee"></i>
+                      <div>
+
+
+
+                      </div>
+
+                      <div style={{ flex: 1 }}>
+
+                        <ModernEmployeeProjectDetails
+
+                          project={dashTasksProj}
+
+                          tasks={tasks.filter(t => (t.project || t.projectId) === (dashTasksProj._id || dashTasksProj.id))}
+
+                          user={user}
+
+                          onBack={() => setDashTasksProj(null)}
+
+                          onMessageTeam={() => setActive("messaging")}
+
+                        />
+
+                      </div>
+
+                    </div>
+
+                  ) : (
+
+                    <>
+
+                      {/* EXACT TEMPLATE LAYOUT - DYNAMIC */}
+
+                      {(() => {
+
+                        const activeProjCount = projects.filter(p => p.status === "Active" || p.status === "Pending").length;
+
+                        const pendingInvCount = invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length;
+
+                        const totalIncome = income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
+
+                        const totalInvAmt = invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").reduce((sum, i) => sum + (Number(i.grandTotal) || 0), 0);
+
+
+
+                        return (
+
+                          <div style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: 12, fontFamily: "'Nunito', sans-serif" }}>
+
+
+
+                            {/* TOP CARDS ROW */}
+
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 20 }}>
+
+
+
+                              {/* Revenue Card */}
+
+                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
+
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+
+                                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "#0097A7", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+
+                                    <i className="ti ti-currency-rupee"></i>
+
+                                  </div>
+
+                                  {totalIncome > 0 && (
+                                    <div style={{ background: "#e6fbf9", color: "#0097A7", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+
+                                      <i className="ti ti-trending-up"></i> Active
 
                                     </div>
-
-                                    {totalIncome > 0 && (
-                                      <div style={{ background: "#e6fbf9", color: "#0097A7", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-
-                                        <i className="ti ti-trending-up"></i> Active
-
-                                      </div>
-                                    )}
-
-                                  </div>
-
-                                  <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
-
-                                    {formatShortCurrency(totalIncome)}
-
-                                  </div>
-
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Revenue This Month</div>
+                                  )}
 
                                 </div>
 
+                                <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
 
-
-                                {/* Clients Card */}
-
-                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
-
-                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-
-                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
-
-                                      <i className="ti ti-users"></i>
-
-                                    </div>
-
-                                    {clients.length > 0 && (
-                                      <div style={{ background: "#dcfce7", color: "#166534", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-
-                                        <i className="ti ti-trending-up"></i> {clients.filter(c => (c.status || "").toLowerCase() === "active").length} active
-
-                                      </div>
-                                    )}
-
-                                  </div>
-
-                                  <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
-
-                                    {clients.length}
-
-                                  </div>
-
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Total Clients</div>
-
-                                  <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} active</div>
+                                  {formatShortCurrency(totalIncome)}
 
                                 </div>
 
-
-
-                                {/* Projects Card */}
-
-                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
-
-                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-
-                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37,99,235,0.1)", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
-
-                                      <i className="ti ti-folder"></i>
-
-                                    </div>
-
-                                    {activeProjCount > 0 && (
-                                      <div style={{ background: "#f1f5f9", color: "#64748b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-
-                                        Active
-
-                                      </div>
-                                    )}
-
-                                  </div>
-
-                                  <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
-
-                                    {activeProjCount}
-
-                                  </div>
-
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Active Projects</div>
-
-                                  <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>
-                                    {(() => {
-                                      const now = new Date();
-                                      const weekAhead = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-                                      const dueThisWeek = projects.filter(p => p.deadline && new Date(p.deadline) >= now && new Date(p.deadline) <= weekAhead).length;
-                                      return dueThisWeek > 0 ? `${dueThisWeek} due this week` : "No deadlines this week";
-                                    })()}
-                                  </div>
-
-                                </div>
-
-
-
-                                {/* Invoices Card */}
-
-                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
-
-                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-
-                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
-
-                                      <i className="ti ti-file-invoice"></i>
-
-                                    </div>
-
-                                    {pendingInvCount > 0 && (
-                                      <div style={{ background: "#fef2f2", color: "#991b1b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-
-                                        <i className="ti ti-trending-down"></i> {invoices.filter(i => (i.status || "").toLowerCase() === "overdue").length > 0 ? "overdue" : "pending"}
-
-                                      </div>
-                                    )}
-
-                                  </div>
-
-                                  <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
-
-                                    {pendingInvCount}
-
-                                  </div>
-
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Unpaid Invoices</div>
-
-                                  <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>{formatShortCurrency(totalInvAmt)} outstanding</div>
-
-                                </div>
-
-
-
-                                {/* Employees Card */}
-
-                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
-
-                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-
-                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(124,58,237,0.1)", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
-
-                                      <i className="ti ti-user-circle"></i>
-
-                                    </div>
-
-                                    {employees.length > 0 && (
-                                      <div style={{ background: "#f3e8ff", color: "#6b21a8", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-
-                                        <i className="ti ti-trending-up"></i> {employees.length}
-
-                                      </div>
-                                    )}
-
-                                  </div>
-
-                                  <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
-
-                                    {employees.length}
-
-                                  </div>
-
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Employees</div>
-
-                                  <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>
-                                    {employees.filter(e => (e.status || "").toLowerCase() === "active").length} active staff
-                                  </div>
-
-                                </div>
-
-
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Revenue This Month</div>
 
                               </div>
 
 
 
-                              {/* MAIN CONTENT AREA */}
+                              {/* Clients Card */}
 
-                              <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "start" }}>
+                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
 
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
 
+                                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
 
-                                {/* LEFT COLUMN */}
-
-                                <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-
-
-
-                                  {/* Total Revenue Bar Chart Placeholder */}
-
-                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-
-                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
-
-                                      <div>
-
-                                        <div style={{ fontSize: 13, color: "rgba(15,28,46,0.6)", fontWeight: 700, marginBottom: 4 }}>Total Revenue</div>
-
-                                        <div style={{ fontSize: 24, fontWeight: 800, color: "#0f1c2e" }}>{formatShortCurrency(totalIncome)} <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(15,28,46,0.4)" }}>this year</span></div>
-
-                                      </div>
-
-                                      <div style={{ display: "flex", gap: 16, fontSize: 12, fontWeight: 700 }}>
-
-                                        <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(15,28,46,0.8)" }}>
-
-                                          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--app-accent)" }}></div> Revenue
-
-                                        </div>
-
-                                        <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(15,28,46,0.8)" }}>
-
-                                          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(var(--app-accent-rgb,0,188,212),0.2)" }}></div> Expenses
-
-                                        </div>
-
-                                      </div>
-
-                                    </div>
-
-                                    <div style={{ height: 180, display: "flex", alignItems: "flex-end", gap: 12, paddingBottom: 10 }}>
-
-                                      {totalIncome > 0 ? (
-                                        [30, 45, 35, 60, 40, 75].map((h, i) => (
-
-                                          <div key={i} style={{ flex: 1, display: "flex", gap: 4, height: "100%", alignItems: "flex-end", padding: "0 4px" }}>
-
-                                            <div style={{ flex: 1, background: "var(--app-accent)", height: `${h}%`, borderRadius: "4px 4px 0 0" }}></div>
-
-                                            <div style={{ flex: 1, background: "rgba(var(--app-accent-rgb,0,188,212),0.2)", height: `${h * 0.4}%`, borderRadius: "4px 4px 0 0" }}></div>
-
-                                          </div>
-
-                                        ))
-                                      ) : (
-                                        [0, 0, 0, 0, 0, 0].map((h, i) => (
-
-                                          <div key={i} style={{ flex: 1, display: "flex", gap: 4, height: "100%", alignItems: "flex-end", padding: "0 4px" }}>
-
-                                            <div style={{ flex: 1, background: "rgba(15,28,46,0.06)", height: "2px", borderRadius: "4px 4px 0 0" }}></div>
-
-                                            <div style={{ flex: 1, background: "rgba(15,28,46,0.03)", height: "2px", borderRadius: "4px 4px 0 0" }}></div>
-
-                                          </div>
-
-                                        ))
-                                      )}
-
-                                    </div>
-
-                                    <div style={{ display: "flex", justifyContent: "space-between", padding: "0 10px", fontSize: 11, color: "rgba(15,28,46,0.4)", fontWeight: 700 }}>
-
-                                      <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
-
-                                    </div>
+                                    <i className="ti ti-users"></i>
 
                                   </div>
 
-                                  {/* Active Projects (moved directly under the chart, no gap) */}
+                                  {clients.length > 0 && (
+                                    <div style={{ background: "#dcfce7", color: "#166534", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
 
-                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-
-                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-
-                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
-
-                                        <i className="ti ti-folder" style={{ color: "var(--app-accent)" }}></i> Active Projects
-
-                                      </div>
-
-                                      <div onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)", cursor: "pointer" }}>
-
-                                        View All
-
-                                      </div>
+                                      <i className="ti ti-trending-up"></i> {clients.filter(c => (c.status || "").toLowerCase() === "active").length} active
 
                                     </div>
-
-                                    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-                                      {projects.filter(p => p.status === "Active" || p.status === "Pending").slice(0, 5).map((p, idx) => {
-
-                                        const colors = ["var(--app-accent)", "var(--app-accent)", "var(--app-accent)", "var(--app-accent)", "var(--app-accent)"];
-
-                                        const bColor = colors[idx % colors.length];
-
-                                        const progress = p.progress || 25;
-
-                                        const barColor = progress > 70 ? "#16a34a" : progress > 40 ? "#f59e0b" : "#dc2626";
-
-                                        const badgeText = "IN PROGRESS";
-
-                                        const badgeColor = "var(--app-accent)";
-
-                                        return (
-
-                                          <div key={p._id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 16, borderBottom: idx === 4 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
-
-                                            <div style={{ display: "flex", gap: 12 }}>
-
-                                              <div style={{ width: 3, background: bColor, borderRadius: 2 }}></div>
-
-                                              <div>
-
-                                                <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{p.name || p.title}</div>
-
-                                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{clients.find(c => c._id === p.clientId)?.clientName || "Internal"} Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
-
-                                              </div>
-
-                                            </div>
-
-                                            <div style={{ width: 100, textAlign: "right" }}>
-
-                                              <div style={{ display: "inline-block", color: badgeColor, background: `${badgeColor}15`, padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800, marginBottom: 8, letterSpacing: "0.5px" }}>
-
-                                                {badgeText}
-
-                                              </div>
-
-                                              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-
-                                                <div style={{ flex: 1, height: 4, background: "rgba(0,0,0,0.06)", borderRadius: 2 }}>
-
-                                                  <div style={{ width: `${progress}%`, height: "100%", background: barColor, borderRadius: 2 }}></div>
-
-                                                </div>
-
-                                                <div style={{ fontSize: 11, fontWeight: 800, color: barColor }}>{progress}%</div>
-
-                                              </div>
-
-                                            </div>
-
-                                          </div>
-
-                                        );
-
-                                      })}
-
-                                      {projects.filter(p => p.status === "Active" || p.status === "Pending").length === 0 && (
-
-                                        <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No active projects</div>
-
-                                      )}
-
-                                    </div>
-
-                                  </div>
+                                  )}
 
                                 </div>
 
-                                {/* RIGHT COLUMN */}
+                                <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
 
-                                <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+                                  {clients.length}
 
+                                </div>
 
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Total Clients</div>
 
-                                  {/* Quick Access */}
+                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} active</div>
 
-                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-
-                                    <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
-
-                                      <i className="ti ti-bolt" style={{ color: "#0097A7" }}></i> Quick Access
-
-                                    </div>
-
-                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-
-                                      {[
-
-                                        { icon: "ti-users", color: "#0097A7", bg: "rgba(0,188,212,0.1)", label: "Clients", sub: `${clients.length} total`, act: "clients" },
-
-                                        { icon: "ti-user-circle", color: "#7c3aed", bg: "rgba(124,58,237,0.1)", label: "Employees", sub: `${employees.length} staff`, act: "employees" },
-
-                                        { icon: "ti-file-invoice", color: "#16a34a", bg: "rgba(22,163,74,0.1)", label: "Invoices", sub: `${pendingInvCount} unpaid`, act: "invoices" },
-
-                                        { icon: "ti-receipt", color: "#2563eb", bg: "rgba(37,99,235,0.1)", label: "Quotations", sub: "Builder", act: "quotations" },
-
-                                        { icon: "ti-report-money", color: "#d97706", bg: "rgba(217,119,6,0.1)", label: "Proposals", sub: "Creator", act: "proposals" },
-
-                                        { icon: "ti-template", color: "#db2777", bg: "rgba(219,39,119,0.1)", label: "Templates", sub: "Designer", act: "templates" },
-
-                                        { icon: "ti-messages", color: "#0097A7", bg: "rgba(0,188,212,0.1)", label: "Messages", sub: "Internal", act: "messaging" },
-
-                                        { icon: "ti-world", color: "#16a34a", bg: "rgba(22,163,74,0.1)", label: "Client Portal", sub: "External", act: "clients" },
-
-                                        { icon: "ti-wallet", color: "#2563eb", bg: "rgba(37,99,235,0.1)", label: "Accounts", sub: "Income/Exp", act: "accounts" },
+                              </div>
 
 
 
-                                      ].map((q, i) => (
-                                        <div key={i} onClick={() => setActive(q.act)} style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderRadius: 12, border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s" }}>
-                                          <div style={{ width: 34, height: 34, borderRadius: 10, background: q.bg, color: q.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>
-                                            <i className={`ti ${q.icon}`}></i>
-                                          </div>
-                                          <div>
-                                            <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>{q.label}</div>
-                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{q.sub}</div>
-                                          </div>
-                                        </div>
-                                      ))}
-                                      <div
-                                        onClick={() => { const ph = (user?.phone || "").replace(/\D/g, ""); window.open(ph ? "https://wa.me/" + ph : "https://web.whatsapp.com/", "_blank"); }}
-                                        style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderRadius: 12, border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s" }}
-                                        onMouseEnter={e => e.currentTarget.style.background = "rgba(37,211,102,0.06)"}
-                                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                                      >
-                                        <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(37,211,102,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
-                                          💬
-                                        </div>
-                                        <div>
-                                          <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>WhatsApp</div>
-                                          <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>Open Chat</div>
-                                        </div>
-                                      </div>                              </div>
-                                  </div>
+                              {/* Projects Card */}
 
-                                  {/* Team Section */}
+                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
 
-                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
 
-                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37,99,235,0.1)", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
 
-                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
-
-                                        <i className="ti ti-user-circle" style={{ color: "#0097A7" }}></i> Team
-
-                                      </div>
-
-                                      <div onClick={() => setActive("employees")} style={{ fontSize: 13, fontWeight: 700, color: "#0097A7", cursor: "pointer" }}>
-
-                                        View All
-
-                                      </div>
-
-                                    </div>
-
-                                    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-                                      {employees.slice(0, 3).map(e => (
-
-                                        <div key={e._id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-
-                                          <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,  var(--app-accent, var(--app-accent, #00BCD4)), #0097A7)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800 }}>
-
-                                            {(e.name || "E")[0].toUpperCase()}
-
-                                          </div>
-
-                                          <div style={{ flex: 1 }}>
-
-                                            <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{e.name}</div>
-
-                                            <div style={{ fontSize: 12, color: "rgba(15,28,46,0.5)" }}>{e.role || "Employee"}</div>
-
-                                          </div>
-
-                                          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#16a34a" }}></div>
-
-                                        </div>
-
-                                      ))}
-
-                                      {employees.length === 0 && <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center" }}>No team members</div>}
-
-                                    </div>
+                                    <i className="ti ti-folder"></i>
 
                                   </div>
 
+                                  {activeProjCount > 0 && (
+                                    <div style={{ background: "#f1f5f9", color: "#64748b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
 
+                                      Active
 
+                                    </div>
+                                  )}
+
+                                </div>
+
+                                <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
+
+                                  {activeProjCount}
+
+                                </div>
+
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Active Projects</div>
+
+                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>
+                                  {(() => {
+                                    const now = new Date();
+                                    const weekAhead = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+                                    const dueThisWeek = projects.filter(p => p.deadline && new Date(p.deadline) >= now && new Date(p.deadline) <= weekAhead).length;
+                                    return dueThisWeek > 0 ? `${dueThisWeek} due this week` : "No deadlines this week";
+                                  })()}
                                 </div>
 
                               </div>
 
 
 
-                              {/* SECONDARY CONTENT AREA */}
+                              {/* Invoices Card */}
 
-                              <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "start", marginTop: 0 }}>
+                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
+
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+
+                                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+
+                                    <i className="ti ti-file-invoice"></i>
+
+                                  </div>
+
+                                  {pendingInvCount > 0 && (
+                                    <div style={{ background: "#fef2f2", color: "#991b1b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+
+                                      <i className="ti ti-trending-down"></i> {invoices.filter(i => (i.status || "").toLowerCase() === "overdue").length > 0 ? "overdue" : "pending"}
+
+                                    </div>
+                                  )}
+
+                                </div>
+
+                                <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
+
+                                  {pendingInvCount}
+
+                                </div>
+
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Unpaid Invoices</div>
+
+                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>{formatShortCurrency(totalInvAmt)} outstanding</div>
+
+                              </div>
 
 
-                                {/* LEFT COLUMN 2 */}
-                                <div style={{ display: "flex", flexDirection: "column", gap: 8, alignSelf: "start" }}>
+
+                              {/* Employees Card */}
+
+                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
+
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+
+                                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(124,58,237,0.1)", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+
+                                    <i className="ti ti-user-circle"></i>
+
+                                  </div>
+
+                                  {employees.length > 0 && (
+                                    <div style={{ background: "#f3e8ff", color: "#6b21a8", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+
+                                      <i className="ti ti-trending-up"></i> {employees.length}
+
+                                    </div>
+                                  )}
+
+                                </div>
+
+                                <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
+
+                                  {employees.length}
+
+                                </div>
+
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Employees</div>
+
+                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>
+                                  {employees.filter(e => (e.status || "").toLowerCase() === "active").length} active staff
+                                </div>
+
+                              </div>
 
 
 
-                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+                            </div>
 
-                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
 
-                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
 
-                                        <i className="ti ti-user-x" style={{ color: "var(--app-accent)" }}></i> Leave Requests
+                            {/* MAIN CONTENT AREA */}
 
-                                        <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length} PENDING</span>
+                            <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "start" }}>
+
+
+
+                              {/* LEFT COLUMN */}
+
+                              <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+
+
+
+                                {/* Total Revenue Bar Chart Placeholder */}
+
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
+
+                                    <div>
+
+                                      <div style={{ fontSize: 13, color: "rgba(15,28,46,0.6)", fontWeight: 700, marginBottom: 4 }}>Total Revenue</div>
+
+                                      <div style={{ fontSize: 24, fontWeight: 800, color: "#0f1c2e" }}>{formatShortCurrency(totalIncome)} <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(15,28,46,0.4)" }}>this year</span></div>
+
+                                    </div>
+
+                                    <div style={{ display: "flex", gap: 16, fontSize: 12, fontWeight: 700 }}>
+
+                                      <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(15,28,46,0.8)" }}>
+
+                                        <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--app-accent)" }}></div> Revenue
 
                                       </div>
 
-                                      <div style={{ fontSize: 13, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer" }}>
+                                      <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(15,28,46,0.8)" }}>
 
-                                        HR Panel
+                                        <div style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(var(--app-accent-rgb,0,188,212),0.2)" }}></div> Expenses
 
                                       </div>
 
                                     </div>
 
-                                    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                                  </div>
 
-                                      {pendingLeaves.map((l, i) => {
+                                  <div style={{ height: 180, display: "flex", alignItems: "flex-end", gap: 12, paddingBottom: 10 }}>
 
-                                        const initials = l.employeeName ? l.employeeName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : "EE";
+                                    {totalIncome > 0 ? (
+                                      [30, 45, 35, 60, 40, 75].map((h, i) => (
 
-                                        const colors = ["#f59e0b", "#a855f7", "#0ea5e9", "#ec4899", "#22c55e"];
+                                        <div key={i} style={{ flex: 1, display: "flex", gap: 4, height: "100%", alignItems: "flex-end", padding: "0 4px" }}>
 
-                                        const bg = colors[i % colors.length];
+                                          <div style={{ flex: 1, background: "var(--app-accent)", height: `${h}%`, borderRadius: "4px 4px 0 0" }}></div>
 
-                                        const getDuration = () => {
+                                          <div style={{ flex: 1, background: "rgba(var(--app-accent-rgb,0,188,212),0.2)", height: `${h * 0.4}%`, borderRadius: "4px 4px 0 0" }}></div>
 
-                                          if (!l.from || !l.to) return "";
+                                        </div>
 
-                                          try {
+                                      ))
+                                    ) : (
+                                      [0, 0, 0, 0, 0, 0].map((h, i) => (
 
-                                            const d1 = new Date(l.from);
+                                        <div key={i} style={{ flex: 1, display: "flex", gap: 4, height: "100%", alignItems: "flex-end", padding: "0 4px" }}>
 
-                                            const d2 = new Date(l.to);
+                                          <div style={{ flex: 1, background: "rgba(15,28,46,0.06)", height: "2px", borderRadius: "4px 4px 0 0" }}></div>
 
-                                            if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return "";
+                                          <div style={{ flex: 1, background: "rgba(15,28,46,0.03)", height: "2px", borderRadius: "4px 4px 0 0" }}></div>
 
-                                            const diffTime = Math.abs(d2 - d1);
+                                        </div>
 
-                                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                                      ))
+                                    )}
 
-                                            return ` (${diffDays}d)`;
+                                  </div>
 
-                                          } catch (err) { return ""; }
+                                  <div style={{ display: "flex", justifyContent: "space-between", padding: "0 10px", fontSize: 11, color: "rgba(15,28,46,0.4)", fontWeight: 700 }}>
 
-                                        };
-
-                                        const detail = `${l.type || "Leave"} ${l.from} - ${l.to}${getDuration()}`;
-
-
-
-                                        return (
-
-                                          <div key={l._id || i} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: 16, borderBottom: i === pendingLeaves.length - 1 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
-
-                                            <div style={{ width: 36, height: 36, borderRadius: "50%", background: bg, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>
-
-                                              {initials}
-
-                                            </div>
-
-                                            <div style={{ flex: 1 }}>
-
-                                              <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{l.employeeName}</div>
-
-                                              <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{detail}</div>
-
-                                            </div>
-
-                                            <div style={{ display: "flex", gap: 8 }}>
-
-                                              <button onClick={() => handleApproveLeave(l._id)} style={{ background: "#dcfce7", color: "#166534", border: "none", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
-
-                                                <i className="ti ti-check"></i> Approve
-
-                                              </button>
-
-                                              <button onClick={() => handleRejectLeave(l._id)} style={{ background: "#fef2f2", color: "#dc2626", border: "none", padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
-
-                                                <i className="ti ti-x"></i>
-
-                                              </button>
-
-                                            </div>
-
-                                          </div>
-
-                                        );
-
-                                      })}
-
-                                      {pendingLeaves.length === 0 && (
-
-                                        <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No pending leave requests.</div>
-
-                                      )}
-
-                                    </div>
+                                    <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
 
                                   </div>
 
                                 </div>
 
+                                {/* Active Projects (moved directly under the chart, no gap) */}
 
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
 
-                                {/* RIGHT COLUMN 2 */}
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
 
-                                <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+                                    <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
 
-
-
-                                  {/* Overdue Tasks */}
-
-                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-
-                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-
-                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
-
-                                        <i className="ti ti-alert-circle" style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))" }}></i> Overdue Tasks
-
-                                        <span style={{ background: "#fef2f2", color: "#dc2626", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>
-
-                                          {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).length}
-
-                                        </span>
-
-                                      </div>
-
-                                      <div onClick={() => { setSidebarOverride("dashboard"); setActive("tasks"); }} style={{ fontSize: 13, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer" }}>
-
-                                        All Tasks
-
-                                      </div>
+                                      <i className="ti ti-folder" style={{ color: "var(--app-accent)" }}></i> Active Projects
 
                                     </div>
 
-                                    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                                    <div onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)", cursor: "pointer" }}>
 
-                                      {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).slice(0, 5).map((t, idx) => (
-
-                                        <div key={t._id} style={{ display: "flex", alignItems: "flex-start", gap: 12, paddingBottom: 16, borderBottom: idx === 4 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
-
-                                          <input type="checkbox" style={{ marginTop: 2, accentColor: " var(--app-accent, var(--app-accent, #00BCD4))" }} />
-
-                                          <div style={{ flex: 1 }}>
-
-                                            <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e", marginBottom: 2 }}>{t.title}</div>
-
-                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{employees.find(e => e._id === t.assignee)?.name || "Unassigned"} Due {t.deadline ? new Date(t.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
-
-                                          </div>
-
-                                          <div style={{ background: "#fef2f2", color: "#dc2626", padding: "4px 8px", borderRadius: 6, fontSize: 9, fontWeight: 800, letterSpacing: "0.5px" }}>HIGH</div>
-
-                                        </div>
-
-                                      ))}
-
-                                      {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).length === 0 && <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", padding: "10px 0" }}>No overdue tasks.</div>}
+                                      View All
 
                                     </div>
 
                                   </div>
 
-                                  {/* Doc Requests (Dynamic from backend) */}
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
-                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+                                    {projects.filter(p => p.status === "Active" || p.status === "Pending").slice(0, 5).map((p, idx) => {
 
-                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                                      const colors = ["var(--app-accent)", "var(--app-accent)", "var(--app-accent)", "var(--app-accent)", "var(--app-accent)"];
 
-                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+                                      const bColor = colors[idx % colors.length];
 
-                                        <i className="ti ti-file-description" style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))" }}></i> Doc Requests
+                                      const progress = p.progress || 25;
 
-                                        <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{employeeDocs.filter(d => d.status === "PENDING").length} PENDING</span>
+                                      const barColor = progress > 70 ? "#16a34a" : progress > 40 ? "#f59e0b" : "#dc2626";
 
-                                      </div>
+                                      const badgeText = "IN PROGRESS";
 
-                                      <div style={{ fontSize: 13, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer" }}>
+                                      const badgeColor = "var(--app-accent)";
 
-                                        Manage
+                                      return (
 
-                                      </div>
+                                        <div key={p._id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 16, borderBottom: idx === 4 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
 
-                                    </div>
+                                          <div style={{ display: "flex", gap: 12 }}>
 
-                                    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                                            <div style={{ width: 3, background: bColor, borderRadius: 2 }}></div>
 
-                                      {employeeDocs.map((d, i) => {
+                                            <div>
 
-                                        const docName = d.docType === "pan" ? "PAN Card" : d.docType === "aadhaar" ? "Aadhaar Card" : d.docType === "passbook" ? "Bank Passbook" : d.docType === "itr" ? "ITR Document" : d.docType;
+                                              <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{p.name || p.title}</div>
 
-                                        const styleConfig =
-
-                                          d.docType === "pan" ? { bg: "#f1f5f9", c: "#0ea5e9" } :
-
-                                            d.docType === "passbook" ? { bg: "#f3e8ff", c: "#a855f7" } :
-
-                                              d.docType === "aadhaar" ? { bg: "#dcfce7", c: "#22c55e" } :
-
-                                                { bg: "#fef3c7", c: "#d97706" };
-
-
-
-                                        const isPending = d.status === "PENDING";
-
-                                        const statusColor = d.status === "APPROVED" ? "#16a34a" : d.status === "REJECTED" ? "#dc2626" : "#ea580c";
-
-
-
-                                        return (
-
-                                          <div key={d._id || i} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: 16, borderBottom: i === employeeDocs.length - 1 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
-
-                                            <div style={{ width: 32, height: 32, borderRadius: 8, background: styleConfig.bg, color: styleConfig.c, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>
-
-                                              <i className="ti ti-file-info"></i>
+                                              <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{clients.find(c => c._id === p.clientId)?.clientName || "Internal"} Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
 
                                             </div>
 
-                                            <div style={{ flex: 1 }}>
+                                          </div>
 
-                                              <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>{docName}</div>
+                                          <div style={{ width: 100, textAlign: "right" }}>
 
-                                              <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{d.employeeName}</div>
+                                            <div style={{ display: "inline-block", color: badgeColor, background: `${badgeColor}15`, padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800, marginBottom: 8, letterSpacing: "0.5px" }}>
+
+                                              {badgeText}
 
                                             </div>
 
                                             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
 
-                                              <a href={d.url} target="_blank" rel="noreferrer" style={{ background: "#f1f5f9", color: "#64748b", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
+                                              <div style={{ flex: 1, height: 4, background: "rgba(0,0,0,0.06)", borderRadius: 2 }}>
 
-                                                <i className="ti ti-eye"></i> View
+                                                <div style={{ width: `${progress}%`, height: "100%", background: barColor, borderRadius: 2 }}></div>
 
-                                              </a>
+                                              </div>
 
-                                              {isPending ? (
-
-                                                <>
-
-                                                  <button onClick={() => handleApproveDoc(d._id)} style={{ background: "#dcfce7", color: "#166534", border: "none", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
-
-                                                    Approve
-
-                                                  </button>
-
-                                                  <button onClick={() => handleRejectDoc(d._id)} style={{ background: "#fef2f2", color: "#dc2626", border: "none", padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
-
-                                                    Reject
-
-                                                  </button>
-
-                                                </>
-
-                                              ) : (
-
-                                                <div style={{ color: statusColor, fontSize: 10, fontWeight: 800, letterSpacing: "0.5px" }}>{d.status}</div>
-
-                                              )}
+                                              <div style={{ fontSize: 11, fontWeight: 800, color: barColor }}>{progress}%</div>
 
                                             </div>
 
                                           </div>
 
-                                        );
+                                        </div>
 
-                                      })}
+                                      );
 
-                                      {employeeDocs.length === 0 && (
+                                    })}
 
-                                        <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No document requests.</div>
+                                    {projects.filter(p => p.status === "Active" || p.status === "Pending").length === 0 && (
 
-                                      )}
+                                      <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No active projects</div>
+
+                                    )}
+
+                                  </div>
+
+                                </div>
+
+                              </div>
+
+                              {/* RIGHT COLUMN */}
+
+                              <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+
+
+
+                                {/* Quick Access */}
+
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+
+                                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
+
+                                    <i className="ti ti-bolt" style={{ color: "#0097A7" }}></i> Quick Access
+
+                                  </div>
+
+                                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+
+                                    {[
+
+                                      { icon: "ti-users", color: "#0097A7", bg: "rgba(0,188,212,0.1)", label: "Clients", sub: `${clients.length} total`, act: "clients" },
+
+                                      { icon: "ti-user-circle", color: "#7c3aed", bg: "rgba(124,58,237,0.1)", label: "Employees", sub: `${employees.length} staff`, act: "employees" },
+
+                                      { icon: "ti-file-invoice", color: "#16a34a", bg: "rgba(22,163,74,0.1)", label: "Invoices", sub: `${pendingInvCount} unpaid`, act: "invoices" },
+
+                                      { icon: "ti-receipt", color: "#2563eb", bg: "rgba(37,99,235,0.1)", label: "Quotations", sub: "Builder", act: "quotations" },
+
+                                      { icon: "ti-report-money", color: "#d97706", bg: "rgba(217,119,6,0.1)", label: "Proposals", sub: "Creator", act: "proposals" },
+
+                                      { icon: "ti-template", color: "#db2777", bg: "rgba(219,39,119,0.1)", label: "Templates", sub: "Designer", act: "templates" },
+
+                                      { icon: "ti-messages", color: "#0097A7", bg: "rgba(0,188,212,0.1)", label: "Messages", sub: "Internal", act: "messaging" },
+
+                                      { icon: "ti-world", color: "#16a34a", bg: "rgba(22,163,74,0.1)", label: "Client Portal", sub: "External", act: "clients" },
+
+                                      { icon: "ti-wallet", color: "#2563eb", bg: "rgba(37,99,235,0.1)", label: "Accounts", sub: "Income/Exp", act: "accounts" },
+
+
+
+                                    ].map((q, i) => (
+                                      <div key={i} onClick={() => setActive(q.act)} style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderRadius: 12, border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s" }}>
+                                        <div style={{ width: 34, height: 34, borderRadius: 10, background: q.bg, color: q.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>
+                                          <i className={`ti ${q.icon}`}></i>
+                                        </div>
+                                        <div>
+                                          <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>{q.label}</div>
+                                          <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{q.sub}</div>
+                                        </div>
+                                      </div>
+                                    ))}
+                                    <div
+                                      onClick={() => { const ph = (user?.phone || "").replace(/\D/g, ""); window.open(ph ? "https://wa.me/" + ph : "https://web.whatsapp.com/", "_blank"); }}
+                                      style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderRadius: 12, border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s" }}
+                                      onMouseEnter={e => e.currentTarget.style.background = "rgba(37,211,102,0.06)"}
+                                      onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                                    >
+                                      <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(37,211,102,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                                        💬
+                                      </div>
+                                      <div>
+                                        <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>WhatsApp</div>
+                                        <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>Open Chat</div>
+                                      </div>
+                                    </div>                              </div>
+                                </div>
+
+                                {/* Team Section */}
+
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+
+                                    <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+
+                                      <i className="ti ti-user-circle" style={{ color: "#0097A7" }}></i> Team
 
                                     </div>
+
+                                    <div onClick={() => setActive("employees")} style={{ fontSize: 13, fontWeight: 700, color: "#0097A7", cursor: "pointer" }}>
+
+                                      View All
+
+                                    </div>
+
+                                  </div>
+
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+                                    {employees.slice(0, 3).map(e => (
+
+                                      <div key={e._id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+
+                                        <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,  var(--app-accent, var(--app-accent, #00BCD4)), #0097A7)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800 }}>
+
+                                          {(e.name || "E")[0].toUpperCase()}
+
+                                        </div>
+
+                                        <div style={{ flex: 1 }}>
+
+                                          <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{e.name}</div>
+
+                                          <div style={{ fontSize: 12, color: "rgba(15,28,46,0.5)" }}>{e.role || "Employee"}</div>
+
+                                        </div>
+
+                                        <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#16a34a" }}></div>
+
+                                      </div>
+
+                                    ))}
+
+                                    {employees.length === 0 && <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center" }}>No team members</div>}
+
+                                  </div>
+
+                                </div>
+
+
+
+                              </div>
+
+                            </div>
+
+
+
+                            {/* SECONDARY CONTENT AREA */}
+
+                            <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "start", marginTop: 0 }}>
+
+
+                              {/* LEFT COLUMN 2 */}
+                              <div style={{ display: "flex", flexDirection: "column", gap: 8, alignSelf: "start" }}>
+
+
+
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+
+                                    <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+
+                                      <i className="ti ti-user-x" style={{ color: "var(--app-accent)" }}></i> Leave Requests
+
+                                      <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length} PENDING</span>
+
+                                    </div>
+
+                                    <div style={{ fontSize: 13, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer" }}>
+
+                                      HR Panel
+
+                                    </div>
+
+                                  </div>
+
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+                                    {pendingLeaves.map((l, i) => {
+
+                                      const initials = l.employeeName ? l.employeeName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : "EE";
+
+                                      const colors = ["#f59e0b", "#a855f7", "#0ea5e9", "#ec4899", "#22c55e"];
+
+                                      const bg = colors[i % colors.length];
+
+                                      const getDuration = () => {
+
+                                        if (!l.from || !l.to) return "";
+
+                                        try {
+
+                                          const d1 = new Date(l.from);
+
+                                          const d2 = new Date(l.to);
+
+                                          if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return "";
+
+                                          const diffTime = Math.abs(d2 - d1);
+
+                                          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+                                          return ` (${diffDays}d)`;
+
+                                        } catch (err) { return ""; }
+
+                                      };
+
+                                      const detail = `${l.type || "Leave"} ${l.from} - ${l.to}${getDuration()}`;
+
+
+
+                                      return (
+
+                                        <div key={l._id || i} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: 16, borderBottom: i === pendingLeaves.length - 1 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
+
+                                          <div style={{ width: 36, height: 36, borderRadius: "50%", background: bg, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>
+
+                                            {initials}
+
+                                          </div>
+
+                                          <div style={{ flex: 1 }}>
+
+                                            <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{l.employeeName}</div>
+
+                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{detail}</div>
+
+                                          </div>
+
+                                          <div style={{ display: "flex", gap: 8 }}>
+
+                                            <button onClick={() => handleApproveLeave(l._id)} style={{ background: "#dcfce7", color: "#166534", border: "none", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+
+                                              <i className="ti ti-check"></i> Approve
+
+                                            </button>
+
+                                            <button onClick={() => handleRejectLeave(l._id)} style={{ background: "#fef2f2", color: "#dc2626", border: "none", padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+
+                                              <i className="ti ti-x"></i>
+
+                                            </button>
+
+                                          </div>
+
+                                        </div>
+
+                                      );
+
+                                    })}
+
+                                    {pendingLeaves.length === 0 && (
+
+                                      <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No pending leave requests.</div>
+
+                                    )}
+
+                                  </div>
+
+                                </div>
+
+                              </div>
+
+
+
+                              {/* RIGHT COLUMN 2 */}
+
+                              <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+
+
+
+                                {/* Overdue Tasks */}
+
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+
+                                    <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+
+                                      <i className="ti ti-alert-circle" style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))" }}></i> Overdue Tasks
+
+                                      <span style={{ background: "#fef2f2", color: "#dc2626", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>
+
+                                        {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).length}
+
+                                      </span>
+
+                                    </div>
+
+                                    <div onClick={() => { setSidebarOverride("dashboard"); setActive("tasks"); }} style={{ fontSize: 13, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer" }}>
+
+                                      All Tasks
+
+                                    </div>
+
+                                  </div>
+
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+                                    {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).slice(0, 5).map((t, idx) => (
+
+                                      <div key={t._id} style={{ display: "flex", alignItems: "flex-start", gap: 12, paddingBottom: 16, borderBottom: idx === 4 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
+
+                                        <input type="checkbox" style={{ marginTop: 2, accentColor: " var(--app-accent, var(--app-accent, #00BCD4))" }} />
+
+                                        <div style={{ flex: 1 }}>
+
+                                          <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e", marginBottom: 2 }}>{t.title}</div>
+
+                                          <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{employees.find(e => e._id === t.assignee)?.name || "Unassigned"} Due {t.deadline ? new Date(t.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
+
+                                        </div>
+
+                                        <div style={{ background: "#fef2f2", color: "#dc2626", padding: "4px 8px", borderRadius: 6, fontSize: 9, fontWeight: 800, letterSpacing: "0.5px" }}>HIGH</div>
+
+                                      </div>
+
+                                    ))}
+
+                                    {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).length === 0 && <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", padding: "10px 0" }}>No overdue tasks.</div>}
+
+                                  </div>
+
+                                </div>
+
+                                {/* Doc Requests (Dynamic from backend) */}
+
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+
+                                    <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+
+                                      <i className="ti ti-file-description" style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))" }}></i> Doc Requests
+
+                                      <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{employeeDocs.filter(d => d.status === "PENDING").length} PENDING</span>
+
+                                    </div>
+
+                                    <div style={{ fontSize: 13, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))", cursor: "pointer" }}>
+
+                                      Manage
+
+                                    </div>
+
+                                  </div>
+
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+                                    {employeeDocs.map((d, i) => {
+
+                                      const docName = d.docType === "pan" ? "PAN Card" : d.docType === "aadhaar" ? "Aadhaar Card" : d.docType === "passbook" ? "Bank Passbook" : d.docType === "itr" ? "ITR Document" : d.docType;
+
+                                      const styleConfig =
+
+                                        d.docType === "pan" ? { bg: "#f1f5f9", c: "#0ea5e9" } :
+
+                                          d.docType === "passbook" ? { bg: "#f3e8ff", c: "#a855f7" } :
+
+                                            d.docType === "aadhaar" ? { bg: "#dcfce7", c: "#22c55e" } :
+
+                                              { bg: "#fef3c7", c: "#d97706" };
+
+
+
+                                      const isPending = d.status === "PENDING";
+
+                                      const statusColor = d.status === "APPROVED" ? "#16a34a" : d.status === "REJECTED" ? "#dc2626" : "#ea580c";
+
+
+
+                                      return (
+
+                                        <div key={d._id || i} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: 16, borderBottom: i === employeeDocs.length - 1 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
+
+                                          <div style={{ width: 32, height: 32, borderRadius: 8, background: styleConfig.bg, color: styleConfig.c, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>
+
+                                            <i className="ti ti-file-info"></i>
+
+                                          </div>
+
+                                          <div style={{ flex: 1 }}>
+
+                                            <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>{docName}</div>
+
+                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{d.employeeName}</div>
+
+                                          </div>
+
+                                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+
+                                            <a href={d.url} target="_blank" rel="noreferrer" style={{ background: "#f1f5f9", color: "#64748b", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
+
+                                              <i className="ti ti-eye"></i> View
+
+                                            </a>
+
+                                            {isPending ? (
+
+                                              <>
+
+                                                <button onClick={() => handleApproveDoc(d._id)} style={{ background: "#dcfce7", color: "#166534", border: "none", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+
+                                                  Approve
+
+                                                </button>
+
+                                                <button onClick={() => handleRejectDoc(d._id)} style={{ background: "#fef2f2", color: "#dc2626", border: "none", padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+
+                                                  Reject
+
+                                                </button>
+
+                                              </>
+
+                                            ) : (
+
+                                              <div style={{ color: statusColor, fontSize: 10, fontWeight: 800, letterSpacing: "0.5px" }}>{d.status}</div>
+
+                                            )}
+
+                                          </div>
+
+                                        </div>
+
+                                      );
+
+                                    })}
+
+                                    {employeeDocs.length === 0 && (
+
+                                      <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No document requests.</div>
+
+                                    )}
 
                                   </div>
 
@@ -10963,492 +10972,552 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                             </div>
 
-                          );
+                          </div>
 
-                        })()}
+                        );
 
+                      })()}
 
-                      </>)}
-                  </div>
-                </>
-              )}
 
+                    </>)}
+                </div>
+              </>
+            )}
 
 
-              {/* ── Pages using new components ── */}
 
-              {validActive === "create-project" && (
+            {/* ── Pages using new components ── */}
 
-                <ModernProjectCreator
+            {validActive === "create-project" && (
 
-                  key="create"
+              <ModernProjectCreator
 
-                  clients={clients}
-
-                  employees={employees}
-
-                  prefillClient={jumpProject?._prefillClient ? clients.find(c => (c.clientName || c.name) === jumpProject._prefillClient) : null}
-
-                  onBack={() => {
-                    const returnTo = sidebarOverride || "projects";
-                    setSidebarOverride(null);
-                    setJumpProject(null);
-                    setActive(returnTo);
-                  }}
-                  onSuccess={async (newProj) => {
-
-                    const saved = newProj?.project || newProj;
-
-                    await fetchProjects();
-
-                    setJumpProject(saved);
-                    setFromEditProject(false);
-                    setActive("project-details");
-
-                  }}
-
-                  onAddEmployeeClick={() => {
-                    const limit = getSubscriptionLimit("employee", subscription);
-                    if (limit !== Infinity && employees.length >= limit) {
-                      setLimitModal({ type: "employee", limit });
-                      return;
-                    }
-                    setNeError({}); setModal("employee");
-                    fetchSubscription();
-                  }}
-
-                />
-
-              )}
-
-
-
-              {validActive === "edit-project" && jumpProject && (
-
-                <ModernProjectCreator
-
-                  key={jumpProject._id || jumpProject.id}
-
-                  editProject={jumpProject}
-
-                  clients={clients}
-
-                  employees={employees}
-
-                  onBack={() => { const returnTo = sidebarOverride || "projects"; setSidebarOverride(null); setActive(returnTo); }}
-
-                  onSuccess={(updatedProj) => {
-
-                    const saved = updatedProj || jumpProject;
-
-                    const merged = { ...jumpProject, ...saved };
-
-                    setProjects(prev => prev.map(p => (p._id === merged._id ? { ...p, ...merged } : p)));
-
-                    setFromEditProject(true);
-
-                    setSidebarOverride(null);
-
-                    setJumpProject(merged);
-
-                    setActive("project-details");
-
-                  }}
-
-                />
-
-              )}
-
-              {validActive === "project-details" && jumpProject && (
-
-                <ModernProjectDetails
-
-                  key={jumpProject._id || jumpProject.id}
-
-                  project={jumpProject}
-
-                  tasks={tasks}
-
-                  employees={employees}
-
-                  user={user}
-
-                  clients={clients}
-
-                  fromClientContext={sidebarOverride === "clients"}
-
-                  scrollContainerRef={mainScrollRef}
-
-                  onAddEmployeeClick={() => {
-                    const limit = getSubscriptionLimit("employee", subscription);
-                    if (limit !== Infinity && employees.length >= limit) {
-                      setLimitModal({ type: "employee", limit });
-                      return;
-                    }
-                    setNeError({}); setModal("employee");
-                  }}
-
-                  autoOpenInvoice={autoOpenInvoice}
-
-                  onAutoOpenInvoiceDone={() => setAutoOpenInvoice(false)}
-                  onAddClient={() => {
-                    setNcError({});
-                    setShowClientPass(false);
-                    setSidebarOverride(null);
-                    setActive("addClient");
-                  }}
-                  onDelete={async () => {
-
-                    try {
-
-                      await axios.delete(`${BASE_URL}/api/projects/${jumpProject._id}`);
-
-                      fetchProjects();
-
-                      setActive("projects");
-
-                    } catch (e) { console.error(e); }
-
-                  }}
-
-                  hideTopActions={fromEditProject}
-
-                  onBack={() => {
-                    setFromEditProject(false);
-                    const returnTo = sidebarOverride || "projects";
-                    setSidebarOverride(null);
-                    setActive(returnTo);
-                  }}
-
-                  onEdit={(updatedProj) => {
-
-                    setFromEditProject(false);
-
-                    setSidebarOpen(false);
-
-                    if (updatedProj) setJumpProject(updatedProj);
-
-                    startNavTransition(() => setActive("edit-project"));
-
-                  }}
-
-                  onUpdate={async () => { await fetchProjects(); await fetchTasks(); }}
-
-                  fetchTasks={fetchTasks}
-
-                  fetchProjects={fetchProjects}
-
-                  onMessageTeam={() => setActive("messaging")}
-
-                  onNewProposal={(proj) => {
-                    setSidebarOverride("proposals");
-                    setActive("proposals");
-                  }}
-
-                  onNewInvoice={(proj, editInv, editIdx) => {
-                    setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now(), ...(editInv ? { editData: editInv, editIndex: editIdx, projectId: proj._id } : {}) });
-                    setJumpInvoice(null);
-                    setPrevActiveBeforeInvoice(active);
-                    setSidebarOverride(active);
-                    setActive("invoices");
-                  }}
-                  onViewInvoice={(entry) => {
-                    setJumpInvoice(entry);
-                    setPrevActiveBeforeInvoice(active);
-                    setSidebarOverride(active);
-                    setActive("invoices");
-                  }}
-                  onLogTime={async (hours) => {
-
-                    try {
-
-                      const current = Number(jumpProject?.loggedHours || 0);
-
-                      const updated = current + Number(hours || 0);
-
-                      await axios.put(`${BASE_URL}/api/projects/${jumpProject._id}`, { loggedHours: updated });
-
-                      setJumpProject(prev => ({ ...prev, loggedHours: updated }));
-
-                      fetchProjects();
-
-                    } catch (e) { console.error(e); }
-
-                  }}
-
-                />
-
-              )}
-
-              {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client, replaceTempId) => {
-                setClients(prev => {
-                  if (replaceTempId) {
-                    // Server-confirmed client arrived — swap out the optimistic temp record
-                    return prev.map(c => c._id === replaceTempId ? client : c);
-                  }
-                  // First call: either the optimistic temp client, or (in older flows)
-                  // the final client directly — append only if it isn't already present.
-                  if (prev.some(c => c._id === client._id)) return prev;
-                  return [...prev, client];
-                });
-                setActive("clients");
-              }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || accentColor} />}
-
-              {validActive === "clients" && <ClientsPage key={clients.length > 0 ? "loaded" : "empty"} clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
-
-                const limit = getSubscriptionLimit("client");
-
-                setActive("addClient");
-
-              }} triggerCrop={triggerCrop}
-                onCreateProject={(proj, isEdit) => {
-
-                  setSidebarOverride("clients");
-
-                  const activeC = proj?._id
-                    ? clients.find(c => c._id === proj._id)
-                    : clients.find(c => (c.clientName || c.name) === proj?.client);
-                  if (activeC) setActiveClientIdForReturn(activeC._id);
-
-                  if (isEdit && proj) {
-
-                    setJumpProject({ ...proj, _fromClientPage: true });
-
-                    setSidebarOpen(false);
-
-                    startNavTransition(() => setActive("edit-project"));
-
-                  } else {
-
-                    if (activeC) {
-
-                      setJumpProject({
-
-                        _prefillClient: activeC.clientName || activeC.name,
-
-                        _prefillContactName: activeC.contactPersonName || "",
-
-                        _prefillContactNo: activeC.contactPersonNo || "",
-
-                        _prefillEmail: activeC.email || "",
-
-                      });
-
-                    }
-
-                    setActive("create-project");
-
-                  }
-
-                }} user={user} />}
-
-
-
-              {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projectsWithProgress} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} user={user} clients={clients} onAddEmployeeClick={() => {
-                const limit = getSubscriptionLimit("employee", subscription);
-                if (limit !== Infinity && employees.length >= limit) {
-                  setLimitModal({ type: "employee", limit });
-                  return;
-                }
-                setNeError({}); setModal("employee");
-                fetchSubscription();
-              }} />}
-
-              {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
-
-              {validActive === "projects" && <ProjectsPage
-
-                onBack={sidebarOverride === "dashboard" ? () => { setSidebarOverride(null); setActive("dashboard"); } : null}
-
-                projects={projects}
-
-                tasks={tasks}
-
-                setProjects={setProjects}
+                key="create"
 
                 clients={clients}
 
                 employees={employees}
 
-                jumpProject={jumpProject}
+                prefillClient={jumpProject?._prefillClient ? clients.find(c => (c.clientName || c.name) === jumpProject._prefillClient) : null}
 
-                setJumpProject={setJumpProject}
+                onBack={() => {
+                  const returnTo = sidebarOverride || "projects";
+                  setSidebarOverride(null);
+                  setJumpProject(null);
+                  setActive(returnTo);
+                }}
+                onSuccess={async (newProj) => {
 
-                config={config}
+                  const saved = newProj?.project || newProj;
 
-                onViewTasks={(proj) => {
+                  await fetchProjects();
 
-                  if (!proj) return;
-
-                  startNavTransition(() => {
-
-                    setSelectedProjectForTasks(proj);
-
-                    setActive("tasks");
-
-                  });
+                  setJumpProject(saved);
+                  setFromEditProject(false);
+                  setActive("project-details");
 
                 }}
 
-                onViewProject={(proj) => {
+                onAddEmployeeClick={() => {
+                  const limit = getSubscriptionLimit("employee", subscription);
+                  if (limit !== Infinity && employees.length >= limit) {
+                    setLimitModal({ type: "employee", limit });
+                    return;
+                  }
+                  setNeError({}); setModal("employee");
+                  fetchSubscription();
+                }}
 
-                  if (!proj) return;
+              />
 
-                  startNavTransition(() => {
+            )}
 
-                    setJumpProject(proj);
 
-                    setActive("project-details");
 
-                  });
+            {validActive === "edit-project" && jumpProject && (
+
+              <ModernProjectCreator
+
+                key={jumpProject._id || jumpProject.id}
+
+                editProject={jumpProject}
+
+                clients={clients}
+
+                employees={employees}
+
+                onBack={() => { const returnTo = sidebarOverride || "projects"; setSidebarOverride(null); setActive(returnTo); }}
+
+                onSuccess={(updatedProj) => {
+
+                  const saved = updatedProj || jumpProject;
+
+                  const merged = { ...jumpProject, ...saved };
+
+                  setProjects(prev => prev.map(p => (p._id === merged._id ? { ...p, ...merged } : p)));
+
+                  setFromEditProject(true);
+
+                  setSidebarOverride(null);
+
+                  setJumpProject(merged);
+
+                  setActive("project-details");
 
                 }}
+
+              />
+
+            )}
+
+            {validActive === "project-details" && jumpProject && (
+
+              <ModernProjectDetails
+
+                key={jumpProject._id || jumpProject.id}
+
+                project={jumpProject}
+
+                tasks={tasks}
+
+                employees={employees}
 
                 user={user}
 
-                fetchTasks={fetchTasks}
+                clients={clients}
 
-                onCreateProject={() => { setSidebarOverride("clients"); setActive("create-project"); }}
+                fromClientContext={sidebarOverride === "clients"}
 
-                onEditProject={(p) => {
+                scrollContainerRef={mainScrollRef}
+
+                onAddEmployeeClick={() => {
+                  const limit = getSubscriptionLimit("employee", subscription);
+                  if (limit !== Infinity && employees.length >= limit) {
+                    setLimitModal({ type: "employee", limit });
+                    return;
+                  }
+                  setNeError({}); setModal("employee");
+                }}
+
+                autoOpenInvoice={autoOpenInvoice}
+
+                onAutoOpenInvoiceDone={() => setAutoOpenInvoice(false)}
+                onAddClient={() => {
+                  setNcError({});
+                  setShowClientPass(false);
+                  setSidebarOverride(null);
+                  setActive("addClient");
+                }}
+                onDelete={async () => {
+
+                  try {
+
+                    await axios.delete(`${BASE_URL}/api/projects/${jumpProject._id}`);
+
+                    fetchProjects();
+
+                    setActive("projects");
+
+                  } catch (e) { console.error(e); }
+
+                }}
+
+                hideTopActions={fromEditProject}
+
+                onBack={() => {
+                  setFromEditProject(false);
+                  const returnTo = sidebarOverride || "projects";
+                  setSidebarOverride(null);
+                  setActive(returnTo);
+                }}
+
+                onEdit={(updatedProj) => {
+
+                  setFromEditProject(false);
 
                   setSidebarOpen(false);
 
-                  setJumpProject(p);
+                  if (updatedProj) setJumpProject(updatedProj);
 
                   startNavTransition(() => setActive("edit-project"));
 
                 }}
 
-                setActive={setActive}
+                onUpdate={async () => { await fetchProjects(); await fetchTasks(); }}
 
-                setInvoicePrefill={setInvoicePrefill}
-
-                setJumpInvoice={setJumpInvoice}
+                fetchTasks={fetchTasks}
 
                 fetchProjects={fetchProjects}
 
-                setPrevActiveBeforeInvoice={setPrevActiveBeforeInvoice}
+                onMessageTeam={() => setActive("messaging")}
 
-                onAddEmployee={() => {
+                onNewProposal={(proj) => {
+                  setSidebarOverride("proposals");
+                  setActive("proposals");
+                }}
 
-                  const limit = getSubscriptionLimit("employee");
+                onNewInvoice={(proj, editInv, editIdx) => {
+                  setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now(), ...(editInv ? { editData: editInv, editIndex: editIdx, projectId: proj._id } : {}) });
+                  setJumpInvoice(null);
+                  setPrevActiveBeforeInvoice(active);
+                  setSidebarOverride(active);
+                  setActive("invoices");
+                }}
+                onViewInvoice={(entry) => {
+                  setJumpInvoice(entry);
+                  setPrevActiveBeforeInvoice(active);
+                  setSidebarOverride(active);
+                  setActive("invoices");
+                }}
+                onLogTime={async (hours) => {
 
-                  if (subscription && employees.length >= limit) {
+                  try {
 
-                    setLimitModal({ type: "employee", limit });
+                    const current = Number(jumpProject?.loggedHours || 0);
 
-                    return;
+                    const updated = current + Number(hours || 0);
 
-                  }
+                    await axios.put(`${BASE_URL}/api/projects/${jumpProject._id}`, { loggedHours: updated });
 
-                  setReturnToModal(null); setModal("employee");
+                    setJumpProject(prev => ({ ...prev, loggedHours: updated }));
+
+                    fetchProjects();
+
+                  } catch (e) { console.error(e); }
 
                 }}
 
-              />}
+              />
+
+            )}
+
+            {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client, replaceTempId) => {
+              setClients(prev => {
+                if (replaceTempId) {
+                  // Server-confirmed client arrived — swap out the optimistic temp record
+                  return prev.map(c => c._id === replaceTempId ? client : c);
+                }
+                // First call: either the optimistic temp client, or (in older flows)
+                // the final client directly — append only if it isn't already present.
+                if (prev.some(c => c._id === client._id)) return prev;
+                return [...prev, client];
+              });
+              setActive("clients");
+            }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || accentColor} />}
+
+            {validActive === "clients" && <ClientsPage key={clients.length > 0 ? "loaded" : "empty"} clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
+
+              const limit = getSubscriptionLimit("client");
+
+              setActive("addClient");
+
+            }} triggerCrop={triggerCrop}
+              onCreateProject={(proj, isEdit) => {
+
+                setSidebarOverride("clients");
+
+                const activeC = proj?._id
+                  ? clients.find(c => c._id === proj._id)
+                  : clients.find(c => (c.clientName || c.name) === proj?.client);
+                if (activeC) setActiveClientIdForReturn(activeC._id);
+
+                if (isEdit && proj) {
+
+                  setJumpProject({ ...proj, _fromClientPage: true });
+
+                  setSidebarOpen(false);
+
+                  startNavTransition(() => setActive("edit-project"));
+
+                } else {
+
+                  if (activeC) {
+
+                    setJumpProject({
+
+                      _prefillClient: activeC.clientName || activeC.name,
+
+                      _prefillContactName: activeC.contactPersonName || "",
+
+                      _prefillContactNo: activeC.contactPersonNo || "",
+
+                      _prefillEmail: activeC.email || "",
+
+                    });
+
+                  }
+
+                  setActive("create-project");
+
+                }
+
+              }} user={user} />}
 
 
 
-              {validActive === "subadmins" && <SubadminsPage subadmins={subadmins} setSubadmins={setSubadmins} employees={employees} managers={managers} quotations={quotations} />}
+            {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projectsWithProgress} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} user={user} clients={clients} onAddEmployeeClick={() => {
+              const limit = getSubscriptionLimit("employee", subscription);
+              if (limit !== Infinity && employees.length >= limit) {
+                setLimitModal({ type: "employee", limit });
+                return;
+              }
+              setNeError({}); setModal("employee");
+              fetchSubscription();
+            }} />}
 
+            {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
 
+            {validActive === "projects" && <ProjectsPage
 
-              {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={sidebarOverride ? () => { setSidebarOverride(null); setActive(prevActiveBeforeInvoice || "dashboard"); } : undefined} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill} onAddClient={() => {
+              onBack={sidebarOverride === "dashboard" ? () => { setSidebarOverride(null); setActive("dashboard"); } : null}
 
-                const limit = getSubscriptionLimit("client");
+              projects={projects}
 
-                if (subscription && clients.length >= limit) {
+              tasks={tasks}
 
-                  setLimitModal({ type: "client", limit });
+              setProjects={setProjects}
+
+              clients={clients}
+
+              employees={employees}
+
+              jumpProject={jumpProject}
+
+              setJumpProject={setJumpProject}
+
+              config={config}
+
+              onViewTasks={(proj) => {
+
+                if (!proj) return;
+
+                startNavTransition(() => {
+
+                  setSelectedProjectForTasks(proj);
+
+                  setActive("tasks");
+
+                });
+
+              }}
+
+              onViewProject={(proj) => {
+
+                if (!proj) return;
+
+                startNavTransition(() => {
+
+                  setJumpProject(proj);
+
+                  setActive("project-details");
+
+                });
+
+              }}
+
+              user={user}
+
+              fetchTasks={fetchTasks}
+
+              onCreateProject={() => { setSidebarOverride("clients"); setActive("create-project"); }}
+
+              onEditProject={(p) => {
+
+                setSidebarOpen(false);
+
+                setJumpProject(p);
+
+                startNavTransition(() => setActive("edit-project"));
+
+              }}
+
+              setActive={setActive}
+
+              setInvoicePrefill={setInvoicePrefill}
+
+              setJumpInvoice={setJumpInvoice}
+
+              fetchProjects={fetchProjects}
+
+              setPrevActiveBeforeInvoice={setPrevActiveBeforeInvoice}
+
+              onAddEmployee={() => {
+
+                const limit = getSubscriptionLimit("employee");
+
+                if (subscription && employees.length >= limit) {
+
+                  setLimitModal({ type: "employee", limit });
 
                   return;
 
                 }
 
-                setReturnToModal(modal); setModal("client");
+                setReturnToModal(null); setModal("employee");
 
-              }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
+              }}
 
-              {validActive === "quotations" && <QuotationCreatorModern user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => {
+            />}
 
-                const limit = getSubscriptionLimit("client");
 
-                if (subscription && clients.length >= limit) {
 
-                  setLimitModal({ type: "client", limit });
+            {validActive === "subadmins" && <SubadminsPage subadmins={subadmins} setSubadmins={setSubadmins} employees={employees} managers={managers} quotations={quotations} />}
 
-                  return;
 
-                }
 
-                setReturnToModal(modal); setModal("client");
+            {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={sidebarOverride ? () => { setSidebarOverride(null); setActive(prevActiveBeforeInvoice || "dashboard"); } : undefined} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill} onAddClient={() => {
 
-              }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
+              const limit = getSubscriptionLimit("client");
 
-              {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} />}
+              if (subscription && clients.length >= limit) {
 
-              {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
+                setLimitModal({ type: "client", limit });
 
-              {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} onSelectProject={(p) => setSelectedProjectForTasks(p)} autoOpenAddModal={autoOpenTaskModal} onAddModalOpened={(val) => setAutoOpenTaskModal(!!val)} />}
+                return;
 
-              {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={companyId} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} THEME={currentTheme} />}
+              }
 
-              {validActive === "messaging" && <MessagingPage user={user} />}
+              setReturnToModal(modal); setModal("client");
 
-              {validActive === "settings" && (
-                <SettingsPage
-                  user={user}
-                  appTheme={appTheme}
-                  setAppTheme={setAppTheme}
-                  themes={THEMES}
-                  customColor={customColor}
-                  setCustomColor={setCustomColor}
-                  onLogoChange={onLogoChange}
-                  triggerCrop={triggerCrop}
-                  onProfileUpdate={(updatedUser) => setUser(updatedUser)}
-                  THEME={currentTheme}
+            }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
+
+            {validActive === "quotations" && <QuotationCreatorModern user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => {
+
+              const limit = getSubscriptionLimit("client");
+
+              if (subscription && clients.length >= limit) {
+
+                setLimitModal({ type: "client", limit });
+
+                return;
+
+              }
+
+              setReturnToModal(modal); setModal("client");
+
+            }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
+
+            {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} />}
+
+            {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
+
+            {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} onSelectProject={(p) => setSelectedProjectForTasks(p)} autoOpenAddModal={autoOpenTaskModal} onAddModalOpened={(val) => setAutoOpenTaskModal(!!val)} />}
+
+            {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={companyId} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} THEME={currentTheme} />}
+
+            {validActive === "messaging" && <MessagingPage user={user} />}
+
+            {validActive === "settings" && (
+              <SettingsPage
+                user={user}
+                appTheme={appTheme}
+                setAppTheme={setAppTheme}
+                themes={THEMES}
+                customColor={customColor}
+                setCustomColor={setCustomColor}
+                onLogoChange={onLogoChange}
+                triggerCrop={triggerCrop}
+                onProfileUpdate={(updatedUser) => setUser(updatedUser)}
+                THEME={currentTheme}
+              />
+            )}
+
+
+            {validActive === "accounts" && <AccountsPage onBack={() => setActive("dashboard")} THEME={currentTheme} initialTab="overview" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+
+            {validActive === "payments" && <AccountsPage THEME={currentTheme} initialTab="income" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+
+            {validActive === "expenses" && <AccountsPage THEME={currentTheme} initialTab="expenses" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+
+            {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
+
+            {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
+
+            {validActive === "templates" && (
+
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
+
+                <iframe
+
+                  id="template-designer-frame"
+
+                  src={`/template-designer.html?v=2`}
+
+                  style={{ width: "100%", height: "100%", border: "none", flex: 1 }}
+
+                  title="Template Designer"
+
+                  onLoad={(e) => {
+
+                    const frame = e.target.contentWindow;
+
+                    frame.postMessage({
+
+                      type: 'SET_DATA',
+
+                      clients: clients.map(c => c.clientName || c.name),
+
+                      employees: employees.map(emp => ({ name: emp.name, id: emp._id || emp.id })),
+
+                      quotations: quotations,
+
+                      company: {
+
+                        name: user?.companyName || "",
+
+                        logoUrl: user?.logoUrl || "",
+
+                        email: user?.email || "",
+
+                        phone: user?.phone || "",
+
+                      }
+
+                    }, '*');
+
+                    frame.postMessage({ type: 'SET_THEME', color: currentTheme.accent }, '*');
+
+                  }}
+
                 />
-              )}
+
+              </div>
+
+            )}
 
 
-              {validActive === "accounts" && <AccountsPage onBack={() => setActive("dashboard")} THEME={currentTheme} initialTab="overview" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
 
-              {validActive === "payments" && <AccountsPage THEME={currentTheme} initialTab="income" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+            {validActive === "letterhead" && (
 
-              {validActive === "expenses" && <AccountsPage THEME={currentTheme} initialTab="expenses" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%", background: "#F5FAFA" }}>
 
-              {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
+                <iframe
 
-              {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
+                  key="letterhead-frame"
 
-              {validActive === "templates" && (
+                  id="letterhead-frame"
 
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
+                  src={`/template-designer.html?v=1#lh`}
 
-                  <iframe
+                  style={{ width: "100%", height: "100%", border: "none", flex: 1, display: "block" }}
 
-                    id="template-designer-frame"
+                  title="Letterhead Designer"
 
-                    src={`/template-designer.html?v=2`}
+                  onLoad={(e) => {
 
-                    style={{ width: "100%", height: "100%", border: "none", flex: 1 }}
+                    const frame = e.target.contentWindow;
 
-                    title="Template Designer"
+                    // Small delay to ensure iframe is fully ready
 
-                    onLoad={(e) => {
-
-                      const frame = e.target.contentWindow;
+                    setTimeout(() => {
 
                       frame.postMessage({
 
                         type: 'SET_DATA',
 
-                        clients: clients.map(c => c.clientName || c.name),
+                        clients: clients.map(c => ({ name: c.clientName || c.name, id: c._id || c.id })),
 
                         employees: employees.map(emp => ({ name: emp.name, id: emp._id || emp.id })),
-
-                        quotations: quotations,
 
                         company: {
 
@@ -11466,321 +11535,113 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                       frame.postMessage({ type: 'SET_THEME', color: currentTheme.accent }, '*');
 
-                    }}
-
-                  />
-
-                </div>
-
-              )}
-
-
-
-              {validActive === "letterhead" && (
-
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%", background: "#F5FAFA" }}>
-
-                  <iframe
-
-                    key="letterhead-frame"
-
-                    id="letterhead-frame"
-
-                    src={`/template-designer.html?v=1#lh`}
-
-                    style={{ width: "100%", height: "100%", border: "none", flex: 1, display: "block" }}
-
-                    title="Letterhead Designer"
-
-                    onLoad={(e) => {
-
-                      const frame = e.target.contentWindow;
-
-                      // Small delay to ensure iframe is fully ready
-
-                      setTimeout(() => {
-
-                        frame.postMessage({
-
-                          type: 'SET_DATA',
-
-                          clients: clients.map(c => ({ name: c.clientName || c.name, id: c._id || c.id })),
-
-                          employees: employees.map(emp => ({ name: emp.name, id: emp._id || emp.id })),
-
-                          company: {
-
-                            name: user?.companyName || "",
-
-                            logoUrl: user?.logoUrl || "",
-
-                            email: user?.email || "",
-
-                            phone: user?.phone || "",
-
-                          }
-
-                        }, '*');
-
-                        frame.postMessage({ type: 'SET_THEME', color: currentTheme.accent }, '*');
-
-                      }, 300);
-
-                    }}
-
-                  />
-
-                </div>
-
-              )}
-
-
-
-              {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={async () => { await fetchSubscription(); setForceUpgradeTab(false); setActive("dashboard"); }} initialTab={forceUpgradeTab || enforceMySubscriptions ? "upgrade" : "overview"} preloadedSubscription={subscription} onTabChange={() => setForceUpgradeTab(false)} packagesList={packages} />}
-
-              {validActive === "reports" && <ReportsPage THEME={currentTheme} clients={clients} projects={projects} employees={employees} managers={managers} income={income} expenses={expenses} />}
-
-              {validActive === "packages" && <PackagesPage packages={packages} onViewPackage={handleViewPackage} onEditPackage={(user?.role !== "subadmin" && user?.role !== "sub_admin" && user?.role !== "sub-admin") ? handleEditPackage : undefined} onSubscribe={() => setActive("mysubscriptions")} THEME={currentTheme} />}
-
-              {validActive === "vendors" && <VendorsPage vendors={vendors} setVendors={setVendors} onAddVendorClick={() => { setNvError({}); setModal("vendor_add"); }} />}
-
-              {validActive === "rolePermissions" && <RolePermissionDashboard />}
-
-              {profileDropdownOpen && (
-
-                <div
-
-                  data-profile-menu="true"
-
-                  style={{
-
-                    position: "fixed",
-
-                    top: "72px",
-
-                    right: "16px",
-
-                    zIndex: 10050,
-
-                    background: "#fff",
-
-                    border: "1px solid #e2e8f0",
-
-                    borderRadius: 12,
-
-                    boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
-
-                    overflow: "hidden",
-
-                    minWidth: 220,
-
-                    maxWidth: 280,
+                    }, 300);
 
                   }}
 
-                >
+                />
 
-                  {/* Current Account Header */}
+              </div>
 
-                  <div style={{ padding: "12px 14px", borderBottom: "1px solid #f1f5f9", background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))" }}>
+            )}
 
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
 
-                      {companyLogo ? (
 
-                        <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "100px", objectFit: "contain", flexShrink: 0, background: "#fff", display: "block", borderRadius: 10, border: "1px solid #f1f5f9" }} />
+            {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={async () => { await fetchSubscription(); setForceUpgradeTab(false); setActive("dashboard"); }} initialTab={forceUpgradeTab || enforceMySubscriptions ? "upgrade" : "overview"} preloadedSubscription={subscription} onTabChange={() => setForceUpgradeTab(false)} packagesList={packages} />}
 
-                      ) : (
+            {validActive === "reports" && <ReportsPage THEME={currentTheme} clients={clients} projects={projects} employees={employees} managers={managers} income={income} expenses={expenses} />}
 
-                        <div style={{ width: 38, height: 38, borderRadius: 10, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 14 }}>{initials}</div>
+            {validActive === "packages" && <PackagesPage packages={packages} onViewPackage={handleViewPackage} onEditPackage={(user?.role !== "subadmin" && user?.role !== "sub_admin" && user?.role !== "sub-admin") ? handleEditPackage : undefined} onSubscribe={() => setActive("mysubscriptions")} THEME={currentTheme} />}
 
-                      )}
+            {validActive === "vendors" && <VendorsPage vendors={vendors} setVendors={setVendors} onAddVendorClick={() => { setNvError({}); setModal("vendor_add"); }} />}
 
-                      <div style={{ flex: 1, minWidth: 0 }}>
+            {validActive === "rolePermissions" && <RolePermissionDashboard />}
 
-                        <div style={{ fontSize: 13, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</div>
+            {profileDropdownOpen && (
 
-                        <div style={{ fontSize: 11, color: "var(--app-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.email}</div>
+              <div
 
-                      </div>
+                data-profile-menu="true"
 
-                      <span style={{ fontSize: 12 }}>✓</span>
+                style={{
+
+                  position: "fixed",
+
+                  top: "72px",
+
+                  right: "16px",
+
+                  zIndex: 10050,
+
+                  background: "#fff",
+
+                  border: "1px solid #e2e8f0",
+
+                  borderRadius: 12,
+
+                  boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
+
+                  overflow: "hidden",
+
+                  minWidth: 220,
+
+                  maxWidth: 280,
+
+                }}
+
+              >
+
+                {/* Current Account Header */}
+
+                <div style={{ padding: "12px 14px", borderBottom: "1px solid #f1f5f9", background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))" }}>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+
+                    {companyLogo ? (
+
+                      <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "100px", objectFit: "contain", flexShrink: 0, background: "#fff", display: "block", borderRadius: 10, border: "1px solid #f1f5f9" }} />
+
+                    ) : (
+
+                      <div style={{ width: 38, height: 38, borderRadius: 10, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 14 }}>{initials}</div>
+
+                    )}
+
+                    <div style={{ flex: 1, minWidth: 0 }}>
+
+                      <div style={{ fontSize: 13, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</div>
+
+                      <div style={{ fontSize: 11, color: "var(--app-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.email}</div>
 
                     </div>
+
+                    <span style={{ fontSize: 12 }}>✓</span>
 
                   </div>
 
+                </div>
 
 
-                  {/* Other Saved Accounts */}
 
-                  {accounts.length > 1 && (
+                {/* Other Saved Accounts */}
 
-                    <div style={{ maxHeight: 180, overflowY: "auto" }}>
+                {accounts.length > 1 && (
 
-                      {accounts.filter(a => a.email !== user?.email).map((account, idx) => {
+                  <div style={{ maxHeight: 180, overflowY: "auto" }}>
 
-                        const accName = account?.name || account?.email?.split("@")[0] || "User";
+                    {accounts.filter(a => a.email !== user?.email).map((account, idx) => {
 
-                        const accInitials = accName.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+                      const accName = account?.name || account?.email?.split("@")[0] || "User";
 
-                        return (
+                      const accInitials = accName.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
 
-                          <button
-
-                            key={account.email || idx}
-
-                            onClick={() => switchAccount(account)}
-
-                            style={{
-
-                              width: "100%",
-
-                              background: "none",
-
-                              border: "none",
-
-                              padding: "10px 14px",
-
-                              cursor: "pointer",
-
-                              fontSize: 13,
-
-                              fontWeight: 600,
-
-                              fontFamily: "inherit",
-
-                              color: T.text,
-
-                              display: "flex",
-
-                              alignItems: "center",
-
-                              gap: 10,
-
-                              borderBottom: "1px solid #f8fafc",
-
-                              textAlign: "left",
-
-                            }}
-
-                            onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
-
-                            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-
-                          >
-
-                            <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 12, flexShrink: 0 }}>
-
-                              {account?.logoUrl ? <img src={account.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 2, background: "#fff" }} /> : <span>{accInitials}</span>}
-
-                            </div>
-
-                            <div style={{ flex: 1, minWidth: 0 }}>
-
-                              <div style={{ fontSize: 12, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{accName}</div>
-
-                              <div style={{ fontSize: 10, color: "#94a3b8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{account?.email}</div>
-
-                            </div>
-
-                          </button>
-
-                        );
-
-                      })}
-
-
-
-                    </div>
-
-                  )}
-
-
-
-                  {/* Menu Options */}
-
-                  <div style={{ borderTop: "1px solid #f1f5f9" }}>
-
-                    <button
-
-                      onClick={() => {
-
-                        setProfileDropdownOpen(false);
-
-                        setShowProfile(true);
-
-                      }}
-
-                      style={{
-
-                        width: "100%",
-
-                        background: "none",
-
-                        border: "none",
-
-                        padding: "10px 14px",
-
-                        cursor: "pointer",
-
-                        fontSize: 13,
-
-                        fontWeight: 700,
-
-                        fontFamily: "inherit",
-
-                        color: T.text,
-
-                        display: "flex",
-
-                        alignItems: "center",
-
-                        gap: 10,
-
-                      }}
-
-                      onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
-
-                      onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-
-                    >
-
-                      <span style={{ fontSize: 14 }}>👤</span>Profile
-
-                    </button>
-
-                    {(isAdmin ||
-
-                      user?.businessLimit?.toLowerCase().includes("multiple") ||
-
-                      user?.businessLimit?.toLowerCase().includes("unlimited") ||
-
-                      subscription?.businessLimit?.toLowerCase().includes("multiple") ||
-
-                      subscription?.businessLimit?.toLowerCase().includes("unlimited") ||
-
-                      subscription?.features?.some(f => f.toLowerCase().includes("multiple")) ||
-
-                      packages.some(p => p.assignedSubadmins?.includes(user?.id || user?._id) &&
-
-                        (p.businessLimit?.toLowerCase().includes("multiple") ||
-
-                          p.features?.some(f => f.toLowerCase().includes("multiple"))))
-
-                    ) && (
+                      return (
 
                         <button
 
-                          onClick={() => {
+                          key={account.email || idx}
 
-                            setProfileDropdownOpen(false);
-
-                            setAccountAuthTab("login");
-
-                            setAccountAuthOpen(true);
-
-                          }}
+                          onClick={() => switchAccount(account)}
 
                           style={{
 
@@ -11796,7 +11657,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                             fontSize: 13,
 
-                            fontWeight: 700,
+                            fontWeight: 600,
 
                             fontFamily: "inherit",
 
@@ -11808,1003 +11669,1459 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                             gap: 10,
 
-                            borderTop: "1px solid #f8fafc",
+                            borderBottom: "1px solid #f8fafc",
+
+                            textAlign: "left",
 
                           }}
 
-                          onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
+                          onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
 
-                          onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                          onMouseLeave={e => e.currentTarget.style.background = "transparent"}
 
                         >
 
-                          <span style={{ fontSize: 14 }}>➕</span> Add Account
+                          <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 12, flexShrink: 0 }}>
+
+                            {account?.logoUrl ? <img src={account.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 2, background: "#fff" }} /> : <span>{accInitials}</span>}
+
+                          </div>
+
+                          <div style={{ flex: 1, minWidth: 0 }}>
+
+                            <div style={{ fontSize: 12, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{accName}</div>
+
+                            <div style={{ fontSize: 10, color: "#94a3b8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{account?.email}</div>
+
+                          </div>
 
                         </button>
 
-                      )}
+                      );
 
-                    <button
+                    })}
 
-                      onClick={() => {
 
-                        setProfileDropdownOpen(false);
-
-                        handleLogout();
-
-                      }}
-
-                      style={{
-
-                        width: "100%",
-
-                        background: "none",
-
-                        border: "none",
-
-                        padding: "10px 14px",
-
-                        cursor: "pointer",
-
-                        fontSize: 13,
-
-                        fontWeight: 700,
-
-                        fontFamily: "inherit",
-
-                        color: "#ef4444",
-
-                        display: "flex",
-
-                        alignItems: "center",
-
-                        gap: 10,
-
-                        borderTop: "1px solid #f8fafc",
-
-                      }}
-
-                      onMouseEnter={e => e.currentTarget.style.background = "#fef2f2"}
-
-                      onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-
-                    >
-
-                      <span style={{ fontSize: 14 }}>🚪</span> Logout            </button>
 
                   </div>
 
-                </div>
-
-              )}
+                )}
 
 
 
-              {accountAuthOpen && (
+                {/* Menu Options */}
 
-                <div style={{ position: "fixed", inset: 0, zIndex: 10060 }}>
+                <div style={{ borderTop: "1px solid #f1f5f9" }}>
 
                   <button
 
-                    onClick={() => setAccountAuthOpen(false)}
+                    onClick={() => {
 
-                    style={{
+                      setProfileDropdownOpen(false);
 
-                      position: "absolute",
-
-                      top: 16,
-
-                      right: 16,
-
-                      zIndex: 10061,
-
-                      background: "rgba(255,255,255,0.22)",
-
-                      border: "1.5px solid rgba(255,255,255,0.35)",
-
-                      color: "#fff",
-
-                      borderRadius: 10,
-
-                      width: 36,
-
-                      height: 36,
-
-                      cursor: "pointer",
-
-                      fontWeight: 900,
-
-                      fontSize: 14,
+                      setShowProfile(true);
 
                     }}
 
+                    style={{
+
+                      width: "100%",
+
+                      background: "none",
+
+                      border: "none",
+
+                      padding: "10px 14px",
+
+                      cursor: "pointer",
+
+                      fontSize: 13,
+
+                      fontWeight: 700,
+
+                      fontFamily: "inherit",
+
+                      color: T.text,
+
+                      display: "flex",
+
+                      alignItems: "center",
+
+                      gap: 10,
+
+                    }}
+
+                    onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
+
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+
                   >
 
-                    ✕
+                    <span style={{ fontSize: 14 }}>👤</span>Profile
 
                   </button>
 
-                  <AuthPage setUser={handleAuthSetUser} initialTab={accountAuthTab} />
+                  {(isAdmin ||
 
-                </div>
+                    user?.businessLimit?.toLowerCase().includes("multiple") ||
 
-              )}
+                    user?.businessLimit?.toLowerCase().includes("unlimited") ||
 
+                    subscription?.businessLimit?.toLowerCase().includes("multiple") ||
 
+                    subscription?.businessLimit?.toLowerCase().includes("unlimited") ||
 
-              {showProfile && <ProfileModal
+                    subscription?.features?.some(f => f.toLowerCase().includes("multiple")) ||
 
-                user={user}
+                    packages.some(p => p.assignedSubadmins?.includes(user?.id || user?._id) &&
 
-                setUser={setUser}
+                      (p.businessLimit?.toLowerCase().includes("multiple") ||
 
-                onClose={() => setShowProfile(false)}
+                        p.features?.some(f => f.toLowerCase().includes("multiple"))))
 
-                onLogout={handleLogout}
-
-                companyLogo={companyLogo}
-
-                onLogoChange={onLogoChange}
-
-                paymentHistory={paymentHistory}
-
-                projects={projects}
-
-                invoices={invoices}
-
-                onLogoUpload={handleHeaderLogoUpload}
-
-              />}
-
-
-
-
-
-              {/* ── Add Client Modal ── */}
-
-              {limitModal && <LimitReachedModal type={limitModal.type} limit={limitModal.limit} onClose={() => setLimitModal(null)} onUpgrade={() => { setLimitModal(null); setForceUpgradeTab(true); setActive("mysubscriptions"); }} />}
-
-              {modal === "client" && <Mdl title={clientSuccessData ? "Yes Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); }} maxWidth={clientSuccessData ? 460 : 780}>
-
-                {clientSuccessData ? (
-
-                  <div style={{ textAlign: "center", padding: "5px 0" }}>
-
-                    <div style={{ width: 54, height: 54, background: "linear-gradient(135deg,#dcfce7,#bbf7d0)", color: "#16a34a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 14px", boxShadow: "0 6px 15px rgba(22,163,74,0.12)" }}>✓</div>
-
-                    <h3 style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 8 }}>Registration Successful!</h3>
-
-                    <p style={{ fontSize: 13, color: "#64748b", marginBottom: 16, lineHeight: 1.4, maxWidth: 340, margin: "0 auto 16px" }}>
-
-                      The client account for <strong style={{ color: T.primary }}>{clientSuccessData.name}</strong> has been created.
-
-                      Share these credentials securely.
-
-                    </p>
-
-
-
-                    <div style={{ background: "linear-gradient(135deg,#f8fafc,#f1f5f9)", border: "1.5px solid #e2e8f0", borderRadius: 12, padding: "16px", marginBottom: 20, textAlign: "left", boxShadow: "inset 0 1px 3px rgba(0,0,0,0.02)" }}>
-
-                      <div style={{ marginBottom: 12 }}>
-
-                        <div style={{ fontSize: 9, color: "#64748b", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: 0.8 }}>LOGIN EMAIL</div>
-
-                        <div style={{ fontSize: 14, fontWeight: 700, color: T.text, background: "#fff", padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0" }}>{clientSuccessData.email}</div>
-
-                      </div>
-
-                      <div>
-
-                        <div style={{ fontSize: 9, color: "#64748b", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: 0.8 }}>TEMPORARY PASSWORD</div>
-
-                        <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-muted)", background: "#fff", padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0", fontFamily: "monospace" }}>{clientSuccessData.password || "Not set (optional)"}</div>
-
-                      </div>
-
-                    </div>
-
-
-
-                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  ) && (
 
                       <button
 
                         onClick={() => {
 
-                          const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password || "Not set"}\n\nLogin URL: ${window.location.origin}\n\nPlease change your password after your first login.`;
+                          setProfileDropdownOpen(false);
 
-                          navigator.clipboard.writeText(text);
+                          setAccountAuthTab("login");
 
-                          toast.success("📋 Credentials copied!");
-
-                        }}
-
-                        style={{ width: "100%", background: "var(--app-accent-gradient)", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(var(--app-accent-rgb),0.2)", transition: "all 0.2s" }}
-
-                      >
-
-                        📋 Copy Login Details
-
-                      </button>
-
-
-
-                      <button
-
-                        onClick={() => {
-
-                          const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password || "Not set"}\n\nLogin URL: ${window.location.origin}`;
-
-                          const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-
-                          window.open(wpUrl, "_blank");
-
-                        }}
-
-                        style={{ width: "100%", background: "#25D366", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(37,211,102,0.2)" }}
-
-                      >
-
-                        <span style={{ fontSize: 16 }}>💬</span> Share via WhatsApp
-
-                      </button>
-
-
-
-                      <button
-
-                        onClick={() => { setModal(null); setClientSuccessData(null); }}
-
-                        style={{ width: "100%", background: "transparent", border: "1.2px solid var(--app-border)", color: "#64748b", borderRadius: 10, padding: "10px", fontWeight: 700, cursor: "pointer", fontSize: 12, marginTop: 6 }}
-
-                      >
-
-                        Close
-
-                      </button>
-
-                    </div>
-
-                  </div>
-
-                ) : (
-
-                  <>
-
-                    <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-
-                      <div
-
-                        onClick={() => {
-
-                          const input = document.createElement('input');
-
-                          input.type = 'file';
-
-                          input.accept = 'image/*';
-
-                          input.onchange = (e) => triggerCrop(e, (croppedImage) => setNc(p => ({ ...p, logoUrl: croppedImage })), 1);
-
-                          input.click();
+                          setAccountAuthOpen(true);
 
                         }}
 
                         style={{
 
-                          position: "relative",
+                          width: "100%",
+
+                          background: "none",
+
+                          border: "none",
+
+                          padding: "10px 14px",
 
                           cursor: "pointer",
 
-                          width: "auto",
+                          fontSize: 13,
 
-                          height: "auto",
+                          fontWeight: 700,
 
-                          maxWidth: "100%",
+                          fontFamily: "inherit",
 
-                          display: "flex",
-
-                          flexDirection: "column",
-
-                          alignItems: "center"
-
-                        }}
-
-                      >
-
-                        <div style={{
-
-                          padding: nc.logoUrl ? 4 : 24,
-
-                          borderRadius: 20,
-
-                          background: "#fff",
-
-                          border: "2.5px dashed var(--app-border)",
+                          color: T.text,
 
                           display: "flex",
 
                           alignItems: "center",
 
-                          justifyContent: "center",
+                          gap: 10,
 
-                          minWidth: 100,
+                          borderTop: "1px solid #f8fafc",
 
-                          minHeight: 100,
+                        }}
 
-                          overflow: "hidden",
+                        onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
 
-                          boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
 
-                          transition: "all 0.3s ease"
+                      >
 
-                        }}>
+                        <span style={{ fontSize: 14 }}>➕</span> Add Account
 
-                          {nc.logoUrl ? (
+                      </button>
 
-                            <img
+                    )}
 
-                              src={nc.logoUrl}
+                  <button
 
-                              alt="Logo"
+                    onClick={() => {
 
-                              style={{
+                      setProfileDropdownOpen(false);
 
-                                width: "auto",
+                      handleLogout();
 
-                                height: "auto",
+                    }}
 
-                                maxWidth: "240px",
+                    style={{
 
-                                maxHeight: "120px",
+                      width: "100%",
 
-                                objectFit: "contain",
+                      background: "none",
 
-                                display: "block",
+                      border: "none",
 
-                                borderRadius: 12
+                      padding: "10px 14px",
 
-                              }}
+                      cursor: "pointer",
 
-                            />
+                      fontSize: 13,
 
-                          ) : (
-                            <div style={{
-                              padding: nc.logoUrl ? 4 : 24,
-                              borderRadius: 20,
-                              background: "#fff",
-                              border: "2.5px dashed var(--app-border)",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              minWidth: 100,
-                              minHeight: 100,
-                              overflow: "hidden",
-                              boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
-                              transition: "all 0.3s ease"
-                            }}>
-                              {nc.logoUrl ? (
-                                <img
-                                  src={nc.logoUrl}
-                                  alt="Logo"
-                                  style={{
-                                    width: "auto",
-                                    height: "auto",
-                                    maxWidth: "240px",
-                                    maxHeight: "120px",
-                                    objectFit: "contain",
-                                    display: "block",
-                                    borderRadius: 12
-                                  }}
-                                />
-                              ) : (
-                                <div style={{ textAlign: "center" }}>
-                                  <div style={{
-                                    width: 60,
-                                    height: 60,
-                                    borderRadius: 14,
-                                    background: " var(--app-accent, var(--app-accent, #00BCD4))",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    margin: "0 auto 10px"
-                                  }}>
-                                    📷
-                                  </div>
-                                  <div style={{ fontSize: 10, fontWeight: 800, color: "#607D86", textTransform: "uppercase", letterSpacing: 1 }}>Upload Logo</div>
-                                </div>)}
-                            </div>
+                      fontWeight: 700,
 
-                          )}
+                      fontFamily: "inherit",
 
-                        </div>
+                      color: "#ef4444",
 
-                        <div style={{
+                      display: "flex",
 
-                          position: "absolute", bottom: -10, right: -10,
+                      alignItems: "center",
 
-                          width: 36, height: 36, borderRadius: "50%",
+                      gap: 10,
 
-                          background: "var(--app-accent)", color: "#fff",
+                      borderTop: "1px solid #f8fafc",
 
-                          display: "flex", alignItems: "center", justifyContent: "center",
+                    }}
 
-                          fontSize: 16, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.4)",
+                    onMouseEnter={e => e.currentTarget.style.background = "#fef2f2"}
 
-                          border: "3px solid #fff"
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
 
-                        }}>📷</div>
+                  >
 
-                      </div>
+                    <span style={{ fontSize: 14 }}>🚪</span> Logout            </button>
+
+                </div>
+
+              </div>
+
+            )}
+
+
+
+            {accountAuthOpen && (
+
+              <div style={{ position: "fixed", inset: 0, zIndex: 10060 }}>
+
+                <button
+
+                  onClick={() => setAccountAuthOpen(false)}
+
+                  style={{
+
+                    position: "absolute",
+
+                    top: 16,
+
+                    right: 16,
+
+                    zIndex: 10061,
+
+                    background: "rgba(255,255,255,0.22)",
+
+                    border: "1.5px solid rgba(255,255,255,0.35)",
+
+                    color: "#fff",
+
+                    borderRadius: 10,
+
+                    width: 36,
+
+                    height: 36,
+
+                    cursor: "pointer",
+
+                    fontWeight: 900,
+
+                    fontSize: 14,
+
+                  }}
+
+                >
+
+                  ✕
+
+                </button>
+
+                <AuthPage setUser={handleAuthSetUser} initialTab={accountAuthTab} />
+
+              </div>
+
+            )}
+
+
+
+            {showProfile && <ProfileModal
+
+              user={user}
+
+              setUser={setUser}
+
+              onClose={() => setShowProfile(false)}
+
+              onLogout={handleLogout}
+
+              companyLogo={companyLogo}
+
+              onLogoChange={onLogoChange}
+
+              paymentHistory={paymentHistory}
+
+              projects={projects}
+
+              invoices={invoices}
+
+              onLogoUpload={handleHeaderLogoUpload}
+
+            />}
+
+
+
+
+
+            {/* ── Add Client Modal ── */}
+
+            {limitModal && <LimitReachedModal type={limitModal.type} limit={limitModal.limit} onClose={() => setLimitModal(null)} onUpgrade={() => { setLimitModal(null); setForceUpgradeTab(true); setActive("mysubscriptions"); }} />}
+
+            {modal === "client" && <Mdl title={clientSuccessData ? "Yes Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); }} maxWidth={clientSuccessData ? 460 : 780}>
+
+              {clientSuccessData ? (
+
+                <div style={{ textAlign: "center", padding: "5px 0" }}>
+
+                  <div style={{ width: 54, height: 54, background: "linear-gradient(135deg,#dcfce7,#bbf7d0)", color: "#16a34a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 14px", boxShadow: "0 6px 15px rgba(22,163,74,0.12)" }}>✓</div>
+
+                  <h3 style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 8 }}>Registration Successful!</h3>
+
+                  <p style={{ fontSize: 13, color: "#64748b", marginBottom: 16, lineHeight: 1.4, maxWidth: 340, margin: "0 auto 16px" }}>
+
+                    The client account for <strong style={{ color: T.primary }}>{clientSuccessData.name}</strong> has been created.
+
+                    Share these credentials securely.
+
+                  </p>
+
+
+
+                  <div style={{ background: "linear-gradient(135deg,#f8fafc,#f1f5f9)", border: "1.5px solid #e2e8f0", borderRadius: 12, padding: "16px", marginBottom: 20, textAlign: "left", boxShadow: "inset 0 1px 3px rgba(0,0,0,0.02)" }}>
+
+                    <div style={{ marginBottom: 12 }}>
+
+                      <div style={{ fontSize: 9, color: "#64748b", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: 0.8 }}>LOGIN EMAIL</div>
+
+                      <div style={{ fontSize: 14, fontWeight: 700, color: T.text, background: "#fff", padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0" }}>{clientSuccessData.email}</div>
 
                     </div>
 
-                    {/* ── CLIENT TYPE ── */}
+                    <div>
 
-                    <div style={{ marginBottom: 16 }}>
+                      <div style={{ fontSize: 9, color: "#64748b", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: 0.8 }}>TEMPORARY PASSWORD</div>
 
-                      <div style={{ fontSize: 11, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 8 }}>Client Type <span style={{ color: '#EF5350' }}>*</span></div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-muted)", background: "#fff", padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0", fontFamily: "monospace" }}>{clientSuccessData.password || "Not set (optional)"}</div>
 
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+                    </div>
 
-                        {[{ val: 'b2b', icon: '🏢', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: '👤', label: 'B2C', sub: 'Individual person' }, { val: 'freelancer', icon: '💼', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
+                  </div>
 
-                          <div key={t.val} onClick={() => setNc(p => ({ ...p, clientType: t.val }))}
 
-                            style={{ border: `2px solid ${nc.clientType === t.val ? ' var(--app-accent, var(--app-accent, #00BCD4))' : '#E0E6EA'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? 'var(--teal-light, var(--teal-light, #E0F7FA))' : '#F4F6F8', transition: 'all .15s', position: 'relative' }}>
 
-                            {nc.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: ' var(--app-accent, var(--app-accent, #00BCD4))', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
 
-                            <div style={{ fontSize: 22, marginBottom: 4 }}>{t.icon}</div>
+                    <button
 
-                            <div style={{ fontSize: 12, fontWeight: 700, color: nc.clientType === t.val ? '#007B8A' : '#1A2332' }}>{t.label}</div>
+                      onClick={() => {
 
-                            <div style={{ fontSize: 10, color: '#94A3B0', marginTop: 2 }}>{t.sub}</div>
+                        const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password || "Not set"}\n\nLogin URL: ${window.location.origin}\n\nPlease change your password after your first login.`;
+
+                        navigator.clipboard.writeText(text);
+
+                        toast.success("📋 Credentials copied!");
+
+                      }}
+
+                      style={{ width: "100%", background: "var(--app-accent-gradient)", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(var(--app-accent-rgb),0.2)", transition: "all 0.2s" }}
+
+                    >
+
+                      📋 Copy Login Details
+
+                    </button>
+
+
+
+                    <button
+
+                      onClick={() => {
+
+                        const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password || "Not set"}\n\nLogin URL: ${window.location.origin}`;
+
+                        const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+
+                        window.open(wpUrl, "_blank");
+
+                      }}
+
+                      style={{ width: "100%", background: "#25D366", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(37,211,102,0.2)" }}
+
+                    >
+
+                      <span style={{ fontSize: 16 }}>💬</span> Share via WhatsApp
+
+                    </button>
+
+
+
+                    <button
+
+                      onClick={() => { setModal(null); setClientSuccessData(null); }}
+
+                      style={{ width: "100%", background: "transparent", border: "1.2px solid var(--app-border)", color: "#64748b", borderRadius: 10, padding: "10px", fontWeight: 700, cursor: "pointer", fontSize: 12, marginTop: 6 }}
+
+                    >
+
+                      Close
+
+                    </button>
+
+                  </div>
+
+                </div>
+
+              ) : (
+
+                <>
+
+                  <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+
+                    <div
+
+                      onClick={() => {
+
+                        const input = document.createElement('input');
+
+                        input.type = 'file';
+
+                        input.accept = 'image/*';
+
+                        input.onchange = (e) => triggerCrop(e, (croppedImage) => setNc(p => ({ ...p, logoUrl: croppedImage })), 1);
+
+                        input.click();
+
+                      }}
+
+                      style={{
+
+                        position: "relative",
+
+                        cursor: "pointer",
+
+                        width: "auto",
+
+                        height: "auto",
+
+                        maxWidth: "100%",
+
+                        display: "flex",
+
+                        flexDirection: "column",
+
+                        alignItems: "center"
+
+                      }}
+
+                    >
+
+                      <div style={{
+
+                        padding: nc.logoUrl ? 4 : 24,
+
+                        borderRadius: 20,
+
+                        background: "#fff",
+
+                        border: "2.5px dashed var(--app-border)",
+
+                        display: "flex",
+
+                        alignItems: "center",
+
+                        justifyContent: "center",
+
+                        minWidth: 100,
+
+                        minHeight: 100,
+
+                        overflow: "hidden",
+
+                        boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
+
+                        transition: "all 0.3s ease"
+
+                      }}>
+
+                        {nc.logoUrl ? (
+
+                          <img
+
+                            src={nc.logoUrl}
+
+                            alt="Logo"
+
+                            style={{
+
+                              width: "auto",
+
+                              height: "auto",
+
+                              maxWidth: "240px",
+
+                              maxHeight: "120px",
+
+                              objectFit: "contain",
+
+                              display: "block",
+
+                              borderRadius: 12
+
+                            }}
+
+                          />
+
+                        ) : (
+                          <div style={{
+                            padding: nc.logoUrl ? 4 : 24,
+                            borderRadius: 20,
+                            background: "#fff",
+                            border: "2.5px dashed var(--app-border)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            minWidth: 100,
+                            minHeight: 100,
+                            overflow: "hidden",
+                            boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
+                            transition: "all 0.3s ease"
+                          }}>
+                            {nc.logoUrl ? (
+                              <img
+                                src={nc.logoUrl}
+                                alt="Logo"
+                                style={{
+                                  width: "auto",
+                                  height: "auto",
+                                  maxWidth: "240px",
+                                  maxHeight: "120px",
+                                  objectFit: "contain",
+                                  display: "block",
+                                  borderRadius: 12
+                                }}
+                              />
+                            ) : (
+                              <div style={{ textAlign: "center" }}>
+                                <div style={{
+                                  width: 60,
+                                  height: 60,
+                                  borderRadius: 14,
+                                  background: " var(--app-accent, var(--app-accent, #00BCD4))",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  margin: "0 auto 10px"
+                                }}>
+                                  📷
+                                </div>
+                                <div style={{ fontSize: 10, fontWeight: 800, color: "#607D86", textTransform: "uppercase", letterSpacing: 1 }}>Upload Logo</div>
+                              </div>)}
+                          </div>
+
+                        )}
+
+                      </div>
+
+                      <div style={{
+
+                        position: "absolute", bottom: -10, right: -10,
+
+                        width: 36, height: 36, borderRadius: "50%",
+
+                        background: "var(--app-accent)", color: "#fff",
+
+                        display: "flex", alignItems: "center", justifyContent: "center",
+
+                        fontSize: 16, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.4)",
+
+                        border: "3px solid #fff"
+
+                      }}>📷</div>
+
+                    </div>
+
+                  </div>
+
+                  {/* ── CLIENT TYPE ── */}
+
+                  <div style={{ marginBottom: 16 }}>
+
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 8 }}>Client Type <span style={{ color: '#EF5350' }}>*</span></div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+
+                      {[{ val: 'b2b', icon: '🏢', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: '👤', label: 'B2C', sub: 'Individual person' }, { val: 'freelancer', icon: '💼', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
+
+                        <div key={t.val} onClick={() => setNc(p => ({ ...p, clientType: t.val }))}
+
+                          style={{ border: `2px solid ${nc.clientType === t.val ? ' var(--app-accent, var(--app-accent, #00BCD4))' : '#E0E6EA'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? 'var(--teal-light, var(--teal-light, #E0F7FA))' : '#F4F6F8', transition: 'all .15s', position: 'relative' }}>
+
+                          {nc.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: ' var(--app-accent, var(--app-accent, #00BCD4))', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
+
+                          <div style={{ fontSize: 22, marginBottom: 4 }}>{t.icon}</div>
+
+                          <div style={{ fontSize: 12, fontWeight: 700, color: nc.clientType === t.val ? '#007B8A' : '#1A2332' }}>{t.label}</div>
+
+                          <div style={{ fontSize: 10, color: '#94A3B0', marginTop: 2 }}>{t.sub}</div>
+
+                        </div>
+                      ))}
+
+                    </div>
+
+                  </div>
+
+
+
+                  {/* ── BASIC INFO ── */}
+
+                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-building" style={{ color: '#fff', fontSize: 16 }}></i></span> Basic Info</div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+
+                      <Fld label="Client / Display Name *" value={nc.name} onChange={v => { setNc({ ...nc, name: v }); setNcError(p => ({ ...p, name: '' })); }} error={ncError.name} />
+
+                      <Fld label="Company Name" value={nc.company} onChange={v => setNc({ ...nc, company: v })} />
+
+                      <Fld label="Category / Industry" value={nc.category} onChange={v => { setNc({ ...nc, category: v }); saveCustomCategory(v); }} options={['', 'Web Development', 'Mobile App Development', 'UI/UX Design', 'Digital Marketing', 'IT Consulting', 'E-commerce', 'Healthcare', 'Education', 'Finance', 'Real Estate', 'Manufacturing', 'Retail', 'Logistics', 'Media & Entertainment', ...customCategories]} allowCustom={true} />
+
+                      <Fld label="Company Tax / GST No." value={nc.gstNumber} onChange={v => setNc({ ...nc, gstNumber: v })} />
+
+                      <Fld label="Client Source" value={nc.source} onChange={v => setNc({ ...nc, source: v })} options={['', 'Referral', 'Website / Organic', 'Social Media', 'Cold Outreach', 'LinkedIn', 'Event / Conference', 'Google Ads', 'Word of Mouth']} allowCustom={true} />
+
+                      <Fld label="Onboarded On" value={nc.onboardedOn} onChange={v => setNc({ ...nc, onboardedOn: v })} type="date" disabled={true} />
+
+                      <Fld label="Status" value={nc.status} onChange={v => setNc({ ...nc, status: v })} options={['Active', 'Inactive']} />
+
+                    </div>
+
+                  </div>
+
+
+
+                  {/* ── PRIMARY CONTACT ── */}
+
+                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-phone-call" style={{ color: '#fff', fontSize: 16 }}></i></span> Primary Contact</div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+
+                      <Fld label="Contact Person Name" value={nc.contactPersonName} onChange={v => setNc({ ...nc, contactPersonName: v })} />
+
+                      <Fld label="Designation" value={nc.designation || ''} onChange={v => setNc({ ...nc, designation: v })} />
+
+                      <Fld label="Email *" value={nc.email} onChange={v => { setNc({ ...nc, email: v }); setNcError(p => ({ ...p, email: '' })); }} type="email" error={ncError.email} />
+
+                      <Fld label="Alt. Email" value={nc.altEmail || ''} onChange={v => setNc({ ...nc, altEmail: v })} type="email" />
+
+                      <Fld label="Contact Person Mobile" value={nc.contactPersonNo} onChange={v => setNc({ ...nc, contactPersonNo: v })} />
+
+                      <Fld label="Office Phone" value={nc.phone} onChange={v => setNc({ ...nc, phone: v })} />
+
+                    </div>
+
+                  </div>
+
+
+
+                  {/* ── ADDRESS ── */}
+
+                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-map-pin" style={{ color: '#fff', fontSize: 16 }}></i></span> Address</div>
+
+                    <div style={{ marginBottom: 12 }}><Fld label="Street / Building Address" value={nc.address} onChange={v => setNc({ ...nc, address: v })} /></div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+
+                      <Fld label="City" value={nc.city} onChange={v => setNc({ ...nc, city: v })} />
+
+                      <Fld label="State / Province" value={nc.state} onChange={v => setNc({ ...nc, state: v })} />
+
+                      <Fld label="Pincode / ZIP" value={nc.pincode} onChange={v => setNc({ ...nc, pincode: v })} />
+
+                      <Fld label="Country" value={nc.country} onChange={v => setNc({ ...nc, country: v })} options={['India', 'United States', 'United Kingdom', 'United Arab Emirates', 'Singapore', 'Australia', 'Canada', 'Germany', 'France']} allowCustom={true} />
+
+                    </div>
+
+                  </div>
+
+
+                  {/* ── ONLINE PRESENCE ── */}
+
+                  {/* ── ONLINE PRESENCE ── */}
+                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <i className="ti ti-link" style={{ color: '#fff', fontSize: 16 }}></i>
+                      </span>
+                      Online Presence
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+                      <Fld label="Website URL" value={nc.website} onChange={v => setNc({ ...nc, website: v })} />
+                      <Fld label="LinkedIn Profile" value={nc.linkedin} onChange={v => setNc({ ...nc, linkedin: v })} />
+                    </div>
+                  </div>
+
+
+
+                  {/* ── BILLING & TERMS ── */}
+
+                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-credit-card" style={{ color: '#fff', fontSize: 16 }}></i></span> Billing & Terms</div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+
+                      <Fld label="Billing Currency" value={nc.billingCurrency} onChange={v => { setNc({ ...nc, billingCurrency: v }); saveCustomCurrency(v); }} options={['INR — Indian Rupee', 'USD — US Dollar', 'GBP — British Pound', 'EUR — Euro', 'AED — UAE Dirham', 'SGD — Singapore Dollar', 'AUD — Australian Dollar', ...customCurrencies]} allowCustom={true} />
+
+                      <Fld label="Payment Terms" value={nc.paymentTerms} onChange={v => setNc({ ...nc, paymentTerms: v })} options={['', 'Due on receipt', 'Net 7', 'Net 15', 'Net 30', 'Net 45', 'Net 60', '50% Advance + 50% on delivery']} allowCustom={true} />
+
+                      <Fld label="Credit Limit" value={nc.creditLimit} onChange={v => setNc({ ...nc, creditLimit: v })} type="number" />
+
+                      <Fld label="Preferred Payment Mode" value={nc.preferredPaymentMode} onChange={v => setNc({ ...nc, preferredPaymentMode: v })} options={['', 'Bank Transfer / NEFT', 'UPI', 'Cheque', 'Credit Card', 'Cash', 'PayPal', 'Stripe']} allowCustom={true} />
+
+                    </div>
+
+                  </div>
+
+
+
+                  {/* ── PORTAL ACCESS ── */}
+
+                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Search Portal Access</div>
+
+                    <div style={{ position: 'relative', marginBottom: 4 }}>
+
+                      <input type={showClientPass ? 'text' : 'password'} value={nc.password} onChange={e => setNc({ ...nc, password: e.target.value })}
+
+                        style={{ width: '100%', border: `1.5px solid ${ncError.password ? '#EF4444' : 'var(--app-border)'}`, borderRadius: 10, padding: '10px 46px 10px 14px', fontSize: 13, color: T.text, background: 'var(--app-bg)', boxSizing: 'border-box', outline: 'none' }}
+
+                        placeholder="Set client portal password *" />
+
+                      <button type="button" onClick={() => setShowClientPass(!showClientPass)} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--app-muted)', fontSize: 11, fontWeight: 700, fontFamily: 'inherit' }}>{showClientPass ? 'HIDE' : 'SHOW'}</button>
+
+                    </div>
+
+                    {ncError.password && <div style={{ fontSize: 11, color: '#EF4444', marginTop: 4 }}>Warning {ncError.password}</div>}
+
+                  </div>
+
+
+
+                  {/* ── INTERNAL NOTES ── */}
+
+                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-notes" style={{ color: '#fff', fontSize: 16 }}></i></span> Internal Notes</div>
+
+                    <textarea value={nc.notes} onChange={e => setNc({ ...nc, notes: e.target.value })}
+
+                      style={{ width: '100%', border: '1.5px solid #E0E6EA', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: T.text, background: '#fff', boxSizing: 'border-box', outline: 'none', minHeight: 70, resize: 'vertical', fontFamily: 'inherit' }}
+
+                      placeholder="Any internal context, special instructions, or notes..." />
+
+                  </div>
+
+
+
+                  <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
+
+                    <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+
+                    <button onClick={addClient} disabled={saveLoading} style={{ ...B("var(--app-accent)"), opacity: saveLoading ? 0.7 : 1 }}>{saveLoading ? "Saving..." : "Add Client"}</button>
+
+                  </div>
+
+                </>
+
+              )}
+
+            </Mdl>}
+
+
+
+            {/* ── Add Employee Modal ── */}
+
+            {modal === "employee" && <Mdl title="Add New Employee" onClose={() => setModal(null)}>
+
+              <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+
+                <Fld label="Full Name *" value={ne.name} onChange={v => setNe({ ...ne, name: v })} error={neError.name} />
+
+                <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} />
+
+                <Fld label="Phone Number" value={ne.phone} onChange={v => setNe({ ...ne, phone: v })} />
+
+                <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v })} options={DEPARTMENT_OPTIONS} />
+
+                <Fld label="Department" value={ne.department} onChange={v => setNe({ ...ne, department: v })} />
+
+                <Fld label="Salary" value={ne.salary} onChange={v => setNe({ ...ne, salary: v })} />
+
+                <Fld label="Date of Birth" value={ne.dateOfBirth} onChange={v => setNe({ ...ne, dateOfBirth: v })} type="date" />
+
+                <Fld label="Joining Date" value={ne.joiningDate} onChange={v => setNe({ ...ne, joiningDate: v })} type="date" />
+
+                <Fld label="Marital Status" value={ne.maritalStatus} onChange={v => setNe({ ...ne, maritalStatus: v })} options={["Unmarried", "Married"]} />
+
+                <Fld label="Status" value={ne.status} onChange={v => setNe({ ...ne, status: v })} options={["Active", "Inactive", "On Leave"]} />
+
+              </div>
+
+              <Fld label="Address" value={ne.address} onChange={v => setNe({ ...ne, address: v })} />
+
+
+
+              <div style={{ marginTop: 14 }}>
+
+                <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
+
+                <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+
+                  <Fld label="Bank Name" value={ne.bankName} onChange={v => setNe({ ...ne, bankName: v })} />
+
+                  <Fld label="IFSC Code" value={ne.ifscCode} onChange={v => setNe({ ...ne, ifscCode: v })} />
+
+                  <Fld label="Account Number" value={ne.accountNumber} onChange={v => setNe({ ...ne, accountNumber: v })} />
+
+                  <Fld label="Branch Name" value={ne.branchName} onChange={v => setNe({ ...ne, branchName: v })} />
+
+                </div>
+
+              </div>
+
+              <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
+                  <div style={{ position: "relative" }}>
+                    <input type={showEmpPass ? "text" : "password"} value={ne.password} onChange={e => { setNe({ ...ne, password: e.target.value }); setNeError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set employee login password" />
+                    <button type="button" onClick={() => setShowEmpPass(!showEmpPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEmpPass ? "HIDE" : "SHOW"}</button>
+                  </div>
+                  {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.password}</div>}
+                </div>
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CONFIRM PASSWORD *</label>
+                  <div style={{ position: "relative" }}>
+                    <input type={showEmpConfirmPass ? "text" : "password"} value={ne.confirmPassword || ""} onChange={e => { setNe({ ...ne, confirmPassword: e.target.value }); setNeError(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.confirmPassword ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter password" />
+                    <button type="button" onClick={() => setShowEmpConfirmPass(!showEmpConfirmPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEmpConfirmPass ? "HIDE" : "SHOW"}</button>
+                  </div>
+                  {neError.confirmPassword && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.confirmPassword}</div>}
+                </div>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6, flexWrap: "wrap" }}>
+
+
+                <button onClick={addEmployee} disabled={empSaveLoading} style={{ ...B("var(--app-accent)"), opacity: empSaveLoading ? 0.7 : 1 }}>{empSaveLoading ? "Saving..." : "Add Employee"}</button>
+
+              </div>
+
+            </Mdl>}
+
+
+
+            {/* ── Add Project Modal ── */}
+            {modal === "project" && <Mdl title="Create New Project" onClose={() => { setModal(null); setPrefillClient(null); }}>
+              <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+                <Fld label="Project Name *" value={np.name} onChange={v => { setNp({ ...np, name: v }); setNpError(p => ({ ...p, name: "" })); }} error={npError.name} />
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CLIENT *</label>
+                  {(prefillClient || (editProject && editProject._fromClientPage)) ? (
+                    <div style={{ border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "var(--app-text, #333)", background: "var(--app-bg)", fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 16 }}>👤</span>
+                      <span>{np.client}</span>
+                      <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--app-accent)", background: "rgba(124,58,237,0.08)", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>Auto-filled</span>
+                    </div>
+                  ) : (
+                    <ClientDropdown
+                      clients={clients}
+                      value={np.client}
+                      onChange={v => {
+                        const sel = clients.find(c => (c.clientName || c.name) === v);
+                        setNp({
+                          ...np,
+                          client: v,
+                          clientId: sel?._id || sel?.id || "",
+                          companyName: sel?.companyName || sel?.company || np.companyName,
+                          phone: sel?.phone || np.phone,
+                          address: sel?.address || np.address,
+                          contactPersonName: sel?.contactPersonName || np.contactPersonName,
+                          contactPersonNo: sel?.contactPersonNo || np.contactPersonNo,
+                          contactEmail: sel?.email || np.contactEmail,
+                        });
+                        setNpError(p => ({ ...p, client: "" }));
+                      }}
+                      error={npError.client}
+                      onAddClient={() => { setModal("client"); setNcError({}); setShowClientPass(false); }}
+                    />
+                  )}
+                  {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {npError.client}</div>}
+                </div>
+
+                <Fld label="Contact Person Name" value={np.contactPersonName} onChange={v => setNp({ ...np, contactPersonName: v })} />
+
+                <Fld label="Purpose" value={np.purpose} onChange={v => setNp({ ...np, purpose: v })} />
+                <Fld label="Company Name" value={np.companyName} onChange={v => setNp({ ...np, companyName: v })} />
+                <Fld label="Contact Person Name" value={np.contactPersonName} onChange={v => setNp({ ...np, contactPersonName: v })} />
+                <Fld label="Contact Person No" value={np.contactPersonNo} onChange={v => setNp({ ...np, contactPersonNo: v })} />
+                <Fld label="Contact Email" value={np.contactEmail} onChange={v => setNp({ ...np, contactEmail: v })} />
+                <Fld label="Phone" value={np.phone} onChange={v => setNp({ ...np, phone: v })} />
+                <Fld label="Address" value={np.address} onChange={v => setNp({ ...np, address: v })} />
+                <div style={{ marginBottom: 14 }}>
+
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>BUDGET</label>
+
+                  <div style={{ display: "flex", gap: 8 }}>
+
+                    <select
+
+                      value={np.currency}
+
+                      onChange={e => setNp({ ...np, currency: e.target.value })}
+
+                      style={{ width: 80, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
+
+                    >
+
+                      {["Rs.", "$", "‚¬", "£", "¥", "AED", "SAR", "QAR", "CAD", "AUD", "SGD", "KWD", "BHD", "OMR"].map(c => <option key={c} value={c}>{c}</option>)}
+
+                    </select>
+
+                    <input
+
+                      type="text"
+
+                      value={np.budget}
+
+                      onChange={e => { const val = e.target.value; if (val && !/^[\d.]*$/.test(val)) return; setNp({ ...np, budget: val }); }}
+
+                      style={{ flex: 1, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
+
+                      placeholder="0.00"
+
+                    />
+
+                  </div>
+
+                </div>
+
+                <Fld label="Start Date" value={np.start} onChange={v => setNp({ ...np, start: v })} type="date" />
+
+                <Fld label="End Date" value={np.end} onChange={v => setNp({ ...np, end: v })} type="date" />
+
+                <Fld label="Team Members" value={np.team} onChange={v => setNp({ ...np, team: v })} />
+
+                <Fld
+
+                  label="Status"
+
+                  value={np.status}
+
+                  onChange={v => {
+
+                    let updatedProgress = np.progress || 0;
+
+                    if (v.toLowerCase() === "completed" || v.toLowerCase() === "done") {
+
+                      updatedProgress = 100;
+
+                    } else if (v.toLowerCase() === "pending") {
+
+                      updatedProgress = 0;
+
+                    } else if (v.toLowerCase() === "in progress" && (np.progress || 0) === 0) {
+
+                      updatedProgress = 50;
+
+                    }
+
+                    setNp({ ...np, status: v, progress: updatedProgress });
+
+                  }}
+
+                  options={["Active", "On Hold", "Completed", "Overdue"]}
+
+                  allowCustom={true}
+
+                />
+
+                <Fld
+
+                  label="Progress (%)"
+
+                  value={np.progress || 0}
+
+                  type="number"
+
+                  placeholder="0"
+
+                  onChange={v => {
+
+                    let val = Number(v);
+
+                    if (val < 0) val = 0;
+
+                    if (val > 100) val = 100;
+
+                    setNp(prev => ({ ...prev, progress: val }));
+
+                  }}
+
+                />
+
+              </div>
+
+              <Fld label="Description" value={np.description} onChange={v => setNp({ ...np, description: v })} />
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
+
+                <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+
+                <button onClick={addProject} disabled={projSaveLoading} style={{ ...B("var(--app-accent)"), opacity: projSaveLoading ? 0.7 : 1 }}>{projSaveLoading ? "Saving..." : "Add Project"}</button>
+
+              </div>
+
+            </Mdl>}
+
+
+
+            {/* ── Add Manager Modal ── */}
+
+            {modal === "manager" && <Mdl title="Add New Manager" onClose={() => setModal(null)}>
+
+              <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+
+                <Fld label="Manager Name *" value={nm.managerName} onChange={v => { setNm({ ...nm, managerName: v }); setNmError(p => ({ ...p, managerName: "" })); }} error={nmError.managerName} />
+
+                <Fld label="Email *" value={nm.email} onChange={v => { setNm({ ...nm, email: v }); setNmError(p => ({ ...p, email: "" })); }} type="email" error={nmError.email} />
+
+                <Fld label="Phone Number" value={nm.phone} onChange={v => setNm({ ...nm, phone: v })} />
+
+                <Fld label="Role" value={nm.role} onChange={v => setNm({ ...nm, role: v })} />
+
+                <Fld label="Department" value={nm.department} onChange={v => setNm({ ...nm, department: v })} />
+
+                <Fld label="Status" value={nm.status} onChange={v => setNm({ ...nm, status: v })} options={["Active", "Inactive"]} />
+
+              </div>
+
+              <Fld label="Address" value={nm.address} onChange={v => setNm({ ...nm, address: v })} />
+
+              <div style={{ marginBottom: 14 }}>
+
+                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
+
+                <div style={{ position: "relative" }}>
+
+                  <input type={showMgrPass ? "text" : "password"} value={nm.password} onChange={e => { setNm({ ...nm, password: e.target.value }); setNmError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nmError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set manager password" />
+
+                  <button type="button" onClick={() => setShowMgrPass(!showMgrPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showMgrPass ? "HIDE" : "SHOW"}</button>
+
+                </div>
+
+                {nmError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {nmError.password}</div>}
+
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
+
+                <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+
+                <button onClick={addManager} disabled={mgrSaveLoading} style={{ ...B("var(--app-accent)"), opacity: mgrSaveLoading ? 0.7 : 1 }}>{mgrSaveLoading ? "Saving..." : "Save Manager "}</button>
+
+              </div>
+
+            </Mdl>}
+
+
+
+            {/* ── Add Subadmin Modal ── */}
+
+            {modal === "subadmin" && <Mdl title="Add New Subadmin" onClose={() => setModal(null)}>
+
+              <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+
+                <Fld label="Full Name *" value={ns.name} onChange={v => { setNs({ ...ns, name: v }); setNsError(p => ({ ...p, name: "" })); }} error={nsError.name} />
+
+                <Fld label="Email *" value={ns.email} onChange={v => { setNs({ ...ns, email: v }); setNsError(p => ({ ...p, email: "" })); }} type="email" error={nsError.email} />
+
+                <Fld label="Phone" value={ns.phone} onChange={v => setNs({ ...ns, phone: v })} />
+
+                <Fld label="Status" value={ns.status} onChange={v => setNs({ ...ns, status: v })} options={["Active", "Inactive"]} />
+
+                <Fld label="Company Name" value={ns.companyName} onChange={v => setNs({ ...ns, companyName: v })} placeholder="Company name" />
+
+                <Fld label="Company Type" value={ns.companyType} onChange={v => setNs({ ...ns, companyType: v })} options={["IT", "Software", "Services", "Consulting", "Other"]} />
+
+                <Fld label="No. of Employees" value={ns.employeeCount} onChange={v => setNs({ ...ns, employeeCount: v })} options={["0-10", "11-50", "51-100", "100+"]} />
+
+                <Fld label="Client Limit *" type="number" value={ns.clientLimit} onChange={v => setNs({ ...ns, clientLimit: v })} />
+
+                <Fld label="Employee Limit *" type="number" value={ns.employeeLimit} onChange={v => setNs({ ...ns, employeeLimit: v })} />
+
+              </div>
+
+              <div style={{ marginBottom: 14 }}>
+
+                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
+
+                <div style={{ position: "relative" }}>
+
+                  <input type={showSubPass ? "text" : "password"} value={ns.password} onChange={e => { setNs({ ...ns, password: e.target.value }); setNsError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nsError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set subadmin password" />
+
+                  <button type="button" onClick={() => setShowSubPass(!showSubPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showSubPass ? "HIDE" : "SHOW"}</button>
+
+                </div>
+
+                {nsError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {nsError.password}</div>}
+
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
+
+                <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+
+                <button onClick={addSubadmin} disabled={subSaveLoading} style={{ ...B("var(--app-accent)"), opacity: subSaveLoading ? 0.7 : 1 }}>{subSaveLoading ? "Saving..." : "Save Subadmin "}</button>
+
+              </div>
+
+            </Mdl>}
+
+
+
+            {/* ── Add Package Modal ── */}
+
+            {modal === "package_add" && <Mdl title="Add New Package" onClose={() => setModal(null)} maxWidth={700}>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
+
+                <Fld label="Package Title *" value={npkg.title} onChange={v => { setNpkg({ ...npkg, title: v }); setPkgError(p => ({ ...p, title: "" })); }} error={pkgError.title} />
+
+                <Fld label="Icon (Emoji)" value={npkg.icon} onChange={v => setNpkg({ ...npkg, icon: v })} placeholder="e.g. 📦" />
+
+
+
+                <Fld label="Description" value={npkg.description} onChange={v => setNpkg({ ...npkg, description: v })} />
+
+              </div>
+
+
+
+              <div style={{ background: "#f8fafc", padding: 18, borderRadius: 16, border: "1px solid #f1f5f9", margin: "14px 0" }}>
+
+                <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>PRICING OPTIONS</div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
+
+                  <Fld label="Monthly Price" value={npkg.monthlyPrice} onChange={v => setNpkg({ ...npkg, monthlyPrice: v })} placeholder="e.g. Rs.999" />
+
+                  <Fld label="Quarterly Price" value={npkg.quarterlyPrice} onChange={v => setNpkg({ ...npkg, quarterlyPrice: v })} placeholder="e.g. Rs.2,499" />
+
+                  <Fld label="Half-Yearly Price" value={npkg.halfYearlyPrice} onChange={v => setNpkg({ ...npkg, halfYearlyPrice: v })} placeholder="e.g. Rs.4,499" />
+
+                  <Fld label="Annual Price" value={npkg.annualPrice} onChange={v => setNpkg({ ...npkg, annualPrice: v })} placeholder="e.g. Rs.7,999" />
+
+                </div>
+
+              </div>
+
+
+
+              <div style={{ background: "#fdf2f8", padding: 18, borderRadius: 16, border: "#fce7f3", margin: "14px 0" }}>
+
+                <div style={{ fontSize: 11, color: "#be185d", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>BUSINESS MANAGEMENT</div>
+
+                <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+
+                  {["Single business manage", "Multiple business manage"].map(mode => (
+
+                    <button
+
+                      key={mode}
+
+                      onClick={() => setNpkg({ ...npkg, businessLimit: mode })}
+
+                      style={{
+
+                        flex: 1,
+
+                        padding: "12px",
+
+                        borderRadius: 12,
+
+                        border: npkg.businessLimit === mode ? "1.5px solid #7c3aed" : "1.5px solid #e2e8f0",
+
+                        background: npkg.businessLimit === mode ? "#f5f3ff" : "#fff",
+
+                        color: npkg.businessLimit === mode ? "#7c3aed" : "#64748b",
+
+                        fontSize: 13,
+
+                        fontWeight: 700,
+
+                        cursor: "pointer",
+
+                        transition: "all 0.2s"
+
+                      }}
+
+                    >
+
+                      {npkg.businessLimit === mode ? "✓ " : ""}{mode}
+
+                    </button>
+
+                  ))}
+
+                </div>
+
+
+
+                <div style={{ fontSize: 11, color: "#be185d", fontWeight: 800, letterSpacing: 1, marginBottom: 12, marginTop: 12 }}>RESOURCE LIMITS</div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
+
+                  <Fld label="MANAGER LIMIT (TYPE NUMBER)" value={npkg.managerLimit} onChange={v => setNpkg({ ...npkg, managerLimit: v })} placeholder="e.g. 5 Manager or Unlimited Manager" />
+
+                  <Fld label="COMPANY NAME LIMIT (CLIENTS)" value={npkg.clientLimit} onChange={v => setNpkg({ ...npkg, clientLimit: v })} placeholder="e.g. 10 Company manage or Unlimited" />
+
+                  <Fld label="EMPLOYEE LIMIT" value={npkg.employeeLimit} onChange={v => setNpkg({ ...npkg, employeeLimit: v })} placeholder="e.g. 50 Employee manage or Unlimited" />
+
+                </div>
+
+              </div>
+
+
+
+              <div style={{ marginBottom: 14 }}>
+
+                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>FEATURES (Comma separated)</label>
+
+                <textarea
+
+                  value={npkg.features}
+
+                  onChange={e => setNpkg({ ...npkg, features: e.target.value })}
+
+                  style={{ width: "100%", height: 80, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", resize: "none" }}
+
+                  placeholder="e.g. Unlimited Company Names, Premium Support, Custom Branding"
+
+                />
+
+              </div>
+
+
+
+              {user?.role === "admin" && (
+
+                <div style={{ marginBottom: 14 }}>
+
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGN TO SUBADMINS (ONLY ASSIGNED WILL SEE THIS)</label>
+
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: 12, border: "1.5px solid var(--app-border)", borderRadius: 10, background: "var(--app-bg)" }}>
+
+                    {subadmins.map(s => (
+
+                      <label key={s._id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.text, cursor: "pointer", background: npkg.assignedSubadmins.includes(s._id) ? "rgba(124, 58, 237, 0.1)" : "transparent", padding: "4px 8px", borderRadius: 6 }}>
+
+                        <input
+
+                          type="checkbox"
+
+                          checked={npkg.assignedSubadmins.includes(s._id)}
+
+                          onChange={() => {
+
+                            const current = npkg.assignedSubadmins || [];
+
+                            const next = current.includes(s._id) ? current.filter(id => id !== s._id) : [...current, s._id];
+
+                            setNpkg({ ...npkg, assignedSubadmins: next });
+
+                          }}
+
+                        />
+
+                        {s.name}
+
+                      </label>
+
+                    ))}
+
+                    {subadmins.length === 0 && <div style={{ fontSize: 12, color: "var(--app-muted)" }}>No subadmins found</div>}
+
+                  </div>
+
+                </div>
+
+              )}
+
+
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+
+                <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+
+                <button onClick={addPackage} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Creating..." : "Create Package "}</button>
+
+              </div>
+
+            </Mdl>}
+
+
+
+            {modal === "vendor_add" && <Mdl title="Add New Vendor" onClose={() => setModal(null)}>
+
+              <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+
+                <Fld label="Vendor Name *" value={nv.vendorName} onChange={v => { setNv({ ...nv, vendorName: v }); setNvError(p => ({ ...p, vendorName: "" })); }} error={nvError.vendorName} />
+
+                <Fld label="Product Name *" value={nv.vendorProduct} onChange={v => { setNv({ ...nv, vendorProduct: v }); setNvError(p => ({ ...p, vendorProduct: "" })); }} error={nvError.vendorProduct} />
+
+                <Fld label="Required Amount *" value={nv.amountTaxGst} type="number" onChange={v => { setNv({ ...nv, amountTaxGst: v }); setNvError(p => ({ ...p, amountTaxGst: "" })); }} error={nvError.amountTaxGst} />
+
+                <Fld label="Paid Amount *" value={nv.paidAmount} type="number" onChange={v => { setNv({ ...nv, paidAmount: v }); setNvError(p => ({ ...p, paidAmount: "" })); }} error={nvError.paidAmount} />
+
+                <Fld label="Date of Purchase" value={nv.dateOfPurchase} type="date" onChange={v => setNv({ ...nv, dateOfPurchase: v })} />
+
+                <Fld label="Mode of Payment" value={nv.modeOfPayment} onChange={v => setNv({ ...nv, modeOfPayment: v })} options={["Cash", "Bank Transfer", "UPI", "Cheque"]} />
+
+              </div>
+
+              <Fld label="Product Description" value={nv.productDescription} onChange={v => setNv({ ...nv, productDescription: v })} />
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
+
+                <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+
+                <button onClick={addVendor} disabled={vendorSaveLoading} style={{ ...B("var(--app-accent)"), opacity: vendorSaveLoading ? 0.7 : 1 }}>{vendorSaveLoading ? "Saving..." : "Save Vendor "}</button>
+
+              </div>
+
+            </Mdl>}
+
+
+
+            {/* ── View Package Modal ── */}
+
+            {viewPackage && (
+
+              <Mdl title={`Package Details: ${viewPackage.title}`} onClose={() => setViewPackage(null)} maxWidth={500}>
+
+                <div style={{ padding: "10px 0" }}>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
+
+                    <div style={{ width: 56, height: 56, borderRadius: "50%", background: "var(--app-accent-gradient)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>
+
+                      {viewPackage.icon || "📦"}
+
+                    </div>
+
+                    <div>
+
+                      <div style={{ fontSize: 18, fontWeight: 800, color: T.text }}>{viewPackage.title}</div>
+
+                      <div style={{ fontSize: 13, color: "var(--app-muted)" }}>{viewPackage.type === "free" ? "Free Package" : "Paid Package"}</div>
+
+                    </div>
+
+                  </div>
+
+
+
+                  <InfoRow icon="📄" label="Description" value={viewPackage.description} />
+
+                  <InfoRow icon="📅" label="Duration" value={`${viewPackage.no_of_days || viewPackage.noOfDays || 30} days`} />
+
+                  <InfoRow icon="💰" label="Price" value={viewPackage.type === "free" ? "Free" : `Rs.${viewPackage.price || 0}`} />
+
+                  <InfoRow icon="" label="Plan Duration" value={viewPackage.planDuration || "Monthly"} />
+
+                  <InfoRow icon="🏢" label="Business" value={viewPackage.businessLimit || ""} />
+
+                  <InfoRow icon="👨‍💼" label="Manager" value={viewPackage.managerLimit || ""} />
+
+                  <InfoRow icon="Team" label="Clients (Company Name)" value={viewPackage.clientLimit || ""} />
+
+                  <InfoRow icon="👤" label="Employee" value={viewPackage.employeeLimit || ""} />
+
+                  <InfoRow icon="📊" label="Status" value={viewPackage.status || "Active"} />
+
+
+
+                  {viewPackage.features && viewPackage.features.length > 0 && (
+
+                    <div style={{ marginTop: 20 }}>
+
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)", marginBottom: 10 }}>FEATURES</div>
+
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+
+                        {(Array.isArray(viewPackage.features) ? viewPackage.features : viewPackage.features.split('\\n')).map((f, i) => (
+
+                          <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: T.text }}>
+
+                            <span style={{ color: "#22c55e" }}>✓</span> {f}
 
                           </div>
+
                         ))}
 
                       </div>
 
                     </div>
 
-
-
-                    {/* ── BASIC INFO ── */}
-
-                    <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-
-                      <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-building" style={{ color: '#fff', fontSize: 16 }}></i></span> Basic Info</div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
-
-                        <Fld label="Client / Display Name *" value={nc.name} onChange={v => { setNc({ ...nc, name: v }); setNcError(p => ({ ...p, name: '' })); }} error={ncError.name} />
-
-                        <Fld label="Company Name" value={nc.company} onChange={v => setNc({ ...nc, company: v })} />
-
-                        <Fld label="Category / Industry" value={nc.category} onChange={v => { setNc({ ...nc, category: v }); saveCustomCategory(v); }} options={['', 'Web Development', 'Mobile App Development', 'UI/UX Design', 'Digital Marketing', 'IT Consulting', 'E-commerce', 'Healthcare', 'Education', 'Finance', 'Real Estate', 'Manufacturing', 'Retail', 'Logistics', 'Media & Entertainment', ...customCategories]} allowCustom={true} />
-
-                        <Fld label="Company Tax / GST No." value={nc.gstNumber} onChange={v => setNc({ ...nc, gstNumber: v })} />
-
-                        <Fld label="Client Source" value={nc.source} onChange={v => setNc({ ...nc, source: v })} options={['', 'Referral', 'Website / Organic', 'Social Media', 'Cold Outreach', 'LinkedIn', 'Event / Conference', 'Google Ads', 'Word of Mouth']} allowCustom={true} />
-
-                        <Fld label="Onboarded On" value={nc.onboardedOn} onChange={v => setNc({ ...nc, onboardedOn: v })} type="date" disabled={true} />
-
-                        <Fld label="Status" value={nc.status} onChange={v => setNc({ ...nc, status: v })} options={['Active', 'Inactive']} />
-
-                      </div>
-
-                    </div>
-
-
-
-                    {/* ── PRIMARY CONTACT ── */}
-
-                    <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-
-                      <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-phone-call" style={{ color: '#fff', fontSize: 16 }}></i></span> Primary Contact</div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
-
-                        <Fld label="Contact Person Name" value={nc.contactPersonName} onChange={v => setNc({ ...nc, contactPersonName: v })} />
-
-                        <Fld label="Designation" value={nc.designation || ''} onChange={v => setNc({ ...nc, designation: v })} />
-
-                        <Fld label="Email *" value={nc.email} onChange={v => { setNc({ ...nc, email: v }); setNcError(p => ({ ...p, email: '' })); }} type="email" error={ncError.email} />
-
-                        <Fld label="Alt. Email" value={nc.altEmail || ''} onChange={v => setNc({ ...nc, altEmail: v })} type="email" />
-
-                        <Fld label="Contact Person Mobile" value={nc.contactPersonNo} onChange={v => setNc({ ...nc, contactPersonNo: v })} />
-
-                        <Fld label="Office Phone" value={nc.phone} onChange={v => setNc({ ...nc, phone: v })} />
-
-                      </div>
-
-                    </div>
-
-
-
-                    {/* ── ADDRESS ── */}
-
-                    <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-
-                      <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-map-pin" style={{ color: '#fff', fontSize: 16 }}></i></span> Address</div>
-
-                      <div style={{ marginBottom: 12 }}><Fld label="Street / Building Address" value={nc.address} onChange={v => setNc({ ...nc, address: v })} /></div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
-
-                        <Fld label="City" value={nc.city} onChange={v => setNc({ ...nc, city: v })} />
-
-                        <Fld label="State / Province" value={nc.state} onChange={v => setNc({ ...nc, state: v })} />
-
-                        <Fld label="Pincode / ZIP" value={nc.pincode} onChange={v => setNc({ ...nc, pincode: v })} />
-
-                        <Fld label="Country" value={nc.country} onChange={v => setNc({ ...nc, country: v })} options={['India', 'United States', 'United Kingdom', 'United Arab Emirates', 'Singapore', 'Australia', 'Canada', 'Germany', 'France']} allowCustom={true} />
-
-                      </div>
-
-                    </div>
-
-
-                    {/* ── ONLINE PRESENCE ── */}
-
-                    {/* ── ONLINE PRESENCE ── */}
-                    <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <i className="ti ti-link" style={{ color: '#fff', fontSize: 16 }}></i>
-                        </span>
-                        Online Presence
-                      </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
-                        <Fld label="Website URL" value={nc.website} onChange={v => setNc({ ...nc, website: v })} />
-                        <Fld label="LinkedIn Profile" value={nc.linkedin} onChange={v => setNc({ ...nc, linkedin: v })} />
-                      </div>
-                    </div>
-
-
-
-                    {/* ── BILLING & TERMS ── */}
-
-                    <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-
-                      <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-credit-card" style={{ color: '#fff', fontSize: 16 }}></i></span> Billing & Terms</div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
-
-                        <Fld label="Billing Currency" value={nc.billingCurrency} onChange={v => { setNc({ ...nc, billingCurrency: v }); saveCustomCurrency(v); }} options={['INR — Indian Rupee', 'USD — US Dollar', 'GBP — British Pound', 'EUR — Euro', 'AED — UAE Dirham', 'SGD — Singapore Dollar', 'AUD — Australian Dollar', ...customCurrencies]} allowCustom={true} />
-
-                        <Fld label="Payment Terms" value={nc.paymentTerms} onChange={v => setNc({ ...nc, paymentTerms: v })} options={['', 'Due on receipt', 'Net 7', 'Net 15', 'Net 30', 'Net 45', 'Net 60', '50% Advance + 50% on delivery']} allowCustom={true} />
-
-                        <Fld label="Credit Limit" value={nc.creditLimit} onChange={v => setNc({ ...nc, creditLimit: v })} type="number" />
-
-                        <Fld label="Preferred Payment Mode" value={nc.preferredPaymentMode} onChange={v => setNc({ ...nc, preferredPaymentMode: v })} options={['', 'Bank Transfer / NEFT', 'UPI', 'Cheque', 'Credit Card', 'Cash', 'PayPal', 'Stripe']} allowCustom={true} />
-
-                      </div>
-
-                    </div>
-
-
-
-                    {/* ── PORTAL ACCESS ── */}
-
-                    <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-
-                      <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Search Portal Access</div>
-
-                      <div style={{ position: 'relative', marginBottom: 4 }}>
-
-                        <input type={showClientPass ? 'text' : 'password'} value={nc.password} onChange={e => setNc({ ...nc, password: e.target.value })}
-
-                          style={{ width: '100%', border: `1.5px solid ${ncError.password ? '#EF4444' : 'var(--app-border)'}`, borderRadius: 10, padding: '10px 46px 10px 14px', fontSize: 13, color: T.text, background: 'var(--app-bg)', boxSizing: 'border-box', outline: 'none' }}
-
-                          placeholder="Set client portal password *" />
-
-                        <button type="button" onClick={() => setShowClientPass(!showClientPass)} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--app-muted)', fontSize: 11, fontWeight: 700, fontFamily: 'inherit' }}>{showClientPass ? 'HIDE' : 'SHOW'}</button>
-
-                      </div>
-
-                      {ncError.password && <div style={{ fontSize: 11, color: '#EF4444', marginTop: 4 }}>Warning {ncError.password}</div>}
-
-                    </div>
-
-
-
-                    {/* ── INTERNAL NOTES ── */}
-
-                    <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-
-                      <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-notes" style={{ color: '#fff', fontSize: 16 }}></i></span> Internal Notes</div>
-
-                      <textarea value={nc.notes} onChange={e => setNc({ ...nc, notes: e.target.value })}
-
-                        style={{ width: '100%', border: '1.5px solid #E0E6EA', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: T.text, background: '#fff', boxSizing: 'border-box', outline: 'none', minHeight: 70, resize: 'vertical', fontFamily: 'inherit' }}
-
-                        placeholder="Any internal context, special instructions, or notes..." />
-
-                    </div>
-
-
-
-                    <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
-
-                      <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-
-                      <button onClick={addClient} disabled={saveLoading} style={{ ...B("var(--app-accent)"), opacity: saveLoading ? 0.7 : 1 }}>{saveLoading ? "Saving..." : "Add Client"}</button>
-
-                    </div>
-
-                  </>
-
-                )}
-
-              </Mdl>}
-
-
-
-              {/* ── Add Employee Modal ── */}
-
-              {modal === "employee" && <Mdl title="Add New Employee" onClose={() => setModal(null)}>
-
-                <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-
-                  <Fld label="Full Name *" value={ne.name} onChange={v => setNe({ ...ne, name: v })} error={neError.name} />
-
-                  <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} />
-
-                  <Fld label="Phone Number" value={ne.phone} onChange={v => setNe({ ...ne, phone: v })} />
-
-                  <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v })} options={DEPARTMENT_OPTIONS} />
-
-                  <Fld label="Department" value={ne.department} onChange={v => setNe({ ...ne, department: v })} />
-
-                  <Fld label="Salary" value={ne.salary} onChange={v => setNe({ ...ne, salary: v })} />
-
-                  <Fld label="Date of Birth" value={ne.dateOfBirth} onChange={v => setNe({ ...ne, dateOfBirth: v })} type="date" />
-
-                  <Fld label="Joining Date" value={ne.joiningDate} onChange={v => setNe({ ...ne, joiningDate: v })} type="date" />
-
-                  <Fld label="Marital Status" value={ne.maritalStatus} onChange={v => setNe({ ...ne, maritalStatus: v })} options={["Unmarried", "Married"]} />
-
-                  <Fld label="Status" value={ne.status} onChange={v => setNe({ ...ne, status: v })} options={["Active", "Inactive", "On Leave"]} />
+                  )}
 
                 </div>
 
-                <Fld label="Address" value={ne.address} onChange={v => setNe({ ...ne, address: v })} />
+                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
 
-
-
-                <div style={{ marginTop: 14 }}>
-
-                  <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
-
-                  <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-
-                    <Fld label="Bank Name" value={ne.bankName} onChange={v => setNe({ ...ne, bankName: v })} />
-
-                    <Fld label="IFSC Code" value={ne.ifscCode} onChange={v => setNe({ ...ne, ifscCode: v })} />
-
-                    <Fld label="Account Number" value={ne.accountNumber} onChange={v => setNe({ ...ne, accountNumber: v })} />
-
-                    <Fld label="Branch Name" value={ne.branchName} onChange={v => setNe({ ...ne, branchName: v })} />
-
-                  </div>
+                  <button onClick={() => setViewPackage(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 20px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>✕</button>
 
                 </div>
 
-                <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-                  <div style={{ marginBottom: 14 }}>
-                    <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
-                    <div style={{ position: "relative" }}>
-                      <input type={showEmpPass ? "text" : "password"} value={ne.password} onChange={e => { setNe({ ...ne, password: e.target.value }); setNeError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set employee login password" />
-                      <button type="button" onClick={() => setShowEmpPass(!showEmpPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEmpPass ? "HIDE" : "SHOW"}</button>
-                    </div>
-                    {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.password}</div>}
-                  </div>
-                  <div style={{ marginBottom: 14 }}>
-                    <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CONFIRM PASSWORD *</label>
-                    <div style={{ position: "relative" }}>
-                      <input type={showEmpConfirmPass ? "text" : "password"} value={ne.confirmPassword || ""} onChange={e => { setNe({ ...ne, confirmPassword: e.target.value }); setNeError(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.confirmPassword ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter password" />
-                      <button type="button" onClick={() => setShowEmpConfirmPass(!showEmpConfirmPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEmpConfirmPass ? "HIDE" : "SHOW"}</button>
-                    </div>
-                    {neError.confirmPassword && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.confirmPassword}</div>}
-                  </div>
-                </div>
+              </Mdl>
 
-                <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6, flexWrap: "wrap" }}>
+            )}
 
 
-                  <button onClick={addEmployee} disabled={empSaveLoading} style={{ ...B("var(--app-accent)"), opacity: empSaveLoading ? 0.7 : 1 }}>{empSaveLoading ? "Saving..." : "Add Employee"}</button>
 
-                </div>
+            {/* ── Edit Package Modal ── */}
 
-              </Mdl>}
+            {editPackage && (
 
-
-
-              {/* ── Add Project Modal ── */}
-              {modal === "project" && <Mdl title="Create New Project" onClose={() => { setModal(null); setPrefillClient(null); }}>
-                <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-                  <Fld label="Project Name *" value={np.name} onChange={v => { setNp({ ...np, name: v }); setNpError(p => ({ ...p, name: "" })); }} error={npError.name} />
-                  <div style={{ marginBottom: 14 }}>
-                    <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CLIENT *</label>
-                    {(prefillClient || (editProject && editProject._fromClientPage)) ? (
-                      <div style={{ border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "var(--app-text, #333)", background: "var(--app-bg)", fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
-                        <span style={{ fontSize: 16 }}>👤</span>
-                        <span>{np.client}</span>
-                        <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--app-accent)", background: "rgba(124,58,237,0.08)", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>Auto-filled</span>
-                      </div>
-                    ) : (
-                      <ClientDropdown
-                        clients={clients}
-                        value={np.client}
-                        onChange={v => {
-                          const sel = clients.find(c => (c.clientName || c.name) === v);
-                          setNp({
-                            ...np,
-                            client: v,
-                            clientId: sel?._id || sel?.id || "",
-                            companyName: sel?.companyName || sel?.company || np.companyName,
-                            phone: sel?.phone || np.phone,
-                            address: sel?.address || np.address,
-                            contactPersonName: sel?.contactPersonName || np.contactPersonName,
-                            contactPersonNo: sel?.contactPersonNo || np.contactPersonNo,
-                            contactEmail: sel?.email || np.contactEmail,
-                          });
-                          setNpError(p => ({ ...p, client: "" }));
-                        }}
-                        error={npError.client}
-                        onAddClient={() => { setModal("client"); setNcError({}); setShowClientPass(false); }}
-                      />
-                    )}
-                    {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {npError.client}</div>}
-                  </div>
-
-                  <Fld label="Contact Person Name" value={np.contactPersonName} onChange={v => setNp({ ...np, contactPersonName: v })} />
-
-                  <Fld label="Purpose" value={np.purpose} onChange={v => setNp({ ...np, purpose: v })} />
-                  <Fld label="Company Name" value={np.companyName} onChange={v => setNp({ ...np, companyName: v })} />
-                  <Fld label="Contact Person Name" value={np.contactPersonName} onChange={v => setNp({ ...np, contactPersonName: v })} />
-                  <Fld label="Contact Person No" value={np.contactPersonNo} onChange={v => setNp({ ...np, contactPersonNo: v })} />
-                  <Fld label="Contact Email" value={np.contactEmail} onChange={v => setNp({ ...np, contactEmail: v })} />
-                  <Fld label="Phone" value={np.phone} onChange={v => setNp({ ...np, phone: v })} />
-                  <Fld label="Address" value={np.address} onChange={v => setNp({ ...np, address: v })} />
-                  <div style={{ marginBottom: 14 }}>
-
-                    <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>BUDGET</label>
-
-                    <div style={{ display: "flex", gap: 8 }}>
-
-                      <select
-
-                        value={np.currency}
-
-                        onChange={e => setNp({ ...np, currency: e.target.value })}
-
-                        style={{ width: 80, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
-
-                      >
-
-                        {["Rs.", "$", "‚¬", "£", "¥", "AED", "SAR", "QAR", "CAD", "AUD", "SGD", "KWD", "BHD", "OMR"].map(c => <option key={c} value={c}>{c}</option>)}
-
-                      </select>
-
-                      <input
-
-                        type="text"
-
-                        value={np.budget}
-
-                        onChange={e => { const val = e.target.value; if (val && !/^[\d.]*$/.test(val)) return; setNp({ ...np, budget: val }); }}
-
-                        style={{ flex: 1, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
-
-                        placeholder="0.00"
-
-                      />
-
-                    </div>
-
-                  </div>
-
-                  <Fld label="Start Date" value={np.start} onChange={v => setNp({ ...np, start: v })} type="date" />
-
-                  <Fld label="End Date" value={np.end} onChange={v => setNp({ ...np, end: v })} type="date" />
-
-                  <Fld label="Team Members" value={np.team} onChange={v => setNp({ ...np, team: v })} />
-
-                  <Fld
-
-                    label="Status"
-
-                    value={np.status}
-
-                    onChange={v => {
-
-                      let updatedProgress = np.progress || 0;
-
-                      if (v.toLowerCase() === "completed" || v.toLowerCase() === "done") {
-
-                        updatedProgress = 100;
-
-                      } else if (v.toLowerCase() === "pending") {
-
-                        updatedProgress = 0;
-
-                      } else if (v.toLowerCase() === "in progress" && (np.progress || 0) === 0) {
-
-                        updatedProgress = 50;
-
-                      }
-
-                      setNp({ ...np, status: v, progress: updatedProgress });
-
-                    }}
-
-                    options={["Active", "On Hold", "Completed", "Overdue"]}
-
-                    allowCustom={true}
-
-                  />
-
-                  <Fld
-
-                    label="Progress (%)"
-
-                    value={np.progress || 0}
-
-                    type="number"
-
-                    placeholder="0"
-
-                    onChange={v => {
-
-                      let val = Number(v);
-
-                      if (val < 0) val = 0;
-
-                      if (val > 100) val = 100;
-
-                      setNp(prev => ({ ...prev, progress: val }));
-
-                    }}
-
-                  />
-
-                </div>
-
-                <Fld label="Description" value={np.description} onChange={v => setNp({ ...np, description: v })} />
-
-                <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
-
-                  <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-
-                  <button onClick={addProject} disabled={projSaveLoading} style={{ ...B("var(--app-accent)"), opacity: projSaveLoading ? 0.7 : 1 }}>{projSaveLoading ? "Saving..." : "Add Project"}</button>
-
-                </div>
-
-              </Mdl>}
-
-
-
-              {/* ── Add Manager Modal ── */}
-
-              {modal === "manager" && <Mdl title="Add New Manager" onClose={() => setModal(null)}>
-
-                <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-
-                  <Fld label="Manager Name *" value={nm.managerName} onChange={v => { setNm({ ...nm, managerName: v }); setNmError(p => ({ ...p, managerName: "" })); }} error={nmError.managerName} />
-
-                  <Fld label="Email *" value={nm.email} onChange={v => { setNm({ ...nm, email: v }); setNmError(p => ({ ...p, email: "" })); }} type="email" error={nmError.email} />
-
-                  <Fld label="Phone Number" value={nm.phone} onChange={v => setNm({ ...nm, phone: v })} />
-
-                  <Fld label="Role" value={nm.role} onChange={v => setNm({ ...nm, role: v })} />
-
-                  <Fld label="Department" value={nm.department} onChange={v => setNm({ ...nm, department: v })} />
-
-                  <Fld label="Status" value={nm.status} onChange={v => setNm({ ...nm, status: v })} options={["Active", "Inactive"]} />
-
-                </div>
-
-                <Fld label="Address" value={nm.address} onChange={v => setNm({ ...nm, address: v })} />
-
-                <div style={{ marginBottom: 14 }}>
-
-                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
-
-                  <div style={{ position: "relative" }}>
-
-                    <input type={showMgrPass ? "text" : "password"} value={nm.password} onChange={e => { setNm({ ...nm, password: e.target.value }); setNmError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nmError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set manager password" />
-
-                    <button type="button" onClick={() => setShowMgrPass(!showMgrPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showMgrPass ? "HIDE" : "SHOW"}</button>
-
-                  </div>
-
-                  {nmError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {nmError.password}</div>}
-
-                </div>
-
-                <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
-
-                  <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-
-                  <button onClick={addManager} disabled={mgrSaveLoading} style={{ ...B("var(--app-accent)"), opacity: mgrSaveLoading ? 0.7 : 1 }}>{mgrSaveLoading ? "Saving..." : "Save Manager "}</button>
-
-                </div>
-
-              </Mdl>}
-
-
-
-              {/* ── Add Subadmin Modal ── */}
-
-              {modal === "subadmin" && <Mdl title="Add New Subadmin" onClose={() => setModal(null)}>
-
-                <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-
-                  <Fld label="Full Name *" value={ns.name} onChange={v => { setNs({ ...ns, name: v }); setNsError(p => ({ ...p, name: "" })); }} error={nsError.name} />
-
-                  <Fld label="Email *" value={ns.email} onChange={v => { setNs({ ...ns, email: v }); setNsError(p => ({ ...p, email: "" })); }} type="email" error={nsError.email} />
-
-                  <Fld label="Phone" value={ns.phone} onChange={v => setNs({ ...ns, phone: v })} />
-
-                  <Fld label="Status" value={ns.status} onChange={v => setNs({ ...ns, status: v })} options={["Active", "Inactive"]} />
-
-                  <Fld label="Company Name" value={ns.companyName} onChange={v => setNs({ ...ns, companyName: v })} placeholder="Company name" />
-
-                  <Fld label="Company Type" value={ns.companyType} onChange={v => setNs({ ...ns, companyType: v })} options={["IT", "Software", "Services", "Consulting", "Other"]} />
-
-                  <Fld label="No. of Employees" value={ns.employeeCount} onChange={v => setNs({ ...ns, employeeCount: v })} options={["0-10", "11-50", "51-100", "100+"]} />
-
-                  <Fld label="Client Limit *" type="number" value={ns.clientLimit} onChange={v => setNs({ ...ns, clientLimit: v })} />
-
-                  <Fld label="Employee Limit *" type="number" value={ns.employeeLimit} onChange={v => setNs({ ...ns, employeeLimit: v })} />
-
-                </div>
-
-                <div style={{ marginBottom: 14 }}>
-
-                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
-
-                  <div style={{ position: "relative" }}>
-
-                    <input type={showSubPass ? "text" : "password"} value={ns.password} onChange={e => { setNs({ ...ns, password: e.target.value }); setNsError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nsError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set subadmin password" />
-
-                    <button type="button" onClick={() => setShowSubPass(!showSubPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showSubPass ? "HIDE" : "SHOW"}</button>
-
-                  </div>
-
-                  {nsError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {nsError.password}</div>}
-
-                </div>
-
-                <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
-
-                  <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-
-                  <button onClick={addSubadmin} disabled={subSaveLoading} style={{ ...B("var(--app-accent)"), opacity: subSaveLoading ? 0.7 : 1 }}>{subSaveLoading ? "Saving..." : "Save Subadmin "}</button>
-
-                </div>
-
-              </Mdl>}
-
-
-
-              {/* ── Add Package Modal ── */}
-
-              {modal === "package_add" && <Mdl title="Add New Package" onClose={() => setModal(null)} maxWidth={700}>
+              <Mdl title={`Edit Package: ${editPackage.title}`} onClose={() => setEditPackage(null)} maxWidth={700}>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
 
-                  <Fld label="Package Title *" value={npkg.title} onChange={v => { setNpkg({ ...npkg, title: v }); setPkgError(p => ({ ...p, title: "" })); }} error={pkgError.title} />
+                  <Fld label="Package Title *" value={editPkgForm.title} onChange={v => setEditPkgForm({ ...editPkgForm, title: v })} />
 
-                  <Fld label="Icon (Emoji)" value={npkg.icon} onChange={v => setNpkg({ ...npkg, icon: v })} placeholder="e.g. 📦" />
+                  <Fld label="Icon (Emoji)" value={editPkgForm.icon} onChange={v => setEditPkgForm({ ...editPkgForm, icon: v })} />
 
+                  <Fld label="Type" value={editPkgForm.type} onChange={v => setEditPkgForm({ ...editPkgForm, type: v })} options={["free", "paid"]} />
 
+                  <Fld label="Price" value={editPkgForm.price} onChange={v => setEditPkgForm({ ...editPkgForm, price: v })} disabled={editPkgForm.type === "free"} />
 
-                  <Fld label="Description" value={npkg.description} onChange={v => setNpkg({ ...npkg, description: v })} />
+                  <Fld label="Number of Days *" value={editPkgForm.noOfDays} onChange={v => setEditPkgForm({ ...editPkgForm, noOfDays: v })} />
+
+                  <Fld label="Status" value={editPkgForm.status} onChange={v => setEditPkgForm({ ...editPkgForm, status: v })} options={["Active", "Inactive"]} />
 
                 </div>
 
@@ -12812,27 +13129,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <div style={{ background: "#f8fafc", padding: 18, borderRadius: 16, border: "1px solid #f1f5f9", margin: "14px 0" }}>
 
-                  <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>PRICING OPTIONS</div>
-
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
-
-                    <Fld label="Monthly Price" value={npkg.monthlyPrice} onChange={v => setNpkg({ ...npkg, monthlyPrice: v })} placeholder="e.g. Rs.999" />
-
-                    <Fld label="Quarterly Price" value={npkg.quarterlyPrice} onChange={v => setNpkg({ ...npkg, quarterlyPrice: v })} placeholder="e.g. Rs.2,499" />
-
-                    <Fld label="Half-Yearly Price" value={npkg.halfYearlyPrice} onChange={v => setNpkg({ ...npkg, halfYearlyPrice: v })} placeholder="e.g. Rs.4,499" />
-
-                    <Fld label="Annual Price" value={npkg.annualPrice} onChange={v => setNpkg({ ...npkg, annualPrice: v })} placeholder="e.g. Rs.7,999" />
-
-                  </div>
-
-                </div>
-
-
-
-                <div style={{ background: "#fdf2f8", padding: 18, borderRadius: 16, border: "#fce7f3", margin: "14px 0" }}>
-
-                  <div style={{ fontSize: 11, color: "#be185d", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>BUSINESS MANAGEMENT</div>
+                  <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>BUSINESS MANAGEMENT</div>
 
                   <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
 
@@ -12842,7 +13139,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                         key={mode}
 
-                        onClick={() => setNpkg({ ...npkg, businessLimit: mode })}
+                        onClick={() => setEditPkgForm({ ...editPkgForm, businessLimit: mode })}
 
                         style={{
 
@@ -12852,11 +13149,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                           borderRadius: 12,
 
-                          border: npkg.businessLimit === mode ? "1.5px solid #7c3aed" : "1.5px solid #e2e8f0",
+                          border: editPkgForm.businessLimit === mode ? "1.5px solid #7c3aed" : "1.5px solid #e2e8f0",
 
-                          background: npkg.businessLimit === mode ? "#f5f3ff" : "#fff",
+                          background: editPkgForm.businessLimit === mode ? "#f5f3ff" : "#fff",
 
-                          color: npkg.businessLimit === mode ? "#7c3aed" : "#64748b",
+                          color: editPkgForm.businessLimit === mode ? "#7c3aed" : "#64748b",
 
                           fontSize: 13,
 
@@ -12870,7 +13167,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                       >
 
-                        {npkg.businessLimit === mode ? "✓ " : ""}{mode}
+                        {editPkgForm.businessLimit === mode ? "✓ " : ""}{mode}
 
                       </button>
 
@@ -12880,15 +13177,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-                  <div style={{ fontSize: 11, color: "#be185d", fontWeight: 800, letterSpacing: 1, marginBottom: 12, marginTop: 12 }}>RESOURCE LIMITS</div>
+                  <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12, marginTop: 12 }}>PACKAGE LIMITS</div>
 
                   <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
 
-                    <Fld label="MANAGER LIMIT (TYPE NUMBER)" value={npkg.managerLimit} onChange={v => setNpkg({ ...npkg, managerLimit: v })} placeholder="e.g. 5 Manager or Unlimited Manager" />
+                    <Fld label="Plan Duration" value={editPkgForm.planDuration} onChange={v => setEditPkgForm({ ...editPkgForm, planDuration: v })} options={["Monthly", "90 Days", "Yearly"]} />
 
-                    <Fld label="COMPANY NAME LIMIT (CLIENTS)" value={npkg.clientLimit} onChange={v => setNpkg({ ...npkg, clientLimit: v })} placeholder="e.g. 10 Company manage or Unlimited" />
+                    <Fld label="MANAGER LIMIT (TYPE NUMBER)" value={editPkgForm.managerLimit} onChange={v => setEditPkgForm({ ...editPkgForm, managerLimit: v })} placeholder="e.g. 5 Manager or Unlimited Manager" />
 
-                    <Fld label="EMPLOYEE LIMIT" value={npkg.employeeLimit} onChange={v => setNpkg({ ...npkg, employeeLimit: v })} placeholder="e.g. 50 Employee manage or Unlimited" />
+                    <Fld label="COMPANY NAME LIMIT (CLIENTS)" value={editPkgForm.clientLimit} onChange={v => setEditPkgForm({ ...editPkgForm, clientLimit: v })} placeholder="e.g. 10 Company manage or Unlimited" />
+
+                    <Fld label="EMPLOYEE LIMIT" value={editPkgForm.employeeLimit} onChange={v => setEditPkgForm({ ...editPkgForm, employeeLimit: v })} placeholder="e.g. 50 Employee manage or Unlimited" />
 
                   </div>
 
@@ -12898,17 +13197,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <div style={{ marginBottom: 14 }}>
 
-                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>FEATURES (Comma separated)</label>
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>DESCRIPTION</label>
 
                   <textarea
 
-                    value={npkg.features}
+                    value={editPkgForm.description}
 
-                    onChange={e => setNpkg({ ...npkg, features: e.target.value })}
+                    onChange={e => setEditPkgForm({ ...editPkgForm, description: e.target.value })}
 
                     style={{ width: "100%", height: 80, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", resize: "none" }}
 
-                    placeholder="e.g. Unlimited Company Names, Premium Support, Custom Branding"
+                    placeholder="Package description..."
 
                   />
 
@@ -12926,21 +13225,21 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                       {subadmins.map(s => (
 
-                        <label key={s._id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.text, cursor: "pointer", background: npkg.assignedSubadmins.includes(s._id) ? "rgba(124, 58, 237, 0.1)" : "transparent", padding: "4px 8px", borderRadius: 6 }}>
+                        <label key={s._id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.text, cursor: "pointer", background: editPkgForm.assignedSubadmins?.includes(s._id) ? "rgba(124, 58, 237, 0.1)" : "transparent", padding: "4px 8px", borderRadius: 6 }}>
 
                           <input
 
                             type="checkbox"
 
-                            checked={npkg.assignedSubadmins.includes(s._id)}
+                            checked={editPkgForm.assignedSubadmins?.includes(s._id)}
 
                             onChange={() => {
 
-                              const current = npkg.assignedSubadmins || [];
+                              const current = editPkgForm.assignedSubadmins || [];
 
                               const next = current.includes(s._id) ? current.filter(id => id !== s._id) : [...current, s._id];
 
-                              setNpkg({ ...npkg, assignedSubadmins: next });
+                              setEditPkgForm({ ...editPkgForm, assignedSubadmins: next });
 
                             }}
 
@@ -12964,560 +13263,272 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
 
-                  <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+                  <button onClick={() => setEditPackage(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
 
-                  <button onClick={addPackage} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Creating..." : "Create Package "}</button>
-
-                </div>
-
-              </Mdl>}
-
-
-
-              {modal === "vendor_add" && <Mdl title="Add New Vendor" onClose={() => setModal(null)}>
-
-                <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-
-                  <Fld label="Vendor Name *" value={nv.vendorName} onChange={v => { setNv({ ...nv, vendorName: v }); setNvError(p => ({ ...p, vendorName: "" })); }} error={nvError.vendorName} />
-
-                  <Fld label="Product Name *" value={nv.vendorProduct} onChange={v => { setNv({ ...nv, vendorProduct: v }); setNvError(p => ({ ...p, vendorProduct: "" })); }} error={nvError.vendorProduct} />
-
-                  <Fld label="Required Amount *" value={nv.amountTaxGst} type="number" onChange={v => { setNv({ ...nv, amountTaxGst: v }); setNvError(p => ({ ...p, amountTaxGst: "" })); }} error={nvError.amountTaxGst} />
-
-                  <Fld label="Paid Amount *" value={nv.paidAmount} type="number" onChange={v => { setNv({ ...nv, paidAmount: v }); setNvError(p => ({ ...p, paidAmount: "" })); }} error={nvError.paidAmount} />
-
-                  <Fld label="Date of Purchase" value={nv.dateOfPurchase} type="date" onChange={v => setNv({ ...nv, dateOfPurchase: v })} />
-
-                  <Fld label="Mode of Payment" value={nv.modeOfPayment} onChange={v => setNv({ ...nv, modeOfPayment: v })} options={["Cash", "Bank Transfer", "UPI", "Cheque"]} />
+                  <button onClick={savePackageEdit} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Saving..." : "Save Changes "}</button>
 
                 </div>
 
-                <Fld label="Product Description" value={nv.productDescription} onChange={v => setNv({ ...nv, productDescription: v })} />
+              </Mdl>
 
-                <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
+            )}
 
-                  <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
 
-                  <button onClick={addVendor} disabled={vendorSaveLoading} style={{ ...B("var(--app-accent)"), opacity: vendorSaveLoading ? 0.7 : 1 }}>{vendorSaveLoading ? "Saving..." : "Save Vendor "}</button>
+
+            {viewProject && (
+
+              <Mdl title="Project Details" onClose={() => setViewProject(null)} maxWidth={550}>
+
+                <div style={{ background: "#fff", borderRadius: 16 }}>
+
+                  {/* Header Info */}
+
+                  <div style={{ background: "var(--app-bg)", padding: "20px 24px", borderRadius: 16, marginBottom: 18, border: "1px solid var(--app-border)" }}>
+
+                    <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 8 }}>{viewProject.name}</h2>
+
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+
+                      <Badge label={viewProject.status || "Pending"} />
+
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--app-muted)", fontSize: 13, fontWeight: 600 }}>
+
+                        <span>Team</span> {viewProject.client}
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+
+
+                  {/* Budget Row */}
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 18 }}>
+
+                    <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>💰</div>
+
+                    <div>
+
+                      <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>BUDGET</div>
+
+                      <div style={{ fontSize: 18, fontWeight: 800, color: "var(--app-sidebar)" }}>{formatCurrency(viewProject.budget, viewProject.currency)}</div>
+
+                    </div>
+
+                  </div>
+
+
+
+                  {/* Assigned Employees */}
+
+                  <div style={{ marginBottom: 18 }}>
+
+                    <h3 style={{ fontSize: 10, fontWeight: 800, color: "var(--app-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>ASSIGNED EMPLOYEES</h3>
+
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+
+                      {(() => {
+
+                        const assignedEmployees = Array.isArray(viewProject.assignedTo) ? viewProject.assignedTo : (viewProject.assignedTo ? [viewProject.assignedTo] : []);
+
+                        return assignedEmployees.length > 0 ? assignedEmployees.map((emp, idx) => (
+
+                          <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "var(--app-bg)", borderRadius: 12, border: "1px solid var(--app-border)" }}>
+
+                            <div style={{ width: 30, height: 30, borderRadius: "50%", background: "var(--app-accent-gradient)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 700 }}>{emp[0].toUpperCase()}</div>
+
+                            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)" }}>{emp}</span>
+
+                          </div>
+
+                        )) : <div style={{ color: "var(--app-muted)", fontSize: 12, fontStyle: "italic" }}>No employees assigned</div>;
+
+                      })()}
+
+                    </div>
+
+                  </div>
+
+
+
+                  {/* Purpose Row */}
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 24 }}>
+
+                    <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>🎯</div>
+
+                    <div>
+
+                      <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>PURPOSE</div>
+
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>{viewProject.purpose || "—"}</div>
+
+                    </div>
+
+                  </div>
+
+
+
+                  <div style={{ display: "flex", gap: 10 }}>
+
+                    <button onClick={() => setViewProject(null)} style={{ flex: 1, padding: "11px", background: "var(--app-accent-gradient)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>✕</button>
+
+                  </div>
 
                 </div>
 
-              </Mdl>}
+              </Mdl>
 
+            )}
 
 
-              {/* ── View Package Modal ── */}
 
-              {viewPackage && (
+            {/* Upload File Modal */}
 
-                <Mdl title={`Package Details: ${viewPackage.title}`} onClose={() => setViewPackage(null)} maxWidth={500}>
+            {uploadFileTarget && (
 
-                  <div style={{ padding: "10px 0" }}>
+              <Mdl title="Upload Document" onClose={() => { setUploadFileTarget(null); setUploadTargetUser(""); }}>
 
-                    <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
+                <div style={{ marginBottom: 16 }}>
 
-                      <div style={{ width: 56, height: 56, borderRadius: "50%", background: "var(--app-accent-gradient)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)", marginBottom: 8 }}>Selected File</div>
 
-                        {viewPackage.icon || "📦"}
+                  <div style={{ padding: "12px 16px", background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 10, display: "flex", alignItems: "center", gap: 10 }}>
 
-                      </div>
+                    <i className="ti ti-file" style={{ fontSize: 20, color: "var(--app-accent)" }}></i>
 
-                      <div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
 
-                        <div style={{ fontSize: 18, fontWeight: 800, color: T.text }}>{viewPackage.title}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{uploadFileTarget.name}</div>
 
-                        <div style={{ fontSize: 13, color: "var(--app-muted)" }}>{viewPackage.type === "free" ? "Free Package" : "Paid Package"}</div>
-
-                      </div>
-
-                    </div>
-
-
-
-                    <InfoRow icon="📄" label="Description" value={viewPackage.description} />
-
-                    <InfoRow icon="📅" label="Duration" value={`${viewPackage.no_of_days || viewPackage.noOfDays || 30} days`} />
-
-                    <InfoRow icon="💰" label="Price" value={viewPackage.type === "free" ? "Free" : `Rs.${viewPackage.price || 0}`} />
-
-                    <InfoRow icon="" label="Plan Duration" value={viewPackage.planDuration || "Monthly"} />
-
-                    <InfoRow icon="🏢" label="Business" value={viewPackage.businessLimit || ""} />
-
-                    <InfoRow icon="👨‍💼" label="Manager" value={viewPackage.managerLimit || ""} />
-
-                    <InfoRow icon="Team" label="Clients (Company Name)" value={viewPackage.clientLimit || ""} />
-
-                    <InfoRow icon="👤" label="Employee" value={viewPackage.employeeLimit || ""} />
-
-                    <InfoRow icon="📊" label="Status" value={viewPackage.status || "Active"} />
-
-
-
-                    {viewPackage.features && viewPackage.features.length > 0 && (
-
-                      <div style={{ marginTop: 20 }}>
-
-                        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)", marginBottom: 10 }}>FEATURES</div>
-
-                        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-
-                          {(Array.isArray(viewPackage.features) ? viewPackage.features : viewPackage.features.split('\\n')).map((f, i) => (
-
-                            <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: T.text }}>
-
-                              <span style={{ color: "#22c55e" }}>✓</span> {f}
-
-                            </div>
-
-                          ))}
-
-                        </div>
-
-                      </div>
-
-                    )}
-
-                  </div>
-
-                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
-
-                    <button onClick={() => setViewPackage(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 20px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>✕</button>
-
-                  </div>
-
-                </Mdl>
-
-              )}
-
-
-
-              {/* ── Edit Package Modal ── */}
-
-              {editPackage && (
-
-                <Mdl title={`Edit Package: ${editPackage.title}`} onClose={() => setEditPackage(null)} maxWidth={700}>
-
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
-
-                    <Fld label="Package Title *" value={editPkgForm.title} onChange={v => setEditPkgForm({ ...editPkgForm, title: v })} />
-
-                    <Fld label="Icon (Emoji)" value={editPkgForm.icon} onChange={v => setEditPkgForm({ ...editPkgForm, icon: v })} />
-
-                    <Fld label="Type" value={editPkgForm.type} onChange={v => setEditPkgForm({ ...editPkgForm, type: v })} options={["free", "paid"]} />
-
-                    <Fld label="Price" value={editPkgForm.price} onChange={v => setEditPkgForm({ ...editPkgForm, price: v })} disabled={editPkgForm.type === "free"} />
-
-                    <Fld label="Number of Days *" value={editPkgForm.noOfDays} onChange={v => setEditPkgForm({ ...editPkgForm, noOfDays: v })} />
-
-                    <Fld label="Status" value={editPkgForm.status} onChange={v => setEditPkgForm({ ...editPkgForm, status: v })} options={["Active", "Inactive"]} />
-
-                  </div>
-
-
-
-                  <div style={{ background: "#f8fafc", padding: 18, borderRadius: 16, border: "1px solid #f1f5f9", margin: "14px 0" }}>
-
-                    <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>BUSINESS MANAGEMENT</div>
-
-                    <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
-
-                      {["Single business manage", "Multiple business manage"].map(mode => (
-
-                        <button
-
-                          key={mode}
-
-                          onClick={() => setEditPkgForm({ ...editPkgForm, businessLimit: mode })}
-
-                          style={{
-
-                            flex: 1,
-
-                            padding: "12px",
-
-                            borderRadius: 12,
-
-                            border: editPkgForm.businessLimit === mode ? "1.5px solid #7c3aed" : "1.5px solid #e2e8f0",
-
-                            background: editPkgForm.businessLimit === mode ? "#f5f3ff" : "#fff",
-
-                            color: editPkgForm.businessLimit === mode ? "#7c3aed" : "#64748b",
-
-                            fontSize: 13,
-
-                            fontWeight: 700,
-
-                            cursor: "pointer",
-
-                            transition: "all 0.2s"
-
-                          }}
-
-                        >
-
-                          {editPkgForm.businessLimit === mode ? "✓ " : ""}{mode}
-
-                        </button>
-
-                      ))}
-
-                    </div>
-
-
-
-                    <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12, marginTop: 12 }}>PACKAGE LIMITS</div>
-
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
-
-                      <Fld label="Plan Duration" value={editPkgForm.planDuration} onChange={v => setEditPkgForm({ ...editPkgForm, planDuration: v })} options={["Monthly", "90 Days", "Yearly"]} />
-
-                      <Fld label="MANAGER LIMIT (TYPE NUMBER)" value={editPkgForm.managerLimit} onChange={v => setEditPkgForm({ ...editPkgForm, managerLimit: v })} placeholder="e.g. 5 Manager or Unlimited Manager" />
-
-                      <Fld label="COMPANY NAME LIMIT (CLIENTS)" value={editPkgForm.clientLimit} onChange={v => setEditPkgForm({ ...editPkgForm, clientLimit: v })} placeholder="e.g. 10 Company manage or Unlimited" />
-
-                      <Fld label="EMPLOYEE LIMIT" value={editPkgForm.employeeLimit} onChange={v => setEditPkgForm({ ...editPkgForm, employeeLimit: v })} placeholder="e.g. 50 Employee manage or Unlimited" />
+                      <div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{(uploadFileTarget.size / 1024 / 1024).toFixed(2)} MB</div>
 
                     </div>
 
                   </div>
 
+                </div>
 
+                <div style={{ marginBottom: 16 }}>
 
-                  <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>SEND TO TYPE *</label>
 
-                    <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>DESCRIPTION</label>
+                  <select value={uploadTargetRole} onChange={(e) => { setUploadTargetRole(e.target.value); setUploadTargetUser(""); }} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--app-border)", background: "var(--app-bg)", color: "var(--app-text)", fontSize: 13, outline: "none", fontFamily: "inherit" }}>
 
-                    <textarea
+                    <option value="client">Client</option>
 
-                      value={editPkgForm.description}
+                    <option value="employee">Employee</option>
 
-                      onChange={e => setEditPkgForm({ ...editPkgForm, description: e.target.value })}
+                  </select>
 
-                      style={{ width: "100%", height: 80, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", resize: "none" }}
+                </div>
 
-                      placeholder="Package description..."
+                <div style={{ marginBottom: 24 }}>
 
-                    />
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>SELECT {uploadTargetRole.toUpperCase()} *</label>
 
-                  </div>
+                  <select value={uploadTargetUser} onChange={(e) => setUploadTargetUser(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--app-border)", background: "var(--app-bg)", color: "var(--app-text)", fontSize: 13, outline: "none", fontFamily: "inherit" }}>
 
+                    <option value="">-- Select --</option>
 
+                    {uploadTargetRole === "client"
 
-                  {user?.role === "admin" && (
+                      ? clients.map(c => <option key={c._id || c.id} value={c.clientName || c.name}>{c.clientName || c.name}</option>)
 
-                    <div style={{ marginBottom: 14 }}>
+                      : employees.map(e => <option key={e._id || e.id} value={e.name}>{e.name}</option>)
 
-                      <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGN TO SUBADMINS (ONLY ASSIGNED WILL SEE THIS)</label>
+                    }
 
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: 12, border: "1.5px solid var(--app-border)", borderRadius: 10, background: "var(--app-bg)" }}>
+                  </select>
 
-                        {subadmins.map(s => (
+                </div>
 
-                          <label key={s._id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.text, cursor: "pointer", background: editPkgForm.assignedSubadmins?.includes(s._id) ? "rgba(124, 58, 237, 0.1)" : "transparent", padding: "4px 8px", borderRadius: 6 }}>
+                <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
 
-                            <input
+                  <button onClick={() => { setUploadFileTarget(null); setUploadTargetUser(""); }} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: "var(--app-text)", borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
+                  <button disabled={!uploadTargetUser || uploadIsSending} onClick={async () => {
+                    setUploadIsSending(true);
+                    try {
+                      const reader = new FileReader();
+                      reader.readAsDataURL(uploadFileTarget);
+                      reader.onload = async () => {
+                        const base64Data = reader.result;
+                        const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
 
-                              type="checkbox"
+                        let resolvedClientId = "";
+                        let resolvedEmployeeId = "";
+                        if (uploadTargetRole === "client") {
+                          const match = clients.find(c => (c.clientName || c.name) === uploadTargetUser);
+                          resolvedClientId = match?._id || match?.id || "";
+                        } else if (uploadTargetRole === "employee") {
+                          const match = employees.find(e => e.name === uploadTargetUser);
+                          resolvedEmployeeId = match?._id || match?.id || "";
+                        }
 
-                              checked={editPkgForm.assignedSubadmins?.includes(s._id)}
+                        await axios.post(`${BASE_URL}/api/documents`, {
+                          docType: "upload",
+                          sendTo: uploadTargetRole,
+                          client: uploadTargetUser,
+                          clientId: resolvedClientId,
+                          employeeId: resolvedEmployeeId,
+                          recipientEmail: "",
+                          htmlContent: base64Data,
+                          senderCompany: companyNameStr,
+                          companyId
+                        });
 
-                              onChange={() => {
-
-                                const current = editPkgForm.assignedSubadmins || [];
-
-                                const next = current.includes(s._id) ? current.filter(id => id !== s._id) : [...current, s._id];
-
-                                setEditPkgForm({ ...editPkgForm, assignedSubadmins: next });
-
-                              }}
-
-                            />
-
-                            {s.name}
-
-                          </label>
-
-                        ))}
-
-                        {subadmins.length === 0 && <div style={{ fontSize: 12, color: "var(--app-muted)" }}>No subadmins found</div>}
-
-                      </div>
-
-                    </div>
-
-                  )}
-
-
-
-                  <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-
-                    <button onClick={() => setEditPackage(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-
-                    <button onClick={savePackageEdit} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Saving..." : "Save Changes "}</button>
-
-                  </div>
-
-                </Mdl>
-
-              )}
-
-
-
-              {viewProject && (
-
-                <Mdl title="Project Details" onClose={() => setViewProject(null)} maxWidth={550}>
-
-                  <div style={{ background: "#fff", borderRadius: 16 }}>
-
-                    {/* Header Info */}
-
-                    <div style={{ background: "var(--app-bg)", padding: "20px 24px", borderRadius: 16, marginBottom: 18, border: "1px solid var(--app-border)" }}>
-
-                      <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 8 }}>{viewProject.name}</h2>
-
-                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-
-                        <Badge label={viewProject.status || "Pending"} />
-
-                        <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--app-muted)", fontSize: 13, fontWeight: 600 }}>
-
-                          <span>Team</span> {viewProject.client}
-
-                        </div>
-
-                      </div>
-
-                    </div>
-
-
-
-                    {/* Budget Row */}
-
-                    <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 18 }}>
-
-                      <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>💰</div>
-
-                      <div>
-
-                        <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>BUDGET</div>
-
-                        <div style={{ fontSize: 18, fontWeight: 800, color: "var(--app-sidebar)" }}>{formatCurrency(viewProject.budget, viewProject.currency)}</div>
-
-                      </div>
-
-                    </div>
-
-
-
-                    {/* Assigned Employees */}
-
-                    <div style={{ marginBottom: 18 }}>
-
-                      <h3 style={{ fontSize: 10, fontWeight: 800, color: "var(--app-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>ASSIGNED EMPLOYEES</h3>
-
-                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-
-                        {(() => {
-
-                          const assignedEmployees = Array.isArray(viewProject.assignedTo) ? viewProject.assignedTo : (viewProject.assignedTo ? [viewProject.assignedTo] : []);
-
-                          return assignedEmployees.length > 0 ? assignedEmployees.map((emp, idx) => (
-
-                            <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "var(--app-bg)", borderRadius: 12, border: "1px solid var(--app-border)" }}>
-
-                              <div style={{ width: 30, height: 30, borderRadius: "50%", background: "var(--app-accent-gradient)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 700 }}>{emp[0].toUpperCase()}</div>
-
-                              <span style={{ fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)" }}>{emp}</span>
-
-                            </div>
-
-                          )) : <div style={{ color: "var(--app-muted)", fontSize: 12, fontStyle: "italic" }}>No employees assigned</div>;
-
-                        })()}
-
-                      </div>
-
-                    </div>
-
-
-
-                    {/* Purpose Row */}
-
-                    <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 24 }}>
-
-                      <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>🎯</div>
-
-                      <div>
-
-                        <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>PURPOSE</div>
-
-                        <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>{viewProject.purpose || "—"}</div>
-
-                      </div>
-
-                    </div>
-
-
-
-                    <div style={{ display: "flex", gap: 10 }}>
-
-                      <button onClick={() => setViewProject(null)} style={{ flex: 1, padding: "11px", background: "var(--app-accent-gradient)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>✕</button>
-
-                    </div>
-
-                  </div>
-
-                </Mdl>
-
-              )}
-
-
-
-              {/* Upload File Modal */}
-
-              {uploadFileTarget && (
-
-                <Mdl title="Upload Document" onClose={() => { setUploadFileTarget(null); setUploadTargetUser(""); }}>
-
-                  <div style={{ marginBottom: 16 }}>
-
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)", marginBottom: 8 }}>Selected File</div>
-
-                    <div style={{ padding: "12px 16px", background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 10, display: "flex", alignItems: "center", gap: 10 }}>
-
-                      <i className="ti ti-file" style={{ fontSize: 20, color: "var(--app-accent)" }}></i>
-
-                      <div style={{ flex: 1, minWidth: 0 }}>
-
-                        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{uploadFileTarget.name}</div>
-
-                        <div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{(uploadFileTarget.size / 1024 / 1024).toFixed(2)} MB</div>
-
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                  <div style={{ marginBottom: 16 }}>
-
-                    <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>SEND TO TYPE *</label>
-
-                    <select value={uploadTargetRole} onChange={(e) => { setUploadTargetRole(e.target.value); setUploadTargetUser(""); }} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--app-border)", background: "var(--app-bg)", color: "var(--app-text)", fontSize: 13, outline: "none", fontFamily: "inherit" }}>
-
-                      <option value="client">Client</option>
-
-                      <option value="employee">Employee</option>
-
-                    </select>
-
-                  </div>
-
-                  <div style={{ marginBottom: 24 }}>
-
-                    <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>SELECT {uploadTargetRole.toUpperCase()} *</label>
-
-                    <select value={uploadTargetUser} onChange={(e) => setUploadTargetUser(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--app-border)", background: "var(--app-bg)", color: "var(--app-text)", fontSize: 13, outline: "none", fontFamily: "inherit" }}>
-
-                      <option value="">-- Select --</option>
-
-                      {uploadTargetRole === "client"
-
-                        ? clients.map(c => <option key={c._id || c.id} value={c.clientName || c.name}>{c.clientName || c.name}</option>)
-
-                        : employees.map(e => <option key={e._id || e.id} value={e.name}>{e.name}</option>)
-
-                      }
-
-                    </select>
-
-                  </div>
-
-                  <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-
-                    <button onClick={() => { setUploadFileTarget(null); setUploadTargetUser(""); }} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: "var(--app-text)", borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
-                    <button disabled={!uploadTargetUser || uploadIsSending} onClick={async () => {
-                      setUploadIsSending(true);
-                      try {
-                        const reader = new FileReader();
-                        reader.readAsDataURL(uploadFileTarget);
-                        reader.onload = async () => {
-                          const base64Data = reader.result;
-                          const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
-
-                          let resolvedClientId = "";
-                          let resolvedEmployeeId = "";
-                          if (uploadTargetRole === "client") {
-                            const match = clients.find(c => (c.clientName || c.name) === uploadTargetUser);
-                            resolvedClientId = match?._id || match?.id || "";
-                          } else if (uploadTargetRole === "employee") {
-                            const match = employees.find(e => e.name === uploadTargetUser);
-                            resolvedEmployeeId = match?._id || match?.id || "";
+                        if (uploadTargetRole === "employee" && resolvedEmployeeId) {
+                          try {
+                            await axios.post(`${BASE_URL}/api/notifications`, {
+                              userId: resolvedEmployeeId,
+                              type: "document",
+                              icon: "ti-files",
+                              text: `A new document has been shared with you`,
+                            });
+                          } catch (notifErr) {
+                            console.error("Failed to notify employee:", notifErr);
                           }
+                        }
 
-                          await axios.post(`${BASE_URL}/api/documents`, {
-                            docType: "upload",
-                            sendTo: uploadTargetRole,
-                            client: uploadTargetUser,
-                            clientId: resolvedClientId,
-                            employeeId: resolvedEmployeeId,
-                            recipientEmail: "",
-                            htmlContent: base64Data,
-                            senderCompany: companyNameStr,
-                            companyId
-                          });
+                        toast.success("File uploaded successfully!");
+                        setUploadFileTarget(null);
+                        setUploadTargetUser("");
+                      };
 
-                          if (uploadTargetRole === "employee" && resolvedEmployeeId) {
-                            try {
-                              await axios.post(`${BASE_URL}/api/notifications`, {
-                                userId: resolvedEmployeeId,
-                                type: "document",
-                                icon: "ti-files",
-                                text: `A new document has been shared with you`,
-                              });
-                            } catch (notifErr) {
-                              console.error("Failed to notify employee:", notifErr);
-                            }
-                          }
+                    } catch (err) {
 
-                          toast.success("File uploaded successfully!");
-                          setUploadFileTarget(null);
-                          setUploadTargetUser("");
-                        };
+                      console.error(err);
 
-                      } catch (err) {
+                      toast.error("Upload failed.");
 
-                        console.error(err);
+                    } finally {
 
-                        toast.error("Upload failed.");
+                      setUploadIsSending(false);
 
-                      } finally {
+                    }
 
-                        setUploadIsSending(false);
+                  }} style={{ flex: 1, padding: "11px", background: (!uploadTargetUser || uploadIsSending) ? "var(--app-border)" : "var(--app-accent)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: (!uploadTargetUser || uploadIsSending) ? "var(--app-muted)" : "#fff", cursor: (!uploadTargetUser || uploadIsSending) ? "not-allowed" : "pointer", fontFamily: "inherit", transition: "all 0.2s" }}>
 
-                      }
+                    {uploadIsSending ? "Uploading..." : "Upload File"}
 
-                    }} style={{ flex: 1, padding: "11px", background: (!uploadTargetUser || uploadIsSending) ? "var(--app-border)" : "var(--app-accent)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: (!uploadTargetUser || uploadIsSending) ? "var(--app-muted)" : "#fff", cursor: (!uploadTargetUser || uploadIsSending) ? "not-allowed" : "pointer", fontFamily: "inherit", transition: "all 0.2s" }}>
+                  </button>
 
-                      {uploadIsSending ? "Uploading..." : "Upload File"}
+                </div>
 
-                    </button>
+              </Mdl>
 
-                  </div>
-
-                </Mdl>
-
-              )}
-
-            </div>
+            )}
 
           </div>
 
-        </div >
+        </div>
 
       </div >
 
-    );
+    </div >
 
-  }
+  );
+
+}

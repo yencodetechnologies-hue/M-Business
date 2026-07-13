@@ -2870,7 +2870,17 @@ useEffect(() => {
 
   const fetchClients = async () => { try { const res = await axios.get(BASE_URL + "/api/clients"); setClients(res.data); try { localStorage.setItem("cached_clients", JSON.stringify(res.data)); } catch {} } catch (e) { console.log(e); } };
   const fetchEmployees = async () => { try { const res = await axios.get(BASE_URL + "/api/employees"); setEmployees(res.data); } catch (e) { console.log(e); } };
-  const fetchProjects = async () => { try { const res = await axios.get(BASE_URL + "/api/projects"); setProjects(res.data); } catch (e) { console.log(e); } };
+  const fetchProjects = async () => {
+      try {
+        const cached = localStorage.getItem("cached_projects");
+        if (cached) { try { setProjects(JSON.parse(cached)); } catch { } }
+      } catch { }
+      try {
+        const res = await axios.get(BASE_URL + "/api/projects");
+        setProjects(res.data);
+        try { localStorage.setItem("cached_projects", JSON.stringify(res.data)); } catch { }
+      } catch (e) { console.log(e); }
+    };
   const fetchManagers = async () => { try { const res = await axios.get(BASE_URL + "/api/managers"); setManagers(res.data); } catch (e) { console.log(e); } };
   const fetchSubadmins = async () => { try { const res = await axios.get(BASE_URL + "/api/subadmins"); setSubadmins(res.data); } catch (e) { console.log(e); } };
   const fetchPackages = async () => { 

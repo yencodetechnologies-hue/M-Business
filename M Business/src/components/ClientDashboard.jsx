@@ -1071,6 +1071,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const activeProjDesc = activeProj?.description || "";
   const activeProjDeadline = activeProj?.deadline || activeProj?.end || "";
   const activeProjStatus = activeProj?.status || "";
+  const portalSettings = activeProj?.portalSettings || { enablePortal: true, showProgress: true, showMilestones: true, showTeam: false, allowMessages: true };
 
   // Styles Injection
   const CSS = `
@@ -1470,7 +1471,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             </button>
 
 
-            <button className={`tn-item ${active === "messages" ? "active" : ""}`} onClick={() => setActive("messages")}>Messages</button>
+            {portalSettings.allowMessages && (
+              <button className={`tn-item ${active === "messages" ? "active" : ""}`} onClick={() => setActive("messages")}>Messages</button>
+            )}
           </div>
           <div className="tn-right">
             <div style={{ position: "relative" }} data-notif-anchor="true">
@@ -1548,10 +1551,12 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             <div className="hero-title">{activeProjName}</div>
             <div className="hero-sub">{activeProjDesc}</div>
             <div className="hero-stats">
-              <div className="hs-item" onClick={() => setActive('projects')} style={{ cursor: 'pointer', opacity: 1 }}>
-                <div className="hs-val">{activeProjProgress}%</div>
-                <div className="hs-label">Complete</div>
-              </div>
+              {portalSettings.showProgress && (
+                <div className="hs-item" onClick={() => setActive('projects')} style={{ cursor: 'pointer', opacity: 1 }}>
+                  <div className="hs-val">{activeProjProgress}%</div>
+                  <div className="hs-label">Complete</div>
+                </div>
+              )}
               <div className="hs-item" onClick={() => setActive('timeline')} style={{ cursor: 'pointer' }}>
                 <div className="hs-val">{activeProjDeadline ? Math.max(0, Math.ceil((new Date(activeProjDeadline) - Date.now()) / (1000 * 60 * 60 * 24))) : '—'}</div>
                 <div className="hs-label">Days Left</div>
@@ -1567,17 +1572,19 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             </div>
           </div>
           <div className="hero-right">
-            <div className="hero-pct-ring">
-              <svg viewBox="0 0 110 110">
-                <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(255,255,255,.15)" strokeWidth="10" />
-                <circle cx="55" cy="55" r="46" fill="none" stroke="#fff" strokeWidth="10"
-                  strokeDasharray="289" strokeDashoffset={dashoffset} strokeLinecap="round" style={{ transition: "stroke-dashoffset 1s ease" }} />
-              </svg>
-              <div className="hero-pct-center">
-                <div className="hero-pct-val">{activeProjProgress}%</div>
-                <div className="hero-pct-label">Done</div>
+            {portalSettings.showProgress && (
+              <div className="hero-pct-ring">
+                <svg viewBox="0 0 110 110">
+                  <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(255,255,255,.15)" strokeWidth="10" />
+                  <circle cx="55" cy="55" r="46" fill="none" stroke="#fff" strokeWidth="10"
+                    strokeDasharray="289" strokeDashoffset={dashoffset} strokeLinecap="round" style={{ transition: "stroke-dashoffset 1s ease" }} />
+                </svg>
+                <div className="hero-pct-center">
+                  <div className="hero-pct-val">{activeProjProgress}%</div>
+                  <div className="hero-pct-label">Done</div>
+                </div>
               </div>
-            </div>
+            )}
             <div className="hero-status-badge"><span>{activeProjStatus || (activeProjProgress === 100 ? "Completed" : "In Review")}</span></div>
           </div>
         </div>
@@ -2817,7 +2824,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           </div>
         )}
 
-        {active === "messages" && (
+        {active === "messages" && portalsettings.allowmessages && (
           <div>
             <div className="sec-header">
               <div className="sec-title">
@@ -2987,10 +2994,12 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             <i className="ti ti-receipt-2"></i>
             <div className="mbn-label">Invoices</div>
           </button>
-          <button className={`mbn-item ${active === "messages" ? "active" : ""}`} onClick={() => setActive("messages")}>
-            <i className="ti ti-message-2"></i>
-            <div className="mbn-label">Messages</div>
-          </button>
+          {portalSettings.allowMessages && (
+            <button className={`mbn-item ${active === "messages" ? "active" : ""}`} onClick={() => setActive("messages")}>
+              <i className="ti ti-message-2"></i>
+              <div className="mbn-label">Messages</div>
+            </button>
+          )}
         </div>
       </div>
       {/* PROPOSAL VIEWER MODAL */}

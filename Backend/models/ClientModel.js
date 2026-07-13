@@ -52,6 +52,7 @@ const ClientSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 ClientSchema.index({ email: 1, companyId: 1 }, { unique: true });
+ClientSchema.index({ companyId: 1, createdAt: -1 });
 
 // Safety net: if a client is ever saved with no password (blank or missing),
 // automatically assign the hashed default password "123456" instead of

@@ -7173,7 +7173,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  const [clients, setClients] = useState(() => { try { const c = localStorage.getItem("cached_clients"); return c ? JSON.parse(c) : []; } catch { return []; } });
+  const [clients, setClients] = useState(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem("user") || "{}");
+      const cid = u.companyId;
+      if (!cid) return [];
+      const c = localStorage.getItem("cached_clients_" + cid);
+      return c ? JSON.parse(c) : [];
+    } catch { return []; }
+  });
 
 
   const todayStr = new Date().toISOString().split("T")[0];
@@ -8202,14 +8210,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   };
 
   const fetchClients = async () => {
+    if (!user?.companyId) return;
     try {
-      const cached = localStorage.getItem("cached_clients");
-      if (cached) { try { setClients(JSON.parse(cached)); } catch { } }
-    } catch { }
-    try {
-      const res = await axios.get(BASE_URL + "/api/clients?companyId=" + encodeURIComponent(user?.companyId || ""));
+      const res = await axios.get(BASE_uRL + "/api/clients", {
+        headers: { 'x-company-id': user.companyId }
+      });
       setClients(res.data);
-      try { localStorage.setItem("cached_clients", JSON.stringify(res.data)); } catch { }
+      try { localStorage.setItem("cached_Clients_" + user.companyId, JSON.stringify(res.data)); } catch { }
     } catch (e) { console.log(e); }
   };
 

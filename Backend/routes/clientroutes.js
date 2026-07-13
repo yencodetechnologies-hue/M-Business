@@ -75,7 +75,8 @@ router.get("/my-projects", verifyClientPortal, async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const filter = req.companyId ? { companyId: req.companyId } : {};
+    const companyId = req.companyId || req.query.companyId || "";
+    const filter = companyId ? { companyId } : {};
     const clients = await Client.find(filter).sort({ createdAt: -1 }).lean();
     res.json(clients);
   } catch (err) {

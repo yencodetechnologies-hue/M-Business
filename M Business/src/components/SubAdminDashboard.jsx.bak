@@ -2869,7 +2869,14 @@ useEffect(() => {
   };
 
   const fetchClients = async () => { try { const res = await axios.get(BASE_URL + "/api/clients"); setClients(res.data); try { localStorage.setItem("cached_clients", JSON.stringify(res.data)); } catch {} } catch (e) { console.log(e); } };
-  const fetchEmployees = async () => { try { const res = await axios.get(BASE_URL + "/api/employees"); setEmployees(res.data); } catch (e) { console.log(e); } };
+  const fetchEmployees = async () => {
+  try {
+    const res = await axios.get(BASE_URL + "/api/employees", {
+      headers: { 'x-company-id': resolveSubadminId() }
+    });
+    setEmployees(res.data);
+  } catch (e) { console.log(e); }
+};
   const fetchProjects = async () => {
       try {
         const cached = localStorage.getItem("cached_projects");
@@ -3020,7 +3027,9 @@ const handleEditPackage = (pkg) => {
   };
 
   const addEmployee = async () => {
-    const errors = {}; if (!ne.name.trim()) errors.name = "Name is required"; if (!ne.email.trim()) errors.email = "Email is required"; if (!ne.password.trim()) errors.password = "Password is required"; if (Object.keys(errors).length > 0) { setNeError(errors); return; } try { setEmpSaveLoading(true); const payload = { ...ne, role: ne.role || "employee" }; const res = await axios.post(BASE_URL + "/api/employees/add", payload); setEmployees(prev => [res.data.employee, ...prev]); setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Active", password: "" }); setShowEmpPass(false); setNeError({}); setModal(null); } catch (err) {
+    const errors = {}; if (!ne.name.trim()) errors.name = "Name is required"; if (!ne.email.trim()) errors.email = "Email is required"; if (!ne.password.trim()) errors.password = "Password is required"; if (Object.keys(errors).length > 0) { setNeError(errors); return; } try { setEmpSaveLoading(true); const payload = { ...ne, role: ne.role || "employee" }; const res = await axios.post(BASE_URL + "/api/employees/add", payload, {
+  headers: { 'x-company-id': resolveSubadminId() }
+}); setEmployees(prev => [res.data.employee, ...prev]); setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Active", password: "" }); setShowEmpPass(false); setNeError({}); setModal(null); } catch (err) {
       const errMsg = err.response?.data?.message || err.response?.data?.msg || "Failed to save";
       const isPasswordError = errMsg.toLowerCase().includes("password");
       setNeError(isPasswordError ? { password: errMsg } : { email: errMsg });

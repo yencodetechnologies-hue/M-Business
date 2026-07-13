@@ -7570,7 +7570,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     // priority instead of just an earlier call in the same tick.
     (async () => {
       await fetchClients();
-      setIsLoading(false);
       await fetchProjects();
 
       fetchProfile();
@@ -8220,7 +8219,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     } catch (e) { console.log(e); }
   };
 
-  const fetchEmployees = async () => { try { const res = await axios.get(BASE_URL + "/api/employees"); setEmployees(res.data); } catch (e) { console.log(e); } };
+  const fetchEmployees = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/api/employees", {
+        headers: { 'x-company-id': resolveSubadminId() }
+      });
+      setEmployees(res.data);
+    } catch (e) { console.log(e); }
+  };
 
   const fetchProjects = async () => {
     try {
@@ -8726,7 +8732,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       };
 
-      const res = await axios.post(BASE_URL + "/api/employees/add", payload);
+      const res = await axios.post(BASE_URL + "/api/employees/add", payload, {
+        headers: { 'x-company-id': resolveSubadminId() }
+      });
 
       setEmployees(prev => [res.data.employee, ...prev]);
 

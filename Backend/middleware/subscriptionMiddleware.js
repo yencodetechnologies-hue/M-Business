@@ -155,6 +155,7 @@ const checkResourceLimit = (resourceType) => async (req, res, next) => {
     let errorMessage = "";
 
     if (resourceType === 'client') {
+      limit = Infinity;
       currentCount = await Client.countDocuments({ companyId });
       errorMessage = `Client limit reached (${limit === Infinity ? "Unlimited" : limit}). Your Admin has restricted your account to ${limit} clients.`;
     } else if (resourceType === 'employee') {

@@ -147,7 +147,7 @@ function Mdl({ title, onClose, children, maxWidth = 820 }) {
   );
 }
 
-function Fld({ label, value, onChange, options, type = "text", error, placeholder, disabled, allowCustom, name }) {
+function Fld({ label, value, onChange, options, type = "text", error, placeholder, disabled, allowCustom, name, dataField }) {
   const s = { width: "100%", border: `1.5px solid ${error ? "#EF4444" : "#ede9fe"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: disabled ? "#f3f0ff" : "#faf5ff", boxSizing: "border-box", outline: "none", fontFamily: "inherit", opacity: disabled ? 0.7 : 1 };
   const sCustom = { flex: 1.2, border: `1.5px solid ${error ? "#EF4444" : "#ede9fe"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "#fff", boxSizing: "border-box", outline: "none", fontFamily: "inherit" };
   return (
@@ -4001,7 +4001,7 @@ const handleEditPackage = (pkg) => {
       {modal === "employee" && <Mdl title="Add New Employee" onClose={() => setModal(null)}>
         <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
           <Fld label="Full Name *" value={ne.name} onChange={v => setNe({ ...ne, name: v })} error={neError.name} name="name" />
-          <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} dataField="email" />
+          <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} name="email" />
           <Fld label="Phone Number" value={ne.phone} onChange={v => setNe({ ...ne, phone: v })} />
           <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v })} options={DEPARTMENT_OPTIONS} />
           <Fld label="Department" value={ne.department} onChange={v => setNe({ ...ne, department: v })} />

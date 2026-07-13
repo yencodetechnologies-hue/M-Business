@@ -559,7 +559,7 @@ function Mdl({ title, onClose, children, maxWidth = 820, zIndex = 1000 }) {
 
 
 
-function Fld({ label, value, onChange, options, type = "text", error, placeholder, disabled, allowCustom, name }) {
+function Fld({ label, value, onChange, options, type = "text", error, placeholder, disabled, allowCustom, name, dataField }) {
   const [isCustomMode, setIsCustomMode] = useState(() => {
     if (!allowCustom) return false;
     if (!value) return false;
@@ -586,7 +586,7 @@ function Fld({ label, value, onChange, options, type = "text", error, placeholde
 
   return (
 
-    <div style={{ marginBottom: 14 }}>
+    <div style={{ marginBottom: 14 }} data-field={dataField || name}>
 
       <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>{label.toUpperCase()}</label>
 
@@ -600,7 +600,7 @@ function Fld({ label, value, onChange, options, type = "text", error, placeholde
 
             <div style={{ display: "flex", gap: 10 }}>
 
-              <select value={selectValue} onChange={e => { const v = e.target.value; if (v === "Custom") { setIsCustomMode(true); onChange(""); } else { setIsCustomMode(false); onChange(v); } }} style={{ ...s, flex: 1 }} disabled={disabled}><option value="Custom">Custom...</option>{options.map(o => <option key={o} value={o}>{o || "Select option..."}</option>)}</select>
+              <select value={value || ""} onChange={e => onChange(e.target.value)} style={s} disabled={disabled}>{options.map(o => <option key={o} value={o === "Select Status" ? "" : o} disabled={o === "Select Status"}>{o}</option>)}</select>
 
               {isCustomMode && <input type="text" placeholder={`Type custom ${label.toLowerCase()}...`} value={value || ""} onChange={e => onChange(e.target.value)} style={sCustom} disabled={disabled} autoFocus />}
 
@@ -7224,7 +7224,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     } catch { return []; }
   });
 
-  const [ne, setNe] = useState({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Pending", password: "" });
+  const [ne, setNe] = useState({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "", password: "" });
 
   const [showEmpPass, setShowEmpPass] = useState(false);
   const [showEmpConfirmPass, setShowEmpConfirmPass] = useState(false);
@@ -7584,11 +7584,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     const cid = resolveSubadminId();
     if (!cid || lastFetchedUserId.current === cid) return;
     lastFetchedUserId.current = cid;
+    fetchEmployees();
     fetchClients();
     fetchProjects();
     fetchProfile();
     Promise.all([
-      fetchEmployees(), fetchManagers(), fetchSubadmins(), fetchPackages(),
+      fetchManagers(), fetchSubadmins(), fetchPackages(),
       fetchSubscription(), fetchQuotations(), fetchPaymentHistory(), fetchVendors(),
       fetchInvoices(), fetchIncome(), fetchExpenses(), fetchTasks(), fetchConfig()
     ]).catch(e => console.log("Background fetch error:", e));
@@ -8660,6 +8661,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     if (!ne.name.trim()) errors.name = "Name is required";
 
     if (!ne.email.trim()) errors.email = "Email required";
+    if (!ne.status || !ne.status.trim()) errors.status = "Status is required";
 
     if (!ne.password.trim()) errors.password = "Password is required";
 
@@ -8777,7 +8779,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       setEmployees(prev => [res.data.employee, ...prev]);
 
-      setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Pending", password: "", confirmPassword: "", dateOfBirth: "", maritalStatus: "", address: "", bankName: "", ifscCode: "", accountNumber: "" });
+      setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "", password: "", confirmPassword: "", dateOfBirth: "", maritalStatus: "", address: "", bankName: "", ifscCode: "", accountNumber: "" });
 
       setShowEmpPass(false);
 
@@ -12529,7 +12531,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <Fld label="Full Name *" value={ne.name} onChange={v => setNe({ ...ne, name: v })} error={neError.name} name="name" />
 
-                <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} dataField="email" />
+                <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} name="email" />
 
                 <Fld label="Phone Number" value={ne.phone} onChange={v => setNe({ ...ne, phone: v })} />
 
@@ -12545,7 +12547,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <Fld label="Marital Status" value={ne.maritalStatus} onChange={v => setNe({ ...ne, maritalStatus: v })} options={["Unmarried", "Married"]} />
 
-                <Fld label="Status" value={ne.status} onChange={v => setNe({ ...ne, status: v })} options={["Active", "Inactive", "On Leave"]} />
+                <Fld label="Status *" value={ne.status} onChange={v => { setNe({ ...ne, status: v }); setNeError(p => ({ ...p, status: "" })); }} options={["Select Status", "Active", "Inactive", "Onboarded"]} error={neError.status} dataField="status" placeholder="Select Status" />
 
               </div>
 

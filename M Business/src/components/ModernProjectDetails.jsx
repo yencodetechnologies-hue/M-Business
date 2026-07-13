@@ -2376,10 +2376,30 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
                                 </select>
                               )}
-                              <button onClick={() => setUpdateType('approval')} style={{ padding: '6px 14px', borderRadius: 20, border: `2px solid ${updateType === 'approval' ? P.primary : P.border}`, background: updateType === 'approval' ? P.primary : '#fff', color: updateType === 'approval' ? '#fff' : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all .15s' }}>
-                                <i className="ti ti-clipboard-check" style={{ fontSize: 13 }} />
-                                Approval Request
-                              </button>
+                              {currProject.approvalRequestEnabled !== false && (
+                                <button onClick={() => setUpdateType('approval')} style={{ padding: '6px 14px', borderRadius: 20, border: `2px solid ${updateType === 'approval' ? P.primary : P.border}`, background: updateType === 'approval' ? P.primary : '#fff', color: updateType === 'approval' ? '#fff' : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all .15s' }}>
+                                  <i className="ti ti-clipboard-check" style={{ fontSize: 13 }} />
+                                  Approval Request
+                                </button>
+                              )}
+                              <label style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 8, fontSize: 11, fontWeight: 700, color: P.textMid, cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={currProject.approvalRequestEnabled !== false}
+                                  onChange={async e => {
+                                    const checked = e.target.checked;
+                                    setCurrProject(prev => ({ ...prev, approvalRequestEnabled: checked }));
+                                    if (!checked && updateType === 'approval') setUpdateType('');
+                                    try {
+                                      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { approvalRequestEnabled: checked });
+                                      fetchProjects && fetchProjects();
+                                    } catch (err) {
+                                      console.error('Failed to update approvalRequestEnabled', err);
+                                    }
+                                  }}
+                                />
+                                Approvals {currProject.approvalRequestEnabled !== false ? 'ON' : 'OFF'}
+                              </label>
                             </div>
                           </div>
 
@@ -2458,7 +2478,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               <button onClick={() => { setPostUpdateAttaching(false); postUpdateFileInputRef.current.value = ''; postUpdateFileInputRef.current.accept = 'image/*'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
                                 <i className="ti ti-photo" style={{ fontSize: 15 }} /> Image
                               </button>
-
+                              <button onClick={() => { setPostUpdateAttaching(false); postUpdateFileInputRef.current.value = ''; postUpdateFileInputRef.current.accept = '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,text/plain'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
+                                <i className="ti ti-file" style={{ fontSize: 15 }} /> File/Doc
+                              </button>
 
                             </div>
 
@@ -2479,6 +2501,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   const hasContent = updateTitle.trim() || updateText.trim();
                                   if (!hasContent) return;
                                   if (updateType === 'approval') {
+                                    if (currProject.approvalRequestEnabled === false) {
+                                      alert('Approval requests are disabled for this project.');
+                                      return;
+                                    }
                                     await submitApprovalRequest();
                                     return;
                                   }
@@ -2567,17 +2593,18 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                                     {attachments.map((att, aidx) => {
                                       const isImg = (att.type && att.type.startsWith('image/')) || /\.(jpe?g|png|gif|webp|svg)$/i.test(att.url || att.name || '');
+                                      const displayUrl = att.url && att.url.startsWith('http') ? att.url : `${BASE_URL}${att.url && att.url.startsWith('/') ? '' : '/'}${att.url || ''}`;
                                       return isImg ? (
                                         <img
                                           key={`${att.url}-${aidx}`}
-                                          src={att.url}
+                                          src={displayUrl}
                                           alt={att.name || 'attachment'}
-                                          onClick={() => window.open(att.url, '_blank')}
+                                          onClick={() => window.open(displayUrl, '_blank')}
                                           style={{ width: 90, height: 70, objectFit: 'cover', borderRadius: 8, border: `1.5px solid ${P.border}`, cursor: 'pointer', background: '#f8fafc' }}
                                           onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = ''; e.currentTarget.style.display = 'none'; }}
                                         />
                                       ) : (
-                                        <a key={`${att.url}-${aidx}`} href={att.url} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#f8fafc', fontSize: 12, fontWeight: 700, color: P.textDark, textDecoration: 'none' }}>
+                                        <a key={`${att.url}-${aidx}`} href={displayUrl} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#f8fafc', fontSize: 12, fontWeight: 700, color: P.textDark, textDecoration: 'none' }}>
                                           <i className="ti ti-file" style={{ fontSize: 14, color: P.primary }} />
                                           {att.name || 'Attachment'}
                                         </a>

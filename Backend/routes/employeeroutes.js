@@ -23,6 +23,7 @@ router.post("/add", checkResourceLimit('employee'), async (req, res) => {
     const { name, email, phone, role, department, salary, status, password, profilePhoto, bankDetails, branchName, dateOfBirth, maritalStatus, address } = req.body;
 
     if (!name || !email) return res.status(400).json({ msg: "Name and Email required" });
+    if (!status || !status.trim()) return res.status(400).json({ msg: "Status is required" });
     if (!password || password.trim().length < 4) return res.status(400).json({ msg: "Password required (min 4 chars)" });
 
     const cleanEmail = email.toLowerCase().trim();
@@ -37,7 +38,7 @@ router.post("/add", checkResourceLimit('employee'), async (req, res) => {
 
     const employee = new Employee({
       name, email, phone: phone || "", role: role || "Employee", department: department || "",
-      salary: salary || "", status: status || "Pending", password: hashedPassword,
+      salary: salary || "", status: status, password: hashedPassword,
       companyId: req.body.companyId || req.companyId || "", profilePhoto: profilePhoto || "",
       bankDetails: bankDetails
         ? { ...bankDetails, branchName: bankDetails.branchName || branchName || "" }
@@ -97,7 +98,7 @@ router.put("/:id", async (req, res) => {
 router.put("/status/:id", async (req, res) => {
   try {
     const { status } = req.body;
-    if (!["Pending", "Approved", "Rejected", "Inactive"].includes(status)) return res.status(400).json({ msg: "Invalid status" });
+    if (!["Active", "Inactive", "Onboarded"].includes(status)) return res.status(400).json({ msg: "Invalid status" });
 
     const employee = await Employee.findByIdAndUpdate(req.params.id, { $set: { status } }, { new: true });
     if (!employee) return res.status(404).json({ msg: "Employee not found" });

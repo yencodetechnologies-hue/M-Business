@@ -583,14 +583,14 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
           <div className="mpc-section-card">
             <div className="mpc-section-heading" style={{ justifyContent: 'space-between' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <i className="ti ti-users" /> Assign Team Members
+                <i className="ti ti-users" /> {editProject ? 'Edit Team Members' : 'Assign Team Members'}
               </span>
               <button
                 className="mpc-btn mpc-btn-primary"
                 style={{ fontSize: 12, padding: '6px 14px' }}
                 onClick={() => { setShowAddEmployee(true); setSelectedEmpsToAdd([]); }}
               >
-                Add Team Member
+                {editProject ? 'Edit Team Members' : 'Add Team Member'}
               </button>
             </div>
 
@@ -645,13 +645,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                         </div>
                       );
                     })}
-                    <button
-                      onClick={() => { setShowAddEmployee(true); setSelectedEmpsToAdd([]); }}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.primary, fontSize: 12, fontWeight: 700, padding: '2px 6px' }}
-                      title="Manage team"
-                    >
-                      Edit
-                    </button>
+
                   </div>
                 );
               })()}
@@ -866,7 +860,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
               )}
             </div>
             <button className="mpc-btn mpc-btn-outline" style={{ marginTop: 16, fontSize: 12, padding: '8px 16px' }} onClick={addMilestone}>
-              <i className="ti ti-plus" /> Add Milestone
+              <i className="ti ti-plus" /> {editProject ? 'Edit Milestones' : 'Add Milestone'}
             </button>
           </div>
 

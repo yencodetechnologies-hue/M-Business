@@ -1073,6 +1073,23 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const activeProjStatus = activeProj?.status || "";
   const portalSettings = activeProj?.portalSettings || { enablePortal: true, showProgress: true, showMilestones: true, showTeam: false, allowMessages: true };
 
+  // If this portal link is tied to a specific project and that project has
+  // had its client portal explicitly disabled, block access entirely rather
+  // than falling through to a normal dashboard render.
+  if (portalMode && targetProject && targetProject.portalSettings && targetProject.portalSettings.enablePortal === false) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F3F8F9", fontFamily: "inherit", padding: 24, textAlign: "center" }}>
+        <div style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 16, padding: "40px 32px", maxWidth: 420 }}>
+          <div style={{ fontSize: 40, marginBottom: 16 }}>🔒</div>
+          <div style={{ fontSize: 18, fontWeight: 800, color: "#0D2027", marginBottom: 8 }}>Portal Unavailable</div>
+          <div style={{ fontSize: 13, color: "#6B8790", lineHeight: 1.6 }}>
+            The client portal has been disabled for this project. Please contact your agency for more information.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Styles Injection
   const CSS = `
   .cp-root {
@@ -1763,7 +1780,28 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       </div>
     );
   }
-
+  function renderTeamComponent() {
+    const assigned = Array.isArray(activeProj?.assignedTo) ? activeProj.assignedTo : [];
+    return (
+      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", padding: 22, marginBottom: 14 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: C.text2, marginBottom: 18 }}>Team Members</div>
+        {assigned.length > 0 ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {assigned.map((name, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 34, height: 34, borderRadius: "50%", background: C.teal, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 13, flexShrink: 0 }}>
+                  {(name || "?").trim().slice(0, 1).toUpperCase()}
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: C.text1 }}>{name}</div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ fontSize: 12, color: C.text3 }}>No team members assigned yet.</div>
+        )}
+      </div>
+    );
+  }
   // Render Files panel
   function renderFilesComponent() {
     if (selectedDoc) {
@@ -2534,8 +2572,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 </div>
               </div>
               <div className="two-col">
-                {renderTimelineComponent()}
+                {portalSettings.showMilestones && renderTimelineComponent()}
                 <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                  {portalSettings.showTeam && renderTeamComponent()}
                   {renderApprovalsComponent()}
                   {renderCalendarComponent()}
                 </div>
@@ -2580,16 +2619,18 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               </div>
 
               {/* Messages */}
-              <div>
-                <div className="sec-header">
-                  <div className="sec-title">
-                    <div className="sec-title-icon" style={{ background: C.purpleBg, color: C.purple }}><i className="ti ti-message-2"></i></div>
-                    Messages & Chat
+              {portalSettings.allowMessages && (
+                <div>
+                  <div className="sec-header">
+                    <div className="sec-title">
+                      <div className="sec-title-icon" style={{ background: C.purpleBg, color: C.purple }}><i className="ti ti-message-2"></i></div>
+                      Messages & Chat
+                    </div>
+                    <div className="sec-action" onClick={() => setActive("messages")}><i className="ti ti-arrow-right" style={{ fontSize: 13 }}></i> Open Chat</div>
                   </div>
-                  <div className="sec-action" onClick={() => setActive("messages")}><i className="ti ti-arrow-right" style={{ fontSize: 13 }}></i> Open Chat</div>
+                  {renderMessagesComponent()}
                 </div>
-                {renderMessagesComponent()}
-              </div>
+              )}
             </div>
 
             {/* Activity, Feedback and Contact */}
@@ -2610,7 +2651,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               </div>
             </div>
             <div className="two-col">
-              {renderTimelineComponent()}
+              {portalSettings.showMilestones && renderTimelineComponent()}
               <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                 {renderApprovalsComponent()}
                 {renderCalendarComponent()}
@@ -2904,15 +2945,17 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                       {proj.description && (
                         <div style={{ fontSize: 12, color: C.text2, marginBottom: 12, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{proj.description}</div>
                       )}
-                      <div style={{ marginBottom: 10 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                          <span style={{ fontSize: 11, color: C.text3, fontWeight: 600 }}>Progress</span>
-                          <span style={{ fontSize: 12, fontWeight: 800, color: C.teal }}>{pct}%</span>
+                      {(proj.portalSettings?.showProgress ?? true) && (
+                        <div style={{ marginBottom: 10 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                            <span style={{ fontSize: 11, color: C.text3, fontWeight: 600 }}>Progress</span>
+                            <span style={{ fontSize: 12, fontWeight: 800, color: C.teal }}>{pct}%</span>
+                          </div>
+                          <div style={{ background: C.border, borderRadius: 20, height: 7, overflow: 'hidden' }}>
+                            <div style={{ width: pct + '%', height: '100%', borderRadius: 20, background: 'linear-gradient(90deg, ' + C.teal + ', ' + C.teal2 + ')', transition: 'width .4s ease' }}></div>
+                          </div>
                         </div>
-                        <div style={{ background: C.border, borderRadius: 20, height: 7, overflow: 'hidden' }}>
-                          <div style={{ width: pct + '%', height: '100%', borderRadius: 20, background: 'linear-gradient(90deg, ' + C.teal + ', ' + C.teal2 + ')', transition: 'width .4s ease' }}></div>
-                        </div>
-                      </div>
+                      )}
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: C.text3, fontWeight: 600 }}>
                           <i className="ti ti-calendar" style={{ fontSize: 12 }}></i>

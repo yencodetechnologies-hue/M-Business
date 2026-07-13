@@ -585,13 +585,15 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <i className="ti ti-users" /> Assign Team Members
               </span>
-              <button
-                className="mpc-btn mpc-btn-primary"
-                style={{ fontSize: 12, padding: '6px 14px' }}
-                onClick={() => { setShowAddEmployee(true); setSelectedEmpToAdd(''); }}
-              >
-                Add Team Member
-              </button>
+              {!editProject && (
+                <button
+                  className="mpc-btn mpc-btn-primary"
+                  style={{ fontSize: 12, padding: '6px 14px' }}
+                  onClick={() => { setShowAddEmployee(true); setSelectedEmpToAdd(''); }}
+                >
+                  Add Team Member
+                </button>
+              )}
             </div>
 
             {/* Already assigned members list */}
@@ -805,14 +807,20 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                       />
                     )}
                     <input type="date" value={m.date} onChange={e => updateMilestone(idx, 'date', e.target.value)} />
-
+                    <i
+                      className="ti ti-trash mpc-remove-ms"
+                      title="Delete milestone"
+                      onClick={() => removeMilestone(idx)}
+                    />
                   </div>
                 );
               })}
             </div>
-            <button className="mpc-btn mpc-btn-outline" style={{ marginTop: 16, fontSize: 12, padding: '8px 16px' }} onClick={addMilestone}>
-              <i className="ti ti-plus" /> Add Milestone
-            </button>
+            {!editProject && (
+              <button className="mpc-btn mpc-btn-outline" style={{ marginTop: 16, fontSize: 12, padding: '8px 16px' }} onClick={addMilestone}>
+                <i className="ti ti-plus" /> Add Milestone
+              </button>
+            )}
           </div>
 
           {/* SECTION 6: CLIENT PORTAL */}

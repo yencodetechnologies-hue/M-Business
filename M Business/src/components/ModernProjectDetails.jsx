@@ -1542,9 +1542,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         const clientList = Array.isArray(res.data) ? res.data : [];
         matched = snapshotClientId
           ? clientList.find(c => String(c._id) === String(snapshotClientId))
-          : null;
+          : clientList.find(c => (c.clientName || c.name || '').toLowerCase().trim() === snapshotClientName);
       }
 
+      if (!matched || !matched._id) {
+        console.error('Could not resolve client for portal link. clientId:', snapshotClientId, 'clientName:', snapshotClientName);
+        return '';
+      }
 
       const subadminCompanyId = user?.companyId || user?._id || user?.id || snapshotCompanyId || '';
       const tokenRes = await axios.post(`${BASE_URL}/api/clients/${matched._id}/portal-token`, {

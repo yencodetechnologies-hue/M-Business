@@ -8166,7 +8166,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  const handleLogout = () => { localStorage.removeItem("user"); localStorage.setItem("loggedOut", "1"); setUser(null); setAccounts([]); };
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("accounts");
+    localStorage.removeItem("activeClientId_subadmin");
+    [
+      "cached_clients", "cached_projects", "cached_tasks", "cached_invoices",
+      "cached_income", "cached_expenses", "cached_employees", "cached_managers",
+      "cached_subadmins", "cached_quotations", "cached_vendors"
+    ].forEach(k => localStorage.removeItem(k));
+    localStorage.setItem("loggedOut", "1");
+    setUser(null);
+    setAccounts([]);
+  };
 
   const handleAuthSetUser = (userData) => {
 

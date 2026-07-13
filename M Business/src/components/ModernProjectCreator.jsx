@@ -613,8 +613,15 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                       </div>
                       <span className="mpc-role-badge">{role}</span>
                       <button
+                        onClick={() => { setShowAddEmployee(true); setSelectedEmpToAdd(''); }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.primary, fontSize: 12, fontWeight: 700, marginLeft: 6, padding: '2px 6px' }}
+                        title="Edit team"
+                      >
+                        Edit
+                      </button>
+                      <button
                         onClick={() => setAssigned(prev => prev.filter(n => n !== empName))}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 16, marginLeft: 6, padding: '2px 4px', lineHeight: 1 }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 16, marginLeft: 2, padding: '2px 4px', lineHeight: 1 }}
                         title="Remove"
                       >
                         <i className="ti ti-x" />

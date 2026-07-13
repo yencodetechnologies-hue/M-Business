@@ -2793,9 +2793,9 @@ useEffect(() => {
     try {
       const res = await axios.get(BASE_URL + "/api/invoices");
       setInvoices(res.data.invoices || []);
+      try { localStorage.setItem("cached_invoices", JSON.stringify(res.data.invoices || [])); } catch { }
     } catch (e) {
       console.log("Fetch invoices error:", e);
-      setInvoices([]);
     }
   };
 
@@ -2814,9 +2814,9 @@ useEffect(() => {
     try {
       const res = await axios.get(BASE_URL + "/api/income");
       setIncome(res.data || []);
+      try { localStorage.setItem("cached_income", JSON.stringify(res.data || [])); } catch { }
     } catch (e) {
       console.log("Fetch income error:", e);
-      setIncome([]);
     }
   };
 
@@ -3027,7 +3027,20 @@ const handleEditPackage = (pkg) => {
   };
 
   const addEmployee = async () => {
-    const errors = {}; if (!ne.name.trim()) errors.name = "Name is required"; if (!ne.email.trim()) errors.email = "Email is required"; if (!ne.password.trim()) errors.password = "Password is required"; if (Object.keys(errors).length > 0) { setNeError(errors); return; } try { setEmpSaveLoading(true); const payload = { ...ne, role: ne.role || "employee" }; const res = await axios.post(BASE_URL + "/api/employees/add", payload, {
+    const errors = {}; if (!ne.name.trim()) errors.name = "Name is required"; if (!ne.email.trim()) errors.email = "Email is required"; if (!ne.password.trim()) errors.password = "Password is required"; if (Object.keys(errors).length > 0) {
+      setNeError(errors);
+      const fieldOrder = ["name", "email", "phone", "password", "confirmPassword"];
+      const firstErrorField = fieldOrder.find(f => errors[f]) || Object.keys(errors)[0];
+      requestAnimationFrame(() => {
+        const el = document.querySelector(`[data-field="${firstErrorField}"]`);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          const input = el.querySelector("input, select, textarea") || el;
+          input.focus();
+        }
+      });
+      return;
+    } try { setEmpSaveLoading(true); const payload = { ...ne, role: ne.role || "employee" }; const res = await axios.post(BASE_URL + "/api/employees/add", payload, {
   headers: { 'x-company-id': resolveSubadminId() }
 }); setEmployees(prev => [res.data.employee, ...prev]); setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Active", password: "" }); setShowEmpPass(false); setNeError({}); setModal(null); } catch (err) {
       const errMsg = err.response?.data?.message || err.response?.data?.msg || "Failed to save";
@@ -3980,7 +3993,7 @@ const handleEditPackage = (pkg) => {
       {modal === "employee" && <Mdl title="Add New Employee" onClose={() => setModal(null)}>
         <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
           <Fld label="Full Name *" value={ne.name} onChange={v => setNe({ ...ne, name: v })} error={neError.name} />
-          <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} />
+          <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} dataField="email" />
           <Fld label="Phone Number" value={ne.phone} onChange={v => setNe({ ...ne, phone: v })} />
           <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v })} options={DEPARTMENT_OPTIONS} />
           <Fld label="Department" value={ne.department} onChange={v => setNe({ ...ne, department: v })} />

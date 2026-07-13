@@ -37,7 +37,7 @@ router.post("/add", checkResourceLimit('employee'), async (req, res) => {
 
     const employee = new Employee({
       name, email, phone: phone || "", role: role || "Employee", department: department || "",
-      salary: salary || "", status: "Pending", password: hashedPassword,
+      salary: salary || "", status: status || "Pending", password: hashedPassword,
       companyId: req.body.companyId || req.companyId || "", profilePhoto: profilePhoto || "",
       bankDetails: bankDetails
         ? { ...bankDetails, branchName: bankDetails.branchName || branchName || "" }

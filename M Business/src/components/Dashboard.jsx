@@ -1962,7 +1962,22 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     }
   };
 
-  const addEmployee = async () => { const errors = {}; if (!ne.name.trim()) errors.name = "Name is required"; if (!ne.email.trim()) errors.email = "Email is required"; if (!ne.password.trim()) errors.password = "Password is required"; if (Object.keys(errors).length > 0) { setNeError(errors); return; } try { setEmpSaveLoading(true); const res = await axios.post(BASE_URL + "/api/employees/add", ne); setEmployees(prev => [res.data.employee, ...prev]); setNe({ name: "", email: "", phone: "", role: "", department: "", salary: "", status: "Active", password: "" }); setShowEmpPass(false); setNeError({}); setModal(null); } catch (err) { setNeError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" }); } finally { setEmpSaveLoading(false); } };
+  const addEmployee = async () => {
+    const errors = {}; if (!ne.name.trim()) errors.name = "Name is required"; if (!ne.email.trim()) errors.email = "Email is required"; if (!ne.password.trim()) errors.password = "Password is required"; if (Object.keys(errors).length > 0) {
+      setNeError(errors);
+      const fieldOrder = ["name", "email", "phone", "password", "confirmPassword"];
+      const firstErrorField = fieldOrder.find(f => errors[f]) || Object.keys(errors)[0];
+      requestAnimationFrame(() => {
+        const el = document.querySelector(`[data-field="${firstErrorField}"]`);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          const input = el.querySelector("input, select, textarea") || el;
+          input.focus();
+        }
+      });
+      return;
+    } try { setEmpSaveLoading(true); const res = await axios.post(BASE_URL + "/api/employees/add", ne); setEmployees(prev => [res.data.employee, ...prev]); setNe({ name: "", email: "", phone: "", role: "", department: "", salary: "", status: "Active", password: "" }); setShowEmpPass(false); setNeError({}); setModal(null); } catch (err) { setNeError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" }); } finally { setEmpSaveLoading(false); }
+  };
 
   const addProject = async () => {
     const errors = {};
@@ -2597,7 +2612,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       {modal === "employee" && <Mdl title="Add New Employee" onClose={() => setModal(null)}>
         <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
           <Fld label="Full Name *" value={ne.name} onChange={v => setNe({ ...ne, name: v })} error={neError.name} />
-          <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} />
+          <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} dataField="email" />
           <Fld label="Phone Number" value={ne.phone} onChange={v => setNe({ ...ne, phone: v })} />
           <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v })} options={DEPARTMENT_OPTIONS} />
           <Fld label="Department" value={ne.department} onChange={v => setNe({ ...ne, department: v })} />

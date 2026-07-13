@@ -7213,7 +7213,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  const [employees, setEmployees] = useState([]);
+  const [employees, setEmployees] = useState(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem("user") || "{}");
+      const cid = String(u?._id || u?.id || u?.userId || u?.companyId || u?.company || "").trim();
+      if (!cid) return [];
+      const c = localStorage.getItem("cached_employees_" + cid);
+      return c ? JSON.parse(c) : [];
+    } catch { return []; }
+  });
 
   const [ne, setNe] = useState({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Pending", password: "" });
 
@@ -7226,7 +7234,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState(() => {
+    try {
+      const c = localStorage.getItem("cached_projects");
+      return c ? JSON.parse(c) : [];
+    } catch { return []; }
+  });
 
   // Once the real projects list has loaded, swap the lightweight
   // placeholder set above (in jumpProject's initializer) for the actual
@@ -7372,9 +7385,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  const [invoices, setInvoices] = useState([]);
+  const [invoices, setInvoices] = useState(() => {
+    try {
+      const c = localStorage.getItem("cached_invoices");
+      return c ? JSON.parse(c) : [];
+    } catch { return []; }
+  });
 
-  const [income, setIncome] = useState([]);
+  const [income, setIncome] = useState(() => {
+    try {
+      const c = localStorage.getItem("cached_income");
+      return c ? JSON.parse(c) : [];
+    } catch { return []; }
+  });
 
   const [expenses, setExpenses] = useState([]);
 
@@ -8708,7 +8731,20 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-    if (Object.keys(errors).length > 0) { setNeError(errors); return; }
+    if (Object.keys(errors).length > 0) {
+      setNeError(errors);
+      const fieldOrder = ["name", "email", "phone", "password", "confirmPassword"];
+      const firstErrorField = fieldOrder.find(f => errors[f]) || Object.keys(errors)[0];
+      requestAnimationFrame(() => {
+        const el = document.querySelector(`[data-field="${firstErrorField}"]`);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          const input = el.querySelector("input, select, textarea") || el;
+          input.focus();
+        }
+      });
+      return;
+    }
 
     try {
 
@@ -9519,7 +9555,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <div className="topbar-icon" onClick={() => { setShowNotifPanel(v => !v); fetchPendingLeaves(); }} style={{ position: 'relative', cursor: 'pointer' }}>
                 <i className="ti ti-bell"></i>
                 {pendingLeaves.length > 0 && (
-                  <span style={{ position: 'absolute', top: -4, right: -4, background: '#EF4444', color: '#fff', borderRadius: '50%', minWidth: 16, height: 16, padding: '0 3px', fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1, zIndex: 2, boxSizing: 'border-box' }}>{pendingLeaves.length}</span>
+                  <span style={{ position: 'absolute', top: -6, right: -6, background: '#EF4444', color: '#fff', borderRadius: 20, minWidth: 18, height: 18, padding: '0 5px', fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1, zIndex: 2, boxSizing: 'border-box' }}>{pendingLeaves.length > 99 ? '99+' : pendingLeaves.length}</span>
                 )}
                 {showNotifPanel && (
                   <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: 44, right: 0, width: 380, background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', border: '1px solid #E2E8F0', zIndex: 99999, overflow: 'hidden' }}>
@@ -12496,7 +12532,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <Fld label="Full Name *" value={ne.name} onChange={v => setNe({ ...ne, name: v })} error={neError.name} />
 
-                <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} />
+                <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} dataField="email" />
 
                 <Fld label="Phone Number" value={ne.phone} onChange={v => setNe({ ...ne, phone: v })} />
 

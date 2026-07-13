@@ -209,7 +209,10 @@ const CSS = `
 .mpv-grid.list .mpv-card-prog { min-width:200px; }
 .mpv-grid.list .mpv-divider { display:none; }
 .mpv-grid.list .mpv-card-bottom { flex-direction:column; align-items:flex-end; gap:6px; padding:14px 18px; border-left:1px solid ${P.border}; }
-
+.mpv-grid.list .mpv-card-top { flex-wrap: wrap; }
+.mpv-grid.list .mpv-card-row1 { order: 2; width: 100%; margin-top: 10px; margin-bottom: 0; }
+.mpv-grid.list .mpv-card-info { order: 1; width: 100%; }
+.mpv-grid.list .mpv-card-prog { order: 3; }
 /* Empty */
 .mpv-empty { display:flex; flex-direction:column; align-items:center; justify-content:center;
   gap:12px; padding:60px 20px; color:${P.textLight}; }

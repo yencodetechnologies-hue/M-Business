@@ -252,7 +252,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [previewInvoice, setPreviewInvoice] = useState(null);
   const [selectedPaymentItems, setSelectedPaymentItems] = useState([]);
   const [activePayTab, setActivePayTab] = useState('inv');
-  const [composerOpen, setComposerOpen] = useState(false);
+  const [composerOpen, setComposerOpen] = useState(true);
   const [showSendConfirmModal, setShowSendConfirmModal] = useState(false);
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [approvalForm, setApprovalForm] = useState({ recipientType: 'client', teamMemberId: '', clientId: '', title: '', desc: '', icon: 'ti-file-text', approveLabel: 'Approve', rejectLabel: 'Review' });
@@ -772,7 +772,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       setUpdateText(''); setUpdateTitle(''); setUpdateType('progress');
       setApprovalForm(f => ({ ...f, teamMemberId: '' }));
       setPostUpdateAttachments([]);
-      setComposerOpen(false);
+
       loadProjectApprovals();
     } catch (err) {
       console.error("Failed to create approval request", err);
@@ -1101,7 +1101,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
       setUpdateText('');
       setUpdateType('general');
-      setComposerOpen(false);
+
       if (onUpdate) onUpdate();
     } catch (err) {
       console.error("Failed to post update:", err);
@@ -1477,7 +1477,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       setUploadClientName('');
       setUploadEmployeeName('');
       setPostUpdateOnUpload(false);
-      if (postUpdateOnUpload) { setUpdateText(''); setUpdateTitle(''); setUpdateType('progress'); setComposerOpen(false); }
+      if (postUpdateOnUpload) { setUpdateText(''); setUpdateTitle(''); setUpdateType('progress'); }
       loadLatest();
       if (onUpdate) onUpdate();
     } catch (err) {
@@ -2237,7 +2237,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 </div>
 
                 <div className={`mpd-tab-pane ${activeTab === 'updates' ? 'mpd-active' : ''}`}>
-                  {(
+                  {composerOpen && (
                     <div ref={composerRef} style={{ marginBottom: 24 }}>
 
                       {(
@@ -2512,7 +2512,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                     setUpdateTitle('');
                                     setPostUpdateAttachments([]);
                                     setUpdateSelectedMembers([]);
-                                    setComposerOpen(false);
+
                                   } catch (err) {
                                     console.error('Failed to post update:', err.response?.data || err.message);
                                     alert('Failed to save update: ' + (err.response?.data?.msg || err.message));
@@ -2528,6 +2528,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           </div>
                         </div>
                       )}
+                    </div>
+                  )}
+                  {!composerOpen && (
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+
                     </div>
                   )}
                   {(!currProject.updates || currProject.updates.length === 0) ? (

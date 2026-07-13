@@ -289,8 +289,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   useEffect(() => {
     const preloadPortalLink = async () => {
-      const clientId = currProject?.clientId || resolvedClientId;
+      const clientId = currProject?.clientId;
       if (!clientId) return;
+      // Already have a link for this exact project — nothing to fetch.
+      if (portalLinkUrl && lastPortalProjectId.current === currProject?._id) return;
       try {
         const res = await axios.get(`${BASE_URL}/api/clients/${clientId}`);
         const c = res.data;
@@ -307,7 +309,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       preloadPortalLink();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currProject?._id]);
+  }, [currProject?._id, currProject?.clientId]);
 
   useEffect(() => {
     if (project && (project.name || project.client)) {

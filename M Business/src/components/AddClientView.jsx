@@ -210,22 +210,12 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           console.error('Client update failed:', err);
         });
       } else {
-        // Optimistic add — show the client immediately with a temporary id,
-        // then swap in the real saved record once the server responds.
-        const tempId = `temp_${Date.now()}`;
-        const optimisticClient = { ...payload, _id: tempId, name: payload.clientName };
-        if (onClientAdded) onClientAdded(optimisticClient);
-        toast.success('Client added successfully!');
-
-        axios.post(`${BASE_URL}/api/clients/add`, payload, {
+        const res = await axios.post(`${BASE_URL}/api/clients/add`, payload, {
           headers: { Authorization: `Bearer ${user?.token || ""}` }
-        }).then(res => {
-          // Swap the temp client for the server-confirmed one, if the caller supports it
-          if (onClientAdded && res.data?.client) onClientAdded(res.data.client, tempId);
-        }).catch(err => {
-          toast.error('Failed to save client. Please try again.');
-          console.error('Client add failed:', err);
         });
+        if (onClientAdded && res.data?.client) onClientAdded(res.data.client);
+        toast.success('Client added successfully!');
+        onBack();
       }
     } catch (err) {
       toast.error(err.response?.data?.message || `Failed to ${isEdit ? 'update' : 'save'} client`);

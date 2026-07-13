@@ -252,10 +252,10 @@ router.get("/feedback", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
-    if (!req.params.id.match(/^[0-9a-fa-f]{24}$/)) {
+    if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
       return res.status(400).json({ msg: "invalid client id" });
     }
-    const client = await client.findbyid(req.params.id);
+    const client = await Client.findById(req.params.id);
     if (!client) return res.status(404).json({ msg: "client not found" });
     res.json(client);
   } catch (err) {

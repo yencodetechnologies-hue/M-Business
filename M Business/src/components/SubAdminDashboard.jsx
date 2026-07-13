@@ -3164,7 +3164,8 @@ ${onboardingLink}`;
               {["Employee", "Role", "Department", "Email", "Joined", "Status", "Actions"].map(h => (
                 <th key={h} style={{ padding: "10px 14px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)", whiteSpace: "nowrap" }}>{h.toUpperCase()}</th>
               ))}
-            </tr></thead>          <tbody>
+            </tr></thead>
+            <tbody>
 
               {filtered.map((e, i) => {
 

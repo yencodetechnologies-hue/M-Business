@@ -91,6 +91,7 @@ export default function AdminDashboard({ user, setUser }) {
   }, [active]);
   const [subadmins, setSubadmins] = useState([]);
   const [clients, setClients] = useState([]);
+  const [clientsLoading, setClientsLoading] = useState(true);
   const [projects, setProjects] = useState([]);
   const [subscriptions, setSubscriptions] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -232,6 +233,7 @@ export default function AdminDashboard({ user, setUser }) {
       const res = await axios.get(BASE_URL + "/api/clients");
       setClients(res.data);
     } catch (e) { console.error(e); }
+    finally { setClientsLoading(false); }
   };
   const fetchProjects = async () => {
     try {
@@ -525,7 +527,7 @@ export default function AdminDashboard({ user, setUser }) {
         <div style={{ flex: 1, padding: 32, overflowY: "auto" }}>
           {active === "dashboard" && <OverviewPage THEME={THEME} subadmins={subadmins} clients={clients} employees={employees} managers={managers} projects={projects} packages={packages} invoices={invoices} />}
           {active === "subadmins" && <SubadminsList THEME={THEME} subadmins={subadmins} refresh={fetchSubadmins} packages={packages} subscriptions={subscriptions} fetchSubscriptions={fetchSubscriptions} />}
-          {active === "clients" && <ClientsPage THEME={THEME} clients={clients} setClients={setClients} onViewProject={(p) => { setJumpProject(p); setActive("project-details"); }} />}
+          {active === "clients" && <ClientsPage THEME={THEME} clients={clients} setClients={setClients} loading={clientsLoading} onViewProject={(p) => { setJumpProject(p); setActive("project-details"); }} />}
           {active === "project-details" && jumpProject && (
             <ModernProjectDetails
               project={jumpProject}
@@ -1764,7 +1766,7 @@ function PackagesPage({ THEME, packages, onEdit, onDelete, darkMode }) {
 }
 
 // ── Clients Page ──
-function ClientsPage({ THEME, clients, setClients, projects = [], setProjects, onAddClient, onViewProject, triggerCrop, onCreateProject }) {
+function ClientsPage({ THEME, clients, setClients, projects = [], setProjects, onAddClient, onViewProject, triggerCrop, onCreateProject, loading }) {
   const [search, setSearch] = useState("");
   const filtered = clients.filter(c =>
     (c.clientName || c.name || "").toLowerCase().includes(search.toLowerCase()) ||
@@ -1802,7 +1804,8 @@ function ClientsPage({ THEME, clients, setClients, projects = [], setProjects, o
               <td style={{ padding: "14px 16px", color: "#64748b" }}>{c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "—"}</td>
             </tr>
           ))}
-          {filtered.length === 0 && <tr><td colSpan={6} style={{ padding: 20, textAlign: "center", color: "#94a3b8" }}>No company names found</td></tr>}
+          {loading && <tr><td colSpan={6} style={{ padding: 20, textAlign: "center", color: "#94a3b8" }}>Loading clients...</td></tr>}
+          {!loading && filtered.length === 0 && <tr><td colSpan={6} style={{ padding: 20, textAlign: "center", color: "#94a3b8" }}>No company names found</td></tr>}
         </tbody>
       </table>
     </div>

@@ -135,16 +135,16 @@ export default function App() {
             }
           />
 
-          <Route path="/tasks" element={<TasksPage />} />
-          <Route path="/canvas" element={<CanvasPage />} />
-          <Route path="/invoice-view" element={<InvoiceViewer />} />
-          <Route path="/quotation-view" element={<QuotationViewer />} />
-          <Route path="/receipt-view" element={<ReceiptViewer />} />
-          <Route path="/calendar" element={<CalendarPage />} />
-          <Route path="/expenses" element={<ExpensesPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
-          <Route path="/quotation-creator" element={<QuotationCreatorModern />} />
-          <Route path="/project-proposal" element={<ProjectProposalCreator />} />
+          <Route path="/tasks" element={user ? <TasksPage /> : <Navigate to="/" replace />} />
+          <Route path="/canvas" element={user ? <CanvasPage /> : <Navigate to="/" replace />} />
+          <Route path="/invoice-view" element={user ? <InvoiceViewer /> : <Navigate to="/" replace />} />
+          <Route path="/quotation-view" element={user ? <QuotationViewer /> : <Navigate to="/" replace />} />
+          <Route path="/receipt-view" element={user ? <ReceiptViewer /> : <Navigate to="/" replace />} />
+          <Route path="/calendar" element={user ? <CalendarPage /> : <Navigate to="/" replace />} />
+          <Route path="/expenses" element={user ? <ExpensesPage /> : <Navigate to="/" replace />} />
+          <Route path="/reports" element={user ? <ReportsPage /> : <Navigate to="/" replace />} />
+          <Route path="/quotation-creator" element={user ? <QuotationCreatorModern /> : <Navigate to="/" replace />} />
+          <Route path="/project-proposal" element={user ? <ProjectProposalCreator /> : <Navigate to="/" replace />} />
           <Route path="/interview-apply/:companySlug" element={<InterviewApplyForm />} />
           <Route path="/employee-onboarding" element={<EmployeeOnboarding />} />
           <Route path="/modern-projects" element={user ? <ModernProjectsPage user={user} /> : <Navigate to="/" replace />} />

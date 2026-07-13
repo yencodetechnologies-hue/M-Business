@@ -7183,6 +7183,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       return c ? JSON.parse(c) : [];
     } catch { return []; }
   });
+  const [clientsLoaded, setClientsLoaded] = useState(false);
 
 
   const todayStr = new Date().toISOString().split("T")[0];
@@ -7577,32 +7578,22 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   };
 
-
-
-  const hasFetched = useRef(false);
-
   const mainScrollRef = useRef(null);
-
+ const lastFetchedUserId = useRef(null);
   useEffect(() => {
-
-    if (hasFetched.current) return;
-
-    hasFetched.current = true;
-
-    // Fire all fetches in parallel — each one paints its own section of the
-    // UI as soon as its own response lands, instead of waiting on others.
+    const cid = resolveSubadminId();
+    if (!cid || lastFetchedUserId.current === cid) return;
+    lastFetchedUserId.current = cid;
     fetchClients();
     fetchProjects();
     fetchProfile();
-    fetchClients();
     Promise.all([
       fetchEmployees(), fetchManagers(), fetchSubadmins(), fetchPackages(),
       fetchSubscription(), fetchQuotations(), fetchPaymentHistory(), fetchVendors(),
       fetchInvoices(), fetchIncome(), fetchExpenses(), fetchTasks(), fetchConfig()
     ]).catch(e => console.log("Background fetch error:", e));
     fetchPendingLeaves(); fetchEmployeeDocs();
-  }, []);
-  // Close notification panel when clicking outside
+  }, [user]); // Close notification panel when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (showNotifPanel && !e.target.closest('.topbar-icon')) {
@@ -8204,7 +8195,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     localStorage.setItem("loggedOut", "1");
     setUser(null);
     setAccounts([]);
-    setClients([]);
+    setActive("dashboard");
   };
 
   const handleAuthSetUser = (userData) => {
@@ -8232,7 +8223,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     if (!cid) return;
     try {
       const cached = localStorage.getItem("cached_clients_" + cid);
-      if (cached) { try { setClients(JSON.parse(cached)); } catch { } }
+      if (cached) { try { setClients(JSON.parse(cached)); setClientsLoaded(true); } catch { } }
     } catch { }
     try {
       const res = await axios.get(BASE_URL + "/api/clients", {
@@ -8240,8 +8231,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         timeout: 8000
       });
       setClients(res.data);
+      setClientsLoaded(true);
       try { localStorage.setItem("cached_clients_" + cid, JSON.stringify(res.data)); } catch { }
-    } catch (e) { console.log(e); }
+    } catch (e) { console.log(e); setClientsLoaded(true); }
   };
 
   const fetchEmployees = async () => {

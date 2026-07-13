@@ -2858,7 +2858,15 @@ useEffect(() => {
     setAccountAuthOpen(false);
     setProfileDropdownOpen(false);
     setShowProfile(false);
+    try {
+      const cid = String(userData?._id || userData?.id || userData?.userId || userData?.companyId || userData?.company || "").trim();
+      if (cid) {
+        const cached = localStorage.getItem("cached_clients_" + cid);
+        if (cached) { setClients(JSON.parse(cached)); setClientsLoaded(true); }
+      }
+    } catch { }
     setUser(userData);
+    setActive("dashboard");
   };
   const onLogoChange = (logo) => {
     setCompanyLogo(logo || fixedLogo);

@@ -142,13 +142,18 @@ const CSS = `
 .mpv-prog-bg { background:${P.bg}; border-radius:20px; height:8px; overflow:hidden; margin-bottom:0; }
 .mpv-prog-fill { height:100%; border-radius:20px; }
 .mpv-divider { height:1px; background:${P.bg}; margin:0 18px; }
-.mpv-card-bottom { padding:12px 18px; display:flex; align-items:center; justify-content:space-between; }
+.mpv-card-bottom { padding:14px 18px; display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+.mpv-card-meta { display:flex; flex-direction:column; gap:4px; min-width:0; }
+.mpv-card-meta-row { display:flex; align-items:center; gap:4px; font-size:11px; color:${P.textLight}; font-weight:600; white-space:nowrap; }
+.mpv-card-meta-row i { color:${P.primary}; font-size:12px; flex-shrink:0; }
+.mpv-card-budget { color:#059669 !important; font-weight:700 !important; }
+.mpv-card-budget i { color:#059669 !important; }
 .mpv-team-stack { display:flex; }
 .mpv-team-stack .mpv-av { border:2px solid #fff; margin-right:-8px; }
 .mpv-av-extra { width:26px; height:26px; border-radius:50%; border:2px solid #fff;
   background:${P.bg}; font-size:9px; font-weight:800; color:${P.textMid};
   display:flex; align-items:center; justify-content:center; }
-.mpv-deadline { text-align:right; }
+.mpv-deadline { text-align:right; flex-shrink:0; }
 .mpv-dl-lbl { font-size:10px; color:${P.textLight}; font-weight:600; text-transform:uppercase; }
 .mpv-dl-val { font-size:12px; font-weight:700; }
 .mpv-tasks { font-size:11px; color:${P.textLight}; display:flex; align-items:center; gap:4px; margin-top:5px; }
@@ -536,8 +541,8 @@ export default function ModernProjectsView({
 
                 {/* Bottom row: team avatars + dates + budget + deadline */}
                 <div className="mpv-card-bottom">
-                  <div>
-                    <div className="mpv-team-stack">
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div className="mpv-team-stack" style={{ marginBottom: 8 }}>
                       {team.length === 0 && (
                         <span style={{ fontSize: 11, color: P.textLight }}>Unassigned</span>
                       )}
@@ -555,26 +560,27 @@ export default function ModernProjectsView({
                         <div className="mpv-av-extra">+{team.length - 3}</div>
                       )}
                     </div>
-                    {taskText && (
-                      <div className="mpv-tasks">
-                        <i className="ti ti-checklist" />
-                        {taskText}
-                      </div>
-                    )}
-                    {/* Start Date */}
-                    {p.start && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 5, fontSize: 11, color: P.textLight, fontWeight: 600 }}>
-                        <i className="ti ti-calendar-event" style={{ color: P.primary, fontSize: 12 }} />
-                        Start: {fmtDate(p.start)}
-                      </div>
-                    )}
-                    {/* Budget */}
-                    {p.budget && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4, fontSize: 11, color: '#059669', fontWeight: 700 }}>
 
-                        Budget: {p.currency || '₹'}{Number(p.budget).toLocaleString('en-IN')}
-                      </div>
-                    )}
+                    <div className="mpv-card-meta">
+                      {taskText && (
+                        <div className="mpv-card-meta-row">
+                          <i className="ti ti-checklist" />
+                          {taskText}
+                        </div>
+                      )}
+                      {p.start && (
+                        <div className="mpv-card-meta-row">
+                          <i className="ti ti-calendar-event" />
+                          Start: {fmtDate(p.start)}
+                        </div>
+                      )}
+                      {p.budget ? (
+                        <div className="mpv-card-meta-row mpv-card-budget">
+                          <i className="ti ti-currency-rupee" />
+                          Budget: {p.currency || '₹'}{Number(p.budget).toLocaleString('en-IN')}
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
 
                   <div className="mpv-deadline">

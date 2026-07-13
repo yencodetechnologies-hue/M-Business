@@ -2466,7 +2466,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                 <select value={approvalForm.teamMemberId} onChange={e => setApprovalForm(f => ({ ...f, teamMemberId: e.target.value, recipientType: 'team' }))} style={{ padding: '8px 10px', borderRadius: 9, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', background: '#fff', fontFamily: 'inherit', minWidth: 160 }}>
                                   <option value="">-- Select team member --</option>
-                                  {(employees || []).map(emp => (<option key={emp._id} value={emp._id}>{emp.name || emp.employeeName}</option>))}
+                                  {(employees || []).filter(emp => assigned.includes(emp.name || emp.employeeName)).map(emp => (<option key={emp._id} value={emp._id}>{emp.name || emp.employeeName}</option>))}
                                 </select>
                               </div>
                             )}

@@ -2013,7 +2013,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
         {feedbackLoading ? (
           <div style={{ color: "#A0B8BE", textAlign: "center", padding: 30 }}>Loading...</div>
         ) : clientFeedback.length === 0 ? (
-          <div style={{ color: "#A0B8BE", textAlign: "center", padding: 30 ,fontSize: 12}}>No feedback submitted yet.</div>
+          <div style={{ color: "#A0B8BE", textAlign: "center", padding: 30, fontSize: 12 }}>No feedback submitted yet.</div>
         ) : (
           clientFeedback.map((fb, i) => (
             <div key={fb._id || i} style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 12, padding: 16, marginBottom: 12 }}>
@@ -10405,7 +10405,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                             {/* MAIN CONTENT AREA */}
 
-                            <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "start" }}>
+                            <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "stretch" }}>
 
 
 
@@ -10581,7 +10581,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                               {/* RIGHT COLUMN */}
 
-                              <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+                              <div style={{ display: "flex", flexDirection: "column", gap: 24, height: "100%" }}>
 
 
 
@@ -10648,7 +10648,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                 {/* Team Section */}
 
-                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", height: "100%", display: "flex", flexDirection: "column" }}>
 
                                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
 
@@ -10666,10 +10666,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                   </div>
 
-                                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 16, overflowY: "auto", flex: 1 }}>
 
                                     {employees.slice(0, 3).map(e => (
-
                                       <div key={e._id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
 
                                         <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,  var(--app-accent, var(--app-accent, #00BCD4)), #0097A7)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800 }}>
@@ -10706,23 +10705,22 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-                            {/* SECONDARY CONTENT AREA */}
+{/* SECONDARY CONTENT AREA */}
 
-                            <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "start", marginTop: 0 }}>
-
-
-                              {/* LEFT COLUMN 2 */}
-                              <div style={{ display: "flex", flexDirection: "column", gap: 8, alignSelf: "start" }}>
+<div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "stretch", marginTop: 0 }}>
 
 
+  {/* LEFT COLUMN 2 */}
+  <div style={{ display: "flex", flexDirection: "column", gap: 8, height: "100%" }}>
 
-                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
 
-                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+<div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", height: "100%", display: "flex", flexDirection: "column" }}>
 
-                                    <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
 
-                                      <i className="ti ti-user-x" style={{ color: "var(--app-accent)" }}></i> Leave Requests
+    <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+
+      <i className="ti ti-user-x" style={{ color: "var(--app-accent)" }}></i> Leave Requests
 
                                       <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length} PENDING</span>
 

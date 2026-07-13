@@ -597,36 +597,49 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
             {/* Already assigned members list */}
             <div className="mpc-team-selector">
 
-              {localEmployees
-                .filter(emp => assigned.includes(emp.name || emp.employeeName || ''))
-                .map(emp => {
-                  const empName = emp.name || emp.employeeName || 'Unknown';
-                  const role = emp.department || emp.role || 'Staff';
-                  return (
-                    <div key={emp._id || emp.id} className="mpc-team-row selected">
-                      <div className="mpc-av" style={{ background: getAvatarColor(empName) }}>{getInitials(empName)}</div>
-                      <div>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: P.textDark }}>{empName}</div>
-                        <div style={{ fontSize: 12, color: P.textLight, fontWeight: 600 }}>{emp.email}</div>
-                      </div>
-                      <span className="mpc-role-badge">{role}</span>
-                      <button
-                        onClick={() => { setShowAddEmployee(true); setSelectedEmpToAdd(''); }}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.primary, fontSize: 12, fontWeight: 700, marginLeft: 6, padding: '2px 6px' }}
-                        title="Edit team"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => setAssigned(prev => prev.filter(n => n !== empName))}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 16, marginLeft: 2, padding: '2px 4px', lineHeight: 1 }}
-                        title="Remove"
-                      >
-                        <i className="ti ti-x" />
-                      </button>
+              {(() => {
+                const assignedEmps = localEmployees.filter(emp => assigned.includes(emp.name || emp.employeeName || ''));
+                if (assignedEmps.length === 0) {
+                  return <div style={{ fontSize: 12, color: P.textLight, padding: '4px 0' }}>No employees assigned yet.</div>;
+                }
+                return (
+                  <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 10, padding: '4px 0' }}>
+                    <div style={{ display: 'flex' }}>
+                      {assignedEmps.map((emp, idx) => {
+                        const empName = emp.name || emp.employeeName || 'Unknown';
+                        return (
+                          <div
+                            key={emp._id || emp.id}
+                            className="mpc-av"
+                            title={empName}
+                            style={{
+                              background: getAvatarColor(empName),
+                              width: 30, height: 30, fontSize: 12,
+                              marginLeft: idx === 0 ? 0 : -8,
+                              border: '2px solid #fff',
+                              borderRadius: '50%',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              color: '#fff', fontWeight: 700, flexShrink: 0
+                            }}
+                          >
+                            {getInitials(empName)}
+                          </div>
+                        );
+                      })}
                     </div>
-                  );
-                })}
+                    <div style={{ fontSize: 13, color: P.textDark, fontWeight: 600 }}>
+                      {assignedEmps.map(e => e.name || e.employeeName || 'Unknown').join(', ')}
+                    </div>
+                    <button
+                      onClick={() => { setShowAddEmployee(true); setSelectedEmpToAdd(''); }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.primary, fontSize: 12, fontWeight: 700, padding: '2px 6px' }}
+                      title="Manage team"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* POPUP MODAL */}

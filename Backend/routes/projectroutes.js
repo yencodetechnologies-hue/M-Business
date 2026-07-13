@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
 const Project = require("../models/ProjectModel");
+const Client = require("../models/ClientModel");
 
 // GET all projects
 router.get("/", async (req, res) => {
@@ -204,6 +206,35 @@ router.post("/add", async (req, res) => {
     console.log("Attempting to save project...");
     const saved = await project.save();
 
+    // Proactively mint the Client Portal token for this project right away,
+    // so the Project Details page never has to show "Generating link..." —
+    // even on the very first visit.
+    try {
+      if (saved.clientId) {
+        const client = await Client.findById(saved.clientId);
+        if (client) {
+          const token = jwt.sign(
+            {
+              clientId: client._id.toString(),
+              email: client.email,
+              name: client.clientName || client.name,
+              companyName: client.companyName || client.company || "",
+              companyId: saved.companyId || client.companyId || "",
+              agencyName: "",
+              projectId: saved._id.toString(),
+              role: "client",
+            },
+            process.env.JWT_SECRET || "secret",
+            { expiresIn: "24h" }
+          );
+          await Client.findByIdAndUpdate(client._id, { portalToken: token, portalTokenProjectId: saved._id.toString() });
+          console.log("✅ Pre-generated portal token for project:", saved._id);
+        }
+      }
+    } catch (err) {
+      console.error("Pre-generate portal token error:", err.message);
+    }
+
     // Auto-create Project Status tracking entry
     try {
       const ProjectStatus = mongoose.models.ProjectStatus;
@@ -227,6 +258,41 @@ router.post("/add", async (req, res) => {
     }
 
     console.log("✅ Project saved:", saved._id);
+
+    // Proactively mint a client-portal token for this project so the
+    // "Client Portal" panel never has to show "Generating link..." the
+    // first time someone opens this project's details page.
+    try {
+      const clientId = req.body.clientId || "";
+      if (clientId) {
+        const client = await Client.findById(clientId);
+        if (client) {
+          const token = jwt.sign(
+            {
+              clientId: client._id.toString(),
+              email: client.email,
+              name: client.clientName || client.name,
+              companyName: client.companyName || client.company || "",
+              companyId: req.companyId || client.companyId || "",
+              agencyName: "",
+              projectId: saved._id.toString(),
+              role: "client",
+            },
+            process.env.JWT_SECRET || "secret",
+            { expiresIn: "24h" }
+          );
+          await Client.findByIdAndUpdate(clientId, {
+            portalToken: token,
+            portalTokenProjectId: saved._id.toString(),
+          });
+          console.log("✅ Pre-generated portal token for project:", saved._id);
+        }
+      }
+    } catch (portalErr) {
+      console.error("Pre-generate portal token error:", portalErr.message);
+      // Non-fatal — the frontend will fall back to generating the token lazily.
+    }
+
     res.status(201).json({ msg: "Project created", project: saved });
 
   } catch (err) {

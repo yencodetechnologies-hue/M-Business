@@ -1656,8 +1656,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               </div>
               <div style={{ fontSize: 12, opacity: 0.85, marginBottom: 4 }}>{clientName}</div>
               <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: 9, padding: '7px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 10 }}>
-                <span style={{ fontSize: 11, fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {loadingPortalLink ? 'Generating link...' : (portalLinkUrl ? `/client-portal/${portalLinkUrl.split('/client-portal/')[1]?.split('?')[0]}` : 'Link not generated')}
+                <span style={{ fontSize: 11, fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', opacity: portalLinkUrl ? 1 : 0 }}>
+                  {portalLinkUrl ? `/client-portal/${portalLinkUrl.split('/client-portal/')[1]?.split('?')[0]}` : '\u00A0'}
                 </span>
                 <button onClick={copyPortalLink} style={{ flexShrink: 0, padding: '4px 10px', borderRadius: 6, border: 'none', background: 'rgba(255,255,255,0.25)', color: '#fff', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Copy</button>
               </div>

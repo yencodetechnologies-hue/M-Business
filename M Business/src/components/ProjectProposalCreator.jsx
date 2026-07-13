@@ -1712,13 +1712,13 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
           {/* STATS ROW */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 22 }}>
-            <div className="stat-card" onClick={() => { setActiveCard("all"); setPropTab("all"); }} style={{ border: activeCard === "all" ? "2px solid var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))" : "1.5px solid var(--border,#E0EEF0)", boxShadow: activeCard === "all" ? "0 4px 16px rgba(0,188,212,.18)" : "" }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--teal-light,var(--teal-light, var(--teal-light, #E0F7FA)))", color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-presentation"></i></div>
-              <div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{total}</div>
-                <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>Total Proposals</div>
-                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))" }}>₹{totalVal.toLocaleString("en-IN")} pipeline</div>
-              </div>
+            <div className="stat-card" onClick={() => { setActiveCard("all"); setPropTab("all"); }} style={{ display: "flex", alignItems: "center", gap: 12, border: activeCard === "all" ? "2px solid var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))" : "1.5px solid var(--border,#E0EEF0)", boxShadow: activeCard === "all" ? "0 4px 16px rgba(0,188,212,.18)" : "" }}>
+           <div style={{ width: 36, height: 36, borderRadius: 10, background: "var(--teal-light,var(--teal-light, var(--teal-light, #E0F7FA)))", color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8, flexShrink: 0 }}><i className="ti ti-presentation"></i></div>
+<div>
+  <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{total}</div>
+  <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>Total Proposals</div>
+  <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))" }}>₹{totalVal.toLocaleString("en-IN")} pipeline</div>
+</div>
             </div>
             <div className="stat-card" onClick={() => { setActiveCard("won"); setPropTab("won"); }} style={{ border: activeCard === "won" ? "2px solid var(--green,#26C281)" : "1.5px solid var(--border,#E0EEF0)", boxShadow: activeCard === "won" ? "0 4px 16px rgba(38,194,129,.18)" : "" }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--green-bg,#E8FAF3)", color: "var(--green,#26C281)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-trophy"></i></div>

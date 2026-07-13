@@ -271,7 +271,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           <div id="basic" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: `linear-gradient(90deg, ${TC_LIGHT} 0%, #ffffff 100%)` }}>
               <div style={{ width: 36, height: 36, background: TC, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🏢</div>
-
+              <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Basic Info</div><div style={{ fontSize: 12, color: '#94A3B0' }}>Core client identity and classification</div></div>
             </div>
             <div style={{ padding: 20 }}>
               <div style={{ marginBottom: 20 }}>

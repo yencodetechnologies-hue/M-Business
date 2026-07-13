@@ -966,34 +966,36 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           </div>
 
           <div className="stats-row">
-            <div className="stat-card" onClick={() => setActiveTab("All")} style={{ cursor: "pointer", transition: "all 0.2s", border: activeTab === "All" ? "2px solid var(--teal)" : "2px solid transparent", borderRadius: 12 }}>
+            <div className="stat-card" onClick={() => setActiveTab("All")} style={{ cursor: "pointer", transition: "all 0.2s", position: "relative", border: activeTab === "All" ? "2px solid var(--teal)" : "2px solid transparent", borderRadius: 12 }}>
+              {activeTab === "All" && <div style={{ position: "absolute", top: 18, right: 20, fontSize: 10, color: "var(--teal)", fontWeight: 700 }}>● Active</div>}
               <div className="stat-icon" style={{ background: "var(--teal-light)", color: "var(--teal)" }}><i className="ti ti-file-text"></i></div>
               <div>
                 <div className="stat-num">{totalQuotes}</div>
                 <div className="stat-label">Total Quotes</div>
                 <div className="stat-sub" style={{ color: "var(--teal)" }}>₹{totalValue.toLocaleString("en-IN")} value</div>
               </div>
-              {activeTab === "All" && <div style={{ marginLeft: "auto", fontSize: 10, color: "var(--teal)", fontWeight: 700, alignSelf: "center" }}>● Active</div>}
             </div>
-            <div className="stat-card" onClick={() => setActiveTab("Accepted")} style={{ cursor: "pointer", transition: "all 0.2s", border: activeTab === "Accepted" ? "2px solid var(--green)" : "2px solid transparent", borderRadius: 12 }}>
+            <div className="stat-card" onClick={() => setActiveTab("Accepted")} style={{ cursor: "pointer", transition: "all 0.2s", position: "relative", border: activeTab === "Accepted" ? "2px solid var(--green)" : "2px solid transparent", borderRadius: 12 }}>
+              {activeTab === "Accepted" && <div style={{ position: "absolute", top: 18, right: 20, fontSize: 10, color: "var(--green)", fontWeight: 700 }}>● Active</div>}
               <div className="stat-icon" style={{ background: "var(--green-bg)", color: "var(--green)" }}><i className="ti ti-circle-check"></i></div>
               <div>
                 <div className="stat-num">{wonCount}</div>
                 <div className="stat-label">Accepted</div>
                 <div className="stat-sub" style={{ color: "var(--green)" }}>₹{wonValue.toLocaleString("en-IN")} won</div>
               </div>
-              {activeTab === "Accepted" && <div style={{ marginLeft: "auto", fontSize: 10, color: "var(--green)", fontWeight: 700, alignSelf: "center" }}>● Active</div>}
             </div>
-            <div className="stat-card" onClick={() => setActiveTab("Sent")} style={{ cursor: "pointer", transition: "all 0.2s", border: activeTab === "Sent" ? "2px solid var(--amber)" : "2px solid transparent", borderRadius: 12 }}>
+
+            <div className="stat-card" onClick={() => setActiveTab("Sent")} style={{ cursor: "pointer", transition: "all 0.2s", position: "relative", border: activeTab === "Sent" ? "2px solid var(--amber)" : "2px solid transparent", borderRadius: 12 }}>
+              {activeTab === "Sent" && <div style={{ position: "absolute", top: 18, right: 20, fontSize: 10, color: "var(--amber)", fontWeight: 700 }}>● Active</div>}
               <div className="stat-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-clock"></i></div>
               <div>
                 <div className="stat-num">{pendingCount}</div>
                 <div className="stat-label">Pending</div>
                 <div className="stat-sub" style={{ color: "var(--amber)" }}>₹{pendingValue.toLocaleString("en-IN")} pending</div>
               </div>
-              {activeTab === "Sent" && <div style={{ marginLeft: "auto", fontSize: 10, color: "var(--amber)", fontWeight: 700, alignSelf: "center" }}>● Active</div>}
             </div>
-            <div className="stat-card" onClick={() => { setActiveTab("All"); setListSearch(""); }} style={{ cursor: "pointer", transition: "all 0.2s", border: "2px solid transparent", borderRadius: 12 }}>
+
+            <div className="stat-card" onClick={() => { setActiveTab("All"); setListSearch(""); }} style={{ cursor: "pointer", transition: "all 0.2s", position: "relative", border: "2px solid transparent", borderRadius: 12 }}>
               <div className="stat-icon" style={{ background: "var(--purple-bg)", color: "var(--purple)" }}><i className="ti ti-percentage"></i></div>
               <div>
                 <div className="stat-num">{winRate}%</div>

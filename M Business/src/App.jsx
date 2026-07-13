@@ -4,8 +4,8 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 // Lazy load all heavy components
-const AuthPage = lazy(() => import("./components/AuthPage"));
-const Dashboard = lazy(() => import("./components/SubAdminDashboard"));
+import AuthPage from "./components/AuthPage";
+import Dashboard from "./components/SubAdminDashboard";
 const AdminDashboard = lazy(() => import("./components/AdminDashboard"));
 const ClientDashboard = lazy(() => import("./components/ClientDashboard"));
 const EmployeeDashboard = lazy(() => import("./components/EmployeeDashboard"));

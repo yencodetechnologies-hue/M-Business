@@ -978,7 +978,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       else localStorage.removeItem("activeClientId_subadmin");
     } catch { }
   }, [activeClientId]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
 
   const [editClient, setEditClient] = useState(null);
@@ -5616,7 +5616,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
             <div style={{ fontSize: 11, fontWeight: 800, color: "var(--app-muted)", marginBottom: 12, letterSpacing: 1 }}>PERSONAL DETAILS</div>
 
-            {[{ icon: "👤", label: "Full Name", value: displayName }, { icon: "📧", label: "Email", value: user?.email || "—" }, { icon: "📱", label: "Phone", value: user?.phone || "—" }, { icon: "🎬", label: "Role", value: user?.role || "user" }].map(({ icon, label, value }) => (
+            {[{ icon: "👤", label: "Full Name", value: displayName }, { icon: "📧", label: "Email", value: user?.email || "—" }, { icon: "📱", label: "Phone", value: user?.phone || "—" }].map(({ icon, label, value }) => (
 
               <div key={label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "var(--app-bg)", borderRadius: 9, border: "1px solid var(--app-border)", marginBottom: 7 }}>
 
@@ -7562,6 +7562,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     // priority instead of just an earlier call in the same tick.
     (async () => {
       await fetchClients();
+      setIsLoading(false);
       await fetchProjects();
 
       fetchProfile();

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 import AddClientView from './AddClientView';
+import { toast } from 'react-toastify';
 // ── Shared Colors ──
 const P = {
   primary: ' var(--app-accent, var(--app-accent, #00BCD4))', primaryDark: '#0097A7', primaryLight: 'var(--teal-light, var(--teal-light, #E0F7FA))', primaryMid: '#B2EBF2',

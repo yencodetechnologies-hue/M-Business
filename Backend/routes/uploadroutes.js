@@ -42,7 +42,7 @@ const upload = multer({
 router.get("/raw/*splat", async (req, res) => {
   try {
     const publicId = Array.isArray(req.params.splat) ? req.params.splat.join("/") : req.params.splat;
-    const media = await Media.findOne({ public_id: publicId });
+    const media = await Media.findOne({ public_id: publicId }) || await Media.findOne({ public_id: publicId.replace(/^\/+|\/+$/g, "") });
     if (!media) return res.status(404).json({ msg: "Not found" });
     const response = await require("axios").get(media.url, { responseType: "arraybuffer" });
     res.set("Content-Type", media.type || "image/svg+xml");

@@ -814,14 +814,24 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                       />
                     )}
                     <input type="date" value={m.date} onChange={e => updateMilestone(idx, 'date', e.target.value)} />
-                    <i
-                      className="ti ti-trash mpc-remove-ms"
-                      title="Delete milestone"
+
+                    <button
+                      type="button"
+                      className="mpc-btn mpc-btn-outline"
+                      style={{ marginLeft: 8, padding: '8px 12px', color: '#dc2626', borderColor: '#dc2626' }}
                       onClick={() => removeMilestone(idx)}
-                    />
+                      title="Delete milestone"
+                    >
+                      <i className="ti ti-trash" /> Delete
+                    </button>
                   </div>
                 );
               })}
+              {milestones.length === 0 && (
+                <div style={{ fontSize: 13, color: '#94a3b8', padding: '8px 0' }}>
+                  {editProject ? 'No milestones added for this project yet.' : 'No milestones added yet.'}
+                </div>
+              )}
             </div>
             {!editProject && (
               <button className="mpc-btn mpc-btn-outline" style={{ marginTop: 16, fontSize: 12, padding: '8px 16px' }} onClick={addMilestone}>

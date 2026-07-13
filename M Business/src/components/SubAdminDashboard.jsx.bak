@@ -3003,7 +3003,9 @@ const handleEditPackage = (pkg) => {
         gstNumber: nc.gstNumber,
         logoUrl: nc.logoUrl
       };
-      const res = await axios.post(BASE_URL + "/api/clients/add", payload);
+      const res = await axios.post(BASE_URL + "/api/clients/add", payload, {
+  headers: { 'x-company-id': resolveSubadminId() }
+});
       setClients(prev => [res.data.client, ...prev]);
       // Store credentials for the success screen
       setClientSuccessData({ email: nc.email, password: nc.password, name: nc.name });

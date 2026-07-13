@@ -8579,7 +8579,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       };
 
-      const res = await axios.post(BASE_URL + "/api/clients/add", payload);
+      const res = await axios.post(BASE_URL + "/api/clients/add", payload, {
+        headers: { 'x-company-id': resolveSubadminId() }
+      });
 
       setClients(prev => [res.data.client, ...prev]);
 

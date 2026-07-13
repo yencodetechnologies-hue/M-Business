@@ -1948,7 +1948,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         preferredPaymentMode: nc.preferredPaymentMode,
         notes: nc.notes
       };
-      const res = await axios.post(BASE_URL + "/api/clients/add", payload);
+      const res = await axios.post(BASE_URL + "/api/clients/add", payload, {
+        headers: { 'x-company-id': resolveSubadminId() }
+      });
       setClients(prev => [res.data.client, ...prev]);
       setClientSuccessData({ email: nc.email, password: nc.password.trim() ? nc.password : "123456", name: nc.name });
       setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", gstNumber: "", logoUrl: "" });

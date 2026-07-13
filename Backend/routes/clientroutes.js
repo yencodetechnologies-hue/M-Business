@@ -33,6 +33,10 @@ router.post("/:clientId/portal-token", async (req, res) => {
     const client = await Client.findById(req.params.clientId);
     if (!client) return res.status(404).json({ msg: "Client not found" });
 
+    if (client.portalToken && client.portalTokenProjectId === (req.body.projectId || "")) {
+      return res.json({ token: client.portalToken });
+    }
+
     const token = jwt.sign(
       {
         clientId: client._id.toString(),
@@ -48,6 +52,7 @@ router.post("/:clientId/portal-token", async (req, res) => {
       { expiresIn: "24h" }
     );
 
+    await Client.findByIdAndUpdate(req.params.clientId, { portalToken: token, portalTokenProjectId: req.body.projectId || "" });
     res.json({ token });
   } catch (err) {
     res.status(500).json({ msg: err.message });

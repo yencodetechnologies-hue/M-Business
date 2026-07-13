@@ -288,6 +288,27 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [currProject, setCurrProject] = useState(project);
 
   useEffect(() => {
+    const preloadPortalLink = async () => {
+      const clientId = currProject?.clientId || resolvedClientId;
+      if (!clientId) return;
+      try {
+        const res = await axios.get(`${BASE_URL}/api/clients/${clientId}`);
+        const c = res.data;
+        if (c?.portalToken && c?.portalTokenProjectId === (currProject?._id || "")) {
+          setPortalLinkUrl(`${window.location.origin}/client-portal/${clientId}?token=${c.portalToken}`);
+          lastPortalProjectId.current = currProject._id;
+          return;
+        }
+      } catch (e) { /* fall through to normal generation */ }
+      generatePortalLink();
+    };
+    if (currProject?._id) {
+      preloadPortalLink();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currProject?._id]);
+
+  useEffect(() => {
     if (project && (project.name || project.client)) {
       setCurrProject(project);
     }

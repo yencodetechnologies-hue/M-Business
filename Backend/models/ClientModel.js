@@ -36,6 +36,8 @@ const ClientSchema = new mongoose.Schema({
   creditLimit: { type: String, default: "" },
   preferredPaymentMode: { type: String, default: "" },
   internalNotes: { type: String, default: "" },
+  portalToken: { type: String, default: "" },
+  portalTokenProjectId: { type: String, default: "" },
   documents: {
     type: [{
       name: { type: String, default: "" },

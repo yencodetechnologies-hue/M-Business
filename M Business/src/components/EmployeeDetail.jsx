@@ -7,6 +7,8 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
 
   const [taskTab, setTaskTab] = useState('all');
   const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [rejectingLeaveIdx, setRejectingLeaveIdx] = useState(null);
+  const [rejectReasonInput, setRejectReasonInput] = useState('');
   const [leaveForm, setLeaveForm] = useState({ type: 'Sick Leave', customType: '', startDate: '', endDate: '', reason: '' });
   const [leaveSaving, setLeaveSaving] = useState(false);
   const [localLeaves, setLocalLeaves] = useState(emp.leaveRequests || []);
@@ -53,8 +55,10 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
     }
   };
 
-  const updateLeaveStatus = async (index, status) => {
-    const updatedLeaves = localLeaves.map((l, i) => i === index ? { ...l, status } : l);
+  const updateLeaveStatus = async (index, status, rejectReason) => {
+    const updatedLeaves = localLeaves.map((l, i) =>
+      i === index ? { ...l, status, ...(status === 'rejected' ? { rejectReason: rejectReason || '' } : {}) } : l
+    );
     setLocalLeaves(updatedLeaves);
     try {
       await axios.put(`${BASE_URL}/api/employees/${emp._id}`, { leaveRequests: updatedLeaves });
@@ -683,12 +687,17 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                         color: leave.status === 'approved' ? 'var(--success)' : leave.status === 'rejected' ? 'var(--danger)' : 'var(--warning)',
                         padding: "4px 8px", borderRadius: "20px", fontSize: "10px", fontWeight: "800", textTransform: "capitalize"
                       }}>{leave.status || "Pending"}</span>
+                      {leave.status === 'rejected' && leave.rejectReason && (
+                        <div style={{ fontSize: "10px", color: "var(--danger)", marginTop: 4, maxWidth: 200 }}>
+                          <strong>Reason:</strong> {leave.rejectReason}
+                        </div>
+                      )}
                     </td>
                     <td>
                       {(!leave.status || leave.status === 'pending') ? (
                         <>
                           <button className="ed-btn" style={{ padding: "4px 8px", fontSize: "10px", background: "#ECFDF5", color: "var(--success)", borderColor: "#D1FAE5" }} onClick={() => updateLeaveStatus(i, 'approved')}>Approve</button>
-                          <button className="ed-btn" style={{ padding: "4px 8px", fontSize: "10px", background: "#FEF2F2", color: "var(--danger)", borderColor: "#FEE2E2", marginLeft: "4px" }} onClick={() => updateLeaveStatus(i, 'rejected')}>Reject</button>
+                          <button className="ed-btn" style={{ padding: "4px 8px", fontSize: "10px", background: "#FEF2F2", color: "var(--danger)", borderColor: "#FEE2E2", marginLeft: "4px" }} onClick={() => { setRejectingLeaveIdx(i); setRejectReasonInput(''); }}>Reject</button>
                         </>
                       ) : <span style={{ color: "var(--text-muted)" }}>—</span>}
                     </td>
@@ -698,6 +707,36 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
             </table>
           )}
         </div>
+
+        {rejectingLeaveIdx !== null && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99998, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={() => setRejectingLeaveIdx(null)}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 14, width: '100%', maxWidth: 380, padding: 22, boxShadow: '0 8px 32px rgba(0,0,0,0.18)' }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-dark, #1A2332)', marginBottom: 12 }}>Reject Leave Request</div>
+              <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>Reason for rejection</label>
+              <textarea
+                autoFocus
+                value={rejectReasonInput}
+                onChange={e => setRejectReasonInput(e.target.value)}
+                placeholder="Enter reason..."
+                style={{ width: '100%', minHeight: 80, padding: '10px 12px', borderRadius: 8, border: '1.5px solid #E2E8F0', fontSize: 13, fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }}
+              />
+              <div style={{ display: 'flex', gap: 10, marginTop: 16, justifyContent: 'flex-end' }}>
+                <button className="ed-btn" style={{ padding: '7px 16px', fontSize: 12 }} onClick={() => setRejectingLeaveIdx(null)}>Cancel</button>
+                <button
+                  className="ed-btn"
+                  style={{ padding: '7px 16px', fontSize: 12, background: 'var(--danger)', color: '#fff', border: 'none' }}
+                  onClick={async () => {
+                    if (!rejectReasonInput.trim()) { alert('Please enter a reason for rejection.'); return; }
+                    await updateLeaveStatus(rejectingLeaveIdx, 'rejected', rejectReasonInput.trim());
+                    setRejectingLeaveIdx(null);
+                  }}
+                >
+                  Confirm Reject
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* BOTTOM GRID: Projects | Tasks | Documents */}

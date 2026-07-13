@@ -75,9 +75,12 @@ router.get("/my-projects", verifyClientPortal, async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const companyId = req.companyId || req.query.companyId || "";
+    const companyId = req.companyId || req.headers['x-company-id'] || req.query.companyId || "";
     const filter = companyId ? { companyId } : {};
-    const clients = await Client.find(filter).sort({ createdAt: -1 }).lean();
+    const clients = await Client.find(filter)
+      .select('-password -__v -portalToken')
+      .sort({ createdAt: -1 })
+      .lean();
     res.json(clients);
   } catch (err) {
     res.status(500).json({ msg: "Server error" });

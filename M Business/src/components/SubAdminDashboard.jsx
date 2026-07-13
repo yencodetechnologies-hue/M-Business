@@ -7594,7 +7594,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     fetchClients();
     fetchProjects();
     fetchProfile();
-    fetchEmployees(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); fetchInvoices(); fetchIncome(); fetchExpenses(); fetchTasks(); fetchConfig();
+    fetchClients();
+    Promise.all([
+      fetchEmployees(), fetchManagers(), fetchSubadmins(), fetchPackages(),
+      fetchSubscription(), fetchQuotations(), fetchPaymentHistory(), fetchVendors(),
+      fetchInvoices(), fetchIncome(), fetchExpenses(), fetchTasks(), fetchConfig()
+    ]).catch(e => console.log("Background fetch error:", e));
     fetchPendingLeaves(); fetchEmployeeDocs();
   }, []);
   // Close notification panel when clicking outside
@@ -8196,14 +8201,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     localStorage.removeItem("user");
     localStorage.removeItem("accounts");
     localStorage.removeItem("activeClientId_subadmin");
-    [
-      "cached_clients", "cached_projects", "cached_tasks", "cached_invoices",
-      "cached_income", "cached_expenses", "cached_employees", "cached_managers",
-      "cached_subadmins", "cached_quotations", "cached_vendors"
-    ].forEach(k => localStorage.removeItem(k));
     localStorage.setItem("loggedOut", "1");
     setUser(null);
     setAccounts([]);
+    setClients([]);
   };
 
   const handleAuthSetUser = (userData) => {
@@ -8235,7 +8236,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     } catch { }
     try {
       const res = await axios.get(BASE_URL + "/api/clients", {
-        headers: { 'x-company-id': cid }
+        headers: { 'x-company-id': cid },
+        timeout: 8000
       });
       setClients(res.data);
       try { localStorage.setItem("cached_clients_" + cid, JSON.stringify(res.data)); } catch { }

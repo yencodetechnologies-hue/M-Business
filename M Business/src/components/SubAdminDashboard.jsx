@@ -8212,11 +8212,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const fetchClients = async () => {
     if (!user?.companyId) return;
     try {
-      const res = await axios.get(BASE_uRL + "/api/clients", {
+      const res = await axios.get(BASE_URL + "/api/clients", {
         headers: { 'x-company-id': user.companyId }
       });
       setClients(res.data);
-      try { localStorage.setItem("cached_Clients_" + user.companyId, JSON.stringify(res.data)); } catch { }
+      try { localStorage.setItem("cached_clients_" + user.companyId, JSON.stringify(res.data)); } catch { }
     } catch (e) { console.log(e); }
   };
 

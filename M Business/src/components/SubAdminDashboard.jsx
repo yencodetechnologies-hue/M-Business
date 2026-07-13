@@ -11000,7 +11000,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   await fetchProjects();
 
-                  setSidebarOverride(null);
                   setJumpProject(saved);
                   setFromEditProject(false);
                   setActive("project-details");

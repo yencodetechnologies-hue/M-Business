@@ -520,7 +520,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const isPreviewableFile = (file) => {
     if (file?.isLetterhead && file?.raw?.htmlContent) return "html";
     const mime = (file?.type || "").toLowerCase();
-    const name = (file?.name || "").toLowerCase();
+    const name = (file?.name || file?.fileName || "").toLowerCase();
     if (mime.includes("pdf") || name.endsWith(".pdf")) return "pdf";
     if (mime.includes("image") || /\.(jpg|jpeg|png|gif|webp|svg)$/.test(name)) return "image";
     return null;
@@ -556,7 +556,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         const myClientId = portalMode
           ? (portalClientId || user._id || user.id || "")
           : (user._id || user.id || "");
-        const [projRes, taskRes, invRes, notifRes, docRes, meetRes, propRes, quotRes, approvalRes, msgRes] = await Promise.all([
+        const [projRes, taskRes, invRes, notifRes, docRes, meetRes, propRes, quotRes, approvalRes, msgRes, clientRes] = await Promise.all([
           axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}&clientId=${encodeURIComponent(myClientId)}`, {
             headers: { 'x-company-id': user.companyId || "" }
           }),
@@ -578,7 +578,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           axios.get(`${BASE_URL}/api/approvals/client/${encodeURIComponent(myClientId)}`, {
             headers: { 'x-company-id': user.companyId || "" }
           }).catch(() => ({ data: [] })),
-          axios.get(`${BASE_URL}/api/messages?companyId=${encodeURIComponent(user.companyId || "")}`).catch(() => ({ data: [] }))
+          axios.get(`${BASE_URL}/api/messages?companyId=${encodeURIComponent(user.companyId || "")}`).catch(() => ({ data: [] })),
+          axios.get(`${BASE_URL}/api/clients/${myClientId}`).catch(() => ({ data: {} })),
         ]);
 
         setProjects(projRes.data || []);
@@ -587,6 +588,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         setNotifs(notifRes.data || []);
         setDocs(docRes.data || []);
         setMeetings(Array.isArray(meetRes.data) ? meetRes.data : []);
+        setClientDocuments(clientRes.data?.documents || []);
 
         // Filter quotations — only show "sent" quotations addressed to this client
         const allQuots = Array.isArray(quotRes.data) ? quotRes.data : (quotRes.data?.quotations || []);

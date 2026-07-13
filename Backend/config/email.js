@@ -117,15 +117,15 @@ const sendUsageLimitAlert = async (userEmail, userName, planName, usageCount, us
   return await sendEmail(userEmail, `⚠️ Usage Limit Alert — ${remaining} remaining in your ${planName} plan`, html);
 };
 
-// Subscription success email (Trial or Paid)
-const sendSubscriptionSuccess = async (userEmail, userName, planName, startDate, endDate, isTrial = false) => {
+// Subscription success email
+const sendSubscriptionSuccess = async (userEmail, userName, planName, startDate, endDate) => {
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
       ${mbHeader}
       <div style="background:#fff;padding:32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;">
         <h3 style="color:#16a34a;margin-top:0;">🎉 Subscription Activated!</h3>
         <p style="color:#4b5563;">Hello <strong>${userName}</strong>,</p>
-        <p style="color:#4b5563;">Your <strong>${planName}</strong> plan has been successfully activated. ${isTrial ? "Enjoy your 30-day free trial!" : "Thank you for choosing M Business."}</p>
+        <p style="color:#4b5563;">Your <strong>${planName}</strong> plan has been successfully activated. Thank you for choosing M Business.</p>
         <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;padding:20px;margin:24px 0;">
           <table style="width:100%;font-size:14px;color:#166534;">
             <tr><td style="padding:5px 0;font-weight:600;">Plan Name</td><td>${planName}</td></tr>
@@ -140,14 +140,11 @@ const sendSubscriptionSuccess = async (userEmail, userName, planName, startDate,
       </div>
     </div>
   `;
-  const subject = isTrial ? `🎉 Your 30-Day Free Trial is Now Active` : `✅ Your ${planName} Subscription is Now Active!`;
+  const subject = `✅ Your ${planName} Subscription is Now Active!`;
   return await sendEmail(userEmail, subject, html);
 };
 
-// Trial welcome email
-const sendTrialWelcome = async (userEmail, userName, endDate) => {
-  return await sendSubscriptionSuccess(userEmail, userName, "30-Day Free Trial", new Date(), endDate, true);
-};
+
 
 // OTP email
 const sendOTPEmail = async (userEmail, otp, purpose = 'verification') => {
@@ -231,4 +228,4 @@ const sendEmployeeStatusUpdateEmail = async (userEmail, userName, companyName, s
   return await sendEmail(userEmail, subject, html);
 };
 
-module.exports = { sendEmail, sendRenewalReminder, sendExpiryNotification, sendUsageLimitAlert, sendTrialWelcome, sendOTPEmail, sendQuickEmail, sendSubscriptionSuccess, sendEmployeeStatusUpdateEmail };
+module.exports = { sendEmail, sendRenewalReminder, sendExpiryNotification, sendUsageLimitAlert, sendOTPEmail, sendQuickEmail, sendSubscriptionSuccess, sendEmployeeStatusUpdateEmail };

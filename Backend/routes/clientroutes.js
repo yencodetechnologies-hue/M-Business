@@ -80,17 +80,6 @@ router.get("/", async (req, res) => {
 
 const { checkResourceLimit } = require("../middleware/subscriptionMiddleware");
 router.post("/add", checkResourceLimit('client'), addClient);
-router.get("/:id", async (req, res) => {
-  try {
-    const client = await Client.findById(req.params.id);
-    if (!client) return res.status(404).json({ msg: "Client not found" });
-    res.json(client);
-  } catch (err) {
-    console.error("Get client by id error:", err);
-    res.status(500).json({ msg: "Server error" });
-  }
-});
-
 router.put("/:id", async (req, res) => {
 
   try {
@@ -142,7 +131,7 @@ router.put("/:id", async (req, res) => {
       console.error("Project cascade-link after client edit failed:", cascadeErr.message);
     }
 
-const updatedClient = await Client.findById(req.params.id);
+    const updatedClient = await Client.findById(req.params.id);
     res.json({ success: true, client: updatedClient });
   } catch (err) {
     res.status(500).json({ msg: "Server error", error: err.message });
@@ -254,4 +243,16 @@ router.get("/feedback", async (req, res) => {
     res.status(500).json({ msg: err.message });
   }
 });
+
+router.get("/:id", async (req, res) => {
+  try {
+    const client = await client.findbyid(req.params.id);
+    if (!client) return res.status(404).json({ msg: "client not found" });
+    res.json(client);
+  } catch (err) {
+    console.error("get client by id error:", err);
+    res.status(500).json({ msg: "server error" });
+  }
+});
+
 module.exports = router;

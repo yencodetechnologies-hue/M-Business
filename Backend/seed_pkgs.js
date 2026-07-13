@@ -5,25 +5,7 @@ dns.setServers(['8.8.8.8', '8.8.4.4']);
 require('dotenv').config();
 
 const DEFAULT_PACKAGES = [
-  {
-    title: "Trial",
-    price: 0,
-    type: "free",
-    no_of_days: 30,
-    icon: "✨",
-    targetRole: "subadmin",
-    status: "Active",
-    features: [
-      "30 Days Free Trial",
-      "5 Projects",
-      "5 Invoices",
-      "Basic Support"
-    ],
-    planDuration: "Monthly",
-    clientLimit: "5",
-    employeeLimit: "5",
-    managerLimit: "2"
-  },
+
   {
     title: "Starter",
     price: 999,

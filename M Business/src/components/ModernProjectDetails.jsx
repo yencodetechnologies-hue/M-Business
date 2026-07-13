@@ -2237,7 +2237,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 </div>
 
                 <div className={`mpd-tab-pane ${activeTab === 'updates' ? 'mpd-active' : ''}`}>
-                  {composerOpen && (
+                  {composerOpen && !hideTopActions && (
                     <div ref={composerRef} style={{ marginBottom: 24 }}>
 
                       {(
@@ -2697,6 +2697,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           exp: { label: 'Add Expense', modal: 'showExpense', icon: 'ti-receipt' },
                         };
                         const b = btnMap[activePayTab] || btnMap['inv'];
+                        if (hideTopActions) return null;
                         return (
                           <button
                             onClick={() => {

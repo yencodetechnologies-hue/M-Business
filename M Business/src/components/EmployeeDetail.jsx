@@ -516,8 +516,9 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         .ed-progress-fill { height: 100%; border-radius: 10px; }
 
         .ed-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .ed-table th { text-align: left; padding: 8px 0; font-size: 10px; font-weight: 800; color: #94A3B8; text-transform: uppercase; border-bottom: 1px solid var(--border); }
-        .ed-table td { padding: 12px 0; font-size: 12px; font-weight: 700; color: #334155; border-bottom: 1px solid #F1F5F9; }
+        .ed-table th { text-align: left; padding: 10px; font-size: 10px; font-weight: 800; color: #94A3B8; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+        .ed-table th:first-child { padding-left: 0; }
+        .ed-table td { font-size: 12px; font-weight: 700; color: #334155; border-bottom: 1px solid #F1F5F9; }
         .ed-table tr:last-child td { border-bottom: none; }
 
         .ed-proj-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #F1F5F9; cursor: pointer; }
@@ -671,38 +672,68 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
           {localLeaves.length === 0 ? (
             <div className="ed-empty"><i className="ti ti-calendar-off" style={{ fontSize: 24, display: 'block', marginBottom: 8 }}></i>No leave requests</div>
           ) : (
-            <table className="ed-table">
+            <table className="ed-table" style={{ tableLayout: "fixed", width: "100%" }}>
+              <colgroup>
+                <col style={{ width: "22%" }} />
+                <col style={{ width: "28%" }} />
+                <col style={{ width: "25%" }} />
+                <col style={{ width: "25%" }} />
+              </colgroup>
               <thead><tr><th>Type</th><th>Dates</th><th>Status</th><th>Action</th></tr></thead>
               <tbody>
-                {localLeaves.map((leave, i) => (
-                  <tr key={i}>
-                    <td>{leave.type || leave.leaveType || "Leave"}</td>
-                    <td style={{ color: "var(--text-muted)", fontSize: "11px" }}>
-                      {leave.startDate ? new Date(leave.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : ""}
-                      {leave.endDate && leave.endDate !== leave.startDate ? ` – ${new Date(leave.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}` : ""}
-                    </td>
-                    <td>
-                      <span style={{
-                        background: leave.status === 'approved' ? '#ECFDF5' : leave.status === 'rejected' ? '#FEF2F2' : '#FFFBEB',
-                        color: leave.status === 'approved' ? 'var(--success)' : leave.status === 'rejected' ? 'var(--danger)' : 'var(--warning)',
-                        padding: "4px 8px", borderRadius: "20px", fontSize: "10px", fontWeight: "800", textTransform: "capitalize"
-                      }}>{leave.status || "Pending"}</span>
-                      {leave.status === 'rejected' && leave.rejectReason && (
-                        <div style={{ fontSize: "10px", color: "var(--danger)", marginTop: 4, maxWidth: 200 }}>
-                          <strong>Reason:</strong> {leave.rejectReason}
-                        </div>
-                      )}
-                    </td>
-                    <td>
-                      {(!leave.status || leave.status === 'pending') ? (
-                        <>
-                          <button className="ed-btn" style={{ padding: "4px 8px", fontSize: "10px", background: "#ECFDF5", color: "var(--success)", borderColor: "#D1FAE5" }} onClick={() => updateLeaveStatus(i, 'approved')}>Approve</button>
-                          <button className="ed-btn" style={{ padding: "4px 8px", fontSize: "10px", background: "#FEF2F2", color: "var(--danger)", borderColor: "#FEE2E2", marginLeft: "4px" }} onClick={() => { setRejectingLeaveIdx(i); setRejectReasonInput(''); }}>Reject</button>
-                        </>
-                      ) : <span style={{ color: "var(--text-muted)" }}>—</span>}
-                    </td>
-                  </tr>
-                ))}
+                {localLeaves.map((leave, i) => {
+                  const currentStatus = leave.status || 'pending';
+                  return (
+                    <tr key={i}>
+                      <td style={{ padding: "14px 10px 14px 0", verticalAlign: "top" }}>{leave.type || leave.leaveType || "Leave"}</td>
+                      <td style={{ color: "var(--text-muted)", fontSize: "11px", padding: "14px 10px", verticalAlign: "top" }}>
+                        {leave.startDate ? new Date(leave.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : ""}
+                        {leave.endDate && leave.endDate !== leave.startDate ? ` – ${new Date(leave.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}` : ""}
+                      </td>
+                      <td style={{ padding: "14px 10px", verticalAlign: "top" }}>
+                        <span style={{
+                          background: currentStatus === 'approved' ? '#ECFDF5' : currentStatus === 'rejected' ? '#FEF2F2' : '#FFFBEB',
+                          color: currentStatus === 'approved' ? 'var(--success)' : currentStatus === 'rejected' ? 'var(--danger)' : 'var(--warning)',
+                          padding: "6px 10px", borderRadius: "8px", fontSize: "11px", fontWeight: "800", textTransform: "capitalize", display: "inline-block"
+                        }}>{currentStatus}</span>
+                        {currentStatus === 'rejected' && leave.rejectReason && (
+                          <div style={{ fontSize: "10px", color: "var(--danger)", marginTop: 6 }}>
+                            <strong>Reason:</strong> {leave.rejectReason}
+                          </div>
+                        )}
+                      </td>
+                      <td style={{ padding: "14px 0 14px 10px", verticalAlign: "top" }}>
+                        {(!leave.status || leave.status === 'pending') ? (
+                          <select
+                            value=""
+                            onChange={e => {
+                              const action = e.target.value;
+                              if (!action) return;
+                              if (action === 'rejected') {
+                                setRejectingLeaveIdx(i);
+                                setRejectReasonInput('');
+                              } else {
+                                updateLeaveStatus(i, 'approved');
+                              }
+                              e.target.value = '';
+                            }}
+                            style={{
+                              padding: "6px 10px", borderRadius: "8px", fontSize: "11px", fontWeight: "800",
+                              fontFamily: "inherit", cursor: "pointer", width: "100%",
+                              background: "#F8FAFC", color: "#334155", border: "1.5px solid var(--border)"
+                            }}
+                          >
+                            <option value="" disabled>Select Action</option>
+                            <option value="approved">Approve</option>
+                            <option value="rejected">Reject</option>
+                          </select>
+                        ) : (
+                          <span style={{ color: "var(--text-muted)" }}>—</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}
@@ -711,7 +742,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         {rejectingLeaveIdx !== null && (
           <div style={{ position: 'fixed', inset: 0, zIndex: 99998, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={() => setRejectingLeaveIdx(null)}>
             <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 14, width: '100%', maxWidth: 380, padding: 22, boxShadow: '0 8px 32px rgba(0,0,0,0.18)' }}>
-              <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-dark, #1A2332)', marginBottom: 12 }}>Reject Leave Request</div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-dark, #1A2332)', marginBottom: 12 }}>{localLeaves[rejectingLeaveIdx]?.status === 'rejected' ? 'Edit Rejection Reason' : 'Reject Leave Request'}</div>
               <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>Reason for rejection</label>
               <textarea
                 autoFocus
@@ -721,7 +752,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                 style={{ width: '100%', minHeight: 80, padding: '10px 12px', borderRadius: 8, border: '1.5px solid #E2E8F0', fontSize: 13, fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }}
               />
               <div style={{ display: 'flex', gap: 10, marginTop: 16, justifyContent: 'flex-end' }}>
-                <button className="ed-btn" style={{ padding: '7px 16px', fontSize: 12 }} onClick={() => setRejectingLeaveIdx(null)}>Cancel</button>
+                <button className="ed-btn" style={{ padding: '7px 16px', fontSize: 12 }} onClick={() => { setRejectingLeaveIdx(null); setRejectReasonInput(''); }}>Cancel</button>
                 <button
                   className="ed-btn"
                   style={{ padding: '7px 16px', fontSize: 12, background: 'var(--danger)', color: '#fff', border: 'none' }}
@@ -945,18 +976,18 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
       {showLeaveModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(6px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
           onClick={() => setShowLeaveModal(false)}>
-          <div style={{ background: '#fff', borderRadius: 18, width: '100%', maxWidth: 440, padding: '28px 28px 22px', boxShadow: '0 24px 60px rgba(0,0,0,0.18)', fontFamily: "'Nunito', sans-serif" }}
+          <div style={{ background: '#fff', borderRadius: 18, width: '100%', maxWidth: 500, padding: '32px 32px 26px', boxShadow: '0 24px 60px rgba(0,0,0,0.18)', fontFamily: "'Nunito', sans-serif" }}
             onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 26 }}>
               <div style={{ fontSize: 17, fontWeight: 800, color: '#0f1c2e', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <i className="ti ti-calendar-plus" style={{ color: ' var(--app-accent, var(--app-accent, #00BCD4))' }}></i> Add Leave Request
               </div>
               <button onClick={() => setShowLeaveModal(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#94a3b8' }}>✕</button>
             </div>
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#718096', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.5px' }}>Leave Type</label>
+            <div style={{ marginBottom: 22 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#718096', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.5px' }}>Leave Type</label>
               <select value={leaveForm.type} onChange={e => setLeaveForm(p => ({ ...p, type: e.target.value, customType: '' }))}
-                style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', background: '#fff' }}>
+                style={{ width: '100%', padding: '12px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', background: '#fff' }}>
                 {['Sick Leave', 'Casual Leave', 'Annual Leave', 'Maternity Leave', 'Paternity Leave', 'Unpaid Leave', 'Other'].map(t => <option key={t}>{t}</option>)}
               </select>
               {leaveForm.type === 'Other' && (
@@ -966,23 +997,23 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                   autoFocus />
               )}
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18, marginBottom: 22 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#718096', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.5px' }}>Start Date *</label>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#718096', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.5px' }}>Start Date *</label>
                 <input type="date" value={leaveForm.startDate} onChange={e => setLeaveForm(p => ({ ...p, startDate: e.target.value }))}
-                  style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                  style={{ width: '100%', padding: '12px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#718096', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.5px' }}>End Date *</label>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#718096', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.5px' }}>End Date *</label>
                 <input type="date" value={leaveForm.endDate} onChange={e => setLeaveForm(p => ({ ...p, endDate: e.target.value }))}
-                  style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                  style={{ width: '100%', padding: '12px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
               </div>
             </div>
-            <div style={{ marginBottom: 20 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#718096', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.5px' }}>Reason (Optional)</label>
+            <div style={{ marginBottom: 26 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#718096', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.5px' }}>Reason (Optional)</label>
               <textarea value={leaveForm.reason} onChange={e => setLeaveForm(p => ({ ...p, reason: e.target.value }))}
                 placeholder="Reason for leave..."
-                style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', minHeight: 70, resize: 'vertical', boxSizing: 'border-box' }} />
+                style={{ width: '100%', padding: '12px 14px', border: '1.5px solid #E2E8F0', borderRadius: 10, fontSize: 13, outline: 'none', fontFamily: 'inherit', minHeight: 80, resize: 'vertical', boxSizing: 'border-box' }} />
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setShowLeaveModal(false)}

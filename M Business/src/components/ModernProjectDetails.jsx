@@ -1642,12 +1642,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   </button>
                 )}
 
-                <button className="mpd-btn mpd-btn-primary" onClick={() => {
-                  setActiveTab('updates');
-                  setComposerOpen(true);
-                }}>
-                  <i className="ti ti-speakerphone"></i> Post Update
-                </button>
+
               </div>
             </div>
           </div>
@@ -2465,12 +2460,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               <button onClick={() => { setPostUpdateAttaching(false); postUpdateFileInputRef.current.value = ''; postUpdateFileInputRef.current.accept = 'image/*'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
                                 <i className="ti ti-photo" style={{ fontSize: 15 }} /> Image
                               </button>
-                              <button onClick={() => { setPostUpdateAttaching(false); postUpdateFileInputRef.current.value = ''; postUpdateFileInputRef.current.accept = '.pdf,.doc,.docx,.xls,.xlsx,.txt'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
-                                <i className="ti ti-file" style={{ fontSize: 15 }} /> File/Doc
-                              </button>
-                              <button onClick={() => { setPostUpdateAttaching(false); postUpdateFileInputRef.current.value = ''; postUpdateFileInputRef.current.accept = '*'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
-                                <i className="ti ti-paperclip" style={{ fontSize: 15 }} /> Attach
-                              </button>
+
 
                             </div>
 

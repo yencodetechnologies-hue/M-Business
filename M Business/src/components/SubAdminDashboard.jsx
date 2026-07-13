@@ -7177,7 +7177,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [clients, setClients] = useState(() => {
     try {
       const u = JSON.parse(localStorage.getItem("user") || "{}");
-      const cid = u.companyId;
+      const cid = String(u?._id || u?.id || u?.userId || u?.companyId || u?.company || "").trim();
       if (!cid) return [];
       const c = localStorage.getItem("cached_clients_" + cid);
       return c ? JSON.parse(c) : [];
@@ -8210,13 +8210,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   };
 
   const fetchClients = async () => {
-    if (!user?.companyId) return;
+    const cid = resolveSubadminId();
+    if (!cid) return;
     try {
       const res = await axios.get(BASE_URL + "/api/clients", {
-        headers: { 'x-company-id': user.companyId }
+        headers: { 'x-company-id': cid }
       });
       setClients(res.data);
-      try { localStorage.setItem("cached_clients_" + user.companyId, JSON.stringify(res.data)); } catch { }
+      try { localStorage.setItem("cached_clients_" + cid, JSON.stringify(res.data)); } catch { }
     } catch (e) { console.log(e); }
   };
 
@@ -11236,7 +11237,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               setActive("clients");
             }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || accentColor} />}
 
-            {validActive === "clients" && <ClientsPage key={clients.length > 0 ? "loaded" : "empty"} clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
+            {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 

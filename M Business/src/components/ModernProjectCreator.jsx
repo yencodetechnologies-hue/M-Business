@@ -819,10 +819,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
           <div className="mpc-section-card" id="sec4">
             <div className="mpc-section-heading"><i className="ti ti-building" /> Client Portal Settings</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <label className="mpc-checkbox-label">
-                <input type="checkbox" checked={portalOpts.enablePortal} onChange={e => setPortalOpts({ ...portalOpts, enablePortal: e.target.checked })} />
-                Enable client portal for this project
-              </label>
+
               <label className="mpc-checkbox-label">
                 <input type="checkbox" checked={portalOpts.showProgress} onChange={e => setPortalOpts({ ...portalOpts, showProgress: e.target.checked })} disabled={!portalOpts.enablePortal} />
                 Show project progress to client

@@ -1598,97 +1598,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <i className="ti ti-chevron-right" style={{ fontSize: 14 }}></i>
             <span style={{ color: P.textDark }}>{projName}</span>
           </div>
-          <div className="mpd-topbar-actions">
-            {!hideTopActions && (<>
-              {onNewInvoice && (
-                <button className="mpd-btn mpd-btn-primary" onClick={() => onNewInvoice(currProject)} style={{ gap: 6 }}>
-                  <i className="ti ti-file-invoice"></i> New Invoice
-                </button>
-              )}
-              <button className="mpd-btn mpd-btn-outline" onClick={handleShare} style={{ gap: 6 }}><i className="ti ti-share"></i> Share</button>
-              <button className="mpd-btn mpd-btn-outline" style={{ gap: 6 }} onClick={() => {
-                // CSV approach — opens in Excel perfectly on all systems
-                const q = (v) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
-                const row = (...cols) => cols.map(q).join(',') + '\n';
 
-                let csv = '';
-
-                // ── Sheet 1: Project Details ──
-                csv += row('PROJECT REPORT', projName);
-                csv += row('Generated', new Date().toLocaleString('en-IN'));
-                csv += row('');
-                csv += row('FIELD', 'VALUE');
-                csv += row('Project Name', projName);
-                csv += row('Client', clientName);
-                csv += row('Status', currProject.status || 'Active');
-                csv += row('Priority', currProject.priority || 'medium');
-                csv += row('Category', category);
-                csv += row('Start Date', currProject.start ? new Date(currProject.start).toLocaleDateString('en-IN') : '');
-                csv += row('Deadline', (currProject.end || currProject.deadline) ? new Date(currProject.end || currProject.deadline).toLocaleDateString('en-IN') : '');
-                csv += row('Contact Person', currProject.contactPersonName || '');
-                csv += row('Contact No', currProject.contactPersonNo || '');
-                csv += row('Description', currProject.description || currProject.purpose || '');
-                csv += row('');
-                csv += row('BUDGET SUMMARY', '');
-                csv += row('Overall Progress', progressPct + '%');
-                csv += row('Milestones Done', doneMilestones + ' / ' + totalMilestones);
-                csv += row('Tasks Done', doneTasks + ' / ' + totalTasks);
-                csv += row('Total Budget', currency + budgetAmt.toLocaleString());
-                csv += row('Billed', currency + billed.toLocaleString());
-                csv += row('Received', currency + received.toLocaleString());
-                csv += row('Pending', currency + pending.toLocaleString());
-                csv += row('Spent (Expenses)', currency + spent.toLocaleString());
-                csv += row('Budget Used', budgetUsedPct + '%');
-                csv += row('');
-                csv += row('TEAM MEMBERS', '');
-                assigned.forEach(m => { csv += row(m); });
-                csv += row('');
-                csv += row('TASKS', '');
-                csv += row('Task Title', 'Status', 'Priority', 'Assigned To', 'Due Date', 'Milestone');
-                projTasks.forEach(t => {
-                  csv += row(t.title || '', t.status || '', t.priority || '', t.assignTo || '', t.date ? new Date(t.date).toLocaleDateString('en-IN') : '', t.milestone || '');
-                });
-                csv += row('');
-                csv += row('MILESTONES', '');
-                csv += row('Milestone Name', 'Due Date', 'Status');
-                (currProject.milestones || []).forEach(m => {
-                  csv += row(m.name || '', m.date ? new Date(m.date).toLocaleDateString('en-IN') : '', m.done ? 'Done' : 'Pending');
-                });
-                csv += row('');
-                csv += row('INVOICES', '');
-                csv += row('Invoice No', 'Description', 'Amount', 'Issue Date', 'Due Date', 'Status');
-                (currProject.invoices || []).forEach(inv => {
-                  csv += row(inv.invoiceNo || '', inv.description || '', currency + (inv.amount || 0), inv.issueDate ? new Date(inv.issueDate).toLocaleDateString('en-IN') : '', inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN') : '', inv.status || '');
-                });
-                csv += row('');
-                csv += row('PAYMENTS RECEIVED', '');
-                csv += row('Payment No', 'Linked Invoice', 'Amount', 'Payment Date', 'Mode');
-                (currProject.paymentsReceived || []).forEach(p => {
-                  csv += row(p.paymentNo || '', p.linkedInvoice || '', currency + (p.amount || 0), p.paymentDate ? new Date(p.paymentDate).toLocaleDateString('en-IN') : '', p.paymentMode || '');
-                });
-                csv += row('');
-                csv += row('EXPENSES', '');
-                csv += row('Expense No', 'Description', 'Amount', 'Date', 'Category', 'Status');
-                (currProject.expenses || []).forEach(e => {
-                  csv += row(e.expenseNo || '', e.description || '', currency + (e.amount || 0), e.date ? new Date(e.date).toLocaleDateString('en-IN') : '', e.category || '', e.status || '');
-                });
-
-                // Add BOM so Excel opens with correct encoding
-                const bom = '\uFEFF';
-                const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${projName.replace(/[^a-z0-9]/gi, '_')}_Report.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                setTimeout(() => URL.revokeObjectURL(url), 5000);
-              }}><i className="ti ti-download"></i> Export</button>
-              <button className="mpd-btn mpd-btn-primary" onClick={() => onEdit && onEdit(currProject)} style={{ gap: 6 }}><i className="ti ti-edit"></i> Edit</button>
-              <button className="mpd-btn mpd-btn-danger" style={{ gap: 6 }} onClick={onDelete || (() => window.confirm('Delete this project?'))}><i className="ti ti-trash"></i> Delete</button>
-            </>)}
-          </div>
         </div>
 
         {/* HEADER + CLIENT PORTAL — side by side, 50/50 */}
@@ -1884,22 +1794,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           </div>
         )}
 
-        {/* KPIs */}
-        <div className="mpd-kpi-row">
-          <div className="mpd-kpi">
-            <div className="mpd-kpi-icon" style={{ background: P.primaryLight }}><i className="ti ti-checklist" style={{ color: P.primary }}></i></div>
-            <div><div className="mpd-kpi-val">{doneTasks}/{totalTasks}</div><div className="mpd-kpi-lbl">Tasks Done</div><div className="mpd-kpi-trend mpd-up">On Track</div></div>
-          </div>
-          <div className="mpd-kpi">
-            <div className="mpd-kpi-icon" style={{ background: P.greenLight }}><i className="ti ti-clock" style={{ color: P.green }}></i></div>
-            <div><div className="mpd-kpi-val">{currProject.loggedHours || 0}h</div><div className="mpd-kpi-lbl">Hours Logged</div><div className="mpd-kpi-trend mpd-up">Active</div></div>
-          </div>
 
-          <div className="mpd-kpi">
-            <div className="mpd-kpi-icon" style={{ background: P.purpleLight }}><i className="ti ti-users" style={{ color: P.purple }}></i></div>
-            <div><div className="mpd-kpi-val">{assigned.length}</div><div className="mpd-kpi-lbl">Team Members</div><div className="mpd-kpi-trend mpd-up">Assigned</div></div>
-          </div>
-        </div>
 
 
 
@@ -2347,7 +2242,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 <div className={`mpd-tab-pane ${activeTab === 'updates' ? 'mpd-active' : ''}`}>
                   {(
                     <div ref={composerRef} style={{ marginBottom: 24 }}>
-                      <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}><i className="ti ti-speakerphone"></i> Post Project Update</h3>
+
                       {(
                         <div>
                           {/* SEND TO */}

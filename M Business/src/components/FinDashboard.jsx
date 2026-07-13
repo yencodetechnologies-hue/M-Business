@@ -149,16 +149,20 @@ a { text-decoration: none; color: inherit; }
 .kpi-grid{display:grid;gap:16px;margin-bottom:22px;}
 .kpi-grid-4{grid-template-columns:repeat(4,1fr);}
 .kpi-grid-5{grid-template-columns:repeat(5,1fr);}
-.kpi{background:var(--white);border:1.5px solid #E0EEF0;border-radius:14px;padding:14px 16px;box-shadow:0 2px 10px rgba(0,0,0,0.02);height:96px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:2px;overflow:hidden;}
-.kpi-label{font-size:10px;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.kpi-value{font-size:19px;font-weight:900;color:var(--text-dark);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.kpi-sub{font-size:10px;font-weight:600;display:flex;align-items:center;gap:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kpi{background:var(--white);border:1.5px solid #E0EEF0;border-radius:14px;padding:14px 16px;box-shadow:0 2px 10px rgba(0,0,0,0.02);height:96px;box-sizing:border-box;display:flex;flex-direction:row;align-items:center;gap:12px;overflow:hidden;}
+.kpi-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.kpi-body{display:flex;flex-direction:column;justify-content:center;gap:2px;overflow:hidden;min-width:0;}
 .kpi-label{font-size:10px;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .kpi-value{font-size:19px;font-weight:900;color:var(--text-dark);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .kpi-sub{font-size:10px;font-weight:600;display:flex;align-items:center;gap:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .kpi-sub.up{color:var(--green);}
 .kpi-sub.down{color:var(--red);}
 .kpi-sub.neutral{color:var(--text-light);}
+.kpi.income .kpi-icon{background:rgba(16,185,129,0.15);color:var(--green);}
+.kpi.expense .kpi-icon{background:rgba(220,38,38,0.15);color:var(--red-dark);}
+.kpi.profit .kpi-icon{background:rgba(37,99,235,0.15);color:var(--primary);}
+.kpi.pending .kpi-icon{background:rgba(245,158,11,0.15);color:#F59E0B;}
+.kpi.vendor .kpi-icon{background:rgba(139,92,246,0.15);color:var(--purple);}
 .table-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:13px;}
 thead tr{background:var(--bg);}
@@ -279,34 +283,49 @@ tr:hover td{background:#FAFCFE;}
             <>
               <div className="kpi-grid kpi-grid-5">
                 <div className="kpi income">
-                  <div className="kpi-label">Total Income</div>
-                  <div className="kpi-value">{fmt(dashboardData.totalIncome)}</div>
-                  <div className={`kpi-sub ${dashboardData.incomeChange >= 0 ? 'up' : 'down'}`}>
-                    <i className={`ti ti-trending-${dashboardData.incomeChange >= 0 ? 'up' : 'down'}`}></i>
-                    {dashboardData.incomeChange >= 0 ? '+' : ''}{dashboardData.incomeChange}% vs last month
+                  <div className="kpi-icon"><i className="ti ti-cash"></i></div>
+                  <div className="kpi-body">
+                    <div className="kpi-label">Total Income</div>
+                    <div className="kpi-value">{fmt(dashboardData.totalIncome)}</div>
+                    <div className={`kpi-sub ${dashboardData.incomeChange >= 0 ? 'up' : 'down'}`}>
+                      <i className={`ti ti-trending-${dashboardData.incomeChange >= 0 ? 'up' : 'down'}`}></i>
+                      {dashboardData.incomeChange >= 0 ? '+' : ''}{dashboardData.incomeChange}% vs last month
+                    </div>
                   </div>
                 </div>
                 <div className="kpi expense">
-                  <div className="kpi-label">Total Expenses</div>
-                  <div className="kpi-value">{fmt(dashboardData.totalExpenses)}</div>
-                  <div className={`kpi-sub ${dashboardData.expenseChange <= 0 ? 'up' : 'down'}`}>
-                    <i className="ti ti-trending-up"></i>+{dashboardData.expenseChange}% vs last month
+                  <div className="kpi-icon"><i className="ti ti-receipt-2"></i></div>
+                  <div className="kpi-body">
+                    <div className="kpi-label">Total Expenses</div>
+                    <div className="kpi-value">{fmt(dashboardData.totalExpenses)}</div>
+                    <div className={`kpi-sub ${dashboardData.expenseChange <= 0 ? 'up' : 'down'}`}>
+                      <i className="ti ti-trending-up"></i>+{dashboardData.expenseChange}% vs last month
+                    </div>
                   </div>
                 </div>
                 <div className="kpi profit">
-                  <div className="kpi-label">Net Profit</div>
-                  <div className="kpi-value">{fmt(dashboardData.netProfit)}</div>
-                  <div className="kpi-sub up"><i className="ti ti-trending-up"></i>+{dashboardData.profitMargin}% margin</div>
+                  <div className="kpi-icon"><i className="ti ti-chart-line"></i></div>
+                  <div className="kpi-body">
+                    <div className="kpi-label">Net Profit</div>
+                    <div className="kpi-value">{fmt(dashboardData.netProfit)}</div>
+                    <div className="kpi-sub up"><i className="ti ti-trending-up"></i>+{dashboardData.profitMargin}% margin</div>
+                  </div>
                 </div>
                 <div className="kpi pending">
-                  <div className="kpi-label">Pending Receivables</div>
-                  <div className="kpi-value">{fmt(dashboardData.pendingReceivables)}</div>
-                  <div className="kpi-sub neutral"><i className="ti ti-clock"></i>{dashboardData.pendingInvoices} invoices due</div>
+                  <div className="kpi-icon"><i className="ti ti-file-invoice"></i></div>
+                  <div className="kpi-body">
+                    <div className="kpi-label">Pending Receivables</div>
+                    <div className="kpi-value">{fmt(dashboardData.pendingReceivables)}</div>
+                    <div className="kpi-sub neutral"><i className="ti ti-clock"></i>{dashboardData.pendingInvoices} invoices due</div>
+                  </div>
                 </div>
                 <div className="kpi vendor">
-                  <div className="kpi-label">Vendor Payables</div>
-                  <div className="kpi-value">{fmt(dashboardData.vendorPayables)}</div>
-                  <div className="kpi-sub down"><i className="ti ti-alert-circle"></i>{dashboardData.overdueVendors} overdue</div>
+                  <div className="kpi-icon"><i className="ti ti-truck"></i></div>
+                  <div className="kpi-body">
+                    <div className="kpi-label">Vendor Payables</div>
+                    <div className="kpi-value">{fmt(dashboardData.vendorPayables)}</div>
+                    <div className="kpi-sub down"><i className="ti ti-alert-circle"></i>{dashboardData.overdueVendors} overdue</div>
+                  </div>
                 </div>
               </div>
 

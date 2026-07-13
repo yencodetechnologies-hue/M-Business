@@ -154,7 +154,7 @@ const CSS = `
 .mpd-uc-body.mpd-open { display:block; animation:fadeIn .2s ease; }
 
 /* GRID LAYOUT */
-.mpd-grid-main-side { display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start; }
+.mpd-grid-main-side { display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:stretch; }
 @media (max-width: 900px) { .mpd-grid-main-side { grid-template-columns:1fr; } }
 
 /* TASKS LIST */
@@ -2059,9 +2059,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         {/* MAIN CONTENT GRID */}
         <div className="mpd-grid-main-side">
           {/* LEFT COL */}
-          <div>
+          <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             {/* TASKS COMPONENT */}
-            <div className="mpd-card" style={{ padding: 0, overflow: 'hidden', marginBottom: 20 }}>
+            <div className="mpd-card" style={{ padding: 0, overflow: 'hidden', marginBottom: 20, display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
               <div className="mpd-card-header" style={{ padding: '20px 24px 10px', marginBottom: 0 }}>
                 <div className="mpd-card-title"><i className="ti ti-list-check"></i> Tasks</div>
                 {!hideTopActions && (
@@ -2075,7 +2075,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   <button className={`mpd-tf ${taskFilter === 'done' ? 'mpd-on' : ''}`} onClick={() => setTaskFilter('done')}>Completed ({doneTasks})</button>
                 </div>
               </div>
-              <div style={{ padding: '0 24px 20px' }}>
+              <div style={{ padding: '0 24px 20px', overflowY: 'auto', flex: 1, minHeight: 0 }}>
                 {filteredTasks.length === 0 ? (
                   <div style={{ padding: 20, textAlign: 'center', color: P.textLight, fontSize: 13 }}>No tasks found for this filter.</div>
                 ) : (
@@ -2936,9 +2936,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         </div>{/* end mpd-grid-main-side */}
 
         {/* TEAM + BUDGET — side by side */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch' }}>
           {/* TEAM SIDEBAR */}
-          <div className="mpd-card" style={{ marginBottom: 0 }}>
+          <div className="mpd-card" style={{ marginBottom: 0, display: 'flex', flexDirection: 'column', maxHeight: 360 }}>
             <div className="mpd-card-header">
               <div className="mpd-card-title"><i className="ti ti-users"></i> Team</div>
               {!hideTopActions && (
@@ -2947,38 +2947,40 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 </button>
               )}
             </div>
-            {assigned.length === 0 ? <div style={{ fontSize: 12, color: P.textLight }}>No team members assigned.</div> : null}
-            {assigned.map((a, i) => (
-              <div key={i} className="mpd-member-row" style={{ display: 'flex', alignItems: 'center' }}>
-                <div className="mpd-av mpd-av-sm" style={{ background: getAvatarColor(a) }}>{getInitials(a)}</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>{a}</div>
-                  <div style={{ fontSize: 11, color: P.textLight }}>{employees.find(e => (e.name || e.employeeName) === a)?.role || 'Member'}</div>
+            <div style={{ overflowY: 'auto', flex: 1 }}>
+              {assigned.length === 0 ? <div style={{ fontSize: 12, color: P.textLight }}>No team members assigned.</div> : null}
+              {assigned.map((a, i) => (
+                <div key={i} className="mpd-member-row" style={{ display: 'flex', alignItems: 'center' }}>
+                  <div className="mpd-av mpd-av-sm" style={{ background: getAvatarColor(a) }}>{getInitials(a)}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>{a}</div>
+                    <div style={{ fontSize: 11, color: P.textLight }}>{employees.find(e => (e.name || e.employeeName) === a)?.role || 'Member'}</div>
+                  </div>
+                  {user?.role !== 'employee' && !hideTopActions && (
+                    <button onClick={async () => {
+                      if (!window.confirm('Remove ' + a + ' from team?')) return;
+                      const updated = (currProject.assignedTo || []).filter((_, idx) => idx !== i);
+                      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated });
+                      try {
+                        const tasksRes = await axios.get(`${BASE_URL}/api/tasks`, { headers: { 'x-company-id': currProject.companyId || '' } });
+                        const allTasks = Array.isArray(tasksRes.data) ? tasksRes.data : [];
+                        const projectTasks = allTasks.filter(t =>
+                          (t.projectId === currProject._id || t.projectId?._id === currProject._id) &&
+                          t.assignTo && t.assignTo !== 'Unassigned' &&
+                          t.assignTo.split(', ').map(n => n.trim()).includes(a)
+                        );
+                        await Promise.all(projectTasks.map(t => {
+                          const names = t.assignTo.split(', ').map(n => n.trim()).filter(Boolean);
+                          const updatedNames = names.filter(n => n !== a);
+                          return axios.put(`${BASE_URL}/api/tasks/${t._id}`, { assignTo: updatedNames.length > 0 ? updatedNames.join(', ') : 'Unassigned' }, { headers: { 'x-company-id': currProject.companyId || '' } });
+                        }));
+                      } catch (e) { console.error('Failed to unassign tasks:', e); }
+                      loadLatest();
+                    }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 14, padding: '4px 6px' }} title="Remove">Delete</button>
+                  )}
                 </div>
-                {user?.role !== 'employee' && !hideTopActions && (
-                  <button onClick={async () => {
-                    if (!window.confirm('Remove ' + a + ' from team?')) return;
-                    const updated = (currProject.assignedTo || []).filter((_, idx) => idx !== i);
-                    await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated });
-                    try {
-                      const tasksRes = await axios.get(`${BASE_URL}/api/tasks`, { headers: { 'x-company-id': currProject.companyId || '' } });
-                      const allTasks = Array.isArray(tasksRes.data) ? tasksRes.data : [];
-                      const projectTasks = allTasks.filter(t =>
-                        (t.projectId === currProject._id || t.projectId?._id === currProject._id) &&
-                        t.assignTo && t.assignTo !== 'Unassigned' &&
-                        t.assignTo.split(', ').map(n => n.trim()).includes(a)
-                      );
-                      await Promise.all(projectTasks.map(t => {
-                        const names = t.assignTo.split(', ').map(n => n.trim()).filter(Boolean);
-                        const updatedNames = names.filter(n => n !== a);
-                        return axios.put(`${BASE_URL}/api/tasks/${t._id}`, { assignTo: updatedNames.length > 0 ? updatedNames.join(', ') : 'Unassigned' }, { headers: { 'x-company-id': currProject.companyId || '' } });
-                      }));
-                    } catch (e) { console.error('Failed to unassign tasks:', e); }
-                    loadLatest();
-                  }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 14, padding: '4px 6px' }} title="Remove">Delete</button>
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           {/* BUDGET */}

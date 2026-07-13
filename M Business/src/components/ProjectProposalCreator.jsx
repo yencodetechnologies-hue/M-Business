@@ -1643,7 +1643,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
       <div style={{ fontFamily: "var(--font,'Nunito',sans-serif)", minHeight: "100%", background: "var(--bg,#F5FAFA)", padding: "24px 28px 40px" }}>
         <style>{`
           .prop-list-wrap .stat-card{background:var(--surface,#fff);border:1.5px solid var(--border,#E0EEF0);border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .15s;}
-          .prop-list-wrap .stat-card:hover{border-color:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));box-shadow:0 4px 16px rgba(0,188,212,.1);}
+          .prop-list-wrap .stat-card:hover{border-color:var(--border,#E0EEF0);box-shadow:none;}
           .prop-list-wrap .proposal-card{background:var(--surface,#fff);border:1.5px solid var(--border,#E0EEF0);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .2s;margin-bottom:14px;}
           .prop-list-wrap .proposal-card:hover{border-color:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));box-shadow:0 6px 24px rgba(0,188,212,.1);}
           .prop-list-wrap .prop-tab{padding:7px 18px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--text2,#607D86);transition:all .15s;border:none;background:none;font-family:inherit;}
@@ -1712,15 +1712,15 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
           {/* STATS ROW */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 22 }}>
-            <div className="stat-card" onClick={() => { setActiveCard("all"); setPropTab("all"); }} style={{ display: "flex", alignItems: "center", gap: 12, border: activeCard === "all" ? "2px solid var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))" : "1.5px solid var(--border,#E0EEF0)", boxShadow: activeCard === "all" ? "0 4px 16px rgba(0,188,212,.18)" : "" }}>
-           <div style={{ width: 36, height: 36, borderRadius: 10, background: "var(--teal-light,var(--teal-light, var(--teal-light, #E0F7FA)))", color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8, flexShrink: 0 }}><i className="ti ti-presentation"></i></div>
-<div>
-  <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{total}</div>
-  <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>Total Proposals</div>
-  <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))" }}>₹{totalVal.toLocaleString("en-IN")} pipeline</div>
-</div>
+            <div className="stat-card" style={{ display: "flex", alignItems: "center", gap: 12, border: "1.5px solid var(--border,#E0EEF0)", cursor: "default" }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: "var(--teal-light,var(--teal-light, var(--teal-light, #E0F7FA)))", color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8, flexShrink: 0 }}><i className="ti ti-presentation"></i></div>
+              <div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{total}</div>
+                <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>Total Proposals</div>
+                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))" }}>₹{totalVal.toLocaleString("en-IN")} pipeline</div>
+              </div>
             </div>
-            <div className="stat-card" onClick={() => { setActiveCard("won"); setPropTab("won"); }} style={{ border: activeCard === "won" ? "2px solid var(--green,#26C281)" : "1.5px solid var(--border,#E0EEF0)", boxShadow: activeCard === "won" ? "0 4px 16px rgba(38,194,129,.18)" : "" }}>
+            <div className="stat-card" style={{ border: "1.5px solid var(--border,#E0EEF0)", cursor: "default" }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--green-bg,#E8FAF3)", color: "var(--green,#26C281)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-trophy"></i></div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{wonCount}</div>
@@ -1728,7 +1728,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                 <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--green,#26C281)" }}>₹{wonVal.toLocaleString("en-IN")} closed</div>
               </div>
             </div>
-            <div className="stat-card" onClick={() => { setActiveCard("inprogress"); setPropTab("negotiation"); }} style={{ border: activeCard === "inprogress" ? "2px solid var(--purple,#7C5CFC)" : "1.5px solid var(--border,#E0EEF0)", boxShadow: activeCard === "inprogress" ? "0 4px 16px rgba(124,92,252,.18)" : "" }}>
+            <div className="stat-card" style={{ border: "1.5px solid var(--border,#E0EEF0)", cursor: "default" }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--purple-bg,#EEE9FF)", color: "var(--purple,#7C5CFC)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-arrows-exchange"></i></div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{activeCount}</div>
@@ -1736,7 +1736,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                 <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--purple,#7C5CFC)" }}>Active pipeline</div>
               </div>
             </div>
-            <div className="stat-card" onClick={() => { setActiveCard("successrate"); setPropTab("won"); }} style={{ border: activeCard === "successrate" ? "2px solid var(--amber,#F5A623)" : "1.5px solid var(--border,#E0EEF0)", boxShadow: activeCard === "successrate" ? "0 4px 16px rgba(245,166,35,.18)" : "" }}>
+            <div className="stat-card" style={{ border: "1.5px solid var(--border,#E0EEF0)", cursor: "default" }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--amber-bg,#FEF5E6)", color: "var(--amber,#F5A623)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-percentage"></i></div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{successRate}%</div>

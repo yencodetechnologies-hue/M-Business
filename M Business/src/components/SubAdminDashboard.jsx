@@ -7566,19 +7566,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
     hasFetched.current = true;
 
-    // Await the clients fetch FIRST so it actually completes and renders
-    // before the rest of the app's fetches are fired — a real sequential
-    // priority instead of just an earlier call in the same tick.
-    (async () => {
-      await fetchClients();
-      await fetchProjects();
-
-      fetchProfile();
-
-      fetchEmployees(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); fetchInvoices(); fetchIncome(); fetchExpenses(); fetchTasks(); fetchConfig();
-
-      fetchPendingLeaves(); fetchEmployeeDocs();
-    })();
+    // Fire all fetches in parallel — each one paints its own section of the
+    // UI as soon as its own response lands, instead of waiting on others.
+    fetchClients();
+    fetchProjects();
+    fetchProfile();
+    fetchEmployees(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); fetchInvoices(); fetchIncome(); fetchExpenses(); fetchTasks(); fetchConfig();
+    fetchPendingLeaves(); fetchEmployeeDocs();
   }, []);
   // Close notification panel when clicking outside
   useEffect(() => {
@@ -8213,6 +8207,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     const cid = resolveSubadminId();
     if (!cid) return;
     try {
+      const cached = localStorage.getItem("cached_clients_" + cid);
+      if (cached) { try { setClients(JSON.parse(cached)); } catch { } }
+    } catch { }
+    try {
       const res = await axios.get(BASE_URL + "/api/clients", {
         headers: { 'x-company-id': cid }
       });
@@ -8222,11 +8220,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   };
 
   const fetchEmployees = async () => {
+    const cid = resolveSubadminId();
+    try {
+      const cached = localStorage.getItem("cached_employees_" + cid);
+      if (cached) { try { setEmployees(JSON.parse(cached)); } catch { } }
+    } catch { }
     try {
       const res = await axios.get(BASE_URL + "/api/employees", {
-        headers: { 'x-company-id': resolveSubadminId() }
+        headers: { 'x-company-id': cid }
       });
       setEmployees(res.data);
+      try { localStorage.setItem("cached_employees_" + cid, JSON.stringify(res.data)); } catch { }
     } catch (e) { console.log(e); }
   };
 
@@ -9515,7 +9519,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <div className="topbar-icon" onClick={() => { setShowNotifPanel(v => !v); fetchPendingLeaves(); }} style={{ position: 'relative', cursor: 'pointer' }}>
                 <i className="ti ti-bell"></i>
                 {pendingLeaves.length > 0 && (
-                  <span style={{ position: 'absolute', top: -4, right: -4, background: '#EF4444', color: '#fff', borderRadius: '50%', width: 16, height: 16, fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{pendingLeaves.length}</span>
+                  <span style={{ position: 'absolute', top: -4, right: -4, background: '#EF4444', color: '#fff', borderRadius: '50%', minWidth: 16, height: 16, padding: '0 3px', fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1, zIndex: 2, boxSizing: 'border-box' }}>{pendingLeaves.length}</span>
                 )}
                 {showNotifPanel && (
                   <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: 44, right: 0, width: 380, background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', border: '1px solid #E2E8F0', zIndex: 99999, overflow: 'hidden' }}>
@@ -10705,22 +10709,22 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-{/* SECONDARY CONTENT AREA */}
+                            {/* SECONDARY CONTENT AREA */}
 
-<div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "stretch", marginTop: 0 }}>
-
-
-  {/* LEFT COLUMN 2 */}
-  <div style={{ display: "flex", flexDirection: "column", gap: 8, height: "100%" }}>
+                            <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "stretch", marginTop: 0 }}>
 
 
-<div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", height: "100%", display: "flex", flexDirection: "column" }}>
+                              {/* LEFT COLUMN 2 */}
+                              <div style={{ display: "flex", flexDirection: "column", gap: 8, height: "100%" }}>
 
-  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
 
-    <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", height: "100%", display: "flex", flexDirection: "column" }}>
 
-      <i className="ti ti-user-x" style={{ color: "var(--app-accent)" }}></i> Leave Requests
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+
+                                    <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+
+                                      <i className="ti ti-user-x" style={{ color: "var(--app-accent)" }}></i> Leave Requests
 
                                       <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length} PENDING</span>
 

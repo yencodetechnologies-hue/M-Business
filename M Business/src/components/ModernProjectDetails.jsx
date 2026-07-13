@@ -294,12 +294,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       try {
         const res = await axios.get(`${BASE_URL}/api/clients/${clientId}`);
         const c = res.data;
-        if (c?.portalToken && c?.portalTokenProjectId === (currProject?._id || "")) {
+        if (c?.portalToken && String(c?.portalTokenProjectId || "") === String(currProject?._id || "")) {
           setPortalLinkUrl(`${window.location.origin}/client-portal/${clientId}?token=${c.portalToken}`);
           lastPortalProjectId.current = currProject._id;
           return;
         }
       } catch (e) { /* fall through to normal generation */ }
+      // Only show "Generating link..." if a link genuinely doesn't exist yet.
       generatePortalLink();
     };
     if (currProject?._id) {
@@ -1527,16 +1528,22 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
     setLoadingPortalLink(true);
     try {
-      const res = await axios.get(`${BASE_URL}/api/clients`, {
-        headers: { 'x-company-id': snapshotCompanyId }
-      });
-      const clientList = Array.isArray(res.data) ? res.data : [];
-
-      // Step 1: Match by stored clientId (most reliable � direct ID match)
-      let matched = snapshotClientId
-        ? clientList.find(c => String(c._id) === String(snapshotClientId))
-        : null;
-
+      let matched = null;
+      if (snapshotClientId) {
+        try {
+          const singleRes = await axios.get(`${BASE_URL}/api/clients/${snapshotClientId}`);
+          matched = singleRes.data;
+        } catch { /* fall through to list-based lookup below */ }
+      }
+      if (!matched) {
+        const res = await axios.get(`${BASE_URL}/api/clients`, {
+          headers: { 'x-company-id': snapshotCompanyId }
+        });
+        const clientList = Array.isArray(res.data) ? res.data : [];
+        matched = snapshotClientId
+          ? clientList.find(c => String(c._id) === String(snapshotClientId))
+          : null;
+      }
 
 
       const subadminCompanyId = user?.companyId || user?._id || user?.id || snapshotCompanyId || '';

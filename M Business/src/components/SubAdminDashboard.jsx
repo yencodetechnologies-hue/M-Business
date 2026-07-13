@@ -1537,7 +1537,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
       {clientProjects.length === 0 ? (
 
-        <div style={{ textAlign: "center", padding: 40, color: "#A0B8BE" }}>No projects for this client</div>
+        <div style={{ textAlign: "center", padding: 40, color: "#A0B8BE", fontSize: 13 }}>No projects for this client</div>
 
       ) : clientProjects.map((p, i) => (
 
@@ -1754,7 +1754,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
           <div style={{ textAlign: "center", padding: 40, color: "#A0B8BE", fontSize: 12 }}>
 
-            <div style={{ fontSize: 32, marginBottom: 8 }}>📂</div>
+            <div style={{ fontSize: 32, marginBottom: 8 }}></div>
 
             No documents uploaded yet
 
@@ -2008,12 +2008,12 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
   const renderFeedback = () => {
     return (
-      <div style={{ padding: 24 }}>
-        <div style={{ fontSize: 15, fontWeight: 800, color: "#1A2332", marginBottom: 16 }}>Client Feedback</div>
+      <div style={{ padding: 2 }}>
+
         {feedbackLoading ? (
           <div style={{ color: "#A0B8BE", textAlign: "center", padding: 30 }}>Loading...</div>
         ) : clientFeedback.length === 0 ? (
-          <div style={{ color: "#A0B8BE", textAlign: "center", padding: 30 }}>No feedback submitted yet.</div>
+          <div style={{ color: "#A0B8BE", textAlign: "center", padding: 30 ,fontSize: 12}}>No feedback submitted yet.</div>
         ) : (
           clientFeedback.map((fb, i) => (
             <div key={fb._id || i} style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 12, padding: 16, marginBottom: 12 }}>

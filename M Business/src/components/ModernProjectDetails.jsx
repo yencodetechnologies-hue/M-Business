@@ -1558,21 +1558,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     }
   };
 
-  useEffect(() => {
-    // Clients viewing their own portal never see the Client Portal panel
-    // (see the render guard below), so don't even generate a link for them.
-    if (user?.role === 'client') return;
-    // Skip while currProject is just the lightweight "restoring" placeholder
-    // set after a page refresh (only has _id, no client/company data yet).
-    // Firing the lookup now would always fail and throw a spurious
-    // "Could not find this client's account" / "Failed to generate client
-    // portal link" alert before the real project data has finished loading.
-    if (currProject?._restoring) return;
-    // Always invalidate and regenerate the portal link when the project or its client changes.
-    setPortalLinkUrl('');
-    lastPortalProjectId.current = null;
-    if (currProject?._id) generatePortalLink();
-  }, [currProject?._id, currProject?.client, currProject?.clientId, currProject?._restoring, user?.role]); // eslint-disable-line react-hooks/exhaustive-deps
+
 
   const copyPortalLink = async () => {
     const link = portalLinkUrl || await generatePortalLink();

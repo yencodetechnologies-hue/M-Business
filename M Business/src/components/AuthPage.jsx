@@ -81,6 +81,13 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
       } catch (e) { }
 
       localStorage.setItem("user", JSON.stringify(userWithLogo));
+      try {
+        const cid = String(userWithLogo?._id || userWithLogo?.id || userWithLogo?.userId || userWithLogo?.companyId || userWithLogo?.company || "").trim();
+        if (cid) {
+          const cachedClients = localStorage.getItem("cached_clients_" + cid);
+          if (cachedClients) localStorage.setItem("__preload_clients_ready", "1");
+        }
+      } catch { }
       setUser(userWithLogo);
     } catch (e) {
       if (e.response?.data?.requiresOTP) {
@@ -137,6 +144,13 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
       if (userData) {
         const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
         localStorage.setItem("user", JSON.stringify(userWithLogo));
+        try {
+          const cid = String(userWithLogo?._id || userWithLogo?.id || userWithLogo?.userId || userWithLogo?.companyId || userWithLogo?.company || "").trim();
+          if (cid) {
+            const cachedClients = localStorage.getItem("cached_clients_" + cid);
+            if (cachedClients) localStorage.setItem("__preload_clients_ready", "1");
+          }
+        } catch { }
         setUser(userWithLogo);
       } else { setTab("login"); }
     } catch (e) { setError(e.response?.data?.msg || "Invalid OTP"); }

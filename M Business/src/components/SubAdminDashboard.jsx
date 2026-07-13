@@ -7579,7 +7579,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   };
 
   const mainScrollRef = useRef(null);
- const lastFetchedUserId = useRef(null);
+  const lastFetchedUserId = useRef(null);
   useEffect(() => {
     const cid = resolveSubadminId();
     if (!cid || lastFetchedUserId.current === cid) return;
@@ -8199,17 +8199,20 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   };
 
   const handleAuthSetUser = (userData) => {
-
     setAccountAuthOpen(false);
-
     setProfileDropdownOpen(false);
-
     setShowProfile(false);
-
+    try {
+      const cid = String(userData?._id || userData?.id || userData?.userId || userData?.companyId || userData?.company || "").trim();
+      if (cid) {
+        const cachedClients = localStorage.getItem("cached_clients_" + cid);
+        if (cachedClients) { setClients(JSON.parse(cachedClients)); setClientsLoaded(true); }
+        const cachedEmployees = localStorage.getItem("cached_employees_" + cid);
+        if (cachedEmployees) setEmployees(JSON.parse(cachedEmployees));
+      }
+    } catch { }
     setUser(userData);
-
   };
-
   const onLogoChange = (logo) => {
     setCompanyLogo(logo || fixedLogo);
     const updatedUser = { ...user, logoUrl: logo || "" };
@@ -9549,7 +9552,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <div className="topbar-icon" onClick={() => { setShowNotifPanel(v => !v); fetchPendingLeaves(); }} style={{ position: 'relative', cursor: 'pointer' }}>
                 <i className="ti ti-bell"></i>
                 {pendingLeaves.length > 0 && (
-                  <span style={{ position: 'absolute', top: -6, right: -6, background: '#EF4444', color: '#fff', borderRadius: 20, minWidth: 18, height: 18, padding: '0 5px', fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1, zIndex: 2, boxSizing: 'border-box' }}>{pendingLeaves.length > 99 ? '99+' : pendingLeaves.length}</span>
+                  <span style={{ position: 'absolute', top: -2, right: -2, width: 10, height: 10, background: '#EF4444', borderRadius: '50%', border: '1.5px solid #fff', zIndex: 2, boxSizing: 'border-box' }}></span>
                 )}
                 {showNotifPanel && (
                   <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: 44, right: 0, width: 380, background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', border: '1px solid #E2E8F0', zIndex: 99999, overflow: 'hidden' }}>

@@ -3154,31 +3154,45 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           <div style={{ position: 'fixed', inset: 0, zIndex: 99996, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ background: '#fff', borderRadius: P.radius, width: 380, padding: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
               <h3 style={{ margin: '0 0 16px', fontSize: 16, color: P.textDark }}>Add Team Member</h3>
-              <select value={selectedNewMember} onChange={e => {
-                if (e.target.value === '__add_new_employee__') {
-                  setShowAddMemberModal(false);
-                  if (onAddEmployeeClick) onAddEmployeeClick();
-                  return;
-                }
-                setSelectedNewMember(e.target.value);
-              }} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none', marginBottom: 16 }}>
-                <option value="">-- Select Employee --</option>
+              <div style={{ maxHeight: 220, overflowY: 'auto', border: `1.5px solid ${P.border}`, borderRadius: 8, padding: '8px 10px', marginBottom: 16 }}>
                 {onAddEmployeeClick && (
-                  <option value="__add_new_employee__" style={{ fontWeight: 700, color: P.purple }}>+ Add Employee</option>
+                  <div
+                    style={{ fontWeight: 700, color: P.purple, cursor: 'pointer', padding: '6px 4px', fontSize: 13 }}
+                    onClick={() => { setShowAddMemberModal(false); onAddEmployeeClick(); }}
+                  >
+                    + Add Employee
+                  </div>
                 )}
-                {(employees || []).filter(emp => !assigned.includes(emp.name || emp.employeeName)).map(emp => (
-                  <option key={emp._id} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName} ({emp.role || 'Employee'})</option>
-                ))}
-
-              </select>
+                {(employees || []).filter(emp => !assigned.includes(emp.name || emp.employeeName)).map(emp => {
+                  const name = emp.name || emp.employeeName;
+                  const checked = selectedNewMember.includes(name);
+                  return (
+                    <label key={emp._id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 4px', fontSize: 13, color: P.textDark, cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => {
+                          setSelectedNewMember(prev =>
+                            checked ? prev.filter(n => n !== name) : [...prev, name]
+                          );
+                        }}
+                      />
+                      {name} ({emp.role || 'Employee'})
+                    </label>
+                  );
+                })}
+                {(employees || []).filter(emp => !assigned.includes(emp.name || emp.employeeName)).length === 0 && (
+                  <div style={{ fontSize: 12, color: P.textLight, padding: '4px' }}>No employees available to add.</div>
+                )}
+              </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-                <button className="mpd-btn mpd-btn-outline" onClick={() => { setShowAddMemberModal(false); setSelectedNewMember(''); }}>Cancel</button>
-                <button className="mpd-btn mpd-btn-primary" disabled={!selectedNewMember} onClick={async () => {
-                  if (!selectedNewMember) return;
-                  const updated = [...(currProject.assignedTo || []), selectedNewMember];
+                <button className="mpd-btn mpd-btn-outline" onClick={() => { setShowAddMemberModal(false); setSelectedNewMember([]); }}>Cancel</button>
+                <button className="mpd-btn mpd-btn-primary" disabled={selectedNewMember.length === 0} onClick={async () => {
+                  if (selectedNewMember.length === 0) return;
+                  const updated = [...(currProject.assignedTo || []), ...selectedNewMember];
                   await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated });
                   setShowAddMemberModal(false);
-                  setSelectedNewMember('');
+                  setSelectedNewMember([]);
                   loadLatest();
                 }}>Add</button>
               </div>

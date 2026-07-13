@@ -90,7 +90,7 @@ export default function AdminDashboard({ user, setUser }) {
       .catch(e => console.error(e));
   }, [active]);
   const [subadmins, setSubadmins] = useState([]);
-  const [clients, setClients] = useState(() => { try { const c = localStorage.getItem("cached_clients"); return c ? JSON.parse(c) : []; } catch { return []; } });
+  const [clients, setClients] = useState([]);
   const [projects, setProjects] = useState([]);
   const [subscriptions, setSubscriptions] = useState([]);
   const [employees, setEmployees] = useState([]);

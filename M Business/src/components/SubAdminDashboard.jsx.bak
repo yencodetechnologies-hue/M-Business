@@ -2683,7 +2683,7 @@ useEffect(() => {
     return () => document.removeEventListener("mousedown", onDown);
   }, [profileDropdownOpen]);
 
-  const [clients, setClients] = useState(() => { try { const c = localStorage.getItem("cached_clients"); return c ? JSON.parse(c) : []; } catch { return []; } });
+  const [clients, setClients] = useState([]);
   const [nc, setNc] = useState({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", contactPersonName: "", contactPersonNo: "", gstNumber: "", logoUrl: "" });
   const [ncError, setNcError] = useState({});
   const [saveLoading, setSaveLoading] = useState(false);

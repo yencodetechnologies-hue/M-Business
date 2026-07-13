@@ -698,7 +698,7 @@ function Mdl({ title, onClose, children, maxWidth = 820 }) {
 
 export default function AdminProposalManagement() {
   const [proposals, setProposals] = useState([]);
-  const [clients, setClients] = useState(() => { try { const c = localStorage.getItem("cached_clients"); return c ? JSON.parse(c) : []; } catch { return []; } });
+  const [clients, setClients] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);

@@ -7212,7 +7212,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  const [employees, setEmployees] = useState(() => { try { const c = localStorage.getItem("cached_employees"); return c ? JSON.parse(c) : []; } catch { return []; } });
+  const [employees, setEmployees] = useState([]);
 
   const [ne, setNe] = useState({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Pending", password: "" });
 
@@ -7225,7 +7225,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  const [projects, setProjects] = useState(() => { try { const c = localStorage.getItem("cached_projects"); return c ? JSON.parse(c) : []; } catch { return []; } });
+  const [projects, setProjects] = useState([]);
 
   // Once the real projects list has loaded, swap the lightweight
   // placeholder set above (in jumpProject's initializer) for the actual
@@ -7249,7 +7249,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  const [managers, setManagers] = useState(() => { try { const c = localStorage.getItem("cached_managers"); return c ? JSON.parse(c) : []; } catch { return []; } });
+  const [managers, setManagers] = useState([]);
 
   const [nm, setNm] = useState({ managerName: "", email: "", phone: "", department: "", role: "Manager", address: "", password: "", status: "Active" });
 

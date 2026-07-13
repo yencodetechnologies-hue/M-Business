@@ -1081,9 +1081,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     if (!updateText.trim()) return;
     setPostingUpdate(true);
     try {
-      const visibleTo = [];
-      if (sendToTeam) visibleTo.push('team');
-      if (sendToClient) visibleTo.push('client');
+      const visibleTo = ['team'];
 
       const newUpdate = {
         text: updateText.trim(),
@@ -1389,9 +1387,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         newUploadedUrl = newlyUploaded[newlyUploaded.length - 1].url;
       }
       if (postUpdateOnUpload) {
-        const visibleTo = [];
-        if (uploadSendToEmployee) visibleTo.push('team');
-        if (uploadSendToClient) visibleTo.push('client');
+        const visibleTo = ['team'];
         const title = uploadHeading.trim() || uploadDescription.trim().slice(0, 60) || 'Update';
         const body = uploadDescription.trim() ? `${uploadHeading.trim() ? uploadHeading + ': ' : ''}${uploadDescription}`.trim() : uploadHeading.trim();
         const composerAttachments = postUpdateAttachments || [];
@@ -2468,21 +2464,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
                             {updateType === 'approval' && (
                               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <div style={{ display: 'flex', borderRadius: 9, border: `1.5px solid ${P.border}`, overflow: 'hidden' }}>
-                                  <button type="button" onClick={() => setApprovalForm(f => ({ ...f, recipientType: 'client' }))} style={{ padding: '8px 14px', border: 'none', cursor: 'pointer', background: approvalForm.recipientType === 'client' ? P.primary : '#fff', color: approvalForm.recipientType === 'client' ? '#fff' : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 800 }}>Client</button>
-                                  <button type="button" onClick={() => setApprovalForm(f => ({ ...f, recipientType: 'team' }))} style={{ padding: '8px 14px', border: 'none', cursor: 'pointer', background: approvalForm.recipientType === 'team' ? P.primary : '#fff', color: approvalForm.recipientType === 'team' ? '#fff' : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 800 }}>Team</button>
-                                </div>
-                                {approvalForm.recipientType === 'client' ? (
-                                  <select value={approvalForm.clientId} onChange={e => setApprovalForm(f => ({ ...f, clientId: e.target.value }))} style={{ padding: '8px 10px', borderRadius: 9, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', background: '#fff', fontFamily: 'inherit', minWidth: 160 }}>
-                                    <option value="">-- Select client --</option>
-                                    {(clients || []).map(c => (<option key={c._id} value={c._id}>{c.clientName || c.name}</option>))}
-                                  </select>
-                                ) : (
-                                  <select value={approvalForm.teamMemberId} onChange={e => setApprovalForm(f => ({ ...f, teamMemberId: e.target.value }))} style={{ padding: '8px 10px', borderRadius: 9, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', background: '#fff', fontFamily: 'inherit', minWidth: 160 }}>
-                                    <option value="">-- Select team member --</option>
-                                    {(employees || []).map(emp => (<option key={emp._id} value={emp._id}>{emp.name || emp.employeeName}</option>))}
-                                  </select>
-                                )}
+                                <select value={approvalForm.teamMemberId} onChange={e => setApprovalForm(f => ({ ...f, teamMemberId: e.target.value, recipientType: 'team' }))} style={{ padding: '8px 10px', borderRadius: 9, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', background: '#fff', fontFamily: 'inherit', minWidth: 160 }}>
+                                  <option value="">-- Select team member --</option>
+                                  {(employees || []).map(emp => (<option key={emp._id} value={emp._id}>{emp.name || emp.employeeName}</option>))}
+                                </select>
                               </div>
                             )}
 
@@ -2499,9 +2484,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   }
                                   setPostingUpdate(true);
                                   try {
-                                    const visibleTo = [];
-                                    if (sendToClient) visibleTo.push('client');
-                                    if (updateSelectedMembers.length > 0) visibleTo.push('team');
+                                    const visibleTo = ['team'];
                                     const title = updateTitle.trim() || updateText.trim().slice(0, 60) || 'Update';
                                     const attachments = postUpdateAttachments || [];
                                     const primaryAttachment = attachments[0] || null;
@@ -2539,7 +2522,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                 }}
                                 style={{ padding: '9px 22px', borderRadius: 10, background: P.primary, color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: 13, fontWeight: 800, cursor: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 'not-allowed' : 'pointer', opacity: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,188,212,.25)', transition: 'all .15s' }}>
                                 <i className="ti ti-send" style={{ fontSize: 15 }} />
-                                {updateType === 'approval' ? `Send Approval Request to ${approvalForm.recipientType === 'team' ? 'Team Member' : 'Client'}` : 'Send to Team'}
+                                {updateType === 'approval' ? 'Send Approval Request to Team Member' : 'Send to Team'}
                               </button>
                             </div>
                           </div>
@@ -2585,7 +2568,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                           src={att.url}
                                           alt={att.name || 'attachment'}
                                           onClick={() => window.open(att.url, '_blank')}
-                                          style={{ width: 200, height: 140, objectFit: 'cover', borderRadius: 10, border: `1.5px solid ${P.border}`, cursor: 'pointer', background: '#f8fafc' }}
+                                          style={{ width: 90, height: 70, objectFit: 'cover', borderRadius: 8, border: `1.5px solid ${P.border}`, cursor: 'pointer', background: '#f8fafc' }}
                                           onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = ''; e.currentTarget.style.display = 'none'; }}
                                         />
                                       ) : (
@@ -3121,17 +3104,34 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 </div>
                 <div style={{ marginBottom: 16 }}>
                   <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Select Team Members</label>
-                  <select
-                    multiple
-                    value={Array.isArray(newTaskAssignTo) ? newTaskAssignTo : []}
-                    onChange={e => setNewTaskAssignTo(Array.from(e.target.selectedOptions, opt => opt.value))}
-                    style={{ width: '100%', minHeight: 100, padding: '8px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', fontSize: 13, color: P.textDark, background: '#fff', boxSizing: 'border-box' }}
-                  >
+                  <div style={{ width: '100%', maxHeight: 160, overflowY: 'auto', padding: '8px', borderRadius: 8, border: `1.5px solid ${P.border}`, boxSizing: 'border-box', background: '#fff' }}>
                     {(employees || [])
                       .filter(emp => assigned.includes(emp.name || emp.employeeName))
-                      .map(emp => { const name = emp.name || emp.employeeName || ''; if (!name) return null; return (<option key={emp._id} value={name}>{name}{emp.role ? ` (${emp.role})` : ''}</option>); })}
-                  </select>
-                  <div style={{ fontSize: 11, color: P.textLight, marginTop: 4 }}>Hold Ctrl (Windows) or Cmd (Mac) to select multiple members.</div>
+                      .map(emp => {
+                        const name = emp.name || emp.employeeName || '';
+                        if (!name) return null;
+                        const checked = Array.isArray(newTaskAssignTo) && newTaskAssignTo.includes(name);
+                        return (
+                          <label key={emp._id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 4px', fontSize: 13, color: P.textDark, cursor: 'pointer' }}>
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={() => {
+                                setNewTaskAssignTo(prev => {
+                                  const arr = Array.isArray(prev) ? prev : [];
+                                  return checked ? arr.filter(n => n !== name) : [...arr, name];
+                                });
+                              }}
+                            />
+                            {name}{emp.role ? ` (${emp.role})` : ''}
+                          </label>
+                        );
+                      })}
+                    {(employees || []).filter(emp => assigned.includes(emp.name || emp.employeeName)).length === 0 && (
+                      <div style={{ fontSize: 12, color: P.textLight, padding: '4px' }}>No employees assigned to this project.</div>
+                    )}
+                  </div>
+                  <div style={{ fontSize: 11, color: P.textLight, marginTop: 4 }}>Select one or more team members.</div>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                   <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddTaskModal(false)}>Cancel</button>

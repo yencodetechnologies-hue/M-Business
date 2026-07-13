@@ -103,7 +103,7 @@ function Mdl({ title, onClose, children, maxWidth = 820 }) {
   );
 }
 
-function Fld({ label, value, onChange, options, type = "text", error, placeholder, disabled, allowCustom }) {
+function Fld({ label, value, onChange, options, type = "text", error, placeholder, disabled, allowCustom, name }) {
   const [isCustomMode, setIsCustomMode] = useState(() => {
     if (!allowCustom) return false;
     if (!value) return false;
@@ -2611,7 +2611,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       {/* ── Add Employee Modal ── */}
       {modal === "employee" && <Mdl title="Add New Employee" onClose={() => setModal(null)}>
         <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-          <Fld label="Full Name *" value={ne.name} onChange={v => setNe({ ...ne, name: v })} error={neError.name} />
+          <Fld label="Full Name *" value={ne.name} onChange={v => setNe({ ...ne, name: v })} error={neError.name} name="name" />
           <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} dataField="email" />
           <Fld label="Phone Number" value={ne.phone} onChange={v => setNe({ ...ne, phone: v })} />
           <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v })} options={DEPARTMENT_OPTIONS} />
@@ -2622,7 +2622,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         <div style={{ marginBottom: 14, marginTop: 4 }}>
           <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
           <div style={{ position: "relative" }}>
-            <input type={showEmpPass ? "text" : "password"} value={ne.password} onChange={e => { setNe({ ...ne, password: e.target.value }); setNeError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set employee login password" />
+            <input id="emp-fld-password" type={showEmpPass ? "text" : "password"} value={ne.password} onChange={e => { setNe({ ...ne, password: e.target.value }); setNeError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set employee login password" />
             <button type="button" onClick={() => setShowEmpPass(!showEmpPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEmpPass ? "HIDE" : "SHOW"}</button>
           </div>
           {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.password}</div>}

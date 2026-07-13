@@ -7204,7 +7204,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  const [employees, setEmployees] = useState([]);
+  const [employees, setEmployees] = useState(() => { try { const c = localStorage.getItem("cached_employees"); return c ? JSON.parse(c) : []; } catch { return []; } });
 
   const [ne, setNe] = useState({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Pending", password: "" });
 
@@ -7241,7 +7241,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  const [managers, setManagers] = useState([]);
+  const [managers, setManagers] = useState(() => { try { const c = localStorage.getItem("cached_managers"); return c ? JSON.parse(c) : []; } catch { return []; } });
 
   const [nm, setNm] = useState({ managerName: "", email: "", phone: "", department: "", role: "Manager", address: "", password: "", status: "Active" });
 
@@ -9532,7 +9532,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
                     <div style={{ padding: '12px 16px', borderTop: '1px solid #E2E8F0', textAlign: 'center' }}>
                       <button onClick={() => setShowNotifPanel(false)} style={{ background: 'none', border: 'none', color: ' var(--app-accent, var(--app-accent, #00BCD4))', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
-                        ✕
+                        Close
                       </button>
                     </div>
                   </div>

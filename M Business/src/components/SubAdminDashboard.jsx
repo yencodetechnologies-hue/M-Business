@@ -1559,7 +1559,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             </div>
 
-            <div style={{ fontSize: 11, color: "#A0B8BE", marginTop: 2 }}>{p.type || "—"} · {p.end ? new Date(p.end).toLocaleDateString("en-IN") : "No deadline"}</div>
+            <div style={{ fontSize: 11, color: "#A0B8BE", marginTop: 2 }}> {p.end ? new Date(p.end).toLocaleDateString("en-IN") : "No deadline"}</div>
 
           </div>
 

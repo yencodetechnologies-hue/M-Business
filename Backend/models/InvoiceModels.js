@@ -17,6 +17,7 @@ const invoiceSchema = new mongoose.Schema({
   dueDateType: { type: String, default: "30" },
   client: { type: String, required: true },
   project: String,
+  projectId: { type: String, default: "" },
   gstRate: { type: Number, default: 18 },
   notes: String,
   terms: String,

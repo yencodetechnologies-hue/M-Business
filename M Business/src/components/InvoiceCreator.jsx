@@ -737,6 +737,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     dueDate: inv.dueDate,
     status: inv.status || 'pending',
     notes: inv.notes,
+    signature: inv.signature || '',
+    signatureType: inv.signatureType || 'text',
     items,
   });
 

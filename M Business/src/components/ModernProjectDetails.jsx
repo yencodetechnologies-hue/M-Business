@@ -2741,22 +2741,36 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           <span style={{ background: 'rgba(59,130,246,.1)', color: '#3B82F6', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{mergedInvoices.length}</span>
                         </div>
                         <div style={{ overflowX: 'auto' }}>
-                          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
-                            <thead><tr style={{ background: '#F8FAFC' }}>{['', 'Invoice #', 'Description', 'Amount', 'Due Date', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
+                          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 900 }}>
+                            <thead><tr style={{ background: '#F8FAFC' }}>{['', 'Invoice ID', 'Client', 'Project', 'Category', 'Amount', 'Issue Date', 'Due Date', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
                             <tbody>
                               {mergedInvoices.map((inv, i) => (
                                 <tr key={i} style={{ borderBottom: '1px solid #F1F5F9', cursor: 'pointer' }}>
                                   <td style={{ padding: '12px 14px' }} onClick={(e) => e.stopPropagation()}>
                                     <input type="checkbox" checked={selectedPaymentItems.includes(i)} onChange={() => setSelectedPaymentItems(prev => prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i])} />
                                   </td>
-                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.invoiceNo || `INV-00${i + 1}`}</td>
-                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.description || inv.notes || '—'}</td>
+                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: ' var(--app-accent, #00BCD4)' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.invoiceNo || `INV-00${i + 1}`}</td>
+                                  <td style={{ padding: '12px 14px' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                      <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#0097A7', color: '#fff', fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                        {(inv.client || currProject.client || '?')[0]?.toUpperCase()}
+                                      </div>
+                                      <span style={{ fontSize: 12, fontWeight: 700, color: '#374151' }}>{inv.client || currProject.client || '—'}</span>
+                                    </div>
+                                  </td>
+                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{currProject.name || '—'}</td>
+                                  <td style={{ padding: '12px 14px' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>
+                                    <span style={{ background: '#EDE9FE', color: '#7C3AED', fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20 }}>{inv.category || 'Milestone'}</span>
+                                  </td>
                                   <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{currency}{(inv.amount || 0).toLocaleString()}</td>
-                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.date || inv.issueDate ? new Date(inv.date || inv.issueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#F59E0B' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
                                   <td style={{ padding: '12px 14px' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}><span style={{ background: inv.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: inv.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{inv.status || 'Draft'}</span></td>
-                                  <td style={{ padding: '12px 14px' }}>
+                                  <td style={{ padding: '12px 14px' }} onClick={(e) => e.stopPropagation()}>
                                     <div style={{ display: 'flex', gap: 4 }}>
+                                      <button onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-eye"></i></button>
                                       <button onClick={() => { if (onNewInvoice) { onNewInvoice(currProject, inv); } else { setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: i })); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+                                      <button style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-send"></i></button>
                                       <button onClick={() => handleDeleteInvoice(inv)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
                                     </div>
                                   </td>
@@ -2790,7 +2804,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         <span style={{ background: '#EDE9FE', color: '#7C3AED', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{(currProject.advances || []).length}</span>
                       </div>
                       <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 900 }}>
                           <thead><tr style={{ background: '#F8FAFC' }}>{['Advance #', 'Description', 'Amount', 'Date', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
                           <tbody>
                             {(currProject.advances || []).map((rec, i) => (
@@ -2823,7 +2837,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         <span style={{ background: '#FFEDD5', color: '#C2410C', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{(currProject.additionalCharges || []).length}</span>
                       </div>
                       <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 900 }}>
                           <thead><tr style={{ background: '#F8FAFC' }}>{['Charge #', 'Description', 'Amount', 'Date', 'Category', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
                           <tbody>
                             {(currProject.additionalCharges || []).map((rec, i) => (
@@ -2857,7 +2871,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         <span style={{ background: '#FEF3C7', color: '#B45309', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{(currProject.milestonePayments || []).length}</span>
                       </div>
                       <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 900 }}>
                           <thead><tr style={{ background: '#F8FAFC' }}>{['Milestone #', 'Name', 'Amount', 'Due Date', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
                           <tbody>
                             {(currProject.milestonePayments || []).map((rec, i) => (
@@ -2936,7 +2950,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       </div>
                       {(currProject.expenses || []).length > 0 ? (
                         <div style={{ overflowX: 'auto' }}>
-                          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
+                          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 900 }}>
                             <thead><tr style={{ background: '#F8FAFC' }}>{['Expense #', 'Description', 'Amount', 'Date', 'Category', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
                             <tbody>
                               {(currProject.expenses || []).map((rec, i) => (

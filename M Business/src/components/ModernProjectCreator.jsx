@@ -657,35 +657,35 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                 )}
               </div>
 
-            </div>
-
-            <div className="mpc-form-2col">
               <div className="mpc-form-group">
                 <label>Priority</label>
                 <select value={priority} onChange={e => setPriority(e.target.value)}>
                   <option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option>
                 </select>
               </div>
+            </div>
+
+            <div className="mpc-form-2col">
               <div className="mpc-form-group">
                 <label>Status</label>
                 <select value={status} onChange={e => setStatus(e.target.value)}>
                   <option>Active</option><option>Planning</option><option>On Hold</option>
                 </select>
               </div>
-            </div>
-            <div className="mpc-form-group">
-              <label>Project Name *</label>
-              <input
-                ref={nameRef}
-                value={name}
-                onChange={e => { setName(e.target.value); if (fieldErrors.name) setFieldErrors(f => ({ ...f, name: false })); }}
-                placeholder="e.g. E-Commerce Platform Redesign"
-                autoFocus
-                style={fieldErrors.name ? { border: '1.5px solid #EF4444' } : undefined}
-              />
-              {fieldErrors.name && (
-                <div style={{ color: '#EF4444', fontSize: 12, fontWeight: 700, marginTop: 4 }}>Required</div>
-              )}
+              <div className="mpc-form-group">
+                <label>Project Name *</label>
+                <input
+                  ref={nameRef}
+                  value={name}
+                  onChange={e => { setName(e.target.value); if (fieldErrors.name) setFieldErrors(f => ({ ...f, name: false })); }}
+                  placeholder="e.g. E-Commerce Platform Redesign"
+                  autoFocus
+                  style={fieldErrors.name ? { border: '1.5px solid #EF4444' } : undefined}
+                />
+                {fieldErrors.name && (
+                  <div style={{ color: '#EF4444', fontSize: 12, fontWeight: 700, marginTop: 4 }}>Required</div>
+                )}
+              </div>
             </div>
 
             <div className="mpc-form-group">

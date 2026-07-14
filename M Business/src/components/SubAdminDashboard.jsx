@@ -6864,6 +6864,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [showColorPicker, setShowColorPicker] = useState(false);
 
   const [returnToModal, setReturnToModal] = useState(null);
+  const [prefillClient, setPrefillClient] = useState(null);
+  const [editProject, setEditProject] = useState(null);
   const [addClientFromInvoice, setAddClientFromInvoice] = useState(false);
   const [pendingInvoiceClientName, setPendingInvoiceClientName] = useState(null);
 
@@ -11080,6 +11082,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   await fetchProjects();
 
+                  if (sidebarOverride === "invoices") {
+                    setSidebarOverride(null);
+                    setJumpProject(null);
+                    setInvoicePrefill(prev => ({ ...(prev || {}), project: saved?.name || "", _t: Date.now() }));
+                    setActive("invoices");
+                    return;
+                  }
+
                   setJumpProject(saved);
                   setFromEditProject(false);
                   setProjectDetailsReadOnly(false);
@@ -11451,7 +11461,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               setAddClientFromInvoice(true);
               setReturnToModal(modal); setModal("client");
 
-            }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}  {validActive === "quotations" && <QuotationCreatorModern user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => {
+            }} onAddProject={() => { setJumpProject(null); setSidebarOverride("invoices"); setActive("create-project"); }} />}  {validActive === "quotations" && <QuotationCreatorModern user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 

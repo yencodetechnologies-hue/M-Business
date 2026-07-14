@@ -11125,8 +11125,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   setProjects(prev => prev.map(p => (p._id === merged._id ? { ...p, ...merged } : p)));
 
-                  setFromEditProject(true);
-
                   setSidebarOverride(null);
 
                   setJumpProject(merged);
@@ -11191,7 +11189,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 }}
 
-                hideTopActions={false}
+                hideTopActions={true}
 
                 onBack={() => {
                   setFromEditProject(false);

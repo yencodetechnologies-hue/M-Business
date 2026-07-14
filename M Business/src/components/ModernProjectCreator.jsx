@@ -722,7 +722,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                 style={{ fontSize: 12, padding: '6px 14px' }}
                 onClick={() => { setShowAddEmployee(true); setSelectedEmpsToAdd([]); }}
               >
-                {editProject ? 'Edit Team Members' : 'Add Team Member'}
+                {editProject ? 'Edit Team Members' : 'Add Team Members'}
               </button>
             </div>
 
@@ -992,7 +992,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
               )}
             </div>
             <button className="mpc-btn mpc-btn-outline" style={{ marginTop: 16, fontSize: 12, padding: '8px 16px' }} onClick={addMilestone}>
-              <i className="ti ti-plus" /> {editProject ? 'Edit Milestones' : 'Add Milestone'}
+              <i className="ti ti-plus" /> {editProject ? 'Edit Milestones' : 'Add Milestones'}
             </button>
           </div>
 

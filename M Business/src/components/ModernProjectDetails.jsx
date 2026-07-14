@@ -1641,12 +1641,21 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         {/* CSS injected once via useEffect above */}
 
         {/* TOPBAR */}
-        <div className="mpd-topbar">
+        <div className="mpd-topbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div className="mpd-breadcrumb">
             <a onClick={onBack}>Projects</a>
             <i className="ti ti-chevron-right" style={{ fontSize: 14 }}></i>
             <span style={{ color: P.textDark }}>{projName}</span>
           </div>
+
+          {onEdit && user?.role !== 'client' && (
+            <button
+              onClick={() => onEdit(currProject)}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 10, border: 'none', background: P.primary, color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+            >
+              <i className="ti ti-edit" style={{ fontSize: 15 }}></i> Edit Project
+            </button>
+          )}
 
         </div>
 

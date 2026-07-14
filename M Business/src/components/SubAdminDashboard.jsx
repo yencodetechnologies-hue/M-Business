@@ -11064,6 +11064,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 key="create"
 
+                editProject={null}
+
                 clients={clients}
 
                 employees={employees}
@@ -11127,17 +11129,23 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 onBack={() => { const returnTo = sidebarOverride || "projects"; setSidebarOverride(null); setActive(returnTo); }}
 
-                onSuccess={(updatedProj) => {
+                onSuccess={async (updatedProj) => {
 
-                  const saved = updatedProj || jumpProject;
+                  const pid = jumpProject._id || jumpProject.id;
+                  let fresh = updatedProj || jumpProject;
 
-                  const merged = { ...jumpProject, ...saved };
+                  try {
+                    const res = await axios.get(`${BASE_URL}/api/projects/${pid}`);
+                    fresh = res.data?.project || res.data || fresh;
+                  } catch (err) {
+                    console.error("Failed to refetch project after update:", err);
+                  }
 
-                  setProjects(prev => prev.map(p => (p._id === merged._id ? { ...p, ...merged } : p)));
+                  await fetchProjects();
 
                   setSidebarOverride(null);
 
-                  setJumpProject(merged);
+                  setJumpProject(fresh);
 
                   setProjectDetailsReadOnly(true);
 

@@ -874,15 +874,34 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     }
     showToast("Pending Generating PDF...");
 
+    // Wait for the DOM to fully paint the latest invoice data before capturing
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    await new Promise(resolve => setTimeout(resolve, 300));
+
     // Helper: resolve CSS variables so html2canvas captures correct colours on all OS/browsers
     const resolveCssVars = (el) => {
-      const computed = getComputedStyle(document.documentElement);
+      const rootComputed = getComputedStyle(document.documentElement);
+      const elComputed = getComputedStyle(el);
+      const resolveVar = (varExpr) => {
+        // varExpr like "--app-accent, var(--app-accent, #00BCD4))" possibly nested; resolve innermost first
+        let expr = varExpr;
+        // Resolve nested var(...) from the inside out
+        let prev;
+        do {
+          prev = expr;
+          expr = expr.replace(/var\(\s*(--[a-zA-Z0-9-]+)\s*(?:,\s*([^()]*(?:\([^()]*\)[^()]*)*))?\)/g, (_, name, fallback) => {
+            const fromEl = elComputed.getPropertyValue(name).trim();
+            const fromRoot = rootComputed.getPropertyValue(name).trim();
+            return fromEl || fromRoot || (fallback ? fallback.trim() : '');
+          });
+        } while (expr !== prev && expr.includes('var('));
+        return expr;
+      };
       const walk = (node) => {
         if (node.nodeType === 1) {
           const st = node.getAttribute('style') || '';
           if (st.includes('var(')) {
-            node.setAttribute('style', st.replace(/var\(([^)]+)\)/g, (_, n) =>
-              computed.getPropertyValue(n.trim()).trim() || ''));
+            node.setAttribute('style', resolveVar(st));
           }
           Array.from(node.children).forEach(walk);
         }

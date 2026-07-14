@@ -4454,7 +4454,7 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
           if (!p || (!p._id && !p.id)) return;
 
-          onViewProject && onViewProject(p);
+          openEdit(p);
 
         }}
 

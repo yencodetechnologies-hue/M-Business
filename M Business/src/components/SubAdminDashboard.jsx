@@ -11191,7 +11191,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 }}
 
-                hideTopActions={fromEditProject}
+                hideTopActions={false}
 
                 onBack={() => {
                   setFromEditProject(false);

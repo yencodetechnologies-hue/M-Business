@@ -715,7 +715,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
           <div className="mpc-section-card">
             <div className="mpc-section-heading" style={{ justifyContent: 'space-between' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <i className="ti ti-users" /> {editProject ? ' Team Members' : 'Assign Team Members'}
+                {editProject ? ' Team Members' : 'Add Team Members'}
               </span>
               <button
                 className="mpc-btn mpc-btn-primary"
@@ -987,7 +987,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
               })}
               {milestones.length === 0 && (
                 <div style={{ fontSize: 13, color: '#94a3b8', padding: '8px 0' }}>
-                  {editProject ? 'No milestones added for this project yet.' : 'No milestones added yet.'}
+                  <i className="ti ti-plus" /> {editProject ? 'Edit Milestones' : 'Add Milestones'}
                 </div>
               )}
             </div>

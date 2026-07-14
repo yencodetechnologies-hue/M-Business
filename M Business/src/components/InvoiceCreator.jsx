@@ -350,37 +350,9 @@ function CanvasSignature({ onSave }) {
 }
 
 // ------------------------------------------------------------
-export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack, jumpInvoice, newInvoicePrefill, onSaveLocalInvoice, newClientName, onNewClientConsumed }) {
+export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack, jumpInvoice, newInvoicePrefill, onSaveLocalInvoice }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || "";
-
-  useEffect(() => {
-    if (newClientName) {
-      upd("client", newClientName);
-      if (onNewClientConsumed) onNewClientConsumed();
-    }
-  }, [newClientName]);
-
-  useEffect(() => {
-    if (newClientName) {
-      upd("client", newClientName);
-      if (onNewClientConsumed) onNewClientConsumed();
-    }
-  }, [newClientName]);
-
-  useEffect(() => {
-    if (newClientName) {
-      upd("client", newClientName);
-      if (onNewClientConsumed) onNewClientConsumed();
-    }
-  }, [newClientName]);
-
-  useEffect(() => {
-    if (newClientName) {
-      upd("client", newClientName);
-      if (onNewClientConsumed) onNewClientConsumed();
-    }
-  }, [newClientName]);
 
   const [step, setStep] = useState(jumpInvoice ? "preview" : newInvoicePrefill ? "form" : "list"); // "list" | "form" | "preview"
   const [internalNav, setInternalNav] = useState(false);

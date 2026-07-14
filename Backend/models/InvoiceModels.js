@@ -47,6 +47,10 @@ const invoiceSchema = new mongoose.Schema({
   signatureType: { type: String, default: "text" },
   invoiceType: { type: String, default: "Milestone" },
   customInvoiceType: { type: String, default: "" },
+  discountPct: { type: Number, default: 0 },
+  discountType: { type: String, default: "Percentage" },
+  customDiscountType: { type: String, default: "" },
+  discountAmt: { type: Number, default: 0 },
   template: { type: String, default: "Classic" },
 }, { timestamps: true });
 

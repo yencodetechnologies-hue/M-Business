@@ -396,6 +396,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           signatureType: ed.signatureType || 'text',
           invoiceType: ed.invoiceType || 'Milestone',
           customInvoiceType: ed.customInvoiceType || '',
+          discountPct: ed.discountPct ?? '',
+          discountType: ed.discountType || 'Percentage',
+          customDiscountType: ed.customDiscountType || '',
           template: ed.template || 'Classic',
           footerMessage: ed.footerMessage || blank.footerMessage,
           amountPaid: ed.amountPaid ?? 0,
@@ -533,6 +536,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     signatureType: "text",
     invoiceType: "Milestone",
     customInvoiceType: "",
+    discountPct: "",
+    discountType: "Percentage",
+    customDiscountType: "",
   };
 
   const [inv, setInv] = useState(blank);
@@ -614,8 +620,18 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     }
   });
 
+  let discountAmt = 0;
+  if (inv.discountPct) {
+    const discVal = parseFloat(inv.discountPct) || 0;
+    if (inv.discountType === "Fixed Amount" || inv.discountType === "Custom") {
+      discountAmt = discVal;
+    } else {
+      discountAmt = (subtotal * discVal) / 100;
+    }
+  }
+
   const amountPaid = parseFloat(inv.amountPaid) || 0;
-  const balanceDue = total - amountPaid;
+  const balanceDue = total - discountAmt + (parseFloat(inv.extraCharges) || 0) - amountPaid;
 
   // ── Fetch list ----------------------------------------------
   const fetchList = async () => {
@@ -632,7 +648,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   useEffect(() => { if (step === "list") fetchList(); }, [step]);
 
   // ── Items ---------------------------------------------------
-  const addItem = () => setItems((p) => [...p, { id: Date.now(), description: "", quantity: 1, rate: "" }]);
+  const addItem = () => setItems((p) => [...p, { id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`, description: "", quantity: 1, rate: "" }]);
   const removeItem = (id) => {
     setItems((p) => {
       if (p.length > 1) return p.filter((i) => i.id !== id);
@@ -748,6 +764,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     signatureType: inv.signatureType || 'text',
     invoiceType: inv.invoiceType || 'Milestone',
     customInvoiceType: inv.customInvoiceType || '',
+    discountPct: inv.discountPct || 0,
+    discountType: inv.discountType || 'Percentage',
+    customDiscountType: inv.customDiscountType || '',
     items,
   });
 
@@ -1065,7 +1084,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <>
                   <div style={{ marginBottom: 10 }}>
                     <label style={lbl}>Amount Paid</label>
-                    <input type="number" value={pd.amountPaid} onChange={e => setReceiptEntry(prev => ({ ...prev, paymentData: { ...prev.paymentData, amountPaid: Number(e.target.value) } }))} style={inp()} />
+                    <input type="number" value={pd.amountPaid === 0 ? "" : pd.amountPaid} onChange={e => setReceiptEntry(prev => ({ ...prev, paymentData: { ...prev.paymentData, amountPaid: e.target.value === "" ? 0 : Number(e.target.value) } }))} style={inp()} />
                   </div>
                   <div style={{ marginBottom: 10 }}>
                     <label style={lbl}>Payment Date</label>
@@ -2216,18 +2235,52 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               <div className="inv-creator-totals-section">
                 <div className="inv-creator-form-row" style={{ marginBottom: "10px" }}>
                   <div className="inv-creator-form-group">
-                    <label className="inv-creator-form-label">Discount (%)</label>
-                    <input className="inv-creator-form-input" type="number" value={inv.discountPct || 0} onChange={(e) => upd("discountPct", Number(e.target.value))} placeholder="0" />
+                    <label className="inv-creator-form-label">Discount Type</label>
+                    <select
+                      className="inv-creator-form-input"
+                      value={inv.discountType || "Percentage"}
+                      onChange={(e) => upd("discountType", e.target.value)}
+                    >
+                      <option value="Percentage">Percentage (%)</option>
+                      <option value="Fixed Amount">Fixed Amount</option>
+                      <option value="Custom">Custom</option>
+                    </select>
+                    {inv.discountType === "Custom" && (
+                      <input
+                        className="inv-creator-form-input"
+                        type="text"
+                        placeholder="Enter custom discount type"
+                        value={inv.customDiscountType || ""}
+                        onChange={(e) => upd("customDiscountType", e.target.value)}
+                        style={{ marginTop: 8 }}
+                      />
+                    )}
                   </div>
                   <div className="inv-creator-form-group">
-                    <label className="inv-creator-form-label">Shipping / Extra Charges</label>
-                    <input className="inv-creator-form-input" type="number" value={inv.extraCharges || 0} onChange={(e) => upd("extraCharges", Number(e.target.value))} placeholder="0" />
+                    <label className="inv-creator-form-label">
+                      Discount {inv.discountType === "Fixed Amount" ? `(${inv.currency || ""})` : inv.discountType === "Custom" ? "" : "(%)"}
+                    </label>
+                    <input
+                      className="inv-creator-form-input"
+                      type="number"
+                      value={inv.discountPct === "" || inv.discountPct === undefined ? "" : inv.discountPct}
+                      onChange={(e) => {
+                        const raw = e.target.value;
+                        upd("discountPct", raw === "" ? "" : Number(raw));
+                      }}
+                      placeholder="0"
+                    />
                   </div>
+
+                </div>
+                <div className="inv-creator-form-group">
+                  <label className="inv-creator-form-label">Shipping / Extra Charges</label>
+                  <input className="inv-creator-form-input" type="number" value={inv.extraCharges === 0 ? "" : inv.extraCharges} onChange={(e) => upd("extraCharges", e.target.value === "" ? 0 : Number(e.target.value))} placeholder="0" />
                 </div>
                 <div className="inv-creator-total-row"><span className="inv-creator-total-label">Subtotal</span><span className="inv-creator-total-val">{formatCurrency(subtotal, inv.currency, false, false, inv.customCurrencySymbol)}</span></div>
-                <div className="inv-creator-total-row discount"><span className="inv-creator-total-label">Discount</span><span className="inv-creator-total-val">- {formatCurrency((subtotal * (inv.discountPct || 0) / 100), inv.currency, false, false, inv.customCurrencySymbol)}</span></div>
+                <div className="inv-creator-total-row discount"><span className="inv-creator-total-label">Discount{inv.discountType === "Custom" && inv.customDiscountType ? ` (${inv.customDiscountType})` : ""}</span><span className="inv-creator-total-val">- {formatCurrency(discountAmt, inv.currency, false, false, inv.customCurrencySymbol)}</span></div>
                 <div className="inv-creator-total-row tax"><span className="inv-creator-total-label">GST / Tax</span><span className="inv-creator-total-val">+ {formatCurrency(gstAmt, inv.currency, false, false, inv.customCurrencySymbol)}</span></div>
-                <div className="inv-creator-total-row"><span className="inv-creator-total-label">Extra Charges</span><span className="inv-creator-total-val">+ {formatCurrency(inv.extraCharges || 0, inv.currency, false, false, inv.customCurrencySymbol)}</span></div>                <div className="inv-creator-total-row grand"><span className="inv-creator-total-label">Total Amount</span><span className="inv-creator-total-val">{formatCurrency(total - (subtotal * (inv.discountPct || 0) / 100) + (inv.extraCharges || 0), inv.currency, false, false, inv.customCurrencySymbol)}</span></div>
+                <div className="inv-creator-total-row"><span className="inv-creator-total-label">Extra Charges</span><span className="inv-creator-total-val">+ {formatCurrency(inv.extraCharges || 0, inv.currency, false, false, inv.customCurrencySymbol)}</span></div>                <div className="inv-creator-total-row grand"><span className="inv-creator-total-label">Total Amount</span><span className="inv-creator-total-val">{formatCurrency(total - discountAmt + (inv.extraCharges || 0), inv.currency, false, false, inv.customCurrencySymbol)}</span></div>
               </div>
             </div>
           </div>

@@ -91,10 +91,14 @@ export default function InvoiceViewer() {
         gstAmt = subtotal * (inv.gstRate / 100);
         total = subtotal + gstAmt;
       }
+      const discountAmt = inv.discountType === "Fixed Amount"
+        ? (Number(inv.discountPct) || 0)
+        : (subtotal * (Number(inv.discountPct) || 0) / 100);
+      total = total - discountAmt + (Number(inv.extraCharges) || 0);
       const historyTotal = inv.paymentHistory?.reduce((s, p) => s + (parseFloat(p.amount) || 0), 0) || 0;
       const finalPaid = Math.max(inv.amountPaid, historyTotal);
       const balanceDue = total - finalPaid;
-      setData({ inv, items, subtotal, gstAmt, total, balanceDue, finalPaid });
+      setData({ inv, items, subtotal, gstAmt, total, discountAmt, balanceDue, finalPaid });
 
       // Fetch latest invoice details from backend to get full signature/branding/payments
       // Fetch latest invoice details from backend to get full signature/branding/payments
@@ -174,7 +178,7 @@ export default function InvoiceViewer() {
     </div>
   );
 
-  const { inv, items, subtotal, gstAmt, total, balanceDue, finalPaid } = data;
+  const { inv, items, subtotal, gstAmt, total, discountAmt, balanceDue, finalPaid } = data;
   const isPaid = balanceDue <= 0;
   // Prevent QRCodeSVG from crashing if the URL with base64 payload is too large
   const qrData = window.location.href.length > 1000
@@ -393,6 +397,7 @@ export default function InvoiceViewer() {
                     <div style={{ width: "min(280px,100%)" }}>
                       {[
                         ["Subtotal", formatCurrency(subtotal, inv.currency)],
+                        ...(discountAmt > 0 ? [[`Discount${inv.discountType === "Custom" && inv.customDiscountType ? ` (${inv.customDiscountType})` : inv.discountType === "Fixed Amount" ? " (Fixed)" : " (%)"}`, "- " + formatCurrency(discountAmt, inv.currency)]] : []),
                         [`GST (${inv.gstRate}%)${inv.isGstIncluded ? " (Incl.)" : ""}`, formatCurrency(gstAmt, inv.currency)],
                         ["Total Amount", formatCurrency(total, inv.currency)],
                         ["Amount Paid", formatCurrency(finalPaid, inv.currency)]

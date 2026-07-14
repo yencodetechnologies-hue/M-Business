@@ -249,7 +249,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     if (step === "preview") window.scrollTo(0, 0);
   }, [step]);
 
-  const addItem = () => setItems((p) => [...p, { id: Date.now(), description: "", quantity: 1, rate: "" }]);
+  const addItem = () => setItems((p) => [...p, { id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`, description: "", quantity: 1, rate: "" }]);
   const removeItem = (id) => {
     setItems((p) => {
       if (p.length > 1) return p.filter((i) => i.id !== id);

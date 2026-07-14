@@ -2440,24 +2440,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   Approval Request
                                 </button>
                               )}
-                              <label style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 8, fontSize: 11, fontWeight: 700, color: P.textMid, cursor: 'pointer' }}>
-                                <input
-                                  type="checkbox"
-                                  checked={currProject.approvalRequestEnabled !== false}
-                                  onChange={async e => {
-                                    const checked = e.target.checked;
-                                    setCurrProject(prev => ({ ...prev, approvalRequestEnabled: checked }));
-                                    if (!checked && updateType === 'approval') setUpdateType('');
-                                    try {
-                                      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { approvalRequestEnabled: checked });
-                                      fetchProjects && fetchProjects();
-                                    } catch (err) {
-                                      console.error('Failed to update approvalRequestEnabled', err);
-                                    }
-                                  }}
-                                />
-                                Approvals {currProject.approvalRequestEnabled !== false ? 'ON' : 'OFF'}
-                              </label>
+
                             </div>
                           </div>
 
@@ -2542,15 +2525,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
                             </div>
 
-                            {updateType === 'approval' && (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <select value={approvalForm.teamMemberId} onChange={e => setApprovalForm(f => ({ ...f, teamMemberId: e.target.value, recipientType: 'team' }))} style={{ padding: '8px 10px', borderRadius: 9, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', background: '#fff', fontFamily: 'inherit', minWidth: 160 }}>
-                                  <option value="">-- Select team member --</option>
-                                  {(employees || []).filter(emp => assigned.includes(emp.name || emp.employeeName)).map(emp => (<option key={emp._id} value={emp._id}>{emp.name || emp.employeeName}</option>))}
-                                </select>
-                              </div>
-                            )}
-
+                     
                             <div style={{ display: 'flex', gap: 10 }}>
 
                               <button

@@ -558,27 +558,6 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
           {/* SECTION 1: BASIC INFO */}
           <div className="mpc-section-card" id="sec1">
             <div className="mpc-section-heading"><i className="ti ti-file-description" /> Basic Information</div>
-
-            <div className="mpc-form-group">
-              <label>Project Name *</label>
-              <input
-                ref={nameRef}
-                value={name}
-                onChange={e => { setName(e.target.value); if (fieldErrors.name) setFieldErrors(f => ({ ...f, name: false })); }}
-                placeholder="e.g. E-Commerce Platform Redesign"
-                autoFocus
-                style={fieldErrors.name ? { border: '1.5px solid #EF4444' } : undefined}
-              />
-              {fieldErrors.name && (
-                <div style={{ color: '#EF4444', fontSize: 12, fontWeight: 700, marginTop: 4 }}>Required</div>
-              )}
-            </div>
-
-            <div className="mpc-form-group">
-              <label>Description</label>
-              <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Describe the project scope, goals and deliverables..." />
-            </div>
-
             <div className="mpc-form-2col">
               <div className="mpc-form-group">
                 <label>Client *</label>
@@ -677,12 +656,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                   />
                 )}
               </div>
-              <div className="mpc-form-group">
-                <label>Category</label>
-                <select value={category} onChange={e => setCategory(e.target.value)}>
-                  <option>Web Development</option><option>Mobile App</option><option>UI/UX Design</option><option>Branding</option><option>Digital Marketing</option>
-                </select>
-              </div>
+
             </div>
 
             <div className="mpc-form-2col">
@@ -699,6 +673,27 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                 </select>
               </div>
             </div>
+            <div className="mpc-form-group">
+              <label>Project Name *</label>
+              <input
+                ref={nameRef}
+                value={name}
+                onChange={e => { setName(e.target.value); if (fieldErrors.name) setFieldErrors(f => ({ ...f, name: false })); }}
+                placeholder="e.g. E-Commerce Platform Redesign"
+                autoFocus
+                style={fieldErrors.name ? { border: '1.5px solid #EF4444' } : undefined}
+              />
+              {fieldErrors.name && (
+                <div style={{ color: '#EF4444', fontSize: 12, fontWeight: 700, marginTop: 4 }}>Required</div>
+              )}
+            </div>
+
+            <div className="mpc-form-group">
+              <label>Description</label>
+              <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Describe the project scope, goals and deliverables..." />
+            </div>
+
+
           </div>
 
           {/* SECTION 2: TIMELINE */}
@@ -883,31 +878,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                 <input type="number" value={budget} onChange={e => setBudget(e.target.value)} placeholder="e.g. 850000" />
               </div>
             </div>
-            {budget && (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 16 }}>
-                <div className="mpc-form-group">
-                  <label>Billed Amount</label>
-                  <input type="number" value={billed} onChange={e => setBilled(e.target.value)} placeholder="0" />
-                </div>
-                <div className="mpc-form-group">
-                  <label>Received Amount</label>
-                  <input type="number" value={received} onChange={e => setReceived(e.target.value)} placeholder="0" />
-                </div>
-                <div className="mpc-form-group">
-                  <label>Pending Amount</label>
-                  <input type="number" value={pending} readOnly style={{ background: '#f0f4f8', cursor: 'not-allowed' }} />
-                </div>
-                <div className="mpc-form-group">
-                  <label>Spent Amount</label>
-                  <input type="number" value={0} readOnly
-                    style={{ background: '#f0f4f8', cursor: 'not-allowed', color: '#94A3B8' }}
-                    title="Spent amount is calculated automatically from expense records" />
-                  <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>
-                    Auto-calculated from expense records
-                  </div>
-                </div>
-              </div>
-            )}
+
           </div>
 
           {/* SECTION 5: MILESTONES */}

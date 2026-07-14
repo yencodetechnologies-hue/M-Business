@@ -912,7 +912,7 @@ export default function AdminDashboard({ user, setUser }) {
                     transition: "all 0.2s"
                   }}
                 >
-                  {pkgSaveLoading ? (editPkg ? "Updating..." : "Creating...") : (editPkg ? "Special Update Package" : "Special Create Package")}
+                  {pkgSaveLoading ? (editPkg ? "Updating..." : "Creating...") : (editPkg ? " Update Package" : " Create Package")}
                 </button>
               </div>
             </div>

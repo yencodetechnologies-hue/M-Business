@@ -1498,8 +1498,8 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     const elements = [...(s.elements || []), { id: uid(), fontSize: 16, fontWeight: 400, x: xPos, y: yPos, w: 400, ...element }];
     updateSlide({ ...s, elements });
     setSelectedElementId(elements[elements.length - 1].id);
-    flash("Special Added to page!");
-  };
+    flash(" Added to page!");
+  }
   const deleteElement = (elId) => {
     const s = doc.slides[page];
     const elements = s.elements.filter(e => e.id !== elId);

@@ -519,7 +519,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
             <div style={{ padding: 20 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Remarks</label>
-                <textarea name="notes" value={formData.notes} onChange={handleChange} placeholder="Any internal context, special instructions, or notes about this client..." style={{ width: '100%', height: 80, padding: '10px 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8', resize: 'vertical' }}></textarea>
+                <textarea name="notes" value={formData.notes} onChange={handleChange} placeholder="Any internal context,  instructions, or notes about this client..." style={{ width: '100%', height: 80, padding: '10px 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8', resize: 'vertical' }}></textarea>
               </div>
             </div>
           </div>

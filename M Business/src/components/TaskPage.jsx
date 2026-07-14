@@ -1157,7 +1157,7 @@ function SidekickPanel({ onClose, groups }) {
       <div style={{ background: `linear-gradient(150deg,${P.dark} 0%,${P.mid} 60%,var(--app-accent) 100%)`, padding: "14px 16px 16px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 9, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17 }}>Special</div>
+            <div style={{ width: 32, height: 32, borderRadius: 9, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17 }}></div>
             <div><div style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>Board Sidekick</div><div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }}>Live insights</div></div>
           </div>
           <button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 7, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff", fontSize: 16 }}>✕</button>

@@ -994,7 +994,7 @@ export default function AdminProposalManagement() {
                   transition: "all .2s"
                 }}
               >
-                Special Add Proposal
+                Add Proposal
               </button>
 
             </div>

@@ -5,14 +5,14 @@ import { BASE_URL } from "../config";
 const API = `${BASE_URL}/api`;
 
 const P = {
-  accent:  "var(--app-accent)",
-  mid:     "var(--app-accent)",
-  dark:    "var(--app-sidebar)",
-  light:   "var(--app-bg)",
-  border:  "var(--app-border)",
-  text:    "var(--app-sidebar)",
-  muted:   "var(--app-muted)",
-  hover:   "var(--app-bg)",
+  accent: "var(--app-accent)",
+  mid: "var(--app-accent)",
+  dark: "var(--app-sidebar)",
+  light: "var(--app-bg)",
+  border: "var(--app-border)",
+  text: "var(--app-sidebar)",
+  muted: "var(--app-muted)",
+  hover: "var(--app-bg)",
 };
 
 const INTEGRATIONS = [
@@ -68,10 +68,10 @@ function TaskManagementPage() {
 
   const handleInviteMember = async () => {
     if (!inviteEmail || !selectedTask) return;
-    
+
     setLoading(true);
     try {
-      await axios.post(`${API}/tasks/invite`, 
+      await axios.post(`${API}/tasks/invite`,
         { taskId: selectedTask._id, email: inviteEmail },
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
@@ -105,10 +105,10 @@ function TaskManagementPage() {
   const handleIntegrationToggle = async (integrationId) => {
     const newIntegrations = { ...integrations, [integrationId]: !integrations[integrationId] };
     setIntegrations(newIntegrations);
-    
+
     if (selectedTask) {
       try {
-        await axios.patch(`${API}/tasks/${selectedTask._id}/integrations`, 
+        await axios.patch(`${API}/tasks/${selectedTask._id}/integrations`,
           { integrations: newIntegrations },
           { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
         );
@@ -125,22 +125,22 @@ function TaskManagementPage() {
     setIntegrations(task.integrations || {});
   };
 
-  const filteredTasks = filterPerson 
-    ? tasks.filter(task => 
-        task.assignedTo?.some(member => member.email === filterPerson) ||
-        task.invitedMembers?.some(invite => invite.email === filterPerson)
-      )
+  const filteredTasks = filterPerson
+    ? tasks.filter(task =>
+      task.assignedTo?.some(member => member.email === filterPerson) ||
+      task.invitedMembers?.some(invite => invite.email === filterPerson)
+    )
     : tasks;
 
   return (
     <div style={{ padding: "20px", backgroundColor: P.light, minHeight: "100vh" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
         <h1 style={{ color: P.dark, marginBottom: "30px" }}>Task Management</h1>
-        
+
         <div style={{ display: "flex", gap: "20px", marginBottom: "30px" }}>
           <div style={{ flex: 1 }}>
             <h3 style={{ color: P.dark, marginBottom: "15px" }}>Tasks</h3>
-            
+
             <div style={{ marginBottom: "20px" }}>
               <input
                 type="text"
@@ -157,10 +157,10 @@ function TaskManagementPage() {
               />
             </div>
 
-            <div style={{ 
-              display: "grid", 
-              gap: "15px", 
-              maxHeight: "600px", 
+            <div style={{
+              display: "grid",
+              gap: "15px",
+              maxHeight: "600px",
               overflowY: "auto",
               backgroundColor: "white",
               padding: "20px",
@@ -185,12 +185,12 @@ function TaskManagementPage() {
                     {task.description}
                   </p>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ 
-                      backgroundColor: P.accent, 
-                      color: "white", 
-                      padding: "4px 8px", 
-                      borderRadius: "4px", 
-                      fontSize: "12px" 
+                    <span style={{
+                      backgroundColor: P.accent,
+                      color: "white",
+                      padding: "4px 8px",
+                      borderRadius: "4px",
+                      fontSize: "12px"
                     }}>
                       {task.status}
                     </span>
@@ -205,11 +205,11 @@ function TaskManagementPage() {
 
           <div style={{ flex: 1 }}>
             {selectedTask ? (
-              <div style={{ 
-                backgroundColor: "white", 
-                padding: "20px", 
-                borderRadius: "12px", 
-                boxShadow: "0 2px 8px rgba(0,0,0,0.1)" 
+              <div style={{
+                backgroundColor: "white",
+                padding: "20px",
+                borderRadius: "12px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
               }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
                   <h3 style={{ color: P.dark, margin: 0 }}>{selectedTask.title}</h3>
@@ -226,7 +226,7 @@ function TaskManagementPage() {
                         fontSize: "14px"
                       }}
                     >
-                      Special Invite Member
+                      Invite Member
                     </button>
                     <button
                       onClick={() => handleAutoAssign(selectedTask._id)}
@@ -240,7 +240,7 @@ function TaskManagementPage() {
                         fontSize: "14px"
                       }}
                     >
-                       Auto-Assign
+                      Auto-Assign
                     </button>
                     <button
                       onClick={() => setShowIntegrationsModal(true)}
@@ -254,37 +254,37 @@ function TaskManagementPage() {
                         fontSize: "14px"
                       }}
                     >
-                       Integrations
+                      Integrations
                     </button>
                   </div>
                 </div>
 
                 <div style={{ marginBottom: "20px" }}>
                   <h4 style={{ color: P.dark, marginBottom: "10px" }}>Profile Members</h4>
-                  
+
                   <div style={{ marginBottom: "15px" }}>
                     <h5 style={{ color: P.muted, fontSize: "14px", marginBottom: "8px" }}>Assigned ({members.assigned?.length || 0})</h5>
                     {members.assigned?.map(member => (
-                      <div key={member._id} style={{ 
-                        display: "flex", 
-                        alignItems: "center", 
-                        gap: "10px", 
-                        padding: "8px", 
-                        backgroundColor: P.light, 
-                        borderRadius: "6px", 
-                        marginBottom: "8px" 
+                      <div key={member._id} style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        padding: "8px",
+                        backgroundColor: P.light,
+                        borderRadius: "6px",
+                        marginBottom: "8px"
                       }}>
-                        <div style={{ 
-                          width: "32px", 
-                          height: "32px", 
-                          borderRadius: "50%", 
-                          backgroundColor: P.accent, 
-                          display: "flex", 
-                          alignItems: "center", 
-                          justifyContent: "center", 
-                          color: "white", 
-                          fontSize: "12px", 
-                          fontWeight: "bold" 
+                        <div style={{
+                          width: "32px",
+                          height: "32px",
+                          borderRadius: "50%",
+                          backgroundColor: P.accent,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "white",
+                          fontSize: "12px",
+                          fontWeight: "bold"
                         }}>
                           {member.name?.charAt(0).toUpperCase()}
                         </div>
@@ -299,26 +299,26 @@ function TaskManagementPage() {
                   <div>
                     <h5 style={{ color: P.muted, fontSize: "14px", marginBottom: "8px" }}>Invited ({members.invited?.length || 0})</h5>
                     {members.invited?.map((invite, index) => (
-                      <div key={index} style={{ 
-                        display: "flex", 
-                        alignItems: "center", 
-                        gap: "10px", 
-                        padding: "8px", 
-                        backgroundColor: P.light, 
-                        borderRadius: "6px", 
-                        marginBottom: "8px" 
+                      <div key={index} style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        padding: "8px",
+                        backgroundColor: P.light,
+                        borderRadius: "6px",
+                        marginBottom: "8px"
                       }}>
-                        <div style={{ 
-                          width: "32px", 
-                          height: "32px", 
-                          borderRadius: "50%", 
-                          backgroundColor: P.muted, 
-                          display: "flex", 
-                          alignItems: "center", 
-                          justifyContent: "center", 
-                          color: "white", 
-                          fontSize: "12px", 
-                          fontWeight: "bold" 
+                        <div style={{
+                          width: "32px",
+                          height: "32px",
+                          borderRadius: "50%",
+                          backgroundColor: P.muted,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "white",
+                          fontSize: "12px",
+                          fontWeight: "bold"
                         }}>
                           {invite.email.charAt(0).toUpperCase()}
                         </div>
@@ -345,11 +345,11 @@ function TaskManagementPage() {
                 </div>
               </div>
             ) : (
-              <div style={{ 
-                backgroundColor: "white", 
-                padding: "40px", 
-                borderRadius: "12px", 
-                textAlign: "center", 
+              <div style={{
+                backgroundColor: "white",
+                padding: "40px",
+                borderRadius: "12px",
+                textAlign: "center",
                 color: P.muted,
                 boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
               }}>

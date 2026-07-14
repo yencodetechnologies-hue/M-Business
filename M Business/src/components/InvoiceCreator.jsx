@@ -1676,6 +1676,15 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                         <div className="inv-hright" style={{ textAlign: "right" }}>
                           <div style={{ fontSize: 36, fontWeight: 900, color: `${currentT.primaryColor}1a`, letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>INVOICE</div>
                           <div style={{ fontSize: 16, fontWeight: 800, color: currentT.primaryColor || "var(--app-accent)" }}>{inv.invoiceNo}</div>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: currentT.primaryColor || "var(--app-accent)", marginTop: 3 }}>
+                            {inv.invoiceType === "Custom" ? (inv.customInvoiceType || "Custom") : (inv.invoiceType || "Milestone")}
+                          </div>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: currentT.primaryColor || "var(--app-accent)", marginTop: 3 }}>
+                            {inv.invoiceType === "Custom" ? (inv.customInvoiceType || "Custom") : (inv.invoiceType || "Milestone")}
+                          </div>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: currentT.primaryColor || "var(--app-accent)", marginTop: 3 }}>
+                            {inv.invoiceType === "Custom" ? (inv.customInvoiceType || "Custom") : (inv.invoiceType || "Milestone")}
+                          </div>
                           {inv.orderNo && <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 3 }}>Order # {inv.orderNo}</div>}
                           <div style={{ fontSize: 11, fontWeight: 700, color: currentT.primaryColor || "var(--app-accent)", marginTop: 3 }}>
                             {inv.invoiceType === "Custom" ? (inv.customInvoiceType || "Custom") : (inv.invoiceType || "Milestone")}

@@ -2661,8 +2661,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         return [
                           { lbl: 'Total Invoiced', val: `${currency}${liveBilled.toLocaleString()}`, sub: `${mergedInvoices.length} invoice(s)`, color: '#3B82F6', icon: 'ti-file-invoice' },
                           { lbl: 'Received', val: `${currency}${liveReceived.toLocaleString()}`, sub: `${liveBilled > 0 ? Math.round((liveReceived / liveBilled) * 100) : 0}% collected`, color: '#22C55E', icon: 'ti-circle-check' },
-                          { lbl: 'Advance Paid', val: `${currency}${liveAdvanceTotal.toLocaleString()}`, sub: `${(currProject.advances || []).length} advance(s)`, color: '#8B5CF6', icon: 'ti-pig-money' },
-                          { lbl: 'Additional', val: `${currency}${liveAdditionalTotal.toLocaleString()}`, sub: `${(currProject.additionalCharges || []).length} charge(s)`, color: '#F97316', icon: 'ti-circle-plus' },
+                        
                           { lbl: 'Outstanding', val: `${currency}${livePending.toLocaleString()}`, sub: 'Balance due', color: '#EF4444', icon: 'ti-alert-circle' },
                         ];
                       })().map(s => (
@@ -2680,9 +2679,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gap: 10, marginBottom: 18 }}>
                       {[
                         { key: 'inv', label: 'Invoice', desc: 'Standard billing', icon: 'ti-file-invoice', color: '#3B82F6', bg: 'rgba(59,130,246,.1)' },
-                        { key: 'adv', label: 'Advance', desc: 'Upfront payments', icon: 'ti-pig-money', color: '#8B5CF6', bg: 'rgba(139,92,246,.1)' },
-                        { key: 'add', label: 'Additional', desc: 'Extra charges', icon: 'ti-circle-plus', color: '#F97316', bg: 'rgba(249,115,22,.1)' },
-                        { key: 'mile', label: 'Milestone', desc: 'Phase billing', icon: 'ti-flag', color: '#F59E0B', bg: 'rgba(245,158,11,.1)' },
+
                         { key: 'pay', label: 'Payment', desc: 'Received amounts', icon: 'ti-credit-card', color: '#22C55E', bg: 'rgba(34,197,94,.1)' },
                         { key: 'exp', label: 'Expenses', desc: 'Project costs', icon: 'ti-receipt', color: '#6B7280', bg: 'rgba(107,114,128,.1)' },
                       ].map(t => (

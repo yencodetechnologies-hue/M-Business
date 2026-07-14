@@ -1017,6 +1017,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const handleCreateTask = async (e) => {
     e.preventDefault();
     if (!newTaskTitle.trim()) return;
+    if (!newTaskMilestone) {
+      alert("Please select a milestone to link this task to.");
+      return;
+    }
     setAddingTask(true);
     try {
       const gId = await getOrCreateGroupId();
@@ -1907,7 +1911,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 const tasksForMilestone = currTasks.filter(t => t.milestone === m.name && !t.isDeleted);
                 const allTasksCompleted = tasksForMilestone.length > 0 && tasksForMilestone.every(t => t.status === 'done' || t.status === 'completed');
                 // Only mark done if tasks exist AND all are completed, OR manually toggled with tasks present
-                const isDone = tasksForMilestone.length > 0 ? (m.done === true || allTasksCompleted) : false;
+                const isDone = m.done === true || allTasksCompleted;
                 const firstNotDone = (currProject.milestones || []).findIndex(x => {
                   const mTasks = currTasks.filter(t => t.milestone === x.name && !t.isDeleted);
                   const mAllCompleted = mTasks.length > 0 && mTasks.every(t => t.status === 'done' || t.status === 'completed');
@@ -3140,9 +3144,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Link to Milestone</label>
-                    <select value={newTaskMilestone} onChange={e => setNewTaskMilestone(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
-                      <option value="">-- No Milestone --</option>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Link to Milestone *</label>
+                    <select required value={newTaskMilestone} onChange={e => setNewTaskMilestone(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
+                      <option value="">-- Select Milestone --</option>
                       {(currProject.milestones || []).map((m, i) => (<option key={i} value={m.name}>{m.name}</option>))}
                     </select>
                   </div>

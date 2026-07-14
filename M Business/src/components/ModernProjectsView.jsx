@@ -201,18 +201,25 @@ const CSS = `
 .mpv-menu-item.danger:hover { background:${P.redLight}; }
 
 /* List view overrides */
-.mpv-grid.list .mpv-card { display:grid; grid-template-columns:1fr auto; }
-.mpv-grid.list .mpv-card-top { display:flex; align-items:center; gap:20px; padding:14px 18px; }
-.mpv-grid.list .mpv-card-title { margin-bottom:2px; font-size:14px; }
+.mpv-grid.list .mpv-card { display:flex; flex-direction:column; }
+.mpv-grid.list .mpv-card-top { display:flex; align-items:center; gap:20px; padding:14px 18px; order:2; flex-wrap:wrap; }
 .mpv-grid.list .mpv-card-client { margin-bottom:0; }
-.mpv-grid.list .mpv-card-info { flex:1; }
-.mpv-grid.list .mpv-card-prog { min-width:200px; }
+.mpv-grid.list .mpv-card-info { flex:1; width:100%; order:1; }
+.mpv-grid.list .mpv-card-prog { min-width:200px; order:2; }
+.mpv-grid.list .mpv-card-row1 { order:-1; width:100%; margin-top:0; margin-bottom:8px; }
 .mpv-grid.list .mpv-divider { display:none; }
-.mpv-grid.list .mpv-card-bottom { flex-direction:column; align-items:flex-end; gap:6px; padding:14px 18px; border-left:1px solid ${P.border}; }
-.mpv-grid.list .mpv-card-top { flex-wrap: wrap; }
-.mpv-grid.list .mpv-card-row1 { order: 2; width: 100%; margin-top: 10px; margin-bottom: 0; }
+.mpv-grid.list .mpv-card-bottom {
+  order:0;
+  flex-direction:row;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  padding:12px 18px;
+  border-left:none;
+}.mpv-grid.list .mpv-card-top { flex-wrap: wrap; }
 .mpv-grid.list .mpv-card-info { order: 1; width: 100%; }
-.mpv-grid.list .mpv-card-prog { order: 3; }
+.mpv-grid.list .mpv-card-prog { order: 2; }
+.mpv-grid.list .mpv-card-row1 { order: 3; width: 100%; margin-top: 10px; margin-bottom: 0; }
 /* Empty */
 .mpv-empty { display:flex; flex-direction:column; align-items:center; justify-content:center;
   gap:12px; padding:60px 20px; color:${P.textLight}; }

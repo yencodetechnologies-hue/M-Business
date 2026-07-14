@@ -394,6 +394,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           upiId: ed.upiId || blank.upiId,
           signature: ed.signature || '',
           signatureType: ed.signatureType || 'text',
+          invoiceType: ed.invoiceType || 'Milestone',
+          customInvoiceType: ed.customInvoiceType || '',
           template: ed.template || 'Classic',
           footerMessage: ed.footerMessage || blank.footerMessage,
           amountPaid: ed.amountPaid ?? 0,
@@ -533,6 +535,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     ifscCode: "HDFC0001234",
     signature: "",
     signatureType: "text",
+    invoiceType: "Milestone",
+    customInvoiceType: "",
   };
 
   const [inv, setInv] = useState(blank);
@@ -739,6 +743,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     notes: inv.notes,
     signature: inv.signature || '',
     signatureType: inv.signatureType || 'text',
+    invoiceType: inv.invoiceType || 'Milestone',
+    customInvoiceType: inv.customInvoiceType || '',
     items,
   });
 
@@ -1671,6 +1677,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                           <div style={{ fontSize: 36, fontWeight: 900, color: `${currentT.primaryColor}1a`, letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>INVOICE</div>
                           <div style={{ fontSize: 16, fontWeight: 800, color: currentT.primaryColor || "var(--app-accent)" }}>{inv.invoiceNo}</div>
                           {inv.orderNo && <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 3 }}>Order # {inv.orderNo}</div>}
+                          <div style={{ fontSize: 11, fontWeight: 700, color: currentT.primaryColor || "var(--app-accent)", marginTop: 3 }}>
+                            {inv.invoiceType === "Custom" ? (inv.customInvoiceType || "Custom") : (inv.invoiceType || "Milestone")}
+                          </div>
                           <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
                             <div style={{ textAlign: "right" }}>
                               <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
@@ -2095,6 +2104,28 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                   ))}
                 </div>
               )}
+              <div style={{ marginTop: 14 }}>
+                <label className="inv-creator-form-label">Invoice Type</label>
+                <select
+                  value={inv.invoiceType || "Milestone"}
+                  onChange={e => upd("invoiceType", e.target.value)}
+                  style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }}
+                >
+                  <option value="Milestone">Milestone</option>
+                  <option value="Advance">Advance</option>
+                  <option value="Additional">Additional</option>
+                  <option value="Custom">Custom</option>
+                </select>
+                {inv.invoiceType === "Custom" && (
+                  <input
+                    type="text"
+                    placeholder="Enter custom invoice type"
+                    value={inv.customInvoiceType || ""}
+                    onChange={e => upd("customInvoiceType", e.target.value)}
+                    style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #E2E8F0", outline: "none", fontFamily: "inherit", boxSizing: "border-box", marginTop: 8 }}
+                  />
+                )}
+              </div>
             </div>
           </div>
 

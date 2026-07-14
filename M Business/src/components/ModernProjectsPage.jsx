@@ -369,14 +369,16 @@ export default function ModernProjectsPage({ user }) {
               onEdit={() => openEdit(selectedProject)}
               onDelete={() => setDeleteTarget(selectedProject)}
               onLogTime={(e) => openLogTime(selectedProject, e)}
-              onNewInvoice={(proj, editPayload) => {
-                if (editPayload && editPayload.editData) {
-                  // Edit invoice — payload already contains editData, editIndex, projectId etc.
+              onNewInvoice={(proj, existingInv, index) => {
+                if (existingInv) {
+                  // Edit invoice — build the shape InvoiceCreator expects
                   setInvoicePrefill({
                     client: proj.client || '',
                     project: proj.name || '',
                     _t: Date.now(),
-                    ...editPayload,
+                    editData: existingInv,
+                    projectId: proj._id,
+                    editIndex: index,
                   });
                 } else {
                   // New invoice
@@ -385,7 +387,7 @@ export default function ModernProjectsPage({ user }) {
                 setJumpInvoice(null);
                 setShowInvoiceCreator(true);
               }}
-              onViewInvoice={(inv) => {
+          onViewInvoice={(proj, inv) => {
                 setJumpInvoice(inv);
                 setShowInvoiceCreator(true);
               }} />

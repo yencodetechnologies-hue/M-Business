@@ -45,6 +45,8 @@ const invoiceSchema = new mongoose.Schema({
   companyId: { type: String, default: "" },
   signature: { type: String, default: "" },
   signatureType: { type: String, default: "text" },
+  invoiceType: { type: String, default: "Milestone" },
+  customInvoiceType: { type: String, default: "" },
   template: { type: String, default: "Classic" },
 }, { timestamps: true });
 

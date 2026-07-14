@@ -11475,7 +11475,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
               setReturnToModal(modal); setModal("client");
 
-            }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
+            }} onAddProject={() => { setPrevActiveBeforeInvoice(active); setActive("create-project"); }} />}
 
             {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} />}
 

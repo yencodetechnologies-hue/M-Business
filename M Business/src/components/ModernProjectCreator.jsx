@@ -715,14 +715,14 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
           <div className="mpc-section-card">
             <div className="mpc-section-heading" style={{ justifyContent: 'space-between' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <i className="ti ti-users" /> {editProject ? 'Edit Team Members' : 'Assign Team Members'}
+                <i className="ti ti-users" /> {editProject ? ' Team Members' : 'Assign Team Members'}
               </span>
               <button
                 className="mpc-btn mpc-btn-primary"
                 style={{ fontSize: 12, padding: '6px 14px' }}
                 onClick={() => { setShowAddEmployee(true); setSelectedEmpsToAdd([]); }}
               >
-                {editProject ? 'Edit Team Members' : 'Add Team Members'}
+                {editProject ? ' Team Members' : 'Add Team Members'}
               </button>
             </div>
 

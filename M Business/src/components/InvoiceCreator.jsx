@@ -404,7 +404,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         });
         const lineItems = ed.items || ed.lineItems;
         setItems(lineItems && lineItems.length > 0 ? lineItems.map((it, i) => ({ ...it, id: it.id || i + 1 })) : [{ id: 1, description: ed.description || '', quantity: 1, rate: ed.amount || '' }]);
-        setEditingId(null);
+        setEditingId(ed._id || newInvoicePrefill.editData?._id || null);
         setLocalEditTarget(
           newInvoicePrefill.projectId && newInvoicePrefill.editIndex != null
             ? { projectId: newInvoicePrefill.projectId, index: newInvoicePrefill.editIndex }
@@ -711,6 +711,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     ]);
     setErrors({});
     setEditingId(null);
+    setLocalEditTarget(null);
   };
 
   // ── API save ------------------------------------------------
@@ -1678,14 +1679,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                           <div style={{ fontSize: 16, fontWeight: 800, color: currentT.primaryColor || "var(--app-accent)" }}>{inv.invoiceNo}</div>
                           <div style={{ fontSize: 10, fontWeight: 700, color: currentT.primaryColor || "var(--app-accent)", marginTop: 3 }}>
                             {inv.invoiceType === "Custom" ? (inv.customInvoiceType || "Custom") : (inv.invoiceType || "Milestone")}
-                          </div>
-                          <div style={{ fontSize: 10, fontWeight: 700, color: currentT.primaryColor || "var(--app-accent)", marginTop: 3 }}>
-                            {inv.invoiceType === "Custom" ? (inv.customInvoiceType || "Custom") : (inv.invoiceType || "Milestone")}
-                          </div>
-                          <div style={{ fontSize: 10, fontWeight: 700, color: currentT.primaryColor || "var(--app-accent)", marginTop: 3 }}>
-                            {inv.invoiceType === "Custom" ? (inv.customInvoiceType || "Custom") : (inv.invoiceType || "Milestone")}
-                          </div>
-                          {inv.orderNo && <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 3 }}>Order # {inv.orderNo}</div>}
+                          </div>   {inv.orderNo && <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 3 }}>Order # {inv.orderNo}</div>}
                           <div style={{ fontSize: 11, fontWeight: 700, color: currentT.primaryColor || "var(--app-accent)", marginTop: 3 }}>
                             {inv.invoiceType === "Custom" ? (inv.customInvoiceType || "Custom") : (inv.invoiceType || "Milestone")}
                           </div>
@@ -2078,9 +2072,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             <div className="inv-creator-card-header">
               <div className="inv-creator-card-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-user-circle"></i></div>
               <div className="inv-creator-card-title">Bill To (Client)</div>
-              <button onClick={onAddClient} style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "5px", padding: "5px 10px", background: "var(--teal-lighter)", border: "1.5px solid var(--teal)", borderRadius: "7px", fontSize: "10px", fontWeight: "700", color: "var(--teal)", cursor: "pointer", fontFamily: "inherit" }}>
-                <i className="ti ti-plus" style={{ fontSize: "12px" }}></i> Add Client
-              </button>
+
             </div>
             <div className="inv-creator-card-body">
               <div className="inv-creator-form-row">
@@ -2531,6 +2523,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <div className="inv-title-area" style={{ textAlign: "right" }}>
                   <div className="inv-title-word" style={{ fontSize: "24px", fontWeight: "900", color: currentT.primaryColor, letterSpacing: "-.5px" }}>INVOICE</div>
                   <div className="inv-id" style={{ fontSize: "11px", fontWeight: "700", color: "#0f1c2e", marginTop: "4px" }}>#{inv.invoiceNo}</div>
+                  <div className="inv-type" style={{ display: "inline-flex", alignItems: "center", padding: "2px 9px", borderRadius: "20px", fontSize: "9px", fontWeight: "700", marginTop: "4px", background: currentT.primaryColor, color: "#fff" }}>
+                    {inv.invoiceType === "Custom" ? (inv.customInvoiceType || "Custom") : (inv.invoiceType || "Milestone")}
+                  </div>
                   <div className="inv-dates" style={{ fontSize: "9px", color: "#64748b", marginTop: "2px", lineHeight: "1.6" }}>
                     <span>Issue: {inv.date ? new Date(inv.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</span><br />
                     <span>Due: {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</span>

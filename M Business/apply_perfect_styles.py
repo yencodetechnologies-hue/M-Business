@@ -62,7 +62,7 @@ old_clear = """  const clearForm = () => {
     setInv({ ...blank, invoiceNo: generateInvoiceNo() });
     setItems([{ id: 1, description: "", quantity: 1, rate: "" }]);
     setErrors({});
-    setEditingId(null);
+    setEditingId(ed._id || newInvoicePrefill.editData?._id || null);
   };"""
 
 new_clear = """  const clearForm = () => {
@@ -72,7 +72,7 @@ new_clear = """  const clearForm = () => {
       { id: 2, description: "Frontend Development", quantity: 1, rate: "30000" }
     ]);
     setErrors({});
-    setEditingId(null);
+    setEditingId(ed._id || newInvoicePrefill.editData?._id || null);
   };"""
 
 code = code.replace(old_clear, new_clear)

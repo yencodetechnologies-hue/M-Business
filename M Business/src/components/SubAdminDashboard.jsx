@@ -6795,6 +6795,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [_navPending, startNavTransition] = useTransition();
 
   const [fromEditProject, setFromEditProject] = useState(false);
+  const [projectDetailsReadOnly, setProjectDetailsReadOnly] = useState(false);
   const [activeClientIdForReturn, setActiveClientIdForReturn] = useState(null);
 
   const [jumpInvoice, setJumpInvoice] = useState(null);
@@ -9921,7 +9922,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                   {formatCurrency(p.budget, p.currency)} budget
                                 </div>
                                 <button
-                                  onClick={(e) => { e.stopPropagation(); setJumpProject(p); setActive("project-details"); }}
+                                  onClick={(e) => { e.stopPropagation(); setJumpProject(p); setProjectDetailsReadOnly(true); setActive("project-details"); }}
                                   style={{ marginTop: 4, background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 10, padding: "10px", fontSize: 12.5, fontWeight: 800, cursor: "pointer" }}
                                 >
                                   Open Project
@@ -11083,6 +11084,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   setJumpProject(saved);
                   setFromEditProject(false);
+                  setProjectDetailsReadOnly(false);
                   setActive("project-details");
 
                 }}
@@ -11128,6 +11130,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   setSidebarOverride(null);
 
                   setJumpProject(merged);
+
+                  setProjectDetailsReadOnly(false);
 
                   setActive("project-details");
 
@@ -11189,7 +11193,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 }}
 
-                hideTopActions={true}
+                hideTopActions={projectDetailsReadOnly}
 
                 onBack={() => {
                   setFromEditProject(false);
@@ -11272,7 +11276,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               setActive("clients");
             }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || accentColor} />}
 
-            {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
+            {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setProjectDetailsReadOnly(true); setActive("project-details"); }} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 
@@ -11375,6 +11379,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 startNavTransition(() => {
 
                   setJumpProject(proj);
+
+                  setProjectDetailsReadOnly(true);
 
                   setActive("project-details");
 

@@ -210,6 +210,138 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   const [milestones, setMilestones] = useState(() => normalizeMilestones(editProject?.milestones));
   const [customMilestoneOptions, setCustomMilestoneOptions] = useState(() => MILESTONE_OPTIONS);
 
+  // ── UPDATES (Edit Project only) ──
+  const [projectUpdates, setProjectUpdates] = useState(() => editProject?.updates || []);
+  const [editingUpdateIdx, setEditingUpdateIdx] = useState(null);
+  const [editUpdateTitle, setEditUpdateTitle] = useState('');
+  const [editUpdateText, setEditUpdateText] = useState('');
+  const [savingUpdateIdx, setSavingUpdateIdx] = useState(null);
+  const [deletingUpdateIdx, setDeletingUpdateIdx] = useState(null);
+
+  const persistUpdates = async (newUpdates) => {
+    if (!editProject?._id) return;
+    await axios.put(`${BASE_URL}/api/projects/${editProject._id}`, { updates: newUpdates });
+  };
+
+  const startEditUpdate = (idx) => {
+    const u = projectUpdates[idx];
+    setEditingUpdateIdx(idx);
+    setEditUpdateTitle(u.title || '');
+    setEditUpdateText(u.text || '');
+  };
+
+  const cancelEditUpdate = () => setEditingUpdateIdx(null);
+
+  const saveEditUpdate = async (idx) => {
+    if (!editUpdateText.trim()) { alert('Update text cannot be empty.'); return; }
+    setSavingUpdateIdx(idx);
+    try {
+      const newUpdates = projectUpdates.map((u, i) =>
+        i === idx ? { ...u, title: editUpdateTitle.trim(), text: editUpdateText.trim() } : u
+      );
+      await persistUpdates(newUpdates);
+      setProjectUpdates(newUpdates);
+      setEditingUpdateIdx(null);
+    } catch (err) {
+      console.error('Failed to update:', err);
+      alert('Failed to save update.');
+    } finally {
+      setSavingUpdateIdx(null);
+    }
+  };
+
+  const deleteUpdate = async (idx) => {
+    if (!confirm('Delete this update?')) return;
+    setDeletingUpdateIdx(idx);
+    try {
+      const newUpdates = projectUpdates.filter((_, i) => i !== idx);
+      await persistUpdates(newUpdates);
+      setProjectUpdates(newUpdates);
+    } catch (err) {
+      console.error('Failed to delete update:', err);
+      alert('Failed to delete update.');
+    } finally {
+      setDeletingUpdateIdx(null);
+    }
+  };
+
+  // ── TASKS (Edit Project only) ──
+  const [projectTasks, setProjectTasks] = useState([]);
+  const [tasksLoading, setTasksLoading] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editTaskTitle, setEditTaskTitle] = useState('');
+  const [editTaskStatus, setEditTaskStatus] = useState('');
+  const [editTaskPriority, setEditTaskPriority] = useState('');
+  const [editTaskDue, setEditTaskDue] = useState('');
+  const [savingTaskId, setSavingTaskId] = useState(null);
+  const [deletingTaskId, setDeletingTaskId] = useState(null);
+
+  useEffect(() => {
+    if (!editProject?._id) return;
+    setTasksLoading(true);
+    axios.get(`${BASE_URL}/api/tasks`, { headers: { 'x-company-id': editProject.companyId || '' } })
+      .then(res => {
+        const all = Array.isArray(res.data) ? res.data : [];
+        const pid = String(editProject._id);
+        const filtered = all.filter(t => {
+          if (!t || t.isDeleted) return false;
+          const tPid = t.projectId ? (t.projectId._id ? String(t.projectId._id) : String(t.projectId)) : null;
+          return tPid === pid || t.project === editProject.name;
+        });
+        setProjectTasks(filtered);
+      })
+      .catch(err => console.error('Failed to load project tasks:', err))
+      .finally(() => setTasksLoading(false));
+  }, [editProject?._id]);
+
+  const startEditTask = (t) => {
+    setEditingTaskId(t._id);
+    setEditTaskTitle(t.title || '');
+    setEditTaskStatus(t.status || 'Not Started');
+    setEditTaskPriority(t.priority || 'medium');
+    setEditTaskDue(t.date ? String(t.date).split('T')[0] : '');
+  };
+
+  const cancelEditTask = () => setEditingTaskId(null);
+
+  const saveEditTask = async (taskId) => {
+    if (!editTaskTitle.trim()) { alert('Task title is required.'); return; }
+    setSavingTaskId(taskId);
+    try {
+      await axios.put(`${BASE_URL}/api/tasks/${taskId}`, {
+        title: editTaskTitle.trim(),
+        status: editTaskStatus,
+        priority: editTaskPriority,
+        date: editTaskDue,
+      });
+      setProjectTasks(prev => prev.map(t => t._id === taskId
+        ? { ...t, title: editTaskTitle.trim(), status: editTaskStatus, priority: editTaskPriority, date: editTaskDue }
+        : t));
+      setEditingTaskId(null);
+    } catch (err) {
+      console.error('Failed to update task:', err);
+      alert('Failed to update task.');
+    } finally {
+      setSavingTaskId(null);
+    }
+  };
+
+  const deleteTask = async (taskId) => {
+    if (!confirm('Delete this task?')) return;
+    setDeletingTaskId(taskId);
+    try {
+      await axios.delete(`${BASE_URL}/api/tasks/${taskId}`).catch(() =>
+        axios.put(`${BASE_URL}/api/tasks/${taskId}`, { isDeleted: true })
+      );
+      setProjectTasks(prev => prev.filter(t => t._id !== taskId));
+    } catch (err) {
+      console.error('Failed to delete task:', err);
+      alert('Failed to delete task.');
+    } finally {
+      setDeletingTaskId(null);
+    }
+  };
+
   const [showAddEmployee, setShowAddEmployee] = useState(false);
   const [selectedEmpsToAdd, setSelectedEmpsToAdd] = useState([]);
   const [showQuickAddEmployee, setShowQuickAddEmployee] = useState(false);
@@ -863,6 +995,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
               <i className="ti ti-plus" /> {editProject ? 'Edit Milestones' : 'Add Milestone'}
             </button>
           </div>
+
 
           {/* SECTION 6: CLIENT PORTAL */}
           <div className="mpc-section-card" id="sec4">

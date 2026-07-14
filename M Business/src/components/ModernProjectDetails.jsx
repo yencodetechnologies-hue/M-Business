@@ -154,7 +154,8 @@ const CSS = `
 .mpd-uc-body.mpd-open { display:block; animation:fadeIn .2s ease; }
 
 /* GRID LAYOUT */
-.mpd-grid-main-side { display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:stretch; }
+.mpd-grid-main-side { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:22px; align-items:stretch; }
+.mpd-grid-main-side > * { min-width:0; }
 @media (max-width: 900px) { .mpd-grid-main-side { grid-template-columns:1fr; } }
 
 /* TASKS LIST */
@@ -337,7 +338,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       const saved = localStorage.getItem('project_tabs_order');
       if (saved) return JSON.parse(saved);
     } catch (e) { }
-    return ['updates', 'activity', 'payments'];
+    return ['updates', 'activity', 'accounts'];
   });
 
   useEffect(() => {
@@ -502,25 +503,66 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   // 👇 ADD THE NEW FUNCTION HERE 👇
   const handleDeleteInvoice = async (inv) => {
-    console.log('Deleting invoice:', inv);
     if (!confirm('Delete this invoice?')) return;
+    if (!inv._globalId) { alert('This invoice cannot be found on the server.'); return; }
     try {
-      if (inv._source === 'global' && inv._globalId) {
-        await axios.delete(`${BASE_URL}/api/invoices/${inv._globalId}`);
-        setProjectInvoices(prev => prev.filter(g => g.id !== inv._globalId));
-      } else {
-        const index = (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo);
-        if (index === -1) return;
-        const updatedList = (currProject.invoices || []).filter((_, i) => i !== index);
-        setCurrProject(prev => ({ ...prev, invoices: updatedList }));
-        await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { invoices: updatedList });
-      }
+      await axios.delete(`${BASE_URL}/api/invoices/${inv._globalId}`);
+      setProjectInvoices(prev => prev.filter(g => g.id !== inv._globalId));
+      fetchProjectInvoices();
       loadLatest();
     } catch (err) {
       alert('Failed to delete invoice.');
     }
   };
   // 👆 END OF NEW FUNCTION 👆
+
+  // ── Share a single invoice directly with its client's portal ──────────
+  const [sharingInvoiceNo, setSharingInvoiceNo] = useState(null);
+  const handleShareToClient = async (inv) => {
+    const invNo = inv.invoiceNo;
+    if (!invNo) { alert('This invoice has no invoice number and cannot be shared.'); return; }
+    setSharingInvoiceNo(invNo);
+    try {
+      if (inv._source === 'global' && inv._globalId) {
+        // Already a full invoice document — just flip its status to "sent"
+        // so it becomes visible to the client (and keeps its existing clientId).
+        await axios.patch(`${BASE_URL}/api/invoices/${inv._globalId}/status`, { status: 'sent' });
+      } else {
+        // Project-local invoice — push it into the global Invoice collection
+        // (upserted by invoiceNo) with the resolved clientId so it shows up
+        // in Client Portal → Invoices.
+        const payload = {
+          inv: {
+            invoiceNo: invNo,
+            client: currProject.client || currProject.clientName || inv.clientName || '',
+            project: currProject.name || '',
+            date: inv.issueDate || inv.date || new Date().toISOString().split('T')[0],
+            dueDate: inv.dueDate || '',
+            notes: inv.notes || '',
+            gstRate: inv.taxPercent ?? (inv.items?.[0]?.gstRate ?? 18),
+            isGstIncluded: inv.taxType === 'inclusive',
+            signature: inv.signature || '',
+            signatureType: inv.signatureType || 'text',
+            currency: currProject.currency || 'INR',
+            clientId: resolvedClientId,
+          },
+          items: (inv.items && inv.items.length)
+            ? inv.items
+            : [{ description: inv.description || 'Invoice', quantity: 1, rate: inv.amount || 0, gstRate: inv.taxPercent || 0, isGstIncluded: inv.taxType === 'inclusive' }],
+          status: 'sent',
+        };
+        await axios.post(`${BASE_URL}/api/invoices`, payload);
+      }
+      alert(`Invoice ${invNo} has been shared with the client.`);
+      fetchProjectInvoices();
+      loadLatest();
+    } catch (err) {
+      console.error('Share to client failed:', err);
+      alert('Failed to share invoice with client.');
+    } finally {
+      setSharingInvoiceNo(null);
+    }
+  };
 
   const handleSendSelectedToPortal = async (targetClient) => {
     if (selectedPaymentItems.length === 0) return;
@@ -676,26 +718,27 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   // Merge the simple project.invoices array with the rich global Invoices
   // (created via the full InvoiceCreator form) so both show up in this list.
   const mergedInvoices = React.useMemo(() => {
-    const local = (currProject?.invoices || []).map(inv => ({ ...inv, _source: 'local' }));
-    const globalOnly = (projectInvoices || [])
-      .filter(g => !local.some(l => l.invoiceNo === g.invoiceNo))
-      .map(g => ({
-        invoiceNo: g.invoiceNo,
-        description: (g.inv && g.inv.notes) || currProject?.name || 'Invoice',
-        amount: g.total || 0,
-        taxType: 'inclusive',
-        taxPercent: 0,
-        issueDate: g.date || g.inv?.date || '',
-        dueDate: g.inv?.dueDate || g.dueDate || '',
-        status: g.status,
-        _source: 'global',
-        _globalId: g.id,
-        category: g.inv?.category || 'General',
-        projectName: g.inv?.project || g.project,
-        clientName: g.inv?.clientName || g.inv?.client || g.client
-      }));
-    return [...local, ...globalOnly];
-  }, [currProject?.invoices, projectInvoices]);
+    // Only the real backend invoices (same collection Sidebar → Invoices uses).
+    // Legacy project-local records are no longer created; any pre-existing
+    // ones are dropped from view so behavior matches Sidebar exactly.
+    return (projectInvoices || []).map(g => ({
+      invoiceNo: g.invoiceNo,
+      description: (g.inv && g.inv.notes) || currProject?.name || 'Invoice',
+      amount: g.total || 0,
+      taxType: g.inv?.isGstIncluded ? 'inclusive' : 'exclusive',
+      taxPercent: g.inv?.gstRate ?? 0,
+      issueDate: g.date || g.inv?.date || '',
+      dueDate: g.inv?.dueDate || g.dueDate || '',
+      status: g.status,
+      _source: 'global',
+      _globalId: g.id,
+      category: g.inv?.category || 'General',
+      projectName: g.inv?.project || g.project,
+      clientName: g.inv?.clientName || g.inv?.client || g.client,
+      inv: g.inv,
+      items: g.items,
+    }));
+  }, [projectInvoices, currProject?.name]);
 
   if (!currProject) return null;
   // Derived Project Data
@@ -2171,7 +2214,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 let lbl = '', icon = null;
                 if (tab === 'updates') lbl = 'Updates';
                 if (tab === 'activity') lbl = 'Activity Logs';
-                if (tab === 'payments') { lbl = 'Payments'; icon = 'ti-arrows-exchange'; }
+                if (tab === 'payments') { lbl = 'Accounts'; icon = 'ti-arrows-exchange'; }
                 return (
                   <button
                     key={tab}
@@ -2661,7 +2704,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         return [
                           { lbl: 'Total Invoiced', val: `${currency}${liveBilled.toLocaleString()}`, sub: `${mergedInvoices.length} invoice(s)`, color: '#3B82F6', icon: 'ti-file-invoice' },
                           { lbl: 'Received', val: `${currency}${liveReceived.toLocaleString()}`, sub: `${liveBilled > 0 ? Math.round((liveReceived / liveBilled) * 100) : 0}% collected`, color: '#22C55E', icon: 'ti-circle-check' },
-                        
+
                           { lbl: 'Outstanding', val: `${currency}${livePending.toLocaleString()}`, sub: 'Balance due', color: '#EF4444', icon: 'ti-alert-circle' },
                         ];
                       })().map(s => (
@@ -2766,8 +2809,15 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   <td style={{ padding: '12px 14px' }} onClick={(e) => e.stopPropagation()}>
                                     <div style={{ display: 'flex', gap: 4 }}>
                                       <button onClick={() => onViewInvoice ? onViewInvoice(currProject, inv, i) : setPreviewInvoice(inv)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-eye"></i></button>
-                                      <button onClick={() => { if (onNewInvoice) { onNewInvoice(currProject, inv, i); } else { setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: i })); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
-                                      <button style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-send"></i></button>
+                                      <button onClick={() => { if (onNewInvoice) { onNewInvoice(currProject, inv); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+                                      <button
+                                        title="Share to Client"
+                                        disabled={sharingInvoiceNo === inv.invoiceNo}
+                                        onClick={() => handleShareToClient(inv)}
+                                        style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: sharingInvoiceNo === inv.invoiceNo ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: sharingInvoiceNo === inv.invoiceNo ? '#CBD5E1' : '#0EA5E9' }}
+                                      >
+                                        <i className={sharingInvoiceNo === inv.invoiceNo ? "ti ti-loader-2" : "ti ti-send"}></i>
+                                      </button>
                                       <button onClick={() => handleDeleteInvoice(inv)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
                                     </div>
                                   </td>

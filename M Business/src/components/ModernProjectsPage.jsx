@@ -371,14 +371,17 @@ export default function ModernProjectsPage({ user }) {
               onLogTime={(e) => openLogTime(selectedProject, e)}
               onNewInvoice={(proj, existingInv, index) => {
                 if (existingInv) {
-                  // Edit invoice — build the shape InvoiceCreator expects
+                  // Edit invoice — always go through the global invoice record
+                  // (same one Sidebar → Invoices uses) so Edit/Save behave identically.
                   setInvoicePrefill({
                     client: proj.client || '',
                     project: proj.name || '',
                     _t: Date.now(),
-                    editData: existingInv,
-                    projectId: proj._id,
-                    editIndex: index,
+                    editData: {
+                      ...(existingInv.inv || existingInv),
+                      _id: existingInv._globalId || existingInv._id || existingInv.id,
+                      items: existingInv.items || existingInv.inv?.items,
+                    },
                   });
                 } else {
                   // New invoice
@@ -387,8 +390,13 @@ export default function ModernProjectsPage({ user }) {
                 setJumpInvoice(null);
                 setShowInvoiceCreator(true);
               }}
-          onViewInvoice={(proj, inv) => {
-                setJumpInvoice(inv);
+              onViewInvoice={(proj, inv) => {
+                // Always pull the freshest copy of this invoice from the current
+                // project data, so a just-saved signature is reflected in View.
+                const freshProj = projects.find(p => p._id === proj._id) || proj;
+                const freshInv =
+                  (freshProj.invoices || []).find(i => i.invoiceNo === inv.invoiceNo) || inv;
+                setJumpInvoice({ ...freshInv, _t: Date.now() });
                 setShowInvoiceCreator(true);
               }} />
           </div>

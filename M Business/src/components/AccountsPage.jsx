@@ -827,7 +827,7 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
       {/* PAGE HEADER */}
       <div className="page-header">
         <div>
-          <div className="page-title">Payments</div>
+          <div className="page-title">Accounts</div>
           <div className="page-sub">Track all incoming and outgoing payments</div>
         </div>
         <div className="header-actions">

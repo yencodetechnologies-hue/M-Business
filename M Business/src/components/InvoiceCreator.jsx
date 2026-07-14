@@ -367,7 +367,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       setStep("preview");
       setInternalNav(false);
     }
-  }, [jumpInvoice]);
+  }, [jumpInvoice?._t, jumpInvoice?.invoiceNo, jumpInvoice?.signature]);
 
   useEffect(() => {
     if (newInvoicePrefill) {
@@ -404,12 +404,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         });
         const lineItems = ed.items || ed.lineItems;
         setItems(lineItems && lineItems.length > 0 ? lineItems.map((it, i) => ({ ...it, id: it.id || i + 1 })) : [{ id: 1, description: ed.description || '', quantity: 1, rate: ed.amount || '' }]);
-        setEditingId(ed._id || newInvoicePrefill.editData?._id || null);
-        setLocalEditTarget(
-          newInvoicePrefill.projectId && newInvoicePrefill.editIndex != null
-            ? { projectId: newInvoicePrefill.projectId, index: newInvoicePrefill.editIndex }
-            : null
-        );
+        setEditingId(ed._id || null);
+        setLocalEditTarget(null);
         setErrors({});
         setStep("form");
         setInternalNav(false);
@@ -753,13 +749,6 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const handleSaveDraft = async () => {
     if (!validate()) return;
     setSaving("draft");
-    if (localEditTarget && onSaveLocalInvoice) {
-      await onSaveLocalInvoice(localEditTarget.projectId, localEditTarget.index, buildLocalInvoiceRecord());
-      setSaving(false);
-      showToast("Save Invoice updated!");
-      setTimeout(() => { if (onBack) onBack(); }, 800);
-      return;
-    }
     const data = await apiSave("draft");
     saveDraftLocal(inv, items, "draft");
     if (data.success && data.invoice?._id) setEditingId(data.invoice._id);
@@ -776,13 +765,6 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const handleSavePreview = async () => {
     if (!validate()) return;
     setSaving("preview");
-    if (localEditTarget && onSaveLocalInvoice) {
-      await onSaveLocalInvoice(localEditTarget.projectId, localEditTarget.index, buildLocalInvoiceRecord());
-      setSaving(false);
-      setStep("preview");
-      window.scrollTo(0, 0);
-      return;
-    }
     const data = await apiSave("draft");
     saveDraftLocal(inv, items, "draft");
     if (data.success && data.invoice?._id) setEditingId(data.invoice._id);

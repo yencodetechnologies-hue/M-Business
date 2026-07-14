@@ -250,7 +250,12 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
   }, [step]);
 
   const addItem = () => setItems((p) => [...p, { id: Date.now(), description: "", quantity: 1, rate: "" }]);
-  const removeItem = (id) => { if (items.length > 1) setItems((p) => p.filter((i) => i.id !== id)); };
+  const removeItem = (id) => {
+    setItems((p) => {
+      if (p.length > 1) return p.filter((i) => i.id !== id);
+      return [{ id: 1, description: "", quantity: 1, rate: "" }];
+    });
+  };
   const updItem = (id, f, v) => {
     setItems((p) => p.map((i) => (i.id === id ? { ...i, [f]: v } : i)));
     setErrors((prev) => { const n = { ...prev }; delete n[`item_${id}_${f}`]; return n; });

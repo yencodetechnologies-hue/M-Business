@@ -405,7 +405,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         const lineItems = ed.items || ed.lineItems;
         setItems(lineItems && lineItems.length > 0 ? lineItems.map((it, i) => ({ ...it, id: it.id || i + 1 })) : [{ id: 1, description: ed.description || '', quantity: 1, rate: ed.amount || '' }]);
         setEditingId(ed._id || null);
-        setLocalEditTarget(null);
+        setLocalEditTarget(newInvoicePrefill.projectId ? { projectId: newInvoicePrefill.projectId, index: newInvoicePrefill.editIndex } : null);
         setErrors({});
         setStep("form");
         setInternalNav(false);
@@ -414,7 +414,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         setInv({ ...blank, invoiceNo: generateInvoiceNo(), client: newInvoicePrefill.client || "", project: newInvoicePrefill.project || "" });
         setItems([{ id: 1, description: "", quantity: 1, rate: "" }]);
         setEditingId(null);
-        setLocalEditTarget(null);
+        setLocalEditTarget(newInvoicePrefill.projectId ? { projectId: newInvoicePrefill.projectId, index: null } : null);
         setErrors({});
         setStep("form");
         setInternalNav(false);
@@ -633,7 +633,12 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
   // ── Items ---------------------------------------------------
   const addItem = () => setItems((p) => [...p, { id: Date.now(), description: "", quantity: 1, rate: "" }]);
-  const removeItem = (id) => { if (items.length > 1) setItems((p) => p.filter((i) => i.id !== id)); };
+  const removeItem = (id) => {
+    setItems((p) => {
+      if (p.length > 1) return p.filter((i) => i.id !== id);
+      return [{ id: 1, description: "", quantity: 1, rate: "" }];
+    });
+  };
   const updItem = (id, f, v) => {
     setItems((p) => p.map((i) => (i.id === id ? { ...i, [f]: v } : i)));
     setErrors((prev) => { const n = { ...prev }; delete n[`item_${id}_${f}`]; return n; });
@@ -713,15 +718,16 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   // ── API save ------------------------------------------------
   const apiSave = async (status = "draft") => {
     try {
-      if (editingId) {
-        const newStatus = inv.status || status;
-        const res = await axios.put(`${BASE_URL}/api/invoices/${editingId}`, { inv, items, status: newStatus });
-        return res.data;
-      } else {
-        const newStatus = inv.status || status;
-        const res = await axios.post(`${BASE_URL}/api/invoices`, { inv, items, status: newStatus });
-        return res.data;
+      const newStatus = inv.status || status;
+      const res = editingId
+        ? await axios.put(`${BASE_URL}/api/invoices/${editingId}`, { inv, items, status: newStatus })
+        : await axios.post(`${BASE_URL}/api/invoices`, { inv, items, status: newStatus });
+
+      // Keep the project's own invoice list in sync (Projects → Accounts view)
+      if (localEditTarget && localEditTarget.projectId && onSaveLocalInvoice) {
+        await onSaveLocalInvoice(localEditTarget.projectId, localEditTarget.index, buildLocalInvoiceRecord());
       }
+      return res.data;
     } catch {
       return { success: false };
     }
@@ -2181,7 +2187,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                           {formatCurrency(lineTotal, inv.currency, false, false, inv.customCurrencySymbol)}
                         </td>
                         <td>
-                          <button className="inv-creator-del-row-btn" onClick={() => removeItem(item.id)} disabled={items.length === 1}><i className="ti ti-trash"></i></button>
+                          <button className="inv-creator-del-row-btn" onClick={() => removeItem(item.id)}><i className="ti ti-trash"></i></button>
                         </td>
                       </tr>
                     );

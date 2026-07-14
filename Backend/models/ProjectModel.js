@@ -81,9 +81,15 @@ const projectSchema = new mongoose.Schema({
       issueDate: { type: String, default: "" },
       dueDate: { type: String, default: "" },
       taxPercent: { type: Number, default: 0 },
+      taxType: { type: String, default: "exclusive" },
       status: { type: String, default: "Draft" },
       notes: { type: String, default: "" },
       notifyClient: { type: Boolean, default: false },
+      signature: { type: String, default: "" },
+      signatureType: { type: String, default: "text" },
+      invoiceType: { type: String, default: "Milestone" },
+      customInvoiceType: { type: String, default: "" },
+      items: { type: mongoose.Schema.Types.Mixed, default: [] },
       createdAt: { type: Date, default: Date.now }
     }],
     default: []

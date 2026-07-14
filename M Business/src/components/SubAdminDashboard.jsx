@@ -1290,7 +1290,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
           {c.logoUrl ? <img src={c.logoUrl} alt="" style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "contain", background: "#fff" }} /> : getAvatar(c)}
 
-          <div style={{ position: "absolute", bottom: 1, right: 1, width: 10, height: 10, borderRadius: "50%", background: st.dot, border: "1.5px solid #fff" }} />
+
 
         </div>
 
@@ -1306,7 +1306,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
 
-          <div style={{ width: 8, height: 8, borderRadius: "50%", background: st.dot }} />
+
 
         </div>
 
@@ -2151,7 +2151,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                   {activeClient.logoUrl ? <img src={activeClient.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : getAvatar(activeClient)}
 
-                  <div style={{ position: "absolute", bottom: 2, right: 2, width: 16, height: 16, borderRadius: "50%", background: st.dot, border: "2px solid #fff" }} />
+
 
                 </div>
 
@@ -2166,13 +2166,8 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                     <div style={{ position: "relative" }} ref={statusDropRef}>
 
                       <button onClick={() => setStatusDropOpen(v => !v)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 11px 5px 9px", background: st.bg, border: `1.5px solid ${st.dot}`, borderRadius: 20, fontSize: 11, fontWeight: 800, color: st.color, cursor: "pointer", fontFamily: "inherit" }}>
-
-                        <span style={{ width: 7, height: 7, borderRadius: "50%", background: st.dot, display: "inline-block" }} />
-
                         {st.label}
-
                         <i className="ti ti-chevron-down" style={{ fontSize: 11, opacity: .7 }} />
-
                       </button>
 
                       {statusDropOpen && (
@@ -2191,7 +2186,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                               <div key={s} onClick={() => updateStatus(activeClient, s)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", fontSize: 12, fontWeight: 700, color: sc.color, background: isCurrentStatus ? sc.bg : "transparent", transition: "background .12s" }} onMouseEnter={e => e.currentTarget.style.background = sc.bg} onMouseLeave={e => e.currentTarget.style.background = isCurrentStatus ? sc.bg : "transparent"}>
 
-                                <span style={{ width: 9, height: 9, borderRadius: "50%", background: sc.dot, display: "inline-block" }} />
+
 
                                 <span style={{ flex: 1 }}>{s}</span>
 

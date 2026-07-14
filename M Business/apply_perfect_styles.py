@@ -332,7 +332,7 @@ prefixed_left_panel = """        {/* Left Panel: Scrollable form cards */}
                           {formatCurrency(lineTotal, inv.currency)}
                         </td>
                         <td>
-                          <button className="inv-creator-del-row-btn" onClick={() => removeItem(item.id)} disabled={items.length === 1}><i className="ti ti-trash"></i></button>
+                          <button className="inv-creator-del-row-btn" onClick={() => removeItem(item.id)}><i className="ti ti-trash"></i></button>
                         </td>
                       </tr>
                     );

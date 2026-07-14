@@ -240,6 +240,11 @@ export default function InvoiceViewer() {
         @media print {
           @page { size: A4 portrait; margin: 12mm 14mm; }
           html, body { margin: 0 !important; padding: 0 !important; background: white !important; }
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+          }
           .no-print, .no-print * { display: none !important; }
           .print-wrapper { background: white !important; padding: 0 !important; min-height: 0 !important; }
           .inv-paper { box-shadow: none !important; border-radius: 0 !important; max-width: 100% !important; width: 100% !important; min-height: 270mm !important; margin: 0 auto !important; position: relative !important; page-break-after: always; }

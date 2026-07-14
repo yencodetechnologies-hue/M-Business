@@ -1184,11 +1184,21 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
   const doDelete = async () => {
 
-    try { await axios.delete(`${BASE_URL}/api/clients/${deleteTarget._id}`); } catch { }
+    const deletedClientId = deleteTarget._id;
+    const deletedClientName = deleteTarget.clientName || deleteTarget.name;
 
-    setClients(prev => prev.filter(c => c._id !== deleteTarget._id));
+    try { await axios.delete(`${BASE_URL}/api/clients/${deletedClientId}`); } catch { }
 
-    if (activeClientId === deleteTarget._id) setActiveClientId(null);
+    setClients(prev => prev.filter(c => c._id !== deletedClientId));
+
+    setProjects(prev => prev.filter(p => {
+      const belongsToDeletedClient =
+        p.clientId === deletedClientId ||
+        (p.clientName || p.client || "") === deletedClientName;
+      return !belongsToDeletedClient;
+    }));
+
+    if (activeClientId === deletedClientId) setActiveClientId(null);
 
     setDeleteTarget(null);
 
@@ -6821,6 +6831,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
 
+  const [isDesktopWidth, setIsDesktopWidth] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 769);
+
+  useEffect(() => {
+    const onResize = () => setIsDesktopWidth(window.innerWidth >= 769);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
   const [companyLogo, setCompanyLogo] = useState(user?.logoUrl ? user.logoUrl : (fixedLogo || null));
 
   const [cropImage, setCropImage] = useState(null);
@@ -6846,6 +6864,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [showColorPicker, setShowColorPicker] = useState(false);
 
   const [returnToModal, setReturnToModal] = useState(null);
+  const [addClientFromInvoice, setAddClientFromInvoice] = useState(false);
+  const [pendingInvoiceClientName, setPendingInvoiceClientName] = useState(null);
+
 
   const [limitModal, setLimitModal] = useState(null); // { type, limit }
 
@@ -8594,11 +8615,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       setClients(prev => [res.data.client, ...prev]);
 
+      if (addClientFromInvoice) {
+        setPendingInvoiceClientName(res.data.client.clientName || res.data.client.name || nc.name);
+      }
+
       // Store credentials for the success screen
 
-      setClientSuccessData({ email: nc.email, password: nc.password, name: nc.name });
-
-      const todayStr = new Date().toISOString().split("T")[0];
+      setClientSuccessData({ email: nc.email, password: nc.password, name: nc.name }); const todayStr = new Date().toISOString().split("T")[0];
 
       setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", logoUrl: "", gstNumber: "", contactPersonName: "", contactPersonNo: "", category: "", clientType: "b2b", source: "", onboardedOn: todayStr, city: "", state: "", pincode: "", country: "India", website: "", linkedin: "", billingCurrency: "INR — Indian Rupee", paymentTerms: "", creditLimit: "", preferredPaymentMode: "", notes: "", designation: "", altEmail: "" });
 
@@ -11413,7 +11436,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={sidebarOverride ? () => { setSidebarOverride(null); setActive(prevActiveBeforeInvoice || "dashboard"); } : undefined} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill} onAddClient={() => {
+            {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={sidebarOverride ? () => { setSidebarOverride(null); setActive(prevActiveBeforeInvoice || "dashboard"); } : undefined} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 
@@ -11425,11 +11448,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
               }
 
+              setAddClientFromInvoice(true);
               setReturnToModal(modal); setModal("client");
 
-            }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
-
-            {validActive === "quotations" && <QuotationCreatorModern user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => {
+            }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}  {validActive === "quotations" && <QuotationCreatorModern user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 
@@ -12022,9 +12044,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             {/* ── Add Client Modal ── */}
 
             {limitModal && <LimitReachedModal type={limitModal.type} limit={limitModal.limit} onClose={() => setLimitModal(null)} onUpgrade={() => { setLimitModal(null); setForceUpgradeTab(true); setActive("mysubscriptions"); }} />}
-
-            {modal === "client" && <Mdl title={clientSuccessData ? "Yes Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); }} maxWidth={clientSuccessData ? 460 : 780}>
-
+            {modal === "client" && <Mdl title={clientSuccessData ? "Yes Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); setAddClientFromInvoice(false); }} maxWidth={clientSuccessData ? 460 : 780}>
               {clientSuccessData ? (
 
                 <div style={{ textAlign: "center", padding: "5px 0" }}>

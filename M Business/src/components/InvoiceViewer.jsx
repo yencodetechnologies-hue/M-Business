@@ -91,7 +91,7 @@ export default function InvoiceViewer() {
         gstAmt = subtotal * (inv.gstRate / 100);
         total = subtotal + gstAmt;
       }
-      const discountAmt = inv.discountType === "Fixed Amount"
+      const discountAmt = inv.discountType === "Custom"
         ? (Number(inv.discountPct) || 0)
         : (subtotal * (Number(inv.discountPct) || 0) / 100);
       total = total - discountAmt + (Number(inv.extraCharges) || 0);
@@ -397,15 +397,17 @@ export default function InvoiceViewer() {
                     <div style={{ width: "min(280px,100%)" }}>
                       {[
                         ["Subtotal", formatCurrency(subtotal, inv.currency)],
-                        ...(discountAmt > 0 ? [[`Discount${inv.discountType === "Custom" && inv.customDiscountType ? ` (${inv.customDiscountType})` : inv.discountType === "Fixed Amount" ? " (Fixed)" : " (%)"}`, "- " + formatCurrency(discountAmt, inv.currency)]] : []),
-                        [`GST (${inv.gstRate}%)${inv.isGstIncluded ? " (Incl.)" : ""}`, formatCurrency(gstAmt, inv.currency)],
-                        ["Total Amount", formatCurrency(total, inv.currency)],
-                        ["Amount Paid", formatCurrency(finalPaid, inv.currency)]
+                        const discountAmt = inv.discountType === "Custom"
+                      ? (Number(inv.discountPct) || 0)
+        : (subtotal * ...(discountAmt > 0 ? [[`Discount${inv.discountType === "Custom" && inv.customDiscountType ? ` (${inv.customDiscountType})` : inv.discountType === "Custom" ? "" : " (%)"}`, "- " + formatCurrency(discountAmt, inv.currency)]] : []),(Number(inv.discountPct) || 0) / 100);
+                      [`GST (${inv.gstRate}%)${inv.isGstIncluded ? " (Incl.)" : ""}`, formatCurrency(gstAmt, inv.currency)],
+                      ["Total Amount", formatCurrency(total, inv.currency)],
+                      ["Amount Paid", formatCurrency(finalPaid, inv.currency)]
                       ].map(([l, v]) => (
-                        <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f8fafc" }}>
-                          <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
-                          <span style={{ fontSize: 12, fontWeight: 600, color: "#111827" }}>{v}</span>
-                        </div>
+                      <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f8fafc" }}>
+                        <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: "#111827" }}>{v}</span>
+                      </div>
                       ))}
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: currentT.primaryBg, borderRadius: 12, marginTop: 8, border: currentT.borderStyle || "1.5px solid #e2e8f0" }}>
                         <span style={{ fontSize: 13, fontWeight: 800, color: "#64748b" }}>BALANCE DUE</span>

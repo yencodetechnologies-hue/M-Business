@@ -356,7 +356,7 @@ router.post("/", async (req, res) => {
       })),
       subtotal,
       gstAmt,
-      total: total - (inv.discountType === "Fixed Amount" ? (parseFloat(inv.discountPct) || 0) : (subtotal * (parseFloat(inv.discountPct) || 0) / 100)) + (parseFloat(inv.extraCharges) || 0),
+      total: total - (inv.discountType === "Custom" ? (parseFloat(inv.discountPct) || 0) : (subtotal * (parseFloat(inv.discountPct) || 0) / 100)) + (parseFloat(inv.extraCharges) || 0),
       status: status || "draft",
       amountPaid: parseFloat(inv.amountPaid) || 0,
       paymentMode: inv.paymentMode || "GPay",
@@ -376,7 +376,7 @@ router.post("/", async (req, res) => {
       discountPct: parseFloat(inv.discountPct) || 0,
       discountType: inv.discountType || "Percentage",
       customDiscountType: inv.customDiscountType || "",
-      discountAmt: inv.discountType === "Fixed Amount"
+      discountAmt: inv.discountType === "Custom"
         ? (parseFloat(inv.discountPct) || 0)
         : (subtotal * (parseFloat(inv.discountPct) || 0) / 100),
       template: inv.template || "Classic",
@@ -511,7 +511,7 @@ router.put("/:id", async (req, res) => {
       })),
       subtotal,
       gstAmt,
-      total: total - (inv.discountType === "Fixed Amount" ? (parseFloat(inv.discountPct) || 0) : (subtotal * (parseFloat(inv.discountPct) || 0) / 100)) + (parseFloat(inv.extraCharges) || 0),
+      total: total - (inv.discountType === "Custom" ? (parseFloat(inv.discountPct) || 0) : (subtotal * (parseFloat(inv.discountPct) || 0) / 100)) + (parseFloat(inv.extraCharges) || 0),
       status: status || "draft",
       amountPaid: parseFloat(inv.amountPaid) || 0,
       paymentDate: inv.paymentDate || "",
@@ -529,7 +529,7 @@ router.put("/:id", async (req, res) => {
       discountPct: parseFloat(inv.discountPct) || 0,
       discountType: inv.discountType || "Percentage",
       customDiscountType: inv.customDiscountType || "",
-      discountAmt: inv.discountType === "Fixed Amount"
+      discountAmt: inv.discountType === "Custom"
         ? (parseFloat(inv.discountPct) || 0)
         : (subtotal * (parseFloat(inv.discountPct) || 0) / 100),
       template: inv.template || "Classic",

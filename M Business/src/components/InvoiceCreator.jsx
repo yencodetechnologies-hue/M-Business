@@ -623,7 +623,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   let discountAmt = 0;
   if (inv.discountPct) {
     const discVal = parseFloat(inv.discountPct) || 0;
-    if (inv.discountType === "Fixed Amount" || inv.discountType === "Custom") {
+    if (inv.discountType === "Custom") {
       discountAmt = discVal;
     } else {
       discountAmt = (subtotal * discVal) / 100;
@@ -2242,23 +2242,12 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                       onChange={(e) => upd("discountType", e.target.value)}
                     >
                       <option value="Percentage">Percentage (%)</option>
-                      <option value="Fixed Amount">Fixed Amount</option>
                       <option value="Custom">Custom</option>
                     </select>
-                    {inv.discountType === "Custom" && (
-                      <input
-                        className="inv-creator-form-input"
-                        type="text"
-                        placeholder="Enter custom discount type"
-                        value={inv.customDiscountType || ""}
-                        onChange={(e) => upd("customDiscountType", e.target.value)}
-                        style={{ marginTop: 8 }}
-                      />
-                    )}
                   </div>
                   <div className="inv-creator-form-group">
                     <label className="inv-creator-form-label">
-                      Discount {inv.discountType === "Fixed Amount" ? `(${inv.currency || ""})` : inv.discountType === "Custom" ? "" : "(%)"}
+                      Discount {inv.discountType === "Custom" ? "" : "(%)"}
                     </label>
                     <input
                       className="inv-creator-form-input"
@@ -2278,7 +2267,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                   <input className="inv-creator-form-input" type="number" value={inv.extraCharges === 0 ? "" : inv.extraCharges} onChange={(e) => upd("extraCharges", e.target.value === "" ? 0 : Number(e.target.value))} placeholder="0" />
                 </div>
                 <div className="inv-creator-total-row"><span className="inv-creator-total-label">Subtotal</span><span className="inv-creator-total-val">{formatCurrency(subtotal, inv.currency, false, false, inv.customCurrencySymbol)}</span></div>
-                <div className="inv-creator-total-row discount"><span className="inv-creator-total-label">Discount{inv.discountType === "Custom" && inv.customDiscountType ? ` (${inv.customDiscountType})` : ""}</span><span className="inv-creator-total-val">- {formatCurrency(discountAmt, inv.currency, false, false, inv.customCurrencySymbol)}</span></div>
+                <div className="inv-creator-total-row discount"><span className="inv-creator-total-label">Discount{inv.discountType === "Custom" ? " (Custom)" : " (%)"}</span><span className="inv-creator-total-val">- {formatCurrency(discountAmt, inv.currency, false, false, inv.customCurrencySymbol)}</span></div>
                 <div className="inv-creator-total-row tax"><span className="inv-creator-total-label">GST / Tax</span><span className="inv-creator-total-val">+ {formatCurrency(gstAmt, inv.currency, false, false, inv.customCurrencySymbol)}</span></div>
                 <div className="inv-creator-total-row"><span className="inv-creator-total-label">Extra Charges</span><span className="inv-creator-total-val">+ {formatCurrency(inv.extraCharges || 0, inv.currency, false, false, inv.customCurrencySymbol)}</span></div>                <div className="inv-creator-total-row grand"><span className="inv-creator-total-label">Total Amount</span><span className="inv-creator-total-val">{formatCurrency(total - discountAmt + (inv.extraCharges || 0), inv.currency, false, false, inv.customCurrencySymbol)}</span></div>
               </div>

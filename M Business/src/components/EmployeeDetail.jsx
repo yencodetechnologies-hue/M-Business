@@ -571,14 +571,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
             <div className="ed-subtitle">Employees / {empId}</div>
           </div>
         </div>
-        <div className="ed-actions">
 
-          {["active", "approved"].includes((emp.status || "").toLowerCase()) ? (
-            <button className="ed-btn danger" onClick={onDeactivate}><i className="ti ti-user-x"></i> Deactivate</button>
-          ) : (
-            <button className="ed-btn" style={{ background: "#ECFDF5", color: "#059669", border: "1px solid #A7F3D0" }} onClick={onActivate}><i className="ti ti-user-check"></i> Activate</button>
-          )}
-        </div>
       </div>
 
       {/* HERO */}
@@ -613,10 +606,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                 <span>Date Joined</span>
               </div>
             )}
-            <div className="ed-tenure">
-              {tenure}
-              <span>Tenure</span>
-            </div>
+
           </div>
         </div>
       </div>
@@ -957,21 +947,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
 
       </div>{/* END BOTTOM GRID */}
 
-      {/* DANGER ZONE */}
-      <div style={{ background: "#FFF5F5", border: "1px solid #FFE4E4", borderRadius: "10px", padding: "14px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "24px" }}>
-        <div>
-          <div style={{ color: "#DC2626", fontWeight: "800", fontSize: "13px", display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
-            <i className="ti ti-alert-triangle" style={{ fontSize: "14px" }}></i> Danger Zone
-          </div>
-          <div style={{ color: "#9CA3AF", fontSize: "12px", fontWeight: "500" }}>
-            Deactivating revokes all access. Deletion is permanent and cannot be undone.
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: "10px" }}>
-          <button className="ed-btn" style={{ background: "#FEF9EC", color: "#D97706", border: "1px solid #FDE68A", fontSize: "12px", padding: "6px 14px" }} onClick={onDeactivate}><i className="ti ti-user-x"></i> Deactivate</button>
-          <button className="ed-btn" style={{ background: "#FFF1F1", color: "#DC2626", border: "1px solid #FECACA", fontSize: "12px", padding: "6px 14px" }} onClick={onDelete}><i className="ti ti-trash"></i> Delete Employee</button>
-        </div>
-      </div>
+
       {/* ADD LEAVE MODAL */}
       {showLeaveModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(6px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}

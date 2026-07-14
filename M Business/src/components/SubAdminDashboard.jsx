@@ -1523,17 +1523,6 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
 
-      {/* Header with Add Project button */}
-
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 4 }}>
-
-        <button onClick={() => onCreateProject && onCreateProject(activeClient)} style={{ background: " var(--app-accent, var(--app-accent, #00BCD4))", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12, color: "#fff", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}>
-
-          <i className="ti ti-plus" style={{ fontSize: 13 }} /> Add Project
-
-        </button>
-
-      </div>
 
       {clientProjects.length === 0 ? (
 
@@ -2510,7 +2499,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
   const [toast, setToast] = useState("");
 
-  const [empDocs, setEmpDocs] = useState({});
+  const [empDocs, setEmpDocs] = useState([]);
 
   const [empDocsLoading, setEmpDocsLoading] = useState(false);
 
@@ -2518,31 +2507,19 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
   const loadEmpDocs = async (emp) => {
 
-    setEmpDocs({});
+    setEmpDocs([]);
 
     setEmpDocsLoading(true);
 
     try {
 
-      const r = await axios.get(`${BASE_URL}/api/employee-dashboard/documents/${encodeURIComponent(emp.name)}/all`);
+      const empId = emp._id || emp.id;
 
-      const docs = r.data?.documents || r.data || [];
+      const r = await axios.get(`${BASE_URL}/api/document-requests/employee/${empId}`);
 
-      if (Array.isArray(docs)) {
+      const docs = Array.isArray(r.data) ? r.data : (r.data?.documents || []);
 
-        const dmap = {};
-
-        docs.forEach(d => {
-
-          const key = d.docType || d.documentType || "default";
-
-          dmap[key] = d;
-
-        });
-
-        setEmpDocs(dmap);
-
-      }
+      setEmpDocs(docs.filter(d => d.fileUrl));
 
     } catch (e) { console.error(e); }
 
@@ -4335,7 +4312,6 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
   const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
 
-
   const openEdit = async (p) => {
     if (!p || (!p._id && !p.id)) return;
     const pid = p._id || p.id;
@@ -4351,7 +4327,6 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
       onEditProject(fullProject);
     }
   };
-
 
 
   const doDelete = async () => {
@@ -11133,7 +11108,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   setJumpProject(merged);
 
-                  setProjectDetailsReadOnly(false);
+                  setProjectDetailsReadOnly(true);
 
                   setActive("project-details");
 

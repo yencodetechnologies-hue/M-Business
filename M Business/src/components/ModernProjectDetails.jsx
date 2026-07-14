@@ -2063,7 +2063,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 {!hideTopActions && (
                   <button className="mpd-btn mpd-btn-outline" onClick={() => { setEditingTask(null); setNewTaskTitle(''); setNewTaskDesc(''); setNewTaskPriority('medium'); setNewTaskAssignTo([]); setNewTaskDue(''); setNewTaskMilestone(''); setShowAddTaskModal(true); }} style={{ padding: '6px 12px', fontSize: 12 }}><i className="ti ti-plus"></i> Add Task</button>
                 )}
-            
+
               </div>
               <div style={{ padding: '0 24px 14px' }}>
                 <div className="mpd-task-filters">
@@ -2238,7 +2238,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 </div>
 
                 <div className={`mpd-tab-pane ${activeTab === 'updates' ? 'mpd-active' : ''}`}>
-                  {composerOpen && (
+                  {!hideTopActions && composerOpen && (
                     <div ref={composerRef} style={{ marginBottom: 24 }}>
 
                       {(
@@ -2575,7 +2575,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                             ? upd.attachments
                             : (upd.fileUrl ? [{ name: upd.fileName, url: upd.fileUrl, type: upd.fileType }] : []);
                           return (
-                            <div key={idx} style={{ border: `1px solid ${P.border}`, borderRadius: 14, overflow: 'hidden', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+                            <div key={upd._id || idx} style={{ border: `1px solid ${P.border}`, borderRadius: 14, overflow: 'hidden', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
                               <div style={{ background: `linear-gradient(135deg,${P.primary},${P.primaryDark})`, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 10 }}>
                                 <i className="ti ti-speakerphone" style={{ color: '#fff', fontSize: 17 }} />
                                 <span style={{ color: '#fff', fontWeight: 800, fontSize: 14 }}>{upd.title || 'Project Update'}</span>
@@ -2587,8 +2587,20 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 4, background: P.primaryLight, color: P.primary, fontSize: 10, fontWeight: 'bold', textTransform: 'uppercase' }}>{upd.type || 'general'}</span>
                                   <span style={{ fontSize: 11, color: P.textLight, marginLeft: 'auto' }}>{new Date(upd.date).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                                 </div>
+                                <div style={{ marginBottom: 10 }}>
+                                  <span style={{
+                                    display: 'inline-block', padding: '3px 10px', borderRadius: 20, fontSize: 10, fontWeight: 800, textTransform: 'uppercase',
+                                    background: upd.status === 'Approved' ? '#DCFCE7' : upd.status === 'Reviewed' ? '#FEF3C7' : '#F1F5F9',
+                                    color: upd.status === 'Approved' ? '#15803D' : upd.status === 'Reviewed' ? '#B45309' : '#64748B',
+                                  }}>{upd.status || 'Pending'}</span>
+                                </div>
                                 {upd.text && (
                                   <div style={{ fontSize: 13, color: P.textMid, lineHeight: 1.6, marginBottom: attachments.length > 0 ? 12 : 0 }}>{upd.text}</div>
+                                )}
+                                {upd.status === 'Reviewed' && upd.reviewComment && (
+                                  <div style={{ marginTop: 10, padding: '10px 12px', borderRadius: 8, background: '#FFFBEB', border: '1px solid #FDE68A', fontSize: 12.5, color: '#92400E' }}>
+                                    <strong>Review note:</strong> {upd.reviewComment}
+                                  </div>
                                 )}
                                 {attachments.length > 0 && (
                                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
@@ -2688,7 +2700,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           <i className="ti ti-send" style={{ fontSize: 13 }}></i> Send ({selectedPaymentItems.length})
                         </button>
                       )}
-                      {(() => {
+                      {!hideTopActions && (() => {
                         const btnMap = {
                           inv: { label: 'New Invoice', modal: 'showNewInvoice', icon: 'ti-file-invoice' },
                           adv: { label: 'New Advance', modal: 'showAdvance', icon: 'ti-pig-money' },

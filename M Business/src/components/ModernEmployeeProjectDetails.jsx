@@ -226,6 +226,9 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
 
   // ── Updates state -------------------------------------------------
   const [updates, setUpdates] = useState([]);
+  const [updateActionLoadingId, setUpdateActionLoadingId] = useState(null);
+  const [reviewingUpdateId, setReviewingUpdateId] = useState(null);
+  const [reviewCommentDraft, setReviewCommentDraft] = useState('');
   const readStorageKey = `read_updates_${user?._id || user?.id || 'guest'}_${project._id}`;
   const [readIds, setReadIds] = useState(() => {
     try {
@@ -368,6 +371,34 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
   }, [project._id, user?.companyId]);
 
   const getUpdKey = (u) => u._id || u.id || u.date || u.text;
+
+  const handleUpdateStatusChange = async (targetUpd, newStatus, reviewComment) => {
+    const targetKey = targetUpd._id || targetUpd.id || targetUpd.date || targetUpd.text;
+    setUpdateActionLoadingId(targetKey);
+    try {
+      const updatedList = updates.map(u => {
+        const k = u._id || u.id || u.date || u.text;
+        if (k !== targetKey) return u;
+        return {
+          ...u,
+          status: newStatus,
+          ...(reviewComment ? { reviewComment } : {}),
+          reviewedAt: new Date().toISOString(),
+          reviewedBy: user?.name || user?.employeeName || 'Employee',
+        };
+      });
+      setUpdates(updatedList);
+      await axios.put(`${BASE_URL}/api/projects/${project._id}`, { updates: updatedList });
+      setReviewingUpdateId(null);
+      setReviewCommentDraft('');
+      addToast(newStatus === 'Approved' ? 'Update approved!' : 'Review submitted!', 'success');
+    } catch (err) {
+      console.error('Failed to update status:', err.message);
+      addToast('Failed to save. Try again.', 'error');
+    } finally {
+      setUpdateActionLoadingId(null);
+    }
+  };
   const displayUpdates = updates.length > 0 ? updates : sampleUpdates;
   const unreadCount = displayUpdates.filter(u => !readIds.has(getUpdKey(u)) && u.unread !== false).length;
 
@@ -626,6 +657,60 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                           </a>
                         );
                       })}
+                    </div>
+                  )}
+
+                  {/* Status + Approve/Review actions */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10, flexWrap: 'wrap' }} onClick={(e) => e.stopPropagation()}>
+                    <span style={{
+                      display: 'inline-block', padding: '3px 10px', borderRadius: 20, fontSize: 10, fontWeight: 800, textTransform: 'uppercase',
+                      background: upd.status === 'Approved' ? '#DCFCE7' : upd.status === 'Reviewed' ? '#FEF3C7' : '#F1F5F9',
+                      color: upd.status === 'Approved' ? '#15803D' : upd.status === 'Reviewed' ? '#B45309' : '#64748B',
+                    }}>{upd.status || 'Pending'}</span>
+
+                    {(!upd.status || upd.status === 'Pending') && (
+                      <>
+                        <button
+                          className="epd2-btn epd2-btn-outline epd2-btn-sm"
+                          disabled={updateActionLoadingId === (upd._id || idx)}
+                          onClick={() => handleUpdateStatusChange(upd, 'Approved')}
+                        >
+                          <i className="ti ti-check" style={{ fontSize: 13 }}></i> Approve
+                        </button>
+                        <button
+                          className="epd2-btn epd2-btn-outline epd2-btn-sm"
+                          onClick={() => setReviewingUpdateId(prev => prev === (upd._id || idx) ? null : (upd._id || idx))}
+                        >
+                          <i className="ti ti-message-circle" style={{ fontSize: 13 }}></i> Review
+                        </button>
+                      </>
+                    )}
+                  </div>
+
+                  {reviewingUpdateId === (upd._id || idx) && (
+                    <div style={{ marginTop: 10 }} onClick={(e) => e.stopPropagation()}>
+                      <textarea
+                        value={reviewCommentDraft}
+                        onChange={(e) => setReviewCommentDraft(e.target.value)}
+                        placeholder="Enter your review comments or reason..."
+                        style={{ width: '100%', minHeight: 70, borderRadius: 8, border: '1.5px solid #e2e8f0', padding: '8px 10px', fontSize: 12.5, fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }}
+                      />
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
+                        <button className="epd2-btn epd2-btn-outline epd2-btn-sm" onClick={() => { setReviewingUpdateId(null); setReviewCommentDraft(''); }}>Cancel</button>
+                        <button
+                          className="epd2-btn epd2-btn-sm"
+                          disabled={!reviewCommentDraft.trim() || updateActionLoadingId === (upd._id || idx)}
+                          onClick={() => handleUpdateStatusChange(upd, 'Reviewed', reviewCommentDraft.trim())}
+                        >
+                          Submit Review
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {upd.status === 'Reviewed' && upd.reviewComment && (
+                    <div style={{ marginTop: 10, padding: '10px 12px', borderRadius: 8, background: '#FFFBEB', border: '1px solid #FDE68A', fontSize: 12.5, color: '#92400E' }}>
+                      <strong>Review note:</strong> {upd.reviewComment}
                     </div>
                   )}
 

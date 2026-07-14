@@ -419,6 +419,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [updateText, setUpdateText] = useState('');
   const [updateTitle, setUpdateTitle] = useState('');
   const [updateType, setUpdateType] = useState('');
+  const [isApprovalRequest, setIsApprovalRequest] = useState(false);
   const [customUpdateTypes, setCustomUpdateTypes] = useState(() => {
     try { return JSON.parse(localStorage.getItem('mb_customUpdateTypes') || '[]'); } catch (e) { return []; }
   });
@@ -837,7 +838,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       const uploadRes = await axios.post(`${BASE_URL}/api/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      const uploadedUrl = uploadRes.data.url;
+      const rawUrl = uploadRes.data.url || '';
+      const uploadedUrl = rawUrl.startsWith('http') ? rawUrl : `${BASE_URL}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
       const approvalCompanyId = user?.companyId || user?.company || user?._id || user?.id || currProject.companyId || '';
       await axios.post(`${BASE_URL}/api/approvals`, {
         companyId: approvalCompanyId,
@@ -1762,8 +1764,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <div style={{ fontSize: 13, fontWeight: 800, color: '#111827', marginBottom: 12 }}>Approval Requests</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {projectApprovals.map(a => {
-                const statusColor = a.status === 'approved' ? '#15803D' : a.status === 'rejected' ? '#DC2626' : '#B45309';
-                const statusBg = a.status === 'approved' ? '#DCFCE7' : a.status === 'rejected' ? '#FEE2E2' : '#FEF3C7';
                 return (
                   <div key={a._id} style={{ padding: '12px 14px', border: '1px solid #F3F4F6', borderRadius: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
                     <div style={{ flex: 1, minWidth: 160 }}>
@@ -1777,15 +1777,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         </div>
                       )}
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                      <span style={{ background: statusBg, color: statusColor, borderRadius: 20, padding: '4px 12px', fontSize: 11, fontWeight: 800 }}>
-                        {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
-                      </span>
-                      <button onClick={() => setViewProjectApproval(a)} style={{ padding: '5px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#fff', color: P.primary, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>View</button>
-                      {!hideTopActions && (
-                        <button onClick={() => handleDeleteApproval(a._id)} style={{ padding: '5px 12px', borderRadius: 8, border: '1.5px solid #FCA5A5', background: P.redLight, color: P.red, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Delete</button>
-                      )}
-                    </div>
+
                   </div>
                 );
               })}
@@ -2112,7 +2104,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         <div className="mpd-grid-main-side">
           {/* RIGHT COL — TASKS */}
 
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', order: 2 }}>
             {/* TASKS COMPONENT */}
             <div className="mpd-card" style={{ padding: 0, overflow: 'hidden', marginBottom: 20, display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
               <div className="mpd-card-header" style={{ padding: '20px 24px 10px', marginBottom: 0 }}>
@@ -2212,8 +2204,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             </div>
           </div>
 
-          {/* LEFT COL — TABS (Payments / Updates / Activity Logs) */}
-          <div>
+          {/* LEFT COL — TABS (Updates / Activity Logs / Accounts) */}
+          <div style={{ order: 1 }}>
             {/* TABS - draggable scroll */}
             <div className="mpd-card">          <div className="mpd-tabs"
               ref={tabsRef}
@@ -2301,7 +2293,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       {(
                         <div>
                           {/* SEND TO */}
-                          {updateType !== 'approval' && (
+                          {(
                             <div style={{ marginBottom: 14 }}>
                               <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Select Team Members</div>
                               <div style={{ position: 'relative' }} ref={updateMembersDropdownRef}>
@@ -2388,7 +2380,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                 </div>
                               ) : (
                                 <select
-                                  value={updateType === 'approval' ? '' : updateType}
+                                  value={updateType}
                                   onChange={e => {
                                     if (e.target.value === '__custom__') {
                                       setCustomUpdateTypeInput('');
@@ -2435,10 +2427,16 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                 </select>
                               )}
                               {currProject.approvalRequestEnabled !== false && (
-                                <button onClick={() => setUpdateType('approval')} style={{ padding: '6px 14px', borderRadius: 20, border: `2px solid ${updateType === 'approval' ? P.primary : P.border}`, background: updateType === 'approval' ? P.primary : '#fff', color: updateType === 'approval' ? '#fff' : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all .15s' }}>
+                                <label style={{ padding: '6px 14px', borderRadius: 20, border: `2px solid ${isApprovalRequest ? P.primary : P.border}`, background: isApprovalRequest ? P.primary : '#fff', color: isApprovalRequest ? '#fff' : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all .15s' }}>
+                                  <input
+                                    type="checkbox"
+                                    checked={isApprovalRequest}
+                                    onChange={e => setIsApprovalRequest(e.target.checked)}
+                                    style={{ margin: 0 }}
+                                  />
                                   <i className="ti ti-clipboard-check" style={{ fontSize: 13 }} />
                                   Approval Request
-                                </button>
+                                </label>
                               )}
 
                             </div>
@@ -2525,7 +2523,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
                             </div>
 
-                     
+
                             <div style={{ display: 'flex', gap: 10 }}>
 
                               <button
@@ -2533,12 +2531,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                 onClick={async () => {
                                   const hasContent = updateTitle.trim() || updateText.trim();
                                   if (!hasContent) return;
-                                  if (updateType === 'approval') {
-                                    if (currProject.approvalRequestEnabled === false) {
-                                      alert('Approval requests are disabled for this project.');
-                                      return;
-                                    }
-                                    await submitApprovalRequest();
+                                  if (isApprovalRequest && currProject.approvalRequestEnabled === false) {
+                                    alert('Approval requests are disabled for this project.');
                                     return;
                                   }
                                   setPostingUpdate(true);
@@ -2560,17 +2554,41 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                       fileType: primaryAttachment ? primaryAttachment.type : '',
                                       attachments,
                                       status: 'sent',
+                                      isApprovalRequest,
+                                      approvalStatus: isApprovalRequest ? 'pending' : undefined,
                                     };
                                     const updatedUpdates = [newUpdate, ...(currProject.updates || [])];
                                     setCurrProject(prev => ({ ...prev, updates: updatedUpdates }));
                                     const putRes = await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { updates: updatedUpdates });
                                     console.log('Update saved:', putRes.data);
+
+                                    if (isApprovalRequest && resolvedClientId) {
+                                      const approvalCompanyId = user?.companyId || user?.company || user?._id || user?.id || currProject.companyId || '';
+                                      await axios.post(`${BASE_URL}/api/approvals`, {
+                                        companyId: approvalCompanyId,
+                                        clientId: resolvedClientId,
+                                        recipientType: 'client',
+                                        senderName: user?.name || user?.clientName || 'Admin',
+                                        title,
+                                        desc: updateText.trim(),
+                                        icon: 'ti-file-text',
+                                        approveLabel: 'Approve',
+                                        rejectLabel: 'Review',
+                                        sourceType: 'project',
+                                        projectId: currProject._id || '',
+                                        fileUrl: primaryAttachment ? primaryAttachment.url : '',
+                                        fileName: primaryAttachment ? primaryAttachment.name : '',
+                                      });
+                                      loadProjectApprovals();
+                                    }
+
                                     await loadLatest();
                                     if (onUpdate) onUpdate();
                                     setUpdateText('');
                                     setUpdateTitle('');
                                     setPostUpdateAttachments([]);
                                     setUpdateSelectedMembers([]);
+                                    setIsApprovalRequest(false);
 
                                   } catch (err) {
                                     console.error('Failed to post update:', err.response?.data || err.message);
@@ -2581,7 +2599,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                 }}
                                 style={{ padding: '9px 22px', borderRadius: 10, background: P.primary, color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: 13, fontWeight: 800, cursor: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 'not-allowed' : 'pointer', opacity: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,188,212,.25)', transition: 'all .15s' }}>
                                 <i className="ti ti-send" style={{ fontSize: 15 }} />
-                                {updateType === 'approval' ? 'Send Approval Request to Team Member' : 'Send to Team'}
+                                {isApprovalRequest ? 'Send Update + Approval Request' : 'Send to Team'}
                               </button>
                             </div>
                           </div>
@@ -2619,13 +2637,36 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 4, background: P.primaryLight, color: P.primary, fontSize: 10, fontWeight: 'bold', textTransform: 'uppercase' }}>{upd.type || 'general'}</span>
                                   <span style={{ fontSize: 11, color: P.textLight, marginLeft: 'auto' }}>{new Date(upd.date).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                                 </div>
-                                <div style={{ marginBottom: 10 }}>
-                                  <span style={{
-                                    display: 'inline-block', padding: '3px 10px', borderRadius: 20, fontSize: 10, fontWeight: 800, textTransform: 'uppercase',
-                                    background: upd.status === 'Approved' ? '#DCFCE7' : upd.status === 'Reviewed' ? '#FEF3C7' : '#F1F5F9',
-                                    color: upd.status === 'Approved' ? '#15803D' : upd.status === 'Reviewed' ? '#B45309' : '#64748B',
-                                  }}>{upd.status || 'Pending'}</span>
-                                </div>
+                                {(() => {
+                                  const linkedApproval = upd.isApprovalRequest
+                                    ? projectApprovals.find(a => a.title === upd.title)
+                                    : null;
+                                  const statusColor = linkedApproval
+                                    ? (linkedApproval.status === 'approved' ? '#15803D' : linkedApproval.status === 'rejected' ? '#DC2626' : '#B45309')
+                                    : (upd.status === 'Approved' ? '#15803D' : upd.status === 'Reviewed' ? '#B45309' : '#64748B');
+                                  const statusBg = linkedApproval
+                                    ? (linkedApproval.status === 'approved' ? '#DCFCE7' : linkedApproval.status === 'rejected' ? '#FEE2E2' : '#FEF3C7')
+                                    : (upd.status === 'Approved' ? '#DCFCE7' : upd.status === 'Reviewed' ? '#FEF3C7' : '#F1F5F9');
+                                  const statusLabel = linkedApproval
+                                    ? (linkedApproval.status.charAt(0).toUpperCase() + linkedApproval.status.slice(1))
+                                    : (upd.status || 'Pending');
+                                  return (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+                                      <span style={{
+                                        display: 'inline-block', padding: '3px 10px', borderRadius: 20, fontSize: 10, fontWeight: 800, textTransform: 'uppercase',
+                                        background: statusBg, color: statusColor,
+                                      }}>{statusLabel}</span>
+                                      {linkedApproval && (
+                                        <>
+                                          <button onClick={() => setViewProjectApproval(linkedApproval)} style={{ padding: '4px 10px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#fff', color: P.primary, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>View</button>
+                                          {!hideTopActions && (
+                                            <button onClick={() => handleDeleteApproval(linkedApproval._id)} style={{ padding: '4px 10px', borderRadius: 8, border: '1.5px solid #FCA5A5', background: P.redLight, color: P.red, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Delete</button>
+                                          )}
+                                        </>
+                                      )}
+                                    </div>
+                                  );
+                                })()}
                                 {upd.text && (
                                   <div style={{ fontSize: 13, color: P.textMid, lineHeight: 1.6, marginBottom: attachments.length > 0 ? 12 : 0 }}>{upd.text}</div>
                                 )}

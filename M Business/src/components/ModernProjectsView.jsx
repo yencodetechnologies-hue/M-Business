@@ -202,24 +202,30 @@ const CSS = `
 
 /* List view overrides */
 .mpv-grid.list .mpv-card { display:flex; flex-direction:column; }
-.mpv-grid.list .mpv-card-top { display:flex; align-items:center; gap:20px; padding:14px 18px; order:2; flex-wrap:wrap; }
+.mpv-grid.list .mpv-card-top { display:contents; }
 .mpv-grid.list .mpv-card-client { margin-bottom:0; }
-.mpv-grid.list .mpv-card-info { flex:1; width:100%; order:1; }
-.mpv-grid.list .mpv-card-prog { min-width:200px; order:2; }
-.mpv-grid.list .mpv-card-row1 { order:-1; width:100%; margin-top:0; margin-bottom:8px; }
-.mpv-grid.list .mpv-divider { display:none; }
+
+/* Summary (status, category, priority) shown first */
+.mpv-grid.list .mpv-card-row1 { order:0; margin:0; padding:14px 18px 8px; }
+
+/* Summary (team, budget, deadline) shown right after */
 .mpv-grid.list .mpv-card-bottom {
-  order:0;
+  order:1;
   flex-direction:row;
   align-items:center;
   justify-content:space-between;
   gap:6px;
-  padding:12px 18px;
+  padding:0 18px 12px;
   border-left:none;
-}.mpv-grid.list .mpv-card-top { flex-wrap: wrap; }
-.mpv-grid.list .mpv-card-info { order: 1; width: 100%; }
-.mpv-grid.list .mpv-card-prog { order: 2; }
-.mpv-grid.list .mpv-card-row1 { order: 3; width: 100%; margin-top: 10px; margin-bottom: 0; }
+}
+
+/* Title / description come after the summary */
+.mpv-grid.list .mpv-card-info { flex:1; order:2; padding:0 18px; }
+
+/* Progress bar shown last */
+.mpv-grid.list .mpv-card-prog { min-width:200px; order:3; padding:0 18px 14px; }
+
+.mpv-grid.list .mpv-divider { display:none; }
 /* Empty */
 .mpv-empty { display:flex; flex-direction:column; align-items:center; justify-content:center;
   gap:12px; padding:60px 20px; color:${P.textLight}; }

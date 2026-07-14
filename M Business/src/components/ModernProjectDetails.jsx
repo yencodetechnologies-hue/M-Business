@@ -2063,6 +2063,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 {!hideTopActions && (
                   <button className="mpd-btn mpd-btn-outline" onClick={() => { setEditingTask(null); setNewTaskTitle(''); setNewTaskDesc(''); setNewTaskPriority('medium'); setNewTaskAssignTo([]); setNewTaskDue(''); setNewTaskMilestone(''); setShowAddTaskModal(true); }} style={{ padding: '6px 12px', fontSize: 12 }}><i className="ti ti-plus"></i> Add Task</button>
                 )}
+            
               </div>
               <div style={{ padding: '0 24px 14px' }}>
                 <div className="mpd-task-filters">
@@ -2237,7 +2238,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 </div>
 
                 <div className={`mpd-tab-pane ${activeTab === 'updates' ? 'mpd-active' : ''}`}>
-                  {composerOpen && !hideTopActions && (
+                  {composerOpen && (
                     <div ref={composerRef} style={{ marginBottom: 24 }}>
 
                       {(
@@ -2697,7 +2698,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           exp: { label: 'Add Expense', modal: 'showExpense', icon: 'ti-receipt' },
                         };
                         const b = btnMap[activePayTab] || btnMap['inv'];
-                        if (hideTopActions) return null;
                         return (
                           <button
                             onClick={() => {

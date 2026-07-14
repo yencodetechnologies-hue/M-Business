@@ -4336,18 +4336,20 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
 
 
-  const openEdit = (p) => {
-
+  const openEdit = async (p) => {
     if (!p || (!p._id && !p.id)) return;
-
-    setJumpProject(p);
-
-    if (onEditProject) {
-
-      onEditProject(p);
-
+    const pid = p._id || p.id;
+    let fullProject = p;
+    try {
+      const res = await axios.get(`${BASE_URL}/api/projects/${pid}`);
+      fullProject = res.data?.project || res.data || p;
+    } catch (err) {
+      console.error("Failed to load full project for edit:", err);
     }
-
+    setJumpProject(fullProject);
+    if (onEditProject) {
+      onEditProject(fullProject);
+    }
   };
 
 

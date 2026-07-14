@@ -8234,14 +8234,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   };
 
   const fetchProjects = async () => {
+    const cid = user?.companyId || user?.company || user?._id || user?.id || "";
     try {
-      const cached = localStorage.getItem("cached_projects");
+      const cached = localStorage.getItem("cached_projects_" + cid);
       if (cached) { try { setProjects(JSON.parse(cached)); } catch { } }
     } catch { }
     try {
-      const res = await axios.get(BASE_URL + "/api/projects");
+      const res = await axios.get(BASE_URL + "/api/projects", {
+        headers: { 'x-company-id': cid }
+      });
       setProjects(res.data);
-      try { localStorage.setItem("cached_projects", JSON.stringify(res.data)); } catch { }
+      try { localStorage.setItem("cached_projects_" + cid, JSON.stringify(res.data)); } catch { }
     } catch (e) { console.log(e); }
   };
 

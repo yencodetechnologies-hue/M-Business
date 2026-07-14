@@ -2058,7 +2058,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
         {/* MAIN CONTENT GRID */}
         <div className="mpd-grid-main-side">
-          {/* LEFT COL */}
+          {/* RIGHT COL — TASKS */}
+
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             {/* TASKS COMPONENT */}
             <div className="mpd-card" style={{ padding: 0, overflow: 'hidden', marginBottom: 20, display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
@@ -2159,7 +2160,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             </div>
           </div>
 
-          {/* RIGHT COL — TABS (Payments / Updates / Activity Logs) */}
+          {/* LEFT COL — TABS (Payments / Updates / Activity Logs) */}
           <div>
             {/* TABS - draggable scroll */}
             <div className="mpd-card">          <div className="mpd-tabs"
@@ -2748,14 +2749,14 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   <td style={{ padding: '12px 14px' }} onClick={(e) => e.stopPropagation()}>
                                     <input type="checkbox" checked={selectedPaymentItems.includes(i)} onChange={() => setSelectedPaymentItems(prev => prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i])} />
                                   </td>
-                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }} onClick={() => setPreviewInvoice(inv)}>{inv.invoiceNo || `INV-00${i + 1}`}</td>
-                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }} onClick={() => setPreviewInvoice(inv)}>{inv.description || inv.notes || '—'}</td>
-                                  <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }} onClick={() => setPreviewInvoice(inv)}>{currency}{(inv.amount || 0).toLocaleString()}</td>
-                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }} onClick={() => setPreviewInvoice(inv)}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
-                                  <td style={{ padding: '12px 14px' }} onClick={() => setPreviewInvoice(inv)}><span style={{ background: inv.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: inv.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{inv.status || 'Draft'}</span></td>
+                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.invoiceNo || `INV-00${i + 1}`}</td>
+                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.description || inv.notes || '—'}</td>
+                                  <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{currency}{(inv.amount || 0).toLocaleString()}</td>
+                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                                  <td style={{ padding: '12px 14px' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}><span style={{ background: inv.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: inv.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{inv.status || 'Draft'}</span></td>
                                   <td style={{ padding: '12px 14px' }}>
                                     <div style={{ display: 'flex', gap: 4 }}>
-                                      <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: i }))} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+                                      <button onClick={() => { if (onNewInvoice) { onNewInvoice(currProject, inv); } else { setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: i })); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
                                       <button onClick={() => handleDeleteInvoice(inv)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
                                     </div>
                                   </td>

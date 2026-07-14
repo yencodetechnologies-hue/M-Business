@@ -8,7 +8,7 @@ router.get("/", async (req, res) => {
   try {
     const { companyId, employeeName, projectNames, client } = req.query;
     const filter = {};
-    
+
     if (companyId && companyId !== "admin-company-id" && companyId !== "default") {
       filter.companyId = companyId;
     } else if (!employeeName && !client) {
@@ -29,19 +29,19 @@ router.get("/", async (req, res) => {
       const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const safeName = escapeRegExp(employeeName);
       const nameRegex = new RegExp(`^\\s*${safeName}\\s*$`, "i");
-      
+
       const orConditions = [
         { createdBy: { $regex: nameRegex } },
         { client: { $regex: nameRegex } } // For clients viewing the same route
       ];
-      
+
       if (projectNames && projectNames !== "undefined" && projectNames !== "null") {
         const pList = Array.isArray(projectNames) ? projectNames : projectNames.split(",").filter(Boolean);
         if (pList.length > 0) {
           orConditions.push({ project: { $in: pList } });
         }
       }
-      
+
       filter.$or = orConditions;
     }
 
@@ -57,12 +57,12 @@ router.post("/", async (req, res) => {
   try {
     const event = new Event(req.body);
     await event.save();
-    
+
     // Email notifications
     try {
       const { sendQuickEmail } = require("../config/email");
       const creatorRole = (event.createdByRole || "").toLowerCase();
-      
+
       if (creatorRole === "subadmin" || creatorRole === "sub_admin" || creatorRole === "sub-admin") {
         if (event.client) {
           const Client = require("../models/ClientModel");
@@ -97,7 +97,7 @@ router.post("/", async (req, res) => {
 // PUT update event
 router.put("/:id", async (req, res) => {
   try {
-    const event = await Event.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
+    const event = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     if (!event) return res.status(404).json({ msg: "Event not found" });
     res.json(event);
   } catch (err) {

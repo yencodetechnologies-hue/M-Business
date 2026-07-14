@@ -1867,6 +1867,24 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
   const [editForm, setEditForm] = useState({});
   const [saving, setSaving] = useState(false);
   const [localProjects, setLocalProjects] = useState(projects || []);
+  const [deleteTargetProj, setDeleteTargetProj] = useState(null);
+  const [deletingProj, setDeletingProj] = useState(false);
+
+  async function handleDeleteProject() {
+    if (!deleteTargetProj || !deleteTargetProj._id) return;
+    setDeletingProj(true);
+    try {
+      await axios.delete(`${BASE_URL}/api/projects/${deleteTargetProj._id}`);
+      setDeleteTargetProj(null);
+      const res = await axios.get(BASE_URL + "/api/projects");
+      setLocalProjects(res.data);
+      if (setProjects) setProjects(res.data);
+    } catch (err) {
+      alert("Delete failed: " + (err.response?.data?.msg || err.message));
+    } finally {
+      setDeletingProj(false);
+    }
+  }
 
   useEffect(() => {
     axios.get(BASE_URL + "/api/projects")
@@ -1995,7 +2013,8 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
         projects={projectsWithProgress}
         searchQuery={search}
         onViewTasks={(p) => setViewTasksProj(p)}
-        onEdit={(p) => { setJumpProject(p); setActive("project-details"); }}
+        onEdit={(p) => openEdit(p)}
+        onDelete={(p) => setDeleteTargetProj(p)}
         onUpdate={fetchProjects}
       />
 
@@ -2089,6 +2108,28 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {deleteTargetProj && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center" }}
+          onClick={e => { if (e.target === e.currentTarget) setDeleteTargetProj(null); }}>
+          <div style={{ background: "#fff", borderRadius: 16, width: 400, padding: 24, boxShadow: "0 24px 80px rgba(0,0,0,0.18)" }}>
+            <h3 style={{ margin: "0 0 10px", fontSize: 16, fontWeight: 800, color: "#1A2332" }}>Delete Project</h3>
+            <p style={{ margin: "0 0 20px", fontSize: 13, color: "#676879" }}>
+              Are you sure you want to delete "<b>{deleteTargetProj.name}</b>"? This cannot be undone.
+            </p>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+              <button onClick={() => setDeleteTargetProj(null)}
+                style={{ padding: "9px 20px", borderRadius: 9, border: "1.5px solid #d1d5db", background: "#fff", color: "#374151", fontWeight: 600, cursor: "pointer", fontSize: 13 }}>
+                Cancel
+              </button>
+              <button onClick={handleDeleteProject} disabled={deletingProj}
+                style={{ padding: "9px 22px", borderRadius: 9, border: "none", background: "#ef4444", color: "#fff", fontWeight: 700, cursor: deletingProj ? "default" : "pointer", fontSize: 13, opacity: deletingProj ? 0.7 : 1 }}>
+                {deletingProj ? "Deleting…" : "Delete"}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -233,6 +233,18 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
   const [requestedDocs, setRequestedDocs] = useState([]);
   const [deletedDocIds, setDeletedDocIds] = useState([]);
   const [dbNotifications, setDbNotifications] = useState([]);
+  const [docRequests, setDocRequests] = useState([]);
+
+  const fetchDocRequests = async () => {
+    const empId = emp?._id || emp?.employeeId;
+    if (!empId) return;
+    try {
+      const res = await axios.get(`${BASE_URL}/api/document-requests/employee/${empId}`);
+      setDocRequests(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error("Failed to fetch document requests:", err);
+    }
+  };
 
   useEffect(() => {
     const fetchEmpNotifications = async () => {
@@ -246,6 +258,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
       }
     };
     fetchEmpNotifications();
+    fetchDocRequests();
   }, [emp]);
 
   // Modals state
@@ -374,7 +387,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         companyId: emp.companyId || "",
       });
 
-      setRequestedDocs(prev => [...prev, res.data]);
+      await fetchDocRequests();
       setShowRequestDocModal(false);
       setNewDocName("");
       setNewDocType("Offer Letter");
@@ -422,35 +435,20 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
 
   const apiDocs = Array.isArray(empDocs) ? empDocs : (empDocs ? Object.values(empDocs) : []);
 
-  // Filter pending document request notifications (unread warnings or texts with upload/document)
-  const dbRequested = dbNotifications
-    .filter(n => !n.isRead && (n.type === "warning" || n.text?.toLowerCase().includes("upload") || n.icon === "Folder"))
-    .map(n => {
-      let name = "";
-      const match = n.text.match(/Please upload your (.+?) \((.+?)\)/);
-      if (match) {
-        name = match[1];
-      } else {
-        name = n.text.replace("Please upload your ", "");
-      }
-      return {
-        _id: n._id,
-        name: name,
-        type: "Requested",
-        uploadedAt: n.createdAt,
-        url: "#"
-      };
-    });
-
-  // Filter out any dbRequested docs that have already been uploaded in apiDocs
-  const pendingDbRequested = dbRequested.filter(d =>
-    !apiDocs.some(ad => (ad.docType || ad.documentType || "").toLowerCase() === d.name.toLowerCase() || (ad.name || "").toLowerCase() === d.name.toLowerCase())
-  );
+  // Real document requests from the backend — reflects live upload status
+  const mappedDocRequests = docRequests.map(dr => ({
+    _id: dr._id,
+    name: dr.documentName,
+    type: dr.documentType,
+    uploadedAt: dr.status === "uploaded" ? dr.uploadedAt : dr.requestedAt,
+    url: dr.status === "uploaded" && dr.fileUrl ? dr.fileUrl : "#",
+    fileName: dr.fileName,
+    status: dr.status
+  }));
 
   const docsToShow = [
     ...apiDocs,
-    ...pendingDbRequested,
-    ...requestedDocs.filter(rd => !apiDocs.some(ad => (ad.name || "").toLowerCase() === (rd.name || "").toLowerCase()))
+    ...mappedDocRequests
   ].filter(d => !deletedDocIds.includes(String(d._id)));
 
   return (
@@ -921,7 +919,6 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
                           if (!confirm('Delete this document?')) return;
                           // Remove from UI immediately
                           setDeletedDocIds(prev => [...prev, String(doc._id)]);
-                          setRequestedDocs(prev => prev.filter((_, idx) => idx !== i));
                           // Try backend delete — silently ignore 404 (doc may be a notification-based request)
                           if (doc._id && !String(doc._id).startsWith('doc_')) {
                             try {

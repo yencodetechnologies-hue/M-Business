@@ -1759,31 +1759,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           </div>
         </div>
 
-        {user?.role !== 'client' && projectApprovals.length > 0 && (
-          <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 14, padding: 18, marginBottom: 20 }}>
-            <div style={{ fontSize: 13, fontWeight: 800, color: '#111827', marginBottom: 12 }}>Approval Requests</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {projectApprovals.map(a => {
-                return (
-                  <div key={a._id} style={{ padding: '12px 14px', border: '1px solid #F3F4F6', borderRadius: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
-                    <div style={{ flex: 1, minWidth: 160 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{a.title}</div>
-                      <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>
-                        Sent to {a.recipientType === 'team' ? 'Team' : 'Client'} {a.senderName ? `by ${a.senderName}` : ''}
-                      </div>
-                      {a.status === 'rejected' && a.rejectReason && (
-                        <div style={{ marginTop: 6, fontSize: 12, color: '#DC2626', background: '#FEF2F2', padding: '6px 10px', borderRadius: 8 }}>
-                          <strong>Rejection reason:</strong> {a.rejectReason}
-                        </div>
-                      )}
-                    </div>
 
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
 
         {viewProjectApproval && (
           <div style={{ position: 'fixed', inset: 0, zIndex: 99998, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={() => setViewProjectApproval(null)}>

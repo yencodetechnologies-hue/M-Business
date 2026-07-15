@@ -439,6 +439,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [postingUpdate, setPostingUpdate] = useState(false);
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [showEditBudgetModal, setShowEditBudgetModal] = useState(false);
+  const [editMemberIndex, setEditMemberIndex] = useState(null);
+  const [editMemberSelection, setEditMemberSelection] = useState('');
+
 
   const [selectedNewMember, setSelectedNewMember] = useState('');
   const [newMilestoneName, setNewMilestoneName] = useState('');
@@ -2752,7 +2755,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   <td style={{ padding: '12px 14px' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>
                                     <span style={{ background: '#EDE9FE', color: '#7C3AED', fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20 }}>{inv.category || 'Milestone'}</span>
                                   </td>
-                                  <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{currency}{(inv.amount || 0).toLocaleString()}</td>
+                                  <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{currency}{(() => { const amt = parseAmt(inv.amount) || parseAmt(inv.total); const taxPct = parseAmt(inv.taxPercent); const taxAmt = inv.taxType === 'inclusive' ? 0 : Math.round(amt * (taxPct / 100)); return (amt + taxAmt).toLocaleString(); })()}</td>
                                   <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.date || inv.issueDate ? new Date(inv.date || inv.issueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
                                   <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#F59E0B' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
                                   <td style={{ padding: '12px 14px' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}><span style={{ background: inv.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: inv.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{inv.status || 'Draft'}</span></td>
@@ -3001,26 +3004,29 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     <div style={{ fontSize: 11, color: P.textLight }}>{employees.find(e => (e.name || e.employeeName) === a)?.role || 'Member'}</div>
                   </div>
                   {user?.role !== 'employee' && !hideTopActions && (
-                    <button onClick={async () => {
-                      if (!window.confirm('Remove ' + a + ' from team?')) return;
-                      const updated = (currProject.assignedTo || []).filter((_, idx) => idx !== i);
-                      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated });
-                      try {
-                        const tasksRes = await axios.get(`${BASE_URL}/api/tasks`, { headers: { 'x-company-id': currProject.companyId || '' } });
-                        const allTasks = Array.isArray(tasksRes.data) ? tasksRes.data : [];
-                        const projectTasks = allTasks.filter(t =>
-                          (t.projectId === currProject._id || t.projectId?._id === currProject._id) &&
-                          t.assignTo && t.assignTo !== 'Unassigned' &&
-                          t.assignTo.split(', ').map(n => n.trim()).includes(a)
-                        );
-                        await Promise.all(projectTasks.map(t => {
-                          const names = t.assignTo.split(', ').map(n => n.trim()).filter(Boolean);
-                          const updatedNames = names.filter(n => n !== a);
-                          return axios.put(`${BASE_URL}/api/tasks/${t._id}`, { assignTo: updatedNames.length > 0 ? updatedNames.join(', ') : 'Unassigned' }, { headers: { 'x-company-id': currProject.companyId || '' } });
-                        }));
-                      } catch (e) { console.error('Failed to unassign tasks:', e); }
-                      loadLatest();
-                    }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 14, padding: '4px 6px' }} title="Remove">Delete</button>
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      <button onClick={() => { setEditMemberIndex(i); setEditMemberSelection(a); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.primary, fontSize: 14, padding: '4px 6px' }} title="Edit">Edit</button>
+                      <button onClick={async () => {
+                        if (!window.confirm('Remove ' + a + ' from team?')) return;
+                        const updated = (currProject.assignedTo || []).filter((_, idx) => idx !== i);
+                        await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated });
+                        try {
+                          const tasksRes = await axios.get(`${BASE_URL}/api/tasks`, { headers: { 'x-company-id': currProject.companyId || '' } });
+                          const allTasks = Array.isArray(tasksRes.data) ? tasksRes.data : [];
+                          const projectTasks = allTasks.filter(t =>
+                            (t.projectId === currProject._id || t.projectId?._id === currProject._id) &&
+                            t.assignTo && t.assignTo !== 'Unassigned' &&
+                            t.assignTo.split(', ').map(n => n.trim()).includes(a)
+                          );
+                          await Promise.all(projectTasks.map(t => {
+                            const names = t.assignTo.split(', ').map(n => n.trim()).filter(Boolean);
+                            const updatedNames = names.filter(n => n !== a);
+                            return axios.put(`${BASE_URL}/api/tasks/${t._id}`, { assignTo: updatedNames.length > 0 ? updatedNames.join(', ') : 'Unassigned' }, { headers: { 'x-company-id': currProject.companyId || '' } });
+                          }));
+                        } catch (e) { console.error('Failed to unassign tasks:', e); }
+                        loadLatest();
+                      }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 14, padding: '4px 6px' }} title="Remove">Delete</button>
+                    </div>
                   )}
                 </div>
               ))}
@@ -3204,6 +3210,140 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   <button type="submit" className="mpd-btn mpd-btn-primary" disabled={addingTask}>{addingTask ? 'Adding...' : editingTask ? 'Update Task' : 'Add Task'}</button>
                 </div>
               </form>
+            </div>
+          </div>
+        )
+      }
+
+      {/* Edit Member Modal */}
+      {
+        editMemberIndex !== null && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99996, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ background: '#fff', borderRadius: P.radius, width: 380, padding: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
+              <h3 style={{ margin: '0 0 16px', fontSize: 16, color: P.textDark }}>Edit Team Member</h3>
+              <div style={{ maxHeight: 220, overflowY: 'auto', border: `1.5px solid ${P.border}`, borderRadius: 8, padding: '8px 10px', marginBottom: 16 }}>
+                {(employees || [])
+                  .filter(emp => {
+                    const name = emp.name || emp.employeeName;
+                    return name === assigned[editMemberIndex] || !assigned.includes(name);
+                  })
+                  .map(emp => {
+                    const name = emp.name || emp.employeeName;
+                    return (
+                      <label key={emp._id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 4px', fontSize: 13, color: P.textDark, cursor: 'pointer' }}>
+                        <input
+                          type="radio"
+                          name="editMemberChoice"
+                          checked={editMemberSelection === name}
+                          onChange={() => setEditMemberSelection(name)}
+                        />
+                        {name} ({emp.role || 'Employee'})
+                      </label>
+                    );
+                  })}
+                {(employees || []).filter(emp => {
+                  const name = emp.name || emp.employeeName;
+                  return name === assigned[editMemberIndex] || !assigned.includes(name);
+                }).length === 0 && (
+                    <div style={{ fontSize: 12, color: P.textLight, padding: '4px' }}>No employees available.</div>
+                  )}
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                <button className="mpd-btn mpd-btn-outline" onClick={() => { setEditMemberIndex(null); setEditMemberSelection(''); }}>Cancel</button>
+                <button className="mpd-btn mpd-btn-primary" disabled={!editMemberSelection} onClick={async () => {
+                  if (!editMemberSelection) return;
+                  const updated = [...(currProject.assignedTo || [])];
+                  const oldName = updated[editMemberIndex];
+                  updated[editMemberIndex] = editMemberSelection;
+                  await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated });
+                  if (oldName && oldName !== editMemberSelection) {
+                    try {
+                      const tasksRes = await axios.get(`${BASE_URL}/api/tasks`, { headers: { 'x-company-id': currProject.companyId || '' } });
+                      const allTasks = Array.isArray(tasksRes.data) ? tasksRes.data : [];
+                      const projectTasks = allTasks.filter(t =>
+                        (t.projectId === currProject._id || t.projectId?._id === currProject._id) &&
+                        t.assignTo && t.assignTo !== 'Unassigned' &&
+                        t.assignTo.split(', ').map(n => n.trim()).includes(oldName)
+                      );
+                      await Promise.all(projectTasks.map(t => {
+                        const names = t.assignTo.split(', ').map(n => n.trim()).filter(Boolean);
+                        const updatedNames = names.map(n => n === oldName ? editMemberSelection : n);
+                        return axios.put(`${BASE_URL}/api/tasks/${t._id}`, { assignTo: updatedNames.length > 0 ? updatedNames.join(', ') : 'Unassigned' }, { headers: { 'x-company-id': currProject.companyId || '' } });
+                      }));
+                    } catch (e) { console.error('Failed to reassign tasks:', e); }
+                  }
+                  setEditMemberIndex(null);
+                  setEditMemberSelection('');
+                  loadLatest();
+                }}>Save</button>
+              </div>
+            </div>
+          </div>
+        )
+      }
+
+      {/* Edit Member Modal */}
+      {
+        editMemberIndex !== null && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99996, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ background: '#fff', borderRadius: P.radius, width: 380, padding: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
+              <h3 style={{ margin: '0 0 16px', fontSize: 16, color: P.textDark }}>Edit Team Member</h3>
+              <div style={{ maxHeight: 220, overflowY: 'auto', border: `1.5px solid ${P.border}`, borderRadius: 8, padding: '8px 10px', marginBottom: 16 }}>
+                {(employees || [])
+                  .filter(emp => {
+                    const name = emp.name || emp.employeeName;
+                    return name === assigned[editMemberIndex] || !assigned.includes(name);
+                  })
+                  .map(emp => {
+                    const name = emp.name || emp.employeeName;
+                    return (
+                      <label key={emp._id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 4px', fontSize: 13, color: P.textDark, cursor: 'pointer' }}>
+                        <input
+                          type="radio"
+                          name="editMemberChoice"
+                          checked={editMemberSelection === name}
+                          onChange={() => setEditMemberSelection(name)}
+                        />
+                        {name} ({emp.role || 'Employee'})
+                      </label>
+                    );
+                  })}
+                {(employees || []).filter(emp => {
+                  const name = emp.name || emp.employeeName;
+                  return name === assigned[editMemberIndex] || !assigned.includes(name);
+                }).length === 0 && (
+                    <div style={{ fontSize: 12, color: P.textLight, padding: '4px' }}>No employees available.</div>
+                  )}
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                <button className="mpd-btn mpd-btn-outline" onClick={() => { setEditMemberIndex(null); setEditMemberSelection(''); }}>Cancel</button>
+                <button className="mpd-btn mpd-btn-primary" disabled={!editMemberSelection} onClick={async () => {
+                  if (!editMemberSelection) return;
+                  const updated = [...(currProject.assignedTo || [])];
+                  const oldName = updated[editMemberIndex];
+                  updated[editMemberIndex] = editMemberSelection;
+                  await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { assignedTo: updated });
+                  if (oldName && oldName !== editMemberSelection) {
+                    try {
+                      const tasksRes = await axios.get(`${BASE_URL}/api/tasks`, { headers: { 'x-company-id': currProject.companyId || '' } });
+                      const allTasks = Array.isArray(tasksRes.data) ? tasksRes.data : [];
+                      const projectTasks = allTasks.filter(t =>
+                        (t.projectId === currProject._id || t.projectId?._id === currProject._id) &&
+                        t.assignTo && t.assignTo !== 'Unassigned' &&
+                        t.assignTo.split(', ').map(n => n.trim()).includes(oldName)
+                      );
+                      await Promise.all(projectTasks.map(t => {
+                        const names = t.assignTo.split(', ').map(n => n.trim()).filter(Boolean);
+                        const updatedNames = names.map(n => n === oldName ? editMemberSelection : n);
+                        return axios.put(`${BASE_URL}/api/tasks/${t._id}`, { assignTo: updatedNames.length > 0 ? updatedNames.join(', ') : 'Unassigned' }, { headers: { 'x-company-id': currProject.companyId || '' } });
+                      }));
+                    } catch (e) { console.error('Failed to reassign tasks:', e); }
+                  }
+                  setEditMemberIndex(null);
+                  setEditMemberSelection('');
+                  loadLatest();
+                }}>Save</button>
+              </div>
             </div>
           </div>
         )

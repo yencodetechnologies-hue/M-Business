@@ -11158,7 +11158,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 onBack={() => { const returnTo = sidebarOverride || "projects"; setSidebarOverride(null); setActive(returnTo); }}
 
-           onSuccess={async (updatedProj) => {
+                onSuccess={async (updatedProj) => {
                   if (updatedProj?._deleted) {
                     setProjects(prev => prev.filter(p => (p._id || p.id) !== updatedProj._id));
                     setJumpProject(null);
@@ -11183,11 +11183,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   setJumpProject(fresh);
 
-                  setProjectDetailsReadOnly(true);
+                  setProjectDetailsReadOnly(false);
 
                   setActive("project-details");
 
-                }}           />
+                }} />
 
             )}
 

@@ -2012,12 +2012,12 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
       <ModernProjectsView
         projects={projectsWithProgress}
         searchQuery={search}
+        onClickProject={(p) => { setJumpProject(p); setActive("project-details"); }}
         onViewTasks={(p) => setViewTasksProj(p)}
         onEdit={(p) => openEdit(p)}
         onDelete={(p) => setDeleteTargetProj(p)}
         onUpdate={fetchProjects}
       />
-
       {/* ── Edit Project Modal ── */}
       {editProj && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center" }}

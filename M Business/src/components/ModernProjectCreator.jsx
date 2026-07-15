@@ -852,7 +852,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                 <div
                   style={{
                     background: '#fff', borderRadius: 16,
-                    padding: '28px 28px 22px', width: '100%', maxWidth: 420,
+                    padding: '32px 32px 26px', width: '100%', maxWidth: 560,
                     boxShadow: '0 20px 60px rgba(0,0,0,0.2)'
                   }}
                   onClick={e => e.stopPropagation()}
@@ -861,8 +861,8 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                     Add Team Member
                   </div>
                   <div style={{
-                    maxHeight: 260, overflowY: 'auto', marginBottom: 20,
-                    border: '1.5px solid #E2E8F0', borderRadius: 10, padding: '6px 4px'
+                    maxHeight: 340, overflowY: 'auto', marginBottom: 20,
+                    border: '1.5px solid #E2E8F0', borderRadius: 10, padding: '10px 8px'
                   }}>
                     {employees.map(emp => {
                       const empName = emp.name || emp.employeeName || '';

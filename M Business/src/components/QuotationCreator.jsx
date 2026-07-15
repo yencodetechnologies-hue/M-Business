@@ -1443,11 +1443,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
         </div>
       </div>
 
-      {hasErrors && (
-        <div className="shake" style={{ background: "#fff5f5", border: "1.5px solid #fca5a5", borderRadius: 10, padding: "12px 16px", marginBottom: 16, fontSize: 13, color: "#b91c1c", fontWeight: 600 }}>
-          Warning Please fill all required fields before saving.
-        </div>
-      )}
+
 
       {/* Quote Details */}
       <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 12 }}>

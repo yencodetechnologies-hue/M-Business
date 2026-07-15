@@ -437,6 +437,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const [viewEntry, setViewEntry] = useState(null);       // entry for view modal
   const [statusUpdating, setStatusUpdating] = useState(null);
   const [paymentModalEntry, setPaymentModalEntry] = useState(null);
+  const [shareModalEntry, setShareModalEntry] = useState(null); // entry pending client selection for Share
+  const [shareSelectedClientId, setShareSelectedClientId] = useState("");
   const [paymentModalStatus, setPaymentModalStatus] = useState("paid");
   const [paymentData, setPaymentData] = useState({ amountPaid: 0, paymentMode: "GPay", paymentDate: new Date().toISOString().split("T")[0], transactionId: "" });
   const [sendReceipt, setSendReceipt] = useState(false);
@@ -1011,15 +1013,18 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
         }
       } else {
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({ title: `Invoice ${entry.invoiceNo}`, text, files: [file] });
-        } else {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url; a.download = file.name; a.click(); URL.revokeObjectURL(url);
-
-          showToast("PDF downloaded!");
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({ title: `Invoice ${entry.invoiceNo}`, text, files: [file] });
+            return;
+          } catch (shareErr) {
+            if (shareErr.name === "AbortError") return;
+          }
         }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url; a.download = file.name; a.click(); URL.revokeObjectURL(url);
+        showToast("Sharing not supported on this device — PDF downloaded instead. You can attach it manually.");
       }
     } catch (err) {
       console.log(err);
@@ -1029,6 +1034,22 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
   const shareInvoice = (entry) => triggerPDFShare(entry, "link");
   const shareWhatsApp = (entry) => triggerPDFShare(entry, "wa");
+
+  const sendInvoiceToClient = async (entry, client) => {
+    if (!entry || !client) return;
+    const clientId = client._id || client.id || client.clientId;
+    try {
+      showToast("Pending Sending invoice to client...");
+      await axios.post(`${BASE_URL}/api/invoices/${entry.id}/send-to-client`, {
+        clientId,
+        clientName: client.clientName || client.name || "",
+      });
+      setShareModalEntry(null);
+      showToast(`Invoice sent to ${client.clientName || client.name}'s dashboard`);
+    } catch (err) {
+      showToast("Error Failed to send invoice to client");
+    }
+  };
 
   // ── Shared styles --------------------------------------------
   const inp = (err) => ({
@@ -1189,6 +1210,86 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
         <Toast msg={toast} />
         {deleteTarget && <ConfirmModal invoiceNo={deleteTarget.invoiceNo} onConfirm={() => handleDelete(deleteTarget)} onCancel={() => setDeleteTarget(null)} />}
+
+        {shareModalEntry && (
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={() => setShareModalEntry(null)}>
+            <div style={{ background: "#fff", borderRadius: 14, width: "100%", maxWidth: 360, maxHeight: "70vh", display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={(e) => e.stopPropagation()}>
+              <div style={{ padding: "16px 18px", borderBottom: "1.5px solid #e5e7eb", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ fontWeight: 800, fontSize: 15, color: "#0f1c2e" }}>Share with client</div>
+                <button onClick={() => setShareModalEntry(null)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#6b7280" }}>✕</button>
+              </div>
+              <div style={{ overflowY: "auto", padding: 8 }}>
+                {clients && clients.length > 0 ? clients.map((c, idx) => {
+                  const name = c.clientName || c.name || "Unnamed Client";
+                  const company = c.companyName || c.company || "";
+                  return (
+                    <button
+                      key={c._id || c.id || idx}
+                      onClick={() => {
+                        const entry = shareModalEntry;
+                        setShareModalEntry(null);
+                        shareInvoice(entry);
+                      }}
+                      style={{ width: "100%", textAlign: "left", padding: "10px 12px", border: "none", background: "#fff", borderRadius: 8, cursor: "pointer", display: "flex", flexDirection: "column", gap: 2 }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = "#f3f4f6"}
+                      onMouseLeave={(e) => e.currentTarget.style.background = "#fff"}
+                    >
+                      <span style={{ fontWeight: 700, fontSize: 13, color: "#0f1c2e" }}>{name}</span>
+                      {company && <span style={{ fontSize: 11, color: "#6b7280" }}>{company}</span>}
+                    </button>
+                  );
+                }) : (
+                  <div style={{ padding: 16, textAlign: "center", fontSize: 13, color: "#6b7280" }}>No clients found</div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {shareModalEntry && (
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={() => { setShareModalEntry(null); setShareSelectedClientId(""); }}>
+            <div style={{ background: "#fff", borderRadius: 14, width: "100%", maxWidth: 360, display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={(e) => e.stopPropagation()}>
+              <div style={{ padding: "16px 18px", borderBottom: "1.5px solid #e5e7eb", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ fontWeight: 800, fontSize: 15, color: "#0f1c2e" }}>Share with client</div>
+                <button onClick={() => { setShareModalEntry(null); setShareSelectedClientId(""); }} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#6b7280" }}>✕</button>
+              </div>
+              <div style={{ padding: 18 }}>
+                <label style={{ display: "block", fontSize: 12, color: "#64748b", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" }}>Select Client</label>
+                <select
+                  value={shareSelectedClientId}
+                  onChange={(e) => setShareSelectedClientId(e.target.value)}
+                  style={{ width: "100%", border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 12px", fontSize: 14, color: "#0f1c2e", background: "var(--app-surface)", boxSizing: "border-box", outline: "none", fontFamily: "inherit" }}
+                >
+                  <option value="">-- Select a client --</option>
+                  {clients && clients.length > 0 ? clients.map((c, idx) => {
+                    const id = c._id || c.id || String(idx);
+                    const name = c.clientName || c.name || "Unnamed Client";
+                    const company = c.companyName || c.company || "";
+                    return (
+                      <option key={id} value={id}>{name}{company ? ` (${company})` : ""}</option>
+                    );
+                  }) : null}
+                </select>
+                {(!clients || clients.length === 0) && (
+                  <div style={{ marginTop: 10, fontSize: 13, color: "#6b7280", textAlign: "center" }}>No clients found</div>
+                )}
+                <button
+                  disabled={!shareSelectedClientId}
+                  onClick={() => {
+                    const chosen = clients.find((c, idx) => (c._id || c.id || String(idx)) === shareSelectedClientId);
+                    if (chosen) {
+                      sendInvoiceToClient(shareModalEntry, chosen);
+                      setShareSelectedClientId("");
+                    }
+                  }}
+                  style={{ width: "100%", marginTop: 16, padding: "12px", background: shareSelectedClientId ? "linear-gradient(135deg,var(--app-accent),var(--app-accent))" : "#e5e7eb", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, color: shareSelectedClientId ? "#fff" : "#9ca3af", cursor: shareSelectedClientId ? "pointer" : "not-allowed", fontFamily: "inherit" }}
+                >
+                  Send
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Payment Modal */}
         {paymentModalEntry && (
@@ -1650,9 +1751,91 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
         {deleteTarget && <ConfirmModal invoiceNo={deleteTarget.invoiceNo} onConfirm={() => handleDelete(deleteTarget)} onCancel={() => setDeleteTarget(null)} />}
 
+        {shareModalEntry && (
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={() => setShareModalEntry(null)}>
+            <div style={{ background: "#fff", borderRadius: 14, width: "100%", maxWidth: 360, maxHeight: "70vh", display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={(e) => e.stopPropagation()}>
+              <div style={{ padding: "16px 18px", borderBottom: "1.5px solid #e5e7eb", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ fontWeight: 800, fontSize: 15, color: "#0f1c2e" }}>Share with client</div>
+                <button onClick={() => setShareModalEntry(null)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#6b7280" }}>✕</button>
+              </div>
+              <div style={{ overflowY: "auto", padding: 8 }}>
+                {clients && clients.length > 0 ? clients.map((c, idx) => {
+                  const name = c.clientName || c.name || "Unnamed Client";
+                  const company = c.companyName || c.company || "";
+                  return (
+                    <button
+                      key={c._id || c.id || idx}
+                      onClick={() => {
+                        const entry = shareModalEntry;
+                        setShareModalEntry(null);
+                        shareInvoice(entry);
+                      }}
+                      style={{ width: "100%", textAlign: "left", padding: "10px 12px", border: "none", background: "#fff", borderRadius: 8, cursor: "pointer", display: "flex", flexDirection: "column", gap: 2 }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = "#f3f4f6"}
+                      onMouseLeave={(e) => e.currentTarget.style.background = "#fff"}
+                    >
+                      <span style={{ fontWeight: 700, fontSize: 13, color: "#0f1c2e" }}>{name}</span>
+                      {company && <span style={{ fontSize: 11, color: "#6b7280" }}>{company}</span>}
+                    </button>
+                  );
+                }) : (
+                  <div style={{ padding: 16, textAlign: "center", fontSize: 13, color: "#6b7280" }}>No clients found</div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {shareModalEntry && (
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={() => { setShareModalEntry(null); setShareSelectedClientId(""); }}>
+            <div style={{ background: "#fff", borderRadius: 14, width: "100%", maxWidth: 360, display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={(e) => e.stopPropagation()}>
+              <div style={{ padding: "16px 18px", borderBottom: "1.5px solid #e5e7eb", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ fontWeight: 800, fontSize: 15, color: "#0f1c2e" }}>Share with client</div>
+                <button onClick={() => { setShareModalEntry(null); setShareSelectedClientId(""); }} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#6b7280" }}>✕</button>
+              </div>
+              <div style={{ padding: 18 }}>
+                <label style={{ display: "block", fontSize: 12, color: "#64748b", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" }}>Select Client</label>
+                <select
+                  value={shareSelectedClientId}
+                  onChange={(e) => setShareSelectedClientId(e.target.value)}
+                  style={{ width: "100%", border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 12px", fontSize: 14, color: "#0f1c2e", background: "var(--app-surface)", boxSizing: "border-box", outline: "none", fontFamily: "inherit" }}
+                >
+                  <option value="">-- Select a client --</option>
+                  {clients && clients.length > 0 ? clients.map((c, idx) => {
+                    const id = c._id || c.id || String(idx);
+                    const name = c.clientName || c.name || "Unnamed Client";
+                    const company = c.companyName || c.company || "";
+                    return (
+                      <option key={id} value={id}>{name}{company ? ` (${company})` : ""}</option>
+                    );
+                  }) : null}
+                </select>
+                {(!clients || clients.length === 0) && (
+                  <div style={{ marginTop: 10, fontSize: 13, color: "#6b7280", textAlign: "center" }}>No clients found</div>
+                )}
+                <button
+                  disabled={!shareSelectedClientId}
+                  onClick={() => {
+                    const chosen = clients.find((c, idx) => (c._id || c.id || String(idx)) === shareSelectedClientId);
+                    if (chosen) {
+                      sendInvoiceToClient(shareModalEntry, chosen);
+                      setShareSelectedClientId("");
+                    }
+                  }}
+                  style={{ width: "100%", marginTop: 16, padding: "12px", background: shareSelectedClientId ? "linear-gradient(135deg,var(--app-accent),var(--app-accent))" : "#e5e7eb", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, color: shareSelectedClientId ? "#fff" : "#9ca3af", cursor: shareSelectedClientId ? "pointer" : "not-allowed", fontFamily: "inherit" }}
+                >
+                  Send
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Toolbar */}
         <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
           <button onClick={() => (!internalNav && onBack) ? onBack() : setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Document Back</button>
+
+          <button onClick={() => setShareModalEntry({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 22px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>Share</button>
 
           <button onClick={() => triggerPDFShare({ id: editingId, invoiceNo: inv.invoiceNo, total: total }, "print")} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>Print / PDF</button>
         </div>
@@ -1956,12 +2139,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         </div>
       </div>
 
-      {/* Error banner */}
-      {hasErrors && (
-        <div className="shake" style={{ background: "#fff5f5", border: "1.5px solid #fca5a5", borderRadius: 10, padding: "12px 16px", marginBottom: 16, fontSize: 13, color: "#b91c1c", fontWeight: 600 }}>
-          Warning Please fill all required fields before saving.
-        </div>
-      )}
+
 
 
       {/* Split Layout Container */}
@@ -2191,7 +2369,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                   {items.map((item, idx) => {
                     const dErr = errors[`item_${item.id}_description`];
                     const rErr = errors[`item_${item.id}_rate`];
-                    const lineBase = (parseFloat(item.quantity) || 0) * (parseFloat(item.rate) || 0);
+                    const qty = parseFloat(item.quantity) || 0;
+                    const rate = parseFloat(item.rate) || 0;
+                    const lineBase = qty * rate;
                     const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
                     const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
                     const lineTax = isIncl ? (lineBase - (lineBase / (1 + rateGst / 100))) : (lineBase * (rateGst / 100));

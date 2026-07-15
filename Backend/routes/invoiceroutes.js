@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
       (doc.items || []).forEach((item) => {
         const q = parseFloat(item.quantity) || 0;
         const r = parseFloat(item.rate) || 0;
-        const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(doc.gstRate) || 18);
+        const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (parseFloat(doc.gstRate) || 18);
         const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (doc.isGstIncluded || false);
 
         const itemBase = q * r;
@@ -30,7 +30,6 @@ router.get("/", async (req, res) => {
           total += itemBase * (1 + rateGst / 100);
         }
       });
-
       // Fetch payment history for this invoice
       const history = await Income.find({ invoiceNo: doc.invoiceNo }).sort({ date: 1 }).lean();
 
@@ -107,7 +106,7 @@ router.get("/project/:projectName", async (req, res) => {
       (doc.items || []).forEach(item => {
         const q = parseFloat(item.quantity) || 0;
         const r = parseFloat(item.rate) || 0;
-        const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(doc.gstRate) || 18);
+        const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (parseFloat(doc.gstRate) || 18);
         const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (doc.isGstIncluded || false);
         const base = q * r;
         total += isIncl ? base : base * (1 + rateGst / 100);
@@ -171,7 +170,7 @@ router.get("/client/:clientName", async (req, res) => {
       (doc.items || []).forEach((item) => {
         const q = parseFloat(item.quantity) || 0;
         const r = parseFloat(item.rate) || 0;
-        const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(doc.gstRate) || 18);
+        const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (parseFloat(doc.gstRate) || 18);
         const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (doc.isGstIncluded || false);
 
         const itemBase = q * r;
@@ -646,6 +645,35 @@ router.delete("/:id", async (req, res) => {
     return res.json({ success: true });
   } catch (err) {
     console.error("DELETE error:", err);
+    return res.status(500).json({ success: false, msg: err.message });
+  }
+});
+
+// ── POST send invoice to a client's dashboard ─────────────────────────────
+router.post("/:id/send-to-client", async (req, res) => {
+  try {
+    const { clientId, clientName } = req.body;
+    if (!clientId) return res.status(400).json({ success: false, msg: "clientId required" });
+
+    const invoice = await Invoice.findById(req.params.id);
+    if (!invoice) return res.status(404).json({ success: false, msg: "Invoice not found" });
+
+    invoice.clientId = clientId;
+    if (invoice.status === "draft") invoice.status = "pending";
+    await invoice.save();
+
+    await new Notification({
+      userId: clientId,
+      type: "invoice",
+      icon: "ti-receipt-2",
+      text: `New invoice ${invoice.invoiceNo} has been sent to you`,
+      link: "payments",
+      companyId: invoice.companyId || "",
+    }).save();
+
+    return res.json({ success: true, invoice });
+  } catch (err) {
+    console.error("POST /api/invoices/:id/send-to-client error:", err);
     return res.status(500).json({ success: false, msg: err.message });
   }
 });

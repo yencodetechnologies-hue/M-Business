@@ -135,7 +135,7 @@ function saveDraftLocal(inv, items, status = "draft") {
   items.forEach((item) => {
     const q = parseFloat(item.quantity) || 0;
     const r = parseFloat(item.rate) || 0;
-    const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
+    const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (inv.gstRate !== undefined && inv.gstRate !== null && inv.gstRate !== "" ? parseFloat(inv.gstRate) : 18);
     const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
 
     const itemBase = q * r;
@@ -601,7 +601,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   items.forEach((item) => {
     const q = parseFloat(item.quantity) || 0;
     const r = parseFloat(item.rate) || 0;
-    const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
+    const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (inv.gstRate !== undefined && inv.gstRate !== null && inv.gstRate !== "" ? parseFloat(inv.gstRate) : 18);
     const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
 
     const itemBase = q * r;
@@ -1406,9 +1406,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             </div>
           </div>
           <div className="header-actions">
-            <button className="filter-btn"><i className="ti ti-filter" style={{ fontSize: 14 }}></i> Filter</button>
+
             <button className="filter-btn"><i className="ti ti-calendar" style={{ fontSize: 14 }}></i> May 2026</button>
-            <button className="filter-btn"><i className="ti ti-download" style={{ fontSize: 14 }}></i> Export</button>
+          
           </div>
         </div>
 
@@ -2136,17 +2136,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             </span>
           )}
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={clearForm} style={{ padding: "8px 14px", background: "#fff", border: "1.5px solid #f3f4f6", borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: "pointer", color: "#6b7280", fontFamily: "inherit" }}>Clear</button>
-          <button onClick={handleSaveDraft} disabled={!!saving}
-            style={{ padding: "8px 18px", background: draftSaved ? "#22c55e" : "#fff", border: `1.5px solid ${draftSaved ? "#22c55e" : "#e5e7eb"}`, borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: saving ? "not-allowed" : "pointer", color: draftSaved ? "#fff" : "#374151", fontFamily: "inherit", transition: "all 0.3s" }}>
-            {saving === "draft" ? "Saving…" : draftSaved ? "Success Saved!" : " Save Draft"}
-          </button>
-          <button onClick={handleSavePreview} disabled={!!saving}
-            style={{ padding: "8px 22px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
-            {saving === "preview" ? "Saving…" : "Preview "}
-          </button>
-        </div>
+
       </div>
 
 

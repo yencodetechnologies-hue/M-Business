@@ -2397,7 +2397,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           }} />}
           {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
-          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} config={config} onViewTasks={(p) => { setSelectedProjectForTasks(p); setActive("tasks"); }} />}
+          clients={clients}
+          employees={employees} projects={projects} setProjects={setProjects} clients={clients} employees={employees} config={config} onViewTasks={(p) => { setSelectedProjectForTasks(p); setActive("tasks"); }} />}
 
           {validActive === "invoices" && <InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setActive("addProject")} />} onAddClient={() => setModal("client")} onAddProject={() => setActive("projects")} />}
           {validActive === "quotations" && <QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setActive("projects")} />}

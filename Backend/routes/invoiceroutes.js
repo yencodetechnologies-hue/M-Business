@@ -19,7 +19,7 @@ router.get("/", async (req, res) => {
       (doc.items || []).forEach((item) => {
         const q = parseFloat(item.quantity) || 0;
         const r = parseFloat(item.rate) || 0;
-        const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (parseFloat(doc.gstRate) || 18);
+        const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (doc.gstRate !== undefined && doc.gstRate !== null && doc.gstRate !== "" ? parseFloat(doc.gstRate) : 18);
         const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (doc.isGstIncluded || false);
 
         const itemBase = q * r;
@@ -104,16 +104,6 @@ router.get("/project/:projectName", async (req, res) => {
     }).sort({ createdAt: -1 }).lean();
 
     const result = invoices.map(doc => {
-      let total = 0;
-      (doc.items || []).forEach(item => {
-        const q = parseFloat(item.quantity) || 0;
-        const r = parseFloat(item.rate) || 0;
-        const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (parseFloat(doc.gstRate) || 18);
-        const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (doc.isGstIncluded || false);
-        const base = q * r;
-        total += isIncl ? base : base * (1 + rateGst / 100);
-      });
-
       return {
         id: doc._id.toString(),
         invoiceNo: doc.invoiceNo || "—",
@@ -122,8 +112,8 @@ router.get("/project/:projectName", async (req, res) => {
         date: doc.date || null,
         dueDate: doc.dueDate || null,
         status: doc.status || "draft",
-        total: doc.total || total,
-        amount: doc.total || total,
+        total: doc.total || 0,
+        amount: doc.total || 0,
         amountPaid: doc.amountPaid || 0,
         currency: doc.currency || "₹",
       };
@@ -173,7 +163,7 @@ router.get("/client/:clientName", async (req, res) => {
       (doc.items || []).forEach((item) => {
         const q = parseFloat(item.quantity) || 0;
         const r = parseFloat(item.rate) || 0;
-        const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (parseFloat(doc.gstRate) || 18);
+        const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (doc.gstRate !== undefined && doc.gstRate !== null && doc.gstRate !== "" ? parseFloat(doc.gstRate) : 18);
         const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (doc.isGstIncluded || false);
 
         const itemBase = q * r;
@@ -310,7 +300,7 @@ router.post("/", async (req, res) => {
     items.forEach((item) => {
       const q = parseFloat(item.quantity) || 0;
       const r = parseFloat(item.rate) || 0;
-      const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
+      const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (inv.gstRate !== undefined && inv.gstRate !== null && inv.gstRate !== "" ? parseFloat(inv.gstRate) : 18);
       const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
 
       const itemBase = q * r;
@@ -354,14 +344,12 @@ router.post("/", async (req, res) => {
         description: i.description || "",
         quantity: parseFloat(i.quantity) || 0,
         rate: parseFloat(i.rate) || 0,
-        gstRate: (i.gstRate !== undefined && i.gstRate !== null && i.gstRate !== "") ? parseFloat(i.gstRate) : (parseFloat(inv.gstRate) || 18),
+        gstRate: (i.gstRate !== undefined && i.gstRate !== null && i.gstRate !== "") ? parseFloat(i.gstRate) : (inv.gstRate !== undefined && inv.gstRate !== null && inv.gstRate !== "" ? parseFloat(inv.gstRate) : 18),
         isGstIncluded: i.isGstIncluded !== undefined ? i.isGstIncluded : (inv.isGstIncluded || false),
       })),
       subtotal,
       gstAmt,
-      total: inv.total !== undefined && inv.total !== null && inv.total !== ""
-        ? parseFloat(inv.total)
-        : total - (inv.discountType === "Custom" ? (parseFloat(inv.discountPct) || 0) : (subtotal * (parseFloat(inv.discountPct) || 0) / 100)) + (parseFloat(inv.extraCharges) || 0),
+      total: total - (inv.discountType === "Custom" ? (parseFloat(inv.discountPct) || 0) : (subtotal * (parseFloat(inv.discountPct) || 0) / 100)) + (parseFloat(inv.extraCharges) || 0),
       status: status || "draft",
       amountPaid: parseFloat(inv.amountPaid) || 0,
       paymentMode: inv.paymentMode || "GPay",
@@ -482,7 +470,7 @@ router.put("/:id", async (req, res) => {
     items.forEach((item) => {
       const q = parseFloat(item.quantity) || 0;
       const r = parseFloat(item.rate) || 0;
-      const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
+      const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (inv.gstRate !== undefined && inv.gstRate !== null && inv.gstRate !== "" ? parseFloat(inv.gstRate) : 18);
       const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
 
       const itemBase = q * r;
@@ -511,14 +499,12 @@ router.put("/:id", async (req, res) => {
         description: i.description || "",
         quantity: parseFloat(i.quantity) || 0,
         rate: parseFloat(i.rate) || 0,
-        gstRate: (i.gstRate !== undefined && i.gstRate !== null && i.gstRate !== "") ? parseFloat(i.gstRate) : (parseFloat(inv.gstRate) || 18),
+        gstRate: (i.gstRate !== undefined && i.gstRate !== null && i.gstRate !== "") ? parseFloat(i.gstRate) : (inv.gstRate !== undefined && inv.gstRate !== null && inv.gstRate !== "" ? parseFloat(inv.gstRate) : 18),
         isGstIncluded: i.isGstIncluded !== undefined ? i.isGstIncluded : (inv.isGstIncluded || false),
       })),
       subtotal,
       gstAmt,
-      total: inv.total !== undefined && inv.total !== null && inv.total !== ""
-        ? parseFloat(inv.total)
-        : total - (inv.discountType === "Custom" ? (parseFloat(inv.discountPct) || 0) : (subtotal * (parseFloat(inv.discountPct) || 0) / 100)) + (parseFloat(inv.extraCharges) || 0),
+      total: total - (inv.discountType === "Custom" ? (parseFloat(inv.discountPct) || 0) : (subtotal * (parseFloat(inv.discountPct) || 0) / 100)) + (parseFloat(inv.extraCharges) || 0),
       status: status || "draft",
       amountPaid: parseFloat(inv.amountPaid) || 0,
       paymentDate: inv.paymentDate || "",

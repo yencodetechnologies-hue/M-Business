@@ -4454,11 +4454,8 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
         }}
 
         onClickProject={(p) => {
-
           if (!p || (!p._id && !p.id)) return;
-
-          openEdit(p);
-
+          onViewProject && onViewProject(p);
         }}
 
         onEdit={(p) => openEdit(p)}
@@ -7222,6 +7219,18 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       return c ? JSON.parse(c) : [];
     } catch { return []; }
   });
+
+  // Active-only lists — used everywhere EXCEPT the Clients/Employees management pages themselves,
+  // so Inactive clients/employees are never selectable/assignable/visible app-wide, while still
+  // remaining manageable (and re-activatable) from their own management pages.
+  const activeClients = React.useMemo(
+    () => clients.filter(c => (c.status || "Active").toLowerCase() !== "inactive"),
+    [clients]
+  );
+  const activeEmployees = React.useMemo(
+    () => employees.filter(e => (e.status || "Active").toLowerCase() !== "inactive"),
+    [employees]
+  );
 
   const [ne, setNe] = useState({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "", password: "" });
 

@@ -561,7 +561,7 @@ export default function ModernProjectsPage({ user }) {
                   <div
                     key={p._id}
                     className={`m-project-card c-${cardColor}`}
-                    onClick={() => { }}
+                    onClick={() => { setSelectedProject(p); sessionStorage.setItem('selectedProjectId', p._id); }}
                     style={{ cursor: 'pointer', position: 'relative' }}
                   >
                     {/* Card actions */}

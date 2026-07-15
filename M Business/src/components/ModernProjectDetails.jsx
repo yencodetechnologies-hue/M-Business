@@ -1650,14 +1650,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <span style={{ color: P.textDark }}>{projName}</span>
           </div>
 
-          {onEdit && user?.role !== 'client' && (
-            <button
-              onClick={() => onEdit({ ...project, ...currProject })}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 10, border: 'none', background: P.primary, color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
-            >
-              <i className="ti ti-edit" style={{ fontSize: 15 }}></i> Edit Project
-            </button>
-          )}
+
 
         </div>
 

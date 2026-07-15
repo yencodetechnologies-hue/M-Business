@@ -1,7 +1,18 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import QuotationCreator from './QuotationCreator';
 import axios from 'axios';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 import { BASE_URL } from '../config';
+
+function QuoToast({ msg }) {
+  if (!msg) return null;
+  return (
+    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 9999, background: 'var(--surface)', border: '2px solid #22c55e', borderRadius: 16, padding: '14px 24px', fontSize: 14, fontWeight: 800, color: '#22c55e', boxShadow: '0 8px 24px rgba(0,0,0,.15)', display: 'flex', alignItems: 'center', gap: 10, animation: 'fadeInUp 0.3s ease-out' }}>
+      ✅ {msg}
+    </div>
+  );
+}
 
 export default function QuotationCreatorModern(props) {
   const [showModernForm, setShowModernForm] = useState(false);
@@ -193,11 +204,146 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
   // ── Save ──
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [toast, setToast] = useState('');
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 2800); };
+  const previewRef = useRef(null);
 
 
   // ── Client searchable dropdown ──
   const [clientDropOpen, setClientDropOpen] = useState(false);
   const [clientSearch, setClientSearch] = useState('');
+
+  const generateQuotationPdf = async () => {
+    const element = previewRef.current;
+    if (!element) return null;
+
+    const resolveCssVars = (el) => {
+      const rootComputed = getComputedStyle(document.documentElement);
+      const elComputed = getComputedStyle(el);
+      const resolveVar = (varExpr) => {
+        let expr = varExpr;
+        let prev;
+        do {
+          prev = expr;
+          expr = expr.replace(/var\(\s*(--[a-zA-Z0-9-]+)\s*(?:,\s*([^()]*(?:\([^()]*\)[^()]*)*))?\)/g, (_, name, fallback) => {
+            const fromEl = elComputed.getPropertyValue(name).trim();
+            const fromRoot = rootComputed.getPropertyValue(name).trim();
+            return fromEl || fromRoot || (fallback ? fallback.trim() : '');
+          });
+        } while (expr !== prev && expr.includes('var('));
+        return expr;
+      };
+      const walk = (node) => {
+        if (node.nodeType === 1) {
+          const st = node.getAttribute('style') || '';
+          if (st.includes('var(')) node.setAttribute('style', resolveVar(st));
+          Array.from(node.children).forEach(walk);
+        }
+      };
+      walk(el);
+    };
+
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+    const elemW = element.scrollWidth;
+    const elemH = element.scrollHeight;
+
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      letterRendering: true,
+      width: elemW,
+      height: elemH,
+      windowWidth: elemW,
+      windowHeight: elemH,
+      onclone: (doc) => {
+        const el = doc.querySelector('.quo-preview');
+        if (el) {
+          resolveCssVars(el);
+          el.style.width = elemW + 'px';
+          el.style.maxWidth = 'none';
+          el.style.overflow = 'visible';
+        }
+      }
+    });
+
+    const A4_W = 210;
+    const A4_H = 297;
+    const imgAspect = canvas.width / canvas.height;
+    const finalW = A4_W;
+    const finalH = A4_W / imgAspect;
+    const imgData = canvas.toDataURL('image/jpeg', 0.98);
+
+    const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
+    let heightLeft = finalH;
+    let position = 0;
+    pdf.addImage(imgData, 'JPEG', 0, position, finalW, finalH);
+    heightLeft -= A4_H;
+    while (heightLeft > 0) {
+      position = heightLeft - finalH;
+      pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', 0, position, finalW, finalH);
+      heightLeft -= A4_H;
+    }
+    return pdf;
+  };
+
+  const handleDownloadPdf = async () => {
+    try {
+      showToast('Generating PDF…');
+      const pdf = await generateQuotationPdf();
+      if (!pdf) return;
+      pdf.save(`Quotation_${qt.quoteNo}.pdf`);
+      showToast('PDF downloaded successfully!');
+    } catch (err) {
+      console.error('PDF generation error', err);
+      showToast('Failed to generate PDF');
+    }
+  };
+
+  const handlePrint = async () => {
+    try {
+      showToast('Preparing print…');
+      const pdf = await generateQuotationPdf();
+      if (!pdf) return;
+      pdf.autoPrint();
+      const blobURL = pdf.output('bloburl');
+      window.open(blobURL, '_blank');
+    } catch (err) {
+      console.error('Print error', err);
+      showToast('Failed to prepare print view');
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      showToast('Generating PDF to share…');
+      const pdf = await generateQuotationPdf();
+      if (!pdf) return;
+      const blob = pdf.output('blob');
+      const file = new File([blob], `Quotation_${qt.quoteNo}.pdf`, { type: 'application/pdf' });
+      const text = `*${qt.fromCompany || 'Your Business'}*\n\nQuotation: ${qt.quoteNo}\nProject: ${qt.title || ''}`;
+
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ title: `Quotation ${qt.quoteNo}`, text, files: [file] });
+          showToast('Quotation shared successfully!');
+          return;
+        } catch (shareErr) {
+          if (shareErr.name === 'AbortError') return;
+        }
+      }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = file.name; a.click(); URL.revokeObjectURL(url);
+      showToast('Sharing not supported on this device — PDF downloaded instead.');
+    } catch (err) {
+      console.error('Share error', err);
+      showToast('Failed to share quotation');
+    }
+  };
+
   const handleSave = async (statusArg = 'draft') => {
     const normalStatus = statusArg.toLowerCase();
     if (normalStatus === 'sent' && !qt.toName) {
@@ -246,9 +392,11 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
       setSaving(false);
       setSaved(true);
       if (normalStatus === 'sent') {
-        alert(`✅ Quotation sent successfully to ${qt.toName}! It will appear in their dashboard immediately.`);
+        showToast(`Quotation sent successfully to ${qt.toName}!`);
+      } else {
+        showToast('Quotation saved successfully!');
       }
-      setTimeout(() => { setSaved(false); onBack(); }, normalStatus === 'sent' ? 400 : 1200);
+      setTimeout(() => { setSaved(false); onBack(); }, normalStatus === 'sent' ? 900 : 1200);
     } catch (e) {
       console.error('Save error', e);
       setSaving(false);
@@ -967,11 +1115,12 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
             <div className="mqc-preview-toolbar">
               <span className="mqc-pt-title">Document Live Preview</span>
               <div style={{ display: 'flex', gap: 6 }}>
-                <button className="mqc-pt-btn"><i className="ti ti-download" style={{ fontSize: 11 }}></i> PDF</button>
-                <button className="mqc-pt-btn"><i className="ti ti-share" style={{ fontSize: 11 }}></i> Share</button>
+                <button className="mqc-pt-btn" onClick={handlePrint}><i className="ti ti-printer" style={{ fontSize: 11 }}></i> Print</button>
+                <button className="mqc-pt-btn" onClick={handleDownloadPdf}><i className="ti ti-download" style={{ fontSize: 11 }}></i> PDF</button>
+                <button className="mqc-pt-btn" onClick={handleShare}><i className="ti ti-share" style={{ fontSize: 11 }}></i> Share</button>
               </div>
             </div>
-            <div className="quo-preview">
+            <div className="quo-preview" ref={previewRef}>
               {/* Header */}
               <div className="quo-header">
                 <div>
@@ -1027,6 +1176,9 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
                 <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--teal)', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 3 }}>Project</div>
                 <div style={{ fontSize: 13, fontWeight: 800, color: qt.title ? 'var(--text)' : 'var(--text3)' }}>{qt.title || '— Project Title —'}</div>
                 <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 2 }}>{qt.type}</div>
+                {qt.description && (
+                  <div style={{ fontSize: 10, color: 'var(--text2)', marginTop: 6, lineHeight: 1.6 }}>{qt.description}</div>
+                )}
               </div>
 
               {/* Scope tags */}
@@ -1161,6 +1313,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
           </div>
         </div>
       </div>
+      <QuoToast msg={toast} />
     </div>
   );
 }

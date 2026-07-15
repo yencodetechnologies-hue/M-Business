@@ -135,7 +135,7 @@ function saveDraftLocal(inv, items, status = "draft") {
   items.forEach((item) => {
     const q = parseFloat(item.quantity) || 0;
     const r = parseFloat(item.rate) || 0;
-    const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
+    const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
     const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
 
     const itemBase = q * r;
@@ -601,7 +601,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   items.forEach((item) => {
     const q = parseFloat(item.quantity) || 0;
     const r = parseFloat(item.rate) || 0;
-    const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
+    const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
     const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
 
     const itemBase = q * r;
@@ -747,9 +747,11 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const apiSave = async (status = "draft") => {
     try {
       const newStatus = inv.status || status;
+      const computedTotal = total - discountAmt + (parseFloat(inv.extraCharges) || 0);
+      const payloadInv = { ...inv, total: computedTotal };
       const res = editingId
-        ? await axios.put(`${BASE_URL}/api/invoices/${editingId}`, { inv, items, status: newStatus })
-        : await axios.post(`${BASE_URL}/api/invoices`, { inv, items, status: newStatus });
+        ? await axios.put(`${BASE_URL}/api/invoices/${editingId}`, { inv: payloadInv, items, status: newStatus })
+        : await axios.post(`${BASE_URL}/api/invoices`, { inv: payloadInv, items, status: newStatus });
 
       // Keep the project's own invoice list in sync (Projects → Accounts view)
       if (localEditTarget && localEditTarget.projectId && onSaveLocalInvoice) {
@@ -765,9 +767,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const buildLocalInvoiceRecord = () => ({
     invoiceNo: inv.invoiceNo,
     description: items[0]?.description || inv.notes || 'Invoice',
-    amount: subtotal,
+    amount: total - discountAmt + (parseFloat(inv.extraCharges) || 0),
     taxType: inv.isGstIncluded ? 'inclusive' : 'exclusive',
-    taxPercent: items[0]?.gstRate !== undefined ? Number(items[0].gstRate) : Number(inv.gstRate) || 0,
+    taxPercent: (items[0]?.gstRate !== undefined && items[0]?.gstRate !== null && items[0]?.gstRate !== "") ? Number(items[0].gstRate) : Number(inv.gstRate) || 0,
     issueDate: inv.date,
     dueDate: inv.dueDate,
     status: inv.status || 'pending',

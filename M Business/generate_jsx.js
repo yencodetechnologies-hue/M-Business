@@ -14,7 +14,7 @@ jsx = jsx.replace(/<(input|br|hr|img)([^>]*?)(?<!\/)>/g, '<$1$2 />');
 
 // Quick JSX conversions
 jsx = jsx.replace(/class=/g, 'className=');
-jsx = jsx.replace(/onclick="[^"]*"/g, 'onClick={() => {}}');
+jsx = jsx.replace(/onclick="[^"]*"/g, 'onClick={() => { sessionStorage.setItem('selectedProjectId', p._id); setSelectedProject(p); }}');
 jsx = jsx.replace(/oninput="[^"]*"/g, 'onChange={() => {}}');
 jsx = jsx.replace(/onchange="[^"]*"/g, 'onChange={() => {}}');
 jsx = jsx.replace(/<!--(.*?)-->/g, '{/* $1 */}');
@@ -32,7 +32,7 @@ jsx = jsx.replace(/style="([^"]*)"/g, (match, p1) => {
       return acc;
     }, {});
     return 'style={' + JSON.stringify(css) + '}';
-  } catch(e) {
+  } catch (e) {
     return 'style={{}}';
   }
 });

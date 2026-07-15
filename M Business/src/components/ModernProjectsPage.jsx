@@ -387,7 +387,7 @@ export default function ModernProjectsPage({ user }) {
                 setJumpInvoice(null);
                 setShowInvoiceCreator(true);
               }}
-          onViewInvoice={(proj, inv) => {
+              onViewInvoice={(proj, inv) => {
                 // Always pull the freshest copy of this invoice from the current
                 // project data, so a just-saved signature is reflected in View.
                 const freshProj = projects.find(p => p._id === proj._id) || proj;
@@ -561,11 +561,11 @@ export default function ModernProjectsPage({ user }) {
                   <div
                     key={p._id}
                     className={`m-project-card c-${cardColor}`}
-                    onClick={() => { sessionStorage.setItem('selectedProjectId', p._id); setSelectedProject(p); }}
+                    onClick={() => { }}
                     style={{ cursor: 'pointer', position: 'relative' }}
                   >
                     {/* Card actions */}
-                    <div style={{ position: 'absolute', top: 12, right: 12, display: 'flex', gap: 6, zIndex: 2 }} onClick={e => e.stopPropagation()}>
+                    <div data-card-actions style={{ position: 'absolute', top: 12, right: 12, display: 'flex', gap: 6, zIndex: 2 }} onClick={e => e.stopPropagation()}>
                       <button
                         title="Log Time"
                         onClick={e => openLogTime(p, e)}
@@ -573,7 +573,7 @@ export default function ModernProjectsPage({ user }) {
                       ><i className="ti ti-clock" style={{ fontSize: 13 }}></i></button>
                       <button
                         title="Edit"
-                        onClick={e => openEdit(p, e)}
+                        onClick={e => { e.stopPropagation(); openEdit(p, e); }}
                         style={{ background: 'rgba(0,188,212,.1)', border: 'none', borderRadius: 6, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: ' var(--app-accent, var(--app-accent, #00BCD4))' }}
                       ><i className="ti ti-edit" style={{ fontSize: 13 }}></i></button>
                       <button

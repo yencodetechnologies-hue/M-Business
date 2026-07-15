@@ -14,7 +14,8 @@ router.get("/", async (req, res) => {
 
     const normalised = await Promise.all(invoices.map(async (doc) => {
       let subtotal = 0;
-      let total = 0;
+      let total = (doc.total !== undefined && doc.total !== null) ? doc.total : 0;
+      let recomputedTotal = 0;
       (doc.items || []).forEach((item) => {
         const q = parseFloat(item.quantity) || 0;
         const r = parseFloat(item.rate) || 0;
@@ -23,13 +24,14 @@ router.get("/", async (req, res) => {
 
         const itemBase = q * r;
         if (isIncl) {
-          total += itemBase;
+          recomputedTotal += itemBase;
           subtotal += itemBase / (1 + rateGst / 100);
         } else {
           subtotal += itemBase;
-          total += itemBase * (1 + rateGst / 100);
+          recomputedTotal += itemBase * (1 + rateGst / 100);
         }
       });
+      if (doc.total === undefined || doc.total === null) total = recomputedTotal;
       // Fetch payment history for this invoice
       const history = await Income.find({ invoiceNo: doc.invoiceNo }).sort({ date: 1 }).lean();
 
@@ -166,7 +168,8 @@ router.get("/client/:clientName", async (req, res) => {
 
     const normalised = await Promise.all(invoices.map(async (doc) => {
       let subtotal = 0;
-      let total = 0;
+      let total = (doc.total !== undefined && doc.total !== null) ? doc.total : 0;
+      let recomputedTotal = 0;
       (doc.items || []).forEach((item) => {
         const q = parseFloat(item.quantity) || 0;
         const r = parseFloat(item.rate) || 0;
@@ -175,13 +178,14 @@ router.get("/client/:clientName", async (req, res) => {
 
         const itemBase = q * r;
         if (isIncl) {
-          total += itemBase;
+          recomputedTotal += itemBase;
           subtotal += itemBase / (1 + rateGst / 100);
         } else {
           subtotal += itemBase;
-          total += itemBase * (1 + rateGst / 100);
+          recomputedTotal += itemBase * (1 + rateGst / 100);
         }
       });
+      if (doc.total === undefined || doc.total === null) total = recomputedTotal;
 
       const history = await Income.find({ invoiceNo: doc.invoiceNo }).sort({ date: 1 }).lean();
 
@@ -350,12 +354,14 @@ router.post("/", async (req, res) => {
         description: i.description || "",
         quantity: parseFloat(i.quantity) || 0,
         rate: parseFloat(i.rate) || 0,
-gstRate: (i.gstRate !== undefined && i.gstRate !== null && i.gstRate !== "") ? parseFloat(i.gstRate) : (parseFloat(inv.gstRate) || 18),
+        gstRate: (i.gstRate !== undefined && i.gstRate !== null && i.gstRate !== "") ? parseFloat(i.gstRate) : (parseFloat(inv.gstRate) || 18),
         isGstIncluded: i.isGstIncluded !== undefined ? i.isGstIncluded : (inv.isGstIncluded || false),
       })),
       subtotal,
       gstAmt,
-      total: total - (inv.discountType === "Custom" ? (parseFloat(inv.discountPct) || 0) : (subtotal * (parseFloat(inv.discountPct) || 0) / 100)) + (parseFloat(inv.extraCharges) || 0),
+      total: inv.total !== undefined && inv.total !== null && inv.total !== ""
+        ? parseFloat(inv.total)
+        : total - (inv.discountType === "Custom" ? (parseFloat(inv.discountPct) || 0) : (subtotal * (parseFloat(inv.discountPct) || 0) / 100)) + (parseFloat(inv.extraCharges) || 0),
       status: status || "draft",
       amountPaid: parseFloat(inv.amountPaid) || 0,
       paymentMode: inv.paymentMode || "GPay",
@@ -476,7 +482,7 @@ router.put("/:id", async (req, res) => {
     items.forEach((item) => {
       const q = parseFloat(item.quantity) || 0;
       const r = parseFloat(item.rate) || 0;
-const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
+      const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
       const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
 
       const itemBase = q * r;
@@ -505,12 +511,14 @@ const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gst
         description: i.description || "",
         quantity: parseFloat(i.quantity) || 0,
         rate: parseFloat(i.rate) || 0,
-gstRate: (i.gstRate !== undefined && i.gstRate !== null && i.gstRate !== "") ? parseFloat(i.gstRate) : (parseFloat(inv.gstRate) || 18),
+        gstRate: (i.gstRate !== undefined && i.gstRate !== null && i.gstRate !== "") ? parseFloat(i.gstRate) : (parseFloat(inv.gstRate) || 18),
         isGstIncluded: i.isGstIncluded !== undefined ? i.isGstIncluded : (inv.isGstIncluded || false),
       })),
       subtotal,
       gstAmt,
-      total: total - (inv.discountType === "Custom" ? (parseFloat(inv.discountPct) || 0) : (subtotal * (parseFloat(inv.discountPct) || 0) / 100)) + (parseFloat(inv.extraCharges) || 0),
+      total: inv.total !== undefined && inv.total !== null && inv.total !== ""
+        ? parseFloat(inv.total)
+        : total - (inv.discountType === "Custom" ? (parseFloat(inv.discountPct) || 0) : (subtotal * (parseFloat(inv.discountPct) || 0) / 100)) + (parseFloat(inv.extraCharges) || 0),
       status: status || "draft",
       amountPaid: parseFloat(inv.amountPaid) || 0,
       paymentDate: inv.paymentDate || "",

@@ -374,6 +374,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   useEffect(() => {
     if (newInvoicePrefill) {
       if (newInvoicePrefill.editData) {
+        loadEntry(newInvoicePrefill.editData, newInvoicePrefill.readOnly ? "preview" : "form");
+        return;
+      }
+      if (false) {
         // Edit mode — pre-fill existing invoice data
         const ed = newInvoicePrefill.editData;
         setInv({
@@ -601,7 +605,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   items.forEach((item) => {
     const q = parseFloat(item.quantity) || 0;
     const r = parseFloat(item.rate) || 0;
-    const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (inv.gstRate !== undefined && inv.gstRate !== null && inv.gstRate !== "" ? parseFloat(inv.gstRate) : 18);
+    const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (inv.gstRate !== undefined && inv.gstRate !== null && inv.gstRate !== "" ? parseFloat(inv.gstRate) : 0);
     const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
 
     const itemBase = q * r;
@@ -712,6 +716,11 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const loadEntry = (entry, targetStep = "form") => {
     // Use entry.inv if it exists, otherwise treat entry itself as the invoice
     const invData = entry.inv || entry;
+    // Signature can live on entry, entry.inv, or (rarely) a top-level
+    // savedSignature field depending on the fetch path — check them all
+    // so a previously saved signature is never dropped in Edit mode.
+    const sig = invData.signature || entry.signature || entry.savedSignature || '';
+    const sigType = invData.signatureType || entry.signatureType || (sig ? (sig.startsWith('data:image') ? 'image' : 'text') : 'text');
     setInv({
       ...blank,
       ...invData,
@@ -720,15 +729,25 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       date: invData.date || entry.date || blank.date,
       dueDate: invData.dueDate || entry.dueDate || blank.dueDate,
       status: invData.status || entry.status || 'draft',
-      signature: invData.signature || entry.signature || '',
-      signatureType: invData.signatureType || entry.signatureType || 'text',
+      signature: sig,
+      signatureType: sigType,
     });
     const sourceItems = (entry.items?.length ? entry.items : invData.items) || [];
-    setItems(
-      sourceItems.length
-        ? sourceItems.map((it, i) => ({ ...it, id: it.id || i + 1 }))
-        : [{ id: 1, description: '', quantity: 1, rate: '' }]
-    );
+    if (sourceItems.length) {
+      setItems(sourceItems.map((it, i) => ({ ...it, id: it.id || i + 1 })));
+    } else {
+      // Older/legacy invoices sometimes only stored a total with no item
+      // breakdown. Rather than showing a blank "—" / ₹0 row, synthesize a
+      // single summary line from the saved total so nothing looks missing.
+      const savedTotal = parseFloat(entry.total ?? invData.total) || 0;
+      setItems([{
+        id: 1,
+        description: invData.notes || entry.description || 'Invoice Total',
+        quantity: 1,
+        rate: savedTotal,
+        gstRate: invData.gstRate ?? 0,
+      }]);
+    }
     // The document's real Mongo _id may live on entry, entry.inv, or entry._id
     // depending on which fetch path populated this row — check all of them
     // so Save always issues a PUT (update) instead of falling back to POST
@@ -755,7 +774,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     try {
       const newStatus = inv.status || status;
       const computedTotal = total - discountAmt + (parseFloat(inv.extraCharges) || 0);
-      const payloadInv = { ...inv, total: computedTotal };
+      const payloadInv = { ...inv, total: computedTotal, signature: inv.signature || "", signatureType: inv.signatureType || "text" };
       const res = editingId
         ? await axios.put(`${BASE_URL}/api/invoices/${editingId}`, { inv: payloadInv, items, status: newStatus })
         : await axios.post(`${BASE_URL}/api/invoices`, { inv: payloadInv, items, status: newStatus });
@@ -2626,7 +2645,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <label className="inv-creator-form-label">Authorised Signature</label>
                 {inv.signature ? (
                   <div style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 12, padding: "14px 18px", display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
-                    <button type="button" onClick={() => { upd("signature", ""); setTypedSig(""); }} style={{ position: "absolute", top: 10, right: 10, border: "none", background: "none", color: "#ef4444", fontSize: 12, cursor: "pointer", fontWeight: "800" }}>CloseClear Signature</button>
+                    <button type="button" onClick={() => { upd("signature", ""); upd("signatureType", "text"); setTypedSig(""); }} style={{ position: "absolute", top: 10, right: 10, border: "none", background: "none", color: "#ef4444", fontSize: 12, cursor: "pointer", fontWeight: "800" }}>CloseClear Signature</button>
                     <div style={{ minHeight: 60, display: "flex", alignItems: "center", justifyContent: "center", width: "100%", marginTop: 12 }}>
                       {inv.signatureType === "image" ? (
                         <img src={inv.signature} alt="Signature Preview" style={{ maxHeight: 50, maxWidth: "100%", objectFit: "contain" }} />
@@ -2681,7 +2700,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                             type="button"
                             onClick={() => {
                               const val = typedSig.trim() || inv.companyName || effectiveCompanyName;
-                              upd("signature", val);
+                              upd("signature", typedSig || val);
                               upd("signatureType", "text");
                             }}
                             style={{

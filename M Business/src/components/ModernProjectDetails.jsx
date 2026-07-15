@@ -537,6 +537,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         const payload = {
           inv: {
             invoiceNo: invNo,
+            signature: inv.signature || '',
+            signatureType: inv.signatureType || 'text',
             client: currProject.client || currProject.clientName || inv.clientName || '',
             project: currProject.name || '',
             date: inv.issueDate || inv.date || new Date().toISOString().split('T')[0],
@@ -546,6 +548,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             isGstIncluded: inv.taxType === 'inclusive',
             signature: inv.signature || '',
             signatureType: inv.signatureType || 'text',
+            // Persist signature to the project's local invoices array so it
+            // survives refresh/re-login even if the global Invoice record
+            // update lags behind.
             currency: currProject.currency || 'INR',
             clientId: resolvedClientId,
           },
@@ -738,6 +743,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       category: g.inv?.category || 'General',
       projectName: g.inv?.project || g.project,
       clientName: g.inv?.clientName || g.inv?.client || g.client,
+      signature: g.inv?.signature || g.signature || '',
+      signatureType: g.inv?.signatureType || g.signatureType || 'text',
       inv: g.inv,
       items: g.items,
     }));
@@ -2750,7 +2757,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   <td style={{ padding: '12px 14px' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>
                                     <span style={{ background: '#EDE9FE', color: '#7C3AED', fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20 }}>{inv.category || 'Milestone'}</span>
                                   </td>
-                                  <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{currency}{(() => { const amt = parseAmt(inv.amount) || parseAmt(inv.total); const taxPct = parseAmt(inv.taxPercent); const taxAmt = inv.taxType === 'inclusive' ? 0 : Math.round(amt * (taxPct / 100)); return (amt + taxAmt).toLocaleString(); })()}</td>
+                                  <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{currency}{(parseAmt(inv.total) || parseAmt(inv.amount) || 0).toLocaleString()}</td>
                                   <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.date || inv.issueDate ? new Date(inv.date || inv.issueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
                                   <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#F59E0B' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
                                   <td style={{ padding: '12px 14px' }} onClick={(e) => e.stopPropagation()}>
@@ -2769,7 +2776,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   </td>
                                   <td style={{ padding: '12px 14px' }} onClick={(e) => e.stopPropagation()}>
                                     <div style={{ display: 'flex', gap: 4 }}>
-                                      <button onClick={() => onViewInvoice ? onViewInvoice(currProject, inv, i) : setPreviewInvoice(inv)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-eye"></i></button>
+                                      <button onClick={() => onViewInvoice ? onViewInvoice({ ...inv, project: inv.projectName || currProject?.name, client: inv.clientName || inv.client }, currProject) : setPreviewInvoice(inv)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-eye"></i></button>
                                       <button onClick={() => { if (onNewInvoice) { onNewInvoice(currProject, inv); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
                                       <button title="Print / PDF" onClick={() => handlePrintInvoice(inv)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-printer"></i></button>
                                       <button
@@ -3550,6 +3557,21 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     </div>
                   </div>
                   {inv.notes && (<div style={{ borderTop: '1px solid #E8EDF2', paddingTop: 14 }}><div style={{ fontSize: 8, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 2 }}>Notes</div><div style={{ fontSize: 8, color: '#64748b', lineHeight: 1.5 }}>{inv.notes}</div></div>)}
+                  {inv.signature && (
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
+                      <div style={{ textAlign: 'right', minWidth: 140 }}>
+                        <div style={{ height: 36, display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end', marginBottom: 4 }}>
+                          {inv.signatureType === 'image' ? (
+                            <img src={inv.signature} alt="Signature" style={{ maxHeight: 32, maxWidth: 130, objectFit: 'contain' }} />
+                          ) : (
+                            <div style={{ fontFamily: "'Dancing Script', cursive", fontSize: 18, fontWeight: 'bold', color: '#1a2e35' }}>{inv.signature}</div>
+                          )}
+                        </div>
+                        <div style={{ width: '100%', height: 1, background: '#E8EDF2', marginBottom: 4 }}></div>
+                        <div style={{ fontSize: 9, fontWeight: 700, color: '#0f1c2e' }}>{user?.companyName || 'Authorized Signatory'}</div>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div style={{ borderTop: '1px solid #E8EDF2', padding: '10px 40px', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{inv.invoiceNo}</div>

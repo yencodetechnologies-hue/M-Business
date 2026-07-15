@@ -913,7 +913,8 @@
       font-weight: 600;
       margin-bottom: 12px
     }
-.lb-editor {
+
+    .lb-editor {
       min-height: 280px;
       outline: none;
       cursor: text;
@@ -5059,7 +5060,7 @@
       set('f-quo-title', qt.project || '');
       set('f-quo-client', qt.client || entry.client || '');
       set('f-quo-cemail', qt.companyEmail || '');
-      set('f-quo-gst', qt.gstRate !== undefined ? qt.gstRate : 18);
+      set('f-quo-gst', qt.gstRate !== undefined ? qt.gstRate : 0);
       set('f-quo-disc', qt.discount || 0);
       // Rebuild items
       const container = document.getElementById('quoItems');

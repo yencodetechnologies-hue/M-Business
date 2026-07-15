@@ -19,7 +19,7 @@ router.get("/", async (req, res) => {
       (doc.items || []).forEach((item) => {
         const q = parseFloat(item.quantity) || 0;
         const r = parseFloat(item.rate) || 0;
-        const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (doc.gstRate !== undefined && doc.gstRate !== null && doc.gstRate !== "" ? parseFloat(doc.gstRate) : 18);
+        const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (doc.gstRate !== undefined && doc.gstRate !== null && doc.gstRate !== "" ? parseFloat(doc.gstRate) : 0);
         const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (doc.isGstIncluded || false);
 
         const itemBase = q * r;
@@ -43,7 +43,7 @@ router.get("/", async (req, res) => {
         dueDateType: doc.dueDateType || "30",
         client: doc.client || "",
         project: doc.project || "",
-        gstRate: doc.gstRate ?? 18,
+        gstRate: doc.gstRate ?? 0,
         notes: doc.notes || "",
         terms: doc.terms || "",
         companyName: doc.companyName || "",
@@ -67,6 +67,7 @@ router.get("/", async (req, res) => {
       };
 
       return {
+        _id: doc._id.toString(),
         id: doc._id.toString(),
         invoiceNo: doc.invoiceNo || "—",
         client: doc.client || "—",
@@ -105,6 +106,7 @@ router.get("/project/:projectName", async (req, res) => {
 
     const result = invoices.map(doc => {
       return {
+        _id: doc._id.toString(),
         id: doc._id.toString(),
         invoiceNo: doc.invoiceNo || "—",
         client: doc.client || "—",
@@ -163,7 +165,7 @@ router.get("/client/:clientName", async (req, res) => {
       (doc.items || []).forEach((item) => {
         const q = parseFloat(item.quantity) || 0;
         const r = parseFloat(item.rate) || 0;
-        const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (doc.gstRate !== undefined && doc.gstRate !== null && doc.gstRate !== "" ? parseFloat(doc.gstRate) : 18);
+        const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (doc.gstRate !== undefined && doc.gstRate !== null && doc.gstRate !== "" ? parseFloat(doc.gstRate) : 0);
         const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (doc.isGstIncluded || false);
 
         const itemBase = q * r;
@@ -180,6 +182,7 @@ router.get("/client/:clientName", async (req, res) => {
       const history = await Income.find({ invoiceNo: doc.invoiceNo }).sort({ date: 1 }).lean();
 
       return {
+        _id: doc._id.toString(),
         id: doc._id.toString(),
         invoiceNo: doc.invoiceNo || "—",
         client: doc.client || "—",
@@ -234,7 +237,7 @@ router.get("/no/:invoiceNo", async (req, res) => {
       dueDate: doc.dueDate || "",
       client: doc.client || "",
       project: doc.project || "",
-      gstRate: doc.gstRate ?? 18,
+      gstRate: doc.gstRate ?? 0,
       notes: doc.notes || "",
       terms: doc.terms || "",
       companyName: doc.companyName || "",
@@ -285,6 +288,8 @@ router.get("/no/:invoiceNo", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const { inv, items, status } = req.body;
+    console.log("Invoice POST signature received:", inv?.signature ? "yes (" + (inv.signature.length) + " chars)" : "MISSING");
+    console.log("Invoice POST signature received:", inv?.signature ? "yes (" + (inv.signature.length) + " chars)" : "MISSING");
 
     if (!inv || !items) {
       return res
@@ -300,7 +305,7 @@ router.post("/", async (req, res) => {
     items.forEach((item) => {
       const q = parseFloat(item.quantity) || 0;
       const r = parseFloat(item.rate) || 0;
-      const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (inv.gstRate !== undefined && inv.gstRate !== null && inv.gstRate !== "" ? parseFloat(inv.gstRate) : 18);
+      const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (inv.gstRate !== undefined && inv.gstRate !== null && inv.gstRate !== "" ? parseFloat(inv.gstRate) : 0);
       const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
 
       const itemBase = q * r;
@@ -470,7 +475,7 @@ router.put("/:id", async (req, res) => {
     items.forEach((item) => {
       const q = parseFloat(item.quantity) || 0;
       const r = parseFloat(item.rate) || 0;
-      const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (inv.gstRate !== undefined && inv.gstRate !== null && inv.gstRate !== "" ? parseFloat(inv.gstRate) : 18);
+      const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (inv.gstRate !== undefined && inv.gstRate !== null && inv.gstRate !== "" ? parseFloat(inv.gstRate) : 0);
       const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
 
       const itemBase = q * r;

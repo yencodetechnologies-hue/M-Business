@@ -83,6 +83,19 @@ export default function AdminDashboard({ user, setUser }) {
     localStorage.setItem("activeTab_admin", active);
   }, [active]);
 
+  const [jumpProject, setJumpProject] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("mb_jumpProject") || "null"); } catch { return null; }
+  });
+  const [jumpInvoicePrefill, setJumpInvoicePrefill] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("mb_jumpInvoicePrefill") || "null"); } catch { return null; }
+  });
+  useEffect(() => {
+    localStorage.setItem("mb_jumpProject", JSON.stringify(jumpProject || null));
+  }, [jumpProject]);
+  useEffect(() => {
+    localStorage.setItem("mb_jumpInvoicePrefill", JSON.stringify(jumpInvoicePrefill || null));
+  }, [jumpInvoicePrefill]);
+
   useEffect(() => {
     if (active !== "projects") return;
     axios.get(BASE_URL + "/api/projects")
@@ -391,6 +404,11 @@ export default function AdminDashboard({ user, setUser }) {
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.setItem("loggedOut", "1");
+    localStorage.removeItem("activeTab_admin");
+    localStorage.removeItem("admin_jumpProject");
+    localStorage.removeItem("admin_jumpInvoicePrefill");
+    localStorage.removeItem("mb_jumpProject");
+    localStorage.removeItem("mb_jumpInvoicePrefill");
     setUser(null);
   };
 
@@ -540,11 +558,15 @@ export default function AdminDashboard({ user, setUser }) {
               hideTopActions={false}
               onUpdate={() => fetchProjects()}
               onNewInvoice={(proj, prefill) => {
-                setJumpInvoicePrefill(prefill || { client: proj?.client || '', project: proj?.name || '' });
+                setJumpInvoicePrefill(
+                  prefill
+                    ? { editData: prefill, client: prefill?.client || prefill?.clientName || proj?.client || '', project: proj?.name || '' }
+                    : { client: proj?.client || '', project: proj?.name || '' }
+                );
                 setActive("invoices");
               }}
               onViewInvoice={(inv) => {
-                setJumpInvoicePrefill({ editData: inv, client: inv?.client || inv?.clientName || '', project: inv?.project || jumpProject?.name || '' });
+                setJumpInvoicePrefill({ editData: inv, client: inv?.client || inv?.clientName || '', project: inv?.project || jumpProject?.name || '', readOnly: true });
                 setActive("invoices");
               }}
             />

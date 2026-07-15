@@ -481,7 +481,7 @@ export default function AdminDashboard({ user, setUser }) {
           {NAV.map(n => {
             const on = active === n.key;
             return (
-              <button key={n.key} onClick={() => setActive(n.key)}
+              <button key={n.key} onClick={() => { setJumpProject(null); setJumpInvoicePrefill(null); setActive(n.key); }}
                 style={{
                   width: "100%", display: "flex", alignItems: "center", gap: 14, padding: "12px 18px",
                   background: on ? (darkMode ? "rgba(255,255,255,0.1)" : "rgba(59,130,246,0.1)") : "transparent",

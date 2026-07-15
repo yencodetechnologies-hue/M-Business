@@ -334,13 +334,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   const tabsRef = useRef(null);
   const tabContentRef = useRef(null);
-  const [tabOrder, setTabOrder] = useState(() => {
-    try {
-      const saved = localStorage.getItem('project_tabs_order');
-      if (saved) return JSON.parse(saved);
-    } catch (e) { }
-    return ['updates', 'activity', 'accounts'];
-  });
+  const [tabOrder, setTabOrder] = useState(['updates', 'activity', 'accounts']);
 
   useEffect(() => {
     localStorage.setItem('project_tabs_order', JSON.stringify(tabOrder));

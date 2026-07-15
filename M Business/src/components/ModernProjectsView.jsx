@@ -453,9 +453,13 @@ export default function ModernProjectsView({
                 key={p._id || p.id || Math.random()}
                 className="mpv-card"
                 style={{
-                  zIndex: isMenuOpen ? 9999 : 1
+                  zIndex: isMenuOpen ? 9999 : 1,
+                  cursor: "pointer"
                 }}
-                onClick={() => onClickProject ? onClickProject(p) : (onViewTasks && onViewTasks(p))}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onClickProject) onClickProject(p);
+                }}
               >
                 <div className="mpv-card-top">
                   {/* Row 1: status badge + priority + action menu */}

@@ -532,11 +532,12 @@ export default function AdminDashboard({ user, setUser }) {
             <ModernProjectDetails
               project={jumpProject}
               onBack={() => { setActive("clients"); setJumpProject(null); }}
-              tasks={[]}
-              employees={[]}
+              tasks={tasks}
+              employees={employees}
               user={user}
               clients={clients}
               fromClientContext={true}
+              hideTopActions={false}
               onUpdate={() => fetchProjects()}
               onNewInvoice={(proj, prefill) => {
                 setJumpInvoicePrefill(prefill || { client: proj?.client || '', project: proj?.name || '' });
@@ -1951,15 +1952,18 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
       }
 
 
-      await axios.put(
+      const savedRes = await axios.put(
         `${BASE_URL}/api/projects/${editProj._id}`,
         payload
       );
+      const savedProject = savedRes.data;
       setEditProj(null);
       if (setProjects) {
         const res = await axios.get(BASE_URL + "/api/projects");
         setProjects(res.data);
       }
+      setJumpProject(savedProject);
+      setActive("project-details");
     } catch (err) {
       alert("Save failed: " + (err.response?.data?.msg || err.message));
     } finally {
@@ -2013,8 +2017,7 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
         projects={projectsWithProgress}
         searchQuery={search}
         onClickProject={(p) => { setJumpProject(p); setActive("project-details"); }}
-        onViewTasks={(p) => setViewTasksProj(p)}
-        onEdit={(p) => openEdit(p)}
+        onEdit={(p) => { console.log("EDIT clicked", p); openEdit(p); }}
         onDelete={(p) => setDeleteTargetProj(p)}
         onUpdate={fetchProjects}
       />

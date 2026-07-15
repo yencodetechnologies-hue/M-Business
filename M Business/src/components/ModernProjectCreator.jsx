@@ -1017,8 +1017,8 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                 );
               })}
               {milestones.length === 0 && (
-                <div style={{ fontSize: 13, color: '#94a3b8', padding: '8px 0' }}>
-                  <i className="ti ti-plus" /> {editProject ? 'Edit Milestones' : 'Add Milestones'}
+                <div style={{ fontSize: 12, color: '#94a3b8', padding: '8px 0' }}>
+                  No milestones assigned yet.
                 </div>
               )}
             </div>
@@ -1028,184 +1028,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
           </div>
 
 
-          {/* SECTION: PROJECT TASKS (Edit Project only) */}
-          {editProject && (
-            <div className="mpc-section-card">
-              <div className="mpc-section-heading"><i className="ti ti-list-check" /> Tasks</div>
-              {tasksLoading ? (
-                <div style={{ padding: '20px 0', textAlign: 'center', color: P.textLight, fontSize: 13 }}>Loading tasks...</div>
-              ) : projectTasks.length === 0 ? (
-                <div style={{ padding: '20px 0', textAlign: 'center', color: P.textLight, fontSize: 13 }}>No tasks for this project yet.</div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {projectTasks.map((t) => (
-                    <div key={t._id} style={{ border: `1.5px solid ${P.border}`, borderRadius: 10, padding: '12px 14px', background: P.bg }}>
-                      {editingTaskId === t._id ? (
-                        <>
-                          <input type="text" value={editTaskTitle} onChange={e => setEditTaskTitle(e.target.value)} placeholder="Task title" style={{ width: '100%', marginBottom: 8, padding: '8px 10px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif' }} />
-                          <div className="mpc-form-2col" style={{ marginBottom: 8 }}>
-                            <select value={editTaskStatus} onChange={e => setEditTaskStatus(e.target.value)} style={{ padding: '8px 10px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13 }}>
-                              <option value="Not Started">Not Started</option>
-                              <option value="In Progress">In Progress</option>
-                              <option value="Completed">Completed</option>
-                              <option value="On Hold">On Hold</option>
-                            </select>
-                            <select value={editTaskPriority} onChange={e => setEditTaskPriority(e.target.value)} style={{ padding: '8px 10px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13 }}>
-                              <option value="low">Low</option>
-                              <option value="medium">Medium</option>
-                              <option value="high">High</option>
-                            </select>
-                          </div>
-                          <input type="date" value={editTaskDue} onChange={e => setEditTaskDue(e.target.value)} style={{ width: '100%', marginBottom: 8, padding: '8px 10px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13 }} />
-                          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-                            <button className="mpc-btn mpc-btn-outline" style={{ padding: '6px 12px', fontSize: 12 }} onClick={cancelEditTask}>Cancel</button>
-                            <button className="mpc-btn mpc-btn-primary" style={{ padding: '6px 12px', fontSize: 12 }} disabled={savingTaskId === t._id} onClick={() => saveEditTask(t._id)}>{savingTaskId === t._id ? 'Saving...' : 'Save'}</button>
-                          </div>
-                        </>
-                      ) : (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-                          <div style={{ flex: 1, minWidth: 160 }}>
-                            <div style={{ fontSize: 13, fontWeight: 800, color: P.textDark }}>{t.title}</div>
-                            <div style={{ fontSize: 11, color: P.textLight, marginTop: 2 }}>
-                              {t.status || 'Not Started'} · {(t.priority || 'medium').charAt(0).toUpperCase() + (t.priority || 'medium').slice(1)}{t.date ? ` · Due ${new Date(t.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}` : ''}
-                            </div>
-                          </div>
-                          <div style={{ display: 'flex', gap: 12 }}>
-                            <button onClick={() => startEditTask(t)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.primary, fontSize: 12, fontWeight: 700, padding: 0 }}>Edit</button>
-                            <button onClick={() => deleteTask(t._id)} disabled={deletingTaskId === t._id} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 12, fontWeight: 700, padding: 0 }}>{deletingTaskId === t._id ? 'Deleting...' : 'Delete'}</button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
 
-          {/* SECTION: PROJECT UPDATES (Edit Project only) */}
-          {editProject && (
-            <div className="mpc-section-card">
-              <div className="mpc-section-heading"><i className="ti ti-speakerphone" /> Updates</div>
-
-              <div className="mpc-form-group">
-                <label>Select Team Members</label>
-                <div style={{ position: 'relative' }}>
-                  <div
-                    onClick={() => setShowUpdateTeamDropdown(v => !v)}
-                    style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: `1.5px solid ${P.primary}`, fontSize: 14, fontFamily: 'Nunito,sans-serif', background: '#fff', color: newUpdateTeamMembers.length ? P.textDark : P.textLight, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxSizing: 'border-box' }}
-                  >
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {newUpdateTeamMembers.length === 0 ? '-- Select Team Members --' : newUpdateTeamMembers.join(', ')}
-                    </span>
-                    <i className={`ti ${showUpdateTeamDropdown ? 'ti-chevron-up' : 'ti-chevron-down'}`} style={{ fontSize: 14, flexShrink: 0, marginLeft: 8 }} />
-                  </div>
-                  {showUpdateTeamDropdown && (
-                    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, background: '#fff', border: `1.5px solid ${P.primary}`, borderRadius: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 20, maxHeight: 220, overflowY: 'auto' }}>
-                      {assigned.length === 0 && (
-                        <div style={{ padding: '10px 12px', fontSize: 12, color: P.textLight }}>No team members assigned to this project yet.</div>
-                      )}
-                      {assigned.map((name, i) => {
-                        const checked = newUpdateTeamMembers.includes(name);
-                        return (
-                          <label key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: 13, color: P.textDark, cursor: 'pointer' }}>
-                            <input
-                              type="checkbox"
-                              checked={checked}
-                              onChange={() => setNewUpdateTeamMembers(prev => checked ? prev.filter(n => n !== name) : [...prev, name])}
-                            />
-                            {name}
-                          </label>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="mpc-form-2col">
-                <div className="mpc-form-group">
-                  <label>Update Type</label>
-                  <select value={newUpdateType} onChange={e => setNewUpdateType(e.target.value)}>
-                    <option value="">Select update type...</option>
-                    <option value="general">General</option>
-                    <option value="progress">Progress</option>
-                    <option value="billing">Billing</option>
-                    <option value="milestone">Milestone</option>
-                  </select>
-                </div>
-                <div className="mpc-form-group" style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 4 }}>
-                  <label className="mpc-checkbox-label" style={{ marginBottom: 0 }}>
-                    <input type="checkbox" checked={newUpdateIsApproval} onChange={e => setNewUpdateIsApproval(e.target.checked)} />
-                    <i className="ti ti-clipboard-check" style={{ fontSize: 15 }} /> Approval Request
-                  </label>
-                </div>
-              </div>
-
-              <div className="mpc-form-group">
-                <label>Update Title *</label>
-                <input type="text" value={newUpdateTitle} onChange={e => setNewUpdateTitle(e.target.value)} placeholder="e.g. Checkout flow 80% complete" />
-              </div>
-
-              <div className="mpc-form-group">
-                <label>Details</label>
-                <textarea value={newUpdateText} onChange={e => setNewUpdateText(e.target.value)} placeholder="What's done, what's next, any blockers or decisions needed..." />
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 20 }}>
-                <div style={{ display: 'flex', gap: 16 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: P.textMid, cursor: 'pointer' }}>
-                    <i className="ti ti-photo" style={{ fontSize: 15 }} /> Image
-                  </span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: P.textMid, cursor: 'pointer' }}>
-                    <i className="ti ti-file" style={{ fontSize: 15 }} /> File/Doc
-                  </span>
-                </div>
-                <button
-                  className="mpc-btn mpc-btn-primary"
-                  disabled={postingNewUpdate || !newUpdateTitle.trim()}
-                  onClick={postNewUpdate}
-                  style={{ opacity: (postingNewUpdate || !newUpdateTitle.trim()) ? 0.6 : 1 }}
-                >
-                  <i className="ti ti-send" style={{ fontSize: 15 }} />
-                  {postingNewUpdate ? 'Sending...' : 'Send to Team'}
-                </button>
-              </div>
-
-              {projectUpdates.length === 0 ? (
-                <div style={{ padding: '20px 0', textAlign: 'center', color: P.textLight, fontSize: 13 }}>No updates posted yet.</div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {projectUpdates.map((u, idx) => (
-                    <div key={idx} style={{ border: `1.5px solid ${P.border}`, borderRadius: 10, padding: '12px 14px', background: P.bg }}>
-                      {editingUpdateIdx === idx ? (
-                        <>
-                          <input type="text" value={editUpdateTitle} onChange={e => setEditUpdateTitle(e.target.value)} placeholder="Title" style={{ width: '100%', marginBottom: 8, padding: '8px 10px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif' }} />
-                          <textarea value={editUpdateText} onChange={e => setEditUpdateText(e.target.value)} placeholder="Details" style={{ width: '100%', marginBottom: 8, padding: '8px 10px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', minHeight: 60 }} />
-                          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-                            <button className="mpc-btn mpc-btn-outline" style={{ padding: '6px 12px', fontSize: 12 }} onClick={cancelEditUpdate}>Cancel</button>
-                            <button className="mpc-btn mpc-btn-primary" style={{ padding: '6px 12px', fontSize: 12 }} disabled={savingUpdateIdx === idx} onClick={() => saveEditUpdate(idx)}>{savingUpdateIdx === idx ? 'Saving...' : 'Save'}</button>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                            <span style={{ fontSize: 13, fontWeight: 800, color: P.textDark }}>{u.title || 'Update'}</span>
-                            <span style={{ fontSize: 11, color: P.textLight }}>{u.date ? new Date(u.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : ''}</span>
-                          </div>
-                          {u.text && <div style={{ fontSize: 12.5, color: P.textMid, marginBottom: 8, lineHeight: 1.5 }}>{u.text}</div>}
-                          <div style={{ display: 'flex', gap: 12 }}>
-                            <button onClick={() => startEditUpdate(idx)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.primary, fontSize: 12, fontWeight: 700, padding: 0 }}>Edit</button>
-                            <button onClick={() => deleteUpdate(idx)} disabled={deletingUpdateIdx === idx} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 12, fontWeight: 700, padding: 0 }}>{deletingUpdateIdx === idx ? 'Deleting...' : 'Delete'}</button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
 
           {/* SECTION 6: CLIENT PORTAL */}
           <div className="mpc-section-card" id="sec4">
@@ -1283,7 +1106,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
           Ensure all required fields are filled before launching.
         </div>
         <div style={{ display: "flex", gap: 12 }}>
-         
+
           <button className="mpc-btn mpc-btn-primary" onClick={handleCreate} disabled={loading || deleting} style={{ opacity: (loading || deleting) ? 0.7 : 1 }}>
             {loading ? <i className="ti ti-loader" style={{ animation: 'spin 1s linear infinite' }} /> : <i className="ti ti-rocket" />}
             {loading ? (editProject ? 'Updating...' : 'Launching...') : (editProject ? 'Update Project' : 'Save Project')}

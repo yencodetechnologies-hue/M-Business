@@ -306,7 +306,7 @@ router.post("/", async (req, res) => {
     items.forEach((item) => {
       const q = parseFloat(item.quantity) || 0;
       const r = parseFloat(item.rate) || 0;
-      const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
+      const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
       const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
 
       const itemBase = q * r;
@@ -350,7 +350,7 @@ router.post("/", async (req, res) => {
         description: i.description || "",
         quantity: parseFloat(i.quantity) || 0,
         rate: parseFloat(i.rate) || 0,
-        gstRate: i.gstRate !== undefined ? parseFloat(i.gstRate) : (parseFloat(inv.gstRate) || 18),
+gstRate: (i.gstRate !== undefined && i.gstRate !== null && i.gstRate !== "") ? parseFloat(i.gstRate) : (parseFloat(inv.gstRate) || 18),
         isGstIncluded: i.isGstIncluded !== undefined ? i.isGstIncluded : (inv.isGstIncluded || false),
       })),
       subtotal,
@@ -476,7 +476,7 @@ router.put("/:id", async (req, res) => {
     items.forEach((item) => {
       const q = parseFloat(item.quantity) || 0;
       const r = parseFloat(item.rate) || 0;
-      const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
+const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
       const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
 
       const itemBase = q * r;
@@ -505,7 +505,7 @@ router.put("/:id", async (req, res) => {
         description: i.description || "",
         quantity: parseFloat(i.quantity) || 0,
         rate: parseFloat(i.rate) || 0,
-        gstRate: i.gstRate !== undefined ? parseFloat(i.gstRate) : (parseFloat(inv.gstRate) || 18),
+gstRate: (i.gstRate !== undefined && i.gstRate !== null && i.gstRate !== "") ? parseFloat(i.gstRate) : (parseFloat(inv.gstRate) || 18),
         isGstIncluded: i.isGstIncluded !== undefined ? i.isGstIncluded : (inv.isGstIncluded || false),
       })),
       subtotal,

@@ -641,11 +641,19 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const fetchList = async () => {
     setListLoading(true);
     try {
-      const res = await axios.get(`${BASE_URL}/api/invoices`);
-      if (res.data.success && Array.isArray(res.data.invoices)) setInvoiceList(res.data.invoices);
-      else setInvoiceList(loadAllDrafts());
-    } catch { setInvoiceList(loadAllDrafts()); }
-    finally { setListLoading(false); }
+      const res = await axios.get(`${BASE_URL}/api/invoices?_t=${Date.now()}`);
+      if (res.data.success && Array.isArray(res.data.invoices)) {
+        setInvoiceList(res.data.invoices);
+      } else {
+        console.warn("Invoice list fetch returned unexpected shape, falling back to local drafts");
+        setInvoiceList(loadAllDrafts());
+      }
+    } catch (err) {
+      console.error("Invoice list fetch failed, falling back to local drafts", err);
+      setInvoiceList(loadAllDrafts());
+    } finally {
+      setListLoading(false);
+    }
   };
 
   useEffect(() => { fetchList(); }, []);

@@ -674,7 +674,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
             </h3>
           </div>
 
-          {loading ? (
+          {loading && events.length === 0 ? (
             <div style={{ textAlign: "center", padding: 40, color: "var(--app-muted)" }}>
               <div style={{ fontSize: 28, marginBottom: 8 }}>Pending</div>
               <div style={{ fontWeight: 600, fontSize: 13 }}>Loading events...</div>

@@ -135,7 +135,7 @@ function saveDraftLocal(inv, items, status = "draft") {
   items.forEach((item) => {
     const q = parseFloat(item.quantity) || 0;
     const r = parseFloat(item.rate) || 0;
-    const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (inv.gstRate !== undefined && inv.gstRate !== null && inv.gstRate !== "" ? parseFloat(inv.gstRate) : 18);
+    const rateGst = (item.gstRate !== undefined && item.gstRate !== null && item.gstRate !== "") ? parseFloat(item.gstRate) : (inv.gstRate !== undefined && inv.gstRate !== null && inv.gstRate !== "" ? parseFloat(inv.gstRate) : 0);
     const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
 
     const itemBase = q * r;
@@ -720,13 +720,20 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       date: invData.date || entry.date || blank.date,
       dueDate: invData.dueDate || entry.dueDate || blank.dueDate,
       status: invData.status || entry.status || 'draft',
+      signature: invData.signature || entry.signature || '',
+      signatureType: invData.signatureType || entry.signatureType || 'text',
     });
+    const sourceItems = (entry.items?.length ? entry.items : invData.items) || [];
     setItems(
-      entry.items?.length
-        ? entry.items.map((it, i) => ({ ...it, id: it.id || i + 1 }))
+      sourceItems.length
+        ? sourceItems.map((it, i) => ({ ...it, id: it.id || i + 1 }))
         : [{ id: 1, description: '', quantity: 1, rate: '' }]
     );
-    setEditingId(entry._id || entry.id || null);
+    // The document's real Mongo _id may live on entry, entry.inv, or entry._id
+    // depending on which fetch path populated this row — check all of them
+    // so Save always issues a PUT (update) instead of falling back to POST
+    // (which silently creates a duplicate invoice).
+    setEditingId(entry._id || entry.id || invData._id || invData.id || null);
     setErrors({});
     setDraftSaved(false);
     setStep(targetStep);
@@ -1408,7 +1415,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           <div className="header-actions">
 
             <button className="filter-btn"><i className="ti ti-calendar" style={{ fontSize: 14 }}></i> May 2026</button>
-          
+
           </div>
         </div>
 

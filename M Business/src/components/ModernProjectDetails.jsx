@@ -506,6 +506,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const handleDeleteInvoice = async (inv) => {
     if (!confirm('Delete this invoice?')) return;
     if (!inv._globalId) { alert('This invoice cannot be found on the server.'); return; }
+    // -- handleInvoiceStatusChange / handlePrintInvoice defined below, kept
+    // near this handler so all invoice row actions live together.
     try {
       await axios.delete(`${BASE_URL}/api/invoices/${inv._globalId}`);
       setProjectInvoices(prev => prev.filter(g => g.id !== inv._globalId));
@@ -2751,11 +2753,25 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{currency}{(() => { const amt = parseAmt(inv.amount) || parseAmt(inv.total); const taxPct = parseAmt(inv.taxPercent); const taxAmt = inv.taxType === 'inclusive' ? 0 : Math.round(amt * (taxPct / 100)); return (amt + taxAmt).toLocaleString(); })()}</td>
                                   <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.date || inv.issueDate ? new Date(inv.date || inv.issueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
                                   <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#F59E0B' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
-                                  <td style={{ padding: '12px 14px' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}><span style={{ background: inv.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: inv.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{inv.status || 'Draft'}</span></td>
+                                  <td style={{ padding: '12px 14px' }} onClick={(e) => e.stopPropagation()}>
+                                    <select
+                                      value={inv.status || 'draft'}
+                                      onChange={(e) => handleInvoiceStatusChange(inv, e.target.value)}
+                                      style={{ background: 'transparent', border: 'none', fontSize: 10, fontWeight: 800, cursor: 'pointer', outline: 'none', color: inv.status === 'Paid' || inv.status === 'paid' ? '#15803D' : '#B45309' }}
+                                    >
+                                      <option value="draft">Draft</option>
+                                      <option value="sent">Sent</option>
+                                      <option value="part_paid">Part Paid</option>
+                                      <option value="paid">Paid</option>
+                                      <option value="unpaid">Unpaid</option>
+                                      <option value="overdue">Overdue</option>
+                                    </select>
+                                  </td>
                                   <td style={{ padding: '12px 14px' }} onClick={(e) => e.stopPropagation()}>
                                     <div style={{ display: 'flex', gap: 4 }}>
                                       <button onClick={() => onViewInvoice ? onViewInvoice(currProject, inv, i) : setPreviewInvoice(inv)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-eye"></i></button>
                                       <button onClick={() => { if (onNewInvoice) { onNewInvoice(currProject, inv); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+                                      <button title="Print / PDF" onClick={() => handlePrintInvoice(inv)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-printer"></i></button>
                                       <button
                                         title="Share to Client"
                                         disabled={sharingInvoiceNo === inv.invoiceNo}

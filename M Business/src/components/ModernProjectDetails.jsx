@@ -334,7 +334,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   const tabsRef = useRef(null);
   const tabContentRef = useRef(null);
-  const [tabOrder, setTabOrder] = useState(['updates', 'activity', 'accounts']);
+  const [tabOrder, setTabOrder] = useState(['updates', 'activity', 'payments']);
 
   useEffect(() => {
     localStorage.setItem('project_tabs_order', JSON.stringify(tabOrder));
@@ -438,6 +438,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   }, [showUpdateMembersDropdown]);
   const [postingUpdate, setPostingUpdate] = useState(false);
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+  const [showEditBudgetModal, setShowEditBudgetModal] = useState(false);
+
   const [selectedNewMember, setSelectedNewMember] = useState('');
   const [newMilestoneName, setNewMilestoneName] = useState('');
   const [newMilestoneDate, setNewMilestoneDate] = useState('');
@@ -3029,6 +3031,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           <div className="mpd-card" style={{ marginBottom: 0 }}>
             <div className="mpd-card-header">
               <div className="mpd-card-title"><i className="ti ti-wallet"></i> Budget</div>
+              {!hideTopActions && (
+                <button className="mpd-btn mpd-btn-outline" onClick={() => setShowEditBudgetModal(true)} style={{ padding: '5px 10px', fontSize: 11 }}>
+                  <i className="ti ti-plus"></i> Add Budget
+                </button>
+              )}
             </div>
             {budgetExceeded && (
               <div style={{ background: '#FEE2E2', border: '1px solid #FECACA', borderRadius: 8, padding: '8px 12px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 7 }}>

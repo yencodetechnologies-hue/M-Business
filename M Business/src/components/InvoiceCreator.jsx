@@ -4,6 +4,7 @@ import axios from "axios";
 import { BASE_URL, FRONTEND_URL } from "../config";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
+import AddClientView from "./AddClientView";
 
 const GST_RATES = [0, 5, 12, 18, 28];
 const DEFAULT_LOGO_URL = "";
@@ -355,6 +356,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const effectiveCompanyName = companyName || "";
 
   const [step, setStep] = useState(jumpInvoice ? "preview" : newInvoicePrefill ? "form" : "list"); // "list" | "form" | "preview"
+  const [showAddClient, setShowAddClient] = useState(false);
   const [internalNav, setInternalNav] = useState(false);
 
   useEffect(() => {
@@ -2106,9 +2108,23 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                     value={inv.client}
                     onChange={v => { upd("client", v); }}
                     error={errors.client}
-                    onAddCompany={onAddClient}
+                    onAddCompany={() => setShowAddClient(true)}
                   />
                   {errors.client && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4, fontWeight: 600 }}>Warning {errors.client}</div>}
+                  {showAddClient && (
+                    <AddClientView
+                      onBack={() => setShowAddClient(false)}
+                      onClientAdded={(newClient) => {
+                        const newName = newClient?.clientName || newClient?.name || '';
+                        if (newName) {
+                          upd("client", newName);
+                          if (clients && Array.isArray(clients)) clients.push(newClient);
+                        }
+                        setShowAddClient(false);
+                      }}
+                      user={JSON.parse(localStorage.getItem("user") || "{}")}
+                    />
+                  )}
                 </div>
                 <div className="inv-creator-form-group" style={{ marginBottom: 0 }}>
                   <label className="inv-creator-form-label">Project</label>

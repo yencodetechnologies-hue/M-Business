@@ -4320,6 +4320,7 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
   const openEdit = async (p) => {
     if (!p || (!p._id && !p.id)) return;
     const pid = p._id || p.id;
+    setJumpProject(p);
     let fullProject = p;
     try {
       const res = await axios.get(`${BASE_URL}/api/projects/${pid}`);
@@ -4327,7 +4328,9 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
     } catch (err) {
       console.error("Failed to load full project for edit:", err);
     }
-    setJumpProject(fullProject);
+    if (fullProject && (fullProject._id === pid || fullProject.id === pid)) {
+      setJumpProject(fullProject);
+    }
     if (onEditProject) {
       onEditProject(fullProject);
     }
@@ -11155,7 +11158,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 onBack={() => { const returnTo = sidebarOverride || "projects"; setSidebarOverride(null); setActive(returnTo); }}
 
-                onSuccess={async (updatedProj) => {
+           onSuccess={async (updatedProj) => {
+                  if (updatedProj?._deleted) {
+                    setProjects(prev => prev.filter(p => (p._id || p.id) !== updatedProj._id));
+                    setJumpProject(null);
+                    setSidebarOverride(null);
+                    setActive("projects");
+                    return;
+                  }
 
                   const pid = jumpProject._id || jumpProject.id;
                   let fresh = updatedProj || jumpProject;
@@ -11177,9 +11187,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   setActive("project-details");
 
-                }}
-
-              />
+                }}           />
 
             )}
 

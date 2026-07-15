@@ -81,6 +81,7 @@ const CSS = `
 /* CARDS */
 .mpd-card { background:#fff; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,.07), 0 0 0 1px rgba(0,0,0,.04); padding:22px 24px; margin-bottom:20px; transition:box-shadow .2s; }
 .mpd-card:hover { box-shadow:0 6px 24px rgba(0,0,0,.1), 0 0 0 1px rgba(0,188,212,.08); }
+.mpd-milestones-card { padding:28px 30px; min-height:340px; }
 .mpd-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
 .mpd-card-title { font-size:15px; font-weight:800; color:${P.textDark}; display:flex; align-items:center; gap:8px; }
 .mpd-card-title i { color:${P.primary}; font-size:18px; }
@@ -1820,7 +1821,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
 
         {/* MILESTONES STANDALONE CARD */}
-        <div className="mpd-card">
+        <div className="mpd-card mpd-milestones-card">
           <div className="mpd-card-header">
             <div className="mpd-card-title"><i className="ti ti-flag"></i> Milestone Progress</div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -2264,9 +2265,261 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
                 <div className={`mpd-tab-pane ${activeTab === 'updates' ? 'mpd-active' : ''}`}>
 
-                  {!composerOpen && (
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+                  {!hideTopActions && (
+                    <div className="mpd-upd-composer">
+                      <div className="mpd-uc-body mpd-open">
+                        <div style={{ marginBottom: 14 }}>
+                          <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Select Team Members</div>
+                          <div style={{ position: 'relative' }} ref={updateMembersDropdownRef}>
+                            <div
+                              onClick={() => setShowUpdateMembersDropdown(v => !v)}
+                              style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.purple}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', background: '#fff', color: updateSelectedMembers.length ? P.textDark : P.textLight, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxSizing: 'border-box' }}
+                            >
+                              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {updateSelectedMembers.length === 0 ? '-- Select Team Members --' : updateSelectedMembers.join(', ')}
+                              </span>
+                              <i className={`ti ${showUpdateMembersDropdown ? 'ti-chevron-up' : 'ti-chevron-down'}`} style={{ fontSize: 14, flexShrink: 0, marginLeft: 8 }} />
+                            </div>
+                            {showUpdateMembersDropdown && (
+                              <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, background: '#fff', border: `1.5px solid ${P.purple}`, borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 20, maxHeight: 200, overflowY: 'auto' }}>
+                                {assigned.length === 0 && (
+                                  <div style={{ padding: '10px 12px', fontSize: 12, color: P.textLight }}>No team members assigned to this project.</div>
+                                )}
+                                {assigned.map((name, i) => {
+                                  const checked = updateSelectedMembers.includes(name);
+                                  return (
+                                    <label key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: 13, color: P.textDark, cursor: 'pointer' }}>
+                                      <input type="checkbox" checked={checked} onChange={() => setUpdateSelectedMembers(prev => checked ? prev.filter(n => n !== name) : [...prev, name])} />
+                                      {name}
+                                    </label>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        </div>
 
+                        <div style={{ display: 'flex', gap: 12, marginBottom: 14, flexWrap: 'wrap' }}>
+                          <div style={{ flex: 1, minWidth: 180 }}>
+                            <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Update Type</div>
+                            {isCustomUpdateTypeMode ? (
+                              <input
+                                type="text"
+                                autoFocus
+                                value={customUpdateTypeInput}
+                                onChange={e => setCustomUpdateTypeInput(e.target.value)}
+                                onKeyDown={e => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    const val = customUpdateTypeInput.trim();
+                                    if (!val) return;
+                                    if (!customUpdateTypes.includes(val)) {
+                                      const next = [...customUpdateTypes, val];
+                                      setCustomUpdateTypes(next);
+                                      localStorage.setItem('mb_customUpdateTypes', JSON.stringify(next));
+                                    }
+                                    setUpdateType(val);
+                                    setIsCustomUpdateTypeMode(false);
+                                  }
+                                }}
+                                onBlur={() => {
+                                  const val = customUpdateTypeInput.trim();
+                                  if (val) {
+                                    if (!customUpdateTypes.includes(val)) {
+                                      const next = [...customUpdateTypes, val];
+                                      setCustomUpdateTypes(next);
+                                      localStorage.setItem('mb_customUpdateTypes', JSON.stringify(next));
+                                    }
+                                    setUpdateType(val);
+                                  }
+                                  setIsCustomUpdateTypeMode(false);
+                                }}
+                                placeholder="Enter custom update type"
+                                style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', boxSizing: 'border-box' }}
+                              />
+                            ) : (
+                              <select
+                                value={updateType}
+                                onChange={e => {
+                                  const val = e.target.value;
+                                  if (val === '__custom__') {
+                                    setCustomUpdateTypeInput('');
+                                    setIsCustomUpdateTypeMode(true);
+                                  } else {
+                                    setUpdateType(val);
+                                  }
+                                }}
+                                style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif' }}
+                              >
+                                <option value="">Select update type...</option>
+                                <option value="general">General</option>
+                                <option value="progress">Progress</option>
+                                <option value="billing">Billing</option>
+                                <option value="milestone">Milestone</option>
+                                {customUpdateTypes.map(t => <option key={t} value={t}>{t}</option>)}
+                                <option value="__custom__">+ Custom</option>
+                              </select>
+                            )}
+                          </div>
+                          <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: P.textMid, cursor: 'pointer', paddingTop: 22, whiteSpace: 'nowrap' }}>
+                            <input type="checkbox" checked={isApprovalRequest} onChange={e => setIsApprovalRequest(e.target.checked)} style={{ accentColor: P.primary, width: 15, height: 15, cursor: 'pointer' }} />
+                            <i className="ti ti-clipboard-check" style={{ fontSize: 14 }} /> Approval Request
+                          </label>
+                        </div>
+
+                        <div style={{ marginBottom: 14 }}>
+                          <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Update Title *</div>
+                          <input
+                            type="text"
+                            value={updateTitle}
+                            onChange={e => setUpdateTitle(e.target.value)}
+                            placeholder="e.g. Checkout flow 80% complete"
+                            style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', boxSizing: 'border-box' }}
+                          />
+                        </div>
+
+                        <div style={{ marginBottom: 14 }}>
+                          <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Details</div>
+                          <textarea
+                            value={updateText}
+                            onChange={e => setUpdateText(e.target.value)}
+                            placeholder="What's done, what's next, any blockers or decisions needed..."
+                            rows={3}
+                            style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', boxSizing: 'border-box', resize: 'vertical' }}
+                          />
+                        </div>
+
+                        <input
+                          type="file"
+                          multiple
+                          ref={postUpdateFileInputRef}
+                          style={{ display: 'none' }}
+                          onChange={async (e) => {
+                            const files = Array.from(e.target.files || []);
+                            if (files.length === 0) return;
+                            setPostUpdateAttaching(true);
+                            await Promise.all(files.map(async (file) => {
+                              const tempId = `${file.name}-${Date.now()}-${Math.random()}`;
+                              setPostUpdateAttachments(prev => [...prev, { name: file.name, url: '', type: file.type, uploading: true, progress: 0, tempId }]);
+                              try {
+                                const formData = new FormData();
+                                formData.append('file', file);
+                                const res = await axios.post(`${BASE_URL}/api/upload`, formData, {
+                                  headers: { 'Content-Type': 'multipart/form-data' },
+                                  onUploadProgress: (evt) => {
+                                    const pct = evt.total ? Math.round((evt.loaded * 100) / evt.total) : 0;
+                                    setPostUpdateAttachments(prev => prev.map(a => a.tempId === tempId ? { ...a, progress: pct } : a));
+                                  }
+                                });
+                                const resolvedUrl = res.data.url && res.data.url.startsWith('http') ? res.data.url : `${BASE_URL}${res.data.url.startsWith('/') ? '' : '/'}${res.data.url}`;
+                                setPostUpdateAttachments(prev => prev.map(a => a.tempId === tempId ? { name: file.name, url: resolvedUrl, type: file.type, uploading: false, progress: 100 } : a));
+                              } catch (err) {
+                                console.error('Attachment upload failed:', file.name, err);
+                                setPostUpdateAttachments(prev => prev.filter(a => a.tempId !== tempId));
+                                alert(`Failed to upload ${file.name}.`);
+                              }
+                            }));
+                            setPostUpdateAttaching(false);
+                            e.target.value = '';
+                          }}
+                        />
+                        {postUpdateAttachments.length > 0 && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 10 }}>
+                            {postUpdateAttachments.map((att, idx) => (
+                              <div key={att.tempId || `${att.name}-${idx}`} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#f8fafc', maxWidth: 320 }}>
+                                <i className={`ti ${(att.type && att.type.startsWith('image/')) || /\.(jpe?g|png|gif|webp|svg)$/i.test(att.name || '') ? 'ti-photo' : 'ti-file'}`} style={{ fontSize: 15, color: P.primary, flexShrink: 0 }} />
+                                <span style={{ fontSize: 12, fontWeight: 700, color: P.textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                                  {att.name}{att.uploading ? ` (${att.progress || 0}%)` : ''}
+                                </span>
+                                <button onClick={() => setPostUpdateAttachments(prev => prev.filter((_, i) => i !== idx))} title="Remove attachment" style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textLight, fontSize: 16, lineHeight: 1, padding: 2, flexShrink: 0 }}>×</button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+                          <div style={{ display: 'flex', gap: 10 }}>
+                            <button onClick={() => { setPostUpdateAttaching(false); postUpdateFileInputRef.current.value = ''; postUpdateFileInputRef.current.accept = 'image/*'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
+                              <i className="ti ti-photo" style={{ fontSize: 15 }} /> Image
+                            </button>
+                            <button onClick={() => { setPostUpdateAttaching(false); postUpdateFileInputRef.current.value = ''; postUpdateFileInputRef.current.accept = '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,text/plain'; postUpdateFileInputRef.current.click(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
+                              <i className="ti ti-file" style={{ fontSize: 15 }} /> File/Doc
+                            </button>
+                          </div>
+                          <button
+                            disabled={postingUpdate || (!updateTitle.trim() && !updateText.trim())}
+                            onClick={async () => {
+                              const hasContent = updateTitle.trim() || updateText.trim();
+                              if (!hasContent) return;
+                              if (isApprovalRequest && currProject.approvalRequestEnabled === false) {
+                                alert('Approval requests are disabled for this project.');
+                                return;
+                              }
+                              setPostingUpdate(true);
+                              try {
+                                const visibleTo = ['team'];
+                                const title = updateTitle.trim() || updateText.trim().slice(0, 60) || 'Update';
+                                const attachments = postUpdateAttachments || [];
+                                const primaryAttachment = attachments[0] || null;
+                                const newUpdate = {
+                                  text: updateText.trim(),
+                                  title,
+                                  date: new Date().toISOString(),
+                                  author: 'Admin',
+                                  type: updateType || 'general',
+                                  visibleTo,
+                                  recipients: updateSelectedMembers,
+                                  fileName: primaryAttachment ? primaryAttachment.name : '',
+                                  fileUrl: primaryAttachment ? primaryAttachment.url : '',
+                                  fileType: primaryAttachment ? primaryAttachment.type : '',
+                                  attachments,
+                                  status: 'sent',
+                                  isApprovalRequest,
+                                  approvalStatus: isApprovalRequest ? 'pending' : undefined,
+                                };
+                                const updatedUpdates = [newUpdate, ...(currProject.updates || [])];
+                                setCurrProject(prev => ({ ...prev, updates: updatedUpdates }));
+                                const putRes = await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { updates: updatedUpdates });
+
+                                if (isApprovalRequest && resolvedClientId) {
+                                  const approvalCompanyId = user?.companyId || user?.company || user?._id || user?.id || currProject.companyId || '';
+                                  await axios.post(`${BASE_URL}/api/approvals`, {
+                                    companyId: approvalCompanyId,
+                                    clientId: resolvedClientId,
+                                    recipientType: 'client',
+                                    senderName: user?.name || user?.clientName || 'Admin',
+                                    title,
+                                    desc: updateText.trim(),
+                                    icon: 'ti-file-text',
+                                    approveLabel: 'Approve',
+                                    rejectLabel: 'Review',
+                                    sourceType: 'project',
+                                    projectId: currProject._id || '',
+                                    fileUrl: primaryAttachment ? primaryAttachment.url : '',
+                                    fileName: primaryAttachment ? primaryAttachment.name : '',
+                                  });
+                                  loadProjectApprovals();
+                                }
+
+                                await loadLatest();
+                                if (onUpdate) onUpdate();
+                                setUpdateText('');
+                                setUpdateTitle('');
+                                setPostUpdateAttachments([]);
+                                setUpdateSelectedMembers([]);
+                                setIsApprovalRequest(false);
+                              } catch (err) {
+                                console.error('Failed to post update:', err.response?.data || err.message);
+                                alert('Failed to save update: ' + (err.response?.data?.msg || err.message));
+                              } finally {
+                                setPostingUpdate(false);
+                              }
+                            }}
+                            style={{ padding: '9px 22px', borderRadius: 10, background: P.primary, color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: 13, fontWeight: 800, cursor: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 'not-allowed' : 'pointer', opacity: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,188,212,.25)', transition: 'all .15s' }}>
+                            <i className="ti ti-send" style={{ fontSize: 15 }} />
+                            {isApprovalRequest ? 'Send Update + Approval Request' : 'Send to Team'}
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   )}
                   {(!currProject.updates || currProject.updates.length === 0) ? (

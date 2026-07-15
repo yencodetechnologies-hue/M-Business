@@ -282,11 +282,11 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
       mf = x.date === selectedDate;
     } else {
       mf =
-        filter === "All" ? x.date === today :
+        filter === "All" ? true :
           filter === "Today" ? x.date === today :
             filter === "Upcoming" ? x.date > today :
               filter === "Past" ? x.date < today :
-                (x.type || "Meeting") === filter && x.date === today;
+                (x.type || "Meeting") === filter;
     }
     return ms && mf;
   };
@@ -728,21 +728,30 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                         }
                         return canEdit ? (
                           <>
-                            <button onClick={() => openEdit(ev)} style={{
+                            <button onClick={() => openEdit(ev, true)} style={{
                               background: finalTheme.bg, border: `1px solid ${finalTheme.border}`,
                               borderRadius: 7, padding: "5px 12px", fontSize: 11,
                               color: finalTheme.accent, cursor: "pointer", fontWeight: 700
                             }}>
-                              {ev._type ? "View" : "Edit"}
+                              View
                             </button>
                             {!ev._type && (
-                              <button onClick={() => del(ev._id || ev.id)} style={{
-                                background: "#fee2e2", border: "1px solid #fecaca",
-                                borderRadius: 7, padding: "5px 12px", fontSize: 11,
-                                color: "#ef4444", cursor: "pointer", fontWeight: 700
-                              }}>
-                                Delete
-                              </button>
+                              <>
+                                <button onClick={() => openEdit(ev)} style={{
+                                  background: finalTheme.bg, border: `1px solid ${finalTheme.border}`,
+                                  borderRadius: 7, padding: "5px 12px", fontSize: 11,
+                                  color: finalTheme.accent, cursor: "pointer", fontWeight: 700
+                                }}>
+                                  Edit
+                                </button>
+                                <button onClick={() => del(ev._id || ev.id)} style={{
+                                  background: "#fee2e2", border: "1px solid #fecaca",
+                                  borderRadius: 7, padding: "5px 12px", fontSize: 11,
+                                  color: "#ef4444", cursor: "pointer", fontWeight: 700
+                                }}>
+                                  Delete
+                                </button>
+                              </>
                             )}
                           </>
                         ) : (
@@ -902,10 +911,6 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
               <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: finalTheme.text || "var(--app-text)" }}>
                 {modal === "add" ? "Add New" : modal === "view" ? "View Event" : "Edit"}
               </h2>
-              <button onClick={() => { setModal(null); setForm(EMPTY); setErr({}); }} style={{
-                background: "none", border: "none", fontSize: 20,
-                cursor: "pointer", color: finalTheme.accent
-              }}>✕</button>
             </div>
 
             {/* Modal body */}
@@ -1091,11 +1096,13 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
 
               {/* Buttons */}
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-                <button onClick={() => { setModal(null); setForm(EMPTY); setErr({}); }} style={{
-                  background: finalTheme.bg, border: `1px solid ${finalTheme.border}`, color: finalTheme.text || "var(--app-text)",
-                  borderRadius: 10, padding: "10px 18px", cursor: "pointer",
-                  fontWeight: 600, fontSize: 13
-                }}>{modal === "view" ? "Close" : "Cancel"}</button>
+                {modal === "view" && (
+                  <button onClick={() => { setModal(null); setForm(EMPTY); setErr({}); }} style={{
+                    background: finalTheme.bg, border: `1px solid ${finalTheme.border}`, color: finalTheme.text || "var(--app-text)",
+                    borderRadius: 10, padding: "10px 18px", cursor: "pointer",
+                    fontWeight: 600, fontSize: 13
+                  }}>Close</button>
+                )}
                 {modal !== "view" && (
                   <button onClick={save} disabled={saving} style={{ ...Btn, opacity: saving ? 0.7 : 1 }}>
                     {saving ? "Saving…" : modal === "add" ? " Save Event" : "Success Update Event"}

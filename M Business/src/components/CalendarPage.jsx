@@ -178,7 +178,12 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
         showToast("Success Event updated!");
       }
 
-      // Notification logic
+      // Close modal and stop the "Saving..." state immediately —
+      // don't wait on notification lookups/network calls.
+      setModal(null);
+      setSaving(false);
+
+      // Notification logic (fire-and-forget, runs after UI already closed)
       if (savedEvent && (savedEvent.client || savedEvent.employee)) {
         const targetNames = [savedEvent.client, savedEvent.employee].filter(Boolean);
         for (const name of targetNames) {
@@ -197,12 +202,10 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
           }
         }
       }
-
-      setModal(null);
     } catch (err) {
       showToast("Error Failed to save. Please try again.");
+      setSaving(false);
     }
-    setSaving(false);
   };
 
   const updateProjectTask = async (type, id, updates) => {
@@ -261,13 +264,55 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
   const dateStr = (d) =>
     `${calYear}-${String(calMonth + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 
+  // Jump the calendar to the month/year of the first matching event whenever
+  // search text or the filter chip changes, so results outside the current
+  // month are still visible.
+  useEffect(() => {
+    if (!search && filter === "All") return;
+    const q = search.toLowerCase();
+    const match = allDisplayEvents.find(x => {
+      if (!x.date) return false;
+      const ms = !q ||
+        (x.name || "").toLowerCase().includes(q) ||
+        (x.project || "").toLowerCase().includes(q) ||
+        (x.client || "").toLowerCase().includes(q);
+      const mf =
+        filter === "All" ? true :
+          filter === "Today" ? x.date === today :
+            filter === "Upcoming" ? x.date > today :
+              filter === "Past" ? x.date < today :
+                filter === "Custom"
+                  ? !FIXED_TYPES.includes(x.type || "Meeting")
+                  : (x.type || "Meeting") === filter;
+      return ms && mf;
+    });
+    if (match) {
+      const eDate = match.date.includes('T') ? match.date.split('T')[0] : match.date;
+      const [y, m] = eDate.split("-").map(Number);
+      if (y !== calYear || (m - 1) !== calMonth) {
+        setCalYear(y);
+        setCalMonth(m - 1);
+      }
+      setSelectedDate(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, filter]);
+
   const eventsOnDay = (d) => {
     const targetDateStr = dateStr(d);
+    const q = search.toLowerCase();
     return allDisplayEvents.filter(e => {
       if (!e.date) return false;
-      // Handle both YYYY-MM-DD and ISO strings
       const eDate = e.date.includes('T') ? e.date.split('T')[0] : e.date;
-      return eDate === targetDateStr;
+      if (eDate !== targetDateStr) return false;
+      const ms = !q ||
+        (e.name || "").toLowerCase().includes(q) ||
+        (e.project || "").toLowerCase().includes(q) ||
+        (e.client || "").toLowerCase().includes(q);
+      if (!ms) return false;
+      if (filter === "All" || filter === "Today" || filter === "Upcoming" || filter === "Past") return true;
+      if (filter === "Custom") return !FIXED_TYPES.includes(e.type || "Meeting");
+      return (e.type || "Meeting") === filter;
     });
   };
 
@@ -375,9 +420,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
         </div>
         <div style={{ flex: 1, minWidth: 160 }}>
           <div style={{ fontSize: 18, fontWeight: 900, color: finalTheme.text || "var(--app-text)" }}>Calendar</div>
-          <div style={{ fontSize: 12, color: finalTheme.muted, marginTop: 1 }}>
-            Home <span style={{ margin: "0 4px" }}>›</span> <span style={{ color: finalTheme.accent, fontWeight: 700 }}>Calendar</span>
-          </div>
+
         </div>
         {!isClient && !isEmployee && (
           <button onClick={() => openAdd(selectedDate || "")} style={Btn}>
@@ -738,7 +781,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                             }}>
                               View
                             </button>
-                            {!ev._type && (
+                            {(ev._type === "event" || !ev._type) && (
                               <>
                                 <button onClick={() => openEdit(ev)} style={{
                                   background: finalTheme.bg, border: `1px solid ${finalTheme.border}`,

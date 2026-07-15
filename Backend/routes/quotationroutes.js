@@ -323,7 +323,7 @@ router.put("/:id", async (req, res) => {
 router.patch("/:id/status", async (req, res) => {
   try {
     const { status } = req.body;
-    const allowed = ["draft", "sent", "approved", "rejected", "expired", "converted"];
+    const allowed = ["draft", "sent", "pending", "approved", "rejected", "expired", "converted"];
     if (!allowed.includes(status)) return res.status(400).json({ success: false, msg: "Invalid status" });
 
     const companyId = req.companyId || "NONE";

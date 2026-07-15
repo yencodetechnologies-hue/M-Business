@@ -3262,7 +3262,33 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         )
       }
 
-      {/* Portal Live Preview Overlay */}
+      {showEditBudgetModal && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 99996, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: '#fff', borderRadius: P.radius, width: 380, padding: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
+            <h3 style={{ margin: '0 0 16px', fontSize: 16, color: P.textDark }}>Set Project Budget</h3>
+            <input
+              type="number"
+              defaultValue={currProject.budget || ''}
+              id="mpd-budget-input"
+              placeholder="Enter budget amount"
+              style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 14, marginBottom: 16, boxSizing: 'border-box' }}
+            />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+              <button onClick={() => setShowEditBudgetModal(false)} style={{ background: '#f1f5f9', border: 'none', borderRadius: 8, padding: '9px 18px', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
+              <button
+                onClick={async () => {
+                  const val = document.getElementById('mpd-budget-input').value;
+                  await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { budget: val });
+                  setShowEditBudgetModal(false);
+                  loadLatest();
+                  if (onUpdate) onUpdate();
+                }}
+                style={{ background: P.primary, color: '#fff', border: 'none', borderRadius: 8, padding: '9px 18px', cursor: 'pointer', fontWeight: 700 }}
+              >Save Budget</button>
+            </div>
+          </div>
+        </div>
+      )}
       {
         showPortalPreview && (
           <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: '#fff', overflowY: 'auto', padding: 20 }}>

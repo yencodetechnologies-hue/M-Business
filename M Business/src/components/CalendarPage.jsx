@@ -286,7 +286,9 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
           filter === "Today" ? x.date === today :
             filter === "Upcoming" ? x.date > today :
               filter === "Past" ? x.date < today :
-                (x.type || "Meeting") === filter;
+                filter === "Custom"
+                  ? !FIXED_TYPES.includes(x.type || "Meeting")
+                  : (x.type || "Meeting") === filter;
     }
     return ms && mf;
   };
@@ -299,9 +301,10 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
     { t: "Upcoming", v: allDisplayEvents.filter(x => x.date > today).length, c: "#10b981", i: "⏰" },
     { t: "Past", v: allDisplayEvents.filter(x => x.date < today).length, c: "#ef4444", i: "✅" },
   ];
-
   const pNames = projects.map(p => p.name || "");
-  const cNames = clients.map(c => c.clientName || c.name || "");
+  const cNames = clients
+    .filter(c => c.status !== "Inactive")
+    .map(c => c.clientName || c.name || "");
 
   const Btn = {
     background: finalTheme.gradient || finalTheme.accent,
@@ -915,30 +918,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
 
             {/* Modal body */}
             <div style={{ overflowY: "auto", padding: "20px 22px", flex: 1 }}>
-              {modal === "add" && (
-                <div style={{ display: "flex", gap: 10, marginBottom: 20, background: finalTheme.bg, padding: 12, borderRadius: 12 }}>
-                  {["Event", "Project", "Task"].map(cat => (
-                    <button
-                      key={cat}
-                      onClick={() => setForm({ ...form, category: cat })}
-                      style={{
-                        flex: 1,
-                        padding: "8px",
-                        borderRadius: 8,
-                        border: "1.5px solid",
-                        borderColor: form.category === cat ? finalTheme.accent : finalTheme.border,
-                        background: form.category === cat ? finalTheme.accent : finalTheme.card,
-                        color: form.category === cat ? "#fff" : finalTheme.accent,
-                        fontSize: 12,
-                        fontWeight: 700,
-                        cursor: "pointer"
-                      }}
-                    >
-                      {cat === "Event" ? "Date Event" : cat === "Project" ? "Build Project" : "Edit Task"}
-                    </button>
-                  ))}
-                </div>
-              )}
+
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
                 {/* Name */}

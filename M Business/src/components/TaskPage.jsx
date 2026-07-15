@@ -709,8 +709,9 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
     setTimeout(() => inputRef.current?.focus(), 50);
   }, []);
 
-  // Build list from localEmployees state
+  // Build list from localEmployees state, excluding Inactive employees
   const empList = (localEmployees || [])
+    .filter(e => typeof e !== 'object' || e === null || e.status !== "Inactive")
     .map(e => typeof e === 'object' && e !== null ? (e.name || e.employeeName || "") : (e || ""))
     .filter(e => typeof e === 'string' && e.trim() !== "");
 

@@ -3,14 +3,14 @@ const mongoose = require("mongoose");
 
 const EventSchema = new mongoose.Schema(
   {
-    name:    { type: String, required: true, trim: true },
+    name: { type: String, required: true, trim: true },
     project: { type: String, default: "" },
-    client:  { type: String, default: "" },
-    date:    { type: String, required: true },   // "YYYY-MM-DD"
-    start:   { type: String, default: "" },       // "HH:MM"
-    end:     { type: String, default: "" },       // "HH:MM"
-    notes:   { type: String, default: "" },
-    type:    { type: String, default: "Meeting", enum: ["Meeting","Call","Review","Planning","Handover","Other"] },
+    client: { type: String, default: "" },
+    date: { type: String, required: true },   // "YYYY-MM-DD"
+    start: { type: String, default: "" },       // "HH:MM"
+    end: { type: String, default: "" },       // "HH:MM"
+    notes: { type: String, default: "" },
+    type: { type: String, default: "Meeting" },
     companyId: { type: String, default: "" },
     createdBy: { type: String, default: "" },
     createdByRole: { type: String, default: "" }

@@ -7,8 +7,9 @@ const T = { text: "var(--app-text)", muted: "var(--app-accent)", border: "var(--
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const FULL_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const TYPES = ["Meeting", "Call", "Review", "Planning", "Handover", "Other"];
-const TC = { Meeting: "var(--app-accent)", Call: "var(--app-accent)", Review: "#22C55E", Planning: "#f59e0b", Handover: "var(--app-accent)", Other: "var(--app-muted)" };
+const FIXED_TYPES = ["Meeting", "Call", "Review", "Planning", "Handover"];
+const TYPES = [...FIXED_TYPES, "Custom"];
+const TC = { Meeting: "var(--app-accent)", Call: "var(--app-accent)", Review: "#22C55E", Planning: "#f59e0b", Handover: "var(--app-accent)", Custom: "var(--app-muted)" };
 const EMPTY = { name: "", project: "", client: "", date: "", start: "", end: "", notes: "", type: "Meeting", category: "Event" };
 
 export default function CalendarPage({ projects = [], tasks = [], clients = [], companyId, onUpdateProject, onUpdateTask, config, user, THEME }) {
@@ -30,7 +31,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
     Meeting: finalTheme.accent || TC.Meeting,
     Call: finalTheme.accent || TC.Call,
     Handover: finalTheme.accent || TC.Handover,
-    Other: finalTheme.muted || TC.Other
+    Custom: finalTheme.muted || TC.Custom
   };
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -956,10 +957,35 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                     display: "block", fontSize: 11, color: finalTheme.accent,
                     fontWeight: 700, letterSpacing: 0.5, marginBottom: 5
                   }}>TYPE</label>
-                  <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}
-                    style={{ ...inp(false), background: finalTheme.bg }} disabled={modal === "view"}>
-                    {TYPES.map(t => <option key={t}>{t}</option>)}
-                  </select>
+                  {(form.type === "Custom" || (form.type && !FIXED_TYPES.includes(form.type))) ? (
+                    <div style={{ position: "relative" }}>
+                      <input
+                        value={form.type === "Custom" ? "" : form.type}
+                        onChange={e => setForm({ ...form, type: e.target.value })}
+                        placeholder="Enter custom event type"
+                        disabled={modal === "view"}
+                        style={{ ...inp(false), background: finalTheme.bg, paddingRight: 28 }}
+                      />
+                      {modal !== "view" && (
+                        <button
+                          type="button"
+                          onClick={() => setForm({ ...form, type: "Meeting" })}
+                          title="Switch back to dropdown"
+                          style={{
+                            position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)",
+                            background: "none", border: "none", cursor: "pointer", color: finalTheme.muted || "#94a3b8", fontSize: 14, lineHeight: 1, padding: 2
+                          }}
+                        >
+                          <i className="ti ti-selector"></i>
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}
+                      style={{ ...inp(false), background: finalTheme.bg }} disabled={modal === "view"}>
+                      {TYPES.map(t => <option key={t}>{t}</option>)}
+                    </select>
+                  )}
                 </div>
 
                 {/* Date */}
@@ -1037,14 +1063,14 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                 }}>
                   <div style={{
                     width: 46, height: 46,
-                    background: `${TYPE_COLORS[form.type] || finalTheme.accent}20`,
-                    border: `2px solid ${TYPE_COLORS[form.type] || finalTheme.accent}40`,
+                    background: `${(FIXED_TYPES.includes(form.type) ? TYPE_COLORS[form.type] : null) || finalTheme.muted || finalTheme.accent}20`,
+                    border: `2px solid ${(FIXED_TYPES.includes(form.type) ? TYPE_COLORS[form.type] : null) || finalTheme.muted || finalTheme.accent}40`,
                     borderRadius: 10, display: "flex", flexDirection: "column",
                     alignItems: "center", justifyContent: "center", flexShrink: 0
                   }}>
                     <div style={{
                       fontSize: 16, fontWeight: 800,
-                      color: TYPE_COLORS[form.type] || finalTheme.accent, lineHeight: 1
+                      color: (FIXED_TYPES.includes(form.type) ? TYPE_COLORS[form.type] : null) || finalTheme.muted || finalTheme.accent, lineHeight: 1
                     }}>
                       {new Date(form.date + "T00:00:00").getDate()}
                     </div>

@@ -7403,6 +7403,30 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [pendingLeaves, setPendingLeaves] = useState([]);
   const [showNotifPanel, setShowNotifPanel] = useState(false);
   const [employeeDocs, setEmployeeDocs] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const unreadNotifCount = notifications.filter(n => !n.isRead).length + pendingLeaves.length;
+
+  const fetchNotifications = async () => {
+    try {
+      const uid = resolveSubadminId();
+      if (!uid) return;
+      const res = await axios.get(`${BASE_URL}/api/notifications/${uid}`);
+      setNotifications(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error('Failed to fetch notifications:', err);
+    }
+  };
+
+  const markAllNotificationsRead = async () => {
+    try {
+      const uid = resolveSubadminId();
+      if (!uid) return;
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      await axios.patch(`${BASE_URL}/api/notifications/read-all/${uid}`);
+    } catch (err) {
+      console.error('Failed to mark notifications read:', err);
+    }
+  };
 
 
 
@@ -7589,7 +7613,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       fetchSubscription(), fetchQuotations(), fetchPaymentHistory(), fetchVendors(),
       fetchInvoices(), fetchIncome(), fetchExpenses(), fetchTasks(), fetchConfig()
     ]).catch(e => console.log("Background fetch error:", e));
-    fetchPendingLeaves(); fetchEmployeeDocs();
+    fetchPendingLeaves(); fetchEmployeeDocs(); fetchNotifications();
+    const notifPollInterval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(notifPollInterval);
   }, [user]); // Close notification panel when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -9552,10 +9578,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             </div>
             <div className="topbar-right">
 
-              <div className="topbar-icon" onClick={() => { setShowNotifPanel(v => !v); fetchPendingLeaves(); }} style={{ position: 'relative', cursor: 'pointer' }}>
+              <div className="topbar-icon" onClick={() => { const next = !showNotifPanel; setShowNotifPanel(next); fetchPendingLeaves(); fetchNotifications(); if (next) markAllNotificationsRead(); }} style={{ position: 'relative', cursor: 'pointer' }}>
                 <i className="ti ti-bell"></i>
-                {pendingLeaves.length > 0 && (
-                  <span style={{ position: 'absolute', top: -2, right: -2, width: 10, height: 10, background: '#EF4444', borderRadius: '50%', border: '1.5px solid #fff', zIndex: 2, boxSizing: 'border-box' }}></span>
+                {unreadNotifCount > 0 && (
+                  <span style={{ position: 'absolute', top: -6, right: -6, minWidth: 16, height: 16, padding: '0 3px', background: '#EF4444', borderRadius: 10, border: '1.5px solid #fff', zIndex: 2, boxSizing: 'border-box', color: '#fff', fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>{unreadNotifCount > 99 ? '99+' : unreadNotifCount}</span>
                 )}
                 {showNotifPanel && (
                   <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: 44, right: 0, width: 380, background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', border: '1px solid #E2E8F0', zIndex: 99999, overflow: 'hidden' }}>

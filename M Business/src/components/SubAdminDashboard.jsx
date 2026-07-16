@@ -6901,7 +6901,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   // ← à®‡à®¤à¯ à®®à®Ÿà¯à®Ÿà¯à®®à¯ à®‡à®°à¯à®•à¯à®•à®£à¯à®®à¯ (KEEP THIS)
 
-  const [appTheme, setAppTheme] = useState("teal");
+  const [appTheme, setAppTheme] = useState(() => localStorage.getItem("appTheme") || "teal");
 
   const [showThemePicker, setShowThemePicker] = useState(false);
 

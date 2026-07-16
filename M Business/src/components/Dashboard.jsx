@@ -1809,15 +1809,20 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     } catch { }
   }, [modal]);
 
-  const [prefillClient, setPrefillClient] = useState(null);
+  const [prefillClientName, setPrefillClientName] = useState(() => localStorage.getItem("prefillClientName_dashboard") || "");
+  useEffect(() => {
+    try {
+      if (prefillClientName) localStorage.setItem("prefillClientName_dashboard", prefillClientName);
+      else localStorage.removeItem("prefillClientName_dashboard");
+    } catch { }
+  }, [prefillClientName]);
 
   // Ensure np.client is synced when prefillClientName is set
   useEffect(() => {
     if (prefillClientName && modal === "project") {
       setNp(prev => ({ ...prev, client: prefillClientName }));
     }
-  }, [prefillClientName, modal]);
-  const [showProfile, setShowProfile] = useState(false);
+  }, [prefillClientName, modal]); const [showProfile, setShowProfile] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [companyLogo, setCompanyLogo] = useState(user?.logoUrl ? user.logoUrl : (fixedLogo || null));
   useEffect(() => { setCompanyLogo(user?.logoUrl ? user.logoUrl : (fixedLogo || null)); }, [user, fixedLogo]);

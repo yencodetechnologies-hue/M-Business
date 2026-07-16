@@ -69,13 +69,13 @@ export default function ModernProjectsPage({ user }) {
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [clients, setClients] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   // ── Invoice ---------------------------------------------------
   const [showInvoiceCreator, setShowInvoiceCreator] = useState(false);
   const [invoicePrefill, setInvoicePrefill] = useState(null);
-  const [jumpInvoice, setJumpInvoice] = useState(null);
   const [prevActiveBeforeInvoice, setPrevActiveBeforeInvoice] = useState("dashboard");
   // ── UI state --------------------------------------------------
   const [selectedProject, setSelectedProject] = useState(() => {
@@ -104,15 +104,17 @@ export default function ModernProjectsPage({ user }) {
     setLoading(true);
     setError('');
     try {
-      const [pRes, tRes, cRes] = await Promise.all([
+      const [pRes, tRes, cRes, eRes] = await Promise.all([
         axios.get(`${BASE_URL}/api/projects`),
         axios.get(`${BASE_URL}/api/tasks`),
         axios.get(`${BASE_URL}/api/clients`).catch(() => ({ data: [] })),
+        axios.get(`${BASE_URL}/api/employees`).catch(() => ({ data: [] })),
       ]);
       const freshProjects = Array.isArray(pRes.data) ? pRes.data : [];
       setProjects(freshProjects);
       setTasks(Array.isArray(tRes.data) ? tRes.data : []);
       setClients(Array.isArray(cRes.data) ? cRes.data : []);
+      setEmployees(Array.isArray(eRes.data) ? eRes.data : []);
       // Keep selectedProject in sync with latest backend data
       setSelectedProject(prev => {
         if (!prev) return prev;
@@ -399,7 +401,7 @@ export default function ModernProjectsPage({ user }) {
           </div>
         </div>
         {/* Modals rendered on top */}
-        {showForm && <ProjectFormModal form={form} setForm={setForm} onSave={handleSave} onClose={() => setShowForm(false)} saving={saving} isEdit={!!editProject} />}
+        {showForm && <ProjectFormModal form={form} setForm={setForm} onSave={handleSave} onClose={() => setShowForm(false)} saving={saving} isEdit={!!editProject} employees={employees} />}
         {deleteTarget && <DeleteModal name={deleteTarget.name} onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} deleting={deleting} />}
         {showLogTime && <LogTimeModal form={logForm} setForm={setLogForm} onSave={handleSaveLog} onClose={() => setShowLogTime(false)} saving={logSaving} projectName={logTimeProject?.name} />}
 
@@ -689,7 +691,7 @@ export default function ModernProjectsPage({ user }) {
 
       {/* ── MODALS ── */}
       {/* ── MODALS ── */}
-      {showForm && <ProjectFormModal form={form} setForm={setForm} onSave={handleSave} onClose={() => setShowForm(false)} saving={saving} isEdit={!!editProject} />}
+      {showForm && <ProjectFormModal form={form} setForm={setForm} onSave={handleSave} onClose={() => setShowForm(false)} saving={saving} isEdit={!!editProject} employees={employees} />}
       {deleteTarget && <DeleteModal name={deleteTarget.name} onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} deleting={deleting} />}
       {showLogTime && <LogTimeModal form={logForm} setForm={setLogForm} onSave={handleSaveLog} onClose={() => setShowLogTime(false)} saving={logSaving} projectName={logTimeProject?.name} />}
 
@@ -713,9 +715,10 @@ export default function ModernProjectsPage({ user }) {
 
 // ─── Project Form Modal ----------------------------------------
 // ─── Project Form Modal (Right Side Drawer) ----------------------------------------
-function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit }) {
+function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit, employees = [] }) {
   const f = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
   const [memberInput, setMemberInput] = useState('');
+  const employeeNames = employees.map(e => e.name || e.employeeName || '').filter(Boolean);
 
   const teamMembers = form.assignedTo
     ? form.assignedTo.split(',').map(s => s.trim()).filter(Boolean)
@@ -865,12 +868,16 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit }) {
             {/* Add member input */}
             <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
               <input
+                list="employee-name-suggestions"
                 style={{ ...INP, flex: 1, background: '#fff' }}
                 value={memberInput}
                 onChange={e => setMemberInput(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addMember(); } }}
-                placeholder="Type name & press Enter or Add…"
+                placeholder={employeeNames.length ? "Select or type a name & press Enter" : "No employees yet — type a name & press Enter"}
               />
+              <datalist id="employee-name-suggestions">
+                {employeeNames.map(n => <option key={n} value={n} />)}
+              </datalist>
               <button
                 type="button"
                 onClick={addMember}

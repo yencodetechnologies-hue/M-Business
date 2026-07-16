@@ -6791,7 +6791,28 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const [jumpInvoice, setJumpInvoice] = useState(null);
 
-  const [invoicePrefill, setInvoicePrefill] = useState(null);
+  const [invoicePrefill, setInvoicePrefill] = useState(() => {
+    try {
+      const saved = localStorage.getItem("invoicePrefill_subadmin");
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) { return null; }
+  });
+  useEffect(() => {
+    try {
+      if (invoicePrefill) {
+        localStorage.setItem("invoicePrefill_subadmin", JSON.stringify(invoicePrefill));
+      } else {
+        localStorage.removeItem("invoicePrefill_subadmin");
+      }
+    } catch (e) { }
+  }, [invoicePrefill]);
+  const [invoiceStep, setInvoiceStep] = useState(() => localStorage.getItem("invoiceStep_subadmin") || null);
+  useEffect(() => {
+    try {
+      if (invoiceStep) localStorage.setItem("invoiceStep_subadmin", invoiceStep);
+      else localStorage.removeItem("invoiceStep_subadmin");
+    } catch (e) { }
+  }, [invoiceStep]);
   const [prevActiveBeforeInvoice, setPrevActiveBeforeInvoice] = useState("dashboard");
 
   const [sidebarOverride, setSidebarOverride] = useState(() => {
@@ -11506,7 +11527,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={sidebarOverride ? () => { setSidebarOverride(null); setActive(prevActiveBeforeInvoice || "dashboard"); } : undefined} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => {
+            {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={sidebarOverride ? () => { setSidebarOverride(null); setActive(prevActiveBeforeInvoice || "dashboard"); } : undefined} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill} initialStep={invoiceStep} onStepChange={setInvoiceStep} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 

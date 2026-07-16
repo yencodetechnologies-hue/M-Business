@@ -389,6 +389,9 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   const [quickEmpRole, setQuickEmpRole] = useState('');
   const [quickAddSaving, setQuickAddSaving] = useState(false);
   const [localEmployees, setLocalEmployees] = useState(employees);
+  useEffect(() => {
+    setLocalEmployees(employees);
+  }, [employees]);
 
   useEffect(() => { setLocalEmployees(employees); }, [employees]);
 
@@ -858,7 +861,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                   onClick={e => e.stopPropagation()}
                 >
                   <div style={{ fontSize: 18, fontWeight: 800, color: P.textDark, marginBottom: 20 }}>
-                    Add Team Member
+                    Add Team Member {`(${employees.length} available)`}
                   </div>
                   <div style={{
                     maxHeight: 340, overflowY: 'auto', marginBottom: 20,
@@ -893,9 +896,15 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                       <button
                         type="button"
                         onClick={() => { setShowAddEmployee(false); setSelectedEmpsToAdd([]); onAddEmployeeClick(); }}
-                        style={{ display: 'block', width: '100%', textAlign: 'left', background: 'none', border: 'none', color: P.primary, fontSize: 13, fontWeight: 700, padding: '9px 10px', cursor: 'pointer' }}
+                        style={{
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                          width: '100%', textAlign: 'center',
+                          background: P.primaryLight || '#E0F7FA', border: `1.5px dashed ${P.primary}`,
+                          color: P.primary, fontSize: 13, fontWeight: 800,
+                          padding: '10px', borderRadius: 10, cursor: 'pointer', marginTop: 6
+                        }}
                       >
-                        + Add New Employee...
+                        <i className="ti ti-plus" style={{ fontSize: 14 }}></i> Add Employee
                       </button>
                     )}
                   </div>

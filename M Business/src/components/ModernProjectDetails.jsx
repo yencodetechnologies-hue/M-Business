@@ -271,6 +271,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadFiles, setUploadFiles] = useState([]); // array of File objects (multi-select support)
   const [postUpdateAttachments, setPostUpdateAttachments] = useState([]); // [{ name, url, type }] for the Post Project Update panel
+  const [editingUpdate, setEditingUpdate] = useState(null); // { index, title, text, attachments }
+  const [editUpdateAttaching, setEditUpdateAttaching] = useState(false);
+  const editUpdateFileInputRef = React.useRef(null);
   const [postUpdateAttaching, setPostUpdateAttaching] = useState(false);
   const postUpdateFileInputRef = useRef(null);
   const [uploadFileError, setUploadFileError] = useState(''); // required-field validation message
@@ -2577,6 +2580,24 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                       )}
                                       {!hideTopActions && (
                                         <button
+                                          onClick={() => {
+                                            const realIdx = updatesPage * 10 + idx;
+                                            setEditingUpdate({
+                                              index: realIdx,
+                                              title: upd.title || '',
+                                              text: upd.text || '',
+                                              attachments: (upd.attachments && upd.attachments.length > 0)
+                                                ? [...upd.attachments]
+                                                : (upd.fileUrl ? [{ name: upd.fileName, url: upd.fileUrl, type: upd.fileType }] : []),
+                                            });
+                                          }}
+                                          style={{ padding: '4px 10px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#fff', color: P.primary, fontSize: 11, fontWeight: 700, cursor: 'pointer', marginLeft: 'auto' }}
+                                        >
+                                          Edit
+                                        </button>
+                                      )}
+                                      {!hideTopActions && (
+                                        <button
                                           onClick={async () => {
                                             if (!window.confirm('Delete this update? This cannot be undone.')) return;
                                             const updatedUpdates = (currProject.updates || []).filter((_, i2) => i2 !== (updatesPage * 10 + idx));
@@ -2589,7 +2610,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                               alert('Failed to delete update.');
                                             }
                                           }}
-                                          style={{ padding: '4px 10px', borderRadius: 8, border: '1.5px solid #FCA5A5', background: P.redLight, color: P.red, fontSize: 11, fontWeight: 700, cursor: 'pointer', marginLeft: 'auto' }}
+                                          style={{ padding: '4px 10px', borderRadius: 8, border: '1.5px solid #FCA5A5', background: P.redLight, color: P.red, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}
                                         >
                                           Delete
                                         </button>
@@ -2643,6 +2664,99 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     );
                   })()}
                 </div>
+
+                {editingUpdate && (
+                  <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setEditingUpdate(null)}>
+                    <div style={{ background: '#fff', borderRadius: 16, padding: '24px 24px 20px', width: '100%', maxWidth: 520, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+                      <div style={{ fontSize: 16, fontWeight: 800, color: P.textDark, marginBottom: 16 }}>Edit Update</div>
+                      <input
+                        value={editingUpdate.title}
+                        onChange={e => setEditingUpdate(prev => ({ ...prev, title: e.target.value }))}
+                        placeholder="Title"
+                        style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 13, marginBottom: 10, boxSizing: 'border-box' }}
+                      />
+                      <textarea
+                        value={editingUpdate.text}
+                        onChange={e => setEditingUpdate(prev => ({ ...prev, text: e.target.value }))}
+                        placeholder="Update details…"
+                        style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 13, height: 80, resize: 'vertical', marginBottom: 12, boxSizing: 'border-box', fontFamily: 'inherit' }}
+                      />
+                      {editingUpdate.attachments.length > 0 && (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+                          {editingUpdate.attachments.map((att, i) => (
+                            <div key={i} style={{ position: 'relative' }}>
+                              {(att.type && att.type.startsWith('image/')) ? (
+                                <img src={att.url && att.url.startsWith('http') ? att.url : `${BASE_URL}${att.url.startsWith('/') ? '' : '/'}${att.url}`} alt={att.name} style={{ width: 70, height: 55, objectFit: 'cover', borderRadius: 8, border: `1.5px solid ${P.border}` }} />
+                              ) : (
+                                <div style={{ padding: '8px 10px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 11, fontWeight: 700 }}>{att.name}</div>
+                              )}
+                              <button onClick={() => setEditingUpdate(prev => prev ? ({ ...prev, attachments: prev.attachments.filter((_, i2) => i2 !== i) }) : prev)} style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', background: '#EF4444', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 11, lineHeight: 1 }}>×</button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        multiple
+                        ref={editUpdateFileInputRef}
+                        style={{ display: 'none' }}
+                        onChange={async (e) => {
+                          const files = Array.from(e.target.files || []);
+                          if (files.length === 0) return;
+                          setEditUpdateAttaching(true);
+                          for (const file of files) {
+                            try {
+                              const formData = new FormData();
+                              formData.append('file', file);
+                              const res = await axios.post(`${BASE_URL}/api/upload`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+                              const resolvedUrl = res.data.url && res.data.url.startsWith('http') ? res.data.url : `${BASE_URL}${res.data.url.startsWith('/') ? '' : '/'}${res.data.url}`;
+                              setEditingUpdate(prev => prev ? ({ ...prev, attachments: [...prev.attachments, { name: file.name, url: resolvedUrl, type: file.type }] }) : prev);
+                            } catch (err) {
+                              console.error('Attachment upload failed:', file.name, err);
+                              alert(`Failed to upload ${file.name}.`);
+                            }
+                          }
+                          setEditUpdateAttaching(false);
+                          e.target.value = '';
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => editUpdateFileInputRef.current.click()}
+                        disabled={editUpdateAttaching}
+                        style={{ background: 'none', border: `1.5px solid ${P.border}`, borderRadius: 8, padding: '7px 12px', fontSize: 12, fontWeight: 700, color: P.textMid, cursor: 'pointer', marginBottom: 16 }}
+                      >
+                        {editUpdateAttaching ? 'Uploading…' : ' Add / Replace Image or File'}
+                      </button>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                        <button onClick={() => setEditingUpdate(null)} style={{ padding: '9px 18px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: '#fff', color: P.textDark, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Cancel</button>
+                        <button
+                          onClick={async () => {
+                            const updatedUpdates = [...(currProject.updates || [])];
+                            updatedUpdates[editingUpdate.index] = {
+                              ...updatedUpdates[editingUpdate.index],
+                              title: editingUpdate.title,
+                              text: editingUpdate.text,
+                              attachments: editingUpdate.attachments,
+                            };
+                            setCurrProject(prev => ({ ...prev, updates: updatedUpdates }));
+                            setEditingUpdate(null);
+                            try {
+                              await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { updates: updatedUpdates });
+                              if (onUpdate) onUpdate();
+                            } catch (err) {
+                              console.error('Failed to save update:', err.response?.data || err.message);
+                              alert('Failed to save update.');
+                            }
+                          }}
+                          style={{ padding: '9px 18px', borderRadius: 10, border: 'none', background: P.primary, color: '#fff', fontWeight: 800, fontSize: 13, cursor: 'pointer' }}
+                        >
+                          Save Changes
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* ── PAYMENTS TAB ── */}
                 <div className={`mpd-tab-pane ${activeTab === 'payments' ? 'mpd-active' : ''}`}>

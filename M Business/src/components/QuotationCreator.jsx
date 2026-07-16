@@ -125,7 +125,10 @@ function ProjectDropdown({ projects, value, onChange, onAddProject, disabled }) 
 export default function QuotationCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onConvertToInvoice, onAddClient, onAddProject, onNewQuotation, onEditQuotation }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || user?.companyName || "M Business";
-  const [step, setStep] = useState("list");
+  const [step, setStep] = useState(initialStep || "list");
+  useEffect(() => {
+    if (onStepChange) onStepChange(step);
+  }, [step]);
 
   const iframeRef = useRef(null);
 

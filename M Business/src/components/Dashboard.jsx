@@ -1801,7 +1801,13 @@ function Sidebar({ active, setActive, onLogout, open, onClose, navItems, initial
 export default function Dashboard({ setUser, user, fixedLogo }) {
   const [active, setActive] = useState(() => localStorage.getItem("activeTab_dashboard") || "dashboard");
   useEffect(() => { localStorage.setItem("activeTab_dashboard", active); }, [active]);
-  const [modal, setModal] = useState(null);
+  const [modal, setModal] = useState(() => localStorage.getItem("openModal_dashboard") || null);
+  useEffect(() => {
+    try {
+      if (modal) localStorage.setItem("openModal_dashboard", modal);
+      else localStorage.removeItem("openModal_dashboard");
+    } catch { }
+  }, [modal]);
 
   const [prefillClient, setPrefillClient] = useState(null);
 
@@ -1846,7 +1852,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [expenses, setExpenses] = useState([]);
   const totalRevenue = income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
   const [config, setConfig] = useState(null);
-  const [viewProject, setViewProject] = useState(null);
+  const [viewProject, setViewProjectRaw] = useState(null);
+  const setViewProject = (p) => {
+    setViewProjectRaw(p);
+    try {
+      if (p) localStorage.setItem("viewProjectId_dashboard", p._id || p.id || "");
+      else localStorage.removeItem("viewProjectId_dashboard");
+    } catch { }
+  };
+  const [restoredContext, setRestoredContext] = useState(false);
   const [subscription, setSubscription] = useState(null);
   const [subLoading, setSubLoading] = useState(false);
   const fetchSubscription = async () => {
@@ -1900,11 +1914,35 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const fetchEmployees = async () => { try { const res = await axios.get(BASE_URL + "/api/employees"); setEmployees(res.data); try { localStorage.setItem("cached_employees", JSON.stringify(res.data)); } catch { } } catch (e) { console.log(e); } };
   const fetchProjects = async () => { try { const res = await axios.get(BASE_URL + "/api/projects"); setProjects(res.data); try { localStorage.setItem("cached_projects", JSON.stringify(res.data)); } catch { } } catch (e) { console.log(e); } };
   const fetchManagers = async () => { try { const res = await axios.get(BASE_URL + "/api/managers"); setManagers(res.data); try { localStorage.setItem("cached_managers", JSON.stringify(res.data)); } catch { } } catch (e) { console.log(e); } };
-  const [selectedProjectForTasks, setSelectedProjectForTasks] = useState(null);
+  const [selectedProjectForTasks, setSelectedProjectForTasksRaw] = useState(null);
+  const setSelectedProjectForTasks = (p) => {
+    setSelectedProjectForTasksRaw(p);
+    try {
+      if (p) localStorage.setItem("selectedProjectId_dashboard", p._id || p.id || "");
+      else localStorage.removeItem("selectedProjectId_dashboard");
+    } catch { }
+  };
   const [mobileExpandedProjectIdx, setMobileExpandedProjectIdx] = useState(null);
   const [autoOpenTaskModal, setAutoOpenTaskModal] = useState(false);
 
   const fetchTasks = async () => { try { const res = await axios.get(BASE_URL + "/api/tasks"); setTasks(res.data); try { localStorage.setItem("cached_tasks", JSON.stringify(res.data)); } catch { } } catch (e) { console.log(e); } };
+
+  useEffect(() => {
+    if (restoredContext || projects.length === 0) return;
+    try {
+      const savedSelId = localStorage.getItem("selectedProjectId_dashboard");
+      if (savedSelId) {
+        const p = projects.find(pr => (pr._id || pr.id) === savedSelId);
+        if (p) setSelectedProjectForTasksRaw(p);
+      }
+      const savedViewId = localStorage.getItem("viewProjectId_dashboard");
+      if (savedViewId) {
+        const p = projects.find(pr => (pr._id || pr.id) === savedViewId);
+        if (p) setViewProjectRaw(p);
+      }
+    } catch { }
+    setRestoredContext(true);
+  }, [projects, restoredContext]);
   const fetchIncome = async () => { try { const res = await axios.get(BASE_URL + "/api/income"); setIncome(res.data || []); try { localStorage.setItem("cached_income", JSON.stringify(res.data || [])); } catch { } } catch (e) { console.log(e); } };
   const fetchExpenses = async () => { try { const res = await axios.get(BASE_URL + "/api/expenses"); setExpenses(res.data || []); try { localStorage.setItem("cached_expenses", JSON.stringify(res.data || [])); } catch { } } catch (e) { console.log(e); } };
   const fetchConfig = async () => { try { const cid = user?._id || user?.id; if (!cid) return; const res = await axios.get(`${BASE_URL}/api/config/${cid}`); setConfig(res.data); } catch (e) { console.log(e); } };
@@ -2397,10 +2435,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           }} />}
           {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
-          clients={clients}
-          employees={employees} projects={projects} setProjects={setProjects} clients={clients} employees={employees} config={config} onViewTasks={(p) => { setSelectedProjectForTasks(p); setActive("tasks"); }} />}
+          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} config={config} onViewTasks={(p) => { setSelectedProjectForTasks(p); setActive("tasks"); }} />}
 
-          {validActive === "invoices" && <InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setActive("addProject")} />} onAddClient={() => setModal("client")} onAddProject={() => setActive("projects")} />}
+          {validActive === "invoices" && <InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setActive("projects")} />}
           {validActive === "quotations" && <QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setActive("projects")} />}
           {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "M Business"} />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
@@ -2815,6 +2852,5 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     </div>
   );
 }
-
 
 

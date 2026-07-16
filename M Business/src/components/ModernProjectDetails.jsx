@@ -2641,9 +2641,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                     {attachments.map((att, aidx) => {
                                       const isImg = (att.type && att.type.startsWith('image/')) || /\.(jpe?g|png|gif|webp|svg)$/i.test(att.url || att.name || '');
                                       const rawAttUrl = att.url || '';
+                                      const API_ORIGIN = BASE_URL || window.location.origin;
                                       const displayUrl = /^https?:\/\//i.test(rawAttUrl)
                                         ? rawAttUrl
-                                        : (rawAttUrl ? `${BASE_URL}${rawAttUrl.startsWith('/') ? '' : '/'}${rawAttUrl}` : '');
+                                        : (rawAttUrl ? `${API_ORIGIN}${rawAttUrl.startsWith('/') ? '' : '/'}${rawAttUrl}` : '');
                                       return isImg ? (
                                         <img
                                           key={`${att.url}-${aidx}`}

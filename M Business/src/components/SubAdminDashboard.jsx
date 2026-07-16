@@ -2862,7 +2862,22 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
               <Fld label="Phone Number" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
 
-              <Fld label="Role / Position" value={editForm.role} onChange={v => setEditForm(p => ({ ...p, role: v }))} options={DEPARTMENT_OPTIONS} />
+              {editForm.role === "Custom" || (editForm.role && !DEPARTMENT_OPTIONS.includes(editForm.role)) ? (
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ROLE / POSITION</label>
+                  <input
+                    type="text"
+                    value={editForm.role === "Custom" ? "" : editForm.role}
+                    onChange={e => setEditForm(p => ({ ...p, role: e.target.value }))}
+                    placeholder="Enter custom role/position"
+                    style={{ width: "100%", border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none", fontFamily: "inherit" }}
+                    autoFocus
+                  />
+                  <button type="button" onClick={() => setEditForm(p => ({ ...p, role: "" }))} style={{ marginTop: 6, background: "none", border: "none", color: "var(--app-accent)", fontSize: 11, fontWeight: 700, cursor: "pointer", padding: 0 }}>← Back to dropdown</button>
+                </div>
+              ) : (
+                <Fld label="Role / Position" value={editForm.role} onChange={v => setEditForm(p => ({ ...p, role: v }))} options={[...DEPARTMENT_OPTIONS, "Custom"]} />
+              )}
 
               <Fld label="Department" value={editForm.department} onChange={v => setEditForm(p => ({ ...p, department: v }))} />
 
@@ -3270,7 +3285,22 @@ ${onboardingLink}`;
             <Fld label="Full Name *" value={editForm.name} onChange={v => setEditForm(p => ({ ...p, name: v }))} error={editErr.name} />
             <Fld label="Email *" value={editForm.email} onChange={v => { setEditForm(p => ({ ...p, email: v })); setEditErr(p => ({ ...p, email: "" })); }} type="email" error={editErr.email} />
             <Fld label="Phone Number" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
-            <Fld label="Role / Position" value={editForm.role} onChange={v => setEditForm(p => ({ ...p, role: v }))} options={DEPARTMENT_OPTIONS} />
+            {editForm.role === "Custom" || (editForm.role && !DEPARTMENT_OPTIONS.includes(editForm.role)) ? (
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ROLE / POSITION</label>
+                <input
+                  type="text"
+                  value={editForm.role === "Custom" ? "" : editForm.role}
+                  onChange={e => setEditForm(p => ({ ...p, role: e.target.value }))}
+                  placeholder="Enter custom role/position"
+                  style={{ width: "100%", border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none", fontFamily: "inherit" }}
+                  autoFocus
+                />
+                <button type="button" onClick={() => setEditForm(p => ({ ...p, role: "" }))} style={{ marginTop: 6, background: "none", border: "none", color: "var(--app-accent)", fontSize: 11, fontWeight: 700, cursor: "pointer", padding: 0 }}>← Back to dropdown</button>
+              </div>
+            ) : (
+              <Fld label="Role / Position" value={editForm.role} onChange={v => setEditForm(p => ({ ...p, role: v }))} options={[...DEPARTMENT_OPTIONS, "Custom"]} />
+            )}
             <Fld label="Department" value={editForm.department} onChange={v => setEditForm(p => ({ ...p, department: v }))} />
             <Fld label="Salary" value={editForm.salary} onChange={v => setEditForm(p => ({ ...p, salary: v }))} />
             <Fld label="Date of Birth" value={editForm.dateOfBirth} onChange={v => setEditForm(p => ({ ...p, dateOfBirth: v }))} type="date" />
@@ -8723,7 +8753,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
     if (!ne.email.trim()) errors.email = "Email required";
     if (!ne.status || !ne.status.trim()) errors.status = "Status is required";
-    if (ne.role === "Custom" && !(ne.customRole || "").trim()) errors.role = "Custom role name is required";
+    if (ne.role === "Custom") errors.role = "Please enter a custom role name";
 
     if (!ne.password.trim()) errors.password = "Password is required";
 
@@ -8813,11 +8843,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       const { confirmPassword, ...neWithoutConfirm } = ne;
 
-      const finalRole = ne.role === "Custom" ? (ne.customRole || "").trim() : ne.role;
-      const { customRole, ...neWithoutCustomFlag } = neWithoutConfirm;
       const payload = {
-        ...neWithoutCustomFlag,
-        role: finalRole || "employee",
+        ...neWithoutConfirm,
+        role: (ne.role && ne.role !== "Custom" ? ne.role.trim() : "") || "employee",
         companyId: resolveSubadminId(),
 
         bankDetails: {
@@ -8840,7 +8868,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       setEmployees(prev => [res.data.employee, ...prev]);
 
-      setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "", password: "", confirmPassword: "", dateOfBirth: "", maritalStatus: "", address: "", bankName: "", ifscCode: "", accountNumber: "", customRole: "" });
+      setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "", password: "", confirmPassword: "", dateOfBirth: "", maritalStatus: "", address: "", bankName: "", ifscCode: "", accountNumber: "" });
 
       setShowEmpPass(false);
 
@@ -12603,20 +12631,22 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <Fld label="Phone Number" value={ne.phone} onChange={v => setNe({ ...ne, phone: v })} />
 
-                <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v, customRole: v === "Custom" ? (ne.customRole || "") : "" })} options={[...DEPARTMENT_OPTIONS, "Custom"]} error={neError.role} dataField="role" />
-                {ne.role === "Custom" && (
-                  <div style={{ marginBottom: 14 }} data-field="customRole">
-                    <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CUSTOM ROLE NAME *</label>
+                {ne.role === "Custom" || (ne.role && ne.role !== "employee" && !DEPARTMENT_OPTIONS.includes(ne.role)) ? (
+                  <div style={{ marginBottom: 14 }} data-field="role">
+                    <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ROLE / POSITION</label>
                     <input
                       type="text"
-                      value={ne.customRole || ""}
-                      onChange={e => { setNe({ ...ne, customRole: e.target.value }); setNeError(p => ({ ...p, role: "" })); }}
-                      placeholder="Enter custom role name"
+                      value={ne.role === "Custom" ? "" : ne.role}
+                      onChange={e => setNe({ ...ne, role: e.target.value })}
+                      placeholder="Enter custom role/position"
                       style={{ width: "100%", border: `1.5px solid ${neError.role ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none", fontFamily: "inherit" }}
                       autoFocus
                     />
+                    <button type="button" onClick={() => setNe({ ...ne, role: "" })} style={{ marginTop: 6, background: "none", border: "none", color: "var(--app-accent)", fontSize: 11, fontWeight: 700, cursor: "pointer", padding: 0 }}>← Back to dropdown</button>
                     {neError.role && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.role}</div>}
                   </div>
+                ) : (
+                  <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v })} options={[...DEPARTMENT_OPTIONS, "Custom"]} error={neError.role} dataField="role" />
                 )}
 
                 <Fld label="Department" value={ne.department} onChange={v => setNe({ ...ne, department: v })} />

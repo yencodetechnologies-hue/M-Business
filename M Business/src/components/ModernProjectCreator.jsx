@@ -861,13 +861,13 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                   onClick={e => e.stopPropagation()}
                 >
                   <div style={{ fontSize: 18, fontWeight: 800, color: P.textDark, marginBottom: 20 }}>
-                    Add Team Member {`(${employees.length} available)`}
+                    Add Team Member {`(${localEmployees.length} available)`}
                   </div>
                   <div style={{
                     maxHeight: 340, overflowY: 'auto', marginBottom: 20,
                     border: '1.5px solid #E2E8F0', borderRadius: 10, padding: '10px 8px'
                   }}>
-                    {employees.map(emp => {
+                    {localEmployees.map(emp => {
                       const empName = emp.name || emp.employeeName || '';
                       const isChecked = selectedEmpsToAdd.includes(empName);
                       return (
@@ -907,6 +907,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                         <i className="ti ti-plus" style={{ fontSize: 14 }}></i> Add Employee
                       </button>
                     )}
+
                   </div>
 
                   <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>

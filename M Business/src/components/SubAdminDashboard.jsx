@@ -11195,6 +11195,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 employees={employees}
 
+                onAddEmployeeClick={() => {
+                  const limit = getSubscriptionLimit("employee", subscription);
+                  if (limit !== Infinity && employees.length >= limit) {
+                    setLimitModal({ type: "employee", limit });
+                    return;
+                  }
+                  setNeError({}); setModal("employee");
+                  fetchSubscription();
+                }}
+
                 onBack={() => { const returnTo = sidebarOverride || "projects"; setSidebarOverride(null); setActive(returnTo); }}
 
                 onSuccess={async (updatedProj) => {

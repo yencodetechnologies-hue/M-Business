@@ -1441,11 +1441,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               <div className="page-sub">Track, manage and send invoices to your clients</div>
             </div>
           </div>
-          <div className="header-actions">
 
-            <button className="filter-btn"><i className="ti ti-calendar" style={{ fontSize: 14 }}></i> May 2026</button>
-
-          </div>
         </div>
 
         {/* STATS */}

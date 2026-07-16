@@ -12,31 +12,47 @@ import { BASE_URL } from "../config";
 /* ------------------------------------------------------------------
   Color system — single teal theme, no mixed colors
 ------------------------------------------------------------------- */
-const T = {
-  accent: "#0D9488",       // teal
-  accent2: "#0D9488",      // same teal → solid button, no gradient mixing
-  accentRgb: "13,148,136", // rgb of #0D9488, used for shadows/rings
-  text: "#1E1B2E",
-  muted: "#6B6478",
-  border: "#E2E8F0",
-  bg: "#F0FDFA",
-  bgSoft: "#CCFBF1",
-  bgSoft2: "#99F6E4",
-  card: "#ffffff",
-  danger: "#DC2626",
-  dangerBg: "#FEF2F2",
-  success: "#16A34A",
-  successBg: "#F0FDF4",
+function buildTheme(accent) {
+  return {
+    accent,
+    accent2: accent,
+    accentRgb: hexToRgbStr(accent),
+    text: "#1E1B2E",
+    muted: "#6B6478",
+    border: "#E2E8F0",
+    bg: "#F0FDFA",
+    bgSoft: "#CCFBF1",
+    bgSoft2: "#99F6E4",
+    card: "#ffffff",
+    danger: "#DC2626",
+    dangerBg: "#FEF2F2",
+    success: "#16A34A",
+    successBg: "#F0FDF4",
+  };
+}
+
+function buildSections(accent) {
+  const s = { fg: accent, bg: "#CCFBF1", ring: `rgba(${hexToRgbStr(accent)},0.12)` };
+  return { personal: s, bank: s, docs: s };
+}
+
+const THEME_PRESETS = {
+  purple: "#7c3aed", ocean: "#0284c7", forest: "#16a34a", sunset: "#ea580c",
+  rose: "#e11d48", slate: "#475569", mint: "#0d9488", candy: "#c026d3", teal: "#00BCD4",
 };
 
-/* All sections use the same teal — no more purple/amber/green mix */
-const SECTIONS = {
-  personal: { fg: "#0D9488", bg: "#CCFBF1", ring: "rgba(13,148,136,0.12)" },
-  bank: { fg: "#0D9488", bg: "#CCFBF1", ring: "rgba(13,148,136,0.12)" },
-  docs: { fg: "#0D9488", bg: "#CCFBF1", ring: "rgba(13,148,136,0.12)" },
-};
+function hexToRgbStr(hex) {
+  const h = (hex || "#0D9488").replace("#", "");
+  const bigint = parseInt(h.length === 3 ? h.split("").map(c => c + c).join("") : h, 16);
+  const r = (bigint >> 16) & 255, g = (bigint >> 8) & 255, b = bigint & 255;
+  return `${r},${g},${b}`;
+}
+
+const T = buildTheme("#0D9488");
+const SECTIONS = buildSections("#0D9488");
 
 export default function EmployeeOnboarding() {
+  const [accentColor, setAccentColor] = useState("#0D9488");
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -68,6 +84,22 @@ export default function EmployeeOnboarding() {
 
   const queryParams = new URLSearchParams(window.location.search);
   const companyName = queryParams.get("company") || "Our Company";
+  const companyId = queryParams.get("companyId") || "";
+
+  // Fetch the company's currently selected dashboard theme color so this
+  // public onboarding form visually matches the dashboard.
+  React.useEffect(() => {
+    if (!companyId) return;
+    axios.get(`${BASE_URL}/api/config/${companyId}`)
+      .then(res => {
+        const cfg = res.data || {};
+        const resolved = cfg.appTheme === "custom"
+          ? (cfg.customColor || "#0D9488")
+          : (THEME_PRESETS[cfg.appTheme] || "#0D9488");
+        setAccentColor(resolved);
+      })
+      .catch(() => { /* keep default teal on failure */ });
+  }, [companyId]);
 
   const handleChange = (field, val) => {
     setForm(prev => ({ ...prev, [field]: val }));

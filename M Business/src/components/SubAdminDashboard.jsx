@@ -3070,11 +3070,11 @@ ${onboardingLink}`;
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
         <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1A2332", margin: 0 }}>Employees</h1>
         <button className="create-btn" onClick={onAddEmployeeClick} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-          <i className="ti ti-plus"></i> Add Employee
+          <i className="ti ti-plus"></i> New Employee
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
 
         <div onClick={() => setStatusFilter("All Status")} style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
 
@@ -3092,13 +3092,7 @@ ${onboardingLink}`;
 
         </div>
 
-        <div onClick={() => setStatusFilter("On Leave")} style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
 
-          <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#fef3c7", color: "#d97706" }}><i className="ti ti-clock"></i></div>
-
-          <div><div style={{ fontSize: 24, fontWeight: 900, color: "var(--text)", lineHeight: 1 }}>{leaveCount}</div><div style={{ fontSize: 11, color: "var(--text-soft)", marginTop: 3, fontWeight: 600 }}>On Leave</div></div>
-
-        </div>
 
         <div onClick={() => setStatusFilter("Inactive")} style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
 
@@ -6534,7 +6528,7 @@ function VendorsPage({ vendors, setVendors, onAddVendorClick }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
         <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1A2332", margin: 0 }}>Vendors</h1>
         <button className="create-btn" onClick={onAddVendorClick} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-          <i className="ti ti-plus"></i> Add New Vendor
+          <i className="ti ti-plus"></i>  New Vendor
         </button>
       </div>
 
@@ -7092,8 +7086,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-
     localStorage.setItem("appTheme", appTheme);
+
+    // Persist theme to backend so pages outside the dashboard (like the
+    // public Employee Onboarding link) can also pick up the current theme.
+    if (companyId) {
+      axios.post(`${BASE_URL}/api/config/${companyId}`, {
+        appTheme,
+        customColor: appTheme === "custom" ? customColor : undefined,
+      }).catch(() => { });
+    }
 
 
 

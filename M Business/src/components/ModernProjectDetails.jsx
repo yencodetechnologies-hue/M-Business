@@ -454,6 +454,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [editingMilestoneIdx, setEditingMilestoneIdx] = useState(null);
   const [editMilestoneName, setEditMilestoneName] = useState('');
   const [editMilestoneDate, setEditMilestoneDate] = useState('');
+  const [isCustomEditMilestoneMode, setIsCustomEditMilestoneMode] = useState(false);
   const [milestoneView, setMilestoneView] = useState('timeline'); // 'timeline' | 'list'
   const [dragMilestoneIdx, setDragMilestoneIdx] = useState(null);
   const [dragOverMilestoneIdx, setDragOverMilestoneIdx] = useState(null);
@@ -1275,6 +1276,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     setEditingMilestoneIdx(idx);
     setEditMilestoneName(m.name || '');
     setEditMilestoneDate(m.date || '');
+    const isPreset = MILESTONE_OPTIONS.filter(o => o !== "Custom").includes(m.name);
+    setIsCustomEditMilestoneMode(false);
   };
 
   const handleUpdateMilestone = async (e) => {
@@ -1997,7 +2000,43 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <form onSubmit={handleUpdateMilestone} style={{ background: P.primaryLight, padding: 14, borderRadius: 10, marginTop: 12, border: `1.5px solid ${P.primary}` }}>
               <div style={{ fontSize: 11, fontWeight: 800, color: P.primaryDark, textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 8 }}>Editing Milestone</div>
               <div style={{ marginBottom: 8 }}>
-                <input type="text" value={editMilestoneName} onChange={e => setEditMilestoneName(e.target.value)} placeholder="Milestone name..." required style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', boxSizing: 'border-box' }} />
+                {!isCustomEditMilestoneMode ? (
+                  <select
+                    value={MILESTONE_OPTIONS.filter(o => o !== "Custom").includes(editMilestoneName) ? editMilestoneName : ""}
+                    onChange={e => {
+                      const val = e.target.value;
+                      if (val === "Custom") {
+                        setEditMilestoneName('');
+                        setIsCustomEditMilestoneMode(true);
+                      } else {
+                        setEditMilestoneName(val);
+                      }
+                    }}
+                    style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none' }}
+                  >
+                    <option value="">Select milestone...</option>
+                    {MILESTONE_OPTIONS.map(opt => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    value={editMilestoneName}
+                    autoFocus
+                    onChange={e => setEditMilestoneName(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (!editMilestoneName.trim()) return;
+                        setIsCustomEditMilestoneMode(false);
+                      }
+                    }}
+                    placeholder="Enter custom milestone name"
+                    required
+                    style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', boxSizing: 'border-box' }}
+                  />
+                )}
               </div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 <input
@@ -2007,7 +2046,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   style={{ padding: '6px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', flex: 1, background: '#fff', color: editMilestoneDate ? P.textDark : '#A0AEC0', fontFamily: 'Nunito, sans-serif', cursor: 'pointer', minWidth: 140 }}
                 />
                 <button type="submit" className="mpd-btn mpd-btn-primary" style={{ padding: '6px 12px', fontSize: 11 }}>Save</button>
-                <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setEditingMilestoneIdx(null)} style={{ padding: '6px 12px', fontSize: 11 }}>✕</button>
+                <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => { setEditingMilestoneIdx(null); setIsCustomEditMilestoneMode(false); }} style={{ padding: '6px 12px', fontSize: 11 }}>✕</button>
               </div>
             </form>
           )}

@@ -24,7 +24,7 @@ router.get('/:companyId', async (req, res) => {
 router.post('/:companyId', async (req, res) => {
   try {
     const { companyId } = req.params;
-    const { projectStatuses, taskStatuses, taskPriorities, customClientCategories, customClientSources } = req.body;
+    const { projectStatuses, taskStatuses, taskPriorities, customClientCategories, customClientSources, appTheme, customColor } = req.body;
 
     let config = await Config.findOne({ companyId });
 
@@ -34,6 +34,8 @@ router.post('/:companyId', async (req, res) => {
       if (taskPriorities) config.taskPriorities = taskPriorities;
       if (customClientCategories) config.customClientCategories = customClientCategories;
       if (customClientSources) config.customClientSources = customClientSources;
+      if (appTheme) config.appTheme = appTheme;
+      if (customColor) config.customColor = customColor;
       await config.save();
     } else {
       config = new Config({
@@ -42,7 +44,9 @@ router.post('/:companyId', async (req, res) => {
         taskStatuses,
         taskPriorities,
         customClientCategories,
-        customClientSources
+        customClientSources,
+        appTheme,
+        customColor
       });
       await config.save();
     } res.json(config);

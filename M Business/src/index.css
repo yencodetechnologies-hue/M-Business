@@ -269,8 +269,6 @@ img {
   align-items: center
 }
 
-.chart-left {}
-
 .chart-title {
   font-size: 14px;
   font-weight: 800;
@@ -3296,7 +3294,7 @@ tbody tr td {
   border-bottom: 1px solid var(--border)
 }
 
-.pb-item {}
+
 
 .pb-label {
   font-size: 10px;
@@ -5059,7 +5057,6 @@ tbody tr:last-child td {
   padding-bottom: 0
 }
 
-.toggle-info {}
 
 .toggle-label {
   font-size: 13px;
@@ -7276,9 +7273,6 @@ input::-webkit-inner-spin-button {
   margin: 0;
 }
 
-input[type=number] {
-  -moz-appearance: textfield;
-}
 
 .inv-creator-template-opt {
   flex: 1;

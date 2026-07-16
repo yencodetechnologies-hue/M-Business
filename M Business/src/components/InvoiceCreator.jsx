@@ -355,7 +355,7 @@ export default function InvoiceCreator({ user, clients, projects, companyLogo, c
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || "";
 
-  const [step, setStep] = useState(jumpInvoice ? "preview" : newInvoicePrefill ? "form" : "list"); // "list" | "form" | "preview"
+  const [step, setStep] = useState(jumpInvoice ? "preview" : (newInvoicePrefill && !jumpInvoice) ? "form" : "list"); // "list" | "form" | "preview"
   const [showAddClient, setShowAddClient] = useState(false);
   const [internalNav, setInternalNav] = useState(false);
   const [invoiceList, setInvoiceList] = useState([]);
@@ -369,7 +369,7 @@ export default function InvoiceCreator({ user, clients, projects, companyLogo, c
     if (jumpInvoice) {
       if (jumpInvoice._restoring) {
         if (invoiceList.length > 0) {
-          const restored = invoiceList.find(e => (e.id || e.invoiceNo) === (jumpInvoice.id || jumpInvoice.invoiceNo));
+          const restored = invoiceList.find(e => (e._id || e.id || e.invoiceNo) === (jumpInvoice.id || jumpInvoice.invoiceNo));
           if (restored) {
             loadEntry(restored, "preview");
             setInternalNav(false);
@@ -384,7 +384,7 @@ export default function InvoiceCreator({ user, clients, projects, companyLogo, c
   }, [jumpInvoice?._t, jumpInvoice?.invoiceNo, jumpInvoice?.signature, jumpInvoice?._restoring, invoiceList]);
 
   useEffect(() => {
-    if (newInvoicePrefill) {
+    if (newInvoicePrefill && !jumpInvoice) {
       if (newInvoicePrefill.editData) {
         loadEntry(newInvoicePrefill.editData, newInvoicePrefill.readOnly ? "preview" : "form");
         return;

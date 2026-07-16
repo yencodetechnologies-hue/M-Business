@@ -11541,7 +11541,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               setSidebarOverride(null);
               setInvoicePrefill(null);
               setActive(jumpProject ? "project-details" : (prevActiveBeforeInvoice || "dashboard"));
-            }} jumpInvoice={jumpInvoice} onOpenInvoice={(entry) => setJumpInvoice(entry)} newInvoicePrefill={invoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => {
+            }} jumpInvoice={jumpInvoice} onOpenInvoice={(entry) => { setInvoicePrefill(null); setJumpInvoice(entry); }} newInvoicePrefill={invoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 

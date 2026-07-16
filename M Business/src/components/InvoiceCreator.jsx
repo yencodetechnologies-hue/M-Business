@@ -358,6 +358,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const [step, setStep] = useState(jumpInvoice ? "preview" : newInvoicePrefill ? "form" : "list"); // "list" | "form" | "preview"
   const [showAddClient, setShowAddClient] = useState(false);
   const [internalNav, setInternalNav] = useState(false);
+  const [invoiceList, setInvoiceList] = useState([]);
+  const [listLoading, setListLoading] = useState(false);
 
   useEffect(() => {
     if (step === "preview") window.scrollTo(0, 0);
@@ -365,11 +367,21 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
   useEffect(() => {
     if (jumpInvoice) {
+      if (jumpInvoice._restoring) {
+        if (invoiceList.length > 0) {
+          const restored = invoiceList.find(e => (e.id || e.invoiceNo) === (jumpInvoice.id || jumpInvoice.invoiceNo));
+          if (restored) {
+            loadEntry(restored, "preview");
+            setInternalNav(false);
+          }
+        }
+        return;
+      }
       loadEntry(jumpInvoice);
       setStep("preview");
       setInternalNav(false);
     }
-  }, [jumpInvoice?._t, jumpInvoice?.invoiceNo, jumpInvoice?.signature]);
+  }, [jumpInvoice?._t, jumpInvoice?.invoiceNo, jumpInvoice?.signature, jumpInvoice?._restoring, invoiceList]);
 
   useEffect(() => {
     if (newInvoicePrefill) {
@@ -431,8 +443,6 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     }
   }, [newInvoicePrefill]);
 
-  const [invoiceList, setInvoiceList] = useState([]);
-  const [listLoading, setListLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [draftSaved, setDraftSaved] = useState(false);
   const [errors, setErrors] = useState({});
@@ -1112,7 +1122,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "var(--app-bg)", minHeight: "100vh", padding: "40px 20px" }}>
 
         <div className="no-print" style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 30 }}>
-          <button onClick={() => jumpInvoice ? onBack() : (setEditingReceipt(false), setStep("list"))} style={{ padding: "12px 24px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>{jumpInvoice ? " Document Back" : " Back to List"}</button>
+          <button onClick={() => jumpInvoice ? onBack() : (setEditingReceipt(false), setStep("list"))} style={{ padding: "12px 24px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>{jumpInvoice ? " Back to Dashboard" : " Back to List"}</button>
           {!editingReceipt && <button onClick={() => setEditingReceipt(true)} style={{ padding: "12px 24px", background: "#fff7ed", border: "1.5px solid #fed7aa", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#ea580c", fontFamily: "inherit" }}>Edit</button>}
           {!editingReceipt && <button onClick={() => window.print()} style={{ padding: "12px 28px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)" }}>Print Receipt</button>}
         </div>
@@ -2132,7 +2142,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     return (
       <div style={{ width: "100%", height: "80vh", display: "flex", flexDirection: "column" }}>
         <div style={{ padding: "10px 0", display: "flex", gap: 10, alignItems: "center" }}>
-          <button onClick={() => jumpInvoice ? onBack() : setStep("list")} style={{ padding: "8px 14px", background: "var(--app-bg)", border: "1.5px solid var(--app-border)", borderRadius: 8, cursor: "pointer", fontWeight: 700, color: "#64748b" }}>{jumpInvoice ? " Document Back" : " Back to List"}</button>
+          <button onClick={() => jumpInvoice ? onBack() : setStep("list")} style={{ padding: "8px 14px", background: "var(--app-bg)", border: "1.5px solid var(--app-border)", borderRadius: 8, cursor: "pointer", fontWeight: 700, color: "#64748b" }}>{jumpInvoice ? " Back to Dashboard" : " Back to List"}</button>
         </div>
         <div style={{ flex: 1, overflow: "hidden", borderRadius: 16 }}>
           <iframe src="/template-designer.html#inv" ref={iframeRef} onLoad={sendThemeToIframe} style={{ width: "100%", height: "100%", border: "none" }} title="Template Designer" />

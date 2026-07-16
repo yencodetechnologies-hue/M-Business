@@ -6044,10 +6044,6 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
                 className={`nav-item ${on ? 'active' : ''}`}
                 onClick={() => {
                   if (n.key === "tasks") setSelectedProjectForTasks(null);
-                  if (n.key === "invoices" || n.key === "projects") {
-                    setJumpProject(null);
-                    setJumpInvoicePrefill(null);
-                  }
                   setActive(n.key);
                   onClose();
                 }}
@@ -6789,30 +6785,26 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [projectDetailsReadOnly, setProjectDetailsReadOnly] = useState(false);
   const [activeClientIdForReturn, setActiveClientIdForReturn] = useState(null);
 
-  const [jumpInvoice, setJumpInvoice] = useState(null);
-
-  const [invoicePrefill, setInvoicePrefill] = useState(() => {
+  const [jumpInvoice, setJumpInvoice] = useState(() => {
     try {
-      const saved = localStorage.getItem("invoicePrefill_subadmin");
-      return saved ? JSON.parse(saved) : null;
-    } catch (e) { return null; }
+      const savedId = localStorage.getItem("jumpInvoiceId_subadmin");
+      const savedActive = localStorage.getItem("activeTab_subadmin");
+      if (savedId && savedActive === "invoices") return { id: savedId, invoiceNo: savedId, _restoring: true };
+    } catch (e) { }
+    return null;
   });
+
   useEffect(() => {
     try {
-      if (invoicePrefill) {
-        localStorage.setItem("invoicePrefill_subadmin", JSON.stringify(invoicePrefill));
+      if (jumpInvoice?.id || jumpInvoice?.invoiceNo) {
+        localStorage.setItem("jumpInvoiceId_subadmin", jumpInvoice.id || jumpInvoice.invoiceNo);
       } else {
-        localStorage.removeItem("invoicePrefill_subadmin");
+        localStorage.removeItem("jumpInvoiceId_subadmin");
       }
     } catch (e) { }
-  }, [invoicePrefill]);
-  const [invoiceStep, setInvoiceStep] = useState(() => localStorage.getItem("invoiceStep_subadmin") || null);
-  useEffect(() => {
-    try {
-      if (invoiceStep) localStorage.setItem("invoiceStep_subadmin", invoiceStep);
-      else localStorage.removeItem("invoiceStep_subadmin");
-    } catch (e) { }
-  }, [invoiceStep]);
+  }, [jumpInvoice]);
+
+  const [invoicePrefill, setInvoicePrefill] = useState(null);
   const [prevActiveBeforeInvoice, setPrevActiveBeforeInvoice] = useState("dashboard");
 
   const [sidebarOverride, setSidebarOverride] = useState(() => {
@@ -9495,7 +9487,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 ["projects", "edit-project", "project-details"].includes(validActive) ? "projects" :
                   validActive
             }
-            setActive={(val) => { setSidebarOverride(null); setInvoicePrefill(null); setJumpProject(null); setActive(val); }}
+            setActive={(val) => { setSidebarOverride(null); setActive(val); }}
             onLogout={handleLogout}
             open={sidebarOpen}
             onClose={() => setSidebarOpen(false)}
@@ -10017,7 +10009,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     ].map((n, i) => n.key === "add" ? (
                       <div key={i} onClick={() => { setJumpProject(null); setActive("create-project"); }} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#26d0ce)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", border: "3px solid #0f0a29" }}>+</div>
                     ) : (
-                      <div key={i} onClick={() => { if (n.key === "invoices" || n.key === "projects") { setJumpProject(null); setJumpInvoicePrefill(null); } setActive(n.key); }} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: active === n.key ? "var(--app-accent)" : "rgba(255,255,255,0.5)", padding: "4px 10px" }}>
+                      <div key={i} onClick={() => setActive(n.key)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: active === n.key ? "var(--app-accent)" : "rgba(255,255,255,0.5)", padding: "4px 10px" }}>
                         <i className={`ti ${n.icon}`} style={{ fontSize: 19 }}></i>
                         <span style={{ fontSize: 9.5, fontWeight: 700 }}>{n.label}</span>
                       </div>
@@ -11195,16 +11187,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 employees={employees}
 
-                onAddEmployeeClick={() => {
-                  const limit = getSubscriptionLimit("employee", subscription);
-                  if (limit !== Infinity && employees.length >= limit) {
-                    setLimitModal({ type: "employee", limit });
-                    return;
-                  }
-                  setNeError({}); setModal("employee");
-                  fetchSubscription();
-                }}
-
                 onBack={() => { const returnTo = sidebarOverride || "projects"; setSidebarOverride(null); setActive(returnTo); }}
 
                 onSuccess={async (updatedProj) => {
@@ -11372,6 +11354,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 if (prev.some(c => c._id === client._id)) return prev;
                 return [...prev, client];
               });
+              // Make sure the newly added client is the one shown/selected —
+              // otherwise the Clients page keeps whatever client was open
+              // before, making the new one look like it "vanished" into
+              // another client's card.
+              setPendingNewClientId(client._id);
+              setActiveClientIdForReturn(client._id);
               setActive("clients");
             }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || accentColor} />}
 
@@ -11537,7 +11525,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={sidebarOverride ? () => { setSidebarOverride(null); setActive(prevActiveBeforeInvoice || "dashboard"); } : undefined} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill} initialStep={invoiceStep} onStepChange={setInvoiceStep} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => {
+            {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={sidebarOverride ? () => { setSidebarOverride(null); setActive(prevActiveBeforeInvoice || "dashboard"); } : undefined} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 

@@ -1,16 +1,60 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700&family=DM+Sans:wght@300;400;500;700&family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <title>M Business</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
-</html>
 
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700&family=DM+Sans:wght@300;400;500;700&family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <title>M Business</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <style>
+    /* Prevent a flash of the wrong background color before React mounts
+         and applies the app's actual theme (light/dark). This matches the
+         app's default light theme background so refresh/first paint looks
+         seamless instead of flashing plain white or browser-default black. */
+    html,
+    body {
+      margin: 0;
+      background: #f5f3ff;
+    }
+
+    html.dark-mode,
+    body.dark-mode {
+      background: #0a1628;
+    }
+
+    #root {
+      min-height: 100vh;
+      background: inherit;
+    }
+  </style>
+  <script>
+    // Apply dark mode class and the correct --app-bg variable as early as
+    // possible, before React even loads, by reading the same localStorage
+    // key the app already uses. Without this, the page shows the plain
+    // fallback background, then flashes to the real themed background
+    // once AdminDashboard's own inline <style> tag mounts and defines
+    // --app-bg for the first time.
+    (function () {
+      try {
+        var dm = localStorage.getItem("empDarkMode") === "true" || localStorage.getItem("adminDarkMode") === "true";
+        if (dm) {
+          document.documentElement.classList.add("dark-mode");
+          document.documentElement.style.setProperty("--app-bg", "#0a1628");
+        } else {
+          document.documentElement.style.setProperty("--app-bg", "#f5f3ff");
+        }
+      } catch (e) { }
+    })();
+  </script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>

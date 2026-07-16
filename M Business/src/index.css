@@ -42,7 +42,7 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--app-bg);
+  background-color: var(--app-bg, #f5f3ff);
   font-family: 'Inter', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--app-text);
   -webkit-font-smoothing: antialiased;

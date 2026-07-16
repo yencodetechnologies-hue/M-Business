@@ -44,6 +44,9 @@ exports.addClient = async (req, res) => {
       console.log("Validation failed: Missing clientName or email");
       return res.status(400).json({ message: "Name and Email are required" });
     }
+    if (!req.companyId) {
+      console.log("Warning: companyId missing when adding client — duplicate check may be unscoped");
+    }
 
     const normalizedEmail = email.toLowerCase().trim();
     const plainPassword = password && password.trim() ? password : "123456";

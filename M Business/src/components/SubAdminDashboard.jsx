@@ -4478,6 +4478,7 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
         onViewInvoice={(entry) => {
           setJumpInvoice(entry);
           setPrevActiveBeforeInvoice(active);
+          setSidebarOverride(active);
           setActive("invoices");
         }}
       />
@@ -9686,18 +9687,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
 
-                  {subscription && (
-
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)" }}>
-
-                      {employees.length} / {getSubscriptionLimit("employee") === Infinity ? "Unlimited" : getSubscriptionLimit("employee")} Used
-
-                    </span>
-
-                  )}
-
-
-
                 </div>
 
               )}
@@ -9708,15 +9697,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
 
-                  {subscription && (
 
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)" }}>
-
-                      {managers.length} / {getSubscriptionLimit("manager") === Infinity ? "Unlimited" : getSubscriptionLimit("manager")} Used
-
-                    </span>
-
-                  )}
 
                   <button
 

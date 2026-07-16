@@ -2636,9 +2636,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                           key={`${att.url}-${aidx}`}
                                           src={displayUrl}
                                           alt={att.name || 'attachment'}
-                                          onClick={() => window.open(displayUrl, '_blank')}
+                                          onClick={() => setPreviewProjectFile({ name: att.name || 'Image', url: displayUrl, type: att.type || 'image/*' })}
                                           style={{ width: 90, height: 70, objectFit: 'cover', borderRadius: 8, border: `1.5px solid ${P.border}`, cursor: 'pointer', background: '#f8fafc' }}
-                                          onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = ''; e.currentTarget.style.display = 'none'; }}
+                                          onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="90" height="70" viewBox="0 0 90 70"%3E%3Crect width="90" height="70" fill="%23f1f5f9"/%3E%3Ctext x="45" y="39" font-size="10" text-anchor="middle" fill="%2394a3b8"%3EFailed to load%3C/text%3E%3C/svg%3E'; }}
                                         />
                                       ) : (
                                         <a key={`${att.url}-${aidx}`} href={displayUrl} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#f8fafc', fontSize: 12, fontWeight: 700, color: P.textDark, textDecoration: 'none' }}>
@@ -3370,10 +3370,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     return (
                       <label key={emp._id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 4px', fontSize: 13, color: P.textDark, cursor: 'pointer' }}>
                         <input
-                          type="radio"
-                          name="editMemberChoice"
+                          type="checkbox"
                           checked={editMemberSelection === name}
-                          onChange={() => setEditMemberSelection(name)}
+                          onChange={() => setEditMemberSelection(editMemberSelection === name ? '' : name)}
                         />
                         {name} ({emp.role || 'Employee'})
                       </label>
@@ -3437,10 +3436,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     return (
                       <label key={emp._id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 4px', fontSize: 13, color: P.textDark, cursor: 'pointer' }}>
                         <input
-                          type="radio"
-                          name="editMemberChoice"
+                          type="checkbox"
                           checked={editMemberSelection === name}
-                          onChange={() => setEditMemberSelection(name)}
+                          onChange={() => setEditMemberSelection(editMemberSelection === name ? '' : name)}
                         />
                         {name} ({emp.role || 'Employee'})
                       </label>

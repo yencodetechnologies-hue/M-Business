@@ -5899,6 +5899,11 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
 
           if (n.key === "tasks") setSelectedProjectForTasks(null);
 
+          if (n.key === "invoices" || n.key === "projects") {
+            setJumpProject(null);
+            setJumpInvoicePrefill(null);
+          }
+
           setActive(n.key);
 
           onClose();
@@ -6039,6 +6044,10 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
                 className={`nav-item ${on ? 'active' : ''}`}
                 onClick={() => {
                   if (n.key === "tasks") setSelectedProjectForTasks(null);
+                  if (n.key === "invoices" || n.key === "projects") {
+                    setJumpProject(null);
+                    setJumpInvoicePrefill(null);
+                  }
                   setActive(n.key);
                   onClose();
                 }}
@@ -9465,7 +9474,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 ["projects", "edit-project", "project-details"].includes(validActive) ? "projects" :
                   validActive
             }
-            setActive={(val) => { setSidebarOverride(null); setActive(val); }}
+            setActive={(val) => { setSidebarOverride(null); setInvoicePrefill(null); setJumpProject(null); setActive(val); }}
             onLogout={handleLogout}
             open={sidebarOpen}
             onClose={() => setSidebarOpen(false)}
@@ -9987,7 +9996,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     ].map((n, i) => n.key === "add" ? (
                       <div key={i} onClick={() => { setJumpProject(null); setActive("create-project"); }} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#26d0ce)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", border: "3px solid #0f0a29" }}>+</div>
                     ) : (
-                      <div key={i} onClick={() => setActive(n.key)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: active === n.key ? "var(--app-accent)" : "rgba(255,255,255,0.5)", padding: "4px 10px" }}>
+                      <div key={i} onClick={() => { if (n.key === "invoices" || n.key === "projects") { setJumpProject(null); setJumpInvoicePrefill(null); } setActive(n.key); }} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: active === n.key ? "var(--app-accent)" : "rgba(255,255,255,0.5)", padding: "4px 10px" }}>
                         <i className={`ti ${n.icon}`} style={{ fontSize: 19 }}></i>
                         <span style={{ fontSize: 9.5, fontWeight: 700 }}>{n.label}</span>
                       </div>

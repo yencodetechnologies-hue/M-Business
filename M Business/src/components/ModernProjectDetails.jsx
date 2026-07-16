@@ -2883,7 +2883,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                       <span style={{ fontSize: 12, fontWeight: 700, color: '#374151' }}>{inv.client || currProject.client || '—'}</span>
                                     </div>
                                   </td>
-                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }} onClick={() => onViewInvoice && onViewInvoice(currProject, inv)}>{currProject.name || '—'}</td>
+                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }} onClick={() => setInvoiceViewModal({ ...inv, project: inv.projectName || currProject?.name, client: inv.clientName || inv.client })}>{currProject.name || '—'}</td>
                                   <td style={{ padding: '12px 14px' }} onClick={() => onViewInvoice && onViewInvoice(currProject, inv)}>
                                     <span style={{ background: '#EDE9FE', color: '#7C3AED', fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20 }}>{inv.category || 'Milestone'}</span>
                                   </td>
@@ -3651,13 +3651,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))));
         const viewURL = `${FRONTEND_URL}/invoice-view?d=${encoded}`;
         return (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '30px 16px' }} onClick={() => setInvoiceViewModal(null)}>
-            <div onClick={e => e.stopPropagation()} style={{ background: '#fff', width: '100%', maxWidth: 900, height: '90vh', borderRadius: 12, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ background: '#1A2332', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ color: '#fff', fontWeight: 800, fontSize: 14 }}>Invoice View — {inv.invoiceNo}</span>
-                <button onClick={() => setInvoiceViewModal(null)} style={{ padding: '6px 14px', background: '#374151', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>✕</button>
-              </div>
-              <iframe title="invoice-view" src={viewURL} style={{ flex: 1, border: 'none', width: '100%' }} />
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '20px 16px' }} onClick={() => setInvoiceViewModal(null)}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#fff', width: '100%', maxWidth: 960, height: '92vh', borderRadius: 10, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', overflow: 'hidden', position: 'relative' }}>
+              <button onClick={() => setInvoiceViewModal(null)} style={{ position: 'absolute', top: 14, right: 14, zIndex: 2, width: 32, height: 32, borderRadius: 8, background: '#374151', color: '#fff', border: 'none', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>✕</button>
+              <iframe title="invoice-view" src={viewURL} style={{ border: 'none', width: '100%', height: '100%' }} />
             </div>
           </div>
         );

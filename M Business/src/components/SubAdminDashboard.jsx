@@ -6725,16 +6725,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     // Never trust a stale "mysubscriptions" tab from a previous session/account
     // as the initial screen — it causes the Upgrade Plan page to flash before
     // the real subscription check (fetchSubscription) redirects appropriately.
-    // Start on "dashboard" instead; the subscription-gate effect will still
-    // send the user to mysubscriptions if they genuinely need to pick a plan.
-    if (saved === "mysubscriptions" || ["create-project", "edit-project"].includes(saved)) return "dashboard";
+    // "create-project" (Add Project) is safe to restore since we now persist
+    // its client context below; "edit-project" still needs the full project
+    // object which isn't reliably restorable yet, so that one still falls back.
+    if (saved === "mysubscriptions" || saved === "edit-project") return "dashboard";
     return saved;
   });
 
   useEffect(() => {
-    const toSave = ["create-project", "edit-project"].includes(active)
-      ? "projects"
-      : active;
+    const toSave = active === "edit-project" ? "projects" : active;
     localStorage.setItem("activeTab_subadmin", toSave);
 
   }, [active]);
@@ -6783,13 +6782,37 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const [fromEditProject, setFromEditProject] = useState(false);
   const [projectDetailsReadOnly, setProjectDetailsReadOnly] = useState(false);
-  const [activeClientIdForReturn, setActiveClientIdForReturn] = useState(null);
+  const [activeClientIdForReturn, setActiveClientIdForReturn] = useState(() => {
+    try {
+      const savedActive = localStorage.getItem("activeTab_subadmin");
+      if (savedActive === "create-project" || savedActive === "project-details" || savedActive === "invoices") {
+        return localStorage.getItem("activeClientIdForReturn_subadmin") || null;
+      }
+    } catch (e) { }
+    return null;
+  });
+
+  useEffect(() => {
+    try {
+      if (activeClientIdForReturn) {
+        localStorage.setItem("activeClientIdForReturn_subadmin", activeClientIdForReturn);
+      } else {
+        localStorage.removeItem("activeClientIdForReturn_subadmin");
+      }
+    } catch (e) { }
+  }, [activeClientIdForReturn]);
 
   const [jumpInvoice, setJumpInvoice] = useState(() => {
     try {
       const savedId = localStorage.getItem("jumpInvoiceId_subadmin");
       const savedActive = localStorage.getItem("activeTab_subadmin");
-      if (savedId && savedActive === "invoices") return { id: savedId, invoiceNo: savedId, _restoring: true };
+      const savedFull = localStorage.getItem("jumpInvoiceFull_subadmin");
+      if (savedId && savedActive === "invoices") {
+        if (savedFull) {
+          try { return JSON.parse(savedFull); } catch (e) { }
+        }
+        return { id: savedId, invoiceNo: savedId, _restoring: true };
+      }
     } catch (e) { }
     return null;
   });
@@ -6798,8 +6821,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     try {
       if (jumpInvoice?.id || jumpInvoice?.invoiceNo) {
         localStorage.setItem("jumpInvoiceId_subadmin", jumpInvoice.id || jumpInvoice.invoiceNo);
+        localStorage.setItem("jumpInvoiceFull_subadmin", JSON.stringify(jumpInvoice));
       } else {
         localStorage.removeItem("jumpInvoiceId_subadmin");
+        localStorage.removeItem("jumpInvoiceFull_subadmin");
       }
     } catch (e) { }
   }, [jumpInvoice]);
@@ -11171,6 +11196,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     return;
                   }
 
+                  if (sidebarOverride === "clients") {
+                    setJumpProject(saved);
+                    setFromEditProject(false);
+                    setProjectDetailsReadOnly(false);
+                    setActive("project-details");
+                    return;
+                  }
+
                   setJumpProject(saved);
                   setFromEditProject(false);
                   setProjectDetailsReadOnly(false);
@@ -11331,7 +11364,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now(), ...(editInv ? { editData: editInv, editIndex: editIdx, projectId: proj._id } : {}) });
                   setJumpInvoice(null);
                   setPrevActiveBeforeInvoice(active);
-                  setSidebarOverride("projects");
+                  setSidebarOverride(sidebarOverride);
                   setActive("invoices");
                 }}
                 onLogTime={async (hours) => {
@@ -11538,9 +11571,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
             {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => {
-              setSidebarOverride(null);
+              const returnTo = jumpProject ? "project-details" : (prevActiveBeforeInvoice || "dashboard");
+              if (!jumpProject) setSidebarOverride(null);
               setInvoicePrefill(null);
-              setActive(jumpProject ? "project-details" : (prevActiveBeforeInvoice || "dashboard"));
+              setActive(returnTo);
             }} jumpInvoice={jumpInvoice} onOpenInvoice={(entry) => { setInvoicePrefill(null); setJumpInvoice(entry); }} newInvoicePrefill={invoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");

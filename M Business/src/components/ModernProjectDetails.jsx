@@ -251,7 +251,20 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     return 'updates';
   });
   const [infoExpanded, setInfoExpanded] = useState(false);
-  const [previewInvoice, setPreviewInvoice] = useState(null);
+  const [previewInvoice, setPreviewInvoice] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`mpd_previewInvoice_${project?._id || project?.id}`);
+      return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
+  });
+  const [previewProjectFile, setPreviewProjectFile] = useState(null);
+  useEffect(() => {
+    try {
+      const key = `mpd_previewInvoice_${project?._id || project?.id}`;
+      if (previewInvoice) localStorage.setItem(key, JSON.stringify(previewInvoice));
+      else localStorage.removeItem(key);
+    } catch { }
+  }, [previewInvoice, project]);
   const [selectedPaymentItems, setSelectedPaymentItems] = useState([]);
   const [activePayTab, setActivePayTab] = useState('inv');
   const [composerOpen, setComposerOpen] = useState(true);
@@ -261,7 +274,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [submittingApproval, setSubmittingApproval] = useState(false);
   const [projectApprovals, setProjectApprovals] = useState([]);
   const [viewProjectApproval, setViewProjectApproval] = useState(null);
-  const [previewProjectFile, setPreviewProjectFile] = useState(null);
+  const [invoiceViewModal, setInvoiceViewModal] = useState(null);
   const [portalLinkUrl, setPortalLinkUrl] = useState('');
   const [loadingPortalLink, setLoadingPortalLink] = useState(false);
   const lastPortalProjectId = useRef(null);
@@ -2856,8 +2869,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               {mergedInvoices.map((inv, i) => (
                                 <tr
                                   key={inv.invoiceNo || i}
-                                  onClick={() => onViewInvoice ? onViewInvoice({ ...inv, project: inv.projectName || currProject?.name, client: inv.clientName || inv.client }, currProject) : setPreviewInvoice(inv)}
-                                  style={{ borderBottom: '1px solid #F1F5F9', cursor: 'pointer' }}
+                                  style={{ borderBottom: '1px solid #F1F5F9' }}
                                 >
                                   <td style={{ padding: '12px 14px' }} onClick={(e) => e.stopPropagation()}>
                                     <input type="checkbox" checked={selectedPaymentItems.includes(i)} onChange={() => setSelectedPaymentItems(prev => prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i])} />
@@ -2871,13 +2883,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                       <span style={{ fontSize: 12, fontWeight: 700, color: '#374151' }}>{inv.client || currProject.client || '—'}</span>
                                     </div>
                                   </td>
-                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{currProject.name || '—'}</td>
-                                  <td style={{ padding: '12px 14px' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>
+                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }} onClick={() => onViewInvoice && onViewInvoice(currProject, inv)}>{currProject.name || '—'}</td>
+                                  <td style={{ padding: '12px 14px' }} onClick={() => onViewInvoice && onViewInvoice(currProject, inv)}>
                                     <span style={{ background: '#EDE9FE', color: '#7C3AED', fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20 }}>{inv.category || 'Milestone'}</span>
                                   </td>
                                   <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(parseAmt(inv.total) || parseAmt(inv.amount) || 0).toLocaleString()}</td>
-                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.date || inv.issueDate ? new Date(inv.date || inv.issueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
-                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#F59E0B' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }} onClick={() => onViewInvoice && onViewInvoice(currProject, inv)}>{inv.date || inv.issueDate ? new Date(inv.date || inv.issueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#F59E0B' }} onClick={() => onViewInvoice && onViewInvoice(currProject, inv)}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
                                   <td style={{ padding: '12px 14px' }} onClick={(e) => e.stopPropagation()}>
                                     <select
                                       value={inv.status || 'draft'}
@@ -2894,7 +2906,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   </td>
                                   <td style={{ padding: '12px 14px' }} onClick={(e) => e.stopPropagation()}>
                                     <div style={{ display: 'flex', gap: 4 }}>
-                                      <button onClick={() => onViewInvoice ? onViewInvoice({ ...inv, project: inv.projectName || currProject?.name, client: inv.clientName || inv.client }, currProject) : setPreviewInvoice(inv)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-eye"></i></button>
+                                      <button onClick={() => setInvoiceViewModal({ ...inv, project: inv.projectName || currProject?.name, client: inv.clientName || inv.client })} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-eye"></i></button>
                                       <button onClick={() => { if (onNewInvoice) { onNewInvoice(currProject, inv); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
                                       <button title="Print / PDF" onClick={() => handlePrintInvoice(inv)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-printer"></i></button>
                                       <button
@@ -2943,9 +2955,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           <tbody>
                             {(currProject.advances || []).map((rec, i) => (
                               <tr
-                                key={inv.invoiceNo || i}
-                                onClick={() => onViewInvoice ? onViewInvoice({ ...inv, project: inv.projectName || currProject?.name, client: inv.clientName || inv.client }, currProject) : setPreviewInvoice(inv)}
-                                style={{ borderBottom: '1px solid #F1F5F9', cursor: 'pointer' }}
+                                key={rec.advanceNo || i}
+                                style={{ borderBottom: '1px solid #F1F5F9' }}
                               >
                                 <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.advanceNo || `ADV-00${i + 1}`}</td>
                                 <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }}>{rec.description || '—'}</td>
@@ -3619,114 +3630,66 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         )
       }
 
-      {/* Invoice Preview Modal */}
-      {
-        previewInvoice && (() => {
-          const inv = previewInvoice;
-          const taxAmt = inv.taxType === 'inclusive' ? Math.round((inv.amount || 0) - (inv.amount || 0) / (1 + (inv.taxPercent || 0) / 100)) : Math.round((inv.amount || 0) * (inv.taxPercent || 0) / 100);
-          const subtotal = inv.taxType === 'inclusive' ? Math.round((inv.amount || 0) / (1 + (inv.taxPercent || 0) / 100)) : (inv.amount || 0);
-          const total = inv.taxType === 'inclusive' ? (inv.amount || 0) : (inv.amount || 0) + taxAmt;
-          const s = (inv.status || '').toLowerCase();
-          const statusColor = s === 'paid' ? '#22C55E' : s === 'overdue' ? '#EF4444' : s === 'sent' ? '#3B82F6' : s === 'pending' ? '#F59E0B' : '#94A3B8';
-          const statusBg = s === 'paid' ? '#DCFCE7' : s === 'overdue' ? '#FEE2E2' : s === 'sent' ? '#DBEAFE' : s === 'pending' ? '#FEF3C7' : '#F1F5F9';
-          return (
-            <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '30px 16px' }}>
-              <div style={{ background: '#fff', width: '100%', maxWidth: 640, borderRadius: 12, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'Arial,sans-serif', overflow: 'hidden' }}>
-                <div style={{ background: '#1A2332', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <i className="ti ti-file-invoice" style={{ color: ' var(--app-accent, var(--app-accent, #00BCD4))', fontSize: 18 }}></i>
-                    <span style={{ color: '#fff', fontWeight: 800, fontSize: 14 }}>Invoice Preview — {inv.invoiceNo}</span>
-                  </div>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button onClick={() => { setPreviewInvoice(null); setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo) })); }} style={{ padding: '6px 14px', background: '#fff', color: '#374151', border: '1px solid #E8EDF2', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}><i className="ti ti-edit"></i> Edit</button>
-                    <button onClick={() => { handleDeleteInvoice(inv); setPreviewInvoice(null); }} style={{ padding: '6px 14px', background: '#FEE2E2', color: '#EF4444', border: '1px solid #FECACA', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}><i className="ti ti-trash"></i> Delete</button>
-                    <button onClick={() => window.print()} style={{ padding: '6px 14px', background: ' var(--app-accent, var(--app-accent, #00BCD4))', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}><i className="ti ti-printer"></i> Print / PDF</button>
-                    <button onClick={() => setPreviewInvoice(null)} style={{ padding: '6px 14px', background: '#374151', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>✕</button>
-                  </div>
-                </div>
-                <div id="invoice-print-area" style={{ padding: '36px 40px', background: '#fff' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
-                    <div>
-                      {user?.logoUrl ? (<img src={user.logoUrl} alt="Logo" style={{ height: 70, borderRadius: 12, marginBottom: 12, objectFit: 'contain' }} />) : (<div style={{ width: 60, height: 60, borderRadius: 12, background: 'linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097A7)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}><span style={{ color: '#fff', fontWeight: 900, fontSize: 24 }}>{(user?.companyName || 'Y')[0].toUpperCase()}</span></div>)}
-                      <div style={{ fontWeight: 900, fontSize: 20, color: '#0f1c2e', letterSpacing: '1px', textTransform: 'uppercase' }}>{user?.companyName || 'YOUR COMPANY'}</div>
-                      <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4, lineHeight: 1.7 }}>{user?.email}<br />{user?.phone}<br />{user?.address}</div>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: 32, fontWeight: 900, color: 'rgba(0,188,212,0.1)', letterSpacing: '-1px', marginBottom: 4 }}>INVOICE</div>
-                      <div style={{ fontSize: 16, fontWeight: 800, color: ' var(--app-accent, var(--app-accent, #00BCD4))' }}>{inv.invoiceNo}</div>
-                      <div style={{ display: 'flex', gap: 20, marginTop: 14, justifyContent: 'flex-end' }}>
-                        <div style={{ textAlign: 'right' }}><div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 3 }}>Date</div><div style={{ fontSize: 12, fontWeight: 700, color: '#0f1c2e' }}>{inv.issueDate ? new Date(inv.issueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div></div>
-                        <div style={{ textAlign: 'right' }}><div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 3 }}>Due Date</div><div style={{ fontSize: 12, fontWeight: 700, color: '#ea580c' }}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div></div>
-                      </div>
-                      {inv.status && inv.status.toLowerCase() !== 'draft' && (<div style={{ marginTop: 12, textAlign: 'right' }}><span style={{ display: 'inline-block', padding: '4px 14px', borderRadius: 20, background: statusBg, color: statusColor, fontSize: 11, fontWeight: 800, border: `1.5px solid ${statusColor}`, letterSpacing: 1 }}>{inv.status.charAt(0).toUpperCase() + inv.status.slice(1).toLowerCase()}</span></div>)}
-                      <div style={{ marginTop: 24 }}><div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '2px', textAlign: 'right', marginBottom: 6 }}>Project</div><div style={{ fontSize: 14, fontWeight: 800, color: '#0f1c2e', textAlign: 'right' }}>{inv.projectName || currProject.name}</div></div>
-                    </div>
-                  </div>
-                  <div style={{ borderBottom: '2px solid #E8EDF2', paddingBottom: 20, marginBottom: 20 }}>
-                    <div style={{ fontSize: 9, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: 10 }}>Bill To</div>
-                    <div style={{ fontWeight: 800, fontSize: 17, color: '#0f1c2e' }}>{inv.clientName || clientName}</div>
-                    <div style={{ fontSize: 13, color: ' var(--app-accent, var(--app-accent, #00BCD4))', fontWeight: 600, marginTop: 2 }}>{inv.clientName || clientName}</div>
-                  </div>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 20 }}>
-                    <thead><tr style={{ background: '#f8fafc' }}>{['#', 'Description', 'Qty', 'Unit Rate', 'Tax Rate', 'Amount'].map(h => (<th key={h} style={{ padding: '9px 11px', textAlign: h === 'Amount' || h === 'Unit Rate' || h === 'Qty' || h === 'Tax Rate' ? 'right' : 'left', fontSize: 9, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1.5, borderBottom: '2px solid #E8EDF2' }}>{h}</th>))}</tr></thead>
-                    <tbody><tr style={{ borderBottom: '1px solid #E8EDF2' }}><td style={{ padding: '12px 11px', fontSize: 12, color: '#64748b', fontWeight: 700 }}>01</td><td style={{ padding: '12px 11px', fontSize: 13, color: '#0f1c2e', fontWeight: 600 }}>{inv.description || 'Service'}</td><td style={{ padding: '12px 11px', fontSize: 13, color: '#374151', textAlign: 'right' }}>1</td><td style={{ padding: '12px 11px', fontSize: 13, color: '#374151', textAlign: 'right' }}>{currency}{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td><td style={{ padding: '12px 11px', fontSize: 13, color: '#6b7280', textAlign: 'right' }}>{inv.taxPercent || 0}%</td><td style={{ padding: '12px 11px', fontSize: 14, color: '#0f1c2e', textAlign: 'right', fontWeight: 700 }}>{currency}{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td></tr></tbody>
-                  </table>
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 24 }}>
-                    <div style={{ width: 200 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 10, borderBottom: '1px solid #E8EDF2' }}><span style={{ color: '#64748b' }}>Subtotal</span><span style={{ fontWeight: 700 }}>{currency}{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 10, borderBottom: '1px solid #E8EDF2' }}><span style={{ color: '#64748b' }}>GST / Tax</span><span style={{ fontWeight: 700 }}>{currency}{taxAmt.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 8px', background: '#0f1c2e', borderRadius: 6, marginTop: 4, color: '#fff' }}><span style={{ fontSize: 10, fontWeight: 800 }}>Balance Due</span><span style={{ fontSize: 12, fontWeight: 900 }}>{currency}{total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>
-                    </div>
-                  </div>
-                  {inv.notes && (<div style={{ borderTop: '1px solid #E8EDF2', paddingTop: 14 }}><div style={{ fontSize: 8, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 2 }}>Notes</div><div style={{ fontSize: 8, color: '#64748b', lineHeight: 1.5 }}>{inv.notes}</div></div>)}
-                  {inv.signature && (
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
-                      <div style={{ textAlign: 'right', minWidth: 140 }}>
-                        <div style={{ height: 36, display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end', marginBottom: 4 }}>
-                          {inv.signatureType === 'image' ? (
-                            <img src={inv.signature} alt="Signature" style={{ maxHeight: 32, maxWidth: 130, objectFit: 'contain' }} />
-                          ) : (
-                            <div style={{ fontFamily: "'Dancing Script', cursive", fontSize: 18, fontWeight: 'bold', color: '#1a2e35' }}>{inv.signature}</div>
-                          )}
-                        </div>
-                        <div style={{ width: '100%', height: 1, background: '#E8EDF2', marginBottom: 4 }}></div>
-                        <div style={{ fontSize: 9, fontWeight: 700, color: '#0f1c2e' }}>{user?.companyName || 'Authorized Signatory'}</div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div style={{ borderTop: '1px solid #E8EDF2', padding: '10px 40px', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{inv.invoiceNo}</div>
-                  <div style={{ position: 'relative' }}>
-                    {(() => {
-                      const st = (inv.status || '').toLowerCase();
-                      const cfg = st === 'paid' ? { label: 'Paid', bg: '#DCFCE7', color: '#15803D', icon: '' } : st === 'overdue' ? { label: 'Overdue', bg: '#FEE2E2', color: '#DC2626', icon: '' } : st === 'sent' ? { label: 'Sent', bg: '#DBEAFE', color: '#1D4ED8', icon: '' } : { label: 'Pending', bg: '#FEF3C7', color: '#B45309', icon: '' };
-                      return (
-                        <>
-                          <span onClick={() => setShowStatusDropdown(prev => !prev)} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 14px', borderRadius: 20, background: cfg.bg, color: cfg.color, fontSize: 12, fontWeight: 800, border: `1.5px solid ${cfg.color}`, cursor: 'pointer', userSelect: 'none' }}>{cfg.icon} {cfg.label} <span style={{ fontSize: 10 }}>▼</span></span>
-                          {showStatusDropdown && (
-                            <div style={{ position: 'absolute', bottom: 36, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: '#fff', border: '1px solid #E8EDF2', borderRadius: 10, boxShadow: '0 4px 20px rgba(0,0,0,0.15)', minWidth: 150, overflow: 'hidden' }}>
-                              {[{ label: 'Pending', color: '#B45309', bg: '#FEF3C7', icon: '' }, { label: 'Paid', color: '#15803D', bg: '#DCFCE7', icon: '' }, { label: 'Overdue', color: '#DC2626', bg: '#FEE2E2', icon: '' }, { label: 'Sent', color: '#1D4ED8', bg: '#DBEAFE', icon: '' }].map(opt => (
-                                <div key={opt.label} onClick={async () => { const updatedInvoices = (currProject.invoices || []).map(x => x.invoiceNo === inv.invoiceNo ? { ...x, status: opt.label } : x); await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { invoices: updatedInvoices }); setShowStatusDropdown(false); setPreviewInvoice(prev => ({ ...prev, status: opt.label })); loadLatest(); }} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', cursor: 'pointer', background: st === opt.label.toLowerCase() ? opt.bg : '#fff', borderBottom: '1px solid #F3F4F6' }} onMouseEnter={e => e.currentTarget.style.background = opt.bg} onMouseLeave={e => e.currentTarget.style.background = st === opt.label.toLowerCase() ? opt.bg : '#fff'}>
-                                  <span>{opt.icon}</span>
-                                  <span style={{ fontSize: 13, fontWeight: 700, color: opt.color }}>{opt.label}</span>
-                                  {st === opt.label.toLowerCase() && <span style={{ marginLeft: 'auto', fontSize: 11 }}>Yes</span>}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </>
-                      );
-                    })()}
-                  </div>
-                  <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>Urban Cafe Billing Software</div>
+      {invoiceViewModal && (() => {
+        const inv = invoiceViewModal;
+        const taxAmt = inv.taxType === 'inclusive' ? Math.round((inv.amount || 0) - (inv.amount || 0) / (1 + (inv.taxPercent || 0) / 100)) : Math.round((inv.amount || 0) * (inv.taxPercent || 0) / 100);
+        const total = inv.taxType === 'inclusive' ? (inv.amount || 0) : (inv.amount || 0) + taxAmt;
+        return (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '30px 16px' }} onClick={() => setInvoiceViewModal(null)}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#fff', width: '100%', maxWidth: 640, borderRadius: 12, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'Arial,sans-serif', overflow: 'hidden' }}>
+              <div style={{ background: '#1A2332', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ color: '#fff', fontWeight: 800, fontSize: 14 }}>Invoice View — {inv.invoiceNo}</span>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button onClick={() => window.print()} style={{ padding: '6px 14px', background: P.primary, color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}><i className="ti ti-printer"></i> Print / PDF</button>
+                  <button onClick={() => setInvoiceViewModal(null)} style={{ padding: '6px 14px', background: '#374151', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>✕</button>
                 </div>
               </div>
+              <div id="invoice-view-print-area" style={{ padding: '36px 40px', background: '#fff' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
+                  <div>
+                    <div style={{ fontWeight: 900, fontSize: 20, color: '#0f1c2e' }}>{user?.companyName || 'YOUR COMPANY'}</div>
+                    <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4 }}>{user?.email}<br />{user?.phone}<br />{user?.address}</div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: P.primary }}>{inv.invoiceNo}</div>
+                    <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>Date: {inv.issueDate ? new Date(inv.issueDate).toLocaleDateString('en-IN') : '—'}</div>
+                    <div style={{ fontSize: 12, color: '#ea580c' }}>Due: {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN') : '—'}</div>
+                    <div style={{ fontSize: 12, color: '#374151', marginTop: 8 }}>Project: <strong>{inv.project || currProject.name}</strong></div>
+                  </div>
+                </div>
+                <div style={{ marginBottom: 20 }}>
+                  <div style={{ fontSize: 10, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1 }}>Bill To</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#0f1c2e', marginTop: 4 }}>{inv.client || currProject.client}</div>
+                </div>
+                {inv.items && inv.items.length > 0 && (
+                  <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 20 }}>
+                    <thead>
+                      <tr style={{ borderBottom: '2px solid #E8EDF2' }}>
+                        {['#', 'Description', 'Qty', 'Rate', 'Amount'].map(h => <th key={h} style={{ textAlign: 'left', padding: '8px 6px', fontSize: 11, color: '#9CA3AF' }}>{h}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {inv.items.map((it, idx) => (
+                        <tr key={idx} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                          <td style={{ padding: '8px 6px', fontSize: 12 }}>{idx + 1}</td>
+                          <td style={{ padding: '8px 6px', fontSize: 12 }}>{it.description}</td>
+                          <td style={{ padding: '8px 6px', fontSize: 12 }}>{it.quantity}</td>
+                          <td style={{ padding: '8px 6px', fontSize: 12 }}>{inv.currency || '₹'}{it.rate}</td>
+                          <td style={{ padding: '8px 6px', fontSize: 12, fontWeight: 700 }}>{inv.currency || '₹'}{(it.quantity * it.rate).toLocaleString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+                <div style={{ textAlign: 'right', fontSize: 18, fontWeight: 900, color: '#0f1c2e' }}>
+                  Total: {inv.currency || '₹'}{(total || inv.amount || 0).toLocaleString()}
+                </div>
+                {inv.notes && <div style={{ marginTop: 20, fontSize: 12, color: '#6B7280' }}><strong>Notes:</strong> {inv.notes}</div>}
+              </div>
             </div>
-          );
-        })()
-      }
-
+          </div>
+        );
+      })()}
 
 
       {/* Upload File Modal */}
@@ -3852,6 +3815,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       ? (sendingFileApproval ? 'Sending...' : 'Send for Approval')
                       : (uploadingModal ? 'Uploading...' : postUpdateOnUpload ? 'Post Update' : 'Upload & Share')}
                   </button>
+
                 </div>
               </div>
             </div>

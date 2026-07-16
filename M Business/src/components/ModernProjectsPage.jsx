@@ -83,6 +83,11 @@ export default function ModernProjectsPage({ user }) {
     return saved ? JSON.parse(saved) : null;
   });
 
+  const [jumpInvoice, setJumpInvoice] = useState(() => {
+    const saved = sessionStorage.getItem('jumpInvoiceData');
+    return saved ? JSON.parse(saved) : null;
+  });
+
   const [prevActiveBeforeInvoice, setPrevActiveBeforeInvoice] = useState("dashboard");
 
   useEffect(() => {
@@ -93,11 +98,17 @@ export default function ModernProjectsPage({ user }) {
       } else {
         sessionStorage.removeItem('invoicePrefillData');
       }
+      if (jumpInvoice) {
+        sessionStorage.setItem('jumpInvoiceData', JSON.stringify(jumpInvoice));
+      } else {
+        sessionStorage.removeItem('jumpInvoiceData');
+      }
     } else {
       sessionStorage.removeItem('showInvoiceCreator');
       sessionStorage.removeItem('invoicePrefillData');
+      sessionStorage.removeItem('jumpInvoiceData');
     }
-  }, [showInvoiceCreator, invoicePrefill]);
+  }, [showInvoiceCreator, invoicePrefill, jumpInvoice]);
 
   // ── UI state --------------------------------------------------
   const [selectedProject, setSelectedProject] = useState(() => {
@@ -412,12 +423,7 @@ export default function ModernProjectsPage({ user }) {
                 setShowInvoiceCreator(true);
               }}
               onViewInvoice={(proj, inv) => {
-                // Always pull the freshest copy of this invoice from the current
-                // project data, so a just-saved signature is reflected in View.
-                const freshProj = projects.find(p => p._id === proj._id) || proj;
-                const freshInv =
-                  (freshProj.invoices || []).find(i => i.invoiceNo === inv.invoiceNo) || inv;
-                setJumpInvoice({ ...freshInv, _t: Date.now() });
+                setJumpInvoice({ ...inv, _t: Date.now() });
                 setShowInvoiceCreator(true);
               }} />
           </div>

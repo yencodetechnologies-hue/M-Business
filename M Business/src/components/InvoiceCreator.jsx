@@ -1639,7 +1639,7 @@ export default function InvoiceCreator({ user, clients, projects, companyLogo, c
                       </td>
                       <td onClick={e => e.stopPropagation()}>
                         <div className="row-actions">
-                          <button className="row-btn" title="View" onClick={(e) => { e.stopPropagation(); loadEntry(entry, "preview"); if (onOpenInvoice) onOpenInvoice(entry); window.scrollTo(0, 0); }}><i className="ti ti-eye"></i></button>
+                          <button className="row-btn" title="View" onClick={(e) => { e.stopPropagation(); setRowViewEntry(entry); }}><i className="ti ti-eye"></i></button>
                           <button className="row-btn" title="Edit" onClick={(e) => { e.stopPropagation(); loadEntry(entry, "form"); window.scrollTo(0, 0); }}><i className="ti ti-edit"></i></button>
                           {(isPaid || isPartPaid) ? (
                             <button className="row-btn" title="Receipt" onClick={() => {

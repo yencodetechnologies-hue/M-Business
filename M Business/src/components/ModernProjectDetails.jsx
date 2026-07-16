@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
-import { BASE_URL } from '../config';
+import { BASE_URL, FRONTEND_URL } from '../config';
 import ModernEmployeeProjectDetails from './ModernEmployeeProjectDetails';
 import ProjectPaymentModals from './ProjectPaymentModals';
 
@@ -3632,60 +3632,32 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
       {invoiceViewModal && (() => {
         const inv = invoiceViewModal;
-        const taxAmt = inv.taxType === 'inclusive' ? Math.round((inv.amount || 0) - (inv.amount || 0) / (1 + (inv.taxPercent || 0) / 100)) : Math.round((inv.amount || 0) * (inv.taxPercent || 0) / 100);
-        const total = inv.taxType === 'inclusive' ? (inv.amount || 0) : (inv.amount || 0) + taxAmt;
+        const slimPayload = {
+          no: inv.invoiceNo, date: inv.issueDate || inv.date, due: inv.dueDate,
+          co: user?.companyName, email: user?.email, phone: user?.phone, addr: user?.address,
+          cl: inv.client || currProject.client, proj: inv.project || currProject.name,
+          gst: inv.taxPercent || inv.gstRate || 0, notes: inv.notes, terms: inv.terms,
+          incGst: inv.taxType === 'inclusive',
+          paid: inv.amountPaid || 0,
+          upi: inv.upiId,
+          cur: inv.currency || '₹',
+          items: (inv.items || []).map((it) => ({ d: it.description, q: it.quantity, r: it.rate })),
+          history: inv.paymentHistory || [],
+          cid: user?.companyId || user?.company || user?._id || '',
+          sig: inv.signatureType === 'text' ? inv.signature : '',
+          sigType: inv.signatureType || 'text',
+          temp: inv.template || 'Classic',
+        };
+        const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))));
+        const viewURL = `${FRONTEND_URL}/invoice-view?d=${encoded}`;
         return (
           <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '30px 16px' }} onClick={() => setInvoiceViewModal(null)}>
-            <div onClick={e => e.stopPropagation()} style={{ background: '#fff', width: '100%', maxWidth: 640, borderRadius: 12, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'Arial,sans-serif', overflow: 'hidden' }}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#fff', width: '100%', maxWidth: 900, height: '90vh', borderRadius: 12, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               <div style={{ background: '#1A2332', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ color: '#fff', fontWeight: 800, fontSize: 14 }}>Invoice View — {inv.invoiceNo}</span>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={() => window.print()} style={{ padding: '6px 14px', background: P.primary, color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}><i className="ti ti-printer"></i> Print / PDF</button>
-                  <button onClick={() => setInvoiceViewModal(null)} style={{ padding: '6px 14px', background: '#374151', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>✕</button>
-                </div>
+                <button onClick={() => setInvoiceViewModal(null)} style={{ padding: '6px 14px', background: '#374151', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>✕</button>
               </div>
-              <div id="invoice-view-print-area" style={{ padding: '36px 40px', background: '#fff' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
-                  <div>
-                    <div style={{ fontWeight: 900, fontSize: 20, color: '#0f1c2e' }}>{user?.companyName || 'YOUR COMPANY'}</div>
-                    <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4 }}>{user?.email}<br />{user?.phone}<br />{user?.address}</div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: P.primary }}>{inv.invoiceNo}</div>
-                    <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>Date: {inv.issueDate ? new Date(inv.issueDate).toLocaleDateString('en-IN') : '—'}</div>
-                    <div style={{ fontSize: 12, color: '#ea580c' }}>Due: {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN') : '—'}</div>
-                    <div style={{ fontSize: 12, color: '#374151', marginTop: 8 }}>Project: <strong>{inv.project || currProject.name}</strong></div>
-                  </div>
-                </div>
-                <div style={{ marginBottom: 20 }}>
-                  <div style={{ fontSize: 10, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1 }}>Bill To</div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: '#0f1c2e', marginTop: 4 }}>{inv.client || currProject.client}</div>
-                </div>
-                {inv.items && inv.items.length > 0 && (
-                  <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 20 }}>
-                    <thead>
-                      <tr style={{ borderBottom: '2px solid #E8EDF2' }}>
-                        {['#', 'Description', 'Qty', 'Rate', 'Amount'].map(h => <th key={h} style={{ textAlign: 'left', padding: '8px 6px', fontSize: 11, color: '#9CA3AF' }}>{h}</th>)}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {inv.items.map((it, idx) => (
-                        <tr key={idx} style={{ borderBottom: '1px solid #F1F5F9' }}>
-                          <td style={{ padding: '8px 6px', fontSize: 12 }}>{idx + 1}</td>
-                          <td style={{ padding: '8px 6px', fontSize: 12 }}>{it.description}</td>
-                          <td style={{ padding: '8px 6px', fontSize: 12 }}>{it.quantity}</td>
-                          <td style={{ padding: '8px 6px', fontSize: 12 }}>{inv.currency || '₹'}{it.rate}</td>
-                          <td style={{ padding: '8px 6px', fontSize: 12, fontWeight: 700 }}>{inv.currency || '₹'}{(it.quantity * it.rate).toLocaleString()}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-                <div style={{ textAlign: 'right', fontSize: 18, fontWeight: 900, color: '#0f1c2e' }}>
-                  Total: {inv.currency || '₹'}{(total || inv.amount || 0).toLocaleString()}
-                </div>
-                {inv.notes && <div style={{ marginTop: 20, fontSize: 12, color: '#6B7280' }}><strong>Notes:</strong> {inv.notes}</div>}
-              </div>
+              <iframe title="invoice-view" src={viewURL} style={{ flex: 1, border: 'none', width: '100%' }} />
             </div>
           </div>
         );

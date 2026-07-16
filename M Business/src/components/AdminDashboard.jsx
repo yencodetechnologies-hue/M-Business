@@ -566,8 +566,7 @@ export default function AdminDashboard({ user, setUser }) {
                 setActive("invoices");
               }}
               onViewInvoice={(inv) => {
-                setJumpInvoicePrefill({ editData: inv, client: inv?.client || inv?.clientName || '', project: inv?.project || jumpProject?.name || '', readOnly: true });
-                setActive("invoices");
+                setProjectInvoiceView({ ...inv, project: inv?.project || jumpProject?.name || '', client: inv?.client || inv?.clientName || '' });
               }}
             />
           )}

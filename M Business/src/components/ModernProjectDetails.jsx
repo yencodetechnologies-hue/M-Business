@@ -2415,7 +2415,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                     setPostUpdateAttachments(prev => prev.map(a => a.tempId === tempId ? { ...a, progress: pct } : a));
                                   }
                                 });
-                                const resolvedUrl = res.data.url && res.data.url.startsWith('http') ? res.data.url : `${BASE_URL}${res.data.url.startsWith('/') ? '' : '/'}${res.data.url}`;
+                                const rawUrl = res.data.url || '';
+                                const resolvedUrl = /^https?:\/\//i.test(rawUrl)
+                                  ? rawUrl
+                                  : `${BASE_URL}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
+                                if (!rawUrl) {
+                                  console.error('Upload response missing url for', file.name, res.data);
+                                }
                                 setPostUpdateAttachments(prev => prev.map(a => a.tempId === tempId ? { name: file.name, url: resolvedUrl, type: file.type, uploading: false, progress: 100 } : a));
                               } catch (err) {
                                 console.error('Attachment upload failed:', file.name, err);
@@ -2450,10 +2456,14 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                             </button>
                           </div>
                           <button
-                            disabled={postingUpdate || (!updateTitle.trim() && !updateText.trim())}
+                            disabled={postingUpdate || (!updateTitle.trim() && !updateText.trim()) || postUpdateAttachments.some(a => a.uploading || !a.url)}
                             onClick={async () => {
                               const hasContent = updateTitle.trim() || updateText.trim();
                               if (!hasContent) return;
+                              if (postUpdateAttachments.some(a => a.uploading || !a.url)) {
+                                alert('Please wait for the attachment to finish uploading before posting.');
+                                return;
+                              }
                               if (isApprovalRequest && currProject.approvalRequestEnabled === false) {
                                 alert('Approval requests are disabled for this project.');
                                 return;
@@ -2630,7 +2640,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                                     {attachments.map((att, aidx) => {
                                       const isImg = (att.type && att.type.startsWith('image/')) || /\.(jpe?g|png|gif|webp|svg)$/i.test(att.url || att.name || '');
-                                      const displayUrl = att.url && att.url.startsWith('http') ? att.url : `${BASE_URL}${att.url && att.url.startsWith('/') ? '' : '/'}${att.url || ''}`;
+                                      const rawAttUrl = att.url || '';
+                                      const displayUrl = /^https?:\/\//i.test(rawAttUrl)
+                                        ? rawAttUrl
+                                        : (rawAttUrl ? `${BASE_URL}${rawAttUrl.startsWith('/') ? '' : '/'}${rawAttUrl}` : '');
                                       return isImg ? (
                                         <img
                                           key={`${att.url}-${aidx}`}
@@ -2709,7 +2722,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               const formData = new FormData();
                               formData.append('file', file);
                               const res = await axios.post(`${BASE_URL}/api/upload`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-                              const resolvedUrl = res.data.url && res.data.url.startsWith('http') ? res.data.url : `${BASE_URL}${res.data.url.startsWith('/') ? '' : '/'}${res.data.url}`;
+                              const rawUrl = res.data.url || '';
+                              const resolvedUrl = /^https?:\/\//i.test(rawUrl)
+                                ? rawUrl
+                                : `${BASE_URL}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
+                              if (!rawUrl) {
+                                console.error('Upload response missing url for', file.name, res.data);
+                              }
                               setEditingUpdate(prev => prev ? ({ ...prev, attachments: [...prev.attachments, { name: file.name, url: resolvedUrl, type: file.type }] }) : prev);
                             } catch (err) {
                               console.error('Attachment upload failed:', file.name, err);

@@ -9,7 +9,7 @@ const employeeSchema = new mongoose.Schema({
   salary: { type: String, default: "" },
   password: { type: String },
   branchName: { type: String },
-  status: { type: String, enum: ["Active", "Inactive", "Pending", "Onboarded", "Approved", "Rejected"], default: "Active" },
+  status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
   companyId: { type: String, default: "" },
   profilePhoto: { type: String, default: "" },
   bankDetails: {

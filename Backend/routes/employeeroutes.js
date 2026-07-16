@@ -98,7 +98,7 @@ router.put("/:id", async (req, res) => {
 router.put("/status/:id", async (req, res) => {
   try {
     const { status } = req.body;
-    if (!["Active", "Inactive", "Onboarded"].includes(status)) return res.status(400).json({ msg: "Invalid status" });
+    if (!["Active", "Inactive"].includes(status)) return res.status(400).json({ msg: "Invalid status" });
 
     const employee = await Employee.findByIdAndUpdate(req.params.id, { $set: { status } }, { new: true });
     if (!employee) return res.status(404).json({ msg: "Employee not found" });

@@ -3123,7 +3123,6 @@ ${onboardingLink}`;
 
           <option value="Inactive">Inactive</option>
 
-          <option value="On Leave">On Leave</option>
 
 
 
@@ -8724,6 +8723,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
     if (!ne.email.trim()) errors.email = "Email required";
     if (!ne.status || !ne.status.trim()) errors.status = "Status is required";
+    if (ne.role === "Custom" && !(ne.customRole || "").trim()) errors.role = "Custom role name is required";
 
     if (!ne.password.trim()) errors.password = "Password is required";
 
@@ -8813,12 +8813,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       const { confirmPassword, ...neWithoutConfirm } = ne;
 
+      const finalRole = ne.role === "Custom" ? (ne.customRole || "").trim() : ne.role;
+      const { customRole, ...neWithoutCustomFlag } = neWithoutConfirm;
       const payload = {
-
-        ...neWithoutConfirm,
-
-        role: ne.role || "employee",
-
+        ...neWithoutCustomFlag,
+        role: finalRole || "employee",
         companyId: resolveSubadminId(),
 
         bankDetails: {
@@ -8841,7 +8840,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       setEmployees(prev => [res.data.employee, ...prev]);
 
-      setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "", password: "", confirmPassword: "", dateOfBirth: "", maritalStatus: "", address: "", bankName: "", ifscCode: "", accountNumber: "" });
+      setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "", password: "", confirmPassword: "", dateOfBirth: "", maritalStatus: "", address: "", bankName: "", ifscCode: "", accountNumber: "", customRole: "" });
 
       setShowEmpPass(false);
 
@@ -12604,7 +12603,21 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <Fld label="Phone Number" value={ne.phone} onChange={v => setNe({ ...ne, phone: v })} />
 
-                <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v })} options={DEPARTMENT_OPTIONS} />
+                <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v, customRole: v === "Custom" ? (ne.customRole || "") : "" })} options={[...DEPARTMENT_OPTIONS, "Custom"]} error={neError.role} dataField="role" />
+                {ne.role === "Custom" && (
+                  <div style={{ marginBottom: 14 }} data-field="customRole">
+                    <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CUSTOM ROLE NAME *</label>
+                    <input
+                      type="text"
+                      value={ne.customRole || ""}
+                      onChange={e => { setNe({ ...ne, customRole: e.target.value }); setNeError(p => ({ ...p, role: "" })); }}
+                      placeholder="Enter custom role name"
+                      style={{ width: "100%", border: `1.5px solid ${neError.role ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none", fontFamily: "inherit" }}
+                      autoFocus
+                    />
+                    {neError.role && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.role}</div>}
+                  </div>
+                )}
 
                 <Fld label="Department" value={ne.department} onChange={v => setNe({ ...ne, department: v })} />
 
@@ -12616,7 +12629,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <Fld label="Marital Status" value={ne.maritalStatus} onChange={v => setNe({ ...ne, maritalStatus: v })} options={["Unmarried", "Married"]} />
 
-                <Fld label="Status *" value={ne.status} onChange={v => { setNe({ ...ne, status: v }); setNeError(p => ({ ...p, status: "" })); }} options={["Select Status", "Active", "Inactive", "Onboarded"]} error={neError.status} dataField="status" placeholder="Select Status" />
+                <Fld label="Status *" value={ne.status} onChange={v => { setNe({ ...ne, status: v }); setNeError(p => ({ ...p, status: "" })); }} options={["Select Status", "Active", "Inactive"]} error={neError.status} dataField="status" placeholder="Select Status" />
 
               </div>
 

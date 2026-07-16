@@ -351,7 +351,7 @@ function CanvasSignature({ onSave }) {
 }
 
 // ------------------------------------------------------------
-export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack, jumpInvoice, newInvoicePrefill, onSaveLocalInvoice }) {
+export default function InvoiceCreator({ user, clients, projects, companyLogo, companyName, onLogoChange, onBack, jumpInvoice, newInvoicePrefill, newClientName, onNewClientConsumed, onAddClient, onOpenInvoice, onAddProject, onSaveLocalInvoice }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || "";
 
@@ -1597,7 +1597,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                   const isPending = !isPaid && !isPartPaid && !isDraft;
 
                   return (
-                    <tr key={entry.id || idx} onClick={() => { loadEntry(entry, "preview"); window.scrollTo(0, 0); }}>
+                    <tr key={entry.id || idx} onClick={() => { loadEntry(entry, "preview"); if (onOpenInvoice) onOpenInvoice(entry); window.scrollTo(0, 0); }}>
                       <td onClick={e => e.stopPropagation()}><input type="checkbox" className="cb" /></td>
                       <td className="inv-id" style={{ color: "var(--teal)", fontWeight: 800 }}>{entry.invoiceNo || "—"}</td>
                       <td>
@@ -1639,7 +1639,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                       </td>
                       <td onClick={e => e.stopPropagation()}>
                         <div className="row-actions">
-                          <button className="row-btn" title="View" onClick={(e) => { e.stopPropagation(); loadEntry(entry, "preview"); window.scrollTo(0, 0); }}><i className="ti ti-eye"></i></button>
+                          <button className="row-btn" title="View" onClick={(e) => { e.stopPropagation(); loadEntry(entry, "preview"); if (onOpenInvoice) onOpenInvoice(entry); window.scrollTo(0, 0); }}><i className="ti ti-eye"></i></button>
                           <button className="row-btn" title="Edit" onClick={(e) => { e.stopPropagation(); loadEntry(entry, "form"); window.scrollTo(0, 0); }}><i className="ti ti-edit"></i></button>
                           {(isPaid || isPartPaid) ? (
                             <button className="row-btn" title="Receipt" onClick={() => {
@@ -1879,7 +1879,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
         {/* Toolbar */}
         <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
-          <button onClick={() => (!internalNav && onBack) ? onBack() : setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Document Back</button>
+          <button onClick={() => onBack ? onBack() : setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Document Back</button>
 
           <button onClick={() => setShareModalEntry({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 22px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>Share</button>
 
@@ -2160,7 +2160,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       {/* Top nav */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <button onClick={() => (!internalNav && onBack) ? onBack() : setStep("list")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "var(--app-accent)", fontWeight: 700, padding: 0, fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4 }}>
+          <button onClick={() => onBack ? onBack() : setStep("list")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "var(--app-accent)", fontWeight: 700, padding: 0, fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4 }}>
             Back
           </button>
           <span style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>

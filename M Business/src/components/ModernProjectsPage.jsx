@@ -74,9 +74,31 @@ export default function ModernProjectsPage({ user }) {
   const [error, setError] = useState('');
 
   // ── Invoice ---------------------------------------------------
-  const [showInvoiceCreator, setShowInvoiceCreator] = useState(false);
-  const [invoicePrefill, setInvoicePrefill] = useState(null);
+  const [showInvoiceCreator, setShowInvoiceCreator] = useState(() => {
+    return sessionStorage.getItem('showInvoiceCreator') === '1';
+  });
+
+  const [invoicePrefill, setInvoicePrefill] = useState(() => {
+    const saved = sessionStorage.getItem('invoicePrefillData');
+    return saved ? JSON.parse(saved) : null;
+  });
+
   const [prevActiveBeforeInvoice, setPrevActiveBeforeInvoice] = useState("dashboard");
+
+  useEffect(() => {
+    if (showInvoiceCreator) {
+      sessionStorage.setItem('showInvoiceCreator', '1');
+      if (invoicePrefill) {
+        sessionStorage.setItem('invoicePrefillData', JSON.stringify(invoicePrefill));
+      } else {
+        sessionStorage.removeItem('invoicePrefillData');
+      }
+    } else {
+      sessionStorage.removeItem('showInvoiceCreator');
+      sessionStorage.removeItem('invoicePrefillData');
+    }
+  }, [showInvoiceCreator, invoicePrefill]);
+
   // ── UI state --------------------------------------------------
   const [selectedProject, setSelectedProject] = useState(() => {
     const saved = sessionStorage.getItem('selectedProjectId');

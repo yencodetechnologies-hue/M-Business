@@ -6804,13 +6804,32 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     } catch (e) { }
   }, [jumpInvoice]);
 
-  const [invoicePrefill, setInvoicePrefill] = useState(null);
+  const [invoicePrefill, setInvoicePrefill] = useState(() => {
+    try {
+      const savedActive = localStorage.getItem("activeTab_subadmin");
+      if (savedActive === "invoices") {
+        const saved = localStorage.getItem("invoicePrefill_subadmin");
+        if (saved) return JSON.parse(saved);
+      }
+    } catch (e) { }
+    return null;
+  });
+
+  useEffect(() => {
+    try {
+      if (invoicePrefill) {
+        localStorage.setItem("invoicePrefill_subadmin", JSON.stringify(invoicePrefill));
+      } else {
+        localStorage.removeItem("invoicePrefill_subadmin");
+      }
+    } catch (e) { }
+  }, [invoicePrefill]);
   const [prevActiveBeforeInvoice, setPrevActiveBeforeInvoice] = useState("dashboard");
 
   const [sidebarOverride, setSidebarOverride] = useState(() => {
     try {
       const savedActive = localStorage.getItem("activeTab_subadmin");
-      if (savedActive === "project-details") {
+      if (savedActive === "project-details" || savedActive === "invoices") {
         return localStorage.getItem("sidebarOverride_subadmin") || null;
       }
     } catch (e) { }
@@ -11312,13 +11331,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now(), ...(editInv ? { editData: editInv, editIndex: editIdx, projectId: proj._id } : {}) });
                   setJumpInvoice(null);
                   setPrevActiveBeforeInvoice(active);
-                  setSidebarOverride(active);
-                  setActive("invoices");
-                }}
-                onViewInvoice={(entry) => {
-                  setJumpInvoice(entry);
-                  setPrevActiveBeforeInvoice(active);
-                  setSidebarOverride(active);
+                  setSidebarOverride("projects");
                   setActive("invoices");
                 }}
                 onLogTime={async (hours) => {
@@ -11524,8 +11537,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             {validActive === "subadmins" && <SubadminsPage subadmins={subadmins} setSubadmins={setSubadmins} employees={employees} managers={managers} quotations={quotations} />}
 
 
-
-            {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={sidebarOverride ? () => { setSidebarOverride(null); setActive(prevActiveBeforeInvoice || "dashboard"); } : undefined} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => {
+            {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => {
+              setSidebarOverride(null);
+              setInvoicePrefill(null);
+              setActive(jumpProject ? "project-details" : (prevActiveBeforeInvoice || "dashboard"));
+            }} jumpInvoice={jumpInvoice} onOpenInvoice={(entry) => setJumpInvoice(entry)} newInvoicePrefill={invoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 

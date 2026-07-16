@@ -686,7 +686,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                     >
                       <option value="">Select client...</option>
                       <option value="__add_client__" style={{ color: "var(--app-accent)", fontWeight: 400 }}>➕ Add New Client</option>
-                      {clients.map(c => <option key={c._id || c.id} value={c.clientName || c.name}>{c.clientName || c.name}</option>)}
+                      {clients.filter(c => (c.status || 'Active').toLowerCase() !== 'inactive').map(c => <option key={c._id || c.id} value={c.clientName || c.name}>{c.clientName || c.name}</option>)}
                     </select>
                   )}
                 </div>
@@ -867,7 +867,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                     maxHeight: 340, overflowY: 'auto', marginBottom: 20,
                     border: '1.5px solid #E2E8F0', borderRadius: 10, padding: '10px 8px'
                   }}>
-                    {localEmployees.map(emp => {
+                    {localEmployees.filter(emp => (emp.status || 'Active').toLowerCase() !== 'inactive').map(emp => {
                       const empName = emp.name || emp.employeeName || '';
                       const isChecked = selectedEmpsToAdd.includes(empName);
                       return (

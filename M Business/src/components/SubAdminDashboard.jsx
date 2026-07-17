@@ -6743,6 +6743,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [returnToCalendar, setReturnToCalendar] = useState(false);
   const [calendarNewClientName, setCalendarNewClientName] = useState(null);
   const [calendarNewProjectName, setCalendarNewProjectName] = useState(null);
+  const [returnToQuotation, setReturnToQuotation] = useState(false);
+  const [quotationNewClientName, setQuotationNewClientName] = useState(null);
 
   const [active, setActive] = useState(() => {
     const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
@@ -8105,7 +8107,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     return Math.max(0, Math.ceil(diffMs / 86400000));
   };
 
-  const isInFreeTrial = () => !subscription && getTrialDaysRemaining() > 0;
+  const isInFreeTrial = () => getTrialDaysRemaining() > 0;
   // ────────────────────────────────────────────────────────────────────────────
 
   const getSubStatus = () => {
@@ -8267,7 +8269,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-    // 2. If subscription has a limit, parse and return it
+    // 2. If subscription has a limit, parse and return it — but a real
+    // trial period always overrides any numeric limit set on the plan.
+
+    if (isInFreeTrial()) {
+
+      return Infinity;
+
+    }
 
     if (val && String(val).trim() !== "" && String(val) !== "0") {
 
@@ -8289,9 +8298,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-    // 4. Free trial limits
+    // 4. Free trial — unlimited, no restrictions during trial
     if (isInFreeTrial()) {
-      return FREE_TRIAL_LIMITS[type] ?? 5;
+      return Infinity;
     }
 
     // 5. Default fallback
@@ -8302,6 +8311,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
   const isUsageAtLimit = (type, currentCount, sub = subscription) => {
+
+    if (isInFreeTrial()) return false;
 
     const limit = getSubscriptionLimit(type, sub);
 
@@ -8625,16 +8636,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       if (id) {
 
         const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
-
         if (subRes.data.hasSubscription) {
 
           const latestSub = subRes.data.subscription;
 
           setSubscription(latestSub);
 
-
-
-          if (isUsageAtLimit("client", clients.length)) {
+          if (!isInFreeTrial() && isUsageAtLimit("client", clients.length)) {
 
             setLimitModal({ type: "client", limit: getSubscriptionLimit("client") });
 
@@ -8833,18 +8841,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           setSubscription(latestSub);
 
+          if (!isInFreeTrial() && isUsageAtLimit("client", clients.length)) {
 
-
-          if (isUsageAtLimit("employee", employees.length)) {
-
-            setLimitModal({ type: "employee", limit: getSubscriptionLimit("employee") });
+            setLimitModal({ type: "client", limit: getSubscriptionLimit("client") });
 
             return;
 
           }
 
         } else {
-
           // No subscription — allow if still in free trial
           if (!isInFreeTrial()) {
             setForceUpgradeTab(true);
@@ -9081,19 +9086,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           setSubscription(latestSub);
 
+          if (!isInFreeTrial() && isUsageAtLimit("client", clients.length)) {
 
-
-          if (isUsageAtLimit("manager", managers.length)) {
-
-            setLimitModal({ type: "manager", limit: getSubscriptionLimit("manager") });
+            setLimitModal({ type: "client", limit: getSubscriptionLimit("client") });
 
             return;
 
           }
 
-        } else {
-
-          // No subscription — allow if still in free trial
+        } else {      // No subscription — allow if still in free trial
           if (!isInFreeTrial()) {
             setForceUpgradeTab(true);
             setActive("mysubscriptions");
@@ -11412,7 +11413,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             )}
 
-            {validActive === "addClient" && <AddClientView onBack={() => { if (returnToCalendar) { setReturnToCalendar(false); setSidebarOverride(null); setActive("calendar"); } else { setActive("clients"); } }} onClientAdded={(client, replaceTempId) => {
+            {validActive === "addClient" && <AddClientView onBack={() => { if (returnToCalendar) { setReturnToCalendar(false); setSidebarOverride(null); setActive("calendar"); } else if (returnToQuotation) { setReturnToQuotation(false); setSidebarOverride(null); setActive("quotations"); } else { setActive("clients"); } }} onClientAdded={(client, replaceTempId) => {
               setClients(prev => {
                 if (replaceTempId) {
                   // Server-confirmed client arrived — swap out the optimistic temp record
@@ -11428,6 +11429,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 setSidebarOverride(null);
                 setCalendarNewClientName(client.clientName || client.name || "");
                 setActive("calendar");
+                return;
+              }
+              if (returnToQuotation) {
+                setReturnToQuotation(false);
+                setSidebarOverride(null);
+                setQuotationNewClientName(client.clientName || client.name || "");
+                setActive("quotations");
                 return;
               }
               // Make sure the newly added client is the one shown/selected —
@@ -11618,19 +11626,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             }} onAddProject={() => { setJumpProject(null); setSidebarOverride("invoices"); setActive("create-project"); }} />}  {validActive === "quotations" && <QuotationCreatorModern user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => {
 
-              const limit = getSubscriptionLimit("client");
+              setNcError({}); setShowClientPass(false);
+              setReturnToQuotation(true);
+              setSidebarOverride("quotations");
+              setActive("addClient");
 
-              if (subscription && clients.length >= limit) {
-
-                setLimitModal({ type: "client", limit });
-
-                return;
-
-              }
-
-              setReturnToModal(modal); setModal("client");
-
-            }} onAddProject={() => { setPrevActiveBeforeInvoice(active); setActive("create-project"); }} />}
+            }} onAddProject={() => { setPrevActiveBeforeInvoice(active); setActive("create-project"); }} newlyAddedClientName={quotationNewClientName} />}
 
             {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} />}
 

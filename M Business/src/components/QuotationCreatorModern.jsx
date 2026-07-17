@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import QuotationCreator from './QuotationCreator';
 import axios from 'axios';
 import html2canvas from 'html2canvas';
@@ -18,6 +18,15 @@ export default function QuotationCreatorModern(props) {
   const [showModernForm, setShowModernForm] = useState(false);
   const [editEntry, setEditEntry] = useState(null);
   const [listRefreshKey, setListRefreshKey] = useState(0);
+
+  // If a client was just added while we were mid-way through the Modern
+  // Form (via "+ New Client"), the parent tears this whole tab down and
+  // rebuilds it — so jump straight back into the form instead of the list.
+  useEffect(() => {
+    if (props.newlyAddedClientName) {
+      setShowModernForm(true);
+    }
+  }, [props.newlyAddedClientName]);
 
   const handleNew = () => {
     setEditEntry(null);
@@ -45,7 +54,7 @@ export default function QuotationCreatorModern(props) {
 const genId = () => Date.now() + Math.random();
 const today = new Date().toISOString().split('T')[0];
 const quoteNo = 'QUO-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 9000) + 1000);
-function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient }) {
+function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient, newlyAddedClientName }) {
   // ── Pre-fill from existing entry if editing ──
   // The API returns: entry.qt (saved form data), entry.items (line items),
   // entry.id (MongoDB _id), entry.client (top-level shortcut), entry.status

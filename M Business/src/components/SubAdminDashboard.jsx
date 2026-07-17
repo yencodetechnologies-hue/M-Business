@@ -11570,7 +11570,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { const returnTo = sidebarOverride || prevActiveBeforeInvoice || "dashboard"; if (returnTo === "project-details" && jumpProject) { setSidebarOverride("clients"); setActive("project-details"); return; } setSidebarOverride(null); setActive(returnTo); }} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill || jumpInvoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => {
+            {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { const returnTo = sidebarOverride || prevActiveBeforeInvoice || "dashboard"; if (jumpProject) { setSidebarOverride("clients"); setActive("project-details"); return; } setSidebarOverride(null); setActive(returnTo); }} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill || jumpInvoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 

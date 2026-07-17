@@ -1743,27 +1743,37 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
         {/* PROGRESS + SUMMARY — single row, 4 equal-width cards */}
         <div className="mpd-prog-card">
-          <div className="mpd-prog-item">
-            <div className="mpd-prog-num">{progressPct}%</div>
-            <div className="mpd-prog-lbl">Overall Milestones</div>
-            <div className="mpd-progress-bg"><div className="mpd-progress-fill" style={{ width: `${progressPct}%` }}></div></div>
-            <div className="mpd-prog-sub">{doneMilestones} of {totalMilestones} milestones</div>
+          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+            <div className="mpd-kpi-icon" style={{ background: P.primaryLight || '#E0F2FE', flexShrink: 0 }}><i className="ti ti-chart-donut" style={{ color: P.primary }}></i></div>
+            <div style={{ flex: 1 }}>
+              <div className="mpd-prog-num">{progressPct}%</div>
+              <div className="mpd-prog-lbl">Overall Milestones</div>
+              <div className="mpd-progress-bg"><div className="mpd-progress-fill" style={{ width: `${progressPct}%` }}></div></div>
+              <div className="mpd-prog-sub">{doneMilestones} of {totalMilestones} milestones</div>
+            </div>
           </div>
-          <div className="mpd-prog-item">
-            <div className="mpd-prog-num">{budgetUsedPct}%</div>
-            <div className="mpd-prog-lbl">Budget Used</div>
-            <div className="mpd-progress-bg"><div className="mpd-progress-fill mpd-purple" style={{ width: `${budgetUsedPct}%` }}></div></div>
-            <div className="mpd-prog-sub">{currency}{spent.toLocaleString()} of {currency}{budgetAmt.toLocaleString()}</div>
+          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+            <div className="mpd-kpi-icon" style={{ background: P.purpleLight, flexShrink: 0 }}><i className="ti ti-chart-bar" style={{ color: P.purple }}></i></div>
+            <div style={{ flex: 1 }}>
+              <div className="mpd-prog-num">{budgetUsedPct}%</div>
+              <div className="mpd-prog-lbl">Budget Used</div>
+              <div className="mpd-progress-bg"><div className="mpd-progress-fill mpd-purple" style={{ width: `${budgetUsedPct}%` }}></div></div>
+              <div className="mpd-prog-sub">{currency}{spent.toLocaleString()} of {currency}{budgetAmt.toLocaleString()}</div>
+            </div>
           </div>
-          <div className="mpd-prog-item">
-            <div className="mpd-kpi-icon" style={{ background: '#FEE2E2', marginBottom: 8 }}><i className="ti ti-arrow-up-right" style={{ color: '#EF4444' }}></i></div>
-            <div className="mpd-prog-num">{currency}{spent.toLocaleString()}</div>
-            <div className="mpd-prog-lbl">Spent Amount</div>
+          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+            <div className="mpd-kpi-icon" style={{ background: '#FEE2E2', flexShrink: 0 }}><i className="ti ti-arrow-up-right" style={{ color: '#EF4444' }}></i></div>
+            <div style={{ flex: 1 }}>
+              <div className="mpd-prog-num">{currency}{spent.toLocaleString()}</div>
+              <div className="mpd-prog-lbl">Spent Amount</div>
+            </div>
           </div>
-          <div className="mpd-prog-item">
-            <div className="mpd-kpi-icon" style={{ background: P.purpleLight, marginBottom: 8 }}><i className="ti ti-pig-money" style={{ color: P.purple }}></i></div>
-            <div className="mpd-prog-num" style={{ color: remaining < 0 ? '#DC2626' : undefined }}>{remaining < 0 ? `-${currency}${Math.abs(remaining).toLocaleString()}` : `${currency}${remaining.toLocaleString()}`}</div>
-            <div className="mpd-prog-lbl">Remaining Budget</div>
+          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+            <div className="mpd-kpi-icon" style={{ background: P.purpleLight, flexShrink: 0 }}><i className="ti ti-pig-money" style={{ color: P.purple }}></i></div>
+            <div style={{ flex: 1 }}>
+              <div className="mpd-prog-num" style={{ color: remaining < 0 ? '#DC2626' : undefined }}>{remaining < 0 ? `-${currency}${Math.abs(remaining).toLocaleString()}` : `${currency}${remaining.toLocaleString()}`}</div>
+              <div className="mpd-prog-lbl">Remaining Budget</div>
+            </div>
           </div>
         </div>
 

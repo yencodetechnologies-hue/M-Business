@@ -48,6 +48,19 @@ export function selSt(el, val) {
 }
 
 /* ── MAIN UPDATE ── */
+export function toggleProposalTypeCustom(el) {
+  const wrap = getEl('propTypeWrap');
+  if (!wrap) return;
+
+  if (el.tagName === 'SELECT' && el.value === '__custom__') {
+    // Replace the select with a text input in the exact same slot.
+    wrap.innerHTML = `<input class="fs" id="propType" placeholder="Enter custom project type" onchange="up()" oninput="up()" />`;
+    const input = getEl('propType');
+    input.focus();
+  }
+  up();
+}
+
 export function up() {
   // Cover
   const t = getEl('propTitle').value;
@@ -342,6 +355,11 @@ export function addTeamMember() {
 }
 
 export function clientSelected(el) {
+  if (el.value === '__add_new__') {
+    if (window._onAddClient) window._onAddClient();
+    el.value = '';
+    return;
+  }
   const clients = window._clientsData || [];
   const val = el.value;
   if (!val) { window._selectedClientId = ''; return; }

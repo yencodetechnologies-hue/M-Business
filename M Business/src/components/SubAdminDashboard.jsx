@@ -6745,6 +6745,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [calendarNewProjectName, setCalendarNewProjectName] = useState(null);
   const [returnToQuotation, setReturnToQuotation] = useState(false);
   const [quotationNewClientName, setQuotationNewClientName] = useState(null);
+  const [returnToProposals, setReturnToProposals] = useState(false);
+  const [proposalNewClientName, setProposalNewClientName] = useState(null);
 
   const [active, setActive] = useState(() => {
     const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
@@ -11413,7 +11415,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             )}
 
-            {validActive === "addClient" && <AddClientView onBack={() => { if (returnToCalendar) { setReturnToCalendar(false); setSidebarOverride(null); setActive("calendar"); } else if (returnToQuotation) { setReturnToQuotation(false); setSidebarOverride(null); setActive("quotations"); } else { setActive("clients"); } }} onClientAdded={(client, replaceTempId) => {
+            {validActive === "addClient" && <AddClientView onBack={() => { if (returnToCalendar) { setReturnToCalendar(false); setSidebarOverride(null); setActive("calendar"); } else if (returnToQuotation) { setReturnToQuotation(false); setSidebarOverride(null); setActive("quotations"); } else if (returnToProposals) { setReturnToProposals(false); setSidebarOverride(null); setActive("proposals"); } else { setActive("clients"); } }} onClientAdded={(client, replaceTempId) => {
               setClients(prev => {
                 if (replaceTempId) {
                   // Server-confirmed client arrived — swap out the optimistic temp record
@@ -11436,6 +11438,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 setSidebarOverride(null);
                 setQuotationNewClientName(client.clientName || client.name || "");
                 setActive("quotations");
+                return;
+              }
+              if (returnToProposals) {
+                setReturnToProposals(false);
+                setSidebarOverride(null);
+                setProposalNewClientName(client.clientName || client.name || "");
+                setActive("proposals");
                 return;
               }
               // Make sure the newly added client is the one shown/selected —
@@ -11633,7 +11642,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             }} onAddProject={() => { setPrevActiveBeforeInvoice(active); setActive("create-project"); }} newlyAddedClientName={quotationNewClientName} />}
 
-            {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} />}
+            {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} onAddClient={() => { setNcError({}); setShowClientPass(false); setReturnToProposals(true); setSidebarOverride("proposals"); setActive("addClient"); }} newlyAddedClientName={proposalNewClientName} />}
 
             {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
 

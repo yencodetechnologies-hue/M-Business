@@ -1120,13 +1120,46 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
 }
 
 // ─── MAIN APP -----------------------------------------------------------------
-export default function CanvaProposal({ clients = [], openNew = false, onOpenNewDone, companyLogo, companyName }) {
+export default function CanvaProposal({ clients = [], openNew = false, onOpenNewDone, companyLogo, companyName, onAddClient, newlyAddedClientName }) {
   // Always start at "list" view; fetchProposals() will switch to "editor" once the
   // correct doc has been loaded from the API (fixes the blank-editor flash when
   // navigating via ?edit= or ?view= URL params before data is ready).
-  const [view, setView] = useState("list");    // list | editor
+  const [view, setView] = useState(() => {
+    try {
+      const savedView = sessionStorage.getItem("proposalFormView");
+      if (savedView === "form" || savedView === "editor") return savedView;
+    } catch (e) { }
+    return "list";
+  });    // list | editor
   const [proposals, setProposals] = useState(() => load());
-  const [doc, setDoc] = useState(null);
+  const [doc, setDoc] = useState(() => {
+    try {
+      const savedDoc = sessionStorage.getItem("proposalFormDoc");
+      if (savedDoc) return JSON.parse(savedDoc);
+    } catch (e) { }
+    return null;
+  });
+
+  useEffect(() => {
+    try {
+      if (view === "form" || view === "editor") {
+        sessionStorage.setItem("proposalFormView", view);
+        if (doc) sessionStorage.setItem("proposalFormDoc", JSON.stringify(doc));
+      } else {
+        sessionStorage.removeItem("proposalFormView");
+        sessionStorage.removeItem("proposalFormDoc");
+      }
+    } catch (e) { }
+  }, [view, doc]);
+
+  // If a client was just added while mid-way through the proposal form
+  // (via "+ Add New Client"), the parent tears this tab down and rebuilds
+  // it — jump straight back into the form view instead of the list.
+  useEffect(() => {
+    if (newlyAddedClientName) {
+      setView("form");
+    }
+  }, [newlyAddedClientName]);
   // True when we arrived via ?edit= or ?view= URL param and are waiting for the
   // proposal data to load — prevents the list from flickering before the editor opens.
   const [isUrlNavigation] = useState(
@@ -1573,6 +1606,8 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
       onBack={() => setView("list")}
       initialData={doc}
       clients={clients}
+      onAddClient={onAddClient}
+      newlyAddedClientName={newlyAddedClientName}
       onSave={async (data) => {
         await createNew(data);
         if (data.status === 'sent') {

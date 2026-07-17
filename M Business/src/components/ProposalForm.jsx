@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as logic from './ProposalFormLogic';
 
-export default function ProposalForm({ onBack, onSave, initialData, clients }) {
+export default function ProposalForm({ onBack, onSave, initialData, clients, onAddClient, newlyAddedClientName }) {
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -71,16 +71,30 @@ export default function ProposalForm({ onBack, onSave, initialData, clients }) {
 
     const clientsList = clients || window._clientsData || [];
     window._clientsData = clientsList;
+    window._onAddClient = onAddClient;
     const sel = document.getElementById('toComp');
     if (sel && sel.tagName === 'SELECT') {
-      sel.innerHTML = '<option value="">-- Select Client --</option>' + clientsList.map(c => {
-        const name = c.clientName || c.name || '';
-        const cid = c._id || c.id || '';
-        return `<option value="${name}" data-client-id="${cid}">${name}</option>`;
-      }).join('');
+      sel.innerHTML = '<option value="">-- Select Client --</option>'
+        + (onAddClient ? '<option value="__add_new__">+ Add New Client</option>' : '')
+        + clientsList.map(c => {
+          const name = c.clientName || c.name || '';
+          const cid = c._id || c.id || '';
+          return `<option value="${name}" data-client-id="${cid}">${name}</option>`;
+        }).join('');
       // if there's initial data, select it
       if (initialData && initialData.client) {
         sel.value = initialData.client;
+      }
+      // If a client was just added and this is a fresh mount, select it and
+      // open the dropdown so the user can see it landed correctly.
+      if (!initialData && newlyAddedClientName) {
+        sel.value = newlyAddedClientName;
+        setTimeout(() => {
+          try {
+            sel.focus();
+            if (typeof sel.showPicker === 'function') sel.showPicker();
+          } catch (e) { }
+        }, 100);
       }
       // Keep track of the selected client's unique ID (used to isolate the
       // proposal to that exact client account, not just a matching name).
@@ -91,6 +105,20 @@ export default function ProposalForm({ onBack, onSave, initialData, clients }) {
     const hookUp = () => {
       const backBtn = c.querySelector('.back-btn');
       if (backBtn) backBtn.onclick = onBack;
+
+      c.querySelectorAll('[onchange]').forEach(el => {
+        const oc = el.getAttribute('onchange');
+        if (!oc) return;
+        const fnMatch = oc.match(/^([a-zA-Z0-9_]+)\((.*)\)$/);
+        if (!fnMatch) return;
+        const fn = fnMatch[1];
+        if (typeof logic[fn] !== 'function') return;
+        const existing = el.onchange;
+        el.onchange = (e) => {
+          if (typeof existing === 'function') existing(e);
+          logic[fn](el);
+        };
+      });
 
       c.querySelectorAll('[onclick]').forEach(el => {
         const oc = el.getAttribute('onclick');
@@ -128,7 +156,8 @@ export default function ProposalForm({ onBack, onSave, initialData, clients }) {
         }
       };
 
-      // Cover upload — real file picker
+      // Cover upload — real file picker, persisted as a data URL so it
+      // survives save/reload (a blob: URL from createObjectURL does not).
       const coverZone = c.querySelector('#coverZone');
       if (coverZone) {
         coverZone.onclick = () => {
@@ -136,12 +165,18 @@ export default function ProposalForm({ onBack, onSave, initialData, clients }) {
           inp.type = 'file'; inp.accept = 'image/*';
           inp.onchange = (e) => {
             const file = e.target.files[0]; if (!file) return;
-            const url = URL.createObjectURL(file);
-            coverZone.style.backgroundImage = `url(${url})`;
-            coverZone.style.backgroundSize = 'cover';
-            coverZone.style.backgroundPosition = 'center';
-            coverZone.style.borderColor = 'var(--teal)';
-            coverZone.innerHTML = `<div style="color:var(--teal);font-weight:700;font-size:12px">Yes Cover image uploaded</div><div style="font-size:10px;color:var(--text3)">Click to change</div>`;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+              const dataUrl = ev.target.result;
+              coverZone.style.backgroundImage = `url(${dataUrl})`;
+              coverZone.style.backgroundSize = 'cover';
+              coverZone.style.backgroundPosition = 'center';
+              coverZone.style.borderColor = 'var(--teal)';
+              coverZone.style.borderStyle = 'solid';
+              coverZone.innerHTML = `<div style="background:rgba(0,0,0,0.55);color:#fff;font-weight:700;font-size:12px;padding:6px 12px;border-radius:8px">Cover image uploaded — Click to change</div>`;
+              coverZone.dataset.coverImage = dataUrl;
+            };
+            reader.readAsDataURL(file);
           };
           inp.click();
         };
@@ -244,7 +279,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 .sp-grid{display:flex;flex-wrap:wrap;gap:7px}
 .sp-toggle{display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;border:1.5px solid var(--border);color:var(--text2);font-family:var(--font);background:var(--surface2)}
 .sp-toggle.on{background:var(--teal-lighter);border-color:var(--teal);color:var(--teal)}
-.sp-toggle.required{background:var(--surface2);border-color:var(--border2);color:var(--text3);cursor:not-allowed;opacity:.7}
+.sp-toggle.required{background:var(--surface2);border-color:var(--border2);color:var(--text2);cursor:not-allowed;font-weight:700}
 .sp-toggle i{font-size:13px}
 
 /* ── CARDS ── */
@@ -516,7 +551,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
           <div class="fg"><label class="fl">Proposal Date</label><input class="fi" type="date" id="propDate" value="2026-06-01" oninput="up()"></div>
         </div>
         <div class="form-row">
-          <div class="fg"><label class="fl">Project Type</label><select class="fs" id="propType" onchange="up()"><option>Web Development</option><option>Mobile App</option><option>UI/UX Design</option><option>Digital Marketing</option><option>Custom Software</option><option>E-Commerce</option><option>Consulting</option></select></div>
+          <div class="fg"><label class="fl">Project Type</label><div id="propTypeWrap"><select class="fs" id="propType" onchange="toggleProposalTypeCustom(this)"><option value="" disabled selected>Select Project Type</option><option value="__custom__">Custom</option><option>Web Development</option><option>Mobile App</option><option>UI/UX Design</option><option>Digital Marketing</option><option>Custom Software</option><option>E-Commerce</option><option>Consulting</option></select></div></div>
           <div class="fg"><label class="fl">Expiry Date</label><input class="fi" type="date" id="propExpiry" value="2026-07-01" oninput="up()"></div>
         </div>
         <div class="fg">

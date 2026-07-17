@@ -221,6 +221,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
   // ── Client searchable dropdown ──
   const [clientDropOpen, setClientDropOpen] = useState(!!newlyAddedClientName);
   const [clientSearch, setClientSearch] = useState('');
+  const [clientFieldError, setClientFieldError] = useState('');
 
   useEffect(() => {
     if (newlyAddedClientName) {
@@ -371,9 +372,16 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
   const handleSave = async (statusArg = 'draft') => {
     const normalStatus = statusArg.toLowerCase();
     if (normalStatus === 'sent' && !qt.toName) {
-      alert('Please select a client before sending the quotation.');
+      setClientFieldError('Client is required');
+      requestAnimationFrame(() => {
+        const el = document.querySelector('[data-field="client-company-name"]');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
       return;
     }
+    setClientFieldError('');
     setSaving(true);
     try {
       const payload = {
@@ -777,16 +785,16 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
             <div className="mqc-card-body">
 
               {/* ── Searchable Client Dropdown ── */}
-              <div className="mqc-form-group" style={{ position: 'relative', zIndex: clientDropOpen ? 50 : 1 }}>
+              <div className="mqc-form-group" data-field="client-company-name" style={{ position: 'relative', zIndex: clientDropOpen ? 50 : 1 }}>
                 <label className="mqc-label">Client / Company Name</label>
 
                 {/* Trigger box */}
                 <div
                   onMouseDown={e => e.preventDefault()}
-                  onClick={() => { setClientDropOpen(o => !o); setClientSearch(''); }}
+                  onClick={() => { setClientDropOpen(o => !o); setClientSearch(''); if (clientFieldError) setClientFieldError(''); }}
                   style={{
                     width: '100%', padding: '10px 36px 10px 13px', background: 'var(--bg)',
-                    border: `1.5px solid ${clientDropOpen ? 'var(--teal)' : 'var(--border)'}`,
+                    border: `1.5px solid ${clientFieldError ? '#EF4444' : clientDropOpen ? 'var(--teal)' : 'var(--border)'}`,
                     borderRadius: 10, fontSize: 13, color: qt.toName ? 'var(--text)' : 'var(--text3)',
                     cursor: 'pointer', userSelect: 'none', boxSizing: 'border-box',
                     display: 'flex', alignItems: 'center', gap: 8, minHeight: 42,
@@ -805,15 +813,17 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
                   )}
                   <span style={{ position: 'absolute', right: 12, top: '50%', transform: `translateY(-50%) rotate(${clientDropOpen ? 180 : 0}deg)`, fontSize: 10, color: 'var(--text3)', transition: 'transform .2s' }}>▼</span>
                 </div>
+                {clientFieldError && <div style={{ fontSize: 11, color: '#EF4444', marginTop: 4 }}>{clientFieldError}</div>}
 
                 {/* Dropdown panel — no fixed backdrop, no scroll freeze */}
                 {clientDropOpen && (
                   <>
                     <div style={{
-                      position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
-                      background: 'var(--surface)', border: '1.5px solid var(--teal)',
-                      borderRadius: 12, boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-                      zIndex: 50, overflow: 'hidden'
+                      position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0,
+                      background: 'var(--surface)', border: '1px solid var(--border)',
+                      borderRadius: 12, boxShadow: '0 12px 28px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08)',
+                      zIndex: 50, overflow: 'hidden', maxHeight: 220, display: 'flex', flexDirection: 'column',
+                      marginBottom: 24
                     }}>
                       {/* Search input */}
                       <div style={{ padding: '10px 10px 6px', borderBottom: '1px solid var(--border)' }}>
@@ -854,7 +864,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
                       )}
 
                       {/* Client list */}
-                      <div style={{ maxHeight: 220, overflowY: 'auto' }}>
+                      <div style={{ maxHeight: 140, overflowY: 'auto', flex: 1 }}>
                         {/* Manual entry option */}
                         {clientSearch.trim() && !clients.some(c => (c.clientName || c.name || '').toLowerCase() === clientSearch.toLowerCase()) && (
                           <div
@@ -998,9 +1008,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
               <div className="mqc-card-icon" style={{ background: 'var(--purple-bg)', color: 'var(--purple)' }}><i className="ti ti-tags"></i></div>
               <div className="mqc-card-title">Scope of Work</div>
               <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
-                <button onClick={addPhase} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '5px 10px', background: 'var(--purple-bg)', border: '1.5px solid var(--purple)', borderRadius: 7, fontSize: 10, fontWeight: 700, color: 'var(--purple)', cursor: 'pointer', fontFamily: 'var(--font)' }}>
-                  <i className="ti ti-plus" style={{ fontSize: 12 }}></i> Add Phase
-                </button>
+
               </div>
             </div>
             <div className="mqc-card-body">
@@ -1022,7 +1030,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
 
               {/* Overview */}
               <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
-                <label className="mqc-label">Project Overview <span style={{ fontSize: 9, color: 'var(--text3)', fontWeight: 600, textTransform: 'none' }}>Visible to client</span></label>
+                <label className="mqc-label">Project Overview</label>
                 <textarea className="mqc-textarea" placeholder="Provide a high-level overview…" style={{ minHeight: 90 }} value={qt.overview} onChange={e => upd('overview', e.target.value)} />
               </div>
 
@@ -1050,7 +1058,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
                         <div className="mqc-feat-label">Features / Deliverables in this phase:</div>
                         {ph.features.map(feat => (
                           <div key={feat.id} className="mqc-feat-row">
-                            <div className="mqc-feat-check">Yes</div>
+                            <div className="mqc-feat-check">✓</div>
                             <input type="text" className="mqc-feat-input" value={feat.text} placeholder="Feature description" onChange={e => updFeature(ph.id, feat.id, e.target.value)} />
                             <button className="mqc-feat-del" onClick={() => removeFeature(ph.id, feat.id)}><i className="ti ti-x"></i></button>
                           </div>
@@ -1257,7 +1265,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
               {qt.overview && (
                 <div style={{ padding: '8px 10px', background: 'var(--teal-lighter)', borderRadius: 8, borderLeft: '3px solid var(--teal)', marginBottom: 12 }}>
                   <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--teal)', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 4 }}>
-                    Project Overview <span style={{ fontSize: 9, fontWeight: 600, color: 'var(--text3)', textTransform: 'none', letterSpacing: 0 }}>· Visible to Client</span>
+                    Project Overview <span style={{ fontSize: 9, fontWeight: 600, color: 'var(--text3)', textTransform: 'none', letterSpacing: 0 }}></span>
                   </div>
                   <div style={{ fontSize: 10, color: 'var(--text2)', lineHeight: 1.7 }}>{qt.overview}</div>
                 </div>

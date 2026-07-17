@@ -2,7 +2,7 @@ const Client = require("../models/ClientModel");
 const DeletedClient = require("../models/DeletedClientModel");
 const bcrypt = require("bcryptjs");
 const { sendQuickEmail } = require("../config/email");
-
+adss
 exports.addClient = async (req, res) => {
   try {
     const {

@@ -15,7 +15,7 @@ function QuoToast({ msg }) {
 }
 
 export default function QuotationCreatorModern(props) {
-  const [showModernForm, setShowModernForm] = useState(false);
+  const [showModernForm, setShowModernForm] = useState(!!props.newlyAddedClientName);
   const [editEntry, setEditEntry] = useState(null);
   const [listRefreshKey, setListRefreshKey] = useState(0);
 
@@ -219,8 +219,23 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
 
 
   // ── Client searchable dropdown ──
-  const [clientDropOpen, setClientDropOpen] = useState(false);
+  const [clientDropOpen, setClientDropOpen] = useState(!!newlyAddedClientName);
   const [clientSearch, setClientSearch] = useState('');
+
+  useEffect(() => {
+    if (newlyAddedClientName) {
+      upd('toName', newlyAddedClientName);
+      const matched = clients.find(c => (c.clientName || c.name) === newlyAddedClientName);
+      if (matched) {
+        upd('toContact', matched.contactPersonName || matched.contactPerson || '');
+        upd('toEmail', matched.email || '');
+        upd('toPhone', matched.contactPersonNo || matched.phone || '');
+        upd('toAddress', matched.address || matched.city || '');
+      }
+      setClientDropOpen(true);
+    }
+  }, [newlyAddedClientName, clients]);
+
 
   const generateQuotationPdf = async () => {
     const element = previewRef.current;
@@ -757,7 +772,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
           <div className="mqc-card">
             <div className="mqc-card-header">
               <div className="mqc-card-icon" style={{ background: 'var(--amber-bg)', color: 'var(--amber)' }}><i className="ti ti-user-circle"></i></div>
-              <div className="mqc-card-title">Prepared For (Client)</div>
+              <div className="mqc-card-title">Prepared For Client</div>
             </div>
             <div className="mqc-card-body">
 

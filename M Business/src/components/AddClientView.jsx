@@ -138,7 +138,9 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
     if (!formData.contactPersonName.trim()) newErrors.contactPersonName = 'Contact person name is required';
 
     if (!formData.address.trim()) newErrors.address = 'Address is required';
-    if (formData.password && formData.password !== confirmPassword) {
+    if (!formData.password || !formData.password.trim()) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password !== confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
 
@@ -146,7 +148,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
       setErrors(newErrors);
 
       // Scroll to and focus the first field with an error, in form order
-      const fieldOrder = ['name', 'company', 'contactPersonName', 'email', 'phone', 'address', 'confirmPassword'];
+      const fieldOrder = ['name', 'company', 'contactPersonName', 'email', 'phone', 'address', 'password', 'confirmPassword'];
       const firstErrorField = fieldOrder.find(f => newErrors[f]);
       if (firstErrorField) {
         setTimeout(() => {
@@ -218,7 +220,18 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
         onBack();
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || `Failed to ${isEdit ? 'update' : 'save'} client`);
+      const errMsg = err.response?.data?.message || `Failed to ${isEdit ? 'update' : 'save'} client`;
+      toast.error(errMsg);
+      if (errMsg.toLowerCase().includes('email') || errMsg.toLowerCase().includes('already exists')) {
+        setErrors(prev => ({ ...prev, email: errMsg }));
+        requestAnimationFrame(() => {
+          const el = document.querySelector('input[name="email"]');
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.focus();
+          }
+        });
+      }
     } finally {
       setSaving(false);
     }
@@ -491,11 +504,12 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
             </div>
             <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Portal password</label>
+                <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Portal password <span style={{ color: '#EF5350' }}>*</span></label>
                 <div style={{ position: 'relative' }}>
-                  <input type={showPass ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} placeholder="Set client portal password" style={{ width: '100%', height: 42, padding: '0 46px 0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} />
+                  <input type={showPass ? 'text' : 'password'} name="password" value={formData.password} onChange={e => { handleChange(e); setErrors({ ...errors, password: '' }); }} placeholder="Set client portal password" style={{ width: '100%', height: 42, padding: '0 46px 0 14px', border: `1.5px solid ${errors.password ? '#EF5350' : '#E0E6EA'}`, borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} />
                   <button onClick={() => setShowPass(!showPass)} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#94A3B0', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>{showPass ? 'HIDE' : 'SHOW'}</button>
                 </div>
+                {errors.password && <div style={{ fontSize: 11, color: '#EF5350' }}>{errors.password}</div>}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Confirm password</label>

@@ -955,8 +955,19 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
               background: finalTheme.bg, flexShrink: 0
             }}>
               <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: finalTheme.text || "var(--app-text)" }}>
-                {modal === "add" ? "Add New" : modal === "view" ? "View Event" : "Edit"}
+                {modal === "add" ? "Add New Event" : modal === "view" ? "View Event" : "Edit"}
               </h2>
+              <button
+                onClick={() => { setModal(null); setForm(EMPTY); setErr({}); }}
+                style={{
+                  background: "none", border: "none", cursor: "pointer",
+                  fontSize: 20, lineHeight: 1, color: finalTheme.muted || "#64748b",
+                  padding: 4, display: "flex", alignItems: "center", justifyContent: "center"
+                }}
+                aria-label="Close"
+              >
+                ✕
+              </button>
             </div>
 
             {/* Modal body */}

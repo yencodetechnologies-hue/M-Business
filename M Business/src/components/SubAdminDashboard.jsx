@@ -8607,9 +8607,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
     const errors = {};
 
-    if (!nc.name.trim()) errors.name = "Name is required";
+    if (!nc.name || !nc.name.trim()) errors.name = "Name is required";
 
-    if (!nc.email.trim()) errors.email = "Email is required";
+    if (!nc.email || !nc.email.trim()) errors.email = "Email is required";
 
 
 
@@ -8668,7 +8668,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-    if (Object.keys(errors).length > 0) { setNcError(errors); return; }
+    if (Object.keys(errors).length > 0) {
+      setNcError(errors);
+      requestAnimationFrame(() => {
+        const el = document.querySelector('.modal-2col input[type="email"]') || document.querySelector('input[placeholder="contact@company.com"]');
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          el.focus();
+        }
+      });
+      return;
+    }
 
     try {
 
@@ -8925,7 +8935,18 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
         const isPasswordError = errMsg.toLowerCase().includes("password");
 
-        setNeError(isPasswordError ? { password: errMsg } : { email: errMsg });
+        const failedField = isPasswordError ? "password" : "email";
+
+        setNeError({ [failedField]: errMsg });
+
+        requestAnimationFrame(() => {
+          const el = document.querySelector(`[data-field="${failedField}"]`) || document.getElementById(`emp-fld-${failedField}`);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "center" });
+            const input = el.querySelector("input, select, textarea") || el;
+            input.focus();
+          }
+        });
 
       }
 
@@ -12663,8 +12684,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
 
                 <Fld label="Full Name *" value={ne.name} onChange={v => setNe({ ...ne, name: v })} error={neError.name} name="name" />
-
-                <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} name="email" />
+                <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} name="email" dataField="email" />
 
                 <Fld label="Phone Number" value={ne.phone} onChange={v => setNe({ ...ne, phone: v })} />
 

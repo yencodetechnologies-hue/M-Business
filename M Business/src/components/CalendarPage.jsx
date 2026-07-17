@@ -12,7 +12,7 @@ const TYPES = [...FIXED_TYPES, "Custom"];
 const TC = { Meeting: "var(--app-accent)", Call: "var(--app-accent)", Review: "#22C55E", Planning: "#f59e0b", Handover: "var(--app-accent)", Custom: "var(--app-muted)" };
 const EMPTY = { name: "", project: "", client: "", date: "", start: "", end: "", notes: "", type: "Meeting", category: "Event" };
 
-export default function CalendarPage({ projects = [], tasks = [], clients = [], companyId, onUpdateProject, onUpdateTask, config, user, THEME }) {
+export default function CalendarPage({ projects = [], tasks = [], clients = [], companyId, onUpdateProject, onUpdateTask, config, user, THEME, onAddProject, onAddClient, newlyAddedClientName, newlyAddedProjectName }) {
   const finalTheme = {
     accent: "#00BCD4",
     gradient: "linear-gradient(135deg, #00BCD4, #0097A7)",
@@ -120,6 +120,43 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
     setForm({ ...EMPTY, date: dateStr || "" });
     setErr({}); setEditId(null); setModal("add");
   };
+
+  // Restore an in-progress Add Event form after returning from
+  // "+ Add New Client" / "+ Add New Project" (which navigate away to
+  // full-page forms and would otherwise lose the draft event).
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem("calendarPendingEvent");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setForm(prev => ({ ...prev, ...parsed.form }));
+        setModal("add");
+        setEditId(parsed.editId || null);
+        sessionStorage.removeItem("calendarPendingEvent");
+      }
+    } catch (e) { }
+  }, []);
+
+  const stashFormAndNavigate = (navigateFn, extra = {}) => {
+    try {
+      sessionStorage.setItem("calendarPendingEvent", JSON.stringify({ form: { ...form, ...extra }, editId }));
+    } catch (e) { }
+    navigateFn();
+  };
+
+  useEffect(() => {
+    if (newlyAddedClientName) {
+      setForm(prev => ({ ...prev, client: newlyAddedClientName }));
+      setModal("add");
+    }
+  }, [newlyAddedClientName]);
+
+  useEffect(() => {
+    if (newlyAddedProjectName) {
+      setForm(prev => ({ ...prev, project: newlyAddedProjectName }));
+      setModal("add");
+    }
+  }, [newlyAddedProjectName]);
 
   const openEdit = (ev, readOnly = false) => {
     const finalReadOnly = readOnly || isClient;
@@ -343,8 +380,8 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
   const stats = [
     { t: "Total", v: allDisplayEvents.length, c: finalTheme.accent || "var(--app-accent)", i: "📅" },
     { t: "Today", v: allDisplayEvents.filter(x => x.date === today).length, c: finalTheme.accent || "var(--app-accent)", i: "📌" },
-    { t: "Upcoming", v: allDisplayEvents.filter(x => x.date > today).length, c: "#10b981", i: "⏰" },
-    { t: "Past", v: allDisplayEvents.filter(x => x.date < today).length, c: "#ef4444", i: "✅" },
+    { t: "Upcoming", v: allDisplayEvents.filter(x => x.date > today).length, c: finalTheme.accent || "var(--app-accent)", i: "⏰" },
+    { t: "Past", v: allDisplayEvents.filter(x => x.date < today).length, c: finalTheme.accent || "var(--app-accent)", i: "✅" },
   ];
   const pNames = projects.map(p => p.name || "");
   const cNames = clients
@@ -433,20 +470,20 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
       <div style={{
         background: finalTheme.card, borderRadius: 16, padding: "16px 20px",
         boxShadow: finalTheme.shadow || "var(--app-shadow)", border: `1px solid ${finalTheme.border}`,
-        display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap"
+        display: "flex", alignItems: "center", gap: 8, flexWrap: "nowrap", overflowX: "auto"
       }}>
         <input placeholder="Search events…" value={search}
           onChange={e => { setSearch(e.target.value); setSelectedDate(null); }}
-          style={{ ...inp(false), maxWidth: 260, padding: "8px 12px", boxSizing: "border-box" }} />
+          style={{ ...inp(false), maxWidth: 260, minWidth: 160, padding: "8px 12px", boxSizing: "border-box", flexShrink: 0 }} />
         {["All", "Today", "Upcoming", "Past", ...TYPES].map((fil, fi) => (
           <button key={`filter-${fi}`}
             onClick={() => { setFilter(fil); setSelectedDate(null); }}
             style={{
               padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700,
-              cursor: "pointer", border: "1.5px solid",
-              borderColor: !selectedDate && filter === fil ? finalTheme.accent : finalTheme.border,
-              background: !selectedDate && filter === fil ? finalTheme.accent : finalTheme.card,
-              color: !selectedDate && filter === fil ? "#fff" : finalTheme.muted
+              cursor: "pointer", border: `1.5px solid ${finalTheme.border}`,
+              background: finalTheme.card,
+              color: finalTheme.muted,
+              flexShrink: 0, whiteSpace: "nowrap"
             }}>{fil}</button>
         ))}
       </div>
@@ -481,14 +518,14 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                 <div key={t}
                   onClick={() => { setFilter(filterKey); setSelectedDate(null); }}
                   style={{
-                    background: isActive ? (c.startsWith('var') ? `rgba(var(--app-accent-rgb), 0.08)` : `${c}12`) : finalTheme.bg,
+                    background: finalTheme.bg,
                     borderRadius: 10, padding: "6px 14px", textAlign: "center",
-                    border: isActive ? `1.5px solid ${c}` : `1px solid ${finalTheme.border}`,
-                    cursor: "pointer", minWidth: 74
+                    border: `1.5px solid ${finalTheme.border}`,
+                    cursor: "pointer", minWidth: 74, boxSizing: "border-box"
                   }}
                 >
                   <div style={{ fontSize: 9, fontWeight: 700, color: finalTheme.muted, letterSpacing: 0.5 }}>{t.toUpperCase()}</div>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: isActive ? c : (finalTheme.text || "var(--app-text)") }}>{v}</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: finalTheme.text || "var(--app-text)" }}>{v}</div>
                 </div>
               );
             })}
@@ -517,7 +554,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                   style={{
                     marginLeft: 6, cursor: "pointer", color: finalTheme.accent,
                     textDecoration: "underline"
-                  }}>CloseClear</span>
+                  }}>Close</span>
               </div>
             )}
           </div>
@@ -1061,9 +1098,13 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                     display: "block", fontSize: 11, color: finalTheme.accent,
                     fontWeight: 700, letterSpacing: 0.5, marginBottom: 5
                   }}>PROJECT</label>
-                  <select value={form.project} onChange={e => setForm({ ...form, project: e.target.value })}
+                  <select value={form.project} onChange={e => {
+                    if (e.target.value === "__add_new__") { if (onAddProject) onAddProject(); return; }
+                    setForm({ ...form, project: e.target.value });
+                  }}
                     style={{ ...inp(false), background: finalTheme.bg }} disabled={modal === "view"}>
                     <option value="">-- Select Project --</option>
+                    {onAddProject && <option value="__add_new__">+ Add New Project</option>}
                     {pNames.map((n, i) => <option key={`p-${i}`}>{n}</option>)}
                   </select>
                 </div>
@@ -1074,12 +1115,15 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                     display: "block", fontSize: 11, color: finalTheme.accent,
                     fontWeight: 700, letterSpacing: 0.5, marginBottom: 5
                   }}>CLIENT</label>
-                  <select value={form.client} onChange={e => setForm({ ...form, client: e.target.value })}
+                  <select value={form.client} onChange={e => {
+                    if (e.target.value === "__add_new__") { if (onAddClient) onAddClient(); return; }
+                    setForm({ ...form, client: e.target.value });
+                  }}
                     style={{ ...inp(false), background: finalTheme.bg }} disabled={modal === "view"}>
                     <option value="">-- Select Client --</option>
+                    {onAddClient && <option value="__add_new__">+ Add New Client</option>}
                     {cNames.map((n, i) => <option key={`c-${i}`}>{n}</option>)}
-                  </select>
-                </div>
+                  </select>    </div>
               </div>
 
               {/* Notes */}

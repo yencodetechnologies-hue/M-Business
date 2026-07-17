@@ -3681,7 +3681,7 @@ const handleEditPackage = (pkg) => {
           {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
           {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id||null} selectedProjectName={selectedProjectForTasks?.name||null} onClearProjectFilter={()=>setSelectedProjectForTasks(null)} />}
-          {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={companyId} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} THEME={currentTheme} />}
+          {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={companyId} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} THEME={currentTheme} onAddProject={() => { setPrevActiveBeforeInvoice(active); setActive("create-project"); }} onAddClient={() => { setModal("client"); setNcError({}); setShowClientPass(false); }} />}
           {validActive === "messaging" && <MessagingPage user={user} />}
 {validActive === "settings" && (
   <SettingsPage 

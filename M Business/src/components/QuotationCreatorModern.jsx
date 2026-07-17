@@ -45,7 +45,7 @@ export default function QuotationCreatorModern(props) {
 const genId = () => Date.now() + Math.random();
 const today = new Date().toISOString().split('T')[0];
 const quoteNo = 'QUO-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 9000) + 1000);
-function ModernForm({ onBack, user, clients = [], editEntry = null }) {
+function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient }) {
   // ── Pre-fill from existing entry if editing ──
   // The API returns: entry.qt (saved form data), entry.items (line items),
   // entry.id (MongoDB _id), entry.client (top-level shortcut), entry.status
@@ -77,7 +77,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
     quoteNo: existingQt.quoteNo || editEntry?.quoteNo || quoteNo,
     quoteDate: resolvedQuoteDate,
     title: resolvedTitle,
-    type: existingQt.type || 'Web Development',
+    type: existingQt.type || '',
     description: existingQt.description || '',
     fromCompany: resolvedFromCompany,
     fromName: resolvedFromName,
@@ -646,7 +646,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
             <div className="mqc-card-header">
               <div className="mqc-card-icon" style={{ background: 'var(--teal-light)', color: 'var(--teal)' }}><i className="ti ti-file-description"></i></div>
               <div className="mqc-card-title">Quotation Details</div>
-              <span className="mqc-card-badge">Auto-numbered</span>
+
             </div>
             <div className="mqc-card-body">
               <div className="mqc-form-row">
@@ -666,9 +666,27 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
                 </div>
                 <div className="mqc-form-group">
                   <label className="mqc-label">Project Type</label>
-                  <select className="mqc-select" value={qt.type} onChange={e => upd('type', e.target.value)}>
-                    {['Web Development', 'Mobile App', 'UI/UX Design', 'Digital Marketing', 'Custom Software', 'Maintenance & Support', 'Consulting'].map(t => <option key={t}>{t}</option>)}
-                  </select>
+                  {(() => {
+                    const presetTypes = ['Web Development', 'Mobile App', 'UI/UX Design', 'Digital Marketing', 'Custom Software', 'Maintenance & Support', 'Consulting'];
+                    const isCustomMode = qt.type === '__custom__' || (qt.type && !presetTypes.includes(qt.type));
+                    return isCustomMode ? (
+                      <input
+                        className="mqc-input"
+                        type="text"
+                        placeholder="Enter custom project type"
+                        value={qt.type === '__custom__' ? '' : qt.type}
+                        onChange={e => upd('type', e.target.value)}
+                        onBlur={e => { if (!e.target.value.trim()) upd('type', presetTypes[0]); }}
+                        autoFocus
+                      />
+                    ) : (
+                      <select className="mqc-select" value={qt.type || ''} onChange={e => upd('type', e.target.value === '__custom__' ? '__custom__' : e.target.value)}>
+                        <option value="" >Select Project Type</option>
+                        <option value="__custom__">Custom</option>
+                        {presetTypes.map(t => <option key={t}>{t}</option>)}
+                      </select>
+                    );
+                  })()}
                 </div>
               </div>
               <div className="mqc-form-group">
@@ -793,6 +811,24 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
                         </div>
                       </div>
 
+                      {/* New Client — always visible, independent of search results */}
+                      {onAddClient && (
+                        <div
+                          onMouseDown={e => e.preventDefault()}
+                          onClick={() => {
+                            setClientDropOpen(false);
+                            setClientSearch('');
+                            onAddClient();
+                          }}
+                          style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', cursor: 'pointer', borderBottom: '1px solid var(--border)', background: 'var(--surface)' }}
+                          onMouseEnter={e => e.currentTarget.style.background = 'var(--surface2)'}
+                          onMouseLeave={e => e.currentTarget.style.background = 'var(--surface)'}
+                        >
+                          <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 14, fontWeight: 700, flexShrink: 0 }}>+</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--teal)' }}>+ New Client</div>
+                        </div>
+                      )}
+
                       {/* Client list */}
                       <div style={{ maxHeight: 220, overflowY: 'auto' }}>
                         {/* Manual entry option */}
@@ -871,6 +907,8 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
                             <div style={{ padding: 16, textAlign: 'center', color: 'var(--text3)', fontSize: 13 }}>No clients found.</div>
                           )}
                       </div>
+
+
 
                       {/* Clear selection */}
                       {qt.toName && (

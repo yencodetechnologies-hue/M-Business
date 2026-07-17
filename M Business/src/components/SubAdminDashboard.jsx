@@ -3076,7 +3076,7 @@ ${onboardingLink}`;
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
 
-        <div onClick={() => setStatusFilter("All Status")} style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
+        <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
 
           <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "rgba(var(--app-accent-rgb,0,188,212),0.08)", color: "var(--app-accent)" }}><i className="ti ti-users"></i></div>
 
@@ -3084,7 +3084,7 @@ ${onboardingLink}`;
 
         </div>
 
-        <div onClick={() => setStatusFilter("Active")} style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
+        <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
 
           <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#dcfce7", color: "#16a34a" }}><i className="ti ti-check"></i></div>
 
@@ -3094,7 +3094,7 @@ ${onboardingLink}`;
 
 
 
-        <div onClick={() => setStatusFilter("Inactive")} style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s" }}>
+        <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
 
           <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#fee2e2", color: "#dc2626" }}><i className="ti ti-user-off"></i></div>
 
@@ -6740,6 +6740,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [expandedMobileProjectIdx, setExpandedMobileProjectIdx] = useState(1);
 
   const [pendingNewClientId, setPendingNewClientId] = useState(null);
+  const [returnToCalendar, setReturnToCalendar] = useState(false);
+  const [calendarNewClientName, setCalendarNewClientName] = useState(null);
+  const [calendarNewProjectName, setCalendarNewProjectName] = useState(null);
 
   const [active, setActive] = useState(() => {
     const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
@@ -11409,7 +11412,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             )}
 
-            {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client, replaceTempId) => {
+            {validActive === "addClient" && <AddClientView onBack={() => { if (returnToCalendar) { setReturnToCalendar(false); setSidebarOverride(null); setActive("calendar"); } else { setActive("clients"); } }} onClientAdded={(client, replaceTempId) => {
               setClients(prev => {
                 if (replaceTempId) {
                   // Server-confirmed client arrived — swap out the optimistic temp record
@@ -11420,6 +11423,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 if (prev.some(c => c._id === client._id)) return prev;
                 return [...prev, client];
               });
+              if (returnToCalendar) {
+                setReturnToCalendar(false);
+                setSidebarOverride(null);
+                setCalendarNewClientName(client.clientName || client.name || "");
+                setActive("calendar");
+                return;
+              }
               // Make sure the newly added client is the one shown/selected —
               // otherwise the Clients page keeps whatever client was open
               // before, making the new one look like it "vanished" into
@@ -11628,7 +11638,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} onSelectProject={(p) => setSelectedProjectForTasks(p)} autoOpenAddModal={autoOpenTaskModal} onAddModalOpened={(val) => setAutoOpenTaskModal(!!val)} />}
 
-            {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={companyId} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} THEME={currentTheme} />}
+            {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={companyId} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} THEME={currentTheme} onAddProject={() => { setReturnToCalendar(true); setSidebarOverride("calendar"); setActive("create-project"); }} onAddClient={() => { setNcError({}); setShowClientPass(false); setReturnToCalendar(true); setSidebarOverride("calendar"); setActive("addClient"); }} newlyAddedClientName={calendarNewClientName} newlyAddedProjectName={calendarNewProjectName} />}
 
             {validActive === "messaging" && <MessagingPage user={user} />}
 
@@ -12683,7 +12693,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
               <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
 
-                <Fld label="Full Name *" value={ne.name} onChange={v => setNe({ ...ne, name: v })} error={neError.name} name="name" />
+                <Fld label="Full Name *" value={ne.name} onChange={v => { setNe({ ...ne, name: v }); setNeError(p => ({ ...p, name: "" })); }} error={neError.name} name="name" />
                 <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} name="email" dataField="email" />
 
                 <Fld label="Phone Number" value={ne.phone} onChange={v => setNe({ ...ne, phone: v })} />

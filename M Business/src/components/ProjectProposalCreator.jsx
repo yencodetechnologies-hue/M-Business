@@ -1127,7 +1127,12 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   const [view, setView] = useState(() => {
     try {
       const savedView = sessionStorage.getItem("proposalFormView");
-      if (savedView === "form" || savedView === "editor") return savedView;
+      const savedDoc = sessionStorage.getItem("proposalFormDoc");
+      // Only "form" has a real render branch below — "editor" is not a
+      // handled view state in this component and restoring it produces a
+      // blank page with no error. Only restore "form", and only when we
+      // also have a saved doc to go with it.
+      if (savedView === "form" && savedDoc) return savedView;
     } catch (e) { }
     return "list";
   });    // list | editor
@@ -1142,7 +1147,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
   useEffect(() => {
     try {
-      if (view === "form" || view === "editor") {
+      if (view === "form") {
         sessionStorage.setItem("proposalFormView", view);
         if (doc) sessionStorage.setItem("proposalFormDoc", JSON.stringify(doc));
       } else {

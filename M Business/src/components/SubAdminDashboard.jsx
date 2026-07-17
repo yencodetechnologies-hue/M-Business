@@ -1202,7 +1202,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
     setDeleteTarget(null);
 
-    showToast("Delete Client deleted!");
+    showToast(" Client deleted!");
 
   };
 
@@ -4482,7 +4482,6 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
         }}
 
         onEdit={(p) => openEdit(p)}
-
         onDelete={(p) => setDeleteTarget(p)}
 
         onAddProject={() => {

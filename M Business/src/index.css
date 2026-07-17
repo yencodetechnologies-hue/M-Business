@@ -1762,10 +1762,11 @@ td.exp-name {
 }
 
 .stat-num {
-  font-size: 19px;
-  font-weight: 800;
+  font-size: 32px;
+  font-weight: 900;
   color: var(--app-text);
   line-height: 1.1;
+  letter-spacing: -1px;
 }
 
 .stat-label {

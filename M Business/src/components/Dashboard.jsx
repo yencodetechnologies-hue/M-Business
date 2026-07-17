@@ -363,7 +363,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
     } catch { }
     setClients(prev => prev.filter(c => c._id !== deleteTarget._id));
     setDeleteTarget(null);
-    showToast("Delete Client deleted!");
+    showToast(" Client deleted!");
   };
 
   return (

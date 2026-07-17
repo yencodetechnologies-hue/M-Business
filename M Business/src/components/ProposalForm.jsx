@@ -85,10 +85,17 @@ export default function ProposalForm({ onBack, onSave, initialData, clients, onA
       if (initialData && initialData.client) {
         sel.value = initialData.client;
       }
-      // If a client was just added and this is a fresh mount, select it and
-      // open the dropdown so the user can see it landed correctly.
+      // If a client was just added and this is a fresh mount, select it,
+      // open the dropdown where the browser supports it, and flash the
+      // field so the newly selected client is unmistakable either way.
       if (!initialData && newlyAddedClientName) {
         sel.value = newlyAddedClientName;
+        sel.style.transition = 'box-shadow .3s, border-color .3s';
+        sel.style.borderColor = '#00BCD4';
+        sel.style.boxShadow = '0 0 0 3px rgba(0,188,212,.25)';
+        setTimeout(() => {
+          sel.style.boxShadow = 'none';
+        }, 2000);
         setTimeout(() => {
           try {
             sel.focus();
@@ -737,7 +744,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
         </div>
         <div id="sigModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
           <div style="background:#fff;border-radius:16px;padding:24px;width:480px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,0.18);">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:13px;font-weight:800;color:#0f1c2e">AUTHORISED SIGNATURE</div><button id="sigModalClose" style="background:none;border:none;font-size:20px;cursor:pointer;color:#607D86;">Close</button></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:13px;font-weight:800;color:#0f1c2e">AUTHORISED SIGNATURE</div><button id="sigModalClose" style="background:none;border:none;font-size:20px;cursor:pointer;color:#607D86;">✕</button></div>
             <div style="display:flex;border-bottom:2px solid #e5e7eb;margin-bottom:14px;"><button id="sigTab-draw" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:var(--teal);border-bottom:2px solid var(--teal);cursor:pointer;margin-bottom:-2px;">Draw</button><button id="sigTab-type" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:#607D86;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-2px;">Type</button><button id="sigTab-upload" style="padding:6px 14px 8px;border:none;background:none;font-size:12px;font-weight:800;color:#607D86;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-2px;">Upload</button></div>
             <div id="sigContent-draw"><div style="background:#F5FAFA;border:1.5px solid #E0EEF0;border-radius:10px;padding:10px;"><canvas id="sigCanvas" width="420" height="160" style="border:1.5px dashed #C5DDE0;border-radius:8px;background:#fff;cursor:crosshair;width:100%;height:160px;display:block;touch-action:none;"></canvas></div><div style="display:flex;gap:10px;margin-top:10px;"><button id="sigClearBtn" style="padding:6px 14px;font-size:11px;background:#fff;border:1.5px solid #e5e7eb;border-radius:6px;cursor:pointer;font-weight:700;color:#374151;">Clear</button><button id="sigApplyDrawBtn" style="padding:6px 14px;font-size:11px;background:var(--teal);color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:800;">Apply Signature</button></div></div>
             <div id="sigContent-type" style="display:none;"><div style="display:flex;gap:8px;align-items:center;"><input id="typedSigInput" type="text" placeholder="Type your name..." style="flex:1;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:18px;font-family:'Dancing Script',cursive;font-weight:bold;color:#1a2e35;outline:none;" /><button id="sigApplyTypeBtn" style="padding:10px 14px;background:var(--teal);border:none;border-radius:10px;color:#fff;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;">Apply</button></div><div id="typedSigPreview" style="margin-top:10px;font-size:11px;color:#64748b;display:none;">Preview: <span id="typedSigPreviewText" style="font-family:'Dancing Script',cursive;font-size:22px;color:#1a2e35;font-weight:bold;"></span></div></div>

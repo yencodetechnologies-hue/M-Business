@@ -355,7 +355,14 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || "";
 
-  const [step, setStep] = useState(jumpInvoice ? "preview" : newInvoicePrefill ? "form" : "list"); // "list" | "form" | "preview"
+  const [step, setStep] = useState(() => {
+    try {
+      const savedStep = localStorage.getItem("invoiceCreatorStep_subadmin");
+      const savedId = localStorage.getItem("invoiceCreatorEditingId_subadmin");
+      if (savedStep === "preview" && savedId) return "preview";
+    } catch (e) { }
+    return jumpInvoice ? "preview" : newInvoicePrefill ? "form" : "list";
+  }); // "list" | "form" | "preview"
   const [showAddClient, setShowAddClient] = useState(false);
   const [internalNav, setInternalNav] = useState(false);
   const [invoiceList, setInvoiceList] = useState([]);
@@ -563,8 +570,40 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const [items, setItems] = useState([
     { id: 1, description: "", quantity: 1, rate: "" }
   ]);
-  const [editingId, setEditingId] = useState(null); // backend _id if editing existing
-  const [localEditTarget, setLocalEditTarget] = useState(null); // { projectId, index } for project-local invoices // backend _id if editing existing
+  const [editingId, setEditingId] = useState(() => {
+    try {
+      const savedStep = localStorage.getItem("invoiceCreatorStep_subadmin");
+      const savedId = localStorage.getItem("invoiceCreatorEditingId_subadmin");
+      if (savedStep === "preview" && savedId) return savedId;
+    } catch (e) { }
+    return null;
+  }); // backend _id if editing existing
+
+  useEffect(() => {
+    try {
+      if (step === "preview" && editingId) {
+        localStorage.setItem("invoiceCreatorStep_subadmin", "preview");
+        localStorage.setItem("invoiceCreatorEditingId_subadmin", editingId);
+      } else {
+        localStorage.removeItem("invoiceCreatorStep_subadmin");
+        localStorage.removeItem("invoiceCreatorEditingId_subadmin");
+      }
+    } catch (e) { }
+  }, [step, editingId]);
+
+  // Restore the invoice's actual data (inv/items) into the preview after a
+  // hard refresh, when we only have a persisted editingId (no jumpInvoice
+  // was passed in — e.g. New Invoice → Preview & Print → refresh).
+  useEffect(() => {
+    if (!jumpInvoice && step === "preview" && editingId && !inv.client && invoiceList.length > 0) {
+      const restored = invoiceList.find(e => (e._id || e.id) === editingId);
+      if (restored) {
+        loadEntry(restored, "preview");
+      }
+    }
+  }, [step, editingId, invoiceList, jumpInvoice]);
+
+  const [localEditTarget, setLocalEditTarget] = useState(null); // { projectId, index } for project-local invoices
 
   const getTemplateStyles = (templateName) => {
     switch (templateName) {
@@ -1875,7 +1914,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
         {/* Toolbar */}
         <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
-          <button onClick={() => (!internalNav && onBack) ? onBack() : setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Document Back</button>
+          <button onClick={() => onBack ? onBack() : setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Document Back</button>
 
           <button onClick={() => setShareModalEntry({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 22px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>Share</button>
 

@@ -6751,14 +6751,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     // the real subscription check (fetchSubscription) redirects appropriately.
     // Start on "dashboard" instead; the subscription-gate effect will still
     // send the user to mysubscriptions if they genuinely need to pick a plan.
-    if (saved === "mysubscriptions" || ["create-project", "edit-project"].includes(saved)) return "dashboard";
+    if (saved === "mysubscriptions" || saved === "edit-project") return "dashboard";
     return saved;
   });
 
   useEffect(() => {
-    const toSave = ["create-project", "edit-project"].includes(active)
-      ? "projects"
-      : active;
+    const toSave = active === "edit-project" ? "projects" : active;
     localStorage.setItem("activeTab_subadmin", toSave);
 
   }, [active]);
@@ -6788,8 +6786,27 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       }
     } catch (e) { }
   }, [jumpProject?._id]);
-  const [jumpInvoicePrefill, setJumpInvoicePrefill] = useState(null);
   const [pendingInvoiceNav, setPendingInvoiceNav] = useState(false);
+
+  const [jumpInvoicePrefill, setJumpInvoicePrefill] = useState(() => {
+    try {
+      const saved = localStorage.getItem("jumpInvoicePrefill_subadmin");
+      const savedActive = localStorage.getItem("activeTab_subadmin");
+      const savedStep = localStorage.getItem("invoiceCreatorStep_subadmin");
+      if (saved && savedActive === "invoices" && savedStep !== "preview") return JSON.parse(saved);
+    } catch (e) { }
+    return null;
+  });
+
+  useEffect(() => {
+    try {
+      if (jumpInvoicePrefill) {
+        localStorage.setItem("jumpInvoicePrefill_subadmin", JSON.stringify(jumpInvoicePrefill));
+      } else {
+        localStorage.removeItem("jumpInvoicePrefill_subadmin");
+      }
+    } catch (e) { }
+  }, [jumpInvoicePrefill]);
 
   useEffect(() => {
     if (pendingInvoiceNav && jumpInvoicePrefill) {
@@ -6828,13 +6845,31 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     } catch (e) { }
   }, [jumpInvoice]);
 
-  const [invoicePrefill, setInvoicePrefill] = useState(null);
+  const [invoicePrefill, setInvoicePrefill] = useState(() => {
+    try {
+      const saved = localStorage.getItem("invoicePrefill_subadmin");
+      const savedActive = localStorage.getItem("activeTab_subadmin");
+      const savedStep = localStorage.getItem("invoiceCreatorStep_subadmin");
+      if (saved && savedActive === "invoices" && savedStep !== "preview") return JSON.parse(saved);
+    } catch (e) { }
+    return null;
+  });
+
+  useEffect(() => {
+    try {
+      if (invoicePrefill) {
+        localStorage.setItem("invoicePrefill_subadmin", JSON.stringify(invoicePrefill));
+      } else {
+        localStorage.removeItem("invoicePrefill_subadmin");
+      }
+    } catch (e) { }
+  }, [invoicePrefill]);
   const [prevActiveBeforeInvoice, setPrevActiveBeforeInvoice] = useState("dashboard");
 
   const [sidebarOverride, setSidebarOverride] = useState(() => {
     try {
       const savedActive = localStorage.getItem("activeTab_subadmin");
-      if (savedActive === "project-details") {
+      if (savedActive === "project-details" || savedActive === "invoices") {
         return localStorage.getItem("sidebarOverride_subadmin") || null;
       }
     } catch (e) { }
@@ -6899,7 +6934,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-  // ← à®‡à®¤à¯ à®®à®Ÿà¯à®Ÿà¯à®®à¯ à®‡à®°à¯à®•à¯à®•à®£à¯à®®à¯ (KEEP THIS)
+
 
   const [appTheme, setAppTheme] = useState(() => localStorage.getItem("appTheme") || "teal");
 
@@ -11535,7 +11570,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={sidebarOverride ? () => { setSidebarOverride(null); setActive(prevActiveBeforeInvoice || "dashboard"); } : undefined} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => {
+            {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { const returnTo = sidebarOverride || prevActiveBeforeInvoice || "dashboard"; if (returnTo === "project-details" && jumpProject) { setSidebarOverride("clients"); setActive("project-details"); return; } setSidebarOverride(null); setActive(returnTo); }} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill || jumpInvoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 

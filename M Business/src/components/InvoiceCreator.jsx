@@ -390,6 +390,29 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     }
   }, [jumpInvoice?._t, jumpInvoice?.invoiceNo, jumpInvoice?.signature, jumpInvoice?._restoring, invoiceList]);
 
+  // Force back to the global invoice list whenever the parent explicitly
+  // clears both jumpInvoice and newInvoicePrefill (e.g. Sidebar > Invoices
+  // was clicked while this component was already mounted from a
+  // project-specific New Invoice flow). Without this, `step`/`editingId`
+  // just keep whatever they were left at, since this component never
+  // remounts on that click.
+  const prevJumpRef = useRef({ jumpInvoice, newInvoicePrefill });
+  useEffect(() => {
+    const had = prevJumpRef.current;
+    if ((had.jumpInvoice || had.newInvoicePrefill) && !jumpInvoice && !newInvoicePrefill) {
+      setStep("list");
+      setEditingId(null);
+      setInv({ ...blank, invoiceNo: generateInvoiceNo() });
+      setItems([{ id: 1, description: "", quantity: 1, rate: "" }]);
+      setLocalEditTarget(null);
+      try {
+        localStorage.removeItem("invoiceCreatorStep_subadmin");
+        localStorage.removeItem("invoiceCreatorEditingId_subadmin");
+      } catch (e) { }
+    }
+    prevJumpRef.current = { jumpInvoice, newInvoicePrefill };
+  }, [jumpInvoice, newInvoicePrefill]);
+
   useEffect(() => {
     if (newInvoicePrefill) {
       if (newInvoicePrefill.editData) {

@@ -1,5 +1,5 @@
 const Group = require("../models/GroupModels");
-const Task  = require("../models/TaskModels");
+const Task = require("../models/TaskModels");
 
 exports.getAllGroups = async (req, res) => {
   try {
@@ -10,7 +10,7 @@ exports.getAllGroups = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
+gfv
 exports.createGroup = async (req, res) => {
   try {
     const { label, color, open } = req.body;
@@ -18,13 +18,13 @@ exports.createGroup = async (req, res) => {
       return res.status(400).json({ message: "Label is required" });
 
     const companyId = req.companyId || "";
-    const last  = await Group.findOne({ isDeleted: false, companyId }).sort({ order: -1 });
+    const last = await Group.findOne({ isDeleted: false, companyId }).sort({ order: -1 });
     const order = last ? last.order + 1 : 0;
 
     const group = await Group.create({
       label: label.trim(),
       color: color || "#7c3aed",
-      open:  open !== undefined ? open : true,
+      open: open !== undefined ? open : true,
       order,
       companyId: req.companyId || "",
     });
@@ -39,7 +39,7 @@ exports.updateGroup = async (req, res) => {
     const updates = {};
     if (req.body.label !== undefined) updates.label = req.body.label.trim();
     if (req.body.color !== undefined) updates.color = req.body.color;
-    if (req.body.open  !== undefined) updates.open  = req.body.open;
+    if (req.body.open !== undefined) updates.open = req.body.open;
 
     const group = await Group.findOneAndUpdate(
       { _id: req.params.id, isDeleted: false },
@@ -75,10 +75,10 @@ exports.seedDefaultGroups = async () => {
   if (count > 0) return;
 
   const defaults = [
-    { label: "To-Do",       color: "#7c3aed", order: 0 },
+    { label: "To-Do", color: "#7c3aed", order: 0 },
     { label: "In Progress", color: "#9333ea", order: 1 },
-    { label: "In Review",   color: "#a855f7", order: 2 },
-    { label: "Completed",   color: "#22c55e", order: 3 },
+    { label: "In Review", color: "#a855f7", order: 2 },
+    { label: "Completed", color: "#22c55e", order: 3 },
   ];
   await Group.insertMany(defaults);
   console.log("✅ Default groups seeded");

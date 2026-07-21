@@ -6047,6 +6047,12 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
                             setJumpProject(null);
                             setJumpInvoicePrefill(null);
                             if (typeof setInvoicePrefill === "function") setInvoicePrefill(null);
+                            try {
+                              localStorage.removeItem("invoiceCreatorStep_subadmin");
+                              localStorage.removeItem("invoiceCreatorEditingId_subadmin");
+                              localStorage.removeItem("invoiceCreatorInv_subadmin");
+                              localStorage.removeItem("invoiceCreatorItems_subadmin");
+                            } catch (e) { }
                           }
                           if (sub.key === "projects") {
                             setJumpProject(null);

@@ -68,7 +68,7 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      zIndex: 10000,
+      zIndex: 999999,
       padding: '20px',
       backdropFilter: 'blur(5px)'
     }}>

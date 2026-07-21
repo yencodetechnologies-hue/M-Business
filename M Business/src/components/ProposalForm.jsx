@@ -202,6 +202,7 @@ export default function ProposalForm({ onBack, onSave, initialData, clients, onA
           const inp = document.createElement('input');
           inp.type = 'file'; inp.accept = 'image/*';
           inp.onchange = (e) => {
+            console.log('onchange fired. files:', e.target.files.length, 'triggerCrop type:', typeof window.triggerCrop);
             if (typeof window.triggerCrop === 'function') {
               window.triggerCrop(e, (croppedImage) => applyCoverImage(croppedImage), 1);
             } else if (window._triggerCrop) {
@@ -213,6 +214,7 @@ export default function ProposalForm({ onBack, onSave, initialData, clients, onA
               reader.readAsDataURL(file);
             }
           };
+          console.log('inp.click() called');
           inp.click();
         };
       }

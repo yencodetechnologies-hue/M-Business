@@ -351,17 +351,19 @@ function CanvasSignature({ onSave }) {
 }
 
 // ------------------------------------------------------------
-export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack, jumpInvoice, newInvoicePrefill, onSaveLocalInvoice }) {
+export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack, jumpInvoice, newInvoicePrefill, onSaveLocalInvoice, onSaveSuccess }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || "";
 
   const [step, setStep] = useState(() => {
+    if (jumpInvoice) return "preview";
+    if (newInvoicePrefill) return "form";
     try {
       const savedStep = localStorage.getItem("invoiceCreatorStep_subadmin");
       const savedId = localStorage.getItem("invoiceCreatorEditingId_subadmin");
       if (savedStep === "preview" && savedId) return "preview";
     } catch (e) { }
-    return jumpInvoice ? "preview" : newInvoicePrefill ? "form" : "list";
+    return "list";
   }); // "list" | "form" | "preview"
   const [showAddClient, setShowAddClient] = useState(false);
   const [internalNav, setInternalNav] = useState(false);
@@ -894,6 +896,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     showToast("Save Draft saved!");
     setTimeout(() => {
       setDraftSaved(false);
+      if (onSaveSuccess) { onSaveSuccess(); return; }
       setStep("list");
     }, 1000);
   };
@@ -906,6 +909,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     saveDraftLocal(inv, items, "draft");
     if (data.success && data.invoice?._id) setEditingId(data.invoice._id);
     setSaving(false);
+    if (onSaveSuccess) { onSaveSuccess(); return; }
     setStep("preview");
     window.scrollTo(0, 0);
   };
@@ -1937,7 +1941,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
         {/* Toolbar */}
         <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
-          <button onClick={() => onBack ? onBack() : setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Document Back</button>
+          <button onClick={() => { if (onBack && (jumpInvoice || newInvoicePrefill)) { onBack(); return; } setStep("list"); }} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Document Back</button>
 
           <button onClick={() => setShareModalEntry({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 22px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>Share</button>
 
@@ -2218,7 +2222,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       {/* Top nav */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <button onClick={() => (!internalNav && onBack) ? onBack() : setStep("list")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "var(--app-accent)", fontWeight: 700, padding: 0, fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4 }}>
+          <button onClick={() => { if (onBack && (jumpInvoice || newInvoicePrefill) && !internalNav) { onBack(); return; } setStep("list"); }} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "var(--app-accent)", fontWeight: 700, padding: 0, fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4 }}>
             Back
           </button>
           <span style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>

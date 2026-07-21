@@ -5859,7 +5859,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
 
 
-function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, companyLogo, onLogoChange, enforceMySubscriptions, onLogoUploadClick, setSelectedProjectForTasks, desktopOpen }) {
+function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, companyLogo, onLogoChange, enforceMySubscriptions, onLogoUploadClick, setSelectedProjectForTasks, desktopOpen, setJumpProject, setJumpInvoicePrefill }) {
   const items = navItems || NAV;
 
   const [isDesktopWidth, setIsDesktopWidth] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 769);
@@ -6043,6 +6043,10 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
                         className={`nav-item ${on ? 'active' : ''}`}
                         onClick={() => {
                           if (sub.key === "tasks") setSelectedProjectForTasks(null);
+                          if (sub.key === "invoices") {
+                            setJumpProject(null);
+                            setJumpInvoicePrefill(null);
+                          }
                           setActive(sub.key);
                           onClose();
                         }}
@@ -6068,6 +6072,10 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
                 className={`nav-item ${on ? 'active' : ''}`}
                 onClick={() => {
                   if (n.key === "tasks") setSelectedProjectForTasks(null);
+                  if (n.key === "invoices") {
+                    setJumpProject(null);
+                    setJumpInvoicePrefill(null);
+                  }
                   setActive(n.key);
                   onClose();
                 }}
@@ -9590,6 +9598,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             onLogoUploadClick={() => headerLogoRef.current?.click()}
             setSelectedProjectForTasks={setSelectedProjectForTasks}
             desktopOpen={desktopSidebarOpen}
+            setJumpProject={setJumpProject}
+            setJumpInvoicePrefill={setJumpInvoicePrefill}
           />
 
         </div>
@@ -11628,7 +11638,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { const returnTo = sidebarOverride || prevActiveBeforeInvoice || "dashboard"; if (jumpProject) { setSidebarOverride("clients"); setActive("project-details"); return; } setSidebarOverride(null); setActive(returnTo); }} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill || jumpInvoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => {
+            {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { if (jumpProject) { setSidebarOverride(sidebarOverride || "projects"); setActive("project-details"); return; } const returnTo = sidebarOverride || prevActiveBeforeInvoice || "dashboard"; setSidebarOverride(null); setActive(returnTo); }} onSaveSuccess={() => {
+              if (jumpProject && (jumpProject._id || jumpProject.id)) {
+                setSidebarOverride(sidebarOverride || "projects");
+                setActive("project-details");
+                return;
+              }
+              const returnTo = sidebarOverride || prevActiveBeforeInvoice || "projects";
+              setSidebarOverride(null);
+              setActive(returnTo);
+            }} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill || jumpInvoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 

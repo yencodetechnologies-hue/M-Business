@@ -74,9 +74,7 @@ export default function ModernProjectsPage({ user }) {
   const [error, setError] = useState('');
 
   // ── Invoice ---------------------------------------------------
-  const [showInvoiceCreator, setShowInvoiceCreator] = useState(() => {
-    return sessionStorage.getItem('showInvoiceCreator') === '1';
-  });
+  const [showInvoiceCreator, setShowInvoiceCreator] = useState(false);
 
   const [invoicePrefill, setInvoicePrefill] = useState(() => {
     const saved = sessionStorage.getItem('invoicePrefillData');
@@ -84,19 +82,12 @@ export default function ModernProjectsPage({ user }) {
   });
 
   const [prevActiveBeforeInvoice, setPrevActiveBeforeInvoice] = useState("dashboard");
+  const [jumpInvoice, setJumpInvoice] = useState(null);
+  const [forceListViewToken, setForceListViewToken] = useState(0);
+
 
   useEffect(() => {
-    if (showInvoiceCreator) {
-      sessionStorage.setItem('showInvoiceCreator', '1');
-      if (invoicePrefill) {
-        sessionStorage.setItem('invoicePrefillData', JSON.stringify(invoicePrefill));
-      } else {
-        sessionStorage.removeItem('invoicePrefillData');
-      }
-    } else {
-      sessionStorage.removeItem('showInvoiceCreator');
-      sessionStorage.removeItem('invoicePrefillData');
-    }
+    sessionStorage.removeItem('showInvoiceCreator');
   }, [showInvoiceCreator, invoicePrefill]);
 
   // ── UI state --------------------------------------------------
@@ -366,7 +357,7 @@ export default function ModernProjectsPage({ user }) {
             <div className="m-nav-item"><i className="ti ti-users"></i>Clients</div>
             <div className="m-nav-item"><i className="ti ti-building"></i>Team</div>
             <div className="m-nav-label">Finance</div>
-            <div className="m-nav-item"><i className="ti ti-receipt"></i>Invoices</div>
+            <div className="m-nav-item" style={{ cursor: 'pointer' }} onClick={() => { setJumpInvoice(null); setInvoicePrefill(null); setForceListViewToken(Date.now()); setShowInvoiceCreator(true); }}><i className="ti ti-receipt"></i>Invoices</div>
             <div className="m-nav-item"><i className="ti ti-settings"></i>Settings</div>
           </nav>
           <div className="m-sidebar-bottom">
@@ -436,6 +427,7 @@ export default function ModernProjectsPage({ user }) {
               projects={projects}
               newInvoicePrefill={invoicePrefill}
               jumpInvoice={jumpInvoice}
+              forceListView={forceListViewToken}
               onSaveLocalInvoice={handleSaveLocalProjectInvoice}
               onBack={() => { setShowInvoiceCreator(false); setJumpInvoice(null); }}
             />
@@ -464,7 +456,7 @@ export default function ModernProjectsPage({ user }) {
           <div className="m-nav-item"><i className="ti ti-users"></i>Clients</div>
           <div className="m-nav-item"><i className="ti ti-building"></i>Team</div>
           <div className="m-nav-label">Finance</div>
-          <div className="m-nav-item"><i className="ti ti-receipt"></i>Invoices</div>
+          <div className="m-nav-item" style={{ cursor: 'pointer' }} onClick={() => { setJumpInvoice(null); setInvoicePrefill(null); setForceListViewToken(Date.now()); setShowInvoiceCreator(true); }}><i className="ti ti-receipt"></i>Invoices</div>
           <div className="m-nav-item"><i className="ti ti-settings"></i>Settings</div>
         </nav>
         <div className="m-sidebar-bottom">
@@ -726,7 +718,9 @@ export default function ModernProjectsPage({ user }) {
               clients={clients}
               projects={projects}
               newInvoicePrefill={invoicePrefill}
-              onBack={() => setShowInvoiceCreator(false)}
+              jumpInvoice={jumpInvoice}
+              forceListView={forceListViewToken}
+              onBack={() => { setShowInvoiceCreator(false); setJumpInvoice(null); }}
             />
           </div>
         )

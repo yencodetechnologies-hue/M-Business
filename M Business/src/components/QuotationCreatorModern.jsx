@@ -289,6 +289,8 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
           el.style.width = elemW + 'px';
           el.style.maxWidth = 'none';
           el.style.overflow = 'visible';
+          // Remove any interactive/UI-only elements (e.g. Accept/Negotiate buttons)
+          el.querySelectorAll('.no-print').forEach(n => n.remove());
         }
       }
     });
@@ -301,19 +303,47 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
     const imgData = canvas.toDataURL('image/jpeg', 0.98);
 
     const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
-    let heightLeft = finalH;
-    let position = 0;
-    pdf.addImage(imgData, 'JPEG', 0, position, finalW, finalH);
-    heightLeft -= A4_H;
-    while (heightLeft > 0) {
-      position = heightLeft - finalH;
-      pdf.addPage();
-      pdf.addImage(imgData, 'JPEG', 0, position, finalW, finalH);
-      heightLeft -= A4_H;
+
+    // px -> mm conversion factor based on the canvas scale used above
+    const pxToMm = finalW / canvas.width;
+    const pageHeightPx = A4_H / pxToMm;
+
+    // Collect the bottom edge (in px, relative to element) of every direct
+    // "block" node inside the preview so we can break between them, not through them.
+    const blocks = Array.from(element.querySelectorAll('.quo-preview *'))
+      .filter(n => n.offsetHeight > 0)
+      .map(n => {
+        const r = n.getBoundingClientRect();
+        const baseR = element.getBoundingClientRect();
+        return (r.bottom - baseR.top) * 2; // *2 to match html2canvas scale:2
+      });
+
+    let renderedPx = 0;
+    let pageNum = 0;
+    while (renderedPx < canvas.height) {
+      let sliceEnd = Math.min(renderedPx + pageHeightPx, canvas.height);
+
+      if (sliceEnd < canvas.height) {
+        const candidates = blocks.filter(b => b > renderedPx && b <= sliceEnd);
+        if (candidates.length) sliceEnd = Math.max(...candidates);
+      }
+
+      const sliceHeightPx = sliceEnd - renderedPx;
+      const pageCanvas = document.createElement('canvas');
+      pageCanvas.width = canvas.width;
+      pageCanvas.height = sliceHeightPx;
+      const ctx = pageCanvas.getContext('2d');
+      ctx.drawImage(canvas, 0, renderedPx, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx);
+      const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.98);
+
+      if (pageNum > 0) pdf.addPage();
+      pdf.addImage(pageImgData, 'JPEG', 0, 0, finalW, sliceHeightPx * pxToMm);
+
+      renderedPx = sliceEnd;
+      pageNum++;
     }
     return pdf;
   };
-
   const handleDownloadPdf = async () => {
     try {
       showToast('Generating PDF…');

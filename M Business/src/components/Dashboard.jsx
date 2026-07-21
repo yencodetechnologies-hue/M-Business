@@ -1800,6 +1800,7 @@ function Sidebar({ active, setActive, onLogout, open, onClose, navItems, initial
 // -----------------------------------------------------------
 export default function Dashboard({ setUser, user, fixedLogo }) {
   const [active, setActive] = useState(() => localStorage.getItem("activeTab_dashboard") || "dashboard");
+  const [sidebarInvoiceClick, setSidebarInvoiceClick] = useState(false);
   useEffect(() => { localStorage.setItem("activeTab_dashboard", active); }, [active]);
   const [modal, setModal] = useState(() => localStorage.getItem("openModal_dashboard") || null);
   useEffect(() => {
@@ -2443,7 +2444,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
           {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} config={config} onViewTasks={(p) => { setSelectedProjectForTasks(p); setActive("tasks"); }} />}
 
-          {validActive === "invoices" && <InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setActive("projects")} forceListView={sidebarInvoiceClick} key="global-invoice-creator" />}
+          {validActive === "invoices" && <InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setActive("projects")} forceListView={sidebarInvoiceClick} onConsumeForceListView={() => setSidebarInvoiceClick(false)} key="global-invoice-creator" />}
           {validActive === "quotations" && <QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setActive("projects")} />}
           {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "M Business"} />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}

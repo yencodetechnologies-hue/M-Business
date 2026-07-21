@@ -177,6 +177,8 @@ export default function ProposalForm({ onBack, onSave, initialData, clients, onA
               const dataUrl = ev.target.result;
               coverZone.style.backgroundImage = `url(${dataUrl})`;
               coverZone.style.backgroundSize = 'cover';
+              coverZone.style.backgroundSize = 'contain';
+              coverZone.style.backgroundRepeat = 'no-repeat';
               coverZone.style.backgroundPosition = 'center';
               coverZone.style.borderColor = 'var(--teal)';
               coverZone.style.borderStyle = 'solid';
@@ -190,6 +192,16 @@ export default function ProposalForm({ onBack, onSave, initialData, clients, onA
       }
     };
     setTimeout(hookUp, 300);
+    setTimeout(() => {
+      c.querySelectorAll('.sp-toggle:not(.required)').forEach(btn => {
+        const oc = btn.getAttribute('onclick') || '';
+        const m = oc.match(/toggleSection\(this,\s*'([^']+)'\)/);
+        if (!m) return;
+        const secId = m[1];
+        btn.removeAttribute('onclick');
+        btn.onclick = () => logic.toggleSection(btn, secId);
+      });
+    }, 310);
     setTimeout(() => {
       const sigBox = document.getElementById('ourSigBox');
       if (sigBox) sigBox.onclick = () => logic.openSignatureModal();

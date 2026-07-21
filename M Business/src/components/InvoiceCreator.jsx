@@ -351,11 +351,12 @@ function CanvasSignature({ onSave }) {
 }
 
 // ------------------------------------------------------------
-export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack, jumpInvoice, newInvoicePrefill, onSaveLocalInvoice, onSaveSuccess, forceListView }) {
+export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack, jumpInvoice, newInvoicePrefill, onSaveLocalInvoice, onSaveSuccess, forceListView, onConsumeForceListView }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || "";
 
   const [step, setStep] = useState(() => {
+    if (forceListView !== undefined && forceListView !== null && forceListView !== false) return "list";
     if (jumpInvoice && (jumpInvoice._id || jumpInvoice.id)) return "preview";
     if (newInvoicePrefill) return "form";
     try {
@@ -366,6 +367,20 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     } catch (e) { }
     return "list";
   });
+
+  useEffect(() => {
+    if (forceListView !== undefined && forceListView !== null && forceListView !== false) {
+      setStep("list");
+      setEditingId(null);
+      try {
+        localStorage.removeItem("invoiceCreatorStep_subadmin");
+        localStorage.removeItem("invoiceCreatorEditingId_subadmin");
+        localStorage.removeItem("invoiceCreatorInv_subadmin");
+        localStorage.removeItem("invoiceCreatorItems_subadmin");
+      } catch (e) { }
+      if (typeof onConsumeForceListView === "function") onConsumeForceListView();
+    }
+  }, [forceListView]);
 
   useEffect(() => {
     try { localStorage.setItem("invoiceCreatorStep_subadmin", step); } catch (e) { }
@@ -1361,40 +1376,6 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         <Toast msg={toast} />
         {deleteTarget && <ConfirmModal invoiceNo={deleteTarget.invoiceNo} onConfirm={() => handleDelete(deleteTarget)} onCancel={() => setDeleteTarget(null)} />}
 
-        {shareModalEntry && (
-          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={() => setShareModalEntry(null)}>
-            <div style={{ background: "#fff", borderRadius: 14, width: "100%", maxWidth: 360, maxHeight: "70vh", display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={(e) => e.stopPropagation()}>
-              <div style={{ padding: "16px 18px", borderBottom: "1.5px solid #e5e7eb", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div style={{ fontWeight: 800, fontSize: 15, color: "#0f1c2e" }}>Share with client</div>
-                <button onClick={() => setShareModalEntry(null)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#6b7280" }}>✕</button>
-              </div>
-              <div style={{ overflowY: "auto", padding: 8 }}>
-                {clients && clients.length > 0 ? clients.map((c, idx) => {
-                  const name = c.clientName || c.name || "Unnamed Client";
-                  const company = c.companyName || c.company || "";
-                  return (
-                    <button
-                      key={c._id || c.id || idx}
-                      onClick={() => {
-                        const entry = shareModalEntry;
-                        setShareModalEntry(null);
-                        shareInvoice(entry);
-                      }}
-                      style={{ width: "100%", textAlign: "left", padding: "10px 12px", border: "none", background: "#fff", borderRadius: 8, cursor: "pointer", display: "flex", flexDirection: "column", gap: 2 }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = "#f3f4f6"}
-                      onMouseLeave={(e) => e.currentTarget.style.background = "#fff"}
-                    >
-                      <span style={{ fontWeight: 700, fontSize: 13, color: "#0f1c2e" }}>{name}</span>
-                      {company && <span style={{ fontSize: 11, color: "#6b7280" }}>{company}</span>}
-                    </button>
-                  );
-                }) : (
-                  <div style={{ padding: 16, textAlign: "center", fontSize: 13, color: "#6b7280" }}>No clients found</div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
 
         {shareModalEntry && (
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={() => { setShareModalEntry(null); setShareSelectedClientId(""); }}>
@@ -1535,11 +1516,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         {/* PAGE HEADER */}
         <div className="page-header">
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            {onBack && (
-              <button onClick={onBack} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--teal-light, var(--teal-light, #E0F7FA))", border: "none", borderRadius: 10, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #00BCD4))", flexShrink: 0 }}>
-                <i className="ti ti-arrow-left" style={{ fontSize: 18 }} />
-              </button>
-            )}
+
             <div>
               <div className="page-title">Invoices</div>
               <div className="page-sub">Track, manage and send invoices to your clients</div>
@@ -1599,11 +1576,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         {/* TABS */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
           <div className="tabs" style={{ display: "flex", gap: 10, alignItems: "center" }}>
-            {onBack && (
-              <button onClick={onBack} style={{ padding: "8px", background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#0f1c2e", display: "flex", alignItems: "center" }} title="Back to Dashboard">
-                <i className="ti ti-arrow-left"></i>
-              </button>
-            )}
+
             {["all", "paid", "pending", "overdue", "draft"].map(t => (
               <button key={t} className={`tab ${filterTab === t ? "active" : ""}`} onClick={() => setFilterTab(t)} style={{ textTransform: "capitalize" }}>{t}</button>
             ))}

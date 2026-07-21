@@ -114,7 +114,7 @@ export default function ModernProjectsPage() {
           <div className="m-nav-label">Finance</div>
           <div className="m-nav-item"><i className="ti ti-file-text"></i>Quotations</div>
           <div className="m-nav-item"><i className="ti ti-presentation"></i>Proposals</div>
-          <div className="m-nav-item"><i className="ti ti-receipt"></i>Invoices</div>
+          <div className="m-nav-item" style={{ cursor: 'pointer' }} onClick={() => { setJumpInvoice(null); setInvoicePrefill(null); setForceListViewToken(Date.now()); setShowInvoiceCreator(true); }}><i className="ti ti-receipt"></i>Invoices</div>
           <div className="m-nav-item"><i className="ti ti-credit-card"></i>Accounts</div>
           <div className="m-nav-item"><i className="ti ti-arrows-exchange"></i>Payments</div>
           <div className="m-nav-item"><i className="ti ti-cash"></i>Expenses</div>

@@ -11644,6 +11644,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 setActive("project-details");
                 return;
               }
+              if (!jumpInvoice && !newInvoicePrefill && !jumpInvoicePrefill) {
+                setSidebarOverride(null);
+                setActive("invoices");
+                return;
+              }
               const returnTo = sidebarOverride || prevActiveBeforeInvoice || "projects";
               setSidebarOverride(null);
               setActive(returnTo);

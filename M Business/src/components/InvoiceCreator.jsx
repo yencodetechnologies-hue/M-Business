@@ -415,10 +415,12 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   // project-specific New Invoice flow). Without this, `step`/`editingId`
   // just keep whatever they were left at, since this component never
   // remounts on that click.
-  const prevJumpRef = useRef({ jumpInvoice, newInvoicePrefill });
+  const prevJumpRef = useRef({ jumpInvoice, newInvoicePrefill, _initialized: false });
   useEffect(() => {
     const had = prevJumpRef.current;
-    if ((had.jumpInvoice || had.newInvoicePrefill) && !jumpInvoice && !newInvoicePrefill && !internalNav) {
+    const isInitialMount = !had._initialized;
+    prevJumpRef.current = { jumpInvoice, newInvoicePrefill, _initialized: true };
+    if (!isInitialMount && (had.jumpInvoice || had.newInvoicePrefill) && !jumpInvoice && !newInvoicePrefill && !internalNav) {
       setStep("list");
       setEditingId(null);
       setInv({ ...blank, invoiceNo: generateInvoiceNo() });
@@ -427,6 +429,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       try {
         localStorage.removeItem("invoiceCreatorStep_subadmin");
         localStorage.removeItem("invoiceCreatorEditingId_subadmin");
+        localStorage.removeItem("invoiceCreatorInv_subadmin");
+        localStorage.removeItem("invoiceCreatorItems_subadmin");
       } catch (e) { }
     }
     prevJumpRef.current = { jumpInvoice, newInvoicePrefill };
@@ -608,10 +612,28 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     customDiscountType: "",
   };
 
-  const [inv, setInv] = useState(blank);
-  const [items, setItems] = useState([
-    { id: 1, description: "", quantity: 1, rate: "" }
-  ]);
+  const [inv, setInv] = useState(() => {
+    try {
+      const saved = localStorage.getItem("invoiceCreatorInv_subadmin");
+      if (saved) return JSON.parse(saved);
+    } catch (e) { }
+    return blank;
+  });
+  const [items, setItems] = useState(() => {
+    try {
+      const saved = localStorage.getItem("invoiceCreatorItems_subadmin");
+      if (saved) return JSON.parse(saved);
+    } catch (e) { }
+    return [{ id: 1, description: "", quantity: 1, rate: "" }];
+  });
+
+  useEffect(() => {
+    try { localStorage.setItem("invoiceCreatorInv_subadmin", JSON.stringify(inv)); } catch (e) { }
+  }, [inv]);
+
+  useEffect(() => {
+    try { localStorage.setItem("invoiceCreatorItems_subadmin", JSON.stringify(items)); } catch (e) { }
+  }, [items]);
   const [editingId, setEditingId] = useState(() => {
     try {
       const savedStep = localStorage.getItem("invoiceCreatorStep_subadmin");
@@ -926,7 +948,6 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     saveDraftLocal(inv, items, "draft");
     if (data.success && data.invoice?._id) setEditingId(data.invoice._id);
     setSaving(false);
-    if (onSaveSuccess) { onSaveSuccess(); return; }
     setStep("preview");
     window.scrollTo(0, 0);
   };

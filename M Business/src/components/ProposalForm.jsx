@@ -184,6 +184,7 @@ export default function ProposalForm({ onBack, onSave, initialData, clients, onA
       // Cover upload — real file picker, persisted as a data URL so it
       // survives save/reload (a blob: URL from createObjectURL does not).
       const coverZone = c.querySelector('#coverZone');
+      console.log('coverZone found:', !!coverZone);
       if (coverZone) {
         const applyCoverImage = (dataUrl) => {
           const liveZone = c.querySelector('#coverZone');

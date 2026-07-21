@@ -91,7 +91,7 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
           onCropComplete={onCropAreaComplete}
         />
       </div>
-      
+
       <div style={{
         width: '100%',
         maxWidth: '500px',
@@ -106,7 +106,10 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '12px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Zoom</span>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--app-accent)' }}>{Math.round(zoom * 100)}%</span>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--app-accent)' }}>
+              {Math.round(zoom * 100)}%
+              {croppedAreaPixels ? ` · ${Math.round(croppedAreaPixels.width)}×${Math.round(croppedAreaPixels.height)}px` : ''}
+            </span>
           </div>
           <input
             type="range"
@@ -116,7 +119,7 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
             step={0.1}
             aria-labelledby="Zoom"
             onChange={(e) => setZoom(parseFloat(e.target.value))}
-            style={{ 
+            style={{
               width: '100%',
               accentColor: 'var(--app-accent)',
               cursor: 'pointer'
@@ -129,8 +132,8 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
           <div style={{ display: 'flex', gap: '8px' }}>
             {[
               { label: '1:1', value: 1 },
-              { label: '4:3', value: 4/3 },
-              { label: '16:9', value: 16/9 },
+              { label: '4:3', value: 4 / 3 },
+              { label: '16:9', value: 16 / 9 },
               { label: 'Free', value: null }
             ].map((opt) => (
               <button
@@ -154,7 +157,7 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
             ))}
           </div>
         </div>
-        
+
         <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
           <button
             onClick={onCancel}

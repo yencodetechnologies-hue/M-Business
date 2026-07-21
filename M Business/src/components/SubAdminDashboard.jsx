@@ -6046,6 +6046,8 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
                           if (sub.key === "invoices") {
                             setJumpProject(null);
                             setJumpInvoicePrefill(null);
+                            if (typeof setInvoicePrefill === "function") setInvoicePrefill(null);
+                            setSidebarOverride(null);
                           }
                           setActive(sub.key);
                           onClose();

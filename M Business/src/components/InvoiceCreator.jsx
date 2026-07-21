@@ -401,7 +401,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const prevJumpRef = useRef({ jumpInvoice, newInvoicePrefill });
   useEffect(() => {
     const had = prevJumpRef.current;
-    if ((had.jumpInvoice || had.newInvoicePrefill) && !jumpInvoice && !newInvoicePrefill) {
+    if ((had.jumpInvoice || had.newInvoicePrefill) && !jumpInvoice && !newInvoicePrefill && !internalNav) {
       setStep("list");
       setEditingId(null);
       setInv({ ...blank, invoiceNo: generateInvoiceNo() });
@@ -413,7 +413,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       } catch (e) { }
     }
     prevJumpRef.current = { jumpInvoice, newInvoicePrefill };
-  }, [jumpInvoice, newInvoicePrefill]);
+  }, [jumpInvoice, newInvoicePrefill, internalNav]);
 
   useEffect(() => {
     if (newInvoicePrefill) {

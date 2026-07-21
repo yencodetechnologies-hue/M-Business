@@ -2886,9 +2886,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       {!hideTopActions && (() => {
                         const btnMap = {
                           inv: { label: 'New Invoice', modal: 'showNewInvoice', icon: 'ti-file-invoice' },
-                          adv: { label: 'New Advance', modal: 'showAdvance', icon: 'ti-pig-money' },
-                          add: { label: 'Additional Charge', modal: 'showAdditional', icon: 'ti-circle-plus' },
-                          mile: { label: 'New Milestone', modal: 'showMilestonePayment', icon: 'ti-flag' },
+
+
                           pay: { label: 'Record Payment', modal: 'showPayment', icon: 'ti-credit-card' },
                           exp: { label: 'Add Expense', modal: 'showExpense', icon: 'ti-receipt' },
                         };
@@ -2965,7 +2964,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                     <div style={{ display: 'flex', gap: 4 }}>
                                       <button onClick={() => onViewInvoice ? onViewInvoice({ ...inv, project: inv.projectName || currProject?.name, client: inv.clientName || inv.client }, currProject) : setPreviewInvoice(inv)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-eye"></i></button>
                                       <button onClick={() => { if (onNewInvoice) { onNewInvoice(currProject, inv); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
-                                      <button title="Print / PDF" onClick={() => handlePrintInvoice(inv)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-printer"></i></button>
+
                                       <button
                                         title="Share to Client"
                                         disabled={sharingInvoiceNo === inv.invoiceNo}

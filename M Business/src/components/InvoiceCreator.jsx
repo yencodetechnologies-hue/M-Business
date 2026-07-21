@@ -356,7 +356,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const effectiveCompanyName = companyName || "";
 
   const [step, setStep] = useState(() => {
-    if (jumpInvoice) return "preview";
+    if (jumpInvoice && (jumpInvoice._id || jumpInvoice.id)) return "preview";
     if (newInvoicePrefill) return "form";
     try {
       const savedStep = localStorage.getItem("invoiceCreatorStep_subadmin");

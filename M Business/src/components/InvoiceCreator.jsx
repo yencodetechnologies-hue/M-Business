@@ -351,7 +351,7 @@ function CanvasSignature({ onSave }) {
 }
 
 // ------------------------------------------------------------
-export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack, jumpInvoice, newInvoicePrefill, onSaveLocalInvoice, onSaveSuccess }) {
+export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack, jumpInvoice, newInvoicePrefill, onSaveLocalInvoice, onSaveSuccess, forceListView }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || "";
 
@@ -362,9 +362,26 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       const savedStep = localStorage.getItem("invoiceCreatorStep_subadmin");
       const savedId = localStorage.getItem("invoiceCreatorEditingId_subadmin");
       if (savedStep === "preview" && savedId) return "preview";
+      if (savedStep === "form") return "form";
     } catch (e) { }
     return "list";
-  }); // "list" | "form" | "preview"
+  });
+
+  useEffect(() => {
+    try { localStorage.setItem("invoiceCreatorStep_subadmin", step); } catch (e) { }
+  }, [step]);
+
+  useEffect(() => {
+    try { localStorage.setItem("invoiceCreatorStep_subadmin", step); } catch (e) { }
+  }, [step]);
+
+  useEffect(() => {
+    try { localStorage.setItem("invoiceCreatorStep_subadmin", step); } catch (e) { }
+  }, [step]);
+
+  useEffect(() => {
+    try { localStorage.setItem("invoiceCreatorStep_subadmin", step); } catch (e) { }
+  }, [step]); // "list" | "form" | "preview"
   const [showAddClient, setShowAddClient] = useState(false);
   const [internalNav, setInternalNav] = useState(false);
   const [invoiceList, setInvoiceList] = useState([]);

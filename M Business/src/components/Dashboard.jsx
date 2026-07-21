@@ -1747,7 +1747,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 // -----------------------------------------------------------
 // SIDEBAR
 // -----------------------------------------------------------
-function Sidebar({ active, setActive, onLogout, open, onClose, navItems, initials, companyName, companyLogo }) {
+function Sidebar({ active, setActive, onLogout, open, onClose, navItems, initials, companyName, companyLogo, setSidebarInvoiceClick }) {
   const items = navItems || NAV;
   return (
     <>
@@ -1784,7 +1784,7 @@ function Sidebar({ active, setActive, onLogout, open, onClose, navItems, initial
           </div>
         </div>
         <nav style={{ flex: 1, minHeight: 0, padding: "10px 8px", overflowY: "auto", position: "relative", zIndex: 1 }}>
-          {items.map(n => { const on = active === n.key; return (<button key={n.key} onClick={() => { setActive(n.key); onClose(); }} style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "10px 14px", background: on ? "linear-gradient(90deg,rgba(37,99,235,0.2),rgba(37,99,235,0.05))" : "transparent", border: on ? "1px solid rgba(37,99,235,0.2)" : "1px solid transparent", borderRadius: 12, color: on ? "#fff" : "rgba(255,255,255,0.5)", fontWeight: on ? 700 : 500, fontSize: 13, cursor: "pointer", marginBottom: 4, textAlign: "left", fontFamily: "inherit", transition: "all 0.2s" }}><span style={{ fontSize: 16, opacity: on ? 1 : 0.7 }}>{n.icon}</span><span style={{ flex: 1 }}>{n.label}</span>{on && <div style={{ width: 6, height: 6, borderRadius: "50%", background: T.accent, flexShrink: 0, boxShadow: `0 0 10px ${T.accent}` }} />}</button>); })}
+          onClick={() => { setActive(n.key); if (n.key === "invoices" && typeof setSidebarInvoiceClick === "function") setSidebarInvoiceClick(true); onClose(); }}
         </nav>
         <div style={{ padding: "10px 8px 14px", borderTop: "1px solid rgba(255,255,255,0.07)", position: "relative", zIndex: 1, flexShrink: 0 }}>
           <button onClick={onLogout} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 9, padding: "10px 12px", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.35)", borderRadius: 11, color: "#fca5a5", fontSize: 12.5, cursor: "pointer", fontWeight: 700, fontFamily: "inherit" }}> Logout</button>
@@ -1824,6 +1824,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     }
   }, [prefillClientName, modal]); const [showProfile, setShowProfile] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  { validActive === "invoices" && <InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setActive("projects")} key="global-invoice-creator" /> }
   const [companyLogo, setCompanyLogo] = useState(user?.logoUrl ? user.logoUrl : (fixedLogo || null));
   useEffect(() => { setCompanyLogo(user?.logoUrl ? user.logoUrl : (fixedLogo || null)); }, [user, fixedLogo]);
 
@@ -2090,7 +2091,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         @media(max-width:768px){.sidebar-spacer{display:none!important;}.mob-topbar-hide{display:none!important;}.main-content{padding:12px!important;}.dash-stats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}.dash-2col{grid-template-columns:1fr!important;}.modal-2col{grid-template-columns:1fr!important;}.page-header{flex-wrap:wrap;gap:8px;}.header-actions{flex-wrap:wrap;gap:8px;}}
       `}</style>
 
-      <Sidebar active={validActive} setActive={setActive} onLogout={handleLogout} open={sidebarOpen} onClose={() => setSidebarOpen(false)} navItems={navItems} initials={initials} companyName={companyNameStr} companyLogo={companyLogo} />
+      <Sidebar active={validActive} setActive={setActive} onLogout={handleLogout} open={sidebarOpen} onClose={() => setSidebarOpen(false)} navItems={navItems} initials={initials} companyName={companyNameStr} companyLogo={companyLogo} setSidebarInvoiceClick={setSidebarInvoiceClick} />
 
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
         <div className="mob-topbar" style={{ display: validActive === "dashboard" ? "none" : "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#fff", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)" }}>
@@ -2442,7 +2443,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
           {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} config={config} onViewTasks={(p) => { setSelectedProjectForTasks(p); setActive("tasks"); }} />}
 
-          {validActive === "invoices" && <InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setActive("projects")} />}
+          {validActive === "invoices" && <InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setActive("projects")} forceListView={sidebarInvoiceClick} key="global-invoice-creator" />}
           {validActive === "quotations" && <QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setActive("projects")} />}
           {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "M Business"} />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}

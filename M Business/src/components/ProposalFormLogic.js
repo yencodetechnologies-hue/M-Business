@@ -19,6 +19,7 @@ const getEl = (id) => {
 /* ── SECTION TOGGLES ── */
 export function toggleSection(btn, id) {
   const secId = (id || '').trim().replace(/['"]/g, '');
+  if (btn.classList.contains('required') || btn.hasAttribute('disabled')) return;
   btn.classList.toggle('on');
   const show = btn.classList.contains('on');
   const sec = document.getElementById(secId);
@@ -35,6 +36,7 @@ export function toggleSection(btn, id) {
   const pvId = pvMap[secId] || ('pv-sec-' + secId.replace('sec-', ''));
   const pvSec = document.getElementById(pvId);
   if (pvSec) pvSec.style.display = show ? 'block' : 'none';
+  console.log('toggleSection fired:', secId, 'show=', show, 'sectionFound=', !!sec, 'previewFound=', !!pvSec);
 }
 /* ── STATUS ── */
 export function selSt(el, val) {

@@ -2,12 +2,13 @@
 import React, { useEffect, useRef } from 'react';
 import * as logic from './ProposalFormLogic';
 
-export default function ProposalForm({ onBack, onSave, initialData, clients, onAddClient, newlyAddedClientName }) {
+export default function ProposalForm({ onBack, onSave, initialData, clients, onAddClient, newlyAddedClientName, onMountExposeCrop }) {
   const containerRef = useRef(null);
 
   useEffect(() => {
     const c = containerRef.current;
     if (!c) return;
+    if (typeof onMountExposeCrop === 'function') onMountExposeCrop();
 
     // Expose ALL logic functions to window so dangerouslySetInnerHTML onclick attrs work natively
     Object.assign(window, logic);
@@ -171,27 +172,64 @@ export default function ProposalForm({ onBack, onSave, initialData, clients, onA
           const inp = document.createElement('input');
           inp.type = 'file'; inp.accept = 'image/*';
           inp.onchange = (e) => {
-            const file = e.target.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-              const dataUrl = ev.target.result;
-              coverZone.style.backgroundImage = `url(${dataUrl})`;
-              coverZone.style.backgroundSize = 'cover';
-              coverZone.style.backgroundSize = 'contain';
-              coverZone.style.backgroundRepeat = 'no-repeat';
-              coverZone.style.backgroundPosition = 'center';
-              coverZone.style.borderColor = 'var(--teal)';
-              coverZone.style.borderStyle = 'solid';
-              coverZone.innerHTML = `<div style="background:rgba(0,0,0,0.55);color:#fff;font-weight:700;font-size:12px;padding:6px 12px;border-radius:8px">Cover image uploaded — Click to change</div>`;
-              coverZone.dataset.coverImage = dataUrl;
-            };
-            reader.readAsDataURL(file);
+            window._triggerCrop
+              ? window._triggerCrop(e, (croppedImage) => {
+                coverZone.style.backgroundImage = `url(${croppedImage})`;
+                coverZone.style.backgroundSize = 'contain';
+                coverZone.style.backgroundRepeat = 'no-repeat';
+                coverZone.style.backgroundPosition = 'center';
+                coverZone.style.borderColor = 'var(--teal)';
+                coverZone.style.borderStyle = 'solid';
+                coverZone.innerHTML = `<div style="background:rgba(0,0,0,0.55);color:#fff;font-weight:700;font-size:12px;padding:6px 12px;border-radius:8px">Cover image uploaded — Click to change</div>`;
+                coverZone.dataset.coverImage = croppedImage;
+              }, 3)
+              : (() => {
+                const file = e.target.files[0]; if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                  const dataUrl = ev.target.result;
+                  coverZone.style.backgroundImage = `url(${dataUrl})`;
+                  coverZone.style.backgroundSize = 'contain';
+                  coverZone.style.backgroundRepeat = 'no-repeat';
+                  coverZone.style.backgroundPosition = 'center';
+                  coverZone.style.borderColor = 'var(--teal)';
+                  coverZone.style.borderStyle = 'solid';
+                  coverZone.innerHTML = `<div style="background:rgba(0,0,0,0.55);color:#fff;font-weight:700;font-size:12px;padding:6px 12px;border-radius:8px">Cover image uploaded — Click to change</div>`;
+                  coverZone.dataset.coverImage = dataUrl;
+                };
+                reader.readAsDataURL(file);
+              })();
           };
           inp.click();
         };
       }
     };
     setTimeout(hookUp, 300);
+    setTimeout(() => {
+      c.querySelectorAll('.sp-toggle').forEach(btn => {
+        btn.style.pointerEvents = 'auto';
+        btn.style.position = 'relative';
+        btn.style.zIndex = '10';
+        const oc = btn.getAttribute('onclick') || '';
+        const m = oc.match(/toggleSection\(this,\s*'([^']+)'\)/);
+        if (!m) return;
+        const secId = m[1];
+        btn.onclick = null;
+        btn.removeAttribute('onclick');
+        btn.addEventListener('click', () => logic.toggleSection(btn, secId));
+      });
+    }, 350);
+    setTimeout(() => {
+      c.querySelectorAll('.sp-toggle').forEach(btn => {
+        const oc = btn.getAttribute('onclick') || '';
+        const m = oc.match(/toggleSection\(this,\s*'([^']+)'\)/);
+        if (!m) return;
+        const secId = m[1];
+        btn.onclick = null;
+        btn.removeAttribute('onclick');
+        btn.addEventListener('click', () => logic.toggleSection(btn, secId));
+      });
+    }, 350);
     setTimeout(() => {
       c.querySelectorAll('.sp-toggle:not(.required)').forEach(btn => {
         const oc = btn.getAttribute('onclick') || '';
@@ -248,7 +286,8 @@ export default function ProposalForm({ onBack, onSave, initialData, clients, onA
 
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "var(--bg)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "var(--bg)", display: "flex", flexDirection: "column", overflow: "hidden" }}
+      onClickCapture={(e) => console.log('CLICK HIT:', e.target)}>
       <style>{`
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
@@ -533,34 +572,33 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
   <!-- ══ LEFT: FORM ══ -->
   <div class="form-panel" id="formSide">
 
-    <div class="section-picker">
+    <div class="section-picker" style="position:relative;z-index:50;pointer-events:auto">
       <div class="sp-title"><i class="ti ti-layout-grid" style="color:var(--teal);font-size:15px"></i> Proposal Sections — Toggle Optional Sections</div>
-      <div class="sp-grid">
-        <button class="sp-toggle required" disabled>Basics</button>
-        <button class="sp-toggle required" disabled>Parties</button>
-        <button class="sp-toggle required" disabled>Summary</button>
-        <button class="sp-toggle required" disabled>Deliverables</button>
-        <button class="sp-toggle required" disabled>Timeline</button>
-        <button class="sp-toggle required" disabled>Pricing</button>
-        <button class="sp-toggle required" disabled>Sign-off</button>
+      <div class="sp-grid" style="position:relative;z-index:50;pointer-events:auto">
+        <button class="sp-toggle on" onclick="toggleSection(this,'sec-basics')">Basics</button>
+        <button class="sp-toggle on" onclick="toggleSection(this,'sec-parties')">Parties</button>
+        <button class="sp-toggle on" onclick="toggleSection(this,'sec-summary')">Summary</button>
+        <button class="sp-toggle on" onclick="toggleSection(this,'sec-deliverables')">Deliverables</button>
+        <button class="sp-toggle on" onclick="toggleSection(this,'sec-timeline')">Timeline</button>
+        <button class="sp-toggle on" onclick="toggleSection(this,'sec-pricing')">Pricing</button>
+        <button class="sp-toggle on" onclick="toggleSection(this,'sec-signoff')">Sign-off</button>
         <button class="sp-toggle on" onclick="toggleSection(this,'sec-team')"><i class="ti ti-users"></i> Our Team</button>
         <button class="sp-toggle on" onclick="toggleSection(this,'sec-value')"><i class="ti ti-star"></i> Value & ROI</button>
         <button class="sp-toggle" onclick="toggleSection(this,'sec-casestudies')"><i class="ti ti-trophy"></i> Case Studies</button>
         <button class="sp-toggle" onclick="toggleSection(this,'sec-testimonials')"><i class="ti ti-quote"></i> Testimonials</button>
         <button class="sp-toggle on" onclick="toggleSection(this,'sec-risks')"><i class="ti ti-shield-exclamation"></i> Risks</button>
-        <button class="sp-toggle" onclick="toggleSection(this,'sec-faq')"><i class="ti ti-help-circle"></i> FAQ</button>
-        <button class="sp-toggle" onclick="toggleSection(this,'sec-whyus')"><i class="ti ti-medal"></i> Why Us</button>
+
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="sec-basics">
       <div class="card-header">
         <div class="card-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ti ti-file-description"></i></div>
         <div class="card-title">Proposal Basics</div>
         <span style="margin-left:auto;font-size:10px;font-weight:700;background:var(--amber-bg);color:var(--amber);padding:3px 9px;border-radius:20px">#PRO-2026-0015</span>
       </div>
       <div class="card-body">
-        <div class="cover-zone" id="coverZone" onclick="uploadCover()">
+        <div class="cover-zone" id="coverZone">
           <i class="ti ti-photo-plus"></i>
           <div class="cover-zone-txt">Upload Cover Image / Banner</div>
           <div class="cover-zone-sub">PNG, JPG · Recommended 1200✕400px</div>
@@ -587,7 +625,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="sec-parties">
       <div class="card-header"><div class="card-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-building"></i></div><div class="card-title">Parties — From & Prepared For</div></div>
       <div class="card-body">
         <div style="font-size:10px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Our Details</div>
@@ -614,7 +652,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="sec-summary">
       <div class="card-header"><div class="card-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ti ti-align-left"></i></div><div class="card-title">Executive Summary</div></div>
       <div class="card-body">
         <div class="fg"><label class="fl">Problem / Challenge <span class="fl-hint">What is the client struggling with?</span></label><textarea class="ta" id="problem" placeholder="Describe the client's pain point…" oninput="up()"></textarea></div>
@@ -623,7 +661,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="sec-deliverables">
       <div class="card-header"><div class="card-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ti ti-checklist"></i></div><div class="card-title">Scope & Deliverables</div><div class="card-actions"><button onclick="addDel()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-plus" style="font-size:11px"></i>Add</button></div></div>
       <div class="card-body">
         <div id="delList">
@@ -637,7 +675,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="sec-timeline">
       <div class="card-header"><div class="card-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ti ti-calendar-stats"></i></div><div class="card-title">Project Timeline & Milestones</div></div>
       <div class="card-body">
         <div class="form-row" style="margin-bottom:14px">
@@ -711,7 +749,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
       <div class="card-body"><div id="whyList"><div class="dv-item"><div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-star"></i></div><input type="text" class="dv-input" value="8+ years delivering enterprise-grade products"><i class="ti ti-x dv-del" onclick="this.parentElement.remove()"></i></div></div><button class="add-btn" onclick="addWhyUs()"><i class="ti ti-plus" style="font-size:13px"></i>Add Point</button></div>
     </div>
 
-    <div class="card">
+    <div class="card" id="sec-pricing">
       <div class="card-header"><div class="card-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-currency-rupee"></i></div><div class="card-title">Investment & Pricing</div></div>
       <div class="card-body">
         <div class="risk-row-g hdr" style="margin-bottom:6px;grid-template-columns:1fr 90px 24px"><div>Service / Item</div><div>Amount (₹)</div><div></div></div>
@@ -741,7 +779,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="sec-signoff">
       <div class="card-header"><div class="card-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ti ti-writing"></i></div><div class="card-title">Closing, Terms & Sign-off</div></div>
       <div class="card-body">
         <div class="fg"><label class="fl">Closing Statement</label><textarea class="ta" id="closing" oninput="up()">We are excited about the opportunity to work with you on this project.</textarea></div>
@@ -791,16 +829,16 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
         </div>
         <div class="p-badge" id="pv-status">DRAFT</div>
       </div>
-      <div class="ps"><div class="ps-lbl"><i class="ti ti-building"></i>Parties</div><div class="party-grid"><div class="party-b"><div class="pb-lbl">Prepared By</div><div class="pb-name" id="pv-from">Prabhu R</div><div class="pb-detail" id="pv-from-d">YENCODE Technologies<br></div></div><div class="party-b"><div class="pb-lbl">Prepared For</div><div class="pb-name" id="pv-to" style="color:var(--text3)">— Client —</div><div class="pb-detail" id="pv-to-d"><span style="color:var(--text3)">Fill in client details</span></div></div></div></div>
-      <div class="ps"><div class="ps-lbl"><i class="ti ti-align-left"></i>Executive Summary</div><div class="exec-block problem"><div class="eb-lbl">Problem</div><div class="eb-text" id="pv-problem"><span style="color:var(--text3);font-style:italic">Describe the client's challenge…</span></div></div><div class="exec-block solution" style="margin-top:6px"><div class="eb-lbl">Solution</div><div class="eb-text" id="pv-solution"><span style="color:var(--text3);font-style:italic">Describe your proposed solution…</span></div></div><div class="exec-block whyus" style="margin-top:6px"><div class="eb-lbl">Expected Outcome</div><div class="eb-text" id="pv-outcome"><span style="color:var(--text3);font-style:italic">Describe expected results…</span></div></div></div>
-      <div class="ps"><div class="ps-lbl"><i class="ti ti-checklist"></i>Scope & Deliverables</div><div class="del-list" id="pv-del"><div class="del-item-p">Fully responsive website (8 pages)</div><div class="del-item-p">Custom UI/UX design + brand guide</div><div class="del-item-p">CMS for easy content management</div><div class="del-item-p">SEO optimisation + Google Analytics</div><div class="del-item-p">3-month post-launch support</div></div></div>
-      <div class="ps"><div class="ps-lbl"><i class="ti ti-calendar-stats"></i>Project Timeline</div><div style="display:flex;gap:12px;margin-bottom:8px"><span style="font-size:10px;font-weight:700;color:var(--text2)">Start: <span id="pv-start" style="color:var(--teal)">01 Jul 2026</span></span><span style="font-size:10px;font-weight:700;color:var(--text2)">End: <span id="pv-end" style="color:var(--teal)">31 Oct 2026</span></span><span style="font-size:10px;font-weight:700;color:var(--text2)">Duration: <span id="pv-dur" style="color:var(--teal)">4 Months</span></span></div><div class="tl-p" id="pv-timeline"></div></div>
+      <div class="ps" id="pv-sec-parties"><div class="ps-lbl"><i class="ti ti-building"></i>Parties</div><div class="party-grid"><div class="party-b"><div class="pb-lbl">Prepared By</div><div class="pb-name" id="pv-from">Prabhu R</div><div class="pb-detail" id="pv-from-d">YENCODE Technologies<br></div></div><div class="party-b"><div class="pb-lbl">Prepared For</div><div class="pb-name" id="pv-to" style="color:var(--text3)">— Client —</div><div class="pb-detail" id="pv-to-d"><span style="color:var(--text3)">Fill in client details</span></div></div></div></div>
+      <div class="ps" id="pv-sec-summary"><div class="ps-lbl"><i class="ti ti-align-left"></i>Executive Summary</div><div class="exec-block problem"><div class="eb-lbl">Problem</div><div class="eb-text" id="pv-problem"><span style="color:var(--text3);font-style:italic">Describe the client's challenge…</span></div></div><div class="exec-block solution" style="margin-top:6px"><div class="eb-lbl">Solution</div><div class="eb-text" id="pv-solution"><span style="color:var(--text3);font-style:italic">Describe your proposed solution…</span></div></div><div class="exec-block whyus" style="margin-top:6px"><div class="eb-lbl">Expected Outcome</div><div class="eb-text" id="pv-outcome"><span style="color:var(--text3);font-style:italic">Describe expected results…</span></div></div></div>
+      <div class="ps" id="pv-sec-deliverables"><div class="ps-lbl"><i class="ti ti-checklist"></i>Scope & Deliverables</div><div class="del-list" id="pv-del"><div class="del-item-p">Fully responsive website (8 pages)</div><div class="del-item-p">Custom UI/UX design + brand guide</div><div class="del-item-p">CMS for easy content management</div><div class="del-item-p">SEO optimisation + Google Analytics</div><div class="del-item-p">3-month post-launch support</div></div></div>
+      <div class="ps" id="pv-sec-timeline"><div class="ps-lbl"><i class="ti ti-calendar-stats"></i>Project Timeline</div><div style="display:flex;gap:12px;margin-bottom:8px"><span style="font-size:10px;font-weight:700;color:var(--text2)">Start: <span id="pv-start" style="color:var(--teal)">01 Jul 2026</span></span><span style="font-size:10px;font-weight:700;color:var(--text2)">End: <span id="pv-end" style="color:var(--teal)">31 Oct 2026</span></span><span style="font-size:10px;font-weight:700;color:var(--text2)">Duration: <span id="pv-dur" style="color:var(--teal)">4 Months</span></span></div><div class="tl-p" id="pv-timeline"></div></div>
       <div class="ps" id="pv-sec-team"><div class="ps-lbl"><i class="ti ti-users"></i>Our Team</div><div class="team-p" id="pv-team"></div></div>
       <div class="ps" id="pv-sec-value"><div class="ps-lbl"><i class="ti ti-trending-up"></i>Value Proposition & ROI</div><div class="val-p" id="pv-value"></div></div>
       <div class="ps" id="pv-sec-cs" style="display:none"><div class="ps-lbl"><i class="ti ti-trophy"></i>Case Studies</div><div id="pv-cs"></div></div>
       <div class="ps" id="pv-sec-tm" style="display:none"><div class="ps-lbl"><i class="ti ti-quote"></i>Testimonials</div><div id="pv-tm"></div></div>
       <div class="ps" id="pv-sec-risks"><div class="ps-lbl"><i class="ti ti-shield-exclamation"></i>Risks & Mitigation</div><div class="risk-p" id="pv-risks"></div></div>
-      <div class="ps"><div class="ps-lbl"><i class="ti ti-currency-rupee"></i>Investment</div><table class="pricing-tbl"><thead><tr><th>Service</th><th>Amount</th></tr></thead><tbody id="pv-pricing"></tbody></table><div class="pricing-grand" style="margin-top:7px"><span>Total Investment</span><span id="pv-grand">₹1,12,100</span></div><div style="margin-top:6px;font-size:10px;color:var(--text2);font-weight:600" id="pv-pay">Payment: 50% advance, 50% on delivery</div></div>
+      <div class="ps" id="pv-sec-pricing"><div class="ps-lbl"><i class="ti ti-currency-rupee"></i>Investment</div><table class="pricing-tbl"><thead><tr><th>Service</th><th>Amount</th></tr></thead><tbody id="pv-pricing"></tbody></table><div class="pricing-grand" style="margin-top:7px"><span>Total Investment</span><span id="pv-grand">₹1,12,100</span></div><div style="margin-top:6px;font-size:10px;color:var(--text2);font-weight:600" id="pv-pay">Payment: 50% advance, 50% on delivery</div></div>
       <div class="ps"><div class="ps-lbl"><i class="ti ti-writing"></i>Closing</div><div id="pv-closing" style="font-size:10px;color:var(--text2);line-height:1.7">We are excited about the opportunity to work with you…</div></div>
       <div class="ps"><div class="ps-lbl"><i class="ti ti-signature"></i>Sign-off</div><div class="sop"><div class="sob"><div class="sob-line"></div><div class="sob-name" id="pv-sig1">Prabhu R</div><div class="sob-role">YENCODE Technologies</div></div><div class="sob"><div class="sob-line" style="background:var(--amber)"></div><div class="sob-name" id="pv-sig2" style="color:var(--text3)">— Client —</div><div class="sob-role" id="pv-sig2-role">Awaiting</div></div></div></div>
     </div>

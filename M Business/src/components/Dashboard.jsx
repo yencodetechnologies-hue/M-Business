@@ -18,6 +18,7 @@ import { DOC_TYPES } from "./EmployeeProfilePanel";
 import ReportsPage from "./ReportsPage";
 import MessagingPage from "./MessagingPage";
 import SettingsPage from "./SettingsPage";
+import ImageCropModal from "./ImageCropModal";
 import { T } from "../index";
 
 
@@ -126,6 +127,29 @@ function Fld({ label, value, onChange, options, type = "text", error, placeholde
 
   const s = { width: "100%", border: `1.5px solid ${error ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: disabled ? "var(--app-border)" : "var(--app-bg)", boxSizing: "border-box", outline: "none", fontFamily: "inherit", opacity: disabled ? 0.7 : 1 };
   const sCustom = { flex: 1.2, border: `1.5px solid ${error ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "#fff", boxSizing: "border-box", outline: "none", fontFamily: "inherit" };
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [cropImage, setCropImage] = useState(null);
+  const [cropCallback, setCropCallback] = useState(null);
+  const [cropAspect, setCropAspect] = useState(1);
+
+  const triggerCrop = (e, callback, aspect = 1) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCropImage(reader.result);
+        setCropCallback(() => callback);
+        setCropAspect(aspect);
+        setShowCropModal(true);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCropComplete = (croppedImage) => {
+    setShowCropModal(false);
+    if (cropCallback) cropCallback(croppedImage);
+  };
   return (
     <div style={{ marginBottom: 14 }} data-field={name}>
       {options ? (
@@ -2451,7 +2475,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} onSelectProject={(p) => setSelectedProjectForTasks(p)} autoOpenAddModal={autoOpenTaskModal} onAddModalOpened={(val) => setAutoOpenTaskModal(!!val)} />}
           {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} THEME={{ accent: "#00BCD4", gradient: "linear-gradient(135deg, #00BCD4, #0097A7)", muted: "#607D86", card: "#FFFFFF", bg: "#F5FAFA", border: "#E0EEF0", text: "#1A2E35" }} />}
           {validActive === "messaging" && <MessagingPage user={user} />}
-          {validActive === "settings" && <SettingsPage THEME={T} user={user} onProfileUpdate={(updates) => { const updated = { ...user, ...updates }; setUser(updated); try { localStorage.setItem("user", JSON.stringify(updated)); } catch { } }} />}
+          {validActive === "settings" && <SettingsPage THEME={T} user={user} triggerCrop={triggerCrop} onProfileUpdate={(updates) => { const updated = { ...user, ...updates }; setUser(updated); try { localStorage.setItem("user", JSON.stringify(updated)); } catch { } }} />}
 
           {validActive === "accounts" && <AccountsPage THEME={T} income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
           {validActive === "expenses" && <ExpensesPage THEME={T} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}

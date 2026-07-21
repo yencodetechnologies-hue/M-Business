@@ -190,10 +190,10 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
 
   const defaultPortalOpts = {
     enablePortal: true,
-    showProgress: true,
-    showMilestones: true,
+    showProgress: false,
+    showMilestones: false,
     showTeam: false,
-    allowMessages: true,
+    allowMessages: false,
   };
 
   const normalizeMilestones = (list) => {
@@ -388,12 +388,12 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   const [quickEmpPassword, setQuickEmpPassword] = useState('');
   const [quickEmpRole, setQuickEmpRole] = useState('');
   const [quickAddSaving, setQuickAddSaving] = useState(false);
-  const [localEmployees, setLocalEmployees] = useState(employees);
+  const [localEmployees, setLocalEmployees] = useState(employees || []);
   useEffect(() => {
-    setLocalEmployees(employees);
+    if (Array.isArray(employees) && employees.length) {
+      setLocalEmployees(employees);
+    }
   }, [employees]);
-
-  useEffect(() => { setLocalEmployees(employees); }, [employees]);
 
   const handleQuickAddEmployee = async () => {
     if (!quickEmpName.trim() || !quickEmpEmail.trim() || !quickEmpPassword.trim()) {
@@ -773,14 +773,14 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
           <div className="mpc-section-card">
             <div className="mpc-section-heading" style={{ justifyContent: 'space-between' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                {editProject ? ' Team Members' : 'Add Team Members'}
+                {editProject ? ' Edit Team Members' : 'Add Team Members'}
               </span>
               <button
                 className="mpc-btn mpc-btn-primary"
                 style={{ fontSize: 12, padding: '6px 14px' }}
                 onClick={() => { setShowAddEmployee(true); setSelectedEmpsToAdd([]); }}
               >
-                {editProject ? ' Team Members' : 'Add Team Members'}
+                {editProject ? ' Edit Team Members' : 'Add Team Members'}
               </button>
             </div>
 
@@ -790,7 +790,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
               {(() => {
                 const assignedEmps = localEmployees.filter(emp => assigned.includes(emp.name || emp.employeeName || ''));
                 if (assignedEmps.length === 0) {
-                  return <div style={{ fontSize: 12, color: P.textLight, padding: '4px 0' }}>No employees assigned yet.</div>;
+                  return <div style={{ fontSize: 12, color: P.textLight, padding: '4px 0' }}>No team members assigned yet.</div>;
                 }
                 return (
                   <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 10, padding: '4px 0' }}>
@@ -904,7 +904,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                           padding: '10px', borderRadius: 10, cursor: 'pointer', marginTop: 6
                         }}
                       >
-                        <i className="ti ti-plus" style={{ fontSize: 14 }}></i> Add Employee
+                        <i className="ti ti-plus" style={{ fontSize: 14 }}></i> Add Team Member
                       </button>
                     )}
 

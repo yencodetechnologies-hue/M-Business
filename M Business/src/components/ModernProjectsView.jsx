@@ -184,14 +184,16 @@ const CSS = `
 .mpv-menu {
   position:absolute;
   right:0;
+  left:auto;
   top:35px;
   background:#fff;
   border:1.5px solid ${P.border};
   border-radius:10px;
   box-shadow:0 8px 24px rgba(0,0,0,.1);
-  z-index:9999;
-  min-width:140px;
-  overflow:hidden;
+  z-index:99999;
+  min-width:170px;
+  white-space:nowrap;
+  overflow:visible;
 }
 .mpv-menu-item { padding:9px 14px; font-size:13px; font-weight:600; cursor:pointer; color:${P.textMid};
   display:flex; align-items:center; gap:8px; transition:all .12s; border-bottom:1px solid ${P.bg}; }
@@ -312,7 +314,11 @@ export default function ModernProjectsView({
     });
 
     if (sortBy === 'newest') {
-      list = [...list].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      list = [...list].sort((a, b) => {
+        const bd = new Date(b.createdAt || b._id?.toString().substring(0, 8) ? parseInt(b._id?.toString().substring(0, 8), 16) * 1000 : 0);
+        const ad = new Date(a.createdAt || a._id?.toString().substring(0, 8) ? parseInt(a._id?.toString().substring(0, 8), 16) * 1000 : 0);
+        return bd - ad;
+      });
     } else if (sortBy === 'deadline') {
       list = [...list].sort((a, b) => new Date(a.end || a.deadline || '9999') - new Date(b.end || b.deadline || '9999'));
     } else if (sortBy === 'progress') {
@@ -427,195 +433,272 @@ export default function ModernProjectsView({
       </div>
 
       {/* ── Project Cards ── */}
-      {displayed.length === 0 ? (
-        <div className="mpv-empty">
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#718096' }}>No projects found</div>
-        </div>
-      ) : (
-        <div className={`mpv-grid${view === 'list' ? ' list' : ''}`}>
-          {paginated.map(p => {
-            const { label: statusLabel, cls: statusCls } = normaliseStatus(p.status);
-            const pct = Math.min(100, Math.max(0, p.progress || 0));
-            const deadline = p.end || p.deadline;
-            const dlColor = deadlineColor(deadline, statusCls);
-            const team = Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []);
-            const prio = (p.priority || 'medium').toLowerCase();
-            const prioLabel = prio.charAt(0).toUpperCase() + prio.slice(1);
-            const isMenuOpen = openMenu === (p._id || p.id);
-
-            // Task count from tasks prop (passed via parent if available)
-            const taskText = p.taskCount != null
-              ? `${p.doneCount || 0}/${p.taskCount} tasks`
-              : (p.tasks || '');
-
-            return (
-              <div
-                key={p._id || p.id || Math.random()}
-                className="mpv-card"
-                style={{
-                  zIndex: isMenuOpen ? 9999 : 1,
-                  cursor: "pointer"
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (onClickProject) onClickProject(p);
-                }}
-              >
-                <div className="mpv-card-top">
-                  {/* Row 1: status badge + priority + action menu */}
-                  <div className="mpv-card-row1">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                      <span className={`mpv-badge ${statusCls}`}>{statusLabel}</span>
-                      {p.category && (
-                        <span style={{ fontSize: 10, fontWeight: 700, color: P.primary, background: P.primaryLight, padding: '3px 8px', borderRadius: 20 }}>
-                          {p.category}
-                        </span>
-                      )}
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      {view === 'list' ? (
+        <div className="mpv-table-wrap" style={{ overflow: "visible", background: "#fff", borderRadius: 14, border: "1px solid #EEF2F4" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 900, fontFamily: "'Nunito',sans-serif" }}>
+            <thead>
+              <tr style={{ background: "#FAFBFC" }}>
+                {["Project", "Client", "Status", "Priority", "Progress", "Deadline", ""].map(h => (
+                  <th key={h} style={{ padding: "10px 14px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, fontFamily: "'Nunito',sans-serif", borderBottom: "2px solid var(--app-border)", whiteSpace: "nowrap", width: h === "" ? "5%" : "15.8%" }}>{h.toUpperCase()}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {displayed.length === 0 ? (
+                <tr><td colSpan={7} style={{ padding: 30, textAlign: "center", color: "var(--app-muted)", fontSize: 13, fontWeight: 400, fontFamily: "'Nunito',sans-serif" }}>No projects found</td></tr>
+              ) : paginated.map(p => {
+                const { label: statusLabel, cls: statusCls } = normaliseStatus(p.status);
+                const pct = Math.min(100, Math.max(0, p.progress || 0));
+                const deadline = p.end || p.deadline;
+                const dlColor = deadlineColor(deadline, statusCls);
+                const prio = (p.priority || 'medium').toLowerCase();
+                const prioLabel = prio.charAt(0).toUpperCase() + prio.slice(1);
+                const isMenuOpen = openMenu === (p._id || p.id);
+                return (
+                  <tr key={p._id || p.id || Math.random()} onClick={(e) => { e.stopPropagation(); if (onClickProject) onClickProject(p); }} style={{ borderBottom: "1px solid #F3F4F6", cursor: "pointer", fontFamily: "'Nunito',sans-serif" }} onMouseEnter={e => e.currentTarget.style.background = "#FAFBFC"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                    <td style={{ padding: "16px 18px" }}>
+                      <div style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{p.name}</div>
+                      <div style={{ color: "#94A3B8", fontSize: 12, marginTop: 2 }}>{p.category || "Web development"}</div>
+                    </td>
+                    <td style={{ padding: "16px 18px", color: "#4A5568" }}>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><i className="ti ti-building" style={{ fontSize: 14 }} />{p.client || "Internal"}</span>
+                    </td>
+                    <td style={{ padding: "16px 18px" }}>
+                      <span className={`mpv-badge ${statusCls}`} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>{statusLabel}</span>
+                    </td>
+                    <td style={{ padding: "16px 18px" }}>
                       <span className={`mpv-prio ${prio}`}>{prioLabel}</span>
+                    </td>
+                    <td style={{ padding: "16px 18px", minWidth: 140 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ flex: 1, height: 6, borderRadius: 4, background: "#EEF2F4", overflow: "hidden" }}>
+                          <div style={{ width: `${pct}%`, height: "100%", background: progColor(statusCls) }} />
+                        </div>
+                        <span style={{ fontWeight: 700, fontSize: 12, color: "#1A2332" }}>{pct}%</span>
+                      </div>
+                    </td>
+                    <td style={{ padding: "16px 18px", fontWeight: 700, color: dlColor }}>
+                      {deadline ? new Date(deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : "—"}
+                    </td>
+                    <td style={{ padding: "16px 18px", position: "static" }} onClick={e => e.stopPropagation()}>
                       {(onEdit || onDelete || onAssign || onNewInvoice) && (
-                        <div style={{ position: 'relative' }} onClick={e => e.stopPropagation()}>
-                          <button
-                            className="mpv-more-btn"
-                            onClick={() => setOpenMenu(isMenuOpen ? null : (p._id || p.id))}
-                          >
+                        <div style={{ position: 'relative', display: 'inline-block' }}>
+                          <button className="mpv-more-btn" onClick={() => setOpenMenu(isMenuOpen ? null : (p._id || p.id))}>
                             <i className="ti ti-dots-vertical" />
                           </button>
                           {isMenuOpen && (
                             <div className="mpv-menu" onMouseDown={e => e.stopPropagation()}>
-                              {onEdit && (
-                                <div className="mpv-menu-item" onClick={() => { setOpenMenu(null); onEdit(p); }}>
-                                  <i className="ti ti-edit" /> Edit Project
-                                </div>
-                              )}
-                              {onAssign && (
-                                <div className="mpv-menu-item" onClick={() => { setOpenMenu(null); onAssign(p); }}>
-                                  <i className="ti ti-user-plus" /> Assign Team
-                                </div>
-                              )}
-                              {onViewTasks && (
-                                <div className="mpv-menu-item" onClick={() => { setOpenMenu(null); onViewTasks(p); }}>
-                                  <i className="ti ti-checklist" /> View Tasks
-                                </div>
-                              )}
-
-                              <div className="mpv-menu-item danger" onClick={() => {
-                                setOpenMenu(null);
-                                if (onDelete) {
-                                  onDelete(p);
-                                } else {
-                                  if (window.confirm(`Delete project "${p.name}"?`)) {
-                                    alert('Please pass an onDelete prop to ModernProjectsView to handle deletion.');
-                                  }
-                                }
-                              }}>
+                              {onEdit && <div className="mpv-menu-item" onClick={() => { setOpenMenu(null); onEdit(p); }}><i className="ti ti-edit" /> Edit Project</div>}
+                              {onAssign && <div className="mpv-menu-item" onClick={() => { setOpenMenu(null); onAssign(p); }}><i className="ti ti-user-plus" /> Assign Team</div>}
+                              {onViewTasks && <div className="mpv-menu-item" onClick={() => { setOpenMenu(null); onViewTasks(p); }}><i className="ti ti-checklist" /> View Tasks</div>}
+                              <div className="mpv-menu-item danger" onClick={() => { setOpenMenu(null); if (onDelete) onDelete(p); else if (window.confirm(`Delete project "${p.name}"?`)) alert('Please pass an onDelete prop to ModernProjectsView to handle deletion.'); }}>
                                 <i className="ti ti-trash" /> Delete Project
                               </div>
                             </div>
                           )}
                         </div>
                       )}
-                    </div>
-                  </div>
-
-                  {/* Project name + client */}
-                  {view === 'list' ? (
-                    <div className="mpv-card-info">
-                      <div className="mpv-card-title">{p.name}</div>
-                      <div className="mpv-card-client"><i className="ti ti-building" />{p.client || 'Internal'}</div>
-                      {p.description && (
-                        <div style={{ fontSize: 11, color: P.textLight, marginTop: 3, lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }}>
-                          {p.description}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <>
-                      <div className="mpv-card-title">{p.name}</div>
-                      <div className="mpv-card-client"><i className="ti ti-building" />{p.client || 'Internal'}</div>
-                      {p.description && (
-                        <div style={{ fontSize: 11.5, color: P.textLight, marginBottom: 10, lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-                          {p.description}
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                  {/* Progress bar */}
-                  <div className={view === 'list' ? 'mpv-card-prog' : ''}>
-                    <div className="mpv-prog-row">
-                      <span className="mpv-pct-lbl">Progress</span>
-                      <span className="mpv-pct">{pct}%</span>
-                    </div>
-                    <div className="mpv-prog-bg">
-                      <div
-                        className="mpv-prog-fill"
-                        style={{ width: `${pct}%`, background: progColor(statusCls) }}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mpv-divider" />
-
-                {/* Bottom row: team avatars + dates + budget + deadline */}
-                <div className="mpv-card-bottom">
-                  <div style={{ minWidth: 0, flex: 1 }}>
-                    <div className="mpv-team-stack" style={{ marginBottom: 8 }}>
-                      {team.length === 0 && (
-                        <span style={{ fontSize: 11, color: P.textLight }}>Unassigned</span>
-                      )}
-                      {team.slice(0, 3).map((name, i) => (
-                        <div
-                          key={i}
-                          className="mpv-av"
-                          style={{ background: getAvColor(name, i) }}
-                          title={name}
-                        >
-                          {getInitials2(name).charAt(0)}
-                        </div>
-                      ))}
-                      {team.length > 3 && (
-                        <div className="mpv-av-extra">+{team.length - 3}</div>
-                      )}
-                    </div>
-
-                    <div className="mpv-card-meta">
-                      {taskText && (
-                        <div className="mpv-card-meta-row">
-                          <i className="ti ti-checklist" />
-                          {taskText}
-                        </div>
-                      )}
-                      {p.start && (
-                        <div className="mpv-card-meta-row">
-                          <i className="ti ti-calendar-event" />
-                          Start: {fmtDate(p.start)}
-                        </div>
-                      )}
-                      {p.budget ? (
-                        <div className="mpv-card-meta-row mpv-card-budget">
-                          <i className="ti ti-currency-rupee" />
-                          Budget: {p.currency || '₹'}{Number(p.budget).toLocaleString('en-IN')}
-                        </div>
-                      ) : null}
-                    </div>
-                  </div>
-
-                  <div className="mpv-deadline">
-                    <div className="mpv-dl-lbl">
-                      {statusCls === 'completed' ? 'Delivered' : 'Deadline'}
-                    </div>
-                    <div className="mpv-dl-val" style={{ color: dlColor }}>
-                      {fmtDate(deadline)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
+      ) : (
+        displayed.length === 0 ? (
+          <div style={{ background: "#fff", borderRadius: 14, border: "1px solid #EEF2F4", overflow: "hidden", fontFamily: "'Nunito',sans-serif" }}>
+            <div style={{ display: "flex", background: "#FAFBFC" }}>
+              {["Project", "Client", "Status", "Priority", "Progress", "Deadline", ""].map(h => (
+                <div key={h} style={{ flex: h === "" ? "0 0 5%" : "1", padding: "10px 14px", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, fontFamily: "'Nunito',sans-serif", borderBottom: "2px solid var(--app-border)", whiteSpace: "nowrap" }}>{h.toUpperCase()}</div>
+              ))}
+            </div>
+            <div style={{ padding: 30, textAlign: "center", color: "var(--app-muted)", fontSize: 13, fontWeight: 400, fontFamily: "'Nunito',sans-serif" }}>No projects found</div>
+          </div>
+        ) : (
+          <div className="mpv-grid">
+            {paginated.map(p => {
+              const { label: statusLabel, cls: statusCls } = normaliseStatus(p.status);
+              const pct = Math.min(100, Math.max(0, p.progress || 0));
+              const deadline = p.end || p.deadline;
+              const dlColor = deadlineColor(deadline, statusCls);
+              const team = Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []);
+              const prio = (p.priority || 'medium').toLowerCase();
+              const prioLabel = prio.charAt(0).toUpperCase() + prio.slice(1);
+              const isMenuOpen = openMenu === (p._id || p.id);
+
+              // Task count from tasks prop (passed via parent if available)
+              const taskText = p.taskCount != null
+                ? `${p.doneCount || 0}/${p.taskCount} tasks`
+                : (p.tasks || '');
+
+              return (
+                <div
+                  key={p._id || p.id || Math.random()}
+                  className="mpv-card"
+                  style={{
+                    zIndex: isMenuOpen ? 9999 : 1,
+                    cursor: "pointer"
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onClickProject) onClickProject(p);
+                  }}
+                >
+                  <div className="mpv-card-top">
+                    {/* Row 1: status badge + priority + action menu */}
+                    <div className="mpv-card-row1">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                        <span className={`mpv-badge ${statusCls}`}>{statusLabel}</span>
+                        {p.category && (
+                          <span style={{ fontSize: 10, fontWeight: 700, color: P.primary, background: P.primaryLight, padding: '3px 8px', borderRadius: 20 }}>
+                            {p.category}
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span className={`mpv-prio ${prio}`}>{prioLabel}</span>
+                        {(onEdit || onDelete || onAssign || onNewInvoice) && (
+                          <div style={{ position: 'relative' }} onClick={e => e.stopPropagation()}>
+                            <button
+                              className="mpv-more-btn"
+                              onClick={() => setOpenMenu(isMenuOpen ? null : (p._id || p.id))}
+                            >
+                              <i className="ti ti-dots-vertical" />
+                            </button>
+                            {isMenuOpen && (
+                              <div className="mpv-menu" onMouseDown={e => e.stopPropagation()}>
+                                {onEdit && (
+                                  <div className="mpv-menu-item" onClick={() => { setOpenMenu(null); onEdit(p); }}>
+                                    <i className="ti ti-edit" /> Edit Project
+                                  </div>
+                                )}
+                                {onAssign && (
+                                  <div className="mpv-menu-item" onClick={() => { setOpenMenu(null); onAssign(p); }}>
+                                    <i className="ti ti-user-plus" /> Assign Team
+                                  </div>
+                                )}
+                                {onViewTasks && (
+                                  <div className="mpv-menu-item" onClick={() => { setOpenMenu(null); onViewTasks(p); }}>
+                                    <i className="ti ti-checklist" /> View Tasks
+                                  </div>
+                                )}
+
+                                <div className="mpv-menu-item danger" onClick={() => {
+                                  setOpenMenu(null);
+                                  if (onDelete) {
+                                    onDelete(p);
+                                  } else {
+                                    if (window.confirm(`Delete project "${p.name}"?`)) {
+                                      alert('Please pass an onDelete prop to ModernProjectsView to handle deletion.');
+                                    }
+                                  }
+                                }}>
+                                  <i className="ti ti-trash" /> Delete Project
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Project name + client */}
+                    {view === 'list' ? (
+                      <div className="mpv-card-info">
+                        <div className="mpv-card-title">{p.name}</div>
+                        <div className="mpv-card-client"><i className="ti ti-building" />{p.client || 'Internal'}</div>
+                        {p.description && (
+                          <div style={{ fontSize: 11, color: P.textLight, marginTop: 3, lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }}>
+                            {p.description}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <>
+                        <div className="mpv-card-title">{p.name}</div>
+                        <div className="mpv-card-client"><i className="ti ti-building" />{p.client || 'Internal'}</div>
+                        {p.description && (
+                          <div style={{ fontSize: 11.5, color: P.textLight, marginBottom: 10, lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                            {p.description}
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {/* Progress bar */}
+                    <div className={view === 'list' ? 'mpv-card-prog' : ''}>
+                      <div className="mpv-prog-row">
+                        <span className="mpv-pct-lbl">Progress</span>
+                        <span className="mpv-pct">{pct}%</span>
+                      </div>
+                      <div className="mpv-prog-bg">
+                        <div
+                          className="mpv-prog-fill"
+                          style={{ width: `${pct}%`, background: progColor(statusCls) }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mpv-divider" />
+
+                  {/* Bottom row: team avatars + dates + budget + deadline */}
+                  <div className="mpv-card-bottom">
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div className="mpv-team-stack" style={{ marginBottom: 8 }}>
+
+                        {team.slice(0, 3).map((name, i) => (
+                          <div
+                            key={i}
+                            className="mpv-av"
+                            style={{ background: getAvColor(name, i) }}
+                            title={name}
+                          >
+                            {getInitials2(name).charAt(0)}
+                          </div>
+                        ))}
+                        {team.length > 3 && (
+                          <div className="mpv-av-extra">+{team.length - 3}</div>
+                        )}
+                      </div>
+
+                      <div className="mpv-card-meta">
+                        {taskText && (
+                          <div className="mpv-card-meta-row">
+                            <i className="ti ti-checklist" />
+                            {taskText}
+                          </div>
+                        )}
+                        {p.start && (
+                          <div className="mpv-card-meta-row">
+                            <i className="ti ti-calendar-event" />
+                            Start: {fmtDate(p.start)}
+                          </div>
+                        )}
+                        {p.budget ? (
+                          <div className="mpv-card-meta-row mpv-card-budget">
+                            <i className="ti ti-currency-rupee" />
+                            Budget: {p.currency || '₹'}{Number(p.budget).toLocaleString('en-IN')}
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
+
+                    <div className="mpv-deadline">
+                      <div className="mpv-dl-lbl">
+                        {statusCls === 'completed' ? 'Delivered' : 'Deadline'}
+                      </div>
+                      <div className="mpv-dl-val" style={{ color: dlColor }}>
+                        {fmtDate(deadline)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )
       )}
 
       {/* Pagination */}

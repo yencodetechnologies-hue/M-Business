@@ -3152,112 +3152,113 @@ ${onboardingLink}`;
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 900 }}>
             <thead><tr style={{ background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
               {["Employee", "Role", "Department", "Email", "Joined", "Status", "Actions"].map(h => (
-                <th key={h} style={{ padding: "10px 14px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)", whiteSpace: "nowrap" }}>{h.toUpperCase()}</th>
+                <th key={h} style={{ padding: "10px 14px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)", whiteSpace: "nowrap", width: "14.28%" }}>{h.toUpperCase()}</th>
               ))}
             </tr></thead>
             <tbody>
 
-              {filtered.map((e, i) => {
+              {filtered.length === 0 ? <tr><td colSpan={7} style={{ padding: 30, textAlign: "center", color: "var(--app-muted)" }}>No employees found</td></tr>
+                : filtered.map((e, i) => {
 
-                const eid = e.employeeId || e._id?.substring(0, 6).toUpperCase() || `EMP-${String(i + 1).padStart(3, "0")}`;
+                  const eid = e.employeeId || e._id?.substring(0, 6).toUpperCase() || `EMP-${String(i + 1).padStart(3, "0")}`;
 
-                const jDate = e.joiningDate ? new Date(e.joiningDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : "—";
+                  const jDate = e.joiningDate ? new Date(e.joiningDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : "—";
 
-                let st = e.status || "Pending";
+                  let st = e.status || "Pending";
 
-                if (st === "Approved") st = "Active";
+                  if (st === "Approved") st = "Active";
 
-                if (st === "Rejected") st = "Inactive";
+                  if (st === "Rejected") st = "Inactive";
 
-                let badgeClass = "badge";
+                  let badgeClass = "badge";
 
-                let badgeStyle = { display: "inline-flex", alignItems: "center", gap: 5, padding: "4px 11px", borderRadius: 20, fontSize: 11, fontWeight: 800 };
+                  let badgeStyle = { display: "inline-flex", alignItems: "center", gap: 5, padding: "4px 11px", borderRadius: 20, fontSize: 11, fontWeight: 800 };
 
-                if (st === "Active") { badgeStyle.background = "#dcfce7"; badgeStyle.color = "#16a34a"; }
+                  if (st === "Active") { badgeStyle.background = "#dcfce7"; badgeStyle.color = "#16a34a"; }
 
-                else if (st === "On Leave" || st === "Pending") { badgeStyle.background = "#fef3c7"; badgeStyle.color = "#d97706"; }
+                  else if (st === "On Leave" || st === "Pending") { badgeStyle.background = "#fef3c7"; badgeStyle.color = "#d97706"; }
 
-                else { badgeStyle.background = "#fee2e2"; badgeStyle.color = "#dc2626"; }
+                  else { badgeStyle.background = "#fee2e2"; badgeStyle.color = "#dc2626"; }
 
-                const dotStyle = { width: 5, height: 5, borderRadius: "50%", background: "currentColor" };
-
-
-
-                const avColors = ["linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097a7)", "linear-gradient(135deg,#7c3aed,#5b21b6)", "linear-gradient(135deg,#d97706,#b45309)", "linear-gradient(135deg,#16a34a,#15803d)", "linear-gradient(135deg,#dc2626,#991b1b)", "linear-gradient(135deg,#ec4899,#be185d)"];
-
-                const avBg = avColors[i % avColors.length];
+                  const dotStyle = { width: 5, height: 5, borderRadius: "50%", background: "currentColor" };
 
 
 
-                return (
+                  const avColors = ["linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097a7)", "linear-gradient(135deg,#7c3aed,#5b21b6)", "linear-gradient(135deg,#d97706,#b45309)", "linear-gradient(135deg,#16a34a,#15803d)", "linear-gradient(135deg,#dc2626,#991b1b)", "linear-gradient(135deg,#ec4899,#be185d)"];
 
-                  <tr key={e._id || i} style={{ cursor: "pointer", borderBottom: "1px solid var(--border)", transition: "background 0.12s" }} onMouseEnter={ev => ev.currentTarget.style.background = "#f8fbff"} onMouseLeave={ev => ev.currentTarget.style.background = "transparent"} onClick={(ev) => { ev.stopPropagation(); setViewEmp(e); loadEmpDocs(e); }}>
+                  const avBg = avColors[i % avColors.length];
 
-                    <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
 
-                      <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
 
-                        <div style={{ width: 38, height: 38, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#fff", background: avBg }}>{getInitials(e.name)}</div>
+                  return (
 
-                        <div>
+                    <tr key={e._id || i} style={{ cursor: "pointer", borderBottom: "1px solid var(--border)", transition: "background 0.12s" }} onMouseEnter={ev => ev.currentTarget.style.background = "#f8fbff"} onMouseLeave={ev => ev.currentTarget.style.background = "transparent"} onClick={(ev) => { ev.stopPropagation(); setViewEmp(e); loadEmpDocs(e); }}>
 
-                          <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text)" }}>{e.name}</div>
+                      <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
 
-                          <div style={{ fontSize: 11, color: "var(--text-soft)" }}>{eid}</div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+
+                          <div style={{ width: 38, height: 38, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#fff", background: avBg }}>{getInitials(e.name)}</div>
+
+                          <div>
+
+                            <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text)" }}>{e.name}</div>
+
+                            <div style={{ fontSize: 11, color: "var(--text-soft)" }}>{eid}</div>
+
+                          </div>
 
                         </div>
 
-                      </div>
+                      </td>
 
-                    </td>
+                      <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
 
-                    <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
+                        <span style={{ background: "#f1f5f9", color: "var(--text-mid)", fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 6 }}>{e.role || "Employee"}</span>
 
-                      <span style={{ background: "#f1f5f9", color: "var(--text-mid)", fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 6 }}>{e.role || "Employee"}</span>
+                      </td>
 
-                    </td>
+                      <td style={{ padding: "13px 16px", verticalAlign: "middle", fontSize: 12, color: "var(--text-mid)", fontWeight: 600 }}>{e.department || "—"}</td>
 
-                    <td style={{ padding: "13px 16px", verticalAlign: "middle", fontSize: 12, color: "var(--text-mid)", fontWeight: 600 }}>{e.department || "—"}</td>
+                      <td style={{ padding: "13px 16px", verticalAlign: "middle", fontSize: 13 }}>{e.email || "—"}</td>
 
-                    <td style={{ padding: "13px 16px", verticalAlign: "middle", fontSize: 13 }}>{e.email || "—"}</td>
+                      <td style={{ padding: "13px 16px", verticalAlign: "middle", fontSize: 13 }}>{jDate}</td>
 
-                    <td style={{ padding: "13px 16px", verticalAlign: "middle", fontSize: 13 }}>{jDate}</td>
+                      <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
 
-                    <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
+                        <div style={badgeStyle}><div style={dotStyle}></div> {st}</div>
 
-                      <div style={badgeStyle}><div style={dotStyle}></div> {st}</div>
+                      </td>
 
-                    </td>
+                      <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
 
-                    <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
+                        <div style={{ display: "flex", gap: 6 }}>
 
-                      <div style={{ display: "flex", gap: 6 }}>
+                          <button onClick={(ev) => { ev.stopPropagation(); setViewEmp(e); loadEmpDocs(e); }} style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "rgba(var(--app-accent-rgb,0,188,212),0.08)", color: "var(--app-accent)" }}><i className="ti ti-eye"></i></button>
+                          <button
+                            type="button"
+                            onClick={(ev) => {
+                              ev.preventDefault();
+                              ev.stopPropagation();
+                              const empData = employees.find(emp => (emp._id || emp.id) === (e._id || e.id)) || e;
+                              openEdit(empData);
+                            }}
+                            style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "#dbeafe", color: "#2563eb", position: "relative", zIndex: 5 }}
+                          >
+                            <i className="ti ti-pencil" style={{ pointerEvents: "none" }}></i>
+                          </button>
 
-                        <button onClick={(ev) => { ev.stopPropagation(); setViewEmp(e); loadEmpDocs(e); }} style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "rgba(var(--app-accent-rgb,0,188,212),0.08)", color: "var(--app-accent)" }}><i className="ti ti-eye"></i></button>
-                        <button
-                          type="button"
-                          onClick={(ev) => {
-                            ev.preventDefault();
-                            ev.stopPropagation();
-                            const empData = employees.find(emp => (emp._id || emp.id) === (e._id || e.id)) || e;
-                            openEdit(empData);
-                          }}
-                          style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "#dbeafe", color: "#2563eb", position: "relative", zIndex: 5 }}
-                        >
-                          <i className="ti ti-pencil" style={{ pointerEvents: "none" }}></i>
-                        </button>
+                          <button onClick={(ev) => { ev.stopPropagation(); setDeleteTarget(e); }} style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "#fee2e2", color: "#dc2626" }}><i className="ti ti-trash"></i></button>
 
-                        <button onClick={(ev) => { ev.stopPropagation(); setDeleteTarget(e); }} style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "#fee2e2", color: "#dc2626" }}><i className="ti ti-trash"></i></button>
+                        </div>
 
-                      </div>
+                      </td>
 
-                    </td>
+                    </tr>
 
-                  </tr>
+                  );
 
-                );
-
-              })}
+                })}
 
             </tbody>
 
@@ -11257,6 +11258,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 clients={clients}
 
                 employees={employees}
+
+                onAddEmployeeClick={() => {
+                  const limit = getSubscriptionLimit("employee", subscription);
+                  if (limit !== Infinity && employees.length >= limit) {
+                    setLimitModal({ type: "employee", limit });
+                    return;
+                  }
+                  setNeError({}); setModal("employee");
+                  fetchSubscription();
+                }}
 
                 onBack={() => { const returnTo = sidebarOverride || "projects"; setSidebarOverride(null); setActive(returnTo); }}
 

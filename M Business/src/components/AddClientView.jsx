@@ -355,13 +355,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
                   <input type="date" disabled name="onboardedOn" value={formData.onboardedOn} onChange={handleChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8', opacity: 0.8, cursor: 'not-allowed' }} />
                 </div>
 
-                <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</label>
-                  <div style={{ display: 'flex', gap: 8, height: 42 }}>
-                    <button onClick={() => setFormData({ ...formData, status: 'Active' })} style={{ flex: 1, height: '100%', borderRadius: 8, border: `1.5px solid ${formData.status === 'Active' ? '#26A69A' : '#E0E6EA'}`, background: formData.status === 'Active' ? '#E0F2F1' : '#F4F6F8', color: formData.status === 'Active' ? '#26A69A' : '#94A3B0', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer' }}>Yes Active</button>
-                    <button onClick={() => setFormData({ ...formData, status: 'Inactive' })} style={{ flex: 1, height: '100%', borderRadius: 8, border: `1.5px solid ${formData.status === 'Inactive' ? '#EF9A9A' : '#E0E6EA'}`, background: formData.status === 'Inactive' ? '#FFEBEE' : '#F4F6F8', color: formData.status === 'Inactive' ? '#EF5350' : '#94A3B0', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer' }}>CloseInactive</button>
-                  </div>
-                </div>
+
               </div>
             </div>
           </div>

@@ -6047,7 +6047,10 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
                             setJumpProject(null);
                             setJumpInvoicePrefill(null);
                             if (typeof setInvoicePrefill === "function") setInvoicePrefill(null);
-                            setSidebarOverride(null);
+                          }
+                          if (sub.key === "projects") {
+                            setJumpProject(null);
+                            if (typeof setProjectDetailsReadOnly === "function") setProjectDetailsReadOnly(false);
                           }
                           setActive(sub.key);
                           onClose();

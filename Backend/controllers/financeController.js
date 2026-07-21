@@ -3,7 +3,7 @@ const Income = require("../models/IncomeModel");
 const Expense = require("../models/AccountModels");
 const Bank = require("../models/BankModel");
 const Invoice = require("../models/InvoiceModels");
-const Vendor = require("../models/VendorModel"); szxsaz
+const Vendor = require("../models/VendorModel");
 
 /* ─── helpers ──────────────────────────────────────────────── */
 const SHORT_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];

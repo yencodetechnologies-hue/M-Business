@@ -332,19 +332,39 @@ export function addWhyUs() {
 }
 
 export function addTeamMember() {
-  const name = prompt('Team member full name:');
-  if (!name) return;
-  const role = prompt('Their job role:') || 'Team Member';
-  const exp = prompt('Years of experience (e.g. 5+ years · Web Dev):') || '';
-  const skills = prompt('Skills (comma-separated):') || '';
   const c = getEl('teamList');
+  const d = document.createElement('div');
+  d.className = 'team-card';
+  d.style.cssText = 'flex-direction:column;align-items:stretch;gap:8px;padding:12px';
+  d.innerHTML = `
+    <div class="fg" style="margin-bottom:0"><label class="fl">Full Name</label><input type="text" class="fi tm-name-inp" placeholder="e.g. Prabhu R"></div>
+    <div class="fg" style="margin-bottom:0"><label class="fl">Job Role</label><input type="text" class="fi tm-role-inp" placeholder="e.g. Lead Developer"></div>
+    <div class="fg" style="margin-bottom:0"><label class="fl">Experience</label><input type="text" class="fi tm-exp-inp" placeholder="e.g. 8+ years · Web & Mobile"></div>
+    <div class="fg" style="margin-bottom:0"><label class="fl">Skills (comma-separated)</label><input type="text" class="fi tm-skills-inp" placeholder="e.g. React.js, Node.js"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:2px">
+      <button type="button" class="icon-del" onclick="this.closest('.team-card').remove()"><i class="ti ti-trash" style="font-size:13px"></i> Cancel</button>
+      <button type="button" class="add-btn" style="width:auto;margin:0;padding:5px 10px" onclick="saveTeamMember(this)"><i class="ti ti-check"></i> Save</button>
+    </div>`;
+  c.appendChild(d);
+  d.querySelector('.tm-name-inp').focus();
+}
+
+export function saveTeamMember(btn) {
+  const card = btn.closest('.team-card');
+  const name = card.querySelector('.tm-name-inp').value.trim();
+  if (!name) { card.querySelector('.tm-name-inp').focus(); return; }
+  const role = card.querySelector('.tm-role-inp').value.trim() || 'Team Member';
+  const exp = card.querySelector('.tm-exp-inp').value.trim();
+  const skills = card.querySelector('.tm-skills-inp').value.trim();
   const colors = ['linear-gradient(135deg,var(--teal),var(--teal4))', 'linear-gradient(135deg,var(--purple),#4E35B0)', 'linear-gradient(135deg,var(--amber),#D4880A)', 'linear-gradient(135deg,var(--blue),#1A4DB5)'];
   const col = colors[Math.floor(Math.random() * colors.length)];
   const init = name.trim().split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
   const skillTags = skills ? skills.split(',').map(s => `<span class="tc-skill">${s.trim()}</span>`).join('') : '';
   const d = document.createElement('div');
   d.className = 'team-card';
-  d.innerHTML = `<div class="tc-av" style="background:${col}">${init}</div>
+  card.className = 'team-card';
+  card.style.cssText = '';
+  card.innerHTML = `<div class="tc-av" style="background:${col}">${init}</div>
     <div style="flex:1;min-width:0">
       <div class="tc-name">${name}</div>
       <div class="tc-role">${role}</div>
@@ -352,7 +372,6 @@ export function addTeamMember() {
       ${skillTags ? `<div class="tc-skills">${skillTags}</div>` : ''}
     </div>
     <i class="ti ti-x tc-del" onclick="this.closest('.team-card').remove();updateTeamPreview()"></i>`;
-  c.appendChild(d);
   updateTeamPreview();
 }
 

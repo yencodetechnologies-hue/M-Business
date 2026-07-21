@@ -212,13 +212,18 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           console.error('Client update failed:', err);
         });
       } else {
+
         const res = await axios.post(`${BASE_URL}/api/clients/add`, payload, {
           headers: { Authorization: `Bearer ${user?.token || ""}` }
         });
-        if (onClientAdded && res.data?.client) onClientAdded(res.data.client);
+        if (onClientAdded && res.data?.client) {
+          onClientAdded(res.data.client);
+        } else {
+          onBack();
+        }
         toast.success('Client added successfully!');
-        onBack();
       }
+
     } catch (err) {
       const errMsg = err.response?.data?.message || `Failed to ${isEdit ? 'update' : 'save'} client`;
       toast.error(errMsg);

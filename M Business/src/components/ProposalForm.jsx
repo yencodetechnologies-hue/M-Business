@@ -4,10 +4,12 @@ import * as logic from './ProposalFormLogic';
 
 export default function ProposalForm({ onBack, onSave, initialData, clients, onAddClient, newlyAddedClientName, onMountExposeCrop }) {
   const containerRef = useRef(null);
+  window._proposalFormContainer = null;
 
   useEffect(() => {
     const c = containerRef.current;
     if (!c) return;
+    window._proposalFormContainer = c;
     if (newlyAddedClientName) {
       const selEl = c.querySelector('#toComp');
       if (selEl && selEl.tagName === 'SELECT') {
@@ -85,7 +87,9 @@ export default function ProposalForm({ onBack, onSave, initialData, clients, onA
 
     const clientsList = clients || window._clientsData || [];
     window._clientsData = clientsList;
-    window._onAddClient = onAddClient;
+    window._onAddClient = () => {
+      if (typeof onAddClient === 'function') onAddClient();
+    };
     const sel = document.getElementById('toComp');
     if (sel && sel.tagName === 'SELECT') {
       sel.innerHTML = '<option value="">-- Select Client --</option>'
@@ -193,17 +197,16 @@ export default function ProposalForm({ onBack, onSave, initialData, clients, onA
           liveZone.innerHTML = `<div style="background:rgba(0,0,0,0.55);color:#fff;font-weight:700;font-size:12px;padding:6px 12px;border-radius:8px">Cover image uploaded — Click to change</div>`;
           liveZone.dataset.coverImage = dataUrl;
         };
-
-        coverZone.onclick = (e) => {
+        coverZone.onclick = () => {
           const inp = document.createElement('input');
           inp.type = 'file'; inp.accept = 'image/*';
-          inp.onchange = (evt) => {
+          inp.onchange = (e) => {
             if (typeof window.triggerCrop === 'function') {
-              window.triggerCrop(evt, (croppedImage) => applyCoverImage(croppedImage), 1);
+              window.triggerCrop(e, (croppedImage) => applyCoverImage(croppedImage), 1);
             } else if (window._triggerCrop) {
-              window._triggerCrop(evt, (croppedImage) => applyCoverImage(croppedImage), 1);
+              window._triggerCrop(e, (croppedImage) => applyCoverImage(croppedImage), 1);
             } else {
-              const file = evt.target.files[0]; if (!file) return;
+              const file = e.target.files[0]; if (!file) return;
               const reader = new FileReader();
               reader.onload = (ev) => applyCoverImage(ev.target.result);
               reader.readAsDataURL(file);

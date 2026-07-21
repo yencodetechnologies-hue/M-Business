@@ -6768,6 +6768,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [quotationNewClientName, setQuotationNewClientName] = useState(null);
   const [returnToProposals, setReturnToProposals] = useState(false);
   const [proposalNewClientName, setProposalNewClientName] = useState(null);
+  const [showAddClientModal, setShowAddClientModal] = useState(false);
 
   const [active, setActive] = useState(() => {
     const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
@@ -11489,6 +11490,28 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               setActive("clients");
             }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || accentColor} />}
 
+            {showAddClientModal && (
+              <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={() => setShowAddClientModal(false)}>
+                <div style={{ background: "#fff", borderRadius: 16, width: "100%", maxWidth: 720, maxHeight: "90vh", overflowY: "auto" }} onClick={e => e.stopPropagation()}>
+                  <AddClientView
+                    onBack={() => { setReturnToProposals(false); setShowAddClientModal(false); }}
+                    onClientAdded={(client, replaceTempId) => {
+                      setClients(prev => {
+                        if (replaceTempId) return prev.map(c => c._id === replaceTempId ? client : c);
+                        if (prev.some(c => c._id === client._id)) return prev;
+                        return [...prev, client];
+                      });
+                      setReturnToProposals(false);
+                      setProposalNewClientName(client.clientName || client.name || "");
+                      setShowAddClientModal(false);
+                    }}
+                    user={user}
+                    themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || accentColor}
+                  />
+                </div>
+              </div>
+            )}
+
             {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setProjectDetailsReadOnly(true); setActive("project-details"); }} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
@@ -11689,7 +11712,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             }} onAddProject={() => { setPrevActiveBeforeInvoice(active); setActive("create-project"); }} newlyAddedClientName={quotationNewClientName} />}
 
-            {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} onAddClient={() => { setNcError({}); setShowClientPass(false); setReturnToProposals(true); setSidebarOverride("proposals"); setActive("addClient"); }} newlyAddedClientName={proposalNewClientName} />}
+            {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} onAddClient={() => { setNcError({}); setShowClientPass(false); setReturnToProposals(true); setActive("addClient"); }} newlyAddedClientName={proposalNewClientName} triggerCrop={triggerCrop} />}
 
             {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
 

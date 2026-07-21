@@ -8,6 +8,19 @@ export default function ProposalForm({ onBack, onSave, initialData, clients, onA
   useEffect(() => {
     const c = containerRef.current;
     if (!c) return;
+    if (newlyAddedClientName) {
+      const selEl = c.querySelector('#toComp');
+      if (selEl && selEl.tagName === 'SELECT') {
+        const opt = Array.from(selEl.options).find(o => o.value === newlyAddedClientName);
+        if (opt) {
+          selEl.value = newlyAddedClientName;
+          selEl.style.transition = 'box-shadow .3s, border-color .3s';
+          selEl.style.borderColor = '#00BCD4';
+          selEl.style.boxShadow = '0 0 0 3px rgba(0,188,212,.25)';
+          setTimeout(() => { selEl.style.boxShadow = 'none'; }, 2000);
+        }
+      }
+    }
     if (typeof onMountExposeCrop === 'function') onMountExposeCrop();
 
     // Expose ALL logic functions to window so dangerouslySetInnerHTML onclick attrs work natively
@@ -168,37 +181,33 @@ export default function ProposalForm({ onBack, onSave, initialData, clients, onA
       // survives save/reload (a blob: URL from createObjectURL does not).
       const coverZone = c.querySelector('#coverZone');
       if (coverZone) {
-        coverZone.onclick = () => {
+        const applyCoverImage = (dataUrl) => {
+          const liveZone = c.querySelector('#coverZone');
+          if (!liveZone) return;
+          liveZone.style.backgroundImage = `url(${dataUrl})`;
+          liveZone.style.backgroundSize = 'contain';
+          liveZone.style.backgroundRepeat = 'no-repeat';
+          liveZone.style.backgroundPosition = 'center';
+          liveZone.style.borderColor = 'var(--teal)';
+          liveZone.style.borderStyle = 'solid';
+          liveZone.innerHTML = `<div style="background:rgba(0,0,0,0.55);color:#fff;font-weight:700;font-size:12px;padding:6px 12px;border-radius:8px">Cover image uploaded — Click to change</div>`;
+          liveZone.dataset.coverImage = dataUrl;
+        };
+
+        coverZone.onclick = (e) => {
           const inp = document.createElement('input');
           inp.type = 'file'; inp.accept = 'image/*';
-          inp.onchange = (e) => {
-            window._triggerCrop
-              ? window._triggerCrop(e, (croppedImage) => {
-                coverZone.style.backgroundImage = `url(${croppedImage})`;
-                coverZone.style.backgroundSize = 'contain';
-                coverZone.style.backgroundRepeat = 'no-repeat';
-                coverZone.style.backgroundPosition = 'center';
-                coverZone.style.borderColor = 'var(--teal)';
-                coverZone.style.borderStyle = 'solid';
-                coverZone.innerHTML = `<div style="background:rgba(0,0,0,0.55);color:#fff;font-weight:700;font-size:12px;padding:6px 12px;border-radius:8px">Cover image uploaded — Click to change</div>`;
-                coverZone.dataset.coverImage = croppedImage;
-              }, 3)
-              : (() => {
-                const file = e.target.files[0]; if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                  const dataUrl = ev.target.result;
-                  coverZone.style.backgroundImage = `url(${dataUrl})`;
-                  coverZone.style.backgroundSize = 'contain';
-                  coverZone.style.backgroundRepeat = 'no-repeat';
-                  coverZone.style.backgroundPosition = 'center';
-                  coverZone.style.borderColor = 'var(--teal)';
-                  coverZone.style.borderStyle = 'solid';
-                  coverZone.innerHTML = `<div style="background:rgba(0,0,0,0.55);color:#fff;font-weight:700;font-size:12px;padding:6px 12px;border-radius:8px">Cover image uploaded — Click to change</div>`;
-                  coverZone.dataset.coverImage = dataUrl;
-                };
-                reader.readAsDataURL(file);
-              })();
+          inp.onchange = (evt) => {
+            if (typeof window.triggerCrop === 'function') {
+              window.triggerCrop(evt, (croppedImage) => applyCoverImage(croppedImage), 1);
+            } else if (window._triggerCrop) {
+              window._triggerCrop(evt, (croppedImage) => applyCoverImage(croppedImage), 1);
+            } else {
+              const file = evt.target.files[0]; if (!file) return;
+              const reader = new FileReader();
+              reader.onload = (ev) => applyCoverImage(ev.target.result);
+              reader.readAsDataURL(file);
+            }
           };
           inp.click();
         };

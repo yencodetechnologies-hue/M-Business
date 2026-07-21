@@ -5587,11 +5587,13 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
             <button
 
-              onClick={() => logoRef.current.click()}
+              onClick={() => logoRef.current && logoRef.current.click()}
 
               style={{ position: "absolute", bottom: -5, right: -5, padding: "6px", background: "rgba(255,255,255,0.9)", border: "none", borderRadius: 8, fontSize: 14, cursor: "pointer", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}
 
-              title="Upload Logo"
+              title="Upload Profile Image"
+
+              type="button"
 
             >
 

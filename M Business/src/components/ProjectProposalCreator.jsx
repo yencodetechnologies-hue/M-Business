@@ -1120,7 +1120,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
 }
 
 // ─── MAIN APP -----------------------------------------------------------------
-export default function CanvaProposal({ clients = [], openNew = false, onOpenNewDone, companyLogo, companyName, onAddClient, newlyAddedClientName }) {
+export default function CanvaProposal({ clients = [], openNew = false, onOpenNewDone, companyLogo, companyName, onAddClient, newlyAddedClientName, triggerCrop }) {
   // Always start at "list" view; fetchProposals() will switch to "editor" once the
   // correct doc has been loaded from the API (fixes the blank-editor flash when
   // navigating via ?edit= or ?view= URL params before data is ready).
@@ -1613,6 +1613,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
       clients={clients}
       onAddClient={onAddClient}
       newlyAddedClientName={newlyAddedClientName}
+      onMountExposeCrop={() => { window.triggerCrop = triggerCrop; }}
       onSave={async (data) => {
         await createNew(data);
         if (data.status === 'sent') {

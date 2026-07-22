@@ -7096,10 +7096,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   useEffect(() => {
 
 
-
-    const t = appTheme === "custom" ? generateThemeFromColor(customColor) : (THEMES[appTheme] || THEMES.teal);
-
+const t = appTheme === "custom" ? generateThemeFromColor(customColor) : (THEMES[appTheme] || THEMES.teal);
     if (!t) return;
+    localStorage.setItem("appTheme", appTheme);
+    if (appTheme === "custom") localStorage.setItem("appCustomColor", customColor);
 
     document.documentElement.style.setProperty("--app-sidebar", t.sidebar);
 
@@ -7123,6 +7123,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
     document.documentElement.style.setProperty("--teal2", t.dot);
 
+    document.documentElement.style.setProperty("--teal", t.accent);
     document.documentElement.style.setProperty("--teal-light", `rgba(${hexToRgb(t.accent)}, 0.1)`);
 
     document.documentElement.style.setProperty("--teal-lighter", `rgba(${hexToRgb(t.accent)}, 0.04)`);

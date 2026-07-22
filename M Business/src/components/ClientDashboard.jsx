@@ -349,7 +349,7 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
     </div>
   );
 }
-export default function ClientDashboard({ user: userProp, setUser, portalMode = false }) {
+export default function ClientDashboard({ user: userProp, setUser, portalMode = false, themeColor = "#00BCD4" }) {
   useAssets();
   const [active, setActive] = useState(() =>
     portalMode ? "dashboard" : (localStorage.getItem("activeTab_client") || "dashboard")
@@ -1093,8 +1093,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   // Styles Injection
   const CSS = `
   .cp-root {
-      --teal:  var(--app-accent, var(--app-accent, #00BCD4));
-      --teal2var(--app-accent2, var(--app-accent2, #00ACC1));
+--teal: ${themeColor};
+      --teal2: ${themeColor};
       --teal3: #006E7F;
       --teal-light: var(--teal-light, var(--teal-light, #E0F7FA));
       --teal-lighter: var(--teal-lighter, #F0FDFE);

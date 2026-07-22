@@ -23,7 +23,7 @@
     }
 
     :root {
-      --teal: var(--app-accent, var(--app-accent, #00BCD4));
+      --teal: var(--app-accent, #00BCD4);
       --teal2: var(--app-accent2, var(--app-accent2, #00ACC1));
       --teal3: #26D0CE;
       --teal4: #006E7F;
@@ -47,8 +47,8 @@
       --purple-bg: #EEE9FF;
       --blue: #2563EB;
       --blue-bg: #EFF4FF;
-      --sidebar-grad: linear-gradient(180deg, #26D0CE 0%, var(--app-accent, var(--app-accent, #00BCD4)) 35%, var(--app-accent2, #00ACC1) 65%, #006E7F 100%);
-      --lh-color: var(--app-accent, var(--app-accent, #00BCD4));
+      --sidebar-grad: linear-gradient(180deg, #26D0CE 0%, var(--teal) 35%, var(--app-accent2, #00ACC1) 65%, #006E7F 100%);
+      --lh-color: var(--teal);
       --font: 'Nunito', sans-serif;
     }
 
@@ -2571,11 +2571,10 @@
                   <div class="csw" style="background:#607D86" data-c="#607D86" onclick="pickColor(this)"></div>
                 </div>
                 <div style="display:flex;gap:7px;align-items:center">
-                  <input type="color" id="cpicker" value=" var(--app-accent, var(--app-accent, #00BCD4))"
-                    oninput="setCustomColor(this.value)"
+                  <input type="color" id="cpicker" value=" var(--teal)" oninput="setCustomColor(this.value)"
                     style="width:32px;height:28px;border:1.5px solid var(--border);border-radius:6px;padding:2px;cursor:pointer;background:var(--bg)">
-                  <input class="fi" id="colorHex" value=" var(--app-accent, var(--app-accent, #00BCD4))"
-                    placeholder="#RRGGBB" style="flex:1" oninput="setCustomColor(this.value)">
+                  <input class="fi" id="colorHex" value=" var(--teal)" placeholder="#RRGGBB" style="flex:1"
+                    oninput="setCustomColor(this.value)">
                 </div>
               </div>
               <div class="fg"><label class="fl">Font</label>
@@ -2617,15 +2616,13 @@
               <div class="layout-grid" id="lhLayoutGrid">
                 <div class="lo sel" onclick="selLayout(this,'lh','logo-left')">
                   <div class="lo-prev"><svg width="80" height="48" viewBox="0 0 80 48">
-                      <rect x="8" y="14" width="18" height="14" rx="3"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" opacity=".9" />
+                      <rect x="8" y="14" width="18" height="14" rx="3" fill=" var(--teal)" opacity=".9" />
                       <rect x="30" y="15" width="26" height="5" rx="2" fill="#1A2E35" opacity=".8" />
                       <rect x="30" y="23" width="18" height="3" rx="1.5" fill="#A0B8BE" />
                       <rect x="56" y="15" width="16" height="3" rx="1.5" fill="#E0EEF0" />
                       <rect x="56" y="21" width="12" height="2.5" rx="1.25" fill="#E0EEF0" />
                       <rect x="56" y="27" width="16" height="2.5" rx="1.25" fill="#E0EEF0" />
-                      <rect x="4" y="36" width="72" height="2" rx="1"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" />
+                      <rect x="4" y="36" width="72" height="2" rx="1" fill=" var(--teal)" />
                     </svg></div>
                   <div class="lo-chk">✓</div>
                   <div class="lo-lbl">Logo Left</div>
@@ -2637,30 +2634,25 @@
                       <rect x="8" y="27" width="16" height="2.5" rx="1.25" fill="#E0EEF0" />
                       <rect x="28" y="15" width="22" height="5" rx="2" fill="#1A2E35" opacity=".8" />
                       <rect x="28" y="23" width="16" height="3" rx="1.5" fill="#A0B8BE" />
-                      <rect x="54" y="14" width="18" height="14" rx="3"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" opacity=".9" />
-                      <rect x="4" y="36" width="72" height="2" rx="1"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" />
+                      <rect x="54" y="14" width="18" height="14" rx="3" fill=" var(--teal)" opacity=".9" />
+                      <rect x="4" y="36" width="72" height="2" rx="1" fill=" var(--teal)" />
                     </svg></div>
                   <div class="lo-chk">✓</div>
                   <div class="lo-lbl">Logo Right</div>
                 </div>
                 <div class="lo" onclick="selLayout(this,'lh','centered')">
                   <div class="lo-prev"><svg width="80" height="48" viewBox="0 0 80 48">
-                      <circle cx="40" cy="15" r="8" fill=" var(--app-accent, var(--app-accent, #00BCD4))"
-                        opacity=".9" />
+                      <circle cx="40" cy="15" r="8" fill=" var(--teal)" opacity=".9" />
                       <rect x="25" y="26" width="30" height="5" rx="2" fill="#1A2E35" opacity=".8" />
                       <rect x="28" y="33" width="24" height="3" rx="1.5" fill="#A0B8BE" />
-                      <rect x="4" y="41" width="72" height="2" rx="1"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" />
+                      <rect x="4" y="41" width="72" height="2" rx="1" fill=" var(--teal)" />
                     </svg></div>
                   <div class="lo-chk">✓</div>
                   <div class="lo-lbl">Centered</div>
                 </div>
                 <div class="lo" onclick="selLayout(this,'lh','banner')">
                   <div class="lo-prev" style="background:transparent"><svg width="80" height="48" viewBox="0 0 80 48">
-                      <rect x="0" y="0" width="80" height="48" fill=" var(--app-accent, var(--app-accent, #00BCD4))"
-                        opacity=".9" />
+                      <rect x="0" y="0" width="80" height="48" fill=" var(--teal)" opacity=".9" />
                       <rect x="8" y="16" width="16" height="12" rx="3" fill="rgba(255,255,255,.3)" />
                       <rect x="28" y="17" width="22" height="4.5" rx="2" fill="rgba(255,255,255,.9)" />
                       <rect x="28" y="24" width="16" height="3" rx="1.5" fill="rgba(255,255,255,.55)" />
@@ -2673,8 +2665,7 @@
                 </div>
                 <div class="lo" onclick="selLayout(this,'lh','split')">
                   <div class="lo-prev" style="background:transparent"><svg width="80" height="48" viewBox="0 0 80 48">
-                      <rect x="0" y="0" width="32" height="48" fill=" var(--app-accent, var(--app-accent, #00BCD4))"
-                        opacity=".9" />
+                      <rect x="0" y="0" width="32" height="48" fill=" var(--teal)" opacity=".9" />
                       <rect x="4" y="12" width="14" height="12" rx="3" fill="rgba(255,255,255,.3)" />
                       <rect x="4" y="27" width="22" height="3.5" rx="1.75" fill="rgba(255,255,255,.85)" />
                       <rect x="4" y="33" width="16" height="2.5" rx="1.25" fill="rgba(255,255,255,.55)" />
@@ -2688,9 +2679,8 @@
                 </div>
                 <div class="lo" onclick="selLayout(this,'lh','top-bar')">
                   <div class="lo-prev" style="background:transparent"><svg width="80" height="48" viewBox="0 0 80 48">
-                      <rect x="0" y="0" width="80" height="5" fill=" var(--app-accent, var(--app-accent, #00BCD4))" />
-                      <rect x="8" y="14" width="14" height="12" rx="3"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" opacity=".8" />
+                      <rect x="0" y="0" width="80" height="5" fill=" var(--teal)" />
+                      <rect x="8" y="14" width="14" height="12" rx="3" fill=" var(--teal)" opacity=".8" />
                       <rect x="26" y="15" width="22" height="4.5" rx="2" fill="#1A2E35" opacity=".8" />
                       <rect x="26" y="22" width="16" height="3" rx="1.5" fill="#A0B8BE" />
                       <rect x="54" y="15" width="18" height="2.5" rx="1.25" fill="#E0EEF0" />
@@ -2834,24 +2824,20 @@
               <div class="layout-grid" id="quoLayoutGrid">
                 <div class="lo sel" onclick="selLayout(this,'quo','classic')">
                   <div class="lo-prev"><svg width="80" height="48" viewBox="0 0 80 48">
-                      <rect x="8" y="10" width="14" height="14" rx="3"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" opacity=".85" />
+                      <rect x="8" y="10" width="14" height="14" rx="3" fill=" var(--teal)" opacity=".85" />
                       <rect x="26" y="11" width="24" height="5" rx="2" fill="#1A2E35" opacity=".8" />
                       <rect x="26" y="19" width="18" height="3" rx="1.5" fill="#A0B8BE" />
                       <rect x="54" y="8" width="18" height="7" rx="2" fill="none" stroke="#A0B8BE" stroke-width="1" />
                       <rect x="56" y="10" width="14" height="3" rx="1.5" fill="#A0B8BE" opacity=".6" />
-                      <rect x="4" y="33" width="72" height="3" rx="1.5"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" />
-                      <rect x="56" y="17" width="18" height="4" rx="2"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" opacity=".2" />
+                      <rect x="4" y="33" width="72" height="3" rx="1.5" fill=" var(--teal)" />
+                      <rect x="56" y="17" width="18" height="4" rx="2" fill=" var(--teal)" opacity=".2" />
                     </svg></div>
                   <div class="lo-chk">✓</div>
                   <div class="lo-lbl">Classic</div>
                 </div>
                 <div class="lo" onclick="selLayout(this,'quo','modern')">
                   <div class="lo-prev" style="background:transparent"><svg width="80" height="48" viewBox="0 0 80 48">
-                      <rect x="0" y="0" width="80" height="40" fill=" var(--app-accent, var(--app-accent, #00BCD4))"
-                        opacity=".9" />
+                      <rect x="0" y="0" width="80" height="40" fill=" var(--teal)" opacity=".9" />
                       <rect x="8" y="12" width="14" height="14" rx="3" fill="rgba(255,255,255,.25)" />
                       <rect x="26" y="13" width="24" height="5" rx="2" fill="rgba(255,255,255,.95)" />
                       <rect x="26" y="21" width="18" height="3" rx="1.5" fill="rgba(255,255,255,.55)" />
@@ -2866,10 +2852,8 @@
                 </div>
                 <div class="lo" onclick="selLayout(this,'quo','minimal')">
                   <div class="lo-prev"><svg width="80" height="48" viewBox="0 0 80 48">
-                      <rect x="4" y="2" width="72" height="4" rx="2"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" />
-                      <rect x="8" y="14" width="12" height="12" rx="3"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" opacity=".7" />
+                      <rect x="4" y="2" width="72" height="4" rx="2" fill=" var(--teal)" />
+                      <rect x="8" y="14" width="12" height="12" rx="3" fill=" var(--teal)" opacity=".7" />
                       <rect x="24" y="15" width="28" height="5" rx="2" fill="#1A2E35" opacity=".8" />
                       <rect x="24" y="23" width="20" height="3" rx="1.5" fill="#A0B8BE" />
                       <rect x="4" y="36" width="72" height="1" rx=".5" fill="#E0EEF0" />
@@ -3003,7 +2987,7 @@
                       <defs>
                         <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
                           <stop offset="0%" stop-color="#004D5E" />
-                          <stop offset="100%" stop-color=" var(--app-accent, var(--app-accent, #00BCD4))" />
+                          <stop offset="100%" stop-color=" var(--teal)" />
                         </linearGradient>
                       </defs>
                       <rect x="0" y="0" width="80" height="48" fill="url(#g1)" />
@@ -3016,10 +3000,8 @@
                 </div>
                 <div class="lo" onclick="selLayout(this,'prop','clean-cover')">
                   <div class="lo-prev"><svg width="80" height="48" viewBox="0 0 80 48">
-                      <rect x="4" y="0" width="72" height="5" rx="2"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" />
-                      <rect x="8" y="12" width="16" height="16" rx="4"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" opacity=".8" />
+                      <rect x="4" y="0" width="72" height="5" rx="2" fill=" var(--teal)" />
+                      <rect x="8" y="12" width="16" height="16" rx="4" fill=" var(--teal)" opacity=".8" />
                       <rect x="8" y="32" width="38" height="5" rx="2" fill="#1A2E35" opacity=".8" />
                       <rect x="8" y="40" width="24" height="3" rx="1.5" fill="#A0B8BE" />
                     </svg></div>
@@ -3028,16 +3010,14 @@
                 </div>
                 <div class="lo" onclick="selLayout(this,'prop','split-cover')">
                   <div class="lo-prev" style="background:transparent"><svg width="80" height="48" viewBox="0 0 80 48">
-                      <rect x="0" y="0" width="40" height="48" fill=" var(--app-accent, var(--app-accent, #00BCD4))"
-                        opacity=".9" />
+                      <rect x="0" y="0" width="40" height="48" fill=" var(--teal)" opacity=".9" />
                       <rect x="6" y="10" width="14" height="14" rx="3" fill="rgba(255,255,255,.25)" />
                       <rect x="4" y="29" width="30" height="4" rx="2" fill="rgba(255,255,255,.9)" />
                       <rect x="4" y="36" width="22" height="3" rx="1.5" fill="rgba(255,255,255,.5)" />
                       <rect x="44" y="10" width="28" height="3" rx="1.5" fill="#A0B8BE" />
                       <rect x="44" y="17" width="22" height="2.5" rx="1.25" fill="#A0B8BE" opacity=".6" />
                       <rect x="44" y="23" width="28" height="2.5" rx="1.25" fill="#A0B8BE" opacity=".6" />
-                      <rect x="44" y="36" width="18" height="5" rx="2"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" opacity=".6" />
+                      <rect x="44" y="36" width="18" height="5" rx="2" fill=" var(--teal)" opacity=".6" />
                     </svg></div>
                   <div class="lo-chk">✓</div>
                   <div class="lo-lbl">Split Cover</div>
@@ -3378,24 +3358,21 @@
               <div class="layout-grid" id="invLayoutGrid">
                 <div class="lo sel" onclick="selLayout(this,'inv','classic')">
                   <div class="lo-prev"><svg width="80" height="48" viewBox="0 0 80 48">
-                      <rect x="8" y="10" width="14" height="14" rx="3"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" opacity=".85" />
+                      <rect x="8" y="10" width="14" height="14" rx="3" fill=" var(--teal)" opacity=".85" />
                       <rect x="26" y="11" width="24" height="5" rx="2" fill="#1A2E35" opacity=".8" />
                       <rect x="26" y="19" width="18" height="3" rx="1.5" fill="#A0B8BE" />
-                      <rect x="54" y="8" width="22" height="8" rx="2" fill="none"
-                        stroke=" var(--app-accent, var(--app-accent, #00BCD4))" stroke-width="1.5" />
-                      <text x="65" y="13.5" font-size="5" font-weight="800"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" text-anchor="middle">INV</text>
-                      <rect x="4" y="33" width="72" height="3" rx="1.5"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" />
+                      <rect x="54" y="8" width="22" height="8" rx="2" fill="none" stroke=" var(--teal)"
+                        stroke-width="1.5" />
+                      <text x="65" y="13.5" font-size="5" font-weight="800" fill=" var(--teal)"
+                        text-anchor="middle">INV</text>
+                      <rect x="4" y="33" width="72" height="3" rx="1.5" fill=" var(--teal)" />
                     </svg></div>
                   <div class="lo-chk">✓</div>
                   <div class="lo-lbl">Classic</div>
                 </div>
                 <div class="lo" onclick="selLayout(this,'inv','modern-banner')">
                   <div class="lo-prev" style="background:transparent"><svg width="80" height="48" viewBox="0 0 80 48">
-                      <rect x="0" y="0" width="80" height="42" fill=" var(--app-accent, var(--app-accent, #00BCD4))"
-                        opacity=".9" />
+                      <rect x="0" y="0" width="80" height="42" fill=" var(--teal)" opacity=".9" />
                       <rect x="8" y="11" width="14" height="14" rx="3" fill="rgba(255,255,255,.25)" />
                       <rect x="26" y="12" width="24" height="5" rx="2" fill="rgba(255,255,255,.95)" />
                       <rect x="26" y="20" width="18" height="3" rx="1.5" fill="rgba(255,255,255,.55)" />
@@ -3407,10 +3384,8 @@
                 </div>
                 <div class="lo" onclick="selLayout(this,'inv','minimal')">
                   <div class="lo-prev"><svg width="80" height="48" viewBox="0 0 80 48">
-                      <rect x="4" y="2" width="72" height="4" rx="2"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" />
-                      <rect x="8" y="13" width="12" height="12" rx="3"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" opacity=".7" />
+                      <rect x="4" y="2" width="72" height="4" rx="2" fill=" var(--teal)" />
+                      <rect x="8" y="13" width="12" height="12" rx="3" fill=" var(--teal)" opacity=".7" />
                       <rect x="24" y="14" width="24" height="5" rx="2" fill="#1A2E35" opacity=".8" />
                       <rect x="24" y="22" width="18" height="3" rx="1.5" fill="#A0B8BE" />
                       <rect x="54" y="13" width="22" height="7" rx="2" fill="none" stroke="#A0B8BE" stroke-width="1" />
@@ -3422,31 +3397,25 @@
                 </div>
                 <div class="lo" onclick="selLayout(this,'inv','right-align')">
                   <div class="lo-prev"><svg width="80" height="48" viewBox="0 0 80 48">
-                      <rect x="8" y="10" width="12" height="12" rx="3"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" opacity=".8" />
+                      <rect x="8" y="10" width="12" height="12" rx="3" fill=" var(--teal)" opacity=".8" />
                       <rect x="8" y="11" width="26" height="5" rx="2" fill="#1A2E35" opacity=".8" />
                       <rect x="8" y="20" width="20" height="3" rx="1.5" fill="#A0B8BE" />
-                      <rect x="38" y="8" width="34" height="26" rx="4"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" opacity=".1"
-                        stroke=" var(--app-accent, var(--app-accent, #00BCD4))" stroke-width="1" /><text x="55" y="18"
-                        font-size="5" font-weight="800" fill=" var(--app-accent, var(--app-accent, #00BCD4))"
-                        text-anchor="middle">INVOICE</text>
+                      <rect x="38" y="8" width="34" height="26" rx="4" fill=" var(--teal)" opacity=".1"
+                        stroke=" var(--teal)" stroke-width="1" /><text x="55" y="18" font-size="5" font-weight="800"
+                        fill=" var(--teal)" text-anchor="middle">INVOICE</text>
                       <rect x="42" y="20" width="26" height="2.5" rx="1.25" fill="#A0B8BE" opacity=".6" />
                       <rect x="42" y="25" width="20" height="2.5" rx="1.25" fill="#A0B8BE" opacity=".6" />
-                      <rect x="4" y="38" width="72" height="2" rx="1"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" />
+                      <rect x="4" y="38" width="72" height="2" rx="1" fill=" var(--teal)" />
                     </svg></div>
                   <div class="lo-chk">✓</div>
                   <div class="lo-lbl">Split Right</div>
                 </div>
                 <div class="lo" onclick="selLayout(this,'inv','centered')">
                   <div class="lo-prev"><svg width="80" height="48" viewBox="0 0 80 48">
-                      <circle cx="40" cy="13" r="8" fill=" var(--app-accent, var(--app-accent, #00BCD4))"
-                        opacity=".85" />
+                      <circle cx="40" cy="13" r="8" fill=" var(--teal)" opacity=".85" />
                       <rect x="24" y="25" width="32" height="5" rx="2" fill="#1A2E35" opacity=".8" />
                       <rect x="28" y="33" width="24" height="3" rx="1.5" fill="#A0B8BE" />
-                      <rect x="4" y="40" width="72" height="2.5" rx="1.25"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" />
+                      <rect x="4" y="40" width="72" height="2.5" rx="1.25" fill=" var(--teal)" />
                     </svg></div>
                   <div class="lo-chk">✓</div>
                   <div class="lo-lbl">Centered</div>
@@ -3454,15 +3423,12 @@
                 <div class="lo" onclick="selLayout(this,'inv','dark-header')">
                   <div class="lo-prev" style="background:transparent"><svg width="80" height="48" viewBox="0 0 80 48">
                       <rect x="0" y="0" width="80" height="42" fill="#1A2E35" />
-                      <rect x="8" y="12" width="14" height="14" rx="3"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" opacity=".8" />
+                      <rect x="8" y="12" width="14" height="14" rx="3" fill=" var(--teal)" opacity=".8" />
                       <rect x="26" y="13" width="24" height="5" rx="2" fill="rgba(255,255,255,.9)" />
                       <rect x="26" y="21" width="18" height="3" rx="1.5" fill="rgba(255,255,255,.4)" />
-                      <rect x="55" y="11" width="20" height="7" rx="2"
-                        fill=" var(--app-accent, var(--app-accent, #00BCD4))" opacity=".25"
-                        stroke=" var(--app-accent, var(--app-accent, #00BCD4))" stroke-width="1" /><text x="65" y="16"
-                        font-size="4.5" font-weight="800" fill=" var(--app-accent, var(--app-accent, #00BCD4))"
-                        text-anchor="middle">INV</text>
+                      <rect x="55" y="11" width="20" height="7" rx="2" fill=" var(--teal)" opacity=".25"
+                        stroke=" var(--teal)" stroke-width="1" /><text x="65" y="16" font-size="4.5" font-weight="800"
+                        fill=" var(--teal)" text-anchor="middle">INV</text>
                     </svg></div>
                   <div class="lo-chk">✓</div>
                   <div class="lo-lbl">Dark</div>
@@ -3779,8 +3745,10 @@
 
     </div><!-- /preview-area -->
   </div><!-- /app -->
-
   <script>
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'REQUEST_THEME' }, '*');
+    }
     // ── SAFE RENDER WRAPPER ──
     window._renderReady = false;
     window.safeRender = function () { if (window._renderReady && typeof render === 'function') render(); };
@@ -4642,7 +4610,7 @@
 
       // Show toast
       const t = document.createElement('div');
-      t.style.cssText = "position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#26C281, var(--app-accent, var(--app-accent, #00BCD4)));color:#fff;padding:14px 22px;border-radius:12px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.15);font-size:13px;display:flex;align-items:center;gap:8px;";
+      t.style.cssText = "position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#26C281, var(--teal));color:#fff;padding:14px 22px;border-radius:12px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.15);font-size:13px;display:flex;align-items:center;gap:8px;";
       t.innerHTML = '<i class="ti ti-circle-check" style="font-size:18px;"></i> Document sent to ' + clientName + '!';
       document.body.appendChild(t);
       setTimeout(() => { t.style.transition = 'opacity 0.4s'; t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 3000);
@@ -5113,6 +5081,8 @@
         document.documentElement.style.setProperty('--teal4', color);
         // Force re-render to apply color to inline styles
         window.color = color;
+        document.documentElement.style.setProperty('--teal2', color);
+        document.documentElement.style.setProperty('--teal4', color);
         render();
       }
     });
@@ -5281,7 +5251,7 @@
       window.parent.postMessage({ type: 'SEND_DOCUMENT', payload: data }, '*');
 
       const t = document.createElement('div');
-      t.style.cssText = "position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#26C281, var(--app-accent, var(--app-accent, #00BCD4)));color:#fff;padding:14px 22px;border-radius:12px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.15);font-size:13px;display:flex;align-items:center;gap:8px;";
+      t.style.cssText = "position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#26C281, var(--teal));color:#fff;padding:14px 22px;border-radius:12px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.15);font-size:13px;display:flex;align-items:center;gap:8px;";
       t.innerHTML = '<i class="ti ti-circle-check" style="font-size:18px;"></i> Letterhead sent to ' + name + '!';
       document.body.appendChild(t);
       setTimeout(() => { t.style.transition = 'opacity 0.4s'; t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 3000);
@@ -5829,7 +5799,7 @@
         <button onclick="closeSendModal()"
           style="flex:1;padding:10px;border:1.5px solid #E0EEF0;border-radius:8px;background:#fff;font-size:13px;font-weight:600;color:#607D86;cursor:pointer;font-family:inherit;">Cancel</button>
         <button onclick="confirmSendFromModal()"
-          style="flex:2;padding:10px;border:none;border-radius:8px;background:linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),var(--app-accent2, #00ACC1));font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;">
+          style="flex:2;padding:10px;border:none;border-radius:8px;background:linear-gradient(135deg, var(--teal),var(--app-accent2, #00ACC1));font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;">
           <i class="ti ti-send" style="margin-right:6px;"></i>Send Now
         </button>
       </div>

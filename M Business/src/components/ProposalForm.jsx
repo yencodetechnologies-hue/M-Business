@@ -620,7 +620,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
   <div class="topbar-actions">
 
     <button class="btn-o" onclick="saveDraft()"><i class="ti ti-device-floppy" style="font-size:13px"></i> Save Draft</button>
-    <button class="btn-o"><i class="ti ti-download" style="font-size:13px"></i> PDF</button>
+    <button class="btn-o" onclick="downloadProposalPDF()"><i class="ti ti-download" style="font-size:13px"></i> PDF</button>
     <button class="btn-t" onclick="sendProposal()"><i class="ti ti-send" style="font-size:13px"></i> Send</button>
 
   </div>
@@ -870,8 +870,8 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
     <div class="preview-toolbar">
       <div class="pt-title-label">Live Preview</div>
       <div class="pt-btns">
-        <button class="pt-b"><i class="ti ti-download" style="font-size:11px"></i> PDF</button>
-        <button class="pt-b"><i class="ti ti-share" style="font-size:11px"></i> Share</button>
+        <button class="pt-b" onclick="downloadProposalPDF()"><i class="ti ti-download" style="font-size:11px"></i> PDF</button>
+        <button class="pt-b" onclick="shareProposalFromForm()"><i class="ti ti-share" style="font-size:11px"></i> Share</button>
       </div>
     </div>
 

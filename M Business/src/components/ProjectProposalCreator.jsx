@@ -1330,7 +1330,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
             setPage(0);
             // Clear the ?edit param so a future refresh doesn't re-open the editor
             window.history.replaceState({}, document.title, window.location.pathname);
-            setView("editor");
+            setView("form");
           }
         } else if (viewId) {
           const found = list.find(p => p.id === viewId || p._id === viewId);
@@ -1340,7 +1340,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
             setIsViewMode(true);
             // Clear the ?view param so a future refresh doesn't re-open view mode
             window.history.replaceState({}, document.title, window.location.pathname);
-            setView("editor");
+            setView("form");
           }
         }
 
@@ -1620,7 +1620,21 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
       clients={clients}
       onAddClient={onAddClient}
       newlyAddedClientName={newlyAddedClientName}
-      onMountExposeCrop={() => { window.triggerCrop = triggerCrop; }}
+      onMountExposeCrop={() => {
+        try {
+          window.triggerCrop = triggerCrop;
+          window._downloadProposalPDF = () => printProposal(doc, companyName);
+          window._shareProposal = () => {
+            if (!doc || (!doc._id && !doc.id)) {
+              alert('Please save the proposal as a draft first before sharing.');
+              return;
+            }
+            shareProposal(doc);
+          };
+        } catch (err) {
+          console.error('onMountExposeCrop failed:', err);
+        }
+      }}
       onSave={onSaveProposalStable}
     />;
   }

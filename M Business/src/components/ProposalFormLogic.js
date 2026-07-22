@@ -443,6 +443,9 @@ export function saveDraft() {
     data.status = 'draft';
     window._onSaveProposal(data);
   }
+  if (window._onBackToProposals) {
+    setTimeout(() => window._onBackToProposals(), 300);
+  }
 }
 
 export function sendProposal() {
@@ -461,7 +464,13 @@ export function sendProposal() {
     setTimeout(() => window._onBackToProposals(), 500);
   }
 }
+export function downloadProposalPDF() {
+  if (typeof window._downloadProposalPDF === 'function') window._downloadProposalPDF();
+}
 
+export function shareProposalFromForm() {
+  if (typeof window._shareProposal === 'function') window._shareProposal();
+}
 export function markWon() {
   selSt(document.querySelectorAll('.sc')[3], 'WON');
   if (window._onSaveProposal) {

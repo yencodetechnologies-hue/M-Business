@@ -9,6 +9,7 @@ import QuotationCreator from "./QuotationCreator";
 import ProjectProposalCreator from "./ProjectProposalCreator";
 import AccountsPage, { ExpensesPage, IncomePage } from "./AccountsPage";
 import ModernProjectDetails from "./ModernProjectDetails";
+import ModernProjectDetails from "./ModernProjectDetails";
 import AdminProposalManagement from "./AdminProposalManagement";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -2342,7 +2343,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               {pTasks.length > 0 ? `${doneTasks}/${pTasks.length} tasks done` : "No tasks yet"}
                             </div>
                             <button
-                              onClick={(e) => { e.stopPropagation(); setViewProject(p); }}
+                              onClick={(e) => { e.stopPropagation(); setViewProject(null); setTimeout(() => setViewProject(p), 0); }}
                               style={{ marginTop: 4, background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 10, padding: "10px", fontSize: 12.5, fontWeight: 800, cursor: "pointer" }}
                             >
                               Open Project
@@ -2421,7 +2422,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                 }} style={{ background: "#25D366", color: "#fff", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Share</button>
                               </td>
                               <td style={{ padding: "9px 10px" }}>
-                                <button onClick={() => setViewProject(p)} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 6, padding: "5px 12px", fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>View</button>
+                                <button onClick={() => { setViewProject(null); setTimeout(() => setViewProject(p), 0); }} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 6, padding: "5px 12px", fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>View</button>
                               </td>
                             </tr>
                           );
@@ -2849,6 +2850,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         <div style={{ position: "fixed", inset: 0, background: "#f8fafc", zIndex: 2000, overflowY: "auto", padding: 20 }}>
           <button onClick={() => setViewProject(null)} style={{ marginBottom: 12, background: "#fff", border: "1px solid var(--app-border)", borderRadius: 10, padding: "8px 16px", cursor: "pointer", fontWeight: 700 }}>← Back</button>
           <ModernProjectDetails
+            key={viewProject?._id}
             project={viewProject}
             tasks={tasks}
             employees={employees}

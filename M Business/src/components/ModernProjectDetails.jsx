@@ -290,7 +290,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [taskFilter, setTaskFilter] = useState('all');
 
   // Live state synchronized with backend
-  const [currProject, setCurrProject] = useState(project);
+  const [currProject, setCurrProject] = useState(project || {});
 
   useEffect(() => {
     const preloadPortalLink = async () => {
@@ -317,10 +317,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   }, [currProject?._id, currProject?.clientId]);
 
   useEffect(() => {
-    if (project && (project.name || project.client)) {
-      setCurrProject(project);
-    }
-  }, [project?._id, project?.name, project?.client]);
+    if (project) setCurrProject(project);
+  }, [project]);
 
   // Whenever a different project is opened (or this project is reopened),
   // fetch the current server data so edits made in a previous session —

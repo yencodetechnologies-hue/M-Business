@@ -1602,11 +1602,18 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
       </div>
     );
   }
-
+  const onSaveProposalStable = useCallback(async (data) => {
+    await createNew(data);
+    if (data.status === 'sent') {
+      flash("Export Proposal sent — it will appear on the client's dashboard now.");
+      setTimeout(() => setView("list"), 500);
+    }
+  }, [createNew, flash]);
   // ══ FORM VIEW --------------------------------------------------------------
   if (view === "form") {
     // Register the back-to-list callback so ProposalFormLogic can call it after Send
     window._onBackToProposals = () => setView("list");
+
     return <ProposalForm
       onBack={() => setView("list")}
       initialData={doc}
@@ -1614,13 +1621,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
       onAddClient={onAddClient}
       newlyAddedClientName={newlyAddedClientName}
       onMountExposeCrop={() => { window.triggerCrop = triggerCrop; }}
-      onSave={async (data) => {
-        await createNew(data);
-        if (data.status === 'sent') {
-          flash("Export Proposal sent — it will appear on the client's dashboard now.");
-          setTimeout(() => setView("list"), 500);
-        }
-      }}
+      onSave={onSaveProposalStable}
     />;
   }
 

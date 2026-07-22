@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as logic from './ProposalFormLogic';
 
-export default function ProposalForm({ onBack, onSave, initialData, clients, onAddClient, newlyAddedClientName, onMountExposeCrop }) {
+function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, newlyAddedClientName, onMountExposeCrop }) {
   const containerRef = useRef(null);
   window._proposalFormContainer = null;
 
@@ -187,6 +187,7 @@ export default function ProposalForm({ onBack, onSave, initialData, clients, onA
       console.log('coverZone found:', !!coverZone);
       if (coverZone) {
         const applyCoverImage = (dataUrl) => {
+          console.log('applyCoverImage called, dataUrl length:', dataUrl?.length);
           const liveZone = document.getElementById('coverZone');
           if (!liveZone) { console.log('coverZone not found when applying image'); return; }
           liveZone.style.backgroundImage = `url(${dataUrl})`;
@@ -197,6 +198,8 @@ export default function ProposalForm({ onBack, onSave, initialData, clients, onA
           liveZone.style.borderStyle = 'solid';
           liveZone.innerHTML = `<div style="background:rgba(0,0,0,0.55);color:#fff;font-weight:700;font-size:12px;padding:6px 12px;border-radius:8px">Cover image uploaded — Click to change</div>`;
           liveZone.dataset.coverImage = dataUrl;
+          console.log('coverZone elements count:', document.querySelectorAll('#coverZone').length);
+          console.log('liveZone bg after set:', liveZone.style.backgroundImage.slice(0, 50));
         };
         coverZone.onclick = () => {
           const inp = document.createElement('input');
@@ -297,7 +300,7 @@ export default function ProposalForm({ onBack, onSave, initialData, clients, onA
     return () => {
       c.removeEventListener('input', handleInput);
     };
-  }, [onBack, onSave]);
+  }, []);
 
 
   return (
@@ -864,3 +867,4 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
     </div>
   );
 }
+export default React.memo(ProposalFormInner);

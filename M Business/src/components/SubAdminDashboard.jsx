@@ -7217,11 +7217,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
   const handleCropComplete = async (croppedImage) => {
-
+    console.log('handleCropComplete called, cropCallback exists:', !!cropCallback);
     setShowCropModal(false);
-
     if (cropCallback) cropCallback(croppedImage);
-
   };
 
 

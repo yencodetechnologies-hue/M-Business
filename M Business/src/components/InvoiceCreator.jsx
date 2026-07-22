@@ -1367,7 +1367,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
     const totalAmt = enriched.reduce((s, e) => s + (parseFloat(e.total) || 0), 0);
     const paidAmt = enriched.reduce((s, e) => s + (parseFloat(e.amountPaid) || 0), 0);
-    const unpaidCnt = enriched.filter(e => ["unpaid", "sent"].includes(e.status)).length;
+    const unpaidCnt = enriched.filter(e => ["unpaid", "sent", "pending"].includes(e.status)).length;
     const draftCnt = enriched.filter(e => e.status === "draft").length;
 
     return (
@@ -1609,7 +1609,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               const filteredData = enriched.filter(e => {
                 if (filterTab === "paid" && e.status !== "paid") return false;
                 if (filterTab === "part_paid" && e.status !== "part_paid") return false;
-                if (filterTab === "pending" && e.status !== "unpaid" && e.status !== "sent") return false;
+                if (filterTab === "pending") console.log('invoice status check:', e.id || e._id, e.status);
+                if (filterTab === "pending" && e.status !== "unpaid" && e.status !== "sent" && e.status !== "pending") return false;
                 if (filterTab === "overdue" && e.status !== "overdue") return false;
                 if (filterTab === "draft" && e.status !== "draft") return false;
                 if (clientFilter !== "all" && e.client !== clientFilter) return false;
@@ -1648,7 +1649,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 ) : enriched.filter(e => {
                   if (filterTab === "paid" && e.status !== "paid") return false;
                   if (filterTab === "part_paid" && e.status !== "part_paid") return false;
-                  if (filterTab === "pending" && e.status !== "unpaid" && e.status !== "sent") return false;
+                  if (filterTab === "pending") console.log('invoice status check:', e.id || e._id, e.status);
+                  if (filterTab === "pending" && e.status !== "unpaid" && e.status !== "sent" && e.status !== "pending") return false;
                   if (filterTab === "overdue" && e.status !== "overdue") return false;
                   if (filterTab === "draft" && e.status !== "draft") return false;
 
@@ -1873,40 +1875,6 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
         {deleteTarget && <ConfirmModal invoiceNo={deleteTarget.invoiceNo} onConfirm={() => handleDelete(deleteTarget)} onCancel={() => setDeleteTarget(null)} />}
 
-        {shareModalEntry && (
-          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={() => setShareModalEntry(null)}>
-            <div style={{ background: "#fff", borderRadius: 14, width: "100%", maxWidth: 360, maxHeight: "70vh", display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={(e) => e.stopPropagation()}>
-              <div style={{ padding: "16px 18px", borderBottom: "1.5px solid #e5e7eb", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div style={{ fontWeight: 800, fontSize: 15, color: "#0f1c2e" }}>Share with client</div>
-                <button onClick={() => setShareModalEntry(null)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#6b7280" }}>✕</button>
-              </div>
-              <div style={{ overflowY: "auto", padding: 8 }}>
-                {clients && clients.length > 0 ? clients.map((c, idx) => {
-                  const name = c.clientName || c.name || "Unnamed Client";
-                  const company = c.companyName || c.company || "";
-                  return (
-                    <button
-                      key={c._id || c.id || idx}
-                      onClick={() => {
-                        const entry = shareModalEntry;
-                        setShareModalEntry(null);
-                        shareInvoice(entry);
-                      }}
-                      style={{ width: "100%", textAlign: "left", padding: "10px 12px", border: "none", background: "#fff", borderRadius: 8, cursor: "pointer", display: "flex", flexDirection: "column", gap: 2 }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = "#f3f4f6"}
-                      onMouseLeave={(e) => e.currentTarget.style.background = "#fff"}
-                    >
-                      <span style={{ fontWeight: 700, fontSize: 13, color: "#0f1c2e" }}>{name}</span>
-                      {company && <span style={{ fontSize: 11, color: "#6b7280" }}>{company}</span>}
-                    </button>
-                  );
-                }) : (
-                  <div style={{ padding: 16, textAlign: "center", fontSize: 13, color: "#6b7280" }}>No clients found</div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
 
         {shareModalEntry && (
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={() => { setShareModalEntry(null); setShareSelectedClientId(""); }}>

@@ -180,20 +180,23 @@ tr:hover td{background:#FAFCFE;}
           <div className="card">
             <div className="table-wrap">
               <table>
-                <thead><tr><th>Vendor Name</th><th>Category</th><th>Total Paid</th><th>Outstanding</th><th>Last Payment</th><th>Status</th><th>Actions</th></tr></thead>
+                <thead><tr><th>Vendor Name</th><th>Product / Category</th><th>Total Amount</th><th>Paid Amount</th><th>Tax (%)</th><th>GST (%)</th><th>Description</th><th>Payment Mode</th></tr></thead>
                 <tbody>
-                  {filteredVendors.length === 0 ? <tr><td colSpan="7" style={{ padding: 20, textAlign: 'center', color: 'var(--text-light)' }}>No vendors found.</td></tr>
+                  {filteredVendors.length === 0 ? <tr><td colSpan="10" style={{ padding: 20, textAlign: 'center', color: 'var(--text-light)' }}>No vendors found.</td></tr>
                     : filteredVendors.map((v, i) => {
                       const outstanding = Number(v.amount || 0) - Number(v.paidAmount || 0);
                       const isPaid = outstanding <= 0;
                       const dateStr = v.dateOfPurchase || v.date || v.createdAt;
                       return (
                         <tr key={v._id || i}>
-                          <td><div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><div className="av av-sm" style={{ background: 'var(--primary)', borderRadius: '8px' }}>{(v.vendorName || 'V').substring(0, 2).toUpperCase()}</div><div><div style={{ fontWeight: 700 }}>{v.vendorName}</div><div style={{ fontSize: '11px', color: 'var(--text-light)' }}>{v.vendorProduct}</div></div></div></td>
+                          <td><div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><div className="av av-sm" style={{ background: 'var(--primary)', borderRadius: '8px' }}>{(v.vendorName || 'V').substring(0, 2).toUpperCase()}</div><div><div style={{ fontWeight: 700 }}>{v.vendorName}</div></div></div></td>
                           <td><span style={{ background: 'var(--primary-light)', color: 'var(--primary-dark)', padding: '2px 8px', borderRadius: '20px', fontSize: '11px', fontWeight: 700 }}>{v.vendorProduct || 'Service'}</span></td>
-                          <td className="amt-out">₹{Number(v.paidAmount || 0).toLocaleString('en-IN')}</td>
-                          <td style={{ color: outstanding > 0 ? 'var(--orange)' : 'var(--text-dark)', fontWeight: 800 }}>₹{Number(Math.max(0, outstanding)).toLocaleString('en-IN')}</td>
-                          <td style={{ fontSize: '12px' }}>{dateStr ? new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                          <td className="amt-out">₹{Number(v.amount || 0).toLocaleString('en-IN')}</td>
+                          <td>₹{Number(v.paidAmount || 0).toLocaleString('en-IN')}</td>
+                          <td>{v.tax || 0}%</td>
+                          <td>{v.gst || 0}%</td>
+                          <td style={{ fontSize: '12px', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.productDescription || '—'}</td>
+                          <td style={{ fontSize: '12px' }}>{v.modeOfPayment || '—'}</td>
                           <td><span className={`badge ${isPaid ? 'badge-paid' : 'badge-pending'}`}>{isPaid ? 'Paid' : 'Pending'}</span></td>
                           <td><div style={{ display: 'flex', gap: '5px' }}>
                             <button className="btn btn-outline btn-sm" onClick={() => setViewVendor(v)}><i className="ti ti-eye"></i></button>

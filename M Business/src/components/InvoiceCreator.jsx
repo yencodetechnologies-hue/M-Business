@@ -959,8 +959,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const handleSavePreview = async () => {
     if (!validate()) return;
     setSaving("preview");
-    const data = await apiSave("draft");
-    saveDraftLocal(inv, items, "draft");
+    const data = await apiSave("sent");
+    saveDraftLocal(inv, items, "sent");
     if (data.success && data.invoice?._id) setEditingId(data.invoice._id);
     setSaving(false);
     setStep("preview");
@@ -1025,9 +1025,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     setStatusUpdating(null);
     if (newStatus === "paid" || newStatus === "part_paid") {
       const isPartial = (paymentDetails.amountPaid || 0) < (entry.total || 0);
-      showToast(isPartial ? "Success Recorded as Part Payment in Accounts" : "Success Recorded as Full Payment in Accounts");
+      showToast(isPartial ? " Recorded as Part Payment in Accounts" : " Recorded as Full Payment in Accounts");
     } else {
-      showToast(`Success Status updated to ${newStatus}`);
+      showToast(` Status updated to ${newStatus}`);
     }
   };
 
@@ -1367,7 +1367,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
     const totalAmt = enriched.reduce((s, e) => s + (parseFloat(e.total) || 0), 0);
     const paidAmt = enriched.reduce((s, e) => s + (parseFloat(e.amountPaid) || 0), 0);
-    const unpaidCnt = enriched.filter(e => ["unpaid", "overdue"].includes(e.status)).length;
+    const unpaidCnt = enriched.filter(e => ["unpaid", "sent"].includes(e.status)).length;
     const draftCnt = enriched.filter(e => e.status === "draft").length;
 
     return (

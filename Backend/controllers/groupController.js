@@ -10,7 +10,7 @@ exports.getAllGroups = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
+sd
 exports.createGroup = async (req, res) => {
   try {
     const { label, color, open } = req.body;

@@ -8,6 +8,7 @@ import CalendarPage from "./CalendarPage";
 import QuotationCreator from "./QuotationCreator";
 import ProjectProposalCreator from "./ProjectProposalCreator";
 import AccountsPage, { ExpensesPage, IncomePage } from "./AccountsPage";
+import ModernProjectDetails from "./ModernProjectDetails";
 import AdminProposalManagement from "./AdminProposalManagement";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -2845,6 +2846,22 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       </Mdl>}
 
       {viewProject && (
+        <div style={{ position: "fixed", inset: 0, background: "#f8fafc", zIndex: 2000, overflowY: "auto", padding: 20 }}>
+          <button onClick={() => setViewProject(null)} style={{ marginBottom: 12, background: "#fff", border: "1px solid var(--app-border)", borderRadius: 10, padding: "8px 16px", cursor: "pointer", fontWeight: 700 }}>← Back</button>
+          <ModernProjectDetails
+            project={viewProject}
+            tasks={tasks}
+            employees={employees}
+            clients={clients}
+            user={user}
+            onBack={() => setViewProject(null)}
+            onUpdate={() => fetchProjects()}
+            fetchProjects={fetchProjects}
+            fetchTasks={fetchTasks}
+          />
+        </div>
+      )}
+      {false && viewProject && (
         <Mdl title="Project Details" onClose={() => setViewProject(null)} maxWidth={550}>
           <div style={{ padding: 16, background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", borderRadius: 14, border: "1px solid var(--app-border)", marginBottom: 18 }}>
             <div style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 6 }}>{viewProject.name}</div>

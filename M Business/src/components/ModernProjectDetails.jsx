@@ -2832,7 +2832,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   <div style={{ padding: '18px 0', overflow: 'visible' }}>
 
                     {/* STATS ROW */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 10, marginBottom: 20 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 20, width: '100%' }}>
                       {(() => {
                         const liveAdvanceTotal = (currProject.advances || []).reduce((s, a) => s + parseAmt(a.amount), 0);
                         const liveAdditionalTotal = (currProject.additionalCharges || []).reduce((s, a) => s + parseAmt(a.amount), 0);
@@ -2857,7 +2857,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     </div>
 
                     {/* PAYMENT TYPE TABS — card style matching mockup */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gap: 10, marginBottom: 18 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 18, width: '100%' }}>
                       {[
                         { key: 'inv', label: 'Invoice', desc: 'Standard billing', icon: 'ti-file-invoice', color: '#3B82F6', bg: 'rgba(59,130,246,.1)' },
 
@@ -2866,7 +2866,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       ].map(t => (
                         <div key={t.key}
                           onClick={() => { setActivePayTab(t.key); setSelectedPaymentItems([]); }}
-                          style={{ background: activePayTab === t.key ? ' var(--app-accent, var(--app-accent, #00BCD4))' : '#fff', border: `1px solid ${activePayTab === t.key ? ' var(--app-accent, var(--app-accent, #00BCD4))' : '#E8EDF2'}`, borderRadius: 12, padding: '14px 8px', textAlign: 'center', cursor: 'pointer', transition: 'all .15s' }}
+                          style={{ background: activePayTab === t.key ? ' var(--app-accent, var(--app-accent, #00BCD4))' : '#fff', border: `1px solid ${activePayTab === t.key ? ' var(--app-accent, var(--app-accent, #00BCD4))' : '#E8EDF2'}`, borderRadius: 12, padding: '14px 12px', textAlign: 'center', cursor: 'pointer', transition: 'all .15s', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
                         >
                           <div style={{ width: 38, height: 38, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px', fontSize: 18, background: activePayTab === t.key ? 'rgba(255,255,255,.25)' : t.bg, color: activePayTab === t.key ? '#fff' : t.color }}>
                             <i className={`ti ${t.icon}`}></i>

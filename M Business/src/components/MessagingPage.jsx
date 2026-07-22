@@ -148,7 +148,7 @@ export default function MessagingPage({ user }) {
 
             return (
               <div key={u._id} className={`conv-item ${selectedUser?._id === u._id ? "active" : ""}`} onClick={() => setSelectedUser(u)}>
-                <div className="ci-avatar" style={{ background: "linear-gradient(135deg,var(--teal),#006E7F)" }}>
+                <div className="ci-avatar" style={{ background: "var(--teal)" }}>
                   {init}
                   <div className="online-dot"></div>
                 </div>
@@ -175,7 +175,7 @@ export default function MessagingPage({ user }) {
         {selectedUser ? (
           <>
             <div className="chat-header">
-              <div className="ch-avatar" style={{ background: "linear-gradient(135deg,var(--teal),#006E7F)" }}>
+              <div className="ch-avatar" style={{ background: "var(--teal)" }}>
                 {selectedUser.name ? selectedUser.name.substring(0, 2).toUpperCase() : "U"}
                 <div className="online-dot" style={{ position: "absolute", bottom: 1, right: 1, width: 10, height: 10, borderRadius: "50%", background: "var(--green)", border: "2px solid #fff" }}></div>
               </div>
@@ -204,7 +204,7 @@ export default function MessagingPage({ user }) {
                   const isMe = m.senderId === (user.id || user._id);
                   return (
                     <div key={i} className={`msg-row ${isMe ? "mine" : ""}`}>
-                      <div className="msg-avatar" style={{ background: isMe ? "linear-gradient(135deg,var(--teal),#006E7F)" : "linear-gradient(135deg,var(--amber),#D4880A)" }}>
+                      <div className="msg-avatar" style={{ background: isMe ? "var(--teal)" : "linear-gradient(135deg,var(--amber),#D4880A)" }}>
                         {isMe ? (user.name ? user.name.substring(0, 1).toUpperCase() : "U") : (selectedUser.name ? selectedUser.name.substring(0, 2).toUpperCase() : "U")}
                       </div>
                       <div className="msg-group">
@@ -315,7 +315,7 @@ export default function MessagingPage({ user }) {
             <i className="ti ti-x ip-close" onClick={() => document.getElementById('infoPanel').style.display = 'none'}></i>
           </div>
           <div className="ip-profile">
-            <div className="ip-avatar" style={{ background: "linear-gradient(135deg,var(--teal),#006E7F)" }}>
+            <div className="ip-avatar" style={{ background: "var(--teal)" }}>
               {selectedUser.name ? selectedUser.name.substring(0, 2).toUpperCase() : "U"}
             </div>
             <div className="ip-name">{selectedUser.name}</div>
@@ -330,14 +330,14 @@ export default function MessagingPage({ user }) {
           <div className="ip-section">
             <div className="ip-sec-title">Participants</div>
             <div className="member-item">
-              <div className="mem-av" style={{ background: "linear-gradient(135deg,var(--teal),#006E7F)" }}>
+              <div className="mem-av" style={{ background: "var(--teal)" }}>
                 {user.name ? user.name.substring(0, 1).toUpperCase() : "U"}
               </div>
               <div><div className="mem-name">{user.name || "You"}</div><div className="mem-role">You</div></div>
               <div className="mem-online on"></div>
             </div>
             <div className="member-item">
-              <div className="mem-av" style={{ background: "linear-gradient(135deg,var(--teal),#006E7F)" }}>
+              <div className="mem-av" style={{ background: "var(--teal)" }}>
                 {selectedUser.name ? selectedUser.name.substring(0, 2).toUpperCase() : "U"}
               </div>
               <div><div className="mem-name">{selectedUser.name}</div><div className="mem-role">{selectedUser.role || "Internal"}</div></div>

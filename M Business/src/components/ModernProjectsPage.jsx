@@ -515,7 +515,7 @@ export default function ModernProjectsPage({ user }) {
                 </div>
               </div>
             ))}
-            <div className="m-stat-card" style={{ cursor: 'default', background: 'linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),#006E7F)', border: 'none' }}>
+            <div className="m-stat-card" style={{ cursor: 'default', background: 'var(--app-accent, var(--app-accent, #00BCD4))', border: 'none' }}>
               <div className="m-stat-icon" style={{ background: 'rgba(255,255,255,0.2)', color: '#fff' }}>
                 <i className="ti ti-currency-rupee"></i>
               </div>
@@ -783,7 +783,7 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit, empl
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '20px 24px', borderBottom: '1.5px solid #E2E8F0',
-          background: 'linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097A7)',
+          background: 'var(--app-accent, var(--app-accent, #00BCD4))',
         }}>
           <div>
             <div style={{ fontSize: 17, fontWeight: 900, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>

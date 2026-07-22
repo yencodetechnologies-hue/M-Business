@@ -5,6 +5,7 @@ import { BASE_URL, FRONTEND_URL } from "../config";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import AddClientView from "./AddClientView";
+import { createRoot } from "react-dom/client";
 
 const GST_RATES = [0, 5, 12, 18, 28];
 const DEFAULT_LOGO_URL = "";
@@ -699,7 +700,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         return {
           primaryColor: " var(--app-accent, var(--app-accent, #00BCD4))",
           primaryBg: "var(--teal-light, var(--teal-light, #E0F7FA))",
-          logoColor: "linear-gradient(135deg,  var(--app-accent, var(--app-accent, #00BCD4)), #006E7F)",
+          logoColor: "var(--app-accent, var(--app-accent, #00BCD4))",
           borderStyle: "1px solid #E0EEF0",
           headerUnderline: "3px solid  var(--app-accent, var(--app-accent, #00BCD4))",
           fontFamily: "'Nunito', sans-serif"
@@ -1060,7 +1061,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       }, 0);
       return;
     }
-    showToast("Pending Generating PDF...");
+
 
     // Wait for the DOM to fully paint the latest invoice data before capturing
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
@@ -1196,24 +1197,131 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       showToast("Error Failed to generate PDF");
     }
   };
-
   const shareInvoice = async (entry) => {
-    const prevStep = step;
-    const prevEditingId = editingId;
-    loadEntry(entry);
-    setStep("preview");
-    document.body.style.pointerEvents = "none";
-    const overlay = document.createElement("div");
-    overlay.style.cssText = "position:fixed;inset:0;background:rgba(255,255,255,0.7);z-index:999999;display:flex;align-items:center;justify-content:center;font-family:sans-serif;font-weight:700;color:#0f1c2e;pointer-events:none;";
-    overlay.textContent = "Preparing to share…";
-    document.body.appendChild(overlay);
-    setTimeout(async () => {
-      await triggerPDFShare(entry, "link", true);
-      document.body.style.pointerEvents = "";
-      overlay.remove();
-      setStep(prevStep);
-      if (prevEditingId !== editingId) setEditingId(prevEditingId);
-    }, 1000);
+    const entryInv = entry.inv || inv;
+    const entryItems = entry.items || items;
+
+    const container = document.createElement("div");
+    container.style.cssText = "position:fixed;top:0;left:0;width:794px;opacity:0;pointer-events:none;z-index:-1;background:#fff;";
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    await new Promise((resolve) => {
+      root.render(
+        <div className="print-wrapper">
+          <div className="invoice-paper" style={{ position: "relative", maxWidth: 794, margin: "0 auto", background: "#fff", borderRadius: 0, boxShadow: "none", display: "flex", flexDirection: "column", minHeight: 1122, width: "100%" }}>
+            <div style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "visible", flexShrink: 0, borderBottom: "1px solid var(--app-border)" }}>
+              <div className="inv-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", gap: 20 }}>
+                <div>
+                  {effectiveLogo ? (
+                    <img src={effectiveLogo} alt="logo" style={{ height: 85, maxWidth: "100%", borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />
+                  ) : (
+                    <div style={{ height: 60, width: 60, background: currentT.logoColor || "var(--app-accent)", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
+                      {(entryInv.companyName || effectiveCompanyName)[0] || "?"}
+                    </div>
+                  )}
+                  <div style={{ fontSize: 24, fontWeight: 900, color: "#0f1c2e", textTransform: "uppercase", letterSpacing: 1 }}>{entryInv.companyName || effectiveCompanyName}</div>
+                  {entryInv.companyEmail && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 3 }}>{entryInv.companyEmail}</div>}
+                  {entryInv.companyPhone && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{entryInv.companyPhone}</div>}
+                  {entryInv.companyAddress && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{entryInv.companyAddress}</div>}
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 36, fontWeight: 900, color: `${currentT.primaryColor}1a`, letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>INVOICE</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: currentT.primaryColor || "var(--app-accent)" }}>{entryInv.invoiceNo || entry.invoiceNo}</div>
+                  <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
+                      <div style={{ fontSize: 12, color: "#0f1c2e", fontWeight: 700 }}>{formatDate(entryInv.date)}</div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DUE DATE</div>
+                      <div style={{ fontSize: 12, color: "#ea580c", fontWeight: 700 }}>{formatDate(entryInv.dueDate)}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style={{ padding: "20px 32px", borderBottom: "2px solid var(--app-border)" }}>
+              <div style={{ fontSize: 9, color: "#64748b", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>BILL TO</div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "#0f1c2e" }}>{entryInv.client || entry.client || "—"}</div>
+            </div>
+            <div style={{ padding: "22px 32px", flexShrink: 0 }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
+                <thead>
+                  <tr style={{ background: "#f8fafc" }}>
+                    {["#", "Description", "Qty", "Unit Rate", "Tax Rate", "Amount"].map((h, i) => (
+                      <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 800, color: "#64748b", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty", "Tax Rate"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {(entryItems || []).map((item, idx) => {
+                    const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(entryInv.gstRate) || 18);
+                    const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (entryInv.isGstIncluded || false);
+                    return (
+                      <tr key={item.id || idx} style={{ borderBottom: "1px solid var(--app-border)" }}>
+                        <td style={{ padding: "12px 11px", color: "#64748b", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
+                        <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#0f1c2e" }}>{item.description || "—"}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, entryInv.currency)}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#6b7280" }}>{rateGst}% {isIncl ? "(Incl)" : ""}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), entryInv.currency)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
+                <div style={{ width: 200 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 8px", background: "#0f1c2e", borderRadius: 6, marginTop: 4, color: "#fff" }}>
+                    <span style={{ fontSize: 10, fontWeight: 800 }}>Total</span>
+                    <span style={{ fontSize: 12, fontWeight: 900 }}>{formatCurrency(entry.total, entryInv.currency)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style={{ background: "#ffffff", borderTop: "2px solid #f1f5f9", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+              <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{effectiveCompanyName}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: currentT.primaryColor || "#7c3aed" }}>{entryInv.footerMessage}</div>
+              <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{entryInv.invoiceNo || entry.invoiceNo}</div>
+            </div>
+          </div>
+        </div>
+      );
+      requestAnimationFrame(() => requestAnimationFrame(resolve));
+    });
+
+    await new Promise(r => setTimeout(r, 200));
+
+    try {
+      const element = container.querySelector(".invoice-paper");
+      if (!element) throw new Error("Render failed");
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true, logging: false });
+      const A4_W = 210, A4_H = 297;
+      const imgAspect = canvas.width / canvas.height;
+      const finalH = A4_W / imgAspect;
+      const imgData = canvas.toDataURL("image/jpeg", 0.98);
+      const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
+      pdf.addImage(imgData, "JPEG", 0, 0, A4_W, finalH);
+      const blob = pdf.output("blob");
+      const file = new File([blob], `Invoice_${entry.invoiceNo || entryInv.invoiceNo}.pdf`, { type: "application/pdf" });
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ title: `Invoice ${entry.invoiceNo || entryInv.invoiceNo}`, files: [file] });
+        } catch (e) { if (e.name !== "AbortError") throw e; }
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url; a.download = file.name; a.click(); URL.revokeObjectURL(url);
+        showToast("Sharing not supported — PDF downloaded instead.");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("Error Failed to generate PDF");
+    } finally {
+      root.unmount();
+      container.remove();
+    }
   };
   const shareWhatsApp = (entry) => triggerPDFShare(entry, "wa");
 
@@ -1611,7 +1719,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <i className="ti ti-search" style={{ fontSize: 14, color: "var(--text3)" }}></i>
                 <input type="text" placeholder="Search by invoice ID, client…" value={listSearch} onChange={(e) => setListSearch(e.target.value)} />
               </div>
-              <button className="sort-btn" onClick={() => setSortOrder(sortOrder === "desc" ? "asc" : "desc")}><i className={sortOrder === "desc" ? "ti ti-sort-descending" : "ti ti-sort-ascending"} style={{ fontSize: 13 }}></i> Sort by Date</button>
+
               <div style={{ position: "relative" }}>
                 <select className="sort-btn" value={clientFilter} onChange={e => setClientFilter(e.target.value)} style={{ appearance: "none", cursor: "pointer", paddingRight: 24, paddingLeft: 10 }}>
                   <option value="all">All Clients</option>
@@ -1696,7 +1804,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                       <td className="inv-id" style={{ color: "var(--teal)", fontWeight: 800 }}>{entry.invoiceNo || "—"}</td>
                       <td>
                         <div className="client-chip">
-                          <div className="client-av" style={{ background: `linear-gradient(135deg,var(--teal),#006E7F)` }}>
+                          <div className="client-av" style={{ background: `var(--app-accent)` }}>
                             {(entry.client || "?")[0].toUpperCase()}
                           </div>
                           <span className="client-name">{entry.client || "—"}</span>

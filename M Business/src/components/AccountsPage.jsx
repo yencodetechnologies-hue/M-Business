@@ -995,7 +995,7 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
                     </td>
                     <td>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <div style={{ width: 24, height: 24, borderRadius: "50%", background: `linear-gradient(135deg,var(--teal),#006E7F)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 800, color: "#fff" }}>
+                        <div style={{ width: 24, height: 24, borderRadius: "50%", background: "var(--teal)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 800, color: "#fff" }}>
                           {(inc.client || "?")[0].toUpperCase()}
                         </div>
                         <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text)" }}>{inc.client}</span>

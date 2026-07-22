@@ -1046,7 +1046,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                   </div>
                   <div className="qc-title">{qtD.project || entry.project || "Untitled Project"}</div>
                   <div className="qc-client">
-                    <div className="qc-av" style={{ background: "linear-gradient(135deg,var(--teal),#006E7F)" }}>{init}</div>
+                    <div className="qc-av" style={{ background: "var(--teal)" }}>{init}</div>
                     <span className="qc-client-name">{entry.client || "Unknown Client"}</span>
                   </div>
                   <div className="qc-items">

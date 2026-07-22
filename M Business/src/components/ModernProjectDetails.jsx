@@ -2312,7 +2312,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           )}
                         </div>
                       );
-                    })() : <div style={{ textAlign: 'center', padding: 20 }}>Activity logs will appear here.</div>}
+                    })() : <div style={{ textAlign: 'center', padding: 20, minHeight: 420 }}>Activity logs will appear here.</div>}
                   </div>
                 </div>
 

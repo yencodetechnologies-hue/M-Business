@@ -171,7 +171,7 @@ export default function FinExpenses({ expenses: propExpenses, setExpenses: propS
             <table className="fe-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr>
-                  <th>Date</th><th>Vendor / Payee</th><th>Description</th><th>Category</th>
+                  <th>Date</th><th>Title</th><th>Description</th><th>Category</th>
                   <th>Amount</th><th>Payment Mode</th><th>Status</th><th>Actions</th>
                 </tr>
               </thead>
@@ -242,7 +242,7 @@ export default function FinExpenses({ expenses: propExpenses, setExpenses: propS
               </div>
             ))}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
-              {[['Category', 'category', CATEGORIES], ['Expense Type', 'expenseType', EXPENSE_TYPES], ['Payment Mode', 'paymentMode', MODES], ['Status', 'status', ['Pending', 'Approved', 'Rejected']]].map(([label, key, opts]) => (
+              {[['Category', 'category', CATEGORIES], ['Expense Type', 'expenseType', EXPENSE_TYPES], ['Payment Mode', 'paymentMode', MODES], ['Status', 'status', ['Paid', 'Pending', 'Overdue']]].map(([label, key, opts]) => (
                 <div key={key}>
                   <label style={S.label}>{label}</label>
                   <select value={form[key]} onChange={e => setForm({ ...form, [key]: e.target.value })} style={S.input}>{opts.map(o => <option key={o}>{o}</option>)}</select>
@@ -271,7 +271,7 @@ export default function FinExpenses({ expenses: propExpenses, setExpenses: propS
               </div>
             ))}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
-              {[['Category', 'category', CATEGORIES], ['Expense Type', 'expenseType', EXPENSE_TYPES], ['Payment Mode', 'paymentMode', MODES], ['Status', 'status', ['Pending', 'Approved', 'Rejected']]].map(([label, key, opts]) => (
+              {[['Category', 'category', CATEGORIES], ['Expense Type', 'expenseType', EXPENSE_TYPES], ['Payment Mode', 'paymentMode', MODES], ['Status', 'status', ['Paid', 'Pending', 'Overdue']]].map(([label, key, opts]) => (
                 <div key={key}>
                   <label style={S.label}>{label}</label>
                   <select value={editForm[key]} onChange={e => setEditForm({ ...editForm, [key]: e.target.value })} style={S.input}>{opts.map(o => <option key={o}>{o}</option>)}</select>

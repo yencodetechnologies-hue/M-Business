@@ -6969,7 +6969,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const [showThemePicker, setShowThemePicker] = useState(false);
 
-  const [customColor, setCustomColor] = useState(() => localStorage.getItem("appCustomColor") || "var(--app-accent)");
+  const [customColor, setCustomColor] = useState(() => localStorage.getItem("appCustomColor") || "#00BCD4");
 
   const [showColorPicker, setShowColorPicker] = useState(false);
 
@@ -7096,7 +7096,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   useEffect(() => {
 
 
-const t = appTheme === "custom" ? generateThemeFromColor(customColor) : (THEMES[appTheme] || THEMES.teal);
+    const t = appTheme === "custom" ? generateThemeFromColor(customColor) : (THEMES[appTheme] || THEMES.teal);
     if (!t) return;
     localStorage.setItem("appTheme", appTheme);
     if (appTheme === "custom") localStorage.setItem("appCustomColor", customColor);

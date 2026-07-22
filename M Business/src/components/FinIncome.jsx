@@ -233,7 +233,7 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
               </div>
             ))}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 14 }}>
-              {[['Category', 'category', CATEGORIES], ['Payment Mode', 'paymentMode', MODES], ['Status', 'status', ['Received', 'Pending', 'Cancelled']]].map(([label, key, opts]) => (
+              {[['Category', 'category', CATEGORIES], ['Payment Mode', 'paymentMode', MODES], ['Status', 'status', ['Received', 'Pending', 'Ovderdue']]].map(([label, key, opts]) => (
                 <div key={key}>
                   <label style={S.label}>{label}</label>
                   <select value={form[key]} onChange={e => setForm({ ...form, [key]: e.target.value })} style={S.input}>{opts.map(o => <option key={o}>{o}</option>)}</select>
@@ -262,7 +262,7 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
               </div>
             ))}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 14 }}>
-              {[['Category', 'category', CATEGORIES], ['Payment Mode', 'paymentMode', MODES], ['Status', 'status', ['Received', 'Pending', 'Cancelled']]].map(([label, key, opts]) => (
+              {[['Category', 'category', CATEGORIES], ['Payment Mode', 'paymentMode', MODES], ['Status', 'status', ['Received', 'Pending', 'Overdue']]].map(([label, key, opts]) => (
                 <div key={key}>
                   <label style={S.label}>{label}</label>
                   <select value={editForm[key]} onChange={e => setEditForm({ ...editForm, [key]: e.target.value })} style={S.input}>{opts.map(o => <option key={o}>{o}</option>)}</select>

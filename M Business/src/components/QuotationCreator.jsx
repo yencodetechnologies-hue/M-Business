@@ -916,7 +916,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
     // Filter
     const filtered = enriched.filter(e => {
-      if (activeTab !== "All" && e.status.toLowerCase() !== activeTab.toLowerCase() && !(activeTab === "Accepted" && (e.status === "converted" || e.status === "approved"))) return false;
+      if (activeTab !== "All" && e.status.toLowerCase() !== activeTab.toLowerCase() && !(activeTab === "Accepted" && (e.status === "converted" || e.status === "approved")) && !(activeTab === "Pending" && e.status === "pending")) return false;
       if (!listSearch) return true;
       const term = listSearch.toLowerCase();
       return (e.quoteNo || "").toLowerCase().includes(term) ||
@@ -1015,10 +1015,8 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           </div>
 
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div className="tabs">
-              {["All", "Draft", "Sent", "Accepted", "Rejected"].map(t => (
-                <button key={t} className={`tab ${activeTab === t ? "active" : ""}`} onClick={() => setActiveTab(t)}>{t}</button>
-              ))}
+            <div className="tabs">{["All", "Draft", "Sent", "Pending", "Accepted", "Rejected"].map(t => (<button key={t} className={`tab ${activeTab === t ? "active" : ""}`} onClick={() => setActiveTab(t)}>{t}</button>
+            ))}
             </div>
             <div style={{ fontSize: 12, color: "var(--text3)", fontWeight: 600 }}>
               {filtered.length} quotations · ₹{filtered.reduce((s, e) => s + (parseFloat(e.qt?.total || e.total) || 0), 0).toLocaleString("en-IN")} total value
@@ -1041,8 +1039,8 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                       style={{ border: "1px solid #e2e8f0", borderRadius: 6, padding: "2px 6px", fontSize: 10, fontWeight: 700, color: "#374151", background: "#fff", cursor: "pointer", outline: "none", marginLeft: "auto" }}
                       onClick={e => e.stopPropagation()}
                     >
-                      {["draft", "sent", "pending", "approved", "rejected", "expired", "converted"].map(s => (
-                        <option key={s} value={s}>{s === "converted" ? "Invoiced" : s.charAt(0).toUpperCase() + s.slice(1)}</option>
+                      {["draft", "sent", "pending", "accepted", "rejected", "converted"].map(s => (
+                        <option key={s} value={s}>{s === "converted" ? "Invoiced" : s === "pending" ? "Pending" : s.charAt(0).toUpperCase() + s.slice(1)}</option>
                       ))}
                     </select>
                   </div>
@@ -1232,7 +1230,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             }
           }} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Edit</button>
           <button onClick={() => shareQuotation({ id: qt.quoteNo, quoteNo: qt.quoteNo, total })} style={{ padding: "10px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>Share</button>
-          <button onClick={() => shareWhatsApp({ id: qt.quoteNo, quoteNo: qt.quoteNo, total })} style={{ padding: "10px 18px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }}>WhatsApp</button>
+
           <button onClick={() => triggerPDFShare({ id: qt.quoteNo, quoteNo: qt.quoteNo, total }, "print")} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>Print / PDF</button>
         </div>
 

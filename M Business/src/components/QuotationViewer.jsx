@@ -183,10 +183,7 @@ export default function QuotationViewer() {
           style={{ padding: "10px 22px", background: "linear-gradient(135deg,#059669,#065f46)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>
           Print / Save PDF
         </button>
-        <button className="action-btn" onClick={handleShare}
-          style={{ padding: "10px 22px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>
-          Share Link
-        </button>
+
       </div>
 
       <div className="qt-paper">

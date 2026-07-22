@@ -53,7 +53,7 @@ export default function QuotationCreatorModern(props) {
 
 const genId = () => Date.now() + Math.random();
 const today = new Date().toISOString().split('T')[0];
-const quoteNo = 'QUO-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 9000) + 1000);
+const genQuoteNo = () => 'QUO-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 9000) + 1000);
 function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient, newlyAddedClientName }) {
   // ── Pre-fill from existing entry if editing ──
   // The API returns: entry.qt (saved form data), entry.items (line items),
@@ -83,7 +83,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
 
   // ── Form fields ──
   const [qt, setQt] = useState({
-    quoteNo: existingQt.quoteNo || editEntry?.quoteNo || quoteNo,
+    quoteNo: existingQt.quoteNo || editEntry?.quoteNo || genQuoteNo(),
     quoteDate: resolvedQuoteDate,
     title: resolvedTitle,
     type: existingQt.type || '',
@@ -205,7 +205,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
   const statuses = [
     { value: 'DRAFT', icon: 'Edit', label: 'Draft' },
     { value: 'SENT', icon: 'Export', label: 'Sent' },
-    { value: 'NEGOTIATION', icon: 'Partnership', label: 'Negotiation' },
+    { value: 'PENDING', icon: 'Partnership', label: 'Pending' },
     { value: 'ACCEPTED', icon: 'Success', label: 'Accepted' },
     { value: 'REJECTED', icon: 'Error', label: 'Rejected' },
   ];
@@ -688,7 +688,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
         <div className="mqc-actions">
           <button className="mqc-btn-outline" onClick={() => handleSave('draft')} disabled={saving}>
             <i className="ti ti-device-floppy" style={{ fontSize: 13 }}></i>
-            {saved ? 'Saved!' : saving ? 'Saving…' : isEditing ? 'Update Draft' : 'Save Draft'}
+            {saved ? 'Saved!' : saving ? 'Saving…' : isEditing ? 'Update ' : 'Save '}
           </button>
           <button className="mqc-btn-teal mqc-btn-amber" onClick={() => handleSave('sent')} disabled={saving}>
             <i className="ti ti-send" style={{ fontSize: 13 }}></i> {isEditing ? 'Update & Send' : 'Send Quote'}
@@ -852,7 +852,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
                       position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0,
                       background: 'var(--surface)', border: '1px solid var(--border)',
                       borderRadius: 12, boxShadow: '0 12px 28px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08)',
-                      zIndex: 50, overflow: 'hidden', maxHeight: 220, display: 'flex', flexDirection: 'column',
+                      zIndex: 50, overflow: 'hidden', maxHeight: 320, display: 'flex', flexDirection: 'column',
                       marginBottom: 24
                     }}>
                       {/* Search input */}
@@ -894,7 +894,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
                       )}
 
                       {/* Client list */}
-                      <div style={{ maxHeight: 140, overflowY: 'auto', flex: 1 }}>
+                      <div style={{ maxHeight: 220, overflowY: 'auto', flex: 1 }}>
                         {/* Manual entry option */}
                         {clientSearch.trim() && !clients.some(c => (c.clientName || c.name || '').toLowerCase() === clientSearch.toLowerCase()) && (
                           <div

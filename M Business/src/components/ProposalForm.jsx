@@ -620,7 +620,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
   <div class="topbar-actions">
 
     <button class="btn-o" onclick="saveDraft()"><i class="ti ti-device-floppy" style="font-size:13px"></i> Save Draft</button>
-    <button class="btn-o" onclick="downloadProposalPDF()"><i class="ti ti-download" style="font-size:13px"></i> PDF</button>
+
     <button class="btn-t" onclick="sendProposal()"><i class="ti ti-send" style="font-size:13px"></i> Send</button>
 
   </div>

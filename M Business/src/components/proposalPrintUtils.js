@@ -337,8 +337,16 @@ function buildSlidesHTML(proposal) {
   return html;
 }
 
-export function printProposal(proposal) {
+export async function printProposal(proposal) {
   if (!proposal) return;
+  if (typeof window.html2pdf === 'undefined') {
+    await new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+      script.onload = resolve;
+      document.head.appendChild(script);
+    });
+  }
 
   let bodyHTML = "";
   if (proposal.html && proposal.html.trim()) {
@@ -380,29 +388,36 @@ export function printProposal(proposal) {
   const existingFrame = document.getElementById("__proposal_print_frame__");
   if (existingFrame) existingFrame.remove();
 
-  const iframe = document.createElement("iframe");
-  iframe.id = "__proposal_print_frame__";
-  iframe.setAttribute("style", "position:fixed;top:0;left:0;width:210mm;height:297mm;border:none;visibility:hidden;z-index:-1;");
-  document.body.appendChild(iframe);
+  const existingContainer = document.getElementById("__proposal_pdf_container__");
+  if (existingContainer) existingContainer.remove();
 
-  const iDoc = iframe.contentDocument || iframe.contentWindow.document;
-  iDoc.open("text/html", "replace");
-  iDoc.write(fullHTML);
-  iDoc.close();
+  const container = document.createElement("div");
+  container.id = "__proposal_pdf_container__";
+  container.style.cssText = "position:fixed;top:0;left:0;width:210mm;background:#fff;z-index:999999;opacity:0;pointer-events:none;";
+  container.innerHTML = `<style>:root{${resolvedVars}}${PRINT_BASE_CSS}${PROPOSAL_PREVIEW_CSS}</style>${bodyHTML}`;
+  document.body.appendChild(container);
 
-  let printed = false;
-  const triggerPrint = () => {
-    if (printed) return;
-    printed = true;
-    try {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    } catch (e) { console.error("Print error:", e); }
-    setTimeout(() => { try { iframe.remove(); } catch (e) { } }, 3000);
+  const waitForImages = () => {
+    const imgs = Array.from(container.querySelectorAll('img'));
+    return Promise.all(imgs.map(img => img.complete ? Promise.resolve() : new Promise(res => { img.onload = res; img.onerror = res; })));
   };
 
-  iframe.onload = () => setTimeout(triggerPrint, 400);
-  setTimeout(triggerPrint, 1800);
+  setTimeout(async () => {
+    try {
+      await waitForImages();
+      await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
+      await window.html2pdf().from(container).set({
+        filename: `${(proposal.title || 'proposal').replace(/[^a-z0-9]/gi, '_')}.pdf`,
+        margin: 0,
+        html2canvas: { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff' },
+        jsPDF: { format: 'a4', unit: 'mm' }
+      }).save();
+    } catch (e) {
+      console.error('PDF generation error:', e);
+    } finally {
+      try { container.remove(); } catch (e) { }
+    }
+  }, 400);
 }
 
 export async function shareProposalAsPDF(proposal, companyName, onStatusUpdate) {

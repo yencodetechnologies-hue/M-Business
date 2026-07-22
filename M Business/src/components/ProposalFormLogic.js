@@ -465,7 +465,12 @@ export function sendProposal() {
   }
 }
 export function downloadProposalPDF() {
-  if (typeof window._downloadProposalPDF === 'function') window._downloadProposalPDF();
+  console.log('downloadProposalPDF called. type:', typeof window._downloadProposalPDF);
+  if (typeof window._downloadProposalPDF === 'function') {
+    window._downloadProposalPDF();
+  } else {
+    alert('PDF export is not ready yet. Please try again in a moment.');
+  }
 }
 
 export function shareProposalFromForm() {

@@ -438,13 +438,14 @@ export function extractProposalData() {
 
 export function saveDraft() {
   selSt(document.querySelectorAll('.sc')[0], 'DRAFT');
+  const goBack = window._onBackToProposals;
   if (window._onSaveProposal) {
     const data = extractProposalData();
     data.status = 'draft';
     window._onSaveProposal(data);
   }
-  if (window._onBackToProposals) {
-    setTimeout(() => window._onBackToProposals(), 300);
+  if (goBack) {
+    setTimeout(() => goBack(), 300);
   }
 }
 

@@ -73,10 +73,10 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
   const resolvedToName = existingQt.toName || existingQt.client || editEntry?.client || '';
   const resolvedTitle = existingQt.title || existingQt.project || '';
   const resolvedQuoteDate = existingQt.quoteDate || existingQt.date || today;
-  const resolvedFromCompany = existingQt.fromCompany || existingQt.companyName || user?.companyName || '';
-  const resolvedFromName = existingQt.fromName || user?.ownerName || user?.name || '';
-  const resolvedFromEmail = existingQt.fromEmail || existingQt.companyEmail || user?.email || '';
-  const resolvedFromPhone = existingQt.fromPhone || existingQt.companyPhone || user?.phone || '';
+  const resolvedFromCompany = existingQt.fromCompany || existingQt.companyName || '';
+  const resolvedFromName = existingQt.fromName || '';
+  const resolvedFromEmail = existingQt.fromEmail || existingQt.companyEmail || '';
+  const resolvedFromPhone = existingQt.fromPhone || existingQt.companyPhone || '';
   const resolvedNotes = existingQt.notes || existingQt.terms || '';
   const resolvedValidity = existingQt.validity || '30';
   const resolvedStatus = (existingQt.status || editEntry?.status || 'DRAFT').toUpperCase();
@@ -786,21 +786,21 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
               <div className="mqc-form-row">
                 <div className="mqc-form-group">
                   <label className="mqc-label">Company Name</label>
-                  <input className="mqc-input" value={qt.fromCompany} onChange={e => upd('fromCompany', e.target.value)} />
+                  <input className="mqc-input" placeholder="e.g. YENCODE Technologies" value={qt.fromCompany} onChange={e => upd('fromCompany', e.target.value)} />
                 </div>
                 <div className="mqc-form-group">
                   <label className="mqc-label">Your Name</label>
-                  <input className="mqc-input" value={qt.fromName} onChange={e => upd('fromName', e.target.value)} />
+                  <input className="mqc-input" placeholder="e.g. Prabhu R" value={qt.fromName} onChange={e => upd('fromName', e.target.value)} />
                 </div>
               </div>
               <div className="mqc-form-row">
                 <div className="mqc-form-group">
                   <label className="mqc-label">Email</label>
-                  <input className="mqc-input" type="email" value={qt.fromEmail} onChange={e => upd('fromEmail', e.target.value)} />
+                  <input className="mqc-input" type="email" placeholder="you@company.com" value={qt.fromEmail} onChange={e => upd('fromEmail', e.target.value)} />
                 </div>
                 <div className="mqc-form-group">
                   <label className="mqc-label">Phone</label>
-                  <input className="mqc-input" type="tel" value={qt.fromPhone} onChange={e => upd('fromPhone', e.target.value)} />
+                  <input className="mqc-input" type="tel" placeholder="+91 XXXXX XXXXX" value={qt.fromPhone} onChange={e => upd('fromPhone', e.target.value)} />
                 </div>
               </div>
             </div>
@@ -815,7 +815,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
             <div className="mqc-card-body">
 
               {/* ── Searchable Client Dropdown ── */}
-              <div className="mqc-form-group" data-field="client-company-name" style={{ position: 'relative', zIndex: clientDropOpen ? 50 : 1 }}>
+              <div className="mqc-form-group" data-field="client-company-name" style={{ position: 'relative', zIndex: clientDropOpen ? 9999 : 1 }}>
                 <label className="mqc-label">Client / Company Name</label>
 
                 {/* Trigger box */}

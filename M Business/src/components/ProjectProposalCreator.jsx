@@ -1612,7 +1612,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   // ══ FORM VIEW --------------------------------------------------------------
   if (view === "form") {
     // Register the back-to-list callback so ProposalFormLogic can call it after Send
-    window._onBackToProposals = () => setView("list");
+    window._onBackToProposals = () => { setPropTab("draft"); setActiveCard("draft"); setView("list"); };
 
     return <ProposalForm
       onBack={() => setView("list")}
@@ -1624,12 +1624,30 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
         try {
           window.triggerCrop = triggerCrop;
           window._downloadProposalPDF = () => printProposal(doc, companyName);
-          window._shareProposal = () => {
+          window._shareProposal = async () => {
             if (!doc || (!doc._id && !doc.id)) {
               alert('Please save the proposal as a draft first before sharing.');
               return;
             }
-            shareProposal(doc);
+            const shareUrl = `${window.location.origin}${window.location.pathname}?view=${doc._id || doc.id}`;
+            if (navigator.share) {
+              try {
+                await navigator.share({
+                  title: doc.title || 'Proposal',
+                  text: `Check out this proposal: ${doc.title || ''}`,
+                  url: shareUrl
+                });
+              } catch (err) {
+                if (err.name !== 'AbortError') console.error('Share failed:', err);
+              }
+            } else {
+              try {
+                await navigator.clipboard.writeText(shareUrl);
+                alert('Share link copied to clipboard!');
+              } catch (err) {
+                prompt('Copy this link to share:', shareUrl);
+              }
+            }
           };
         } catch (err) {
           console.error('onMountExposeCrop failed:', err);

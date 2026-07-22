@@ -437,11 +437,10 @@ export function extractProposalData() {
 }
 
 export function saveDraft() {
-  selSt(document.querySelectorAll('.sc')[0], 'DRAFT');
   const goBack = window._onBackToProposals;
   if (window._onSaveProposal) {
     const data = extractProposalData();
-    data.status = 'draft';
+    data.status = currentStatus.toLowerCase();
     window._onSaveProposal(data);
   }
   if (goBack) {

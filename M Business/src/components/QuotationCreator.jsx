@@ -869,10 +869,10 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     try {
       await axios.patch(`${BASE_URL}/api/quotations/${entry.id}/status`, { status: newStatus });
       fetchList();
-      if (newStatus === "approved") {
+      if (newStatus === "accepted") {
         const hasPaid = (entry.amountPaid || entry.qt?.amountPaid || 0) > 0;
-        if (hasPaid) alert("Success Quotation Approved & Advance Recorded in Accounts!");
-        else alert("Success Quotation Approved!");
+        if (hasPaid) alert("Success Quotation Accepted & Advance Recorded in Accounts!");
+        else alert("Success Quotation Accepted!");
       }
     } catch (error) {
       console.error('Status update error:', error);
@@ -1039,8 +1039,8 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                       style={{ border: "1px solid #e2e8f0", borderRadius: 6, padding: "2px 6px", fontSize: 10, fontWeight: 700, color: "#374151", background: "#fff", cursor: "pointer", outline: "none", marginLeft: "auto" }}
                       onClick={e => e.stopPropagation()}
                     >
-                      {["draft", "sent", "pending", "accepted", "rejected", "converted"].map(s => (
-                        <option key={s} value={s}>{s === "converted" ? "Invoiced" : s === "pending" ? "Pending" : s.charAt(0).toUpperCase() + s.slice(1)}</option>
+                      {["draft", "sent", "pending", "approved", "rejected", "converted"].map(s => (
+                        <option key={s} value={s}>{s === "converted" ? "Invoiced" : s === "pending" ? "Pending" : s === "approved" ? "Accepted" : s.charAt(0).toUpperCase() + s.slice(1)}</option>
                       ))}
                     </select>
                   </div>

@@ -1871,7 +1871,25 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                             </div>
                           </div>
                           <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0, position: "relative" }}>
-                            <span className={`badge-pill badge-${badge.cls}`}>{badge.label}</span>
+                            <select
+                              value={p.status || 'draft'}
+                              onClick={e => e.stopPropagation()}
+                              onChange={async (e) => {
+                                const newStatus = e.target.value;
+                                const updated = { ...p, status: newStatus };
+                                setProposals(prev => prev.map(x => (x.id || x._id) === (p.id || p._id) ? updated : x));
+                                try {
+                                  await persist(updated);
+                                } catch (err) {
+                                  console.error('Proposal status update failed:', err);
+                                }
+                              }}
+                              style={{ border: '1px solid #e2e8f0', borderRadius: 6, padding: '2px 6px', fontSize: 10, fontWeight: 700, color: '#374151', background: '#fff', cursor: 'pointer', outline: 'none' }}
+                            >
+                              {['draft', 'sent', 'negotiation', 'approved', 'rejected'].map(s => (
+                                <option key={s} value={s}>{s === 'approved' ? 'Won' : s === 'rejected' ? 'Lost' : s.charAt(0).toUpperCase() + s.slice(1)}</option>
+                              ))}
+                            </select>
                             <button onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === (p.id || p._id) ? null : (p.id || p._id)); }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3,#A0B8BE)", fontSize: 17, padding: 4 }}><i className="ti ti-dots-vertical"></i></button>
                             {openMenuId === (p.id || p._id) && (
                               <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 28, right: 0, background: "#fff", border: "1.5px solid #e0eef0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 999, minWidth: 160, overflow: "hidden" }}>

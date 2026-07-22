@@ -686,7 +686,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
           <div className="mqc-topbar-title">{isEditing ? 'Edit Quotation' : 'Create Quotation'}</div>
         </div>
         <div className="mqc-actions">
-          <button className="mqc-btn-outline" onClick={() => handleSave('draft')} disabled={saving}>
+          <button className="mqc-btn-outline" onClick={() => handleSave(qt.status.toLowerCase())} disabled={saving}>
             <i className="ti ti-device-floppy" style={{ fontSize: 13 }}></i>
             {saved ? 'Saved!' : saving ? 'Saving…' : isEditing ? 'Update ' : 'Save '}
           </button>

@@ -175,7 +175,6 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
       if (dupBtn) dupBtn.onclick = () => {
         if (window._onSaveProposal) {
           const data = logic.extractProposalData();
-          data.title = data.title + ' ()';
           data.status = 'draft';
           window._onSaveProposal(data);
         }
@@ -619,7 +618,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
   </div>
   <div class="topbar-actions">
 
-    <button class="btn-o" onclick="saveDraft()"><i class="ti ti-device-floppy" style="font-size:13px"></i> Save Draft</button>
+    <button class="btn-o" onclick="saveDraft()"><i class="ti ti-device-floppy" style="font-size:13px"></i> Save </button>
 
     <button class="btn-t" onclick="sendProposal()"><i class="ti ti-send" style="font-size:13px"></i> Send</button>
 
@@ -678,7 +677,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
             <button class="sc neg" onclick="selSt(this,'NEGOTIATION')">Negotiation</button>
             <button class="sc won" onclick="selSt(this,'WON')">Won</button>
             <button class="sc lost" onclick="selSt(this,'LOST')">Lost</button>
-            <button class="sc exp" onclick="selSt(this,'EXPIRED')">Expired</button>
+
           </div>
         </div>
       </div>

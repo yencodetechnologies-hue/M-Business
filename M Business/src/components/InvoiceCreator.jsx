@@ -1608,7 +1608,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             <button className="export-btn" onClick={() => {
               const filteredData = enriched.filter(e => {
                 if (filterTab === "paid" && e.status !== "paid" && e.status !== "part_paid") return false;
-                if (filterTab === "pending" && e.status !== "unpaid" && e.status !== "part_paid") return false;
+                if (filterTab === "pending" && e.status !== "pending" && e.status !== "part_paid") return false;
                 if (filterTab === "overdue" && e.status !== "overdue") return false;
                 if (filterTab === "draft" && e.status !== "draft") return false;
                 if (clientFilter !== "all" && e.client !== clientFilter) return false;
@@ -1646,7 +1646,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                   <tr><td colSpan={10} style={{ textAlign: "center", padding: 40, color: "var(--text3)" }}></td></tr>
                 ) : enriched.filter(e => {
                   if (filterTab === "paid" && e.status !== "paid" && e.status !== "part_paid") return false;
-                  if (filterTab === "pending" && e.status !== "unpaid" && e.status !== "part_paid") return false;
+                  if (filterTab === "pending" && e.status !== "pending" && e.status !== "part_paid") return false;
                   if (filterTab === "overdue" && e.status !== "overdue") return false;
                   if (filterTab === "draft" && e.status !== "draft") return false;
 
@@ -1702,12 +1702,13 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                             cursor: "pointer", outline: "none", fontFamily: "inherit",
                             color: isPaid ? "var(--green)" : isOverdue ? "var(--red)" : isPending ? "var(--amber)" : "var(--text3)"
                           }}>
-                          <option value="draft">Draft</option>
-                          <option value="sent">Sent</option>
-                          <option value="part_paid">Part Paid</option>
+
+                          <option value="pending">pending</option>
                           <option value="paid">Paid</option>
-                          <option value="unpaid">Unpaid</option>
+                          <option value="part_paid">Part Paid</option>
+
                           <option value="overdue">Overdue</option>
+                          <option value="draft">Draft</option>
                         </select>
                       </td>
                       <td onClick={e => e.stopPropagation()}>

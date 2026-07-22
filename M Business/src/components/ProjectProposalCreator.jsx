@@ -1403,7 +1403,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     setProposals(prev => [nd, ...prev]);
     setDoc(nd);
     setPage(0);
-    setView("editor");
+    setView("form");
     // ...and save it to the database right away. Without this, a proposal
     // marked "sent" only ever lived in local state and never reached the
     // client's dashboard.

@@ -198,6 +198,13 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
           liveZone.style.borderStyle = 'solid';
           liveZone.innerHTML = `<div style="background:rgba(0,0,0,0.55);color:#fff;font-weight:700;font-size:12px;padding:6px 12px;border-radius:8px">Cover image uploaded — Click to change</div>`;
           liveZone.dataset.coverImage = dataUrl;
+          const pCover = document.querySelector('.p-cover');
+          if (pCover) {
+            pCover.style.backgroundImage = `linear-gradient(135deg, rgba(0,62,78,.75), rgba(0,150,180,.7)), url(${dataUrl})`;
+            pCover.style.backgroundSize = 'cover';
+            pCover.style.backgroundPosition = 'center';
+          }
+          if (typeof logic.up === 'function') logic.up();
           console.log('coverZone elements count:', document.querySelectorAll('#coverZone').length);
           console.log('liveZone bg after set:', liveZone.style.backgroundImage.slice(0, 50));
         };
@@ -611,11 +618,11 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
     <div class="topbar-title">Create Proposal</div>
   </div>
   <div class="topbar-actions">
-    <button class="btn-o"><i class="ti ti-copy" style="font-size:13px"></i> Duplicate</button>
+
     <button class="btn-o" onclick="saveDraft()"><i class="ti ti-device-floppy" style="font-size:13px"></i> Save Draft</button>
     <button class="btn-o"><i class="ti ti-download" style="font-size:13px"></i> PDF</button>
     <button class="btn-t" onclick="sendProposal()"><i class="ti ti-send" style="font-size:13px"></i> Send</button>
-    <button class="btn-t btn-g" onclick="markWon()"><i class="ti ti-trophy" style="font-size:13px"></i> Mark Won</button>
+
   </div>
 </header>
 

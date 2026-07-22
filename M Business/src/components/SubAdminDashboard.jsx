@@ -10404,116 +10404,66 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 20 }}>
 
 
-
-                              {/* Revenue Card */}
-
                               <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
-
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-
-                                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "#0097A7", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
-
-                                    <i className="ti ti-currency-rupee"></i>
-
+                                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "#0097A7", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                      <i className="ti ti-currency-rupee"></i>
+                                    </div>
+                                    <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
+                                      {formatShortCurrency(totalIncome)}
+                                    </div>
                                   </div>
-
                                   {totalIncome > 0 && (
                                     <div style={{ background: "#e6fbf9", color: "#0097A7", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-
                                       <i className="ti ti-trending-up"></i> Active
-
                                     </div>
                                   )}
-
                                 </div>
-
-                                <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
-
-                                  {formatShortCurrency(totalIncome)}
-
-                                </div>
-
                                 <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Revenue This Month</div>
-
                               </div>
 
 
-
                               {/* Clients Card */}
-
                               <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
-
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-
-                                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
-
-                                    <i className="ti ti-users"></i>
-
+                                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                      <i className="ti ti-users"></i>
+                                    </div>
+                                    <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
+                                      {clients.length}
+                                    </div>
                                   </div>
-
                                   {clients.length > 0 && (
                                     <div style={{ background: "#dcfce7", color: "#166534", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-
                                       <i className="ti ti-trending-up"></i> {clients.filter(c => (c.status || "").toLowerCase() === "active").length} active
-
                                     </div>
                                   )}
-
                                 </div>
-
-                                <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
-
-                                  {clients.length}
-
-                                </div>
-
                                 <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Total Clients</div>
-
-                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} active</div>
-
                               </div>
 
 
 
                               {/* Projects Card */}
-
                               <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
-
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-
-                                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37,99,235,0.1)", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
-
-                                    <i className="ti ti-folder"></i>
-
+                                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37,99,235,0.1)", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                      <i className="ti ti-folder"></i>
+                                    </div>
+                                    <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
+                                      {activeProjCount}
+                                    </div>
                                   </div>
-
                                   {activeProjCount > 0 && (
                                     <div style={{ background: "#f1f5f9", color: "#64748b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-
                                       Active
-
                                     </div>
                                   )}
-
                                 </div>
-
-                                <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
-
-                                  {activeProjCount}
-
-                                </div>
-
                                 <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Active Projects</div>
-
-                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>
-                                  {(() => {
-                                    const now = new Date();
-                                    const weekAhead = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-                                    const dueThisWeek = projects.filter(p => p.deadline && new Date(p.deadline) >= now && new Date(p.deadline) <= weekAhead).length;
-                                    return dueThisWeek > 0 ? `${dueThisWeek} due this week` : "No deadlines this week";
-                                  })()}
-                                </div>
-
                               </div>
 
 
@@ -10521,67 +10471,43 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               {/* Invoices Card */}
 
                               <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
-
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-
-                                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
-
-                                    <i className="ti ti-file-invoice"></i>
-
+                                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                      <i className="ti ti-file-invoice"></i>
+                                    </div>
+                                    <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
+                                      {pendingInvCount}
+                                    </div>
                                   </div>
-
                                   {pendingInvCount > 0 && (
                                     <div style={{ background: "#fef2f2", color: "#991b1b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-
                                       <i className="ti ti-trending-down"></i> {invoices.filter(i => (i.status || "").toLowerCase() === "overdue").length > 0 ? "overdue" : "pending"}
-
                                     </div>
                                   )}
-
                                 </div>
-
-                                <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
-
-                                  {pendingInvCount}
-
-                                </div>
-
                                 <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Unpaid Invoices</div>
-
-                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>{formatShortCurrency(totalInvAmt)} outstanding</div>
-
                               </div>
-
 
 
                               {/* Employees Card */}
 
                               <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
-
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-
-                                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(124,58,237,0.1)", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
-
-                                    <i className="ti ti-user-circle"></i>
-
+                                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(124,58,237,0.1)", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                      <i className="ti ti-user-circle"></i>
+                                    </div>
+                                    <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
+                                      {employees.length}
+                                    </div>
                                   </div>
-
                                   {employees.length > 0 && (
                                     <div style={{ background: "#f3e8ff", color: "#6b21a8", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-
                                       <i className="ti ti-trending-up"></i> {employees.length}
-
                                     </div>
                                   )}
-
                                 </div>
-
-                                <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
-
-                                  {employees.length}
-
-                                </div>
-
                                 <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Employees</div>
 
                                 <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>

@@ -260,17 +260,6 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
     }, 310);
     setTimeout(() => {
       const sigBox = document.getElementById('ourSigBox');
-      const clientSelEl = document.getElementById('toComp');
-      if (clientSelEl) {
-        const existingChange = clientSelEl.onchange;
-        clientSelEl.addEventListener('change', () => {
-          if (clientSelEl.value) {
-            const errEl = document.getElementById('toCompError');
-            if (errEl) errEl.remove();
-            clientSelEl.style.borderColor = '';
-          }
-        });
-      }
       if (sigBox) sigBox.onclick = () => {
         const clientSel = document.getElementById('toComp');
         if (clientSel && !clientSel.value) {

@@ -81,15 +81,19 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
         borderRadius: '16px 16px 0 0',
         overflow: 'hidden'
       }}>
-        <Cropper
-          image={image}
-          crop={crop}
-          zoom={zoom}
-          aspect={aspect}
-          onCropChange={onCropChange}
-          onZoomChange={onZoomChange}
-          onCropComplete={onCropAreaComplete}
-        />
+        {image && (
+          <Cropper
+            image={image}
+            crop={crop}
+            zoom={zoom}
+            aspect={aspect}
+            onCropChange={onCropChange}
+            onZoomChange={onZoomChange}
+            onCropComplete={onCropAreaComplete}
+            objectFit="contain"
+            style={{ containerStyle: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 } }}
+          />
+        )}
       </div>
 
       <div style={{

@@ -187,8 +187,8 @@ export default function ProposalForm({ onBack, onSave, initialData, clients, onA
       console.log('coverZone found:', !!coverZone);
       if (coverZone) {
         const applyCoverImage = (dataUrl) => {
-          const liveZone = c.querySelector('#coverZone');
-          if (!liveZone) return;
+          const liveZone = document.getElementById('coverZone');
+          if (!liveZone) { console.log('coverZone not found when applying image'); return; }
           liveZone.style.backgroundImage = `url(${dataUrl})`;
           liveZone.style.backgroundSize = 'contain';
           liveZone.style.backgroundRepeat = 'no-repeat';

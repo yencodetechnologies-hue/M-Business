@@ -1134,7 +1134,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
             <tbody>
               {paginated.length === 0 ? <tr><td colSpan={7} style={{ padding: 30, textAlign: "center", color: "var(--app-muted)", fontSize: 13, fontWeight: 400, fontFamily: "'Nunito',sans-serif" }}>No projects found</td></tr>
                 : paginated.map((p, i) => (
-                  <tr key={p._id || i} style={{ borderBottom: "1px solid var(--app-border)", cursor: "pointer" }} onMouseEnter={ev => ev.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={ev => ev.currentTarget.style.background = "transparent"} onClick={() => onViewTasks?.(p)}>
+                  <tr key={p._id || i} style={{ borderBottom: "1px solid var(--app-border)", cursor: "pointer" }} onMouseEnter={ev => ev.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={ev => ev.currentTarget.style.background = "transparent"} onClick={() => { setViewProject(null); setTimeout(() => setViewProject(p), 0); }}>
                     <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 11, fontFamily: "monospace" }}>{`PRJ${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
                     <td style={{ padding: "12px 14px", fontWeight: 700, color: T.text }}>{p.name}</td>
                     <td style={{ padding: "12px 14px", color: "var(--app-accent)" }}>{p.client || "—"}</td>
@@ -2858,6 +2858,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             onUpdate={() => fetchProjects()}
             fetchProjects={fetchProjects}
             fetchTasks={fetchTasks}
+            hideTopActions={false}
           />
         </div>
       )}

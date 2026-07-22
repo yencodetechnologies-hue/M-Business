@@ -10511,9 +10511,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                 </div>
                                 <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Employees</div>
 
-                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.4)", marginTop: 8 }}>
-                                  {employees.filter(e => (e.status || "").toLowerCase() === "active").length} active staff
-                                </div>
+
 
                               </div>
 

@@ -11434,7 +11434,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               </div>
             )}
 
-            {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setProjectDetailsReadOnly(true); setActive("project-details"); }} onAddClient={() => {
+            {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 
@@ -11538,7 +11538,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   setJumpProject(proj);
 
-                  setProjectDetailsReadOnly(true);
+                  setProjectDetailsReadOnly(false);
 
                   setActive("project-details");
 

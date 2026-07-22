@@ -95,7 +95,7 @@ function ConfirmModal({ invoiceNo, onConfirm, onCancel }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
       <div style={{ background: "var(--app-card)", borderRadius: 24, width: "100%", maxWidth: 380, padding: "32px", boxShadow: "var(--app-shadow)", textAlign: "center", border: "1px solid var(--app-border)" }}>
-        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, margin: "0 auto 20px" }}>Delete</div>
+
         <h3 style={{ margin: "0 0 10px", fontSize: 18, fontWeight: 800, color: "#0f1c2e" }}>Delete Invoice?</h3>
         <p style={{ color: "#64748b", fontSize: 14, margin: "0 0 24px", lineHeight: 1.5 }}>
           Are you sure you want to delete <strong style={{ color: "var(--app-accent)" }}>{invoiceNo}</strong>?
@@ -1197,7 +1197,24 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     }
   };
 
-  const shareInvoice = (entry) => triggerPDFShare(entry, "link");
+  const shareInvoice = async (entry) => {
+    const prevStep = step;
+    const prevEditingId = editingId;
+    loadEntry(entry);
+    setStep("preview");
+    document.body.style.pointerEvents = "none";
+    const overlay = document.createElement("div");
+    overlay.style.cssText = "position:fixed;inset:0;background:rgba(255,255,255,0.7);z-index:999999;display:flex;align-items:center;justify-content:center;font-family:sans-serif;font-weight:700;color:#0f1c2e;pointer-events:none;";
+    overlay.textContent = "Preparing to share…";
+    document.body.appendChild(overlay);
+    setTimeout(async () => {
+      await triggerPDFShare(entry, "link", true);
+      document.body.style.pointerEvents = "";
+      overlay.remove();
+      setStep(prevStep);
+      if (prevEditingId !== editingId) setEditingId(prevEditingId);
+    }, 1000);
+  };
   const shareWhatsApp = (entry) => triggerPDFShare(entry, "wa");
 
   const sendInvoiceToClient = async (entry, client) => {

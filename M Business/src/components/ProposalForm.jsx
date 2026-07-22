@@ -260,7 +260,35 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
     }, 310);
     setTimeout(() => {
       const sigBox = document.getElementById('ourSigBox');
-      if (sigBox) sigBox.onclick = () => logic.openSignatureModal();
+      const clientSelEl = document.getElementById('toComp');
+      if (clientSelEl) {
+        const existingChange = clientSelEl.onchange;
+        clientSelEl.addEventListener('change', () => {
+          if (clientSelEl.value) {
+            const errEl = document.getElementById('toCompError');
+            if (errEl) errEl.remove();
+            clientSelEl.style.borderColor = '';
+          }
+        });
+      }
+      if (sigBox) sigBox.onclick = () => {
+        const clientSel = document.getElementById('toComp');
+        if (clientSel && !clientSel.value) {
+          let errEl = document.getElementById('toCompError');
+          if (!errEl) {
+            errEl = document.createElement('div');
+            errEl.id = 'toCompError';
+            errEl.style.cssText = 'color:var(--red);font-size:10px;font-weight:700;margin-top:4px';
+            errEl.textContent = 'Required — please select a client before signing';
+            clientSel.parentElement.appendChild(errEl);
+          }
+          clientSel.style.borderColor = 'var(--red)';
+          clientSel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(() => { clientSel.focus(); if (typeof clientSel.showPicker === 'function') { try { clientSel.showPicker(); } catch (e) { } } }, 300);
+          return;
+        }
+        logic.openSignatureModal();
+      };
     }, 400);
     // Existing data load
     if (initialData) {
@@ -296,11 +324,28 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
         if (logic.updateRisksPreview) logic.updateRisksPreview();
       } catch (e) { console.error('Init error', e); }
     }, 300);
-
     return () => {
       c.removeEventListener('input', handleInput);
     };
   }, []);
+
+  useEffect(() => {
+    const sel = document.getElementById('toComp');
+    if (!sel || sel.tagName !== 'SELECT') return;
+    const currentVal = sel.value;
+    const clientsList = clients || [];
+    window._clientsData = clientsList;
+    sel.innerHTML = '<option value="">-- Select Client --</option>'
+      + (onAddClient ? '<option value="__add_new__">+ Add New Client</option>' : '')
+      + clientsList.map(c => {
+        const name = c.clientName || c.name || '';
+        const cid = c._id || c.id || '';
+        return `<option value="${name}" data-client-id="${cid}">${name}</option>`;
+      }).join('');
+    if (clientsList.some(c => (c.clientName || c.name) === currentVal)) {
+      sel.value = currentVal;
+    }
+  }, [clients, onAddClient]);
 
 
   return (

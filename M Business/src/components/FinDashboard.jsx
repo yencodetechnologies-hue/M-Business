@@ -261,9 +261,7 @@ tr:hover td{background:#FAFCFE;}
               }}
               style={{ cursor: 'pointer' }}
             />
-            <button className="btn btn-outline">
-              <i className="ti ti-file-analytics"></i>Reports
-            </button>
+
             <button className="btn btn-primary" style={{ background: 'var(--purple)' }}>
               <i className="ti ti-shield-check"></i>Auditor Portal
             </button>

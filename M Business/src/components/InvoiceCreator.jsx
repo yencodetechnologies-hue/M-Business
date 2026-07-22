@@ -1452,12 +1452,12 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                   <span style={{ color: "#ef4444" }}> *</span>
                 </label>
                 <div style={{ position: "relative" }}>
-                  <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#6b7280", fontSize: 14, fontWeight: 600 }}>{paymentModalEntry.currency || inv.currency}</span>
+                  <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#6b7280", fontSize: 14, fontWeight: 600, pointerEvents: "none" }}>{paymentModalEntry.currency || inv.currency}</span>
                   <input type="number"
                     value={paymentData.amountPaid === 0 ? "" : paymentData.amountPaid}
                     onChange={e => setPaymentData(p => ({ ...p, amountPaid: e.target.value === "" ? 0 : Number(e.target.value) }))}
                     placeholder="Enter amount"
-                    style={{ ...inp(), paddingLeft: 30, fontWeight: 700, fontSize: 16 }} />
+                    style={{ ...inp(), paddingLeft: 52, fontWeight: 700, fontSize: 16 }} />
                 </div>
                 <p style={{ fontSize: 10, color: "#9ca3af", marginTop: 4 }}>This amount will be added to the total paid.</p>
               </div>
@@ -1577,8 +1577,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
           <div className="tabs" style={{ display: "flex", gap: 10, alignItems: "center" }}>
 
-            {["all", "paid", "pending", "overdue", "draft"].map(t => (
-              <button key={t} className={`tab ${filterTab === t ? "active" : ""}`} onClick={() => setFilterTab(t)} style={{ textTransform: "capitalize" }}>{t}</button>
+            {["all", "paid", "part_paid", "pending", "overdue", "draft"].map(t => (
+              <button key={t} className={`tab ${filterTab === t ? "active" : ""}`} onClick={() => setFilterTab(t)} style={{ textTransform: "capitalize" }}>{t === "part_paid" ? "Part Paid" : t}</button>
             ))}
           </div>
           <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (typeof e.nativeEvent?.stopImmediatePropagation === 'function') e.nativeEvent.stopImmediatePropagation(); clearForm(); setStep("form"); setInternalNav(true); }} type="button" style={{ padding: "8px 16px", background: "var(--teal)", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
@@ -1607,8 +1607,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             </div>
             <button className="export-btn" onClick={() => {
               const filteredData = enriched.filter(e => {
-                if (filterTab === "paid" && e.status !== "paid" && e.status !== "part_paid") return false;
-                if (filterTab === "pending" && e.status !== "pending" && e.status !== "part_paid") return false;
+                if (filterTab === "paid" && e.status !== "paid") return false;
+                if (filterTab === "part_paid" && e.status !== "part_paid") return false;
+                if (filterTab === "pending" && e.status !== "unpaid" && e.status !== "sent") return false;
                 if (filterTab === "overdue" && e.status !== "overdue") return false;
                 if (filterTab === "draft" && e.status !== "draft") return false;
                 if (clientFilter !== "all" && e.client !== clientFilter) return false;
@@ -1645,8 +1646,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 ) : enriched.length === 0 ? (
                   <tr><td colSpan={10} style={{ textAlign: "center", padding: 40, color: "var(--text3)" }}></td></tr>
                 ) : enriched.filter(e => {
-                  if (filterTab === "paid" && e.status !== "paid" && e.status !== "part_paid") return false;
-                  if (filterTab === "pending" && e.status !== "pending" && e.status !== "part_paid") return false;
+                  if (filterTab === "paid" && e.status !== "paid") return false;
+                  if (filterTab === "part_paid" && e.status !== "part_paid") return false;
+                  if (filterTab === "pending" && e.status !== "unpaid" && e.status !== "sent") return false;
                   if (filterTab === "overdue" && e.status !== "overdue") return false;
                   if (filterTab === "draft" && e.status !== "draft") return false;
 

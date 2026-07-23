@@ -2151,7 +2151,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               </div>
               <div style={{ padding: '0 24px 20px', overflowY: 'auto', flex: 1, minHeight: 0 }}>
                 {filteredTasks.length === 0 ? (
-                  <div style={{ padding: 20, textAlign: 'center', color: P.textLight, fontSize: 13 }}>No tasks found for this filter.</div>
+                  <div style={{ padding: 20, minHeight: 420, display: 'flex', alignItems: 'center', justifyContent: 'center', color: P.textLight, fontSize: 13 }}>No tasks found for this filter.</div>
                 ) : (
                   filteredTasks.map(t => {
                     const isDone = t.status === 'done' || t.status === 'completed' || t.checked === true;
@@ -2584,7 +2584,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     </div>
                   )}
                   {(!currProject.updates || currProject.updates.length === 0) ? (
-                    <div style={{ padding: 20, textAlign: 'center', color: P.textLight, fontSize: 13 }}>No updates posted yet.</div>
+                    <div style={{ padding: 20, paddingTop: 80, textAlign: 'center', color: P.textLight, fontSize: 13 }}>No updates posted yet.</div>
                   ) : (() => {
                     const perPage = 10;
                     const totalPages = Math.ceil(currProject.updates.length / perPage);

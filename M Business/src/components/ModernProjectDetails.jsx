@@ -291,7 +291,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   // Live state synchronized with backend
   const [currProject, setCurrProject] = useState(project || {});
+  const [localPortalOpts, setLocalPortalOpts] = useState(currProject?.portalOpts || {});
 
+  useEffect(() => {
+    setLocalPortalOpts(currProject?.portalOpts || {});
+  }, [currProject?._id]);
   useEffect(() => {
     const preloadPortalLink = async () => {
       const clientId = currProject?.clientId;
@@ -3307,6 +3311,27 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         </div>
 
       </div >
+      <div className="mpd-card" style={{ marginTop: 20 }}>
+        <div className="mpd-section-heading"><i className="ti ti-building" /> Client Portal Settings</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 14 }}>
+          <label className="mpc-checkbox-label">
+            <input type="checkbox" checked={!!localPortalOpts.showProgress} onChange={e => { const next = { ...localPortalOpts, showProgress: e.target.checked }; setLocalPortalOpts(next); onUpdate && onUpdate({ ...currProject, portalOpts: next }); }} />
+            Show project progress to client
+          </label>
+          <label className="mpc-checkbox-label">
+            <input type="checkbox" checked={!!localPortalOpts.showMilestones} onChange={e => { const next = { ...localPortalOpts, showMilestones: e.target.checked }; setLocalPortalOpts(next); onUpdate && onUpdate({ ...currProject, portalOpts: next }); }} />
+            Show milestones to client
+          </label>
+          <label className="mpc-checkbox-label">
+            <input type="checkbox" checked={!!localPortalOpts.showTeam} onChange={e => { const next = { ...localPortalOpts, showTeam: e.target.checked }; setLocalPortalOpts(next); onUpdate && onUpdate({ ...currProject, portalOpts: next }); }} />
+            Show team members to client
+          </label>
+          <label className="mpc-checkbox-label">
+            <input type="checkbox" checked={!!localPortalOpts.allowMessages} onChange={e => { const next = { ...localPortalOpts, allowMessages: e.target.checked }; setLocalPortalOpts(next); onUpdate && onUpdate({ ...currProject, portalOpts: next }); }} />
+            Allow client to send messages
+          </label>
+        </div>
+      </div>
 
       {previewProjectFile && (() => {
         const fname = (previewProjectFile.name || previewProjectFile.url || '').toLowerCase();

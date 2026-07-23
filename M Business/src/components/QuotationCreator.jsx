@@ -1230,28 +1230,25 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             }
           }} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Edit</button>
           <button onClick={async () => {
-            const entry = { id: qt.quoteNo, quoteNo: qt.quoteNo, qt, items };
-            const doc = buildPDFFromData(entry);
-
-            await new Promise(resolve => {
-              const QRCode = require('qrcode');
-              const qrCanvas = document.createElement('canvas');
-              QRCode.toCanvas(qrCanvas, qrData, { width: 200, margin: 1 }, () => {
-                const qrImg = qrCanvas.toDataURL('image/png');
-                const pageCount = doc.internal.getNumberOfPages();
-                doc.setPage(pageCount);
-                doc.setFillColor(240, 253, 250);
-                doc.roundedRect(210 - 14 - 32, 297 - 55, 32, 40, 2, 2, 'F');
-                doc.setDrawColor(209, 250, 229);
-                doc.roundedRect(210 - 14 - 32, 297 - 55, 32, 40, 2, 2, 'S');
-                doc.addImage(qrImg, 'PNG', 210 - 14 - 28, 297 - 51, 24, 24);
-                doc.setFontSize(6);
-                doc.setTextColor(107, 114, 128);
-                doc.text('SCAN QUOTE', 210 - 14 - 16, 297 - 24, { align: 'center' });
-                resolve();
-              });
-            });
-
+            const node = document.querySelector('.qt-paper');
+            if (!node) return;
+            const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+            const imgData = canvas.toDataURL('image/png');
+            const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+            const pageWidth = 210;
+            const pageHeight = 297;
+            const imgWidth = pageWidth;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
+            let position = 0;
+            doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+            while (heightLeft > 0) {
+              position = heightLeft - imgHeight;
+              doc.addPage();
+              doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+              heightLeft -= pageHeight;
+            }
             const blob = doc.output('blob');
             const fileName = `Quotation_${qt.quoteNo || 'draft'}.pdf`;
             const file = new File([blob], fileName, { type: 'application/pdf' });

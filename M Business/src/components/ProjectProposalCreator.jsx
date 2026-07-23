@@ -1637,25 +1637,40 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                 if (!savedDoc) { alert('Please save the proposal as a draft first before sharing.'); return; }
                 current = savedDoc;
               }
-              const shareUrl = `${window.location.origin}${window.location.pathname}?view=${current._id || current.id}`;
-              if (navigator.share) {
+              const node = document.getElementById('propDoc');
+              if (!node) { alert('Proposal preview not found — please try again.'); return; }
+              const html2canvasMod = await import('html2canvas');
+              const html2canvas = html2canvasMod.default;
+              const { jsPDF } = await import('jspdf');
+              const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+              const imgData = canvas.toDataURL('image/png');
+              const pdfDoc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+              const pageWidth = 210;
+              const pageHeight = 297;
+              const imgWidth = pageWidth;
+              const imgHeight = (canvas.height * imgWidth) / canvas.width;
+              let heightLeft = imgHeight;
+              let position = 0;
+              pdfDoc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+              heightLeft -= pageHeight;
+              while (heightLeft > 0) {
+                position = heightLeft - imgHeight;
+                pdfDoc.addPage();
+                pdfDoc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+              }
+              const blob = pdfDoc.output('blob');
+              const fileName = `${(current.title || 'Proposal').replace(/[^a-z0-9]/gi, '_')}.pdf`;
+              const file = new File([blob], fileName, { type: 'application/pdf' });
+              if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 try {
-                  await navigator.share({
-                    title: current.title || 'Proposal',
-                    text: `Check out this proposal: ${current.title || ''}`,
-                    url: shareUrl
-                  });
+                  await navigator.share({ files: [file] });
+                  return;
                 } catch (err) {
-                  if (err.name !== 'AbortError' && err.name !== 'InvalidStateError') console.error('Share failed:', err);
-                }
-              } else {
-                try {
-                  await navigator.clipboard.writeText(shareUrl);
-                  alert('Share link copied to clipboard!');
-                } catch (err) {
-                  prompt('Copy this link to share:', shareUrl);
+                  if (err.name === 'AbortError') return;
                 }
               }
+              pdfDoc.save(fileName);
             } finally {
               window._shareInProgress = false;
             }

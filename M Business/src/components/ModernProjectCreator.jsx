@@ -429,6 +429,13 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
     return { ...defaultPortalOpts, ...ps };
   });
 
+  useEffect(() => {
+    const ps = editProject?.portalSettings || editProject?.portalOpts;
+    if (ps && typeof ps === 'object') {
+      setPortalOpts({ ...defaultPortalOpts, ...ps });
+    }
+  }, [editProject?._id, editProject?.portalSettings, editProject?.portalOpts]);
+
   // Auto-calculate pending = billed - received
   useEffect(() => {
     const b = Number(billed) || 0;

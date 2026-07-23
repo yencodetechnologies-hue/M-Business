@@ -382,8 +382,10 @@ export default function ModernProjectsPage({ user }) {
                   const res = await axios.put(`${BASE_URL}/api/projects/${updated._id || updated.id}`, updated, {
                     headers: { 'x-company-id': user?.companyId || user?._id || user?.id || '' }
                   });
-                  setProjects(prev => prev.map(p => (p._id === res.data._id ? res.data : p)));
-                  return res.data;
+                  const savedProject = res.data.project || res.data;
+                  setProjects(prev => prev.map(p => (p._id === savedProject._id ? savedProject : p)));
+                  setSelectedProject(prev => (prev && prev._id === savedProject._id ? savedProject : prev));
+                  return savedProject;
                 } catch (err) {
                   console.error('Failed to update project:', err);
                 }

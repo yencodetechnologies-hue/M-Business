@@ -556,7 +556,17 @@ export default function AdminDashboard({ user, setUser }) {
               clients={clients}
               fromClientContext={true}
               hideTopActions={false}
-              onUpdate={() => fetchProjects()}
+              onUpdate={async (updated) => {
+                try {
+                  const res = await axios.put(`${BASE_URL}/api/projects/${updated._id || updated.id}`, updated, {
+                    headers: { 'x-company-id': user?.companyId || user?._id || user?.id || '' }
+                  });
+                  await fetchProjects();
+                  return res.data;
+                } catch (err) {
+                  console.error('Failed to update project:', err);
+                }
+              }}
               onNewInvoice={(proj, prefill) => {
                 setJumpInvoicePrefill(
                   prefill

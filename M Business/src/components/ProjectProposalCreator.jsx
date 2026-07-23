@@ -1642,7 +1642,17 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
               const html2canvasMod = await import('html2canvas');
               const html2canvas = html2canvasMod.default;
               const { jsPDF } = await import('jspdf');
-              const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+              const canvas = await html2canvas(node, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#ffffff',
+                onclone: (clonedDoc) => {
+                  const rootStyles = getComputedStyle(document.documentElement);
+                  const teal = rootStyles.getPropertyValue('--app-accent').trim() || '#00BCD4';
+                  clonedDoc.documentElement.style.setProperty('--app-accent', teal);
+                  clonedDoc.documentElement.style.setProperty('--teal', teal);
+                }
+              });
               const imgData = canvas.toDataURL('image/png');
               const pdfDoc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
               const pageWidth = 210;
@@ -1919,7 +1929,45 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                             {openMenuId === (p.id || p._id) && (
                               <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 28, right: 0, background: "#fff", border: "1.5px solid #e0eef0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 999, minWidth: 160, overflow: "hidden" }}>
                                 <div onClick={e => { setOpenMenuId(null); setViewingProposal(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-eye" style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))" }}></i> View</div>
-                                <div onClick={async e => { setOpenMenuId(null); const shareUrl = `${window.location.origin}${window.location.pathname}?view=${p._id || p.id}`; const shareTitle = `Proposal ${p.title || ''} — ${p.client || p.clientName || ''}`; if (navigator.share) { try { await navigator.share({ title: shareTitle, text: shareTitle, url: shareUrl }); } catch (err) { if (err.name !== 'AbortError') console.error('Share failed:', err); } } else { try { await navigator.clipboard.writeText(shareUrl); flash('Link copied to clipboard!'); } catch { prompt('Copy this link:', shareUrl); } } }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-share" style={{ color: "#7C5CFC" }}></i> Share</div>
+                                <div onClick={async e => {
+                                  setOpenMenuId(null);
+                                  const node = document.getElementById('propDoc');
+                                  let sourceEl = node;
+                                  let tmp = null;
+                                  if (!sourceEl) {
+                                    tmp = document.createElement('div');
+                                    tmp.style.cssText = 'position:fixed;left:-9999px;top:0;width:800px;background:#fff;';
+                                    tmp.innerHTML = p.html || `<div style="padding:40px">${p.title || 'Proposal'}</div>`;
+                                    document.body.appendChild(tmp);
+                                    sourceEl = tmp;
+                                  }
+                                  const html2canvasMod = await import('html2canvas');
+                                  const html2canvas = html2canvasMod.default;
+                                  const { jsPDF } = await import('jspdf');
+                                  const canvas = await html2canvas(sourceEl, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+                                  if (tmp) document.body.removeChild(tmp);
+                                  const imgData = canvas.toDataURL('image/png');
+                                  const pdfDoc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+                                  const pageWidth = 210, pageHeight = 297;
+                                  const imgWidth = pageWidth;
+                                  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                                  let heightLeft = imgHeight, position = 0;
+                                  pdfDoc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                                  heightLeft -= pageHeight;
+                                  while (heightLeft > 0) {
+                                    position = heightLeft - imgHeight;
+                                    pdfDoc.addPage();
+                                    pdfDoc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                                    heightLeft -= pageHeight;
+                                  }
+                                  const blob = pdfDoc.output('blob');
+                                  const fileName = `${(p.title || 'Proposal').replace(/[^a-z0-9]/gi, '_')}.pdf`;
+                                  const file = new File([blob], fileName, { type: 'application/pdf' });
+                                  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                                    try { await navigator.share({ files: [file] }); return; } catch (err) { if (err.name === 'AbortError') return; }
+                                  }
+                                  pdfDoc.save(fileName);
+                                }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-share" style={{ color: "#7C5CFC" }}></i> Share</div>
                                 <div onClick={e => { setOpenMenuId(null); printProposal(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-download" style={{ color: "#2563EB" }}></i> PDF</div>
                                 <div onClick={e => { setOpenMenuId(null); deleteProposal(p.id, p._id, e); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }} onMouseEnter={e => e.currentTarget.style.background = "#fff1f2"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-trash" style={{ color: "#EF4444" }}></i> Delete</div>
                               </div>

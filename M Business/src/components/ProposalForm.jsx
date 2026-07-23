@@ -206,17 +206,17 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
           console.log('coverZone elements count:', document.querySelectorAll('#coverZone').length);
           console.log('liveZone bg after set:', liveZone.style.backgroundImage.slice(0, 50));
         };
-       coverZone.onclick = () => {
-  const inp = document.createElement('input');
-  inp.type = 'file'; inp.accept = 'image/*';
-  inp.onchange = (e) => {
-    const file = e.target.files[0]; if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => applyCoverImage(ev.target.result);
-    reader.readAsDataURL(file);
-  };
-  inp.click();
-};
+        coverZone.onclick = () => {
+          const inp = document.createElement('input');
+          inp.type = 'file'; inp.accept = 'image/*';
+          inp.onchange = (e) => {
+            const file = e.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => applyCoverImage(ev.target.result);
+            reader.readAsDataURL(file);
+          };
+          inp.click();
+        };
       }
     };
     setTimeout(hookUp, 300);
@@ -750,7 +750,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
       <div class="card-header"><div class="card-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-users"></i></div><div class="card-title">Our Team <span class="opt-badge">Optional</span></div><div class="card-actions"><button onclick="addTeamMember()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-user-plus" style="font-size:11px"></i>Add</button></div></div>
       <div class="card-body">
         <div id="teamList">
-          <div class="team-card"><div class="tc-av" style="background:linear-gradient(135deg,var(--teal),var(--teal4))">P</div><div style="flex:1;min-width:0"><div class="tc-name">Prabhu R</div><div class="tc-role">Lead Developer & Project Manager</div><div class="tc-exp">8+ years · Web & Mobile</div><div class="tc-skills"><span class="tc-skill">React.js</span><span class="tc-skill">Node.js</span></div></div><i class="ti ti-x tc-del" onclick="this.closest('.team-card').remove();updateTeamPreview()"></i></div>
+          <div class="team-card"><div class="tc-av" style="background:linear-gradient(135deg,var(--teal),var(--teal4))">P</div><div style="flex:1;min-width:0"><div class="tc-name">Your Name</div><div class="tc-role">Lead Developer & Project Manager</div><div class="tc-exp">8+ years · Web & Mobile</div><div class="tc-skills"><span class="tc-skill">React.js</span><span class="tc-skill">Node.js</span></div></div><i class="ti ti-x tc-del" onclick="this.closest('.team-card').remove();updateTeamPreview()"></i></div>
           <div class="team-card"><div class="tc-av" style="background:linear-gradient(135deg,var(--purple),#4E35B0)">AN</div><div style="flex:1;min-width:0"><div class="tc-name">Anitha N</div><div class="tc-role">Senior UI/UX Designer</div><div class="tc-exp">5+ years · SaaS & Corporate</div><div class="tc-skills"><span class="tc-skill">Figma</span><span class="tc-skill">Prototyping</span></div></div><i class="ti ti-x tc-del" onclick="this.closest('.team-card').remove();updateTeamPreview()"></i></div>
         </div>
       </div>
@@ -869,7 +869,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
         <div class="p-logo">YT</div>
         <div class="p-label">Project Proposal</div>
         <div class="p-title" id="pv-title">— Proposal Title —</div>
-        <div class="p-subtitle" id="pv-sub">Prepared by YENCODE Technologies</div>
+<div class="p-subtitle" id="pv-sub">Prepared by Your Company Name</div>
         <div class="p-meta">
           <div class="p-meta-i"><i class="ti ti-calendar" style="font-size:11px"></i><span id="pv-date">01 Jun 2026</span></div>
           <div class="p-meta-i"><i class="ti ti-tag" style="font-size:11px"></i><span id="pv-type">Web Development</span></div>
@@ -877,7 +877,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
         </div>
         <div class="p-badge" id="pv-status">DRAFT</div>
       </div>
-      <div class="ps" id="pv-sec-parties"><div class="ps-lbl"><i class="ti ti-building"></i>Parties</div><div class="party-grid"><div class="party-b"><div class="pb-lbl">Prepared By</div><div class="pb-name" id="pv-from">Prabhu R</div><div class="pb-detail" id="pv-from-d">YENCODE Technologies<br></div></div><div class="party-b"><div class="pb-lbl">Prepared For</div><div class="pb-name" id="pv-to" style="color:var(--text3)">— Client —</div><div class="pb-detail" id="pv-to-d"><span style="color:var(--text3)">Fill in client details</span></div></div></div></div>
+      <div class="ps" id="pv-sec-parties"><div class="ps-lbl"><i class="ti ti-building"></i>Parties</div><div class="party-grid"><div class="party-b"><div class="pb-lbl">Prepared By</div><div class="pb-name" id="pv-from">Your Name</div><div class="pb-name" id="pv-from">Your Name</div><div class="pb-detail" id="pv-from-d">Your Company Name<br></div><div class="pb-detail" id="pv-from-d">Your Company Name<br></div><div class="pb-detail" id="pv-from-d">Your Company<br></div></div><div class="party-b"><div class="pb-lbl">Prepared For</div><div class="pb-name" id="pv-to" style="color:var(--text3)">— Client —</div><div class="pb-detail" id="pv-to-d"><span style="color:var(--text3)">Fill in client details</span></div></div></div></div>
       <div class="ps" id="pv-sec-summary"><div class="ps-lbl"><i class="ti ti-align-left"></i>Executive Summary</div><div class="exec-block problem"><div class="eb-lbl">Problem</div><div class="eb-text" id="pv-problem"><span style="color:var(--text3);font-style:italic">Describe the client's challenge…</span></div></div><div class="exec-block solution" style="margin-top:6px"><div class="eb-lbl">Solution</div><div class="eb-text" id="pv-solution"><span style="color:var(--text3);font-style:italic">Describe your proposed solution…</span></div></div><div class="exec-block whyus" style="margin-top:6px"><div class="eb-lbl">Expected Outcome</div><div class="eb-text" id="pv-outcome"><span style="color:var(--text3);font-style:italic">Describe expected results…</span></div></div></div>
       <div class="ps" id="pv-sec-deliverables"><div class="ps-lbl"><i class="ti ti-checklist"></i>Scope & Deliverables</div><div class="del-list" id="pv-del"><div class="del-item-p">Fully responsive website (8 pages)</div><div class="del-item-p">Custom UI/UX design + brand guide</div><div class="del-item-p">CMS for easy content management</div><div class="del-item-p">SEO optimisation + Google Analytics</div><div class="del-item-p">3-month post-launch support</div></div></div>
       <div class="ps" id="pv-sec-timeline"><div class="ps-lbl"><i class="ti ti-calendar-stats"></i>Project Timeline</div><div style="display:flex;gap:12px;margin-bottom:8px"><span style="font-size:10px;font-weight:700;color:var(--text2)">Start: <span id="pv-start" style="color:var(--teal)">01 Jul 2026</span></span><span style="font-size:10px;font-weight:700;color:var(--text2)">End: <span id="pv-end" style="color:var(--teal)">31 Oct 2026</span></span><span style="font-size:10px;font-weight:700;color:var(--text2)">Duration: <span id="pv-dur" style="color:var(--teal)">4 Months</span></span></div><div class="tl-p" id="pv-timeline"></div></div>
@@ -888,7 +888,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
       <div class="ps" id="pv-sec-risks"><div class="ps-lbl"><i class="ti ti-shield-exclamation"></i>Risks & Mitigation</div><div class="risk-p" id="pv-risks"></div></div>
       <div class="ps" id="pv-sec-pricing"><div class="ps-lbl"><i class="ti ti-currency-rupee"></i>Investment</div><table class="pricing-tbl"><thead><tr><th>Service</th><th>Amount</th></tr></thead><tbody id="pv-pricing"></tbody></table><div class="pricing-grand" style="margin-top:7px"><span>Total Investment</span><span id="pv-grand">₹1,12,100</span></div><div style="margin-top:6px;font-size:10px;color:var(--text2);font-weight:600" id="pv-pay">Payment: 50% advance, 50% on delivery</div></div>
       <div class="ps"><div class="ps-lbl"><i class="ti ti-writing"></i>Closing</div><div id="pv-closing" style="font-size:10px;color:var(--text2);line-height:1.7">We are excited about the opportunity to work with you…</div></div>
-      <div class="ps"><div class="ps-lbl"><i class="ti ti-signature"></i>Sign-off</div><div class="sop"><div class="sob"><div class="sob-line"></div><div class="sob-name" id="pv-sig1">Prabhu R</div><div class="sob-role">YENCODE Technologies</div></div><div class="sob"><div class="sob-line" style="background:var(--amber)"></div><div class="sob-name" id="pv-sig2" style="color:var(--text3)">— Client —</div><div class="sob-role" id="pv-sig2-role">Awaiting</div></div></div></div>
+      <div class="ps"><div class="ps-lbl"><i class="ti ti-signature"></i>Sign-off</div><div class="sop"><div class="sob"><div class="sob-line"></div><div class="sob-name" id="pv-sig1">Your Name</div><div class="sob-role">Your Company Name</div></div><div class="sob"><div class="sob-line" style="background:var(--amber)"></div><div class="sob-name" id="pv-sig2" style="color:var(--text3)">— Client —</div><div class="sob-role" id="pv-sig2-role">Awaiting</div></div></div></div>
     </div>
   </div><!-- /preview-panel -->
 

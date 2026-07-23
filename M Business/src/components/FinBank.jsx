@@ -288,7 +288,7 @@ a { text-decoration: none; color: inherit; }
             <div className="form-group"><label>IFSC Code *</label><input placeholder="e.g. HDFC0001234" value={newBank.ifscCode} onChange={e => setNewBank({ ...newBank, ifscCode: e.target.value })} /></div>
             <div className="form-group"><label>Account Type</label><select value={newBank.accountType} onChange={e => setNewBank({ ...newBank, accountType: e.target.value })}><option>Current</option><option>Savings</option></select></div>
           </div>
-          <div className="form-group"><label>Account Holder Name</label><input value={newBank.holderName} onChange={e => setNewBank({ ...newBank, holderName: e.target.value })} placeholder="e.g. YENCODE Technologies" /></div>
+          <div className="form-group"><label>Account Holder Name</label><input value={newBank.holderName} onChange={e => setNewBank({ ...newBank, holderName: e.target.value })} placeholder="e.g. Your Company" /></div>
           <div style={{ background: 'var(--orange-light)', borderRadius: '10px', padding: '12px 14px', fontSize: '12px', color: 'var(--orange-dark)', fontWeight: 600, marginBottom: '16px', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
             <i className="ti ti-shield-lock" style={{ fontSize: '16px', marginTop: '1px' }}></i>
             A small test deposit of ₹1 will be made to verify the account.

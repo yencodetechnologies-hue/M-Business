@@ -94,7 +94,7 @@ export default function AuditorLogin({ onLogin }) {
             <label>Client Company</label>
             <div className="inp-icon-wrap">
               <i className="ti ti-building inp-icon"></i>
-              <input className="inp" defaultValue="YENCODE Technologies Pvt Ltd" readOnly style={{ background: '#F7FAFC', color: '#718096' }} />
+              <input className="inp" defaultValue="Your Company Pvt Ltd" readOnly style={{ background: '#F7FAFC', color: '#718096' }} />
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px', fontSize: '13px' }}>

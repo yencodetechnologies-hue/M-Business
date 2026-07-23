@@ -32,7 +32,7 @@ if end_td_css != -1 and '/* INVOICE PREVIEW DOC */' not in td_html:
 new_inner = inv_preview_inner
 # Header / From
 new_inner = new_inner.replace('<div class="inv-logo-box">YT</div>', '${logo}')
-new_inner = new_inner.replace('YENCODE Technologies', '${co}')
+new_inner = new_inner.replace('Your Company', '${co}')
 new_inner = new_inner.replace('GST: 33ABCDE1234F1Z5', 'GST: ${v("f-gst")||""}')
 new_inner = new_inner.replace('', '${v("f-email")||""}')
 new_inner = new_inner.replace('', '${v("f-phone")||""}')
@@ -64,7 +64,7 @@ new_inner = new_inner.replace('id="pGrand"', 'id="invGrand"')
 
 # Footer
 new_inner = new_inner.replace('Thank you for your business! Please make payment within the due date.', '${notes}')
-new_inner = new_inner.replace('<div class="inv-sig-name" id="pSigName">Prabhu R</div>', '<div class="inv-sig-name" id="pSigName">${v("f-sig")||co}</div>')
+new_inner = new_inner.replace('<div class="inv-sig-name" id="pSigName">Your Name</div>', '<div class="inv-sig-name" id="pSigName">${v("f-sig")||co}</div>')
 new_inner = new_inner.replace('<div class="inv-sig-role" id="pSigRole">Founder</div>', '<div class="inv-sig-role" id="pSigRole">${v("f-sig-role")||""}</div>')
 
 # Payment terms & details

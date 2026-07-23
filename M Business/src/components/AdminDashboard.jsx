@@ -2106,7 +2106,7 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
                 </div>
                 <div style={{ gridColumn: "1/-1" }}>
                   <label style={LBL}>Assigned To (comma-separated)</label>
-                  <input style={INP} value={editForm.assignedTo} onChange={e => f("assignedTo", e.target.value)} placeholder="e.g. Prabhu R, Yuvan S" />
+                  <input style={INP} value={editForm.assignedTo} onChange={e => f("assignedTo", e.target.value)} placeholder="e.g. Your Name, Yuvan S" />
                 </div>
                 <div>
                   <label style={LBL}>Manager</label>

@@ -787,7 +787,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
                 </div>
                 <div className="mqc-form-group">
                   <label className="mqc-label">Your Name</label>
-                  <input className="mqc-input" placeholder="e.g. Prabhu R" value={qt.fromName} onChange={e => upd('fromName', e.target.value)} />
+                  <input className="mqc-input" placeholder="e.g. Your Name" value={qt.fromName} onChange={e => upd('fromName', e.target.value)} />
                 </div>
               </div>
               <div className="mqc-form-row">

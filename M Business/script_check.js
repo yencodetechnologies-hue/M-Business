@@ -213,7 +213,7 @@ function renderLetter() {
       <div class="lb-sig-line" style="background:${color}"></div>
       <div class="lb-sig-name">${sig}</div>
       ${sigRole ? `<div class="lb-sig-role">${sigRole}</div>` : ''}
-      <div class="lb-sig-dept">${v('f-company') || 'YENCODE Technologies'}</div>
+      <div class="lb-sig-dept">${v('f-company') || 'Your Company'}</div>
     </div>`;
   wcUpdate();
 }
@@ -245,7 +245,7 @@ function calcQuo() {
 }
 
 function renderQuo() {
-  const co = v('f-company') || 'YENCODE Technologies';
+  const co = v('f-company') || 'Your Company';
   const nameSz = parseInt(document.getElementById('nameSz').value) || 16;
   const hdrBg = v('f-quo-hdr-bg') || 'white';
   const bg = bgCfg(hdrBg);
@@ -317,7 +317,7 @@ function calcProp() {
 }
 
 function renderProp() {
-  const co = v('f-company') || 'YENCODE Technologies';
+  const co = v('f-company') || 'Your Company';
   const title = v('f-prop-title') || '— Proposal Title —';
   const client = v('f-prop-client');
   const nameSz = parseInt(document.getElementById('nameSz').value) || 16;
@@ -554,7 +554,7 @@ function calcInv() {
 
 // ── INVOICE RENDER ──
 function renderInv() {
-  const co = v('f-company') || 'YENCODE Technologies';
+  const co = v('f-company') || 'Your Company';
   const nameSz = parseInt(document.getElementById('nameSz').value) || 16;
   const logo = makeLogoEl();
   const invNum = v('f-inv-num') || 'INV-2026-0001';

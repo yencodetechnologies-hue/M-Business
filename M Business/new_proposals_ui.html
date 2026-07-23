@@ -1952,7 +1952,7 @@
               <div class="fg"><label class="fl">Company Name</label><input class="fi" type="text" id="fromComp" value=""
                   oninput="up()"></div>
               <div class="fg"><label class="fl">Contact Person</label><input class="fi" type="text" id="fromPerson"
-                  value="Prabhu R" oninput="up()"></div>
+                  value="Your Name" oninput="up()"></div>
             </div>
             <div class="form-row">
               <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="fromEmail" value=""
@@ -2173,7 +2173,7 @@
               <div class="team-card">
                 <div class="tc-av" style="background:linear-gradient(135deg,var(--teal),var(--teal4))">P</div>
                 <div style="flex:1;min-width:0">
-                  <div class="tc-name">Prabhu R</div>
+                  <div class="tc-name">Your Name</div>
                   <div class="tc-role">Lead Developer & Project Manager</div>
                   <div class="tc-exp">8+ years · Web & Mobile Applications</div>
                   <div class="tc-skills"><span class="tc-skill">React.js</span><span
@@ -2570,7 +2570,7 @@
             <div class="form-row">
               <div class="fg"><label class="fl">Our Signature</label>
                 <div class="sig-box"
-                  onclick="this.innerHTML='<i class=\'ti ti-check\' style=\'font-size:18px;color:var(--teal)\'></i><div style=\'font-size:11px;color:var(--teal);font-weight:700;margin-top:3px\'>Prabhu R — Signed</div>'">
+                  onclick="this.innerHTML='<i class=\'ti ti-check\' style=\'font-size:18px;color:var(--teal)\'></i><div style=\'font-size:11px;color:var(--teal);font-weight:700;margin-top:3px\'>Your Name — Signed</div>'">
                   <i class="ti ti-signature" style="font-size:22px;color:var(--text3)"></i>
                   <div style="font-size:11px;color:var(--text3);font-weight:600">Click to sign</div>
                 </div>
@@ -2742,7 +2742,7 @@
               <div class="sop">
                 <div class="sob">
                   <div class="sob-line"></div>
-                  <div class="sob-name" id="pv-sig1">Prabhu R</div>
+                  <div class="sob-name" id="pv-sig1">Your Name</div>
                   <div class="sob-role"></div>
                 </div>
                 <div class="sob">
@@ -2801,9 +2801,9 @@
       document.getElementById('pv-expiry').textContent = 'Expires ' + fmtDate(document.getElementById('propExpiry').value);
       // Parties
       const fp = document.getElementById('fromPerson').value, fc = document.getElementById('fromComp').value, fe = document.getElementById('fromEmail').value;
-      document.getElementById('pv-from').textContent = fp || 'Prabhu R';
+      document.getElementById('pv-from').textContent = fp || 'Your Name';
       document.getElementById('pv-from-d').innerHTML = `${fc}<br>${fe}`;
-      document.getElementById('pv-sig1').textContent = fp || 'Prabhu R';
+      document.getElementById('pv-sig1').textContent = fp || 'Your Name';
       document.getElementById('pv-to').textContent = tc || '— Client —';
       document.getElementById('pv-to').style.color = tc ? 'var(--text)' : 'var(--text3)';
       const tp = document.getElementById('toPerson').value, te = document.getElementById('toEmail').value, ta = document.getElementById('toAddr').value;

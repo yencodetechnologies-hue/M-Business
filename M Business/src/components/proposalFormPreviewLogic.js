@@ -33,15 +33,15 @@ function up() {
   document.getElementById('pv-title').textContent = t || '— Proposal Title —';
   document.getElementById('pv-title').style.color = t ? '#fff' : 'rgba(255,255,255,.45)';
   const tc = document.getElementById('toComp').value;
-  document.getElementById('pv-sub').textContent = tc ? 'Prepared for ' + tc + ' by YENCODE Technologies' : 'Prepared by YENCODE Technologies';
+  document.getElementById('pv-sub').textContent = tc ? 'Prepared for ' + tc + ' by Your Company Name' : 'Prepared by Your Company Name';
   document.getElementById('pv-date').textContent = fmtDate(document.getElementById('propDate').value);
   document.getElementById('pv-type').textContent = document.getElementById('propType').value;
   document.getElementById('pv-expiry').textContent = 'Expires ' + fmtDate(document.getElementById('propExpiry').value);
   // Parties
   const fp = document.getElementById('fromPerson').value, fc = document.getElementById('fromComp').value, fe = document.getElementById('fromEmail').value;
-  document.getElementById('pv-from').textContent = fp || 'Prabhu R';
+  document.getElementById('pv-from').textContent = fp || 'Your Name';
   document.getElementById('pv-from-d').innerHTML = `${fc}<br>${fe}`;
-  document.getElementById('pv-sig1').textContent = fp || 'Prabhu R';
+  document.getElementById('pv-sig1').textContent = fp || 'Your Name';
   document.getElementById('pv-to').textContent = tc || '— Client —';
   document.getElementById('pv-to').style.color = tc ? 'var(--text)' : 'var(--text3)';
   const tp = document.getElementById('toPerson').value, te = document.getElementById('toEmail').value, ta = document.getElementById('toAddr').value;
@@ -289,7 +289,7 @@ function addWhyUs() {
   const d = document.createElement('div');
   d.className = 'dv-item';
   d.innerHTML = `<div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-star"></i></div>
-    <input type="text" class="dv-input" placeholder="Why choose YENCODE…">
+<input type="text" class="dv-input" placeholder="Why choose us…">
     <i class="ti ti-x dv-del" onclick="this.parentElement.remove()"></i>`;
   c.appendChild(d);
   d.querySelector('.dv-input').focus();

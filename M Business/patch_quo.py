@@ -31,13 +31,13 @@ if start_td_css != -1 and end_td_css != -1:
     td_html = td_html[:start_td_css] + quo_css + '\n' + td_html[end_td_css:]
 
 new_inner = quo_preview_inner
-new_inner = new_inner.replace('YENCODE Technologies', '${co}')
+new_inner = new_inner.replace('Your Company', '${co}')
 new_inner = new_inner.replace('<br>\n                ', '${v("f-email")||""}<br>\n                ${v("f-phone")||""}')
 new_inner = new_inner.replace('<div class="quo-logo-box">YT</div>', '${logo}')
 new_inner = new_inner.replace('#QUO-2026-0022', '#${v("f-quo-num")}')
 new_inner = new_inner.replace('Date: 01 Jun 2026', 'Date: ${fmtDate(v("f-quo-date"))}')
 new_inner = new_inner.replace('Valid until: 16 Jun 2026', 'Valid until: ${validDate}')
-new_inner = new_inner.replace('<div class="quo-party-name" id="pFromName">Prabhu R</div>', '<div class="quo-party-name" id="pFromName">${v("f-sig")||co}</div>')
+new_inner = new_inner.replace('<div class="quo-party-name" id="pFromName">Your Name</div>', '<div class="quo-party-name" id="pFromName">${v("f-sig")||co}</div>')
 new_inner = new_inner.replace('<div class="quo-party-detail" id="pFromDetail">${co}<br>\nChennai, Tamil Nadu</div>', '<div class="quo-party-detail" id="pFromDetail">${co}<br>\n${v("f-addr")||""}</div>')
 new_inner = new_inner.replace('— Client Name —', '${client}')
 new_inner = new_inner.replace('<span style="color:var(--text3)">Fill in client details</span>', '${cemail}')
@@ -54,7 +54,7 @@ new_inner = new_inner.replace('id="pDiscRow"', 'id="quoDiscRow"')
 new_inner = new_inner.replace('id="pDisc"', 'id="quoDisc"')
 new_inner = new_inner.replace('id="pGrand"', 'id="quoGrand"')
 
-new_inner = new_inner.replace('<div class="quo-sig-name" id="pSigName">Prabhu R</div>', '<div class="quo-sig-name" id="pSigName">${v("f-sig")||co}</div>')
+new_inner = new_inner.replace('<div class="quo-sig-name" id="pSigName">Your Name</div>', '<div class="quo-sig-name" id="pSigName">${v("f-sig")||co}</div>')
 new_inner = new_inner.replace('<div class="quo-sig-role">${co}</div>', '<div class="quo-sig-role">${v("f-sig-role")||"Authorised Signatory"}</div>')
 
 js_replacement = """

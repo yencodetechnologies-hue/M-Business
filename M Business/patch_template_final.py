@@ -27,7 +27,7 @@ team_acc = '''
               <div class="team-card">
                 <div class="tc-av" style="background:linear-gradient(135deg,var(--teal),var(--teal4))">PR</div>
                 <div style="flex:1;min-width:0">
-                  <div class="tc-name">Prabhu R</div>
+                  <div class="tc-name">Your Name</div>
                   <div class="tc-role">Lead Developer & Project Manager</div>
                   <div class="tc-exp">8+ years · Web & Mobile Applications</div>
                   <div class="tc-skills"><span class="tc-skill">React.js</span><span class="tc-skill">Node.js</span></div>

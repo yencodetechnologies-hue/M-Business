@@ -1431,17 +1431,14 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           <div style={{ background: "#fff", borderRadius: 16, border: "1.5px solid #E0EEF0", padding: "32px" }}>
             <div style={{ fontSize: 18, fontWeight: 800, color: "#0D2027", marginBottom: 20 }}>Account Settings</div>
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#96B0B8", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>Name</div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "#0D2027", padding: "10px 14px", background: "#F3F8F9", borderRadius: 9, border: "1px solid #DFF0F2" }}>{user?.clientName || user?.name || "—"}</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#96B0B8", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>Company Name</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "#0D2027", padding: "10px 14px", background: "#F3F8F9", borderRadius: 9, border: "1px solid #DFF0F2" }}>{user?.companyName || user?.company || "—"}</div>
             </div>
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: "#96B0B8", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>Email</div>
               <div style={{ fontSize: 14, fontWeight: 600, color: "#0D2027", padding: "10px 14px", background: "#F3F8F9", borderRadius: 9, border: "1px solid #DFF0F2" }}>{user?.email || "—"}</div>
             </div>
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#96B0B8", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>Company</div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "#0D2027", padding: "10px 14px", background: "#F3F8F9", borderRadius: 9, border: "1px solid #DFF0F2" }}>{user?.companyName || user?.company || "—"}</div>
-            </div>
+
             <button onClick={handleLogout} style={{ marginTop: 8, padding: "10px 20px", background: "#FEF2F2", border: "1.5px solid #FECACA", borderRadius: 9, color: "#EF4444", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
               <i className="ti ti-logout" style={{ marginRight: 6 }}></i>Sign Out
             </button>

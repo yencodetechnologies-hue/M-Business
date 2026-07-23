@@ -1070,7 +1070,7 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
                     <span style={{ fontSize: 22, fontWeight: 900, color: ' var(--app-accent, var(--app-accent, #00BCD4))' }}>YT</span>
                   </div>
                   <div style={{ height: 1, background: ' var(--app-accent, var(--app-accent, #00BCD4))', marginBottom: 6 }}></div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: '#0D2027' }}>YENCODE Technologies</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#0D2027' }}>Your Company</div>
                   <div style={{ fontSize: 10, color: '#96B0B8' }}>Authorised Signatory</div>
                 </div>
 

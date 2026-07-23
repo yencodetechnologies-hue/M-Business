@@ -10,8 +10,8 @@ const endIdx = html.indexOf('<script>');
 let bodyHtml = html.substring(startIdx, endIdx);
 
 // Remove pre-filled values so it's not "dynamic" dummy data
-bodyHtml = bodyHtml.replace(/value="YENCODE Technologies"/g, '');
-bodyHtml = bodyHtml.replace(/value="Prabhu R"/g, '');
+bodyHtml = bodyHtml.replace(/value="Your Company"/g, '');
+bodyHtml = bodyHtml.replace(/value="Your Name"/g, '');
 bodyHtml = bodyHtml.replace(/value="YDMart Group"/g, '');
 bodyHtml = bodyHtml.replace(/value="E-Commerce \/ Retail"/g, '');
 bodyHtml = bodyHtml.replace(/value="YDMart E-Commerce App"/g, '');

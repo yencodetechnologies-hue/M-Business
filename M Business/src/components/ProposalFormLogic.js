@@ -69,15 +69,15 @@ export function up() {
   getEl('pv-title').textContent = t || '— Proposal Title —';
   getEl('pv-title').style.color = t ? '#fff' : 'rgba(255,255,255,.45)';
   const tc = getEl('toComp').value;
-  getEl('pv-sub').textContent = tc ? 'Prepared for ' + tc + ' by YENCODE Technologies' : 'Prepared by YENCODE Technologies';
+  getEl('pv-sub').textContent = tc ? 'Prepared for ' + tc + ' by Your Company Name' : 'Prepared by Your Company Name';
   getEl('pv-date').textContent = fmtDate(getEl('propDate').value);
   getEl('pv-type').textContent = getEl('propType').value;
   getEl('pv-expiry').textContent = 'Expires ' + fmtDate(getEl('propExpiry').value);
   // Parties
   const fp = getEl('fromPerson').value, fc = getEl('fromComp').value, fe = getEl('fromEmail').value;
-  getEl('pv-from').textContent = fp || 'Prabhu R';
+  getEl('pv-from').textContent = fp || 'Your Name';
   getEl('pv-from-d').innerHTML = `${fc}<br>${fe}`;
-  getEl('pv-sig1').textContent = fp || 'Prabhu R';
+  getEl('pv-sig1').textContent = fp || 'Your Name';
   getEl('pv-to').textContent = tc || '— Client —';
   getEl('pv-to').style.color = tc ? 'var(--text)' : 'var(--text3)';
   const tp = getEl('toPerson').value, te = getEl('toEmail').value, ta = getEl('toAddr').value;
@@ -325,7 +325,7 @@ export function addWhyUs() {
   const d = document.createElement('div');
   d.className = 'dv-item';
   d.innerHTML = `<div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-star"></i></div>
-    <input type="text" class="dv-input" placeholder="Why choose YENCODE…">
+<input type="text" class="dv-input" placeholder="Why choose us…">
     <i class="ti ti-x dv-del" onclick="this.parentElement.remove()"></i>`;
   c.appendChild(d);
   d.querySelector('.dv-input').focus();
@@ -337,7 +337,7 @@ export function addTeamMember() {
   d.className = 'team-card';
   d.style.cssText = 'flex-direction:column;align-items:stretch;gap:8px;padding:12px';
   d.innerHTML = `
-    <div class="fg" style="margin-bottom:0"><label class="fl">Full Name</label><input type="text" class="fi tm-name-inp" placeholder="e.g. Prabhu R"></div>
+    <div class="fg" style="margin-bottom:0"><label class="fl">Full Name</label><input type="text" class="fi tm-name-inp" placeholder="e.g. Your Name"></div>
     <div class="fg" style="margin-bottom:0"><label class="fl">Job Role</label><input type="text" class="fi tm-role-inp" placeholder="e.g. Lead Developer"></div>
     <div class="fg" style="margin-bottom:0"><label class="fl">Experience</label><input type="text" class="fi tm-exp-inp" placeholder="e.g. 8+ years · Web & Mobile"></div>
     <div class="fg" style="margin-bottom:0"><label class="fl">Skills (comma-separated)</label><input type="text" class="fi tm-skills-inp" placeholder="e.g. React.js, Node.js"></div>
@@ -405,7 +405,7 @@ export function uploadCover() {
 
 export function signProposal(btn) {
   if (!btn) return;
-  const name = document.getElementById('pv-from')?.innerText || 'Yencode Technologies';
+  const name = document.getElementById('pv-from')?.innerText || 'Your Company Name';
   btn.innerHTML = `<i class='ti ti-check' style='font-size:18px;color:var(--teal)'></i><div style='font-size:11px;color:var(--teal);font-weight:700;margin-top:3px'>${name} — Signed</div>`;
   btn.style.borderColor = 'var(--teal)';
   btn.style.background = 'var(--teal-lighter)';

@@ -375,11 +375,11 @@ body{display:flex;min-height:100vh}
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">Company Name</label>
-              <input className="form-input" type="text" id="fromCompany" value="YENCODE Technologies" onInput="updatePreview()" />
+              <input className="form-input" type="text" id="fromCompany" value="Your Company" onInput="updatePreview()" />
             </div>
             <div className="form-group">
               <label className="form-label">Your Name</label>
-              <input className="form-input" type="text" id="fromName" value="Prabhu R" onInput="updatePreview()" />
+              <input className="form-input" type="text" id="fromName" value="Your Name" onInput="updatePreview()" />
             </div>
           </div>
           <div className="form-row">
@@ -824,7 +824,7 @@ Phase 3: Testing & Launch (2 weeks)</textarea>
           </div>
           <div className="form-group">
             <label className="form-label">Notes to Client</label>
-            <textarea className="form-textarea" id="quoNotes" onInput="updatePreview()">Thank you for considering YENCODE Technologies. This quotation is valid for 15 days. For queries, reach us at </textarea>
+            <textarea className="form-textarea" id="quoNotes" onInput="updatePreview()">Thank you for considering Your Company. This quotation is valid for 15 days. For queries, reach us at </textarea>
           </div>
           <div className="form-group">
             <label className="form-label">Terms & Conditions</label>
@@ -862,7 +862,7 @@ Phase 3: Testing & Launch (2 weeks)</textarea>
           <div className="quo-header">
             <div>
               <div className="quo-logo-box">YT</div>
-              <div className="quo-company" id="pFromCompany">YENCODE Technologies</div>
+              <div className="quo-company" id="pFromCompany">Your Company</div>
               <div className="quo-company-sub" id="pFromSub">
                 <br>
                 +91 89254 33533
@@ -883,8 +883,8 @@ Phase 3: Testing & Launch (2 weeks)</textarea>
           <div className="quo-parties">
             <div>
               <div className="quo-party-lbl">Prepared By</div>
-              <div className="quo-party-name" id="pFromName">Prabhu R</div>
-              <div className="quo-party-detail" id="pFromDetail">YENCODE Technologies<br>Chennai, Tamil Nadu</div>
+              <div className="quo-party-name" id="pFromName">Your Name</div>
+              <div className="quo-party-detail" id="pFromDetail">Your Company<br>Chennai, Tamil Nadu</div>
             </div>
             <div>
               <div className="quo-party-lbl">Prepared For</div>
@@ -944,12 +944,12 @@ Phase 3: Testing & Launch (2 weeks)</textarea>
           <div className="quo-footer">
             <div className="inv-notes">
               <div className="quo-notes-lbl">Notes</div>
-              <div className="quo-notes-text" id="pNotes">Thank you for considering YENCODE Technologies. This quotation is valid for 15 days.</div>
+              <div className="quo-notes-text" id="pNotes">Thank you for considering Your Company. This quotation is valid for 15 days.</div>
             </div>
             <div style={{textAlign: "right"}}>
               <div className="quo-sig-line"></div>
-              <div className="quo-sig-name" id="pSigName">Prabhu R</div>
-              <div className="quo-sig-role">YENCODE Technologies</div>
+              <div className="quo-sig-name" id="pSigName">Your Name</div>
+              <div className="quo-sig-role">Your Company</div>
             </div>
           </div>
 

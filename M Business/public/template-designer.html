@@ -3227,7 +3227,7 @@
                 <div class="team-card">
                   <div class="tc-av" style="background:linear-gradient(135deg,var(--teal),var(--teal4))">PR</div>
                   <div style="flex:1;min-width:0">
-                    <div class="tc-name">Prabhu R</div>
+                    <div class="tc-name">Your Name</div>
                     <div class="tc-role">Lead Developer & Project Manager</div>
                     <div class="tc-exp">8+ years · Web & Mobile Applications</div>
                     <div class="tc-skills"><span class="tc-skill">React.js</span><span class="tc-skill">Node.js</span>
@@ -4018,7 +4018,7 @@
       <div class="lb-sig-line" style="background:${color}"></div>
       <div class="lb-sig-name">${sig}</div>
       ${sigRole ? `<div class="lb-sig-role">${sigRole}</div>` : ''}
-      <div class="lb-sig-dept">${v('f-company') || 'YENCODE Technologies'}</div>
+      <div class="lb-sig-dept">${v('f-company') || 'Your Company'}</div>
     </div>`;
       const _newEditor = document.getElementById('lbEditor');
       if (_newEditor && _lbEditorContent) _newEditor.innerHTML = _lbEditorContent;
@@ -4052,7 +4052,7 @@
     }
 
     function renderQuo() {
-      const co = v('f-company') || 'YENCODE Technologies';
+      const co = v('f-company') || 'Your Company';
       const logo = makeLogoEl();
       const quoTitle = v('f-quo-title') || '— Project Title —';
       const client = v('f-quo-client') || '— Client Name —';
@@ -4173,7 +4173,7 @@
     // calcTotal() replaced by propUp()
 
     function renderProp() {
-      const co = v('f-company') || 'YENCODE Technologies';
+      const co = v('f-company') || 'Your Company';
       const title = v('f-prop-title') || '— Proposal Title —';
       const client = v('f-prop-client');
       const nameSz = parseInt(document.getElementById('nameSz').value) || 16;
@@ -4228,7 +4228,7 @@
           <div class="p-logo">YT</div>
           <div class="p-label">Project Proposal</div>
           <div class="p-title" id="pv-title">— Proposal Title —</div>
-          <div class="p-subtitle" id="pv-sub">Prepared by YENCODE Technologies</div>
+          <div class="p-subtitle" id="pv-sub">Prepared by Your Company</div>
           <div class="p-meta">
             <div class="p-meta-i"><i class="ti ti-calendar" style="font-size:11px"></i><span id="pv-date">01 Jun 2026</span></div>
             <div class="p-meta-i"><i class="ti ti-tag" style="font-size:11px"></i><span id="pv-type">Web Development</span></div>
@@ -4243,8 +4243,8 @@
           <div class="party-grid">
             <div class="party-b">
               <div class="pb-lbl">Prepared By</div>
-              <div class="pb-name" id="pv-from">Prabhu R</div>
-              <div class="pb-detail" id="pv-from-d">YENCODE Technologies<br></div>
+              <div class="pb-name" id="pv-from">Your Name</div>
+              <div class="pb-detail" id="pv-from-d">Your Company<br></div>
             </div>
             <div class="party-b">
               <div class="pb-lbl">Prepared For</div>
@@ -4337,7 +4337,7 @@
               <div class="team-card">
                 <div class="tc-av" style="background:linear-gradient(135deg,var(--teal),var(--teal4))">PR</div>
                 <div style="flex:1;min-width:0">
-                  <div class="tc-name">Prabhu R</div>
+                  <div class="tc-name">Your Name</div>
                   <div class="tc-role">Lead Developer & Project Manager</div>
                   <div class="tc-exp">8+ years · Web & Mobile Applications</div>
                   <div class="tc-skills"><span class="tc-skill">React.js</span><span class="tc-skill">Node.js</span></div>
@@ -4407,8 +4407,8 @@
           <div class="sop">
             <div class="sob">
               <div class="sob-line"></div>
-              <div class="sob-name" id="pv-sig1">Prabhu R</div>
-              <div class="sob-role">YENCODE Technologies</div>
+              <div class="sob-name" id="pv-sig1">Your Name</div>
+              <div class="sob-role">Your Company</div>
             </div>
             <div class="sob">
               <div class="sob-line" style="background:var(--amber)"></div>
@@ -4689,7 +4689,7 @@
 
     // ── INVOICE RENDER ──
     function renderInv() {
-      const co = v('f-company') || 'YENCODE Technologies';
+      const co = v('f-company') || 'Your Company';
       const nameSz = parseInt(document.getElementById('nameSz').value) || 16;
       const logo = makeLogoEl();
       const invNum = v('f-inv-num') || 'INV-2026-0001';
@@ -4827,7 +4827,7 @@
           <div class="inv-header">
             <div class="inv-logo-area">
               <div class="inv-logo-box">YT</div>
-              <div class="inv-company-name" id="pInvFromComp">YENCODE Technologies</div>
+              <div class="inv-company-name" id="pInvFromComp">Your Company</div>
               <div class="inv-company-details" id="pInvFromDet">
                 yencodetechnologies@gmail.com<br>
                 +91 89254 33533<br>
@@ -4849,7 +4849,7 @@
           <div class="inv-parties">
             <div>
               <div class="inv-party-label">From</div>
-              <div class="inv-party-name" id="pInvFromName">YENCODE Technologies</div>
+              <div class="inv-party-name" id="pInvFromName">Your Company</div>
               <div class="inv-party-detail" id="pInvFromDet2">
                 GST: 33ABCDE1234F1Z5<br>
                 Chennai, Tamil Nadu, India
@@ -4921,8 +4921,8 @@
             </div>
             <div class="inv-sig">
               <div class="inv-sig-line"></div>
-              <div class="inv-sig-name">Prabhu R</div>
-              <div class="inv-sig-role">YENCODE Technologies</div>
+              <div class="inv-sig-name">Your Name</div>
+              <div class="inv-sig-role">Your Company</div>
             </div>
           </div>
 
@@ -5433,15 +5433,15 @@
       document.getElementById('pv-title').textContent = t || '— Proposal Title —';
       document.getElementById('pv-title').style.color = t ? '#fff' : 'rgba(255,255,255,.45)';
       const tc = window._tdv('f-prop-client');
-      document.getElementById('pv-sub').textContent = tc ? 'Prepared for ' + tc + ' by YENCODE Technologies' : 'Prepared by YENCODE Technologies';
+      document.getElementById('pv-sub').textContent = tc ? 'Prepared for ' + tc + ' by Your Company' : 'Prepared by Your Company';
       document.getElementById('pv-date').textContent = fmtDate(window._tdv('f-prop-date'));
       document.getElementById('pv-type').textContent = window._tdv('f-prop-type');
       document.getElementById('pv-expiry').textContent = 'Expires ' + fmtDate(window._tdv('f-prop-expiry'));
       // Parties
       const fp = window._tdv('f-sig'), fc = window._tdv('f-company'), fe = window._tdv('f-email');
-      document.getElementById('pv-from').textContent = fp || 'Prabhu R';
+      document.getElementById('pv-from').textContent = fp || 'Your Name';
       document.getElementById('pv-from-d').innerHTML = `${fc}<br>${fe}`;
-      document.getElementById('pv-sig1').textContent = fp || 'Prabhu R';
+      document.getElementById('pv-sig1').textContent = fp || 'Your Name';
       document.getElementById('pv-to').textContent = tc || '— Client —';
       document.getElementById('pv-to').style.color = tc ? 'var(--text)' : 'var(--text3)';
       const tp = window._tdv('f-prop-cperson'), te = window._tdv('f-prop-cemail'), ta = window._tdv('f-prop-caddr');

@@ -1617,7 +1617,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         projectId: snapshotProjectId || '',
       });
 
-      const link = `${window.location.origin}/client-portal/${matched._id}?token=${tokenRes.data.token}`;
+      const link = `${window.location.origin}/client-portal/${matched._id}`;
       setPortalLinkUrl(link);
       lastPortalProjectId.current = snapshotProjectId;
       return link;
@@ -1722,7 +1722,17 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 <button onClick={copyPortalLink} style={{ flexShrink: 0, padding: '4px 10px', borderRadius: 6, border: 'none', background: 'rgba(255,255,255,0.25)', color: '#fff', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Copy</button>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                <button onClick={async () => { const link = portalLinkUrl || await generatePortalLink(); if (link) window.open(link, '_blank'); }} style={{ padding: '10px', borderRadius: 9, border: 'none', background: '#fff', color: P.primaryDark, fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <button onClick={async () => {
+                  const link = portalLinkUrl || await generatePortalLink();
+                  if (!link) return;
+                  const cleanLink = link.split('?')[0];
+                  sessionStorage.setItem('__portal_auth_token__', link.split('?token=')[1] || '');
+                  const newTab = window.open('about:blank', '_blank');
+                  if (newTab) {
+                    newTab.document.title = 'Opening Client Portal…';
+                    newTab.location.replace(link);
+                  }
+                }} style={{ padding: '10px', borderRadius: 9, border: 'none', background: '#fff', color: P.primaryDark, fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                   <i className="ti ti-external-link"></i> Open Portal
                 </button>
                 <button onClick={copyPortalLink} style={{ padding: '10px', borderRadius: 9, border: '1.5px solid rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>

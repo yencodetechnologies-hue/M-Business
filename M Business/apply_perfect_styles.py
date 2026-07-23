@@ -44,7 +44,7 @@ new_blank_part = """  const blank = {
     isGstIncluded: false,
     upiId: "yencode@okaxis",
     bankName: "HDFC Bank",
-    accountName: "YENCODE Technologies",
+    accountName: "COMPANY NAME ",
     accountNumber: "5020123456789",
     ifscCode: "HDFC0001234",
   };

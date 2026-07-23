@@ -193,7 +193,7 @@ tr:hover td{background:#FAFCFE;}
         <div className="aud-page">
           <div className="aud-hero">
             <div className="aud-hero-left">
-              <h1>YENCODE Technologies Pvt Ltd — Audit Access</h1>
+              <h1>Your Company Pvt Ltd — Audit Access</h1>
               <p>FY 2025-26 &nbsp;·&nbsp; Period: June 2026 &nbsp;·&nbsp; Last shared: Jun 5, 2026 at 11:42 AM</p>
             </div>
             <div className="aud-hero-stats">

@@ -2151,7 +2151,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               </div>
               <div style={{ padding: '0 24px 20px', overflowY: 'auto', flex: 1, minHeight: 0 }}>
                 {filteredTasks.length === 0 ? (
-                  <div style={{ padding: 20, minHeight: 420, display: 'flex', alignItems: 'center', justifyContent: 'center', color: P.textLight, fontSize: 13 }}>No tasks found for this filter.</div>
+                  <div style={{ padding: 20, minHeight: 460, display: 'flex', alignItems: 'center', justifyContent: 'center', color: P.textLight, fontSize: 13 }}>No tasks found for this filter.</div>
                 ) : (
                   filteredTasks.map(t => {
                     const isDone = t.status === 'done' || t.status === 'completed' || t.checked === true;
@@ -2310,7 +2310,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           )}
                         </div>
                       );
-                    })() : <div style={{ textAlign: 'center', padding: 20, minHeight: 420, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Activity logs will appear here.</div>}
+                    })() : <div style={{ textAlign: 'center', padding: 20, minHeight: 460, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Activity logs will appear here.</div>}
                   </div>
                 </div>
 

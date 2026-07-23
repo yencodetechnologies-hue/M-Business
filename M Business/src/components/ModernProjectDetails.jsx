@@ -71,7 +71,7 @@ const CSS = `
 .mpd-btn:hover::after { opacity:1; }
 .mpd-btn-primary { background:linear-gradient(135deg,${P.primary},${P.primaryDark}); color:#fff; box-shadow:0 4px 14px rgba(0,188,212,.35); }
 .mpd-btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(0,188,212,.45); }
-.mpd-btn-outline { background:#fff; border:1.5px solid ${P.border}; color:${P.textMid}; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+.mpd-btn-outline { background:#fff; border:1.5px solid ${P.primary}; color:${P.primary}; box-shadow:0 1px 4px rgba(0,0,0,.06); }
 .mpd-btn-outline:hover { border-color:${P.primary}; color:${P.primary}; background:${P.primaryLight}; transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,188,212,.15); }
 .mpd-btn-danger { background:${P.redLight}; color:${P.red}; border:1.5px solid #FCA5A5; }
 .mpd-btn-danger:hover { background:${P.red}; color:#fff; transform:translateY(-1px); }
@@ -1662,8 +1662,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <i className="ti ti-chevron-right" style={{ fontSize: 14 }}></i>
             <span style={{ color: P.textDark }}>{projName}</span>
           </div>
-
-
+          {onEdit && (
+            <button className="mpd-btn mpd-btn-primary" onClick={() => onEdit(currProject)}>
+              <i className="ti ti-edit"></i> Edit Project
+            </button>
+          )}
 
         </div>
 
@@ -1703,7 +1706,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     + New Quotation
                   </button>
                 )}
-
 
               </div>
             </div>

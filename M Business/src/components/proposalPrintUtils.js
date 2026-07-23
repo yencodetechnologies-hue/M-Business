@@ -336,9 +336,10 @@ function buildSlidesHTML(proposal) {
 
   return html;
 }
-
 export async function printProposal(proposal) {
   if (!proposal) return;
+  const liveDocSnapshot = document.getElementById('propDoc');
+  proposal = { ...proposal, __liveHTML: liveDocSnapshot ? liveDocSnapshot.outerHTML : null };
   if (typeof window.html2pdf === 'undefined') {
     await new Promise((resolve) => {
       const script = document.createElement('script');
@@ -349,14 +350,15 @@ export async function printProposal(proposal) {
   }
 
   let bodyHTML = "";
-  if (proposal.html && proposal.html.trim()) {
+  if (proposal.__liveHTML) {
+    bodyHTML = proposal.__liveHTML;
+  } else if (proposal.html && proposal.html.trim()) {
     bodyHTML = proposal.html;
   } else if (proposal.slides && proposal.slides.length > 0) {
     bodyHTML = buildSlidesHTML(proposal);
   } else {
     bodyHTML = `<div style="padding:80px;text-align:center;color:#aaa;font-size:14px;">No proposal content to display.</div>`;
   }
-
   let resolvedVars = HARDCODED_VARS;
   try {
     const cs = getComputedStyle(document.documentElement);
@@ -401,15 +403,18 @@ export async function printProposal(proposal) {
     const imgs = Array.from(container.querySelectorAll('img'));
     return Promise.all(imgs.map(img => img.complete ? Promise.resolve() : new Promise(res => { img.onload = res; img.onerror = res; })));
   };
-
   setTimeout(async () => {
     try {
+      if (!bodyHTML || bodyHTML.includes('No proposal content to display')) {
+        console.warn('printProposal: no content found, propDoc missing at call time');
+      }
       await waitForImages();
       await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
+      await new Promise(res => setTimeout(res, 300));
       await window.html2pdf().from(container).set({
         filename: `${(proposal.title || 'proposal').replace(/[^a-z0-9]/gi, '_')}.pdf`,
         margin: 0,
-        html2canvas: { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff' },
+        html2canvas: { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', logging: true },
         jsPDF: { format: 'a4', unit: 'mm' }
       }).save();
     } catch (e) {

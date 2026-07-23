@@ -179,10 +179,7 @@ export default function QuotationViewer() {
       `}</style>
 
       <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
-        <button className="action-btn" onClick={() => window.print()}
-          style={{ padding: "10px 22px", background: "linear-gradient(135deg,#059669,#065f46)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>
-          Print / Save PDF
-        </button>
+
 
       </div>
 

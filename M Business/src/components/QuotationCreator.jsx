@@ -1229,9 +1229,43 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               setStep("form");
             }
           }} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Edit</button>
-          <button onClick={() => shareQuotation({ id: qt.quoteNo, quoteNo: qt.quoteNo, total })} style={{ padding: "10px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>Share</button>
+          <button onClick={async () => {
+            const entry = { id: qt.quoteNo, quoteNo: qt.quoteNo, qt, items };
+            const doc = buildPDFFromData(entry);
 
-          <button onClick={() => triggerPDFShare({ id: qt.quoteNo, quoteNo: qt.quoteNo, total }, "print")} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>Print / PDF</button>
+            await new Promise(resolve => {
+              const QRCode = require('qrcode');
+              const qrCanvas = document.createElement('canvas');
+              QRCode.toCanvas(qrCanvas, qrData, { width: 200, margin: 1 }, () => {
+                const qrImg = qrCanvas.toDataURL('image/png');
+                const pageCount = doc.internal.getNumberOfPages();
+                doc.setPage(pageCount);
+                doc.setFillColor(240, 253, 250);
+                doc.roundedRect(210 - 14 - 32, 297 - 55, 32, 40, 2, 2, 'F');
+                doc.setDrawColor(209, 250, 229);
+                doc.roundedRect(210 - 14 - 32, 297 - 55, 32, 40, 2, 2, 'S');
+                doc.addImage(qrImg, 'PNG', 210 - 14 - 28, 297 - 51, 24, 24);
+                doc.setFontSize(6);
+                doc.setTextColor(107, 114, 128);
+                doc.text('SCAN QUOTE', 210 - 14 - 16, 297 - 24, { align: 'center' });
+                resolve();
+              });
+            });
+
+            const blob = doc.output('blob');
+            const fileName = `Quotation_${qt.quoteNo || 'draft'}.pdf`;
+            const file = new File([blob], fileName, { type: 'application/pdf' });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              try {
+                await navigator.share({ files: [file] });
+                return;
+              } catch (e) {
+                if (e.name === "AbortError") return;
+              }
+            }
+            doc.save(fileName);
+            showToast('Sharing not supported on this device — PDF downloaded instead.');
+          }} style={{ padding: "10px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>Share</button>  <button onClick={() => window.print()} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>Print / PDF</button>
         </div>
 
         <div className="qt-paper print-container">

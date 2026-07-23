@@ -1372,13 +1372,15 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
         const res = await axios.put(`${BASE_URL}/api/proposals/${d._id}`, d);
         setProposals(prev => prev.map(p => p._id === d._id ? res.data : p));
         setDoc(res.data);
-        return res.data;                     //  return so callers can use it
+        window._currentProposalDoc = res.data;
+        return res.data;                   //  return so callers can use it
       } else {
         // First save — create in DB
         const res = await axios.post(`${BASE_URL}/api/proposals`, d);
         setProposals(prev => [res.data, ...prev.filter(p => p.id !== d.id)]);
         setDoc(res.data);
-        return res.data;                     //  return the DB doc (now has _id)
+        window._currentProposalDoc = res.data;
+        return res.data;                //  return the DB doc (now has _id)
       }
     } catch (err) {
       console.error("Error persisting proposal:", err);
@@ -1604,12 +1606,12 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     );
   }
   const onSaveProposalStable = useCallback(async (data) => {
-    await createNew(data);
-    if (data.status === 'sent') {
-      flash("Export Proposal sent — it will appear on the client's dashboard now.");
-      setTimeout(() => setView("list"), 500);
-    }
-  }, [createNew, flash]);
+    const base = doc || makeInitialProposal(THEMES[0].name, companyName || "");
+    const merged = { ...base, ...data, id: base.id || pid() };
+    await persist(merged);
+    flash(data.status === 'sent' ? "Export Proposal sent — it will appear on the client's dashboard now." : " Saved!");
+    setTimeout(() => setView("list"), 400);
+  }, [doc, persist, flash, companyName]);
   // ══ FORM VIEW --------------------------------------------------------------
   if (view === "form") {
     // Register the back-to-list callback so ProposalFormLogic can call it after Send
@@ -1624,37 +1626,44 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
       onMountExposeCrop={() => {
         try {
           window.triggerCrop = triggerCrop;
-          window._downloadProposalPDF = () => printProposal(doc, companyName);
+          window._downloadProposalPDF = () => printProposal(window._currentProposalDoc || doc, companyName);
           window._shareProposal = async () => {
-            if (!doc || (!doc._id && !doc.id)) {
-              alert('Please save the proposal as a draft first before sharing.');
-              return;
-            }
-            const shareUrl = `${window.location.origin}${window.location.pathname}?view=${doc._id || doc.id}`;
-            if (navigator.share) {
-              try {
-                await navigator.share({
-                  title: doc.title || 'Proposal',
-                  text: `Check out this proposal: ${doc.title || ''}`,
-                  url: shareUrl
-                });
-              } catch (err) {
-                if (err.name !== 'AbortError') console.error('Share failed:', err);
+            if (window._shareInProgress) return;
+            window._shareInProgress = true;
+            try {
+              let current = window._currentProposalDoc || doc;
+              if (!current || (!current._id && !current.id)) {
+                const savedDoc = await persist({ ...(current || makeInitialProposal(THEMES[0].name, companyName || "")), ...(typeof extractProposalData === 'function' ? extractProposalData() : {}) });
+                if (!savedDoc) { alert('Please save the proposal as a draft first before sharing.'); return; }
+                current = savedDoc;
               }
-            } else {
-              try {
-                await navigator.clipboard.writeText(shareUrl);
-                alert('Share link copied to clipboard!');
-              } catch (err) {
-                prompt('Copy this link to share:', shareUrl);
+              const shareUrl = `${window.location.origin}${window.location.pathname}?view=${current._id || current.id}`;
+              if (navigator.share) {
+                try {
+                  await navigator.share({
+                    title: current.title || 'Proposal',
+                    text: `Check out this proposal: ${current.title || ''}`,
+                    url: shareUrl
+                  });
+                } catch (err) {
+                  if (err.name !== 'AbortError' && err.name !== 'InvalidStateError') console.error('Share failed:', err);
+                }
+              } else {
+                try {
+                  await navigator.clipboard.writeText(shareUrl);
+                  alert('Share link copied to clipboard!');
+                } catch (err) {
+                  prompt('Copy this link to share:', shareUrl);
+                }
               }
+            } finally {
+              window._shareInProgress = false;
             }
           };
         } catch (err) {
           console.error('onMountExposeCrop failed:', err);
         }
-      }}
-      onSave={onSaveProposalStable}
+      }} onSave={onSaveProposalStable}
     />;
   }
 

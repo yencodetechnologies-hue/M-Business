@@ -206,25 +206,17 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
           console.log('coverZone elements count:', document.querySelectorAll('#coverZone').length);
           console.log('liveZone bg after set:', liveZone.style.backgroundImage.slice(0, 50));
         };
-        coverZone.onclick = () => {
-          const inp = document.createElement('input');
-          inp.type = 'file'; inp.accept = 'image/*';
-          inp.onchange = (e) => {
-            console.log('onchange fired. files:', e.target.files.length, 'triggerCrop type:', typeof window.triggerCrop);
-            if (typeof window.triggerCrop === 'function') {
-              window.triggerCrop(e, (croppedImage) => applyCoverImage(croppedImage), 1);
-            } else if (window._triggerCrop) {
-              window._triggerCrop(e, (croppedImage) => applyCoverImage(croppedImage), 1);
-            } else {
-              const file = e.target.files[0]; if (!file) return;
-              const reader = new FileReader();
-              reader.onload = (ev) => applyCoverImage(ev.target.result);
-              reader.readAsDataURL(file);
-            }
-          };
-          console.log('inp.click() called');
-          inp.click();
-        };
+       coverZone.onclick = () => {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*';
+  inp.onchange = (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => applyCoverImage(ev.target.result);
+    reader.readAsDataURL(file);
+  };
+  inp.click();
+};
       }
     };
     setTimeout(hookUp, 300);

@@ -1583,6 +1583,66 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   };
 
   const printProposal = (p) => { import("./proposalPrintUtils").then(m => m.printProposal(p)); };
+
+  const shareProposalPDF = async (p) => {
+    const node = document.getElementById('propDoc');
+    if (!node) {
+      // Not on the live form — use the dedicated PDF builder that has its own
+      // complete stylesheet baked in, instead of trying to snapshot a DOM
+      // node that doesn't exist here.
+      const mod = await import('./proposalPrintUtils');
+      await mod.printProposal(p, companyName);
+      return;
+    }
+    const sourceEl = node;
+
+    await document.fonts.ready;
+    await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
+    const html2canvasMod = await import('html2canvas');
+    const html2canvas = html2canvasMod.default;
+    const { jsPDF } = await import('jspdf');
+    const canvas = await html2canvas(sourceEl, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      windowWidth: sourceEl.scrollWidth,
+      windowHeight: sourceEl.scrollHeight,
+      onclone: (clonedDoc) => {
+        const liveStyles = Array.from(document.querySelectorAll('style'));
+        liveStyles.forEach(styleTag => {
+          const cloned = clonedDoc.createElement('style');
+          cloned.textContent = styleTag.textContent;
+          clonedDoc.head.appendChild(cloned);
+        });
+        const rootStyles = getComputedStyle(document.documentElement);
+        const teal = rootStyles.getPropertyValue('--app-accent').trim() || '#00BCD4';
+        clonedDoc.documentElement.style.setProperty('--app-accent', teal);
+        clonedDoc.documentElement.style.setProperty('--teal', teal);
+      }
+    });
+    if (tmp) document.body.removeChild(tmp);
+    const imgData = canvas.toDataURL('image/png');
+    const pdfDoc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    const pageWidth = 210, pageHeight = 297;
+    const imgWidth = pageWidth;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    let heightLeft = imgHeight, position = 0;
+    pdfDoc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdfDoc.addPage();
+      pdfDoc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+    const blob = pdfDoc.output('blob');
+    const fileName = `${(p.title || 'Proposal').replace(/[^a-z0-9]/gi, '_')}.pdf`;
+    const file = new File([blob], fileName, { type: 'application/pdf' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file] }); return; } catch (err) { if (err.name === 'AbortError') return; }
+    }
+    pdfDoc.save(fileName);
+  };
   const duplicateSlide = (i) => {
     const s = { ...doc.slides[i], id: uid() };
     const slides = [...doc.slides]; slides.splice(i + 1, 0, s);
@@ -1642,11 +1702,21 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
               const html2canvasMod = await import('html2canvas');
               const html2canvas = html2canvasMod.default;
               const { jsPDF } = await import('jspdf');
+              await document.fonts.ready;
+              await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
               const canvas = await html2canvas(node, {
                 scale: 2,
                 useCORS: true,
                 backgroundColor: '#ffffff',
+                windowWidth: node.scrollWidth,
+                windowHeight: node.scrollHeight,
                 onclone: (clonedDoc) => {
+                  const liveStyles = Array.from(document.querySelectorAll('style'));
+                  liveStyles.forEach(styleTag => {
+                    const cloned = clonedDoc.createElement('style');
+                    cloned.textContent = styleTag.textContent;
+                    clonedDoc.head.appendChild(cloned);
+                  });
                   const rootStyles = getComputedStyle(document.documentElement);
                   const teal = rootStyles.getPropertyValue('--app-accent').trim() || '#00BCD4';
                   clonedDoc.documentElement.style.setProperty('--app-accent', teal);
@@ -1944,7 +2014,27 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                                   const html2canvasMod = await import('html2canvas');
                                   const html2canvas = html2canvasMod.default;
                                   const { jsPDF } = await import('jspdf');
-                                  const canvas = await html2canvas(sourceEl, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+                                  await document.fonts.ready;
+                                  await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
+                                  const canvas = await html2canvas(sourceEl, {
+                                    scale: 2,
+                                    useCORS: true,
+                                    backgroundColor: '#ffffff',
+                                    windowWidth: sourceEl.scrollWidth,
+                                    windowHeight: sourceEl.scrollHeight,
+                                    onclone: (clonedDoc) => {
+                                      const liveStyles = Array.from(document.querySelectorAll('style'));
+                                      liveStyles.forEach(styleTag => {
+                                        const cloned = clonedDoc.createElement('style');
+                                        cloned.textContent = styleTag.textContent;
+                                        clonedDoc.head.appendChild(cloned);
+                                      });
+                                      const rootStyles = getComputedStyle(document.documentElement);
+                                      const teal = rootStyles.getPropertyValue('--app-accent').trim() || '#00BCD4';
+                                      clonedDoc.documentElement.style.setProperty('--app-accent', teal);
+                                      clonedDoc.documentElement.style.setProperty('--teal', teal);
+                                    }
+                                  });
                                   if (tmp) document.body.removeChild(tmp);
                                   const imgData = canvas.toDataURL('image/png');
                                   const pdfDoc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
@@ -2129,7 +2219,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
             proposal={viewingProposal}
             onClose={() => setViewingProposal(null)}
             onPrint={() => printProposal(viewingProposal)}
-            onShare={() => shareProposal(viewingProposal)}
+            onShare={() => shareProposalPDF(viewingProposal)}
             BASE_URL={BASE_URL}
             onUpdated={(updated) => {
               setProposals(prev => prev.map(p =>

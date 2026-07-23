@@ -377,7 +377,17 @@ export default function ModernProjectsPage({ user }) {
               project={toDetailShape(selectedProject)}
               onBack={() => { sessionStorage.removeItem('selectedProjectId'); setSelectedProject(null); }}
               tasks={tasksForProject(selectedProject)}
-              onUpdate={fetchAll}
+              onUpdate={async (updated) => {
+                try {
+                  const res = await axios.put(`${BASE_URL}/api/projects/${updated._id || updated.id}`, updated, {
+                    headers: { 'x-company-id': user?.companyId || user?._id || user?.id || '' }
+                  });
+                  setProjects(prev => prev.map(p => (p._id === res.data._id ? res.data : p)));
+                  return res.data;
+                } catch (err) {
+                  console.error('Failed to update project:', err);
+                }
+              }}
               fromClientContext={false}
               fetchProjects={fetchAll}
               fetchTasks={fetchAll}

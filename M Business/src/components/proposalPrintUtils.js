@@ -403,7 +403,7 @@ export async function printProposal(proposal) {
     const imgs = Array.from(container.querySelectorAll('img'));
     return Promise.all(imgs.map(img => img.complete ? Promise.resolve() : new Promise(res => { img.onload = res; img.onerror = res; })));
   };
-  setTimeout(async () => {
+  await new Promise(resolve => setTimeout(async () => {
     try {
       if (!bodyHTML || bodyHTML.includes('No proposal content to display')) {
         console.warn('printProposal: no content found, propDoc missing at call time');
@@ -411,18 +411,39 @@ export async function printProposal(proposal) {
       await waitForImages();
       await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
       await new Promise(res => setTimeout(res, 300));
-      await window.html2pdf().from(container).set({
+      const worker = window.html2pdf().from(container).set({
         filename: `${(proposal.title || 'proposal').replace(/[^a-z0-9]/gi, '_')}.pdf`,
         margin: 0,
-        html2canvas: { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', logging: true },
+        html2canvas: { scale: 1.5, useCORS: true, allowTaint: true, backgroundColor: '#ffffff' },
         jsPDF: { format: 'a4', unit: 'mm' }
-      }).save();
+      });
+      const blob = await worker.output('blob');
+      const fileName = `${(proposal.title || 'proposal').replace(/[^a-z0-9]/gi, '_')}.pdf`;
+      const file = new File([blob], fileName, { type: 'application/pdf' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file] });
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = fileName;
+            a.click();
+          }
+        }
+      } else {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = fileName;
+        a.click();
+      }
     } catch (e) {
       console.error('PDF generation error:', e);
     } finally {
       try { container.remove(); } catch (e) { }
+      resolve();
     }
-  }, 400);
+  }, 400));
 }
 
 export async function shareProposalAsPDF(proposal, companyName, onStatusUpdate) {

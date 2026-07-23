@@ -7,7 +7,8 @@ export default function FinBank() {
   const [isLinkBankModalOpen, setIsLinkBankModalOpen] = useState(false);
   const [banks, setBanks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [newBank, setNewBank] = useState({ bankName: 'HDFC Bank', accountType: 'Current', accountNo: '', ifscCode: '', holderName: '' });
+  const emptyBankForm = { bankName: 'HDFC Bank', accountType: 'Current', accountNo: '', confirmAccountNo: '', ifscCode: '', holderName: '', customBankName: '', customAccountType: '' };
+  const [newBank, setNewBank] = useState(emptyBankForm);
   const mainScrollRef = useRef(null);
   const [selectedBankId, setSelectedBankId] = useState(null);
   const [income, setIncome] = useState([]);
@@ -66,21 +67,26 @@ export default function FinBank() {
   const closeImport = () => setIsImportModalOpen(false);
 
   const linkBank = async () => {
+    if ((newBank.accountNo || '').trim() !== (newBank.confirmAccountNo || '').trim()) {
+      return;
+    }
     try {
+      const resolvedBankName = newBank.bankName === 'Custom' ? newBank.customBankName : newBank.bankName;
+      const resolvedAccountType = newBank.accountType === 'Custom' ? newBank.customAccountType : newBank.accountType;
       await axios.post(`${BASE_URL}/api/banks`, {
         ...newBank,
+        bankName: resolvedBankName,
+        accountType: resolvedAccountType,
         balance: 0
       }, {
         headers: { "x-company-id": localStorage.getItem("companyId") || "" }
       });
       setIsLinkBankModalOpen(false);
-      alert('Bank account linked! Verify the test deposit.');
       fetchBanks();
     } catch (e) {
       alert('Failed to link bank');
     }
   };
-
   const toast = (msg) => alert(msg);
 
   const colors = [
@@ -170,8 +176,8 @@ a { text-decoration: none; color: inherit; }
           <div className="breadcrumb"><i className="ti ti-wallet" style={{ fontSize: 22, color: '#1A2332' }}></i><span style={{ fontSize: 22, fontWeight: 900, color: '#1A2332' }}>Bank Accounts</span></div>
           <div className="topbar-actions">
             <button className="btn btn-outline" onClick={openImport} style={{ borderColor: 'var(--primary)', color: 'var(--primary)' }}><i className="ti ti-upload"></i>Import Statement</button>
-            <button className="btn btn-outline" onClick={() => toast('Syncing all accounts...')}>Sync All</button>
-            <button className="btn btn-primary" onClick={() => setIsLinkBankModalOpen(true)}><i className="ti ti-plus"></i>Link Bank Account</button>
+
+            <button className="btn btn-primary" onClick={() => { setNewBank(emptyBankForm); setIsLinkBankModalOpen(true); }}><i className="ti ti-plus"></i>Link Bank Account</button>
           </div>
         </div>
         <div className="content" ref={mainScrollRef}>
@@ -269,8 +275,8 @@ a { text-decoration: none; color: inherit; }
               <div className="card">
                 <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-dark)', marginBottom: '12px' }}>Export Statement</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <button className="exp-btn exp-pdf" style={{ justifyContent: 'flex-start' }} onClick={() => toast('Downloading PDF statement...')}><i className="ti ti-file-type-pdf"></i>Download PDF</button>
-                  <button className="exp-btn exp-excel" style={{ justifyContent: 'flex-start' }} onClick={() => toast('Downloading Excel...')}><i className="ti ti-file-spreadsheet"></i>Download Excel</button>
+                  <button className="exp-btn exp-pdf" style={{ justifyContent: 'flex-start' }} onClick={downloadStatementPDF}><i className="ti ti-file-type-pdf"></i>Download PDF</button>
+                  <button className="exp-btn exp-excel" style={{ justifyContent: 'flex-start' }} onClick={downloadStatementExcel}><i className="ti ti-file-spreadsheet"></i>Download Excel</button>
                 </div>
               </div>
             </div>
@@ -281,18 +287,49 @@ a { text-decoration: none; color: inherit; }
       <div className={`modal-bg ${isLinkBankModalOpen ? 'open' : ''}`} onClick={(e) => { if (e.target.className.includes('modal-bg')) setIsLinkBankModalOpen(false) }}>
         <div className="modal modal-sm">
           <div className="modal-title"><i className="ti ti-building-bank"></i>Link Bank Account</div>
-          <div className="form-group"><label>Bank Name *</label><select value={newBank.bankName} onChange={e => setNewBank({ ...newBank, bankName: e.target.value })}><option>HDFC Bank</option><option>ICICI Bank</option><option>State Bank of India</option><option>Axis Bank</option></select></div>
+          <div className="form-group">
+            <label>Bank Name *</label>
+            {newBank.bankName === 'Custom' ? (
+              <input type="text" placeholder="Enter bank name" value={newBank.customBankName} onChange={e => setNewBank({ ...newBank, customBankName: e.target.value })} autoFocus />
+            ) : (
+              <select value={newBank.bankName} onChange={e => setNewBank({ ...newBank, bankName: e.target.value })}>
+                <option value="Custom">Custom</option>
+                <option>HDFC Bank</option>
+                <option>ICICI Bank</option>
+                <option>State Bank of India</option>
+                <option>Axis Bank</option>
+              </select>
+            )}
+            {newBank.bankName === 'Custom' && (
+              <button type="button" onClick={() => setNewBank({ ...newBank, bankName: 'HDFC Bank', customBankName: '' })} style={{ marginTop: 6, fontSize: 12, background: 'none', border: 'none', color: 'var(--app-accent)', cursor: 'pointer', padding: 0 }}>← Back to dropdown</button>
+            )} </div>
           <div className="form-group"><label>Account Number *</label><input placeholder="Enter account number" value={newBank.accountNo} onChange={e => setNewBank({ ...newBank, accountNo: e.target.value })} /></div>
-          <div className="form-group"><label>Confirm Account Number *</label><input placeholder="Re-enter account number" /></div>
+          <div className="form-group">
+            <label>Confirm Account Number *</label>
+            <input type="text" value={newBank.confirmAccountNo} onChange={e => setNewBank({ ...newBank, confirmAccountNo: e.target.value })} placeholder="Re-enter account number" />
+            {newBank.confirmAccountNo && newBank.accountNo !== newBank.confirmAccountNo && (
+              <div style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>Does not match</div>
+            )}
+          </div>
           <div className="form-2col">
             <div className="form-group"><label>IFSC Code *</label><input placeholder="e.g. HDFC0001234" value={newBank.ifscCode} onChange={e => setNewBank({ ...newBank, ifscCode: e.target.value })} /></div>
-            <div className="form-group"><label>Account Type</label><select value={newBank.accountType} onChange={e => setNewBank({ ...newBank, accountType: e.target.value })}><option>Current</option><option>Savings</option></select></div>
+            <div className="form-group">
+              <label>Account Type</label>
+              {newBank.accountType === 'Custom' ? (
+                <input type="text" placeholder="Enter account type" value={newBank.customAccountType} onChange={e => setNewBank({ ...newBank, customAccountType: e.target.value })} autoFocus />
+              ) : (
+                <select value={newBank.accountType} onChange={e => setNewBank({ ...newBank, accountType: e.target.value })}>
+                  <option value="Custom">Custom</option>
+                  <option>Current</option>
+                  <option>Savings</option>
+                </select>
+              )}
+              {newBank.accountType === 'Custom' && (
+                <button type="button" onClick={() => setNewBank({ ...newBank, accountType: 'Current', customAccountType: '' })} style={{ marginTop: 6, fontSize: 12, background: 'none', border: 'none', color: 'var(--app-accent)', cursor: 'pointer', padding: 0 }}>← Back to dropdown</button>
+              )}</div>
           </div>
           <div className="form-group"><label>Account Holder Name</label><input value={newBank.holderName} onChange={e => setNewBank({ ...newBank, holderName: e.target.value })} placeholder="e.g. Your Company" /></div>
-          <div style={{ background: 'var(--orange-light)', borderRadius: '10px', padding: '12px 14px', fontSize: '12px', color: 'var(--orange-dark)', fontWeight: 600, marginBottom: '16px', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-            <i className="ti ti-shield-lock" style={{ fontSize: '16px', marginTop: '1px' }}></i>
-            A small test deposit of ₹1 will be made to verify the account.
-          </div>
+
           <div className="modal-footer">
             <button className="btn btn-outline" onClick={() => setIsLinkBankModalOpen(false)}>Cancel</button>
             <button className="btn btn-primary" onClick={linkBank}><i className="ti ti-link"></i>Link & Verify</button>

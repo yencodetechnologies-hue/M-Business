@@ -129,7 +129,7 @@ export default function FinIncome({ income: propIncome, setIncome: propSetIncome
 
         {/* KPI CARDS */}
         <div style={{ display: 'flex', gap: 16, marginBottom: 22, flexWrap: 'wrap' }}>
-          {[['Total Income', total, '#26C281', 'ti-cash', income.length + ' records'], ['Received', received, 'var(--app-accent, #00BCD4)', 'ti-check', income.filter(i => i.status !== 'Pending').length + ' payments'], ['Pending', pending, '#F59E0B', 'ti-clock', income.filter(i => i.status === 'Pending').length + ' outstanding']].map(([label, val, color, icon, sub]) => (
+          {[['Total Income', total, '#26C281', 'ti-cash', income.length + ' records'], ['Received', received, '#00BCD4', 'ti-check', income.filter(i => i.status !== 'Pending').length + ' payments'], ['Pending', pending, '#F59E0B', 'ti-clock', income.filter(i => i.status === 'Pending').length + ' outstanding']].map(([label, val, color, icon, sub]) => (
             <div key={label} style={{ cursor: 'default', flex: '1 1 200px', minWidth: 200, background: '#fff', border: '1.5px solid #E0EEF0', borderRadius: 14, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
               <div style={{ width: 40, height: 40, borderRadius: 10, background: `${color}1a`, color: color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}><i className={`ti ${icon}`} /></div>
               <div>

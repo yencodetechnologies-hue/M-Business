@@ -1223,6 +1223,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   const [newForm, setNewForm] = useState({ title: "", client: "", value: "" });
   const [viewingProposal, setViewingProposal] = useState(null);
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [shareModalProposal, setShareModalProposal] = useState(null);
 
   // Role-based security: Force View Mode for clients
   useEffect(() => {
@@ -1894,7 +1895,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                             {openMenuId === (p.id || p._id) && (
                               <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 28, right: 0, background: "#fff", border: "1.5px solid #e0eef0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 999, minWidth: 160, overflow: "hidden" }}>
                                 <div onClick={e => { setOpenMenuId(null); setViewingProposal(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-eye" style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))" }}></i> View</div>
-                                <div onClick={e => { setOpenMenuId(null); shareProposal(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-share" style={{ color: "#7C5CFC" }}></i> Share</div>
+                                <div onClick={async e => { setOpenMenuId(null); const shareUrl = `${window.location.origin}${window.location.pathname}?view=${p._id || p.id}`; const shareTitle = `Proposal ${p.title || ''} — ${p.client || p.clientName || ''}`; if (navigator.share) { try { await navigator.share({ title: shareTitle, text: shareTitle, url: shareUrl }); } catch (err) { if (err.name !== 'AbortError') console.error('Share failed:', err); } } else { try { await navigator.clipboard.writeText(shareUrl); flash('Link copied to clipboard!'); } catch { prompt('Copy this link:', shareUrl); } } }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-share" style={{ color: "#7C5CFC" }}></i> Share</div>
                                 <div onClick={e => { setOpenMenuId(null); printProposal(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-download" style={{ color: "#2563EB" }}></i> PDF</div>
                                 <div onClick={e => { setOpenMenuId(null); deleteProposal(p.id, p._id, e); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }} onMouseEnter={e => e.currentTarget.style.background = "#fff1f2"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-trash" style={{ color: "#EF4444" }}></i> Delete</div>
                               </div>
@@ -1953,7 +1954,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                           <div style={{ fontSize: 15, fontWeight: 800, color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))" }}>₹{value.toLocaleString("en-IN")}</div>
                           <div style={{ display: "flex", gap: 6 }} onClick={e => e.stopPropagation()}>
                             <button className="pf-btn" onClick={e => { e.stopPropagation(); setViewingProposal(p); }}><i className="ti ti-eye" style={{ fontSize: 12 }}></i> View</button>
-                            <button className="pf-btn" onClick={e => { e.stopPropagation(); shareProposal(p); }}><i className="ti ti-share" style={{ fontSize: 12 }}></i> Share</button>
+                            <button className="pf-btn" onClick={async e => { e.stopPropagation(); const shareUrl = `${window.location.origin}${window.location.pathname}?view=${p._id || p.id}`; const shareTitle = `Proposal ${p.title || ''} — ${p.client || p.clientName || ''}`; if (navigator.share) { try { await navigator.share({ title: shareTitle, text: shareTitle, url: shareUrl }); } catch (err) { if (err.name !== 'AbortError') console.error('Share failed:', err); } } else { try { await navigator.clipboard.writeText(shareUrl); flash('Link copied to clipboard!'); } catch { prompt('Copy this link:', shareUrl); } } }}><i className="ti ti-share" style={{ fontSize: 12 }}></i> Share</button>
                             <button className="pf-btn" onClick={e => { e.stopPropagation(); printProposal(p); }}><i className="ti ti-download" style={{ fontSize: 12 }}></i> PDF</button>
                           </div>
                         </div>
@@ -2065,6 +2066,20 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
               setViewingProposal(updated);
             }}
           />
+        )}
+        {shareModalProposal && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 100000, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => setShareModalProposal(null)}>
+            <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 16, padding: 24, width: 360, maxWidth: "90vw" }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: "#1A2E35", marginBottom: 4 }}>Share Proposal</div>
+              <div style={{ fontSize: 12, color: "#607D86", marginBottom: 18 }}>{shareModalProposal.title || "Untitled Proposal"}</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <button onClick={async () => { await shareProposal(shareModalProposal); setShareModalProposal(null); }} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 10, border: "1.5px solid #e0eef0", background: "#f0fdfe", cursor: "pointer", fontSize: 13, fontWeight: 700, color: " var(--app-accent, var(--app-accent, #00BCD4))" }}><i className="ti ti-file-download"></i> Share as PDF</button>
+                <button onClick={() => { shareWhatsApp(shareModalProposal); setShareModalProposal(null); }} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 10, border: "1.5px solid #e0eef0", background: "#f0fdf4", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#15803D" }}><i className="ti ti-brand-whatsapp"></i> Share via WhatsApp</button>
+                <button onClick={async () => { const link = `${window.location.origin}${window.location.pathname}?view=${shareModalProposal._id || shareModalProposal.id}`; try { await navigator.clipboard.writeText(link); flash("Link copied to clipboard!"); } catch { prompt("Copy this link:", link); } setShareModalProposal(null); }} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 10, border: "1.5px solid #e0eef0", background: "#fff", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#374151" }}><i className="ti ti-link"></i> Copy Link</button>
+              </div>
+              <button onClick={() => setShareModalProposal(null)} style={{ marginTop: 16, width: "100%", padding: "9px", borderRadius: 10, border: "1.5px solid #e0eef0", background: "#fff", cursor: "pointer", fontSize: 12, fontWeight: 700, color: "#607D86" }}>Cancel</button>
+            </div>
+          </div>
         )}
       </div>
 

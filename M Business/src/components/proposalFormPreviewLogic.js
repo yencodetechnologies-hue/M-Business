@@ -2,13 +2,13 @@
 let msCount = 5;
 let currentStatus = 'DRAFT';
 
-const fmtDate = v => { try { return new Date(v).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); } catch { return v; } };
+const fmtDate = v => { try { return new Date(v).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }); } catch { return v; } };
 const fmt = n => '₹' + Number(n).toLocaleString('en-IN');
 
 /* ── SECTION TOGGLES ── */
 function toggleSection(btn, id) {
   const sec = document.getElementById(id);
-  const pvSec = document.getElementById('pv-sec-' + id.replace('sec-',''));
+  const pvSec = document.getElementById('pv-sec-' + id.replace('sec-', ''));
   btn.classList.toggle('on');
   const show = btn.classList.contains('on');
   if (sec) sec.style.display = show ? '' : 'none';
@@ -17,8 +17,8 @@ function toggleSection(btn, id) {
 
 /* ── STATUS ── */
 function selSt(el, val) {
-  document.querySelectorAll('.sc').forEach(c => c.className = 'sc ' + c.className.split(' ').filter(x => ['won','lost','sent','neg','exp'].includes(x)).join(' '));
-  const classMap = { DRAFT:'active-sc', SENT:'sent', NEGOTIATION:'neg', WON:'won', LOST:'lost', EXPIRED:'exp' };
+  document.querySelectorAll('.sc').forEach(c => c.className = 'sc ' + c.className.split(' ').filter(x => ['won', 'lost', 'sent', 'neg', 'exp'].includes(x)).join(' '));
+  const classMap = { DRAFT: 'active-sc', SENT: 'sent', NEGOTIATION: 'neg', WON: 'won', LOST: 'lost', EXPIRED: 'exp' };
   document.querySelectorAll('.sc').forEach(c => { c.className = 'sc'; });
   el.classList.add(classMap[val] || 'active-sc');
   currentStatus = val;
@@ -45,7 +45,7 @@ function up() {
   document.getElementById('pv-to').textContent = tc || '— Client —';
   document.getElementById('pv-to').style.color = tc ? 'var(--text)' : 'var(--text3)';
   const tp = document.getElementById('toPerson').value, te = document.getElementById('toEmail').value, ta = document.getElementById('toAddr').value;
-  document.getElementById('pv-to-d').innerHTML = tc ? `${tp ? tp+'<br>' : ''}${te ? te+'<br>' : ''}${ta}` : '<span style="color:var(--text3)">Fill in client details</span>';
+  document.getElementById('pv-to-d').innerHTML = tc ? `${tp ? tp + '<br>' : ''}${te ? te + '<br>' : ''}${ta}` : '<span style="color:var(--text3)">Fill in client details</span>';
   document.getElementById('pv-sig2').textContent = tc || '— Client —';
   document.getElementById('pv-sig2').style.color = tc ? 'var(--text)' : 'var(--text3)';
   document.getElementById('pv-sig2-role').textContent = tc || 'Awaiting';
@@ -71,7 +71,7 @@ function up() {
   // Payment
   document.getElementById('pv-pay').textContent = 'Payment: ' + document.getElementById('paySchedule').value;
   // Closing
-  document.getElementById('pv-closing').innerHTML = (document.getElementById('closing').value || '').replace(/\n/g,'<br>');
+  document.getElementById('pv-closing').innerHTML = (document.getElementById('closing').value || '').replace(/\n/g, '<br>');
 }
 
 function updateMilestonesPreview() {
@@ -80,8 +80,8 @@ function updateMilestonesPreview() {
   items.forEach((it, i) => {
     const ti = it.querySelector('.ms-inp'), di = it.querySelector('.ms-date'), de = it.querySelector('.ms-desc');
     const isLast = i === items.length - 1;
-    html += `<div class="tl-pi"><div class="tl-left"><div class="tl-dot">${i+1}</div>${!isLast?'<div class="tl-line-p"></div>':''}</div>
-      <div><div class="tl-pi-title">${ti?ti.value:'Milestone'}</div>${di&&di.value?`<div class="tl-pi-date">${fmtDate(di.value)}</div>`:''}${de&&de.value?`<div class="tl-pi-desc">${de.value}</div>`:''}</div></div>`;
+    html += `<div class="tl-pi"><div class="tl-left"><div class="tl-dot">${i + 1}</div>${!isLast ? '<div class="tl-line-p"></div>' : ''}</div>
+      <div><div class="tl-pi-title">${ti ? ti.value : 'Milestone'}</div>${di && di.value ? `<div class="tl-pi-date">${fmtDate(di.value)}</div>` : ''}${de && de.value ? `<div class="tl-pi-desc">${de.value}</div>` : ''}</div></div>`;
   });
   document.getElementById('pv-timeline').innerHTML = html;
 }
@@ -94,7 +94,7 @@ function updateTeamPreview() {
     const r = it.querySelector('.tc-role').textContent;
     const av = it.querySelector('.tc-av');
     const bg = av ? av.style.background : 'var(--teal)';
-    const init = n.trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    const init = n.trim().split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
     html += `<div class="tp-card" style="display:flex;align-items:center;gap:7px"><div class="tp-av-p" style="background:${bg}">${init}</div><div><div class="tp-name-p">${n}</div><div class="tp-role-p">${r}</div></div></div>`;
   });
   document.getElementById('pv-team').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No team members</span>';
@@ -115,7 +115,7 @@ function updateRisksPreview() {
     if (!inputs[0] || !inputs[0].value) return;
     const lik = sel ? sel.value : 'Medium';
     const cls = lik === 'High' ? 'h' : lik === 'Low' ? 'l' : 'm';
-    html += `<div class="risk-pi"><span class="risk-badge-p ${cls}">${lik}</span><div><div class="risk-pi-text">${inputs[0].value}</div>${inputs[1]?`<div class="risk-pi-mit"> ${inputs[1].value}</div>`:''}</div></div>`;
+    html += `<div class="risk-pi"><span class="risk-badge-p ${cls}">${lik}</span><div><div class="risk-pi-text">${inputs[0].value}</div>${inputs[1] ? `<div class="risk-pi-mit"> ${inputs[1].value}</div>` : ''}</div></div>`;
   });
   document.getElementById('pv-risks').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No risks added</span>';
 }
@@ -302,9 +302,9 @@ function addTeamMember() {
   const exp = prompt('Years of experience (e.g. 5+ years · Web Dev):') || '';
   const skills = prompt('Skills (comma-separated):') || '';
   const c = document.getElementById('teamList');
-  const colors = ['linear-gradient(135deg,var(--teal),var(--teal4))','linear-gradient(135deg,var(--purple),#4E35B0)','linear-gradient(135deg,var(--amber),#D4880A)','linear-gradient(135deg,var(--blue),#1A4DB5)'];
+  const colors = ['linear-gradient(135deg,var(--teal),var(--teal4))', 'linear-gradient(135deg,var(--purple),#4E35B0)', 'linear-gradient(135deg,var(--amber),#D4880A)', 'linear-gradient(135deg,var(--blue),#1A4DB5)'];
   const col = colors[Math.floor(Math.random() * colors.length)];
-  const init = name.trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  const init = name.trim().split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
   const skillTags = skills ? skills.split(',').map(s => `<span class="tc-skill">${s.trim()}</span>`).join('') : '';
   const d = document.createElement('div');
   d.className = 'team-card';
@@ -335,15 +335,27 @@ function uploadCover() {
   z.style.borderColor = 'var(--teal)';
   z.innerHTML = `<i class="ti ti-check" style="font-size:22px;color:var(--teal)"></i><div class="cover-zone-txt" style="color:var(--teal)">Cover image uploaded</div><div class="cover-zone-sub">Click to change</div>`;
 }
-
-function saveDraft() { selSt(document.querySelectorAll('.sc')[0],'DRAFT'); alert('Proposal saved as draft!'); }
+function saveDraft() {
+  selSt(document.querySelectorAll('.sc')[0], 'DRAFT');
+  if (typeof window._onSaveProposal === 'function' && typeof extractProposalData === 'function') {
+    const data = extractProposalData();
+    data.status = 'draft';
+    window._onSaveProposal(data);
+  }
+  alert('Proposal saved as draft!');
+}
 function sendProposal() {
   const c = document.getElementById('toComp').value;
   if (!c) { alert('Please enter client name first.'); document.getElementById('toComp').focus(); return; }
-  selSt(document.querySelectorAll('.sc')[1],'SENT');
+  selSt(document.querySelectorAll('.sc')[1], 'SENT');
+  if (typeof window._onSaveProposal === 'function' && typeof extractProposalData === 'function') {
+    const data = extractProposalData();
+    data.status = 'sent';
+    window._onSaveProposal(data);
+  }
   alert('Proposal sent to ' + c + '!');
 }
-function markWon() { selSt(document.querySelectorAll('.sc')[3],'WON'); alert('Proposal marked as Won Award'); }
+function markWon() { selSt(document.querySelectorAll('.sc')[3], 'WON'); alert('Proposal marked as Won Award'); }
 
 // Init
 calcTotal();

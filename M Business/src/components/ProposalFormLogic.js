@@ -436,15 +436,15 @@ export function extractProposalData() {
   };
 }
 
-export function saveDraft() {
-  const goBack = window._onBackToProposals;
-  if (window._onSaveProposal) {
+function saveDraft() {
+  selSt(document.querySelectorAll('.sc')[0], 'DRAFT');
+  if (typeof window._onSaveProposal === 'function' && typeof extractProposalData === 'function') {
     const data = extractProposalData();
-    data.status = currentStatus.toLowerCase();
+    data.status = 'draft';
     window._onSaveProposal(data);
   }
-  if (goBack) {
-    setTimeout(() => goBack(), 300);
+  if (typeof window._onBackToProposals === 'function') {
+    window._onBackToProposals();
   }
 }
 

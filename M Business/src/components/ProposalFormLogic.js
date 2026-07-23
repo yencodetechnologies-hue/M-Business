@@ -436,7 +436,7 @@ export function extractProposalData() {
   };
 }
 
-function saveDraft() {
+export function saveDraft() {
   selSt(document.querySelectorAll('.sc')[0], 'DRAFT');
   if (typeof window._onSaveProposal === 'function' && typeof extractProposalData === 'function') {
     const data = extractProposalData();
@@ -485,7 +485,8 @@ export function markWon() {
   }
 }
 
-// Init
+
+
 // Init
 calcTotal();
 up();

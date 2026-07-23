@@ -128,8 +128,7 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
     // Hook up back button
     // Hook up back button + all topbar buttons
     const hookUp = () => {
-      const backBtn = c.querySelector('.back-btn');
-      if (backBtn) backBtn.onclick = onBack;
+      c.querySelectorAll('.back-btn, .topbar-title').forEach(el => { el.onclick = onBack; el.style.cursor = 'pointer'; });
 
       c.querySelectorAll('[onchange]').forEach(el => {
         const oc = el.getAttribute('onchange');

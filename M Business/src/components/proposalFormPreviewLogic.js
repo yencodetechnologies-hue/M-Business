@@ -335,14 +335,16 @@ function uploadCover() {
   z.style.borderColor = 'var(--teal)';
   z.innerHTML = `<i class="ti ti-check" style="font-size:22px;color:var(--teal)"></i><div class="cover-zone-txt" style="color:var(--teal)">Cover image uploaded</div><div class="cover-zone-sub">Click to change</div>`;
 }
-function saveDraft() {
+export function saveDraft() {
   selSt(document.querySelectorAll('.sc')[0], 'DRAFT');
   if (typeof window._onSaveProposal === 'function' && typeof extractProposalData === 'function') {
     const data = extractProposalData();
     data.status = 'draft';
     window._onSaveProposal(data);
   }
-  alert('Proposal saved as draft!');
+  if (typeof window._onBackToProposals === 'function') {
+    window._onBackToProposals();
+  }
 }
 function sendProposal() {
   const c = document.getElementById('toComp').value;

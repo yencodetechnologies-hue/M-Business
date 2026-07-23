@@ -66,9 +66,7 @@ export default function ProposalForm({ onBack, onSave }) {
     c.addEventListener('input', handleInput);
 
     // Hook up topbar buttons explicitly
-    const backBtn = c.querySelector('.back-btn');
-    if (backBtn) backBtn.onclick = onBack;
-
+c.querySelectorAll('.back-btn, .topbar-title').forEach(el => { el.onclick = onBack; el.style.cursor = 'pointer'; });
     const actions = c.querySelectorAll('.topbar-actions button');
     actions.forEach((btn, idx) => {
       if (idx === 0) return; // Skip Duplicate

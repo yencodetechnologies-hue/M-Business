@@ -103,7 +103,7 @@ export default function FinVendors() {
 }
 * { box-sizing: border-box; }
 a { text-decoration: none; color: inherit; }
-.main{ flex:1; display:flex; flex-direction:column; min-height:100vh; background: var(--bg); font-family: 'Nunito', sans-serif; color: var(--text-dark); }
+.main{ flex:1; width:100%; display:flex; flex-direction:column; min-height:100vh; background: var(--bg); font-family: 'Nunito', sans-serif; color: var(--text-dark); }
 .topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 26px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
 .breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-light);}
 .breadcrumb a{color:var(--primary);font-weight:700;}
@@ -117,7 +117,7 @@ a { text-decoration: none; color: inherit; }
 .card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;}
 .kpi-grid{display:grid;gap:16px;margin-bottom:22px;}
 .kpi-grid-4{grid-template-columns:repeat(4,1fr);}
-.kpi{background:var(--white);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);border-left:4px solid transparent;height:96px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:2px;overflow:hidden;}
+.kpi{background:var(--white);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);border-left:4px solid transparent;height:96px;box-sizing:border-box;overflow:hidden;}
 .kpi.vendor{border-left-color:var(--purple);}
 .kpi.pending{border-left-color:var(--orange);}
 .kpi.expense{border-left-color:var(--red);}
@@ -160,7 +160,7 @@ tr:hover td{background:#FAFCFE;}
       `}</style>
       <div className="main">
         <div className="topbar">
-          <div className="breadcrumb"><a href="#">Finance</a><i className="ti ti-chevron-right"></i><span>Vendors</span></div>
+          <div className="breadcrumb"><i className="ti ti-users" style={{ fontSize: 22, color: '#1A2332' }}></i><span style={{ fontSize: 22, fontWeight: 900, color: '#1A2332' }}>Vendors</span></div>
           <div className="topbar-actions">
             <button className="btn btn-outline" onClick={openImport} style={{ borderColor: 'var(--primary)', color: 'var(--primary)' }}><i className="ti ti-upload"></i>Import Statement</button>
             <button className="btn btn-outline"><i className="ti ti-arrow-bar-up"></i>Pay a Vendor</button>
@@ -169,12 +169,23 @@ tr:hover td{background:#FAFCFE;}
         </div>
         <div className="content">
           <div className="kpi-grid kpi-grid-4">
-            <div className="kpi vendor"><div className="kpi-label">Total Vendors</div><div className="kpi-value">{totalVendors}</div><div className="kpi-sub neutral"><i className="ti ti-truck"></i>Active suppliers</div></div>
-            <div className="kpi pending"><div className="kpi-label">Total Payable</div><div className="kpi-value">₹{totalPayable.toLocaleString('en-IN')}</div><div className="kpi-sub down"><i className="ti ti-alert-circle"></i>{vendors.filter(v => v.amount > v.paidAmount).length} overdue</div></div>
-            <div className="kpi expense"><div className="kpi-label">Total Paid</div><div className="kpi-value">₹{totalPaid.toLocaleString('en-IN')}</div><div className="kpi-sub neutral"><i className="ti ti-check"></i>Payments</div></div>
-            <div className="kpi income"><div className="kpi-label">Total Vendor Spend</div><div className="kpi-value">₹{totalSpend.toLocaleString('en-IN')}</div><div className="kpi-sub neutral"><i className="ti ti-calendar"></i>Overall</div></div>
-          </div>
-          <div className="toolbar">
+            <div className="kpi vendor" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--purple-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className="ti ti-users" style={{ color: 'var(--purple)', fontSize: 18 }}></i></div>
+              <div><div className="kpi-label">Total Vendors</div><div className="kpi-value">{totalVendors}</div><div className="kpi-sub neutral">Active suppliers</div></div>
+            </div>
+            <div className="kpi pending" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--orange-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className="ti ti-alert-circle" style={{ color: 'var(--orange)', fontSize: 18 }}></i></div>
+              <div><div className="kpi-label">Total Payable</div><div className="kpi-value">₹{totalPayable.toLocaleString('en-IN')}</div><div className="kpi-sub down">{vendors.filter(v => v.amount > v.paidAmount).length} overdue</div></div>
+            </div>
+            <div className="kpi expense" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--red-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className="ti ti-check" style={{ color: 'var(--red)', fontSize: 18 }}></i></div>
+              <div><div className="kpi-label">Total Paid</div><div className="kpi-value">₹{totalPaid.toLocaleString('en-IN')}</div><div className="kpi-sub neutral">Payments</div></div>
+            </div>
+            <div className="kpi income" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--green-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className="ti ti-calendar" style={{ color: 'var(--green)', fontSize: 18 }}></i></div>
+              <div><div className="kpi-label">Total Vendor Spend</div><div className="kpi-value">₹{totalSpend.toLocaleString('en-IN')}</div><div className="kpi-sub neutral">Overall</div></div>
+            </div>
+          </div>      <div className="toolbar">
             <div className="search-box"><i className="ti ti-search"></i><input placeholder="Search vendors..." value={search} onChange={e => setSearch(e.target.value)} /></div>
           </div>
           <div className="card">

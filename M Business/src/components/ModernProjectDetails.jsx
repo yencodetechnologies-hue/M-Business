@@ -2285,7 +2285,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               </div>
             </div>
 
-              <div ref={tabContentRef} style={{ userSelect: 'none', overflow: 'visible', minHeight: 0 }}>
+              <div ref={tabContentRef} style={{ userSelect: 'none', overflow: 'visible', minHeight: 620 }}>
                 <div className={`mpd-tab-pane ${activeTab === 'activity' ? 'mpd-active' : ''}`}>
                   <div style={{ padding: '12px 16px', color: P.textLight, fontSize: 13 }}>
                     {(currProject.updates && currProject.updates.length > 0) ? (() => {
@@ -2310,7 +2310,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           )}
                         </div>
                       );
-                    })() : <div style={{ textAlign: 'center', padding: 20, minHeight: 420 }}>Activity logs will appear here.</div>}
+                    })() : <div style={{ textAlign: 'center', padding: 20, minHeight: 420, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Activity logs will appear here.</div>}
                   </div>
                 </div>
 
@@ -2899,7 +2899,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                 setPaymentModalsState(prev => ({ ...prev, [b.modal]: true }));
                               }
                             }}
-                            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: ' var(--app-accent, var(--app-accent, #00BCD4))', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}
+                            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: ' var(--app-accent, var(--app-accent, #00BCD4))', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none' }}
                           >
                             <i className={`ti ${b.icon}`} style={{ fontSize: 13 }}></i> {b.label}
                           </button>

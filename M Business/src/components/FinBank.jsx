@@ -107,7 +107,7 @@ export default function FinBank() {
 }
 * { box-sizing: border-box; }
 a { text-decoration: none; color: inherit; }
-.main{ flex:1; display:flex; flex-direction:column; min-height:100vh; background: var(--bg); font-family: 'Nunito', sans-serif; color: var(--text-dark); }
+.main{ flex:1; width:100%; display:flex; flex-direction:column; min-height:100vh; background: var(--bg); font-family: 'Nunito', sans-serif; color: var(--text-dark); }
 .topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 26px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
 .breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-light);}
 .breadcrumb a{color:var(--primary);font-weight:700;}
@@ -119,7 +119,7 @@ a { text-decoration: none; color: inherit; }
 .card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;}
 .kpi-grid{display:grid;gap:16px;margin-bottom:22px;}
 .kpi-grid-4{grid-template-columns:repeat(4,1fr);}
-.kpi{background:var(--white);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);border-left:4px solid transparent;height:96px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:2px;overflow:hidden;}
+.kpi{background:var(--white);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);border-left:4px solid transparent;height:96px;box-sizing:border-box;overflow:hidden;}
 .kpi.profit{border-left-color:var(--primary);}
 .kpi.pending{border-left-color:var(--orange);}
 .kpi.expense{border-left-color:var(--red);}
@@ -167,7 +167,7 @@ a { text-decoration: none; color: inherit; }
       `}</style>
       <div className="main">
         <div className="topbar">
-          <div className="breadcrumb"><a href="#">Finance</a><i className="ti ti-chevron-right"></i><span>Bank Accounts</span></div>
+          <div className="breadcrumb"><i className="ti ti-wallet" style={{ fontSize: 22, color: '#1A2332' }}></i><span style={{ fontSize: 22, fontWeight: 900, color: '#1A2332' }}>Bank Accounts</span></div>
           <div className="topbar-actions">
             <button className="btn btn-outline" onClick={openImport} style={{ borderColor: 'var(--primary)', color: 'var(--primary)' }}><i className="ti ti-upload"></i>Import Statement</button>
             <button className="btn btn-outline" onClick={() => toast('Syncing all accounts...')}>Sync All</button>
@@ -193,10 +193,22 @@ a { text-decoration: none; color: inherit; }
           </div>
 
           <div className="kpi-grid kpi-grid-4" style={{ marginBottom: '22px' }}>
-            <div className="kpi profit"><div className="kpi-label">Total Balance</div><div className="kpi-value">₹{totalBalance.toLocaleString('en-IN')}</div><div className="kpi-sub up"><i className="ti ti-building-bank"></i>Across {banks.length} accounts</div></div>
-            <div className="kpi income"><div className="kpi-label">Total Credits</div><div className="kpi-value">₹{totalCredits.toLocaleString('en-IN')}</div><div className="kpi-sub up"><i className="ti ti-arrow-down"></i>{income.length} transactions</div></div>
-            <div className="kpi pending"><div className="kpi-label">Total Debits</div><div className="kpi-value">₹{totalDebits.toLocaleString('en-IN')}</div><div className="kpi-sub down"><i className="ti ti-arrow-up"></i>{expenses.length} transactions</div></div>
-            <div className="kpi expense"><div className="kpi-label">Net Flow</div><div className="kpi-value" style={{ color: totalCredits - totalDebits >= 0 ? 'var(--green)' : 'var(--red-dark)' }}>₹{Math.abs(totalCredits - totalDebits).toLocaleString('en-IN')}</div><div className={`kpi-sub ${totalCredits >= totalDebits ? 'up' : 'down'}`}><i className={`ti ti-trending-${totalCredits >= totalDebits ? 'up' : 'down'}`}></i>{totalCredits >= totalDebits ? 'Surplus' : 'Deficit'}</div></div>
+            <div className="kpi profit" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className="ti ti-building-bank" style={{ color: 'var(--primary)', fontSize: 18 }}></i></div>
+              <div><div className="kpi-label">Total Balance</div><div className="kpi-value">₹{totalBalance.toLocaleString('en-IN')}</div><div className="kpi-sub up">Across {banks.length} accounts</div></div>
+            </div>
+            <div className="kpi income" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--green-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className="ti ti-arrow-down" style={{ color: 'var(--green)', fontSize: 18 }}></i></div>
+              <div><div className="kpi-label">Total Credits</div><div className="kpi-value">₹{totalCredits.toLocaleString('en-IN')}</div><div className="kpi-sub up">{income.length} transactions</div></div>
+            </div>
+            <div className="kpi pending" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--orange-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className="ti ti-arrow-up" style={{ color: 'var(--orange)', fontSize: 18 }}></i></div>
+              <div><div className="kpi-label">Total Debits</div><div className="kpi-value">₹{totalDebits.toLocaleString('en-IN')}</div><div className="kpi-sub down">{expenses.length} transactions</div></div>
+            </div>
+            <div className="kpi expense" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: totalCredits - totalDebits >= 0 ? 'var(--green-light)' : 'var(--red-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className={`ti ti-trending-${totalCredits >= totalDebits ? 'up' : 'down'}`} style={{ color: totalCredits - totalDebits >= 0 ? 'var(--green)' : 'var(--red-dark)', fontSize: 18 }}></i></div>
+              <div><div className="kpi-label">Net Flow</div><div className="kpi-value" style={{ color: totalCredits - totalDebits >= 0 ? 'var(--green)' : 'var(--red-dark)' }}>₹{Math.abs(totalCredits - totalDebits).toLocaleString('en-IN')}</div><div className={`kpi-sub ${totalCredits >= totalDebits ? 'up' : 'down'}`}>{totalCredits >= totalDebits ? 'Surplus' : 'Deficit'}</div></div>
+            </div>
           </div>
 
           <div className="grid-main-side">

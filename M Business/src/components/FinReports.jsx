@@ -84,7 +84,7 @@ a { text-decoration: none; color: inherit; }
 
       <div className="main">
         <div className="topbar">
-          <div className="breadcrumb"><a href="#">Finance</a><i className="ti ti-chevron-right"></i><span>Reports & Export</span></div>
+          <div className="breadcrumb"><a href="#"></a><span style={{ fontSize: 22, fontWeight: 900, color: '#1A2332' }}>Reports & Export</span></div>
           <div className="topbar-actions">
             <button className="btn btn-outline" onClick={openImport} style={{ borderColor: 'var(--primary)', color: 'var(--primary)' }}><i className="ti ti-upload"></i>Import Statement</button>
             <button className="btn btn-outline" style={{ background: 'var(--purple)', color: '#fff', border: 'none' }}><i className="ti ti-shield-check"></i>Auditor Portal</button>

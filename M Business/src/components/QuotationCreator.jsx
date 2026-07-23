@@ -1071,7 +1071,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                   </div>
                   <div className="qc-actions" onClick={e => e.stopPropagation()}>
                     <button className="qa-btn" onClick={() => { if (onEditQuotation) { onEditQuotation(entry); } else { loadEntry(entry); } }}><i className="ti ti-edit" style={{ fontSize: 13 }}></i> Edit</button>
-                    <button className="qa-btn" onClick={() => triggerPDFShare(entry, "print")}><i className="ti ti-download" style={{ fontSize: 13 }}></i> PDF</button>
+                    <button className="qa-btn" onClick={() => { const doc = buildPDFFromData(entry); doc.save(`Quotation_${entry.quoteNo || 'draft'}.pdf`); showToast('PDF downloaded!'); }}><i className="ti ti-download" style={{ fontSize: 13 }}></i> PDF</button>
                     {(entry.status === "approved" || entry.status === "converted") ? (
                       <button className="qa-btn primary" style={entry.status === "converted" ? { background: "var(--surface)", color: "var(--teal)", borderColor: "var(--teal)" } : {}} onClick={() => entry.status !== "converted" && handleConvert(entry)} disabled={entry.status === "converted" || convertingId === entry.id}>
                         {entry.status === "converted" ? <><i className="ti ti-circle-check" style={{ fontSize: 13 }}></i> Done</> : <><i className="ti ti-receipt" style={{ fontSize: 13 }}></i> Invoice</>}

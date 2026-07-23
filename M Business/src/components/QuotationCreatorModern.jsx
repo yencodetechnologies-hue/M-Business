@@ -686,12 +686,9 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
           <div className="mqc-topbar-title">{isEditing ? 'Edit Quotation' : 'Create Quotation'}</div>
         </div>
         <div className="mqc-actions">
-          <button className="mqc-btn-outline" onClick={() => handleSave(qt.status.toLowerCase())} disabled={saving}>
-            <i className="ti ti-device-floppy" style={{ fontSize: 13 }}></i>
-            {saved ? 'Saved!' : saving ? 'Saving…' : isEditing ? 'Update ' : 'Save '}
-          </button>
+
           <button className="mqc-btn-teal mqc-btn-amber" onClick={() => handleSave('sent')} disabled={saving}>
-            <i className="ti ti-send" style={{ fontSize: 13 }}></i> {isEditing ? 'Update & Send' : 'Send Quote'}
+            <i className="ti ti-send" style={{ fontSize: 13 }}></i> {isEditing ? 'Update ' : 'Send Quote'}
           </button>
           <button className="mqc-btn-teal mqc-btn-green" onClick={onBack}>
             <i className="ti ti-arrow-left" style={{ fontSize: 13 }}></i> {isEditing ? 'Cancel' : 'Back'}

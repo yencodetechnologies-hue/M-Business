@@ -2284,7 +2284,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 </span>
               </div>
             </div>
-
               <div ref={tabContentRef} style={{ userSelect: 'none', overflow: 'visible', minHeight: 620 }}>
                 <div className={`mpd-tab-pane ${activeTab === 'activity' ? 'mpd-active' : ''}`}>
                   <div style={{ padding: '12px 16px', color: P.textLight, fontSize: 13 }}>

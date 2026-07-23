@@ -861,7 +861,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                   onClick={e => e.stopPropagation()}
                 >
                   <div style={{ fontSize: 18, fontWeight: 800, color: P.textDark, marginBottom: 20 }}>
-                    Add Team Member {`(${localEmployees.length} available)`}
+                    Team Member {`(${localEmployees.length} available)`}
                   </div>
                   <div style={{
                     maxHeight: 340, overflowY: 'auto', marginBottom: 20,

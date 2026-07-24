@@ -45,6 +45,10 @@ const projectSchema = new mongoose.Schema({
       date: { type: Date, default: Date.now },
       author: { type: String, default: "System" },
       visibleTo: { type: [String], default: ["team", "client"] },
+      recipients: { type: [String], default: [] },
+      isApprovalRequest: { type: Boolean, default: false },
+      approvalStatus: { type: String, default: "" },
+      status: { type: String, default: "" },
       // Legacy single-attachment fields (kept for backwards compatibility)
       fileName: { type: String, default: "" },
       fileUrl: { type: String, default: "" },

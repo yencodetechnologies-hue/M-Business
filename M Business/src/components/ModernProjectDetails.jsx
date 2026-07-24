@@ -3015,6 +3015,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                             try {
                               await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { updates: updatedUpdates });
 
+                              const linkedApproval = (projectApprovals || []).find(a =>
+                                a.title === original.title && String(a.projectId || '') === String(currProject._id || '')
+                              );
+
                               if (nowApprovalRequest && !wasApprovalRequest && resolvedClientId) {
                                 const approvalCompanyId = user?.companyId || user?.company || user?._id || user?.id || currProject.companyId || '';
                                 await axios.post(`${BASE_URL}/api/approvals`, {
@@ -3031,6 +3035,23 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   projectId: currProject._id || '',
                                   fileUrl: editingUpdate.attachments?.[0]?.url || '',
                                   fileName: editingUpdate.attachments?.[0]?.name || '',
+                                });
+                                loadProjectApprovals();
+                              } else if (!nowApprovalRequest && wasApprovalRequest) {
+                                if (linkedApproval) {
+                                  try {
+                                    await axios.delete(`${BASE_URL}/api/approvals/${linkedApproval._id}`);
+                                  } catch (delErr) {
+                                    console.error('Failed to delete linked approval:', delErr.response?.data || delErr.message);
+                                  }
+                                } else {
+                                  console.warn('No linkedApproval found to delete for title:', original.title, '— projectApprovals may be stale or title mismatched.');
+                                }
+                                await loadProjectApprovals();
+                              } else if (nowApprovalRequest && wasApprovalRequest && linkedApproval && linkedApproval.title !== editingUpdate.title) {
+                                await axios.patch(`${BASE_URL}/api/approvals/${linkedApproval._id}`, {
+                                  title: editingUpdate.title,
+                                  desc: editingUpdate.text,
                                 });
                                 loadProjectApprovals();
                               }

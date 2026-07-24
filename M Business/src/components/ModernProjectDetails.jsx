@@ -1286,8 +1286,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       loadLatest();
       if (onUpdate) onUpdate();
     } catch (err) {
-      console.error("Failed to add milestone:", err);
-      alert("Failed to add milestone.");
+      console.error("Failed to add milestone — FULL ERROR:", err);
+      console.error("Error stack:", err?.stack);
+      alert("Failed to add milestone. Details: " + (err?.message || String(err)));
     }
   };
 

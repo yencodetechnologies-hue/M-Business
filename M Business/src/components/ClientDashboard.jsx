@@ -1615,8 +1615,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
   // Render Gantt Timeline helper
   function renderTimelineComponent() {
-    const proj = targetProject || projects[0];
-    const milestones = proj?.milestones || [];
+    const proj = targetProject || projects[0] || {};
+    const milestones = Array.isArray(proj.milestones) ? proj.milestones : [];
     const today = new Date();
 
     // ── Milestone Steps ------------------------------------------
@@ -1761,8 +1761,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             {stepNodes}
           </div>
         ) : (
-          <div style={{ textAlign: 'center', color: C.text3, fontSize: 13, padding: '12px 0' }}>
-            No milestones defined for this project yet.
+          <div style={{ minHeight: 120, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", color: C.text3, fontSize: 12, padding: 24, boxSizing: "border-box" }} key="milestone-empty-state">
+            No milestones assigned. All caught up!
           </div>
         )}
       </div>

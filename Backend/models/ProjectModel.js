@@ -31,6 +31,8 @@ const projectSchema = new mongoose.Schema({
     type: [{
       name: { type: String, required: true },
       date: { type: String, default: "" },
+      startDate: { type: String, default: "" },
+      endDate: { type: String, default: "" },
       done: { type: Boolean, default: false }
     }],
     default: []

@@ -1639,9 +1639,17 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     const pStart = proj?.start ? new Date(proj.start) : new Date(today.getFullYear(), today.getMonth() - 1, 1);
     const pEnd = (proj?.end || proj?.deadline) ? new Date(proj.end || proj.deadline) : new Date(today.getFullYear(), today.getMonth() + 2, 0);
 
+    // Base the visible month range on the actual project span (pStart–pEnd), not a fixed -1..+4 window,
+    // so tightly-clustered milestones don't get crammed next to empty trailing months.
+    const spanStartMonth = new Date(pStart.getFullYear(), pStart.getMonth(), 1);
+    const spanEndMonth = new Date(pEnd.getFullYear(), pEnd.getMonth(), 1);
+    let totalSpanMonths = (spanEndMonth.getFullYear() - spanStartMonth.getFullYear()) * 12 + (spanEndMonth.getMonth() - spanStartMonth.getMonth()) + 1;
+    totalSpanMonths = Math.max(totalSpanMonths, 4); // never fewer than 4 columns
+    totalSpanMonths = Math.min(totalSpanMonths, 8); // never more than 8 columns (avoid squeeze)
+
     const ganttMonths = [];
-    for (let i = -1; i <= 4; i++) {
-      const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
+    for (let i = 0; i < totalSpanMonths; i++) {
+      const d = new Date(spanStartMonth.getFullYear(), spanStartMonth.getMonth() + i, 1);
       ganttMonths.push({ label: d.toLocaleString('en-IN', { month: 'short' }), year: d.getFullYear(), month: d.getMonth() });
     }
 
@@ -1665,63 +1673,71 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     });
 
     const ganttRows = milestones.map((m, idx) => {
-      const prevMilestone = idx > 0 ? milestones[idx - 1] : null;
-      const barStart = prevMilestone ? (prevMilestone.date ? new Date(prevMilestone.date) : resolvedDates[idx - 1]) : pStart;
-      const barEnd = resolvedDates[idx];
+      // Each milestone/task now uses its OWN start/end range — never borrowed from a neighbor.
+      // Falls back to a resolved single-day span only if explicit dates are missing.
+      const barStart = m.startDate ? new Date(m.startDate) : (m.date ? new Date(m.date) : resolvedDates[idx]);
+      const barEnd = m.endDate ? new Date(m.endDate) : (m.date ? new Date(m.date) : resolvedDates[idx]);
       const startColIdx = monthIndex(barStart);
       const endColIdx = monthIndex(barEnd);
-      const isTodayInRange = startColIdx !== -1 && endColIdx !== -1 && todayColIdx >= startColIdx && todayColIdx <= endColIdx;
+      const isTodayInRange = startColIdx !== -1 && endColIdx !== -1 && todayColIdx >= startColIdx && todayColIdx <= endColIdx
+        && today >= barStart && today <= barEnd;
       const barColor = m.done ? C.teal : (isTodayInRange ? C.amber : '#CBD5E1');
       const textColor = m.done ? '#fff' : C.text2;
-      const labelText = m.done ? `${m.name} ✓` : (isTodayInRange ? 'In Review' : 'Planned');
+      const labelText = m.done ? `${m.name} ✓` : (isTodayInRange ? 'In Progress' : 'Planned');
 
-      // Progress: explicit m.progress wins; else done=100, in-progress=time-elapsed within range, pending=0
       let progressPct = typeof m.progress === 'number' ? m.progress
         : m.done ? 100
           : isTodayInRange ? Math.min(100, Math.max(0, ((today - barStart) / (barEnd - barStart || 1)) * 100))
             : 0;
 
+      // Compute one continuous left/width position across the ENTIRE grid width (not per-cell),
+      // so a single task always renders as one unbroken bar regardless of how many months it spans.
+      const totalCols = ganttMonths.length;
+      let overallLeftPct = 0, overallWidthPct = 0;
+      if (startColIdx !== -1 && endColIdx !== -1) {
+        const startDaysInMonth = new Date(barStart.getFullYear(), barStart.getMonth() + 1, 0).getDate();
+        const endDaysInMonth = new Date(barEnd.getFullYear(), barEnd.getMonth() + 1, 0).getDate();
+        const startFrac = startColIdx + (barStart.getDate() - 1) / startDaysInMonth;
+        const endFrac = endColIdx + barEnd.getDate() / endDaysInMonth;
+        overallLeftPct = (startFrac / totalCols) * 100;
+        overallWidthPct = Math.max(((endFrac - startFrac) / totalCols) * 100, 100 / totalCols / 4); // min visible sliver
+      }
+
       return (
-        <div key={idx} className="tl-row">
+        <div key={idx} className="tl-row" style={{ position: 'relative' }}>
           <div>
             <div className="tl-task-name">{m.name}</div>
             <div className="tl-task-sub">{m.done ? 'Done' : 'Pending'}</div>
           </div>
-          {ganttMonths.map((gm, gi) => {
-            const isToday = gi === todayColIdx;
-            const inRange = startColIdx !== -1 && endColIdx !== -1 && gi >= startColIdx && gi <= endColIdx;
-            let segLeft = 0, segWidth = 100;
-            if (inRange) {
-              const daysInCol = new Date(gm.year, gm.month + 1, 0).getDate();
-              if (gi === startColIdx && startColIdx === endColIdx) {
-                segLeft = ((barStart.getDate() - 1) / daysInCol) * 100;
-                segWidth = ((barEnd.getDate() - barStart.getDate() + 1) / daysInCol) * 100;
-              } else if (gi === startColIdx) {
-                segLeft = ((barStart.getDate() - 1) / daysInCol) * 100;
-                segWidth = 100 - segLeft;
-              } else if (gi === endColIdx) {
-                segWidth = (barEnd.getDate() / daysInCol) * 100;
-              }
-              segWidth = Math.max(segWidth, 6); // guarantee a visible sliver even for very short spans
-            }
-            return (
-              <div key={gi} className="tl-grid-cell" style={{ position: 'relative' }}>
-                {isToday && (
-                  <div className="today-line" style={{ left: `${todayPct}%` }}></div>
-                )}
-                {inRange && (
-                  <div className="tl-bar-wrap">
-                    <div className="tl-bar" style={{ width: `${segWidth}%`, left: `${segLeft}%`, background: barColor, color: textColor }}>
-                      {gi === startColIdx && (
-                        <div className="tl-bar-fill" style={{ width: `${progressPct}%` }}></div>
-                      )}
-                      <span className="tl-bar-label">{gi === startColIdx ? labelText : ''}</span>
-                    </div>
-                  </div>
+          <div style={{ position: 'relative', gridColumn: `2 / span ${ganttMonths.length}`, height: 28 }}>
+            {ganttMonths.map((gm, gi) => (
+              <div key={gi} className="tl-grid-cell" style={{ position: 'absolute', left: `${(gi / totalCols) * 100}%`, width: `${100 / totalCols}%`, height: '100%' }}>
+                {gi === todayColIdx && (
+                  <div className="today-line" style={{ position: 'absolute', left: `${todayPct}%`, top: 0, bottom: 0, zIndex: 1 }}></div>
                 )}
               </div>
-            );
-          })}
+            ))}
+            {startColIdx !== -1 && endColIdx !== -1 && (
+              <div className="tl-bar-wrap" style={{ position: 'absolute', left: `${overallLeftPct}%`, width: `${overallWidthPct}%`, top: 0, height: '100%' }}>
+                <div
+                  className="tl-bar"
+                  style={{
+                    width: '100%',
+                    background: barColor,
+                    color: textColor,
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                    position: 'relative',
+                    zIndex: 0
+                  }}
+                >
+                  <div className="tl-bar-fill" style={{ width: `${progressPct}%` }}></div>
+                  <span className="tl-bar-label" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{labelText}</span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       );
     });
@@ -1763,7 +1779,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                   <div key={gi} className="tl-month" style={{ position: 'relative', ...(gi === todayColIdx ? { color: C.teal, fontWeight: 800 } : {}) }}>
                     {gm.label}
                     {gi === todayColIdx && (
-                      <div className="today-label" style={{ position: 'absolute', top: -18, left: `${todayPct}%`, transform: 'translateX(-50%)' }}>TODAY</div>
+                      <div className="today-label" style={{ position: 'absolute', top: -18, left: `${((gi + todayPct / 100) / ganttMonths.length) * 100 * ganttMonths.length}%`, transform: 'translateX(-50%)', zIndex: 2, whiteSpace: 'nowrap' }}>TODAY</div>
                     )}
                   </div>
                 ))}

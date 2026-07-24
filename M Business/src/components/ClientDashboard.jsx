@@ -2499,7 +2499,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     const proj = targetProject || projects[0];
     const projUpdates = (proj?.updates || [])
       .filter(upd => !upd.visibleTo || upd.visibleTo.includes('client') || upd.visibleTo.includes('team'))
-      .slice(0, 3).map((upd, i) => ({
+      .slice(0, 6).map((upd, i) => ({
         id: 'upd-' + i,
         title: upd.text || upd.title || 'Project update posted',
         time: upd.date ? new Date(upd.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',

@@ -1150,7 +1150,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     if (!updateText.trim()) return;
     setPostingUpdate(true);
     try {
-      const visibleTo = ['team'];
+      const visibleTo = ['team', 'client'];
 
       const newUpdate = {
         text: updateText.trim(),
@@ -1462,7 +1462,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         newUploadedUrl = newlyUploaded[newlyUploaded.length - 1].url;
       }
       if (postUpdateOnUpload) {
-        const visibleTo = ['team'];
+        const visibleTo = ['team', 'client'];
         const title = uploadHeading.trim() || uploadDescription.trim().slice(0, 60) || 'Update';
         const body = uploadDescription.trim() ? `${uploadHeading.trim() ? uploadHeading + ': ' : ''}${uploadDescription}`.trim() : uploadHeading.trim();
         const composerAttachments = postUpdateAttachments || [];
@@ -2578,7 +2578,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   }
                                   setPostingUpdate(true);
                                   try {
-                                    const visibleTo = ['team'];
+                                    const visibleTo = ['team', 'client'];
                                     const title = updateTitle.trim() || updateText.trim().slice(0, 60) || 'Update';
                                     const attachments = postUpdateAttachments || [];
                                     const primaryAttachment = attachments[0] || null;
@@ -2684,7 +2684,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                     : (upd.status === 'Approved' ? '#DCFCE7' : upd.status === 'Reviewed' ? '#FEF3C7' : '#F1F5F9');
                                   const statusLabel = linkedApproval
                                     ? (linkedApproval.status.charAt(0).toUpperCase() + linkedApproval.status.slice(1))
-                                    : (upd.status || 'Pending');
+                                    : (upd.isApprovalRequest ? (upd.status || 'Pending') : 'Sent');
                                   return (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
                                       <span style={{

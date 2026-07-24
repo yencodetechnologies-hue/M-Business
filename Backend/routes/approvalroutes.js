@@ -10,7 +10,7 @@ router.get("/client/:clientId", async (req, res) => {
         const clientId = String(req.params.clientId).trim();
         if (!companyId || !clientId) return res.json([]);
 
-        const docs = await Approval.find({ companyId, clientId, recipientType: "client", status: "pending" })
+        const docs = await Approval.find({ companyId, clientId, recipientType: "client" })
             .sort({ createdAt: -1 })
             .lean();
         res.json(docs);

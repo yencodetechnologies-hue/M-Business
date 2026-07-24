@@ -1120,7 +1120,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
       {/* ACTION BAR */}
       <div className="mpc-action-bar">
         <div style={{ fontSize: 13, color: P.textLight, fontWeight: 600 }}>
-          Ensure all required fields are filled before launching.
+
         </div>
         <div style={{ display: "flex", gap: 12 }}>
 

@@ -172,7 +172,7 @@ const projectSchema = new mongoose.Schema({
     default: []
   },
   portalSettings: {
-    type: Object,
+    type: mongoose.Schema.Types.Mixed,
     default: {
       enablePortal: true,
       showProgress: true,

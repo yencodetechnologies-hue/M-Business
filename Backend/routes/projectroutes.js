@@ -359,12 +359,16 @@ router.put("/:id", async (req, res) => {
     }
 
     const companyId = req.companyId || "";
-    const project = await Project.findOneAndUpdate(
-      { _id: rawId, companyId },
-      { $set: updateData },
-      { new: true }
-    );
+    const project = await Project.findOne({ _id: rawId, companyId });
     if (!project) return res.status(404).json({ msg: "Project not found or unauthorized" });
+
+    Object.keys(updateData).forEach(key => {
+      project[key] = updateData[key];
+    });
+    if (updateData.portalSettings) {
+      project.markModified('portalSettings');
+    }
+    await project.save();
 
     // Auto-update Project Status tracking entry
     try {

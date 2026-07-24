@@ -2197,7 +2197,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
 
         {/* MAIN CONTENT GRID */}
-        <div className="mpd-grid-main-side" style={{ marginTop: 32 }}>
+        <div className="mpd-grid-main-side" style={{ marginTop: 20 }}>
           {/* RIGHT COL — TASKS */}
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%', order: 2, marginLeft: 20, flex: '1 1 0%', minWidth: 0 }}>
             {/* TASKS COMPONENT */}

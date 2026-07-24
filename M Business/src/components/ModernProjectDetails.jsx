@@ -77,6 +77,8 @@ const CSS = `
 .mpd-btn-danger:hover { background:${P.red}; color:#fff; transform:translateY(-1px); }
 .mpd-btn:focus, .mpd-btn:active { outline: none; box-shadow: none; transform:none; }
 .mpd-btn-primary:focus, .mpd-btn-primary:active { background:${P.primaryDark}; box-shadow:none; }
+.mpc-checkbox-label { display:flex; align-items:center; gap:10px; cursor:pointer; font-size:13px; font-weight:700; color:${P.textMid}; user-select:none; }
+.mpc-checkbox-label input { accent-color:${P.primary}; width:16px; height:16px; cursor:pointer; }
 
 /* CARDS */
 .mpd-card { background:#fff; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,.07), 0 0 0 1px rgba(0,0,0,.04); padding:22px 24px; margin-bottom:20px; transition:box-shadow .2s; }
@@ -467,15 +469,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [selectedNewMember, setSelectedNewMember] = useState('');
   const [newMilestoneName, setNewMilestoneName] = useState('');
   const [newMilestoneDate, setNewMilestoneDate] = useState('');
-  const [newMilestoneStartDate, setNewMilestoneStartDate] = useState('');
-  const [newMilestoneEndDate, setNewMilestoneEndDate] = useState('');
   const [showAddMilestone, setShowAddMilestone] = useState(false);
   const [isCustomMilestoneMode, setIsCustomMilestoneMode] = useState(false);
   const [editingMilestoneIdx, setEditingMilestoneIdx] = useState(null);
   const [editMilestoneName, setEditMilestoneName] = useState('');
   const [editMilestoneDate, setEditMilestoneDate] = useState('');
-  const [editMilestoneStartDate, setEditMilestoneStartDate] = useState('');
-  const [editMilestoneEndDate, setEditMilestoneEndDate] = useState('');
   const [isCustomEditMilestoneMode, setIsCustomEditMilestoneMode] = useState(false);
   const [milestoneView, setMilestoneView] = useState('timeline'); // 'timeline' | 'list'
   const [dragMilestoneIdx, setDragMilestoneIdx] = useState(null);
@@ -1269,8 +1267,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       const newMilestone = {
         name: newMilestoneName.trim(),
         date: newMilestoneDate || '',
-        startDate: newMilestoneStartDate || '',
-        endDate: newMilestoneEndDate || '',
         done: false
       };
       const updatedMilestones = [...(currProject.milestones || []), newMilestone];
@@ -1301,8 +1297,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     setEditingMilestoneIdx(idx);
     setEditMilestoneName(m.name || '');
     setEditMilestoneDate(m.date || '');
-    setEditMilestoneStartDate(m.startDate || '');
-    setEditMilestoneEndDate(m.endDate || '');
     const isPreset = MILESTONE_OPTIONS.filter(o => o !== "Custom").includes(m.name);
     setIsCustomEditMilestoneMode(false);
   };
@@ -1316,7 +1310,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
       const updatedMilestones = (currProject.milestones || []).map((m, idx) =>
         idx === editingMilestoneIdx
-          ? { ...m, name: trimmedNewName, date: editMilestoneDate || '', startDate: editMilestoneStartDate || '', endDate: editMilestoneEndDate || '' }
+          ? { ...m, name: trimmedNewName, date: editMilestoneDate || '' }
           : m
       );
 
@@ -2096,33 +2090,18 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   />
                 )}
               </div>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 8, flexWrap: 'wrap' }}>
-                <div style={{ flex: 1, minWidth: 140 }}>
-                  <label style={{ fontSize: 10, fontWeight: 700, color: P.textLight, display: 'block', marginBottom: 3 }}>Start Date</label>
-                  <input
-                    type="date"
-                    value={editMilestoneStartDate}
-                    onChange={e => setEditMilestoneStartDate(e.target.value)}
-                    style={{ width: '100%', padding: '6px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', background: '#fff', color: editMilestoneStartDate ? P.textDark : '#A0AEC0', fontFamily: 'Nunito, sans-serif', cursor: 'pointer', boxSizing: 'border-box' }}
-                  />
-                </div>
-                <div style={{ flex: 1, minWidth: 140 }}>
-                  <label style={{ fontSize: 10, fontWeight: 700, color: P.textLight, display: 'block', marginBottom: 3 }}>End Date</label>
-                  <input
-                    type="date"
-                    value={editMilestoneEndDate}
-                    onChange={e => setEditMilestoneEndDate(e.target.value)}
-                    style={{ width: '100%', padding: '6px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', background: '#fff', color: editMilestoneEndDate ? P.textDark : '#A0AEC0', fontFamily: 'Nunito, sans-serif', cursor: 'pointer', boxSizing: 'border-box' }}
-                  />
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 8 }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input
+                  type="date"
+                  value={editMilestoneDate}
+                  onChange={e => setEditMilestoneDate(e.target.value)}
+                  style={{ padding: '6px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', flex: 1, background: '#fff', color: editMilestoneDate ? P.textDark : '#A0AEC0', fontFamily: 'Nunito, sans-serif', cursor: 'pointer', minWidth: 140 }}
+                />
                 <button type="submit" className="mpd-btn mpd-btn-primary" style={{ padding: '6px 12px', fontSize: 11 }}>Save</button>
                 <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => { setEditingMilestoneIdx(null); setIsCustomEditMilestoneMode(false); }} style={{ padding: '6px 12px', fontSize: 11 }}>✕</button>
               </div>
             </form>
           )}
-
           {showAddMilestone && (
             <form onSubmit={handleAddMilestone} style={{ background: P.bg, padding: 14, borderRadius: 10, marginTop: 12 }}>
               <div style={{ marginBottom: 8 }}>
@@ -2165,27 +2144,26 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 )}
               </div>
 
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 8, flexWrap: 'wrap' }}>
-                <div style={{ flex: 1, minWidth: 140 }}>
-                  <label style={{ fontSize: 10, fontWeight: 700, color: P.textLight, display: 'block', marginBottom: 3 }}>Start Date</label>
-                  <input
-                    type="date"
-                    value={newMilestoneStartDate}
-                    onChange={e => setNewMilestoneStartDate(e.target.value)}
-                    style={{ width: '100%', padding: '6px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', background: '#fff', color: newMilestoneStartDate ? P.textDark : '#A0AEC0', fontFamily: 'Nunito, sans-serif', cursor: 'pointer', boxSizing: 'border-box' }}
-                  />
-                </div>
-                <div style={{ flex: 1, minWidth: 140 }}>
-                  <label style={{ fontSize: 10, fontWeight: 700, color: P.textLight, display: 'block', marginBottom: 3 }}>End Date</label>
-                  <input
-                    type="date"
-                    value={newMilestoneEndDate}
-                    onChange={e => setNewMilestoneEndDate(e.target.value)}
-                    style={{ width: '100%', padding: '6px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', background: '#fff', color: newMilestoneEndDate ? P.textDark : '#A0AEC0', fontFamily: 'Nunito, sans-serif', cursor: 'pointer', boxSizing: 'border-box' }}
-                  />
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 8 }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input
+                  type="date"
+                  value={newMilestoneDate}
+                  onChange={e => setNewMilestoneDate(e.target.value)}
+                  style={{
+                    padding: '6px 10px',
+                    borderRadius: 6,
+                    border: `1.5px solid ${P.border}`,
+                    fontSize: 12,
+                    outline: 'none',
+                    flex: 1,
+                    background: '#fff',
+                    color: newMilestoneDate ? P.textDark : '#A0AEC0',
+                    fontFamily: 'Nunito, sans-serif',
+                    cursor: 'pointer',
+                    minWidth: 140,
+                  }}
+                />
+
                 <button type="submit" className="mpd-btn mpd-btn-primary" style={{ padding: '6px 12px', fontSize: 11 }}>Add</button>
                 <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => { setShowAddMilestone(false); setIsCustomMilestoneMode(false); }} style={{ padding: '6px 12px', fontSize: 11 }}>✕</button>
               </div>

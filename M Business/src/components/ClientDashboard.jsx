@@ -651,9 +651,112 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         setLoading(false);
       }
     };
+
+    // Background refresh — identical to fetchAll but never touches `loading`,
+    // so periodic polling can't cause any loading-gated section to flash.
+    const fetchAllSilent = async () => {
+      try {
+        const myClientId = portalMode
+          ? (portalClientId || user._id || user.id || "")
+          : (user._id || user.id || "");
+        const [projRes, taskRes, invRes, notifRes, docRes, meetRes, propRes, quotRes, approvalRes, msgRes, clientRes] = await Promise.all([
+          axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}&clientId=${encodeURIComponent(myClientId)}`, {
+            headers: { 'x-company-id': user.companyId || "" }
+          }),
+          axios.get(`${BASE_URL}/api/tasks/client/${encodeURIComponent(clientName)}?clientId=${encodeURIComponent(myClientId)}`, {
+            headers: { 'x-company-id': user.companyId || "" }
+          }),
+          axios.get(`${BASE_URL}/api/invoices/client/${encodeURIComponent(clientName)}?clientId=${encodeURIComponent(myClientId)}`, {
+            headers: { 'x-company-id': user.companyId || "" }
+          }),
+          axios.get(`${BASE_URL}/api/notifications/${user._id || user.id}`),
+          axios.get(`${BASE_URL}/api/documents?companyId=${user.companyId || ""}&client=${encodeURIComponent(clientName)}&sendTo=client&clientId=${encodeURIComponent(myClientId)}`).catch(() => ({ data: [] })),
+          axios.get(`${BASE_URL}/api/meetings?client=${encodeURIComponent(clientName)}`).catch(() => ({ data: [] })),
+          axios.get(`${BASE_URL}/api/proposals/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}&clientId=${encodeURIComponent(user._id || user.id || "")}`, {
+            headers: { 'x-company-id': user.companyId || "" }
+          }).catch(() => ({ data: [] })),
+          axios.get(`${BASE_URL}/api/quotations/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}&clientId=${encodeURIComponent(myClientId)}`, {
+            headers: { 'x-company-id': user.companyId || "" }
+          }).catch(() => ({ data: [] })),
+          axios.get(`${BASE_URL}/api/approvals/client/${encodeURIComponent(myClientId)}`, {
+            headers: { 'x-company-id': user.companyId || "" }
+          }).catch(() => ({ data: [] })),
+          axios.get(`${BASE_URL}/api/messages?companyId=${encodeURIComponent(user.companyId || "")}`).catch(() => ({ data: [] })),
+          axios.get(`${BASE_URL}/api/clients/${myClientId}`).catch(() => ({ data: {} })),
+        ]);
+
+        setProjects(projRes.data || []);
+        setTasks(taskRes.data || []);
+        setInvoices(invRes.data || []);
+        setNotifs(notifRes.data || []);
+        setDocs(docRes.data || []);
+        setMeetings(Array.isArray(meetRes.data) ? meetRes.data : []);
+        setClientDocuments(clientRes.data?.documents || []);
+
+        const allQuots = Array.isArray(quotRes.data) ? quotRes.data : (quotRes.data?.quotations || []);
+        const myClientIdStr = String(user._id || user.id || "");
+        const cn = (clientName || "").toLowerCase().trim();
+        const filteredQuots = allQuots.filter(q => {
+          if (q.status !== "sent") return false;
+          const qClient = (q.client || q.qt?.client || q.qt?.toName || "").toLowerCase().trim();
+          return qClient === cn;
+        });
+        setQuotations(filteredQuots);
+        setApprovals(Array.isArray(approvalRes.data) ? approvalRes.data.map(a => ({
+          id: a._id,
+          title: a.title,
+          desc: a.desc,
+          icon: a.icon,
+          approveLabel: a.approveLabel,
+          rejectLabel: a.rejectLabel,
+          senderName: a.senderName,
+          status: a.status,
+          rejectReason: a.rejectReason,
+          respondedAt: a.respondedAt || a.updatedAt || null,
+          fileUrl: a.fileUrl,
+          fileName: a.fileName,
+          recipientType: a.recipientType,
+        })) : []);
+
+        const allMsgs = Array.isArray(msgRes.data) ? msgRes.data : [];
+        const myIdStr = String(myClientId);
+        const threadMsgs = allMsgs
+          .filter(m => String(m.senderId) === myIdStr || String(m.receiverId) === myIdStr)
+          .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+          .map(m => ({
+            id: m._id,
+            sender: String(m.senderId) === myIdStr ? "You" : m.senderName,
+            msg: m.content,
+            attachmentUrl: m.attachmentUrl || "",
+            attachmentName: m.attachmentName || "",
+            time: new Date(m.createdAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+            mine: String(m.senderId) === myIdStr,
+          }));
+        setChatMessages(threadMsgs);
+
+        const allProps = propRes.data || [];
+        const filtered = allProps.filter(p => {
+          const matchStatus = ["sent", "pending", "approved", "rejected"].includes(p.status);
+          if (!matchStatus) return false;
+          if (p.clientId) return String(p.clientId) === myClientIdStr;
+          const propClient = (p.client || p.clientName || "").toLowerCase().trim();
+          return propClient === cn;
+        });
+        setProposals(filtered);
+      } catch (err) {
+        console.error("Failed to silently refresh client dashboard data", err);
+      }
+    };
+
     fetchAll();
-    // Auto-refresh every 30s — new files will show immediately
-    const interval = setInterval(fetchAll, 30000);
+    // Auto-refresh every 30s — new files will show immediately.
+    // NOTE: fetchAll() calls setLoading(true)/(false) internally on every run,
+    // which was toggling loading state on the 30s interval and causing any
+    // loading-gated UI to flicker. Silence the loading flag on background
+    // refreshes so only the very first load shows a loading state.
+    const interval = setInterval(() => {
+      fetchAllSilent();
+    }, 30000);
     return () => clearInterval(interval);
   }, [user?._id, clientName]);
 
@@ -2674,17 +2777,15 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                       Project Timeline
                     </div>
                   </div>
-                  {portalSettings.showMilestones && (
-                    (() => {
-                      const { milestoneProgressBlock, ganttChartBlock } = renderTimelineComponent();
-                      return (
-                        <div style={{ flex: 1, display: "flex", flexDirection: "column" }} id="milestone-progress-block">
-                          {milestoneProgressBlock}
-                          {ganttChartBlock}
-                        </div>
-                      );
-                    })()
-                  )}
+                  {portalSettings.showMilestones && (() => {
+                    const { milestoneProgressBlock, ganttChartBlock } = renderTimelineComponent();
+                    return (
+                      <div style={{ flex: 1, display: "flex", flexDirection: "column", opacity: 1 }} id="milestone-progress-block">
+                        {milestoneProgressBlock}
+                        {ganttChartBlock}
+                      </div>
+                    );
+                  })()}
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                   {portalSettings.showTeam && renderTeamComponent()}

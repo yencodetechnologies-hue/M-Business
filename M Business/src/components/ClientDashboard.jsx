@@ -610,6 +610,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           senderName: a.senderName,
           status: a.status,
           rejectReason: a.rejectReason,
+          respondedAt: a.respondedAt || a.updatedAt || null,
           fileUrl: a.fileUrl,
           fileName: a.fileName,
           recipientType: a.recipientType,
@@ -854,9 +855,10 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   }
 
   const handleApprove = async (id) => {
-    setApprovals(prev => prev.filter(a => a.id !== id));
+    const respondedAt = new Date().toISOString();
+    setApprovals(prev => prev.map(a => a.id === id ? { ...a, status: "approved", respondedAt } : a));
     try {
-      await axios.patch(`${BASE_URL}/api/approvals/${id}/respond`, { status: "approved" });
+      await axios.patch(`${BASE_URL}/api/approvals/${id}/respond`, { status: "approved", respondedAt });
     } catch (err) {
       console.error("Failed to approve", err);
       alert("Something went wrong saving your response. Please try again.");
@@ -866,10 +868,12 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const submitRejection = async () => {
     if (!rejectReasonText.trim()) { alert("Please enter a reason for rejecting."); return; }
     const id = rejectModalApp.id;
-    setApprovals(prev => prev.filter(a => a.id !== id));
+    const respondedAt = new Date().toISOString();
+    const reason = rejectReasonText.trim();
+    setApprovals(prev => prev.map(a => a.id === id ? { ...a, status: "rejected", rejectReason: reason, respondedAt } : a));
     setRejectModalApp(null);
     try {
-      await axios.patch(`${BASE_URL}/api/approvals/${id}/respond`, { status: "rejected", rejectReason: rejectReasonText.trim() });
+      await axios.patch(`${BASE_URL}/api/approvals/${id}/respond`, { status: "rejected", rejectReason: reason, respondedAt });
     } catch (err) {
       console.error("Failed to reject", err);
       alert("Something went wrong saving your response. Please try again.");
@@ -1940,8 +1944,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     }
 
     return (
-      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden", padding: "16px 18px" }}>
-        <div className="files-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden", padding: "16px 18px", height: "100%", display: "flex", flexDirection: "column" }}>
+        <div className="files-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)", alignContent: "start" }}>
           {recentFiles.map((file, idx) => (
             <div key={idx} className="file-card" onClick={() => {
               if (file.isLetterhead && file.raw?.htmlContent) { setSelectedDoc(file.raw); }
@@ -2141,7 +2145,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     });
 
     return (
-      <div className="calendar-panel">
+      <div className="calendar-panel" style={{ height: "100%", display: "flex", flexDirection: "column" }}>
         <div className="cal-header">
           <div className="cal-month">{monthLabel}</div>
           <div className="cal-nav">
@@ -2203,24 +2207,41 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     return (
       <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden", height: "100%", display: "flex", flexDirection: "column" }}>
         <div style={{ flex: 1, overflowY: "auto" }}>
-          {approvals.map((app) => (
-            <div key={app.id} className="approval-item" style={{ flexWrap: 'wrap' }}>
-              <div className="ai-icon"><i className={`ti ${app.icon}`}></i></div>
-              <div style={{ flex: 1, minWidth: 160 }}>
-                <div className="ai-title">{app.title}</div>
-                <div className="ai-desc">{app.desc}</div>
-                {app.senderName && <div style={{ fontSize: 10, color: C.text3, marginTop: 2 }}>From {app.senderName}</div>}
+          {approvals.map((app) => {
+            const isResponded = app.status === "approved" || app.status === "rejected";
+            const respondedDate = app.respondedAt ? new Date(app.respondedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "";
+            const respondedTime = app.respondedAt ? new Date(app.respondedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "";
+            return (
+              <div key={app.id} className="approval-item" style={{ flexWrap: 'wrap', alignItems: 'center' }}>
+                <div className="ai-icon"><i className={`ti ${app.icon}`}></i></div>
+                <div style={{ flex: 1, minWidth: 160 }}>
+                  <div className="ai-title">{app.title}</div>
+                  <div className="ai-desc">{app.desc}</div>
+                  {app.senderName && <div style={{ fontSize: 10, color: C.text3, marginTop: 2 }}>From {app.senderName}</div>}
+                  {isResponded && (
+                    <div style={{ fontSize: 11, fontWeight: 700, marginTop: 4, color: app.status === "approved" ? C.green : C.red, display: "flex", alignItems: "center", gap: 4 }}>
+                      <i className={`ti ${app.status === "approved" ? "ti-circle-check" : "ti-circle-x"}`} style={{ fontSize: 12 }}></i>
+                      {app.status === "approved" ? "Approved" : "Rejected"} on {respondedDate}{respondedTime ? ` at ${respondedTime}` : ""}
+                      {app.status === "rejected" && app.rejectReason && (
+                        <span style={{ fontWeight: 600, color: C.text3, marginLeft: 4 }}>— {app.rejectReason}</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <div className="ai-actions" style={{ alignSelf: 'center', marginLeft: 'auto', flexShrink: 0 }}>
+                  <button className="ai-btn" onClick={() => setViewApprovalApp(app)}>View</button>
+                  {!isResponded && (
+                    <>
+                      <button className="ai-btn approve" onClick={() => handleApprove(app.id)}>
+                        <i className="ti ti-check" style={{ fontSize: 12 }}></i> {app.approveLabel || "Approve"}
+                      </button>
+                      <button className="ai-btn reject" onClick={() => { setRejectModalApp(app); setRejectReasonText(""); }}>{app.rejectLabel || "Reject"}</button>
+                    </>
+                  )}
+                </div>
               </div>
-              <div className="ai-actions">
-                <button className="ai-btn" onClick={() => setViewApprovalApp(app)}>View</button>
-                <button className="ai-btn approve" onClick={() => handleApprove(app.id)}>
-                  <i className="ti ti-check" style={{ fontSize: 12 }}></i> {app.approveLabel || "Approve"}
-                </button>
-                <button className="ai-btn reject" onClick={() => { setRejectModalApp(app); setRejectReasonText(""); }}>{app.rejectLabel || "Reject"}</button>
-              </div>
-            </div>
-          ))}
-          {approvals.length === 0 && (
+            );
+          })}         {approvals.length === 0 && (
             <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", color: C.text3, fontSize: 12, padding: 24, boxSizing: "border-box" }}>No pending approvals. All caught up!</div>
           )}
         </div>
@@ -2272,6 +2293,29 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     </div>
                   );
                 })()}
+              </div>
+              <div style={{ display: "flex", gap: 8, padding: "14px 20px", borderTop: "1px solid " + C.border }}>
+                <button
+                  className="ai-btn approve"
+                  style={{ flex: 1, padding: "10px", fontSize: 13 }}
+                  onClick={() => {
+                    handleApprove(viewApprovalApp.id);
+                    setViewApprovalApp(null);
+                  }}
+                >
+                  <i className="ti ti-check" style={{ fontSize: 13 }}></i> {viewApprovalApp.approveLabel || "Approve"}
+                </button>
+                <button
+                  className="ai-btn reject"
+                  style={{ flex: 1, padding: "10px", fontSize: 13 }}
+                  onClick={() => {
+                    setRejectModalApp(viewApprovalApp);
+                    setRejectReasonText("");
+                    setViewApprovalApp(null);
+                  }}
+                >
+                  {viewApprovalApp.rejectLabel || "Review"}
+                </button>
               </div>
             </div>
           </div>
@@ -2538,7 +2582,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     const managerEmail = proj?.managerEmail || proj?.contactEmail || '';
     const initial = (managerName || 'P').trim().charAt(0).toUpperCase();
     return (
-      <div className="contact-card">
+      <div className="contact-card" style={{ height: "100%", display: "flex", flexDirection: "column" }}>
         <div className="cc-label">Point of Contact</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
           <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(255,255,255,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800, color: '#fff', flexShrink: 0, border: '2px solid rgba(255,255,255,.3)' }}>{initial}</div>
@@ -2652,7 +2696,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     </div>
                   </div>
                 </div>
-                {renderFilesOverviewComponent()}
+                <div style={{ flex: 1, minHeight: 0 }}>{renderFilesOverviewComponent()}</div>
               </div>
 
               {/* Invoices */}
@@ -2673,31 +2717,94 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
 
             {/* Meeting Schedule and Point of Contact */}
-            <div className="two-col">
-              <div>
+            <div className="two-col" style={{ alignItems: "stretch" }}>
+              <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
                 <div className="sec-header">
                   <div className="sec-title">
                     <div className="sec-title-icon" style={{ background: C.amberBg, color: C.amber }}><i className="ti ti-calendar-event"></i></div>
                     Meeting Schedule
                   </div>
                 </div>
-                {renderCalendarComponent()}
+                <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>{renderCalendarComponent()}</div>
               </div>
-              <div>
+              <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
                 <div className="sec-header">
                   <div className="sec-title">
                     <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-user-circle"></i></div>
                     Point of Contact
                   </div>
                 </div>
-                {renderContactCard()}
+                <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>{renderContactCard()}</div>
               </div>
             </div>
-
             {/* Activity and Feedback */}
-            <div className="two-col">
-              {renderActivityFeed()}
-              {renderFeedbackPanel()}
+            <div>
+              <div className="sec-header">
+                <div className="sec-title">
+                  <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-history"></i></div>
+                  Activity & Feedback
+                </div>
+              </div>
+              <div className="two-col" style={{ alignItems: "stretch" }}>
+                <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+                  <div className="activity-feed" style={{ flex: 1 }}>
+                    {(() => {
+                      const proj = targetProject || projects[0];
+                      const projUpdates = (proj?.updates || [])
+                        .filter(upd => !upd.visibleTo || upd.visibleTo.includes('client') || upd.visibleTo.includes('team'))
+                        .slice(0, 3).map((upd, i) => ({
+                          id: 'upd-' + i,
+                          title: upd.text || upd.title || 'Project update posted',
+                          time: upd.date ? new Date(upd.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
+                          icon: 'ti-speakerphone'
+                        }));
+                      const notifItems = notifs.slice(0, 3).map((n, i) => ({
+                        id: 'notif-' + i,
+                        title: n.text || 'Notification',
+                        time: n.createdAt ? new Date(n.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
+                        icon: 'ti-bell'
+                      }));
+                      const feedItems = [...projUpdates, ...notifItems].slice(0, 4);
+                      const dotColors = {
+                        'ti-speakerphone': { bg: C.tealLight, color: C.teal },
+                        'ti-bell': { bg: C.purpleBg, color: C.purple },
+                        'ti-upload': { bg: C.blueBg, color: C.blue },
+                        'ti-flag': { bg: C.greenBg, color: C.green },
+                        'ti-chart-line': { bg: C.amberBg, color: C.amber },
+                        'ti-calendar': { bg: C.blueBg, color: C.blue },
+                      };
+                      return feedItems.length === 0 ? (
+                        <div style={{ fontSize: 12, color: C.text3, textAlign: 'center', padding: '12px 0' }}>No recent activity.</div>
+                      ) : (
+                        feedItems.map((item, idx) => {
+                          const dc = dotColors[item.icon] || { bg: C.tealLight, color: C.teal };
+                          return (
+                            <div key={item.id} className="af-item" onClick={() => setActive('timeline')} style={{ cursor: 'pointer' }}>
+                              <div className="af-dot-col">
+                                <div className="af-dot" style={{ background: dc.bg, color: dc.color }}><i className={`ti ${item.icon}`} style={{ fontSize: 13 }}></i></div>
+                                {idx < feedItems.length - 1 && <div className="af-line"></div>}
+                              </div>
+                              <div style={{ flex: 1 }}>
+                                <div className="af-title">{item.title}</div>
+                                <div className="af-time"><i className="ti ti-clock" style={{ fontSize: 11 }}></i> {item.time}</div>
+                              </div>
+                            </div>
+                          );
+                        })
+                      );
+                    })()}
+                  </div>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+                  <div className="sec-header">
+                    <div className="sec-title">
+                      <div className="sec-title-icon" style={{ background: C.purpleBg, color: C.purple }}><i className="ti ti-star"></i></div>
+                      Feedback
+                    </div>
+                  </div>
+                  <div style={{ flex: 1 }}>{renderFeedbackPanel()}</div>
+                </div>
+              </div>
             </div>    </>
         )}
         {active === "timeline" && (

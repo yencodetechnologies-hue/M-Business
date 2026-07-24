@@ -2583,7 +2583,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                     const attachments = postUpdateAttachments || [];
                                     const primaryAttachment = attachments[0] || null;
                                     const newUpdate = {
-                                      text: updateText.trim(),
+                                      text: updateText.trim() || title,
                                       title,
                                       date: new Date().toISOString(),
                                       author: 'Admin',

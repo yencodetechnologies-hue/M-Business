@@ -3371,10 +3371,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <input type="checkbox" checked={!!localPortalOpts.showMilestones} onChange={e => setLocalPortalOpts({ ...localPortalOpts, showMilestones: e.target.checked })} />
             Show milestones to client
           </label>
-          <label className="mpc-checkbox-label">
-            <input type="checkbox" checked={!!localPortalOpts.showTeam} onChange={e => setLocalPortalOpts({ ...localPortalOpts, showTeam: e.target.checked })} />
-            Show team members to client
-          </label>
+
           <label className="mpc-checkbox-label">
             <input type="checkbox" checked={!!localPortalOpts.allowMessages} onChange={e => setLocalPortalOpts({ ...localPortalOpts, allowMessages: e.target.checked })} />
             Allow client to send messages

@@ -1759,11 +1759,14 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         </div>
 
         {/* Gantt Chart */}
-        <div className="timeline-card">
+        <div className="sec-header" style={{ marginTop: 0, marginBottom: 14 }}>
+          <div className="sec-title">
+            <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-chart-bar"></i></div>
+            Gantt Chart · {ganttMonths[0]?.label} {ganttMonths[0]?.year} – {ganttMonths[ganttMonths.length - 1]?.label} {ganttMonths[ganttMonths.length - 1]?.year}
+          </div>
+        </div>
+        <div className="timeline-card" style={{ height: 420, display: "flex", flexDirection: "column" }}>
           <div className="tc-header">
-            <div className="tc-title">
-              Gantt Chart · {ganttMonths[0]?.label} {ganttMonths[0]?.year} – {ganttMonths[ganttMonths.length - 1]?.label} {ganttMonths[ganttMonths.length - 1]?.year}
-            </div>
             <div className="tc-legend">
               <div className="tc-legend-item"><div className="tc-legend-dot" style={{ background: C.teal }}></div>Completed</div>
               <div className="tc-legend-item"><div className="tc-legend-dot" style={{ background: C.amber }}></div>Active</div>
@@ -1771,7 +1774,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               <div className="tc-legend-item"><div className="tc-legend-dot" style={{ background: C.red }}></div>Today</div>
             </div>
           </div>
-          <div className="timeline-scroll">
+          <div className="timeline-scroll" style={{ flex: 1, overflowY: "auto" }}>
             <div className="timeline-wrap">
               <div className="tl-months">
                 <div className="tl-month"></div>
@@ -2228,7 +2231,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             </div>
           ))}
           {approvals.length === 0 && (
-            <div style={{ padding: 24, textAlign: "center", color: C.text3, fontSize: 12 }}>No pending approvals. All caught up!</div>
+            <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", color: C.text3, fontSize: 12, padding: 24, boxSizing: "border-box" }}>No pending approvals. All caught up!</div>
           )}
         </div>
 
@@ -2601,14 +2604,14 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     </div>
                   </div>
                   {portalSettings.showMilestones && (
-                    <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+                    <div style={{ flex: 1, display: "flex", flexDirection: "column" }} id="milestone-progress-block">
                       {renderTimelineComponent()}
                     </div>
                   )}
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                   {portalSettings.showTeam && renderTeamComponent()}
-                  <div style={{ display: "flex", flexDirection: "column" }}>
+                  <div style={{ display: "flex", flexDirection: "column", height: 233 }}>
                     <div className="sec-header">
                       <div className="sec-title">
                         <div className="sec-title-icon" style={{ background: C.redBg, color: C.red }}><i className="ti ti-clipboard-check"></i></div>
@@ -2619,7 +2622,19 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                       {renderApprovalsComponent()}
                     </div>
                   </div>
-                  {renderCalendarComponent()}
+                  {portalSettings.allowMessages && (
+                    <div>
+                      <div className="sec-header">
+                        <div className="sec-title">
+                          <div className="sec-title-icon" style={{ background: C.purpleBg, color: C.purple }}><i className="ti ti-message-2"></i></div>
+                          Messages & Chat
+
+                        </div>
+                        <div className="sec-action" onClick={() => setActive("messages")}><i className="ti ti-arrow-right" style={{ fontSize: 13 }}></i> Open Chat</div>
+                      </div>
+                      {renderMessagesComponent()}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -2645,7 +2660,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               {renderFilesOverviewComponent()}
             </div>
 
-            {/* Invoices and Messages */}
+            {/* Invoices and Calendar */}
             <div className="two-col">
               {/* Invoices */}
               <div>
@@ -2661,19 +2676,16 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 {renderInvoicesComponent()}
               </div>
 
-              {/* Messages */}
-              {portalSettings.allowMessages && (
-                <div>
-                  <div className="sec-header">
-                    <div className="sec-title">
-                      <div className="sec-title-icon" style={{ background: C.purpleBg, color: C.purple }}><i className="ti ti-message-2"></i></div>
-                      Messages & Chat
-                    </div>
-                    <div className="sec-action" onClick={() => setActive("messages")}><i className="ti ti-arrow-right" style={{ fontSize: 13 }}></i> Open Chat</div>
+              {/* Calendar */}
+              <div>
+                <div className="sec-header">
+                  <div className="sec-title">
+                    <div className="sec-title-icon" style={{ background: C.amberBg, color: C.amber }}><i className="ti ti-calendar-event"></i></div>
+                    Meeting Schedule
                   </div>
-                  {renderMessagesComponent()}
                 </div>
-              )}
+                {renderCalendarComponent()}
+              </div>
             </div>
 
             {/* Activity, Feedback and Contact */}

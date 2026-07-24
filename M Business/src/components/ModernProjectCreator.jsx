@@ -203,6 +203,8 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
     return list.map(m => ({
       name: m?.name || '',
       date: safeDate(m?.date),
+      startDate: safeDate(m?.startDate),
+      endDate: safeDate(m?.endDate),
       isCustom: m?.name ? !MILESTONE_OPTIONS.includes(m.name) : false,
     }));
   };
@@ -459,7 +461,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   };
 
   const addMilestone = () => {
-    setMilestones([...milestones, { name: '', date: '', isCustom: false }]);
+    setMilestones([...milestones, { name: '', date: '', startDate: '', endDate: '', isCustom: false }]);
   };
 
   const updateMilestone = (idx, field, val) => {
@@ -1019,7 +1021,16 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                         style={{ minWidth: 320, height: 46, fontSize: 15, padding: '10px 14px', boxSizing: 'border-box' }}
                       />
                     )}
-                    <input type="date" value={m.date} onChange={e => updateMilestone(idx, 'date', e.target.value)} />
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+                      <div>
+                        <label style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', display: 'block', marginBottom: 3 }}>Start Date</label>
+                        <input type="date" value={m.startDate || ''} onChange={e => updateMilestone(idx, 'startDate', e.target.value)} />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', display: 'block', marginBottom: 3 }}>End Date</label>
+                        <input type="date" value={m.endDate || ''} onChange={e => updateMilestone(idx, 'endDate', e.target.value)} />
+                      </div>
+                    </div>
 
                     <button
                       type="button"

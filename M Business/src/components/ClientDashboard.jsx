@@ -1759,7 +1759,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         </div>
 
         {/* Gantt Chart */}
-        <div className="timeline-card" style={{ minHeight: 340 }}>
+        <div className="timeline-card">
           <div className="tc-header">
             <div className="tc-title">
               Gantt Chart · {ganttMonths[0]?.label} {ganttMonths[0]?.year} – {ganttMonths[ganttMonths.length - 1]?.label} {ganttMonths[ganttMonths.length - 1]?.year}
@@ -2208,9 +2208,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   // Render Approvals helper
   function renderApprovalsComponent() {
     return (
-      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden" }}>
-        <div style={{ padding: "14px 18px", borderBottom: "1px solid " + C.border, fontSize: 12, fontWeight: 800, color: C.text2, background: C.surface2 }}>Pending Approvals</div>
-        <div>
+      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden", height: "100%", display: "flex", flexDirection: "column" }}>
+        <div style={{ flex: 1, overflowY: "auto" }}>
           {approvals.map((app) => (
             <div key={app.id} className="approval-item" style={{ flexWrap: 'wrap' }}>
               <div className="ai-icon"><i className={`ti ${app.icon}`}></i></div>
@@ -2432,20 +2431,21 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               onMouseEnter={e => { e.currentTarget.style.borderColor = C.teal; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,188,212,.12)'; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.04)'; }}
             >
-              <div style={{
-                width: 40, height: 40, borderRadius: 12,
-                background: card.bg, color: card.color,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 20,
-              }}>
-                <i className={`ti ${card.icon}`}></i>
-              </div>
-              <div style={{ fontSize: 28, fontWeight: 900, color: C.text, lineHeight: 1 }}>
-                {card.value}
-              </div>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: C.text2 }}>{card.label}</div>
-                <div style={{ fontSize: 11, color: C.text3, marginTop: 2 }}>{card.sub}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div style={{
+                  width: 40, height: 40, borderRadius: 12,
+                  background: card.bg, color: card.color,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 20, flexShrink: 0,
+                }}>
+                  <i className={`ti ${card.icon}`}></i>
+                </div>
+                <div>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: C.text, lineHeight: 1 }}>
+                    {card.value}
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: C.text2, marginTop: 2 }}>{card.label}</div>
+                </div>
               </div>
             </div>
           ))}
@@ -2591,19 +2591,34 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
             {/* Timeline */}
             <div>
-              <div className="sec-header"><div className="sec-title" onClick={() => setActive('timeline')} style={{ cursor: 'pointer' }}>
-                <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-calendar-stats"></i></div>
-                Project Timeline
-              </div>
-                <div className="sec-action" onClick={() => setActive('timeline')}>
-                  <i className="ti ti-arrow-right" style={{ fontSize: 13 }}></i> View Full
+
+              <div className="two-col" style={{ alignItems: "stretch" }}>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <div className="sec-header">
+                    <div className="sec-title">
+                      <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-calendar-stats"></i></div>
+                      Project Timeline
+                    </div>
+                  </div>
+                  {portalSettings.showMilestones && (
+                    <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+                      {renderTimelineComponent()}
+                    </div>
+                  )}
                 </div>
-              </div>
-              <div className="two-col">
-                {portalSettings.showMilestones && renderTimelineComponent()}
                 <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                   {portalSettings.showTeam && renderTeamComponent()}
-                  {renderApprovalsComponent()}
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <div className="sec-header">
+                      <div className="sec-title">
+                        <div className="sec-title-icon" style={{ background: C.redBg, color: C.red }}><i className="ti ti-clipboard-check"></i></div>
+                        Pending Approvals
+                      </div>
+                    </div>
+                    <div style={{ flex: 1, minHeight: 0 }}>
+                      {renderApprovalsComponent()}
+                    </div>
+                  </div>
                   {renderCalendarComponent()}
                 </div>
               </div>

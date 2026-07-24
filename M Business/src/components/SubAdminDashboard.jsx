@@ -2017,6 +2017,11 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
           clientFeedback.map((fb, i) => (
             <div key={fb._id || i} style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 12, padding: 16, marginBottom: 12 }}>
 
+              <div style={{ display: "flex", gap: 2, marginBottom: 8 }}>
+                {[1, 2, 3, 4, 5].map(star => (
+                  <i key={star} className="ti ti-star-filled" style={{ fontSize: 16, color: (fb.rating || 0) >= star ? "#F59E0B" : "#E0EEF0" }}></i>
+                ))}
+              </div>
               <div style={{ fontSize: 13, color: "#4A5568", marginBottom: 8 }}>{fb.message || "—"}</div>
               <div style={{ fontSize: 11, color: "#A0B8BE" }}>{fb.createdAt ? new Date(fb.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : ''}</div>
             </div>

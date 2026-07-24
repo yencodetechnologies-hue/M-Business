@@ -1227,7 +1227,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .step-date { font-size: 9px; color: var(--text3); font-weight: 600; text-align: center; }
 
     /* ── LAYOUTS ── */
-    .cp-root .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.cp-root .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
     .cp-root .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
 
     /* ── FILES PANEL ── */
@@ -1759,7 +1759,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         </div>
 
         {/* Gantt Chart */}
-        <div className="timeline-card">
+        <div className="timeline-card" style={{ minHeight: 340 }}>
           <div className="tc-header">
             <div className="tc-title">
               Gantt Chart · {ganttMonths[0]?.label} {ganttMonths[0]?.year} – {ganttMonths[ganttMonths.length - 1]?.label} {ganttMonths[ganttMonths.length - 1]?.year}
@@ -2018,7 +2018,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         </div>
 
         {/* Invoices List */}
-        <div>
+        <div style={{ maxHeight: 340, overflowY: 'auto' }}>
           {finalInvoicesList.map((inv) => (
             <div key={inv.id} className="invoice-item" onClick={() => {
               if (inv.status !== "paid") {
@@ -2485,25 +2485,44 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     }));
     const feedItems = [...projUpdates, ...notifItems].slice(0, 4);
 
+    const dotColors = {
+      'ti-speakerphone': { bg: C.tealLight, color: C.teal },
+      'ti-bell': { bg: C.purpleBg, color: C.purple },
+      'ti-upload': { bg: C.blueBg, color: C.blue },
+      'ti-flag': { bg: C.greenBg, color: C.green },
+      'ti-chart-line': { bg: C.amberBg, color: C.amber },
+      'ti-calendar': { bg: C.blueBg, color: C.blue },
+    };
+
     return (
-      <div className="activity-feed">
-        <div style={{ fontSize: 12, fontWeight: 800, color: C.text2, marginBottom: 14 }}>Recent Activity</div>
-        {feedItems.length === 0 ? (
-          <div style={{ fontSize: 12, color: C.text3, textAlign: 'center', padding: '12px 0' }}>No recent activity.</div>
-        ) : (
-          feedItems.map((item) => (
-            <div key={item.id} className="af-item" onClick={() => setActive('timeline')} style={{ cursor: 'pointer' }}>
-              <div className="af-dot-col">
-                <div className="af-dot"><i className={`ti ${item.icon}`}></i></div>
-                <div className="af-line"></div>
-              </div>
-              <div>
-                <div className="af-title">{item.title}</div>
-                <div className="af-time"><i className="ti ti-clock" style={{ fontSize: 12 }}></i> {item.time}</div>
-              </div>
-            </div>
-          ))
-        )}
+      <div>
+        <div className="sec-header">
+          <div className="sec-title">
+            <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-history"></i></div>
+            Recent Activity
+          </div>
+        </div>
+        <div className="activity-feed">
+          {feedItems.length === 0 ? (
+            <div style={{ fontSize: 12, color: C.text3, textAlign: 'center', padding: '12px 0' }}>No recent activity.</div>
+          ) : (
+            feedItems.map((item, idx) => {
+              const dc = dotColors[item.icon] || { bg: C.tealLight, color: C.teal };
+              return (
+                <div key={item.id} className="af-item" onClick={() => setActive('timeline')} style={{ cursor: 'pointer' }}>
+                  <div className="af-dot-col">
+                    <div className="af-dot" style={{ background: dc.bg, color: dc.color }}><i className={`ti ${item.icon}`} style={{ fontSize: 13 }}></i></div>
+                    {idx < feedItems.length - 1 && <div className="af-line"></div>}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div className="af-title">{item.title}</div>
+                    <div className="af-time"><i className="ti ti-clock" style={{ fontSize: 11 }}></i> {item.time}</div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
     );
   }
@@ -2512,17 +2531,16 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   function renderFeedbackPanel() {
     return (
       <div className="feedback-panel">
-        <div style={{ fontSize: 12, fontWeight: 800, color: C.text2, marginBottom: 4 }}>Rate Our Services</div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 4 }}>How is the project going?</div>
+        <div style={{ fontSize: 12, color: C.text3, marginBottom: 10 }}>Your feedback helps us deliver better.</div>
         <form onSubmit={submitFeedback}>
           <div className="rating-row">
             {[1, 2, 3, 4, 5].map((star) => (
-              <span key={star} className={`star ${feedbackRating >= star ? "active" : ""}`} onClick={() => setFeedbackRating(star)}>
-
-              </span>
+              <span key={star} className={`star ${feedbackRating >= star ? "active" : ""}`} onClick={() => setFeedbackRating(star)}>★</span>
             ))}
           </div>
-          <textarea className="feedback-input" placeholder="Tell us how we can improve…" value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} required></textarea>
-          <button className="feedback-submit" type="submit">Submit Feedback</button>
+          <textarea className="feedback-input" placeholder="Share your thoughts on the design, communication, progress…" value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} required></textarea>
+          <button className="feedback-submit" type="submit"><i className="ti ti-send" style={{ fontSize: 14, marginRight: 4 }}></i> Submit Feedback</button>
         </form>
       </div>
     );
@@ -2534,19 +2552,25 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     const managerName = proj?.manager || proj?.contactPersonName || 'Project Manager';
     const managerPhone = proj?.contactPersonNo || proj?.managerPhone || '';
     const managerEmail = proj?.managerEmail || proj?.contactEmail || '';
+    const initial = (managerName || 'P').trim().charAt(0).toUpperCase();
     return (
       <div className="contact-card">
-        <div className="cc-label">Your Account Manager</div>
-        <div className="cc-name">{managerName}</div>
-        <div className="cc-role">{proj?.managerRole || `Project Lead, ${agencyName}`}</div>
+        <div className="cc-label">Point of Contact</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
+          <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(255,255,255,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800, color: '#fff', flexShrink: 0, border: '2px solid rgba(255,255,255,.3)' }}>{initial}</div>
+          <div>
+            <div className="cc-name">{managerName}</div>
+            <div className="cc-role">{proj?.managerRole || `Project Lead, ${agencyName}`}</div>
+          </div>
+        </div>
         <div className="cc-contacts">
           {managerEmail && <div className="cc-contact-row"><i className="ti ti-mail"></i> {managerEmail}</div>}
           {managerPhone && <div className="cc-contact-row"><i className="ti ti-phone"></i> {managerPhone}</div>}
           {!managerEmail && !managerPhone && <div className="cc-contact-row" style={{ opacity: 0.6 }}><i className="ti ti-info-circle"></i> Contact details not set</div>}
         </div>
         <div className="cc-actions">
-          <button className="cc-btn" onClick={() => setActive("messages")}><i className="ti ti-message-2"></i> Chat</button>
-          <button className="cc-btn" onClick={() => managerPhone ? window.open('tel:' + managerPhone) : alert("Phone not available")}><i className="ti ti-phone-call"></i> Call</button>
+          <button className="cc-btn" onClick={() => setActive("messages")}><i className="ti ti-message-2" style={{ fontSize: 13 }}></i> Message</button>
+          <button className="cc-btn" onClick={() => managerPhone ? window.open('tel:' + managerPhone) : alert("Phone not available")}><i className="ti ti-phone" style={{ fontSize: 13 }}></i> Call</button>
         </div>
       </div>
     );

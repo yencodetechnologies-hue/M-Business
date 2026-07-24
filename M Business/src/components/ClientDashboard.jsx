@@ -1742,23 +1742,23 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       );
     });
 
-    return (
-      <div>
-        {/* Milestone Steps */}
-        <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", padding: 22, marginBottom: 14 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: C.text2, marginBottom: 18 }}>Milestone Progress</div>
-          {milestones.length > 0 ? (
-            <div className="steps-grid" style={{ gridTemplateColumns: `repeat(${milestones.length}, 1fr)` }}>
-              {stepNodes}
-            </div>
-          ) : (
-            <div style={{ textAlign: 'center', color: C.text3, fontSize: 13, padding: '12px 0' }}>
-              No milestones defined for this project yet.
-            </div>
-          )}
-        </div>
+    const milestoneProgressBlock = (
+      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", padding: 22, marginBottom: 14 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: C.text2, marginBottom: 18 }}>Milestone Progress</div>
+        {milestones.length > 0 ? (
+          <div className="steps-grid" style={{ gridTemplateColumns: `repeat(${milestones.length}, 1fr)` }}>
+            {stepNodes}
+          </div>
+        ) : (
+          <div style={{ textAlign: 'center', color: C.text3, fontSize: 13, padding: '12px 0' }}>
+            No milestones defined for this project yet.
+          </div>
+        )}
+      </div>
+    );
 
-        {/* Gantt Chart */}
+    const ganttChartBlock = (
+      <>
         <div className="sec-header" style={{ marginTop: 0, marginBottom: 14 }}>
           <div className="sec-title">
             <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-chart-bar"></i></div>
@@ -1793,8 +1793,10 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             </div>
           </div>
         </div>
-      </div>
+      </>
     );
+
+    return { milestoneProgressBlock, ganttChartBlock };
   }
   function renderTeamComponent() {
     const assigned = Array.isArray(activeProj?.assignedTo) ? activeProj.assignedTo : [];
@@ -1902,7 +1904,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   // footprint/style as the Invoices & Payments card, instead of the large
   // grid used on the dedicated Files tab.
   function renderFilesOverviewComponent() {
-    const recentFiles = allFiles.slice(0, 6);
+    const recentFiles = allFiles.slice(0, 9);
     if (selectedDoc) {
       return (
         <div style={{ display: "flex", flexDirection: "column", background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", padding: 20 }}>
@@ -1936,35 +1938,18 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         </div>
       );
     }
+
     return (
-      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden" }}>
-        <div style={{ maxHeight: 268, overflowY: "auto" }}>
+      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden", padding: "16px 18px" }}>
+        <div className="files-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
           {recentFiles.map((file, idx) => (
-            <div key={idx} className="invoice-item" onClick={() => {
-              if (file.url) {
-                if (file.isLetterhead && file.raw?.htmlContent) { setSelectedDoc(file.raw); }
-                else if (isPreviewableFile(file)) { setPreviewFile(file); }
-                else if (file.url) { window.open(file.url, "_blank", "noopener"); }
-              } else if (file.raw) {
-                setSelectedDoc(file.raw);
-              }
+            <div key={idx} className="file-card" onClick={() => {
+              if (file.isLetterhead && file.raw?.htmlContent) { setSelectedDoc(file.raw); }
+              else if (isPreviewableFile(file)) { setPreviewFile(file); }
+              else if (file.url) { window.open(file.url, "_blank", "noopener"); }
             }}>
-              <div className="inv-icon" style={{ background: file.bg, color: file.col }}><i className={`ti ${file.icon}`}></i></div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="inv-id" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.name}</div>
-                <div className="inv-desc" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.description || file.meta}</div>
-              </div>
-              <div style={{ textAlign: "right", marginRight: 10 }}>
-                <div className="inv-date">{file.date}</div>
-              </div>
-              <div className="inv-dl" title="View" onClick={(e) => {
-                e.stopPropagation();
-                if (!file.url) return;
-                if (file.isLetterhead && file.raw?.htmlContent) { setSelectedDoc(file.raw); }
-                else if (isPreviewableFile(file)) { setPreviewFile(file); }
-                else if (file.url) { window.open(file.url, "_blank", "noopener"); }
-              }}><i className="ti ti-eye"></i></div>
-              <div className="inv-dl" title="Download" style={{ marginLeft: 6 }} onClick={(e) => {
+              {file.isNew && <span className="fc-new-badge">New</span>}
+              <div className="fc-download" title="Download" onClick={(e) => {
                 e.stopPropagation();
                 if (file.isLetterhead && file.raw?.htmlContent) {
                   const blob = new Blob([file.raw.htmlContent], { type: "text/html" });
@@ -1978,15 +1963,20 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                   downloadSingleFile(file);
                 }
               }}><i className="ti ti-download"></i></div>
+              <div className="fc-icon" style={{ background: file.bg, color: file.col }}><i className={`ti ${file.icon}`}></i></div>
+              <div className="fc-name">{file.name}</div>
+              <div className="fc-meta">{file.description || file.meta}</div>
+              <div className="fc-date">{file.date}</div>
             </div>
           ))}
           {recentFiles.length === 0 && (
-            <div style={{ padding: 30, textAlign: "center", color: C.text3, fontSize: 12 }}>No files found.</div>
+            <div style={{ padding: 30, textAlign: "center", color: C.text3, fontSize: 12, gridColumn: "1 / -1" }}>No files found.</div>
           )}
         </div>
       </div>
     );
   }
+
 
   // Render Invoices helper
   function renderInvoicesComponent() {
@@ -2604,9 +2594,15 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     </div>
                   </div>
                   {portalSettings.showMilestones && (
-                    <div style={{ flex: 1, display: "flex", flexDirection: "column" }} id="milestone-progress-block">
-                      {renderTimelineComponent()}
-                    </div>
+                    (() => {
+                      const { milestoneProgressBlock, ganttChartBlock } = renderTimelineComponent();
+                      return (
+                        <div style={{ flex: 1, display: "flex", flexDirection: "column" }} id="milestone-progress-block">
+                          {milestoneProgressBlock}
+                          {ganttChartBlock}
+                        </div>
+                      );
+                    })()
                   )}
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
@@ -2630,7 +2626,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                           Messages & Chat
 
                         </div>
-                        <div className="sec-action" onClick={() => setActive("messages")}><i className="ti ti-arrow-right" style={{ fontSize: 13 }}></i> Open Chat</div>
+
                       </div>
                       {renderMessagesComponent()}
                     </div>
@@ -2639,31 +2635,28 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               </div>
             </div>
 
-            {/* Files & Documents */}
-            <div>
-              <div className="sec-header">
-                <div className="sec-title" onClick={() => setActive('files')} style={{ cursor: 'pointer' }}>
-                  <div className="sec-title-icon" style={{ background: C.blueBg, color: C.blue }}><i className="ti ti-files"></i></div>
-                  Files & Documents
-                </div>
-                <div style={{ display: "flex", gap: 8 }}>
-                  <div className="sec-action" onClick={handleRefresh} style={{ opacity: refreshing ? 0.6 : 1 }}>
-                    <i className={`ti ${refreshing ? "ti-loader-2" : "ti-refresh"}`} style={{ fontSize: 13, animation: refreshing ? "spin 1s linear infinite" : "none" }}></i>
-                    {refreshing ? "Refreshing..." : "Refresh"}
+            {/* Files & Documents and Invoices & Payments */}
+            <div className="two-col" style={{ alignItems: "stretch" }}>
+              {/* Files & Documents */}
+              <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+                <div className="sec-header">
+                  <div className="sec-title" onClick={() => setActive('files')} style={{ cursor: 'pointer' }}>
+                    <div className="sec-title-icon" style={{ background: C.blueBg, color: C.blue }}><i className="ti ti-files"></i></div>
+                    Files & Documents
                   </div>
-                  <div className="sec-action" onClick={handleDownloadAll} style={{ opacity: downloadingAll ? 0.6 : 1, cursor: downloadingAll ? "not-allowed" : "pointer", pointerEvents: downloadingAll ? "none" : "auto" }}>
-                    <i className={`ti ${downloadingAll ? "ti-loader-2" : "ti-download"}`} style={{ fontSize: 13, animation: downloadingAll ? "spin 1s linear infinite" : "none" }}></i>
-                    {downloadingAll ? "Downloading..." : "Download All"}
-                  </div>
-                </div>
-              </div>
-              {renderFilesOverviewComponent()}
-            </div>
+                  <div style={{ display: "flex", gap: 8 }}>
 
-            {/* Invoices and Calendar */}
-            <div className="two-col">
+                    <div className="sec-action" onClick={handleDownloadAll} style={{ opacity: downloadingAll ? 0.6 : 1, cursor: downloadingAll ? "not-allowed" : "pointer", pointerEvents: downloadingAll ? "none" : "auto" }}>
+                      <i className={`ti ${downloadingAll ? "ti-loader-2" : "ti-download"}`} style={{ fontSize: 13, animation: downloadingAll ? "spin 1s linear infinite" : "none" }}></i>
+                      {downloadingAll ? "Downloading..." : "Download All"}
+                    </div>
+                  </div>
+                </div>
+                {renderFilesOverviewComponent()}
+              </div>
+
               {/* Invoices */}
-              <div>
+              <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
                 <div className="sec-header">
                   <div className="sec-title" onClick={() => setActive('payments')} style={{ cursor: 'pointer' }}>
                     <div className="sec-title-icon" style={{ background: C.greenBg, color: C.green }}><i className="ti ti-receipt-2"></i></div>
@@ -2675,8 +2668,12 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 </div>
                 {renderInvoicesComponent()}
               </div>
+            </div>
+            {/* Calendar */}
 
-              {/* Calendar */}
+
+            {/* Meeting Schedule and Point of Contact */}
+            <div className="two-col">
               <div>
                 <div className="sec-header">
                   <div className="sec-title">
@@ -2686,17 +2683,23 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 </div>
                 {renderCalendarComponent()}
               </div>
+              <div>
+                <div className="sec-header">
+                  <div className="sec-title">
+                    <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-user-circle"></i></div>
+                    Point of Contact
+                  </div>
+                </div>
+                {renderContactCard()}
+              </div>
             </div>
 
-            {/* Activity, Feedback and Contact */}
-            <div className="three-col">
+            {/* Activity and Feedback */}
+            <div className="two-col">
               {renderActivityFeed()}
               {renderFeedbackPanel()}
-              {renderContactCard()}
-            </div>
-          </>
+            </div>    </>
         )}
-
         {active === "timeline" && (
           <div>
             <div className="sec-header">
@@ -2706,7 +2709,10 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               </div>
             </div>
             <div className="two-col">
-              {portalSettings.showMilestones && renderTimelineComponent()}
+              {portalSettings.showMilestones && (() => {
+                const { milestoneProgressBlock, ganttChartBlock } = renderTimelineComponent();
+                return <>{milestoneProgressBlock}{ganttChartBlock}</>;
+              })()}
               <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                 {renderApprovalsComponent()}
                 {renderCalendarComponent()}
@@ -3101,106 +3107,111 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         </div>
       </div>
       {/* PROPOSAL VIEWER MODAL */}
-      {viewingProposal && (
-        <ProposalViewerModal
-          proposal={viewingProposal}
-          clientName={clientName}
-          BASE_URL={BASE_URL}
-          onClose={() => setViewingProposal(null)}
-          onSigned={(updated) => {
-            setProposals(prev => prev.map(p => (p._id === updated._id ? updated : p)));
-            setViewingProposal(updated);
-          }}
-        />
-      )}
+      {
+        viewingProposal && (
+          <ProposalViewerModal
+            proposal={viewingProposal}
+            clientName={clientName}
+            BASE_URL={BASE_URL}
+            onClose={() => setViewingProposal(null)}
+            onSigned={(updated) => {
+              setProposals(prev => prev.map(p => (p._id === updated._id ? updated : p)));
+              setViewingProposal(updated);
+            }}
+          />
+        )
+      }
       {/* PAYMENT MODAL (CHECKOUT DIALOG OVERLAY) */}
-      {payModalOpen && paymentInvoice && (
-        <div className="modal-overlay" onClick={() => setPayModalOpen(false)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <span className="modal-title">Complete Payment</span>
-              <button className="modal-close" onClick={() => setPayModalOpen(false)}>&times;</button>
-            </div>
-            <div className="modal-body">
-              <div style={{ background: C.surface2, border: "1px solid " + C.border, borderRadius: 10, padding: 14, textAlign: "center" }}>
-                <div style={{ fontSize: 11, color: C.text3, textTransform: "uppercase", fontWeight: 700, letterSpacing: 0.5 }}>Amount Due</div>
-                <div style={{ fontSize: 28, fontWeight: 900, color: C.text, margin: "6px 0", fontFamily: "Nunito Sans" }}>
-                  ₹{(paymentInvoice.total - (paymentInvoice.amountPaid || 0)).toLocaleString("en-IN")}
-                </div>
-                <div style={{ fontSize: 11, color: C.text2 }}>Invoice {paymentInvoice.invoiceNo}</div>
+      {
+        payModalOpen && paymentInvoice && (
+          <div className="modal-overlay" onClick={() => setPayModalOpen(false)}>
+            <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <span className="modal-title">Complete Payment</span>
+                <button className="modal-close" onClick={() => setPayModalOpen(false)}>&times;</button>
               </div>
-
-              <div style={{ fontSize: 12, fontWeight: 800, color: C.text2, marginTop: 4 }}>Select Payment Method</div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", border: "1.5px solid " + C.teal, borderRadius: 10, cursor: "pointer", background: C.tealLighter }}>
-                  <i className="ti ti-brand-google-play" style={{ fontSize: 20, color: C.teal }}></i>
-                  <div style={{ flex: 1, fontSize: 13, fontWeight: 700, color: C.text }}>Google Pay / UPI</div>
-                  <div style={{ width: 14, height: 14, borderRadius: "50%", background: C.teal, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }}></div>
+              <div className="modal-body">
+                <div style={{ background: C.surface2, border: "1px solid " + C.border, borderRadius: 10, padding: 14, textAlign: "center" }}>
+                  <div style={{ fontSize: 11, color: C.text3, textTransform: "uppercase", fontWeight: 700, letterSpacing: 0.5 }}>Amount Due</div>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: C.text, margin: "6px 0", fontFamily: "Nunito Sans" }}>
+                    ₹{(paymentInvoice.total - (paymentInvoice.amountPaid || 0)).toLocaleString("en-IN")}
                   </div>
+                  <div style={{ fontSize: 11, color: C.text2 }}>Invoice {paymentInvoice.invoiceNo}</div>
                 </div>
 
+                <div style={{ fontSize: 12, fontWeight: 800, color: C.text2, marginTop: 4 }}>Select Payment Method</div>
 
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", border: "1.5px solid " + C.teal, borderRadius: 10, cursor: "pointer", background: C.tealLighter }}>
+                    <i className="ti ti-brand-google-play" style={{ fontSize: 20, color: C.teal }}></i>
+                    <div style={{ flex: 1, fontSize: 13, fontWeight: 700, color: C.text }}>Google Pay / UPI</div>
+                    <div style={{ width: 14, height: 14, borderRadius: "50%", background: C.teal, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }}></div>
+                    </div>
+                  </div>
+
+
+                </div>
+
+                <button onClick={executePayment} disabled={paymentProcessing} style={{ width: "100%", padding: "12px", background: C.teal, color: "#fff", border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: "700", cursor: "pointer", marginTop: 8, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                  {paymentProcessing ? (
+                    <>Processing...</>
+                  ) : (
+                    <>Confirm & Pay ₹{(paymentInvoice.total - (paymentInvoice.amountPaid || 0)).toLocaleString("en-IN")}</>
+                  )}
+                </button>
               </div>
-
-              <button onClick={executePayment} disabled={paymentProcessing} style={{ width: "100%", padding: "12px", background: C.teal, color: "#fff", border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: "700", cursor: "pointer", marginTop: 8, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                {paymentProcessing ? (
-                  <>Processing...</>
-                ) : (
-                  <>Confirm & Pay ₹{(paymentInvoice.total - (paymentInvoice.amountPaid || 0)).toLocaleString("en-IN")}</>
-                )}
-              </button>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* RECEIPT MODAL */}
-      {receiptInvoice && (
-        <div className="modal-overlay" onClick={() => setReceiptInvoice(null)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 480 }}>
-            <div className="modal-header">
-              <span className="modal-title">Payment Receipt</span>
-              <button className="modal-close" onClick={() => setReceiptInvoice(null)}>&times;</button>
-            </div>
-            <div className="modal-body">
-              <div id="receipt-print-area" style={{ background: "#fff", border: "1px solid " + C.border, borderRadius: 12, padding: 24 }}>
-                <div style={{ textAlign: "center", marginBottom: 16 }}>
-                  <div style={{ width: 44, height: 44, borderRadius: "50%", background: C.greenBg, color: C.green, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px" }}>
-                    <i className="ti ti-circle-check" style={{ fontSize: 22 }}></i>
-                  </div>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: C.green }}>Payment Successful</div>
-                </div>
-
-                <div style={{ textAlign: "center", marginBottom: 16, paddingBottom: 16, borderBottom: "1px dashed " + C.border }}>
-                  <div style={{ fontSize: 12, color: C.text3, fontWeight: 700 }}>{agencyName}</div>
-                  <div style={{ fontSize: 22, fontWeight: 900, color: C.text, margin: "4px 0" }}>
-                    ₹{(receiptInvoice.amountPaid || receiptInvoice.total).toLocaleString("en-IN")}
-                  </div>
-                </div>
-
-                {[
-                  ["Client", clientName],
-                  ["Invoice No.", receiptInvoice.invoiceNo],
-                  ["Project", receiptInvoice.project || receiptInvoice.desc || "-"],
-                  ["Payment Method", receiptInvoice.paymentMode || "GPay"],
-                  ["Transaction ID", receiptInvoice.transactionId || "-"],
-                  ["Payment Date", receiptInvoice.paymentDate || receiptInvoice.date || "-"],
-                  ["Status", "Paid"],
-                ].map(([label, val]) => (
-                  <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", fontSize: 13 }}>
-                    <span style={{ color: C.text3, fontWeight: 600 }}>{label}</span>
-                    <span style={{ color: C.text, fontWeight: 700 }}>{val}</span>
-                  </div>
-                ))}
+      {
+        receiptInvoice && (
+          <div className="modal-overlay" onClick={() => setReceiptInvoice(null)}>
+            <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 480 }}>
+              <div className="modal-header">
+                <span className="modal-title">Payment Receipt</span>
+                <button className="modal-close" onClick={() => setReceiptInvoice(null)}>&times;</button>
               </div>
+              <div className="modal-body">
+                <div id="receipt-print-area" style={{ background: "#fff", border: "1px solid " + C.border, borderRadius: 12, padding: 24 }}>
+                  <div style={{ textAlign: "center", marginBottom: 16 }}>
+                    <div style={{ width: 44, height: 44, borderRadius: "50%", background: C.greenBg, color: C.green, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px" }}>
+                      <i className="ti ti-circle-check" style={{ fontSize: 22 }}></i>
+                    </div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: C.green }}>Payment Successful</div>
+                  </div>
 
-              <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
-                <button onClick={() => window.print()} style={{ flex: 1, padding: "11px", background: C.surface2, color: C.text, border: "1px solid " + C.border, borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                  <i className="ti ti-printer"></i> Print
-                </button>
-                <style>{`
+                  <div style={{ textAlign: "center", marginBottom: 16, paddingBottom: 16, borderBottom: "1px dashed " + C.border }}>
+                    <div style={{ fontSize: 12, color: C.text3, fontWeight: 700 }}>{agencyName}</div>
+                    <div style={{ fontSize: 22, fontWeight: 900, color: C.text, margin: "4px 0" }}>
+                      ₹{(receiptInvoice.amountPaid || receiptInvoice.total).toLocaleString("en-IN")}
+                    </div>
+                  </div>
+
+                  {[
+                    ["Client", clientName],
+                    ["Invoice No.", receiptInvoice.invoiceNo],
+                    ["Project", receiptInvoice.project || receiptInvoice.desc || "-"],
+                    ["Payment Method", receiptInvoice.paymentMode || "GPay"],
+                    ["Transaction ID", receiptInvoice.transactionId || "-"],
+                    ["Payment Date", receiptInvoice.paymentDate || receiptInvoice.date || "-"],
+                    ["Status", "Paid"],
+                  ].map(([label, val]) => (
+                    <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", fontSize: 13 }}>
+                      <span style={{ color: C.text3, fontWeight: 600 }}>{label}</span>
+                      <span style={{ color: C.text, fontWeight: 700 }}>{val}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
+                  <button onClick={() => window.print()} style={{ flex: 1, padding: "11px", background: C.surface2, color: C.text, border: "1px solid " + C.border, borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                    <i className="ti ti-printer"></i> Print
+                  </button>
+                  <style>{`
                   @media print {
                     body * { visibility: hidden; }
                     #receipt-print-area, #receipt-print-area * { visibility: visible; }
@@ -3215,32 +3226,35 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     }
                   }
                 `}</style>
-                <button onClick={() => downloadReceiptPdf(receiptInvoice, clientName, agencyName)} style={{ flex: 1, padding: "11px", background: C.teal, color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                  <i className="ti ti-download"></i> Download PDF
-                </button>
+                  <button onClick={() => downloadReceiptPdf(receiptInvoice, clientName, agencyName)} style={{ flex: 1, padding: "11px", background: C.teal, color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                    <i className="ti ti-download"></i> Download PDF
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
-      {previewFile && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,0.75)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => setPreviewFile(null)}>
-          <div style={{ background: "#fff", width: "100%", maxWidth: 900, height: "85vh", borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ padding: "14px 20px", borderBottom: "1px solid " + C.border, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
-              <div style={{ fontSize: 14, fontWeight: 800, color: C.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingRight: 12 }}>{previewFile.name}</div>
-              <button onClick={() => setPreviewFile(null)} style={{ background: C.bg, border: "1px solid " + C.border, color: C.text2, width: 30, height: 30, borderRadius: 8, cursor: "pointer", fontSize: 15, flexShrink: 0 }}>✕</button>
-            </div>
-            <div style={{ flex: 1, background: "#f4f4f4", display: "flex", alignItems: "center", justifyContent: "center", overflow: "auto" }}>
-              {isPreviewableFile(previewFile) === "image" ? (
-                <img src={previewFile.url} alt={previewFile.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
-              ) : (
-                <iframe src={previewFile.url} title={previewFile.name} style={{ width: "100%", height: "100%", border: "none" }} />
-              )}
+      {
+        previewFile && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,0.75)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => setPreviewFile(null)}>
+            <div style={{ background: "#fff", width: "100%", maxWidth: 900, height: "85vh", borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }} onClick={(e) => e.stopPropagation()}>
+              <div style={{ padding: "14px 20px", borderBottom: "1px solid " + C.border, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: C.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingRight: 12 }}>{previewFile.name}</div>
+                <button onClick={() => setPreviewFile(null)} style={{ background: C.bg, border: "1px solid " + C.border, color: C.text2, width: 30, height: 30, borderRadius: 8, cursor: "pointer", fontSize: 15, flexShrink: 0 }}>✕</button>
+              </div>
+              <div style={{ flex: 1, background: "#f4f4f4", display: "flex", alignItems: "center", justifyContent: "center", overflow: "auto" }}>
+                {isPreviewableFile(previewFile) === "image" ? (
+                  <img src={previewFile.url} alt={previewFile.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
+                ) : (
+                  <iframe src={previewFile.url} title={previewFile.name} style={{ width: "100%", height: "100%", border: "none" }} />
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 }

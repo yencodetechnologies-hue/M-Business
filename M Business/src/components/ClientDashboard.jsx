@@ -2204,10 +2204,24 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
   // Render Approvals helper
   function renderApprovalsComponent() {
+    const proj = targetProject || projects[0];
+    const nonApprovalUpdates = (proj?.updates || [])
+      .filter(upd => !upd.isApprovalRequest && (!upd.visibleTo || upd.visibleTo.includes('client') || upd.visibleTo.includes('team')))
+      .map((upd, i) => ({
+        id: 'upd-view-' + i,
+        title: upd.title || upd.text || 'Project Update',
+        desc: upd.text || '',
+        icon: upd.icon || 'ti-speakerphone',
+        senderName: upd.author || '',
+        isPlainUpdate: true,
+        fileUrl: upd.fileUrl || (upd.attachments && upd.attachments[0]?.url) || '',
+        fileName: upd.fileName || (upd.attachments && upd.attachments[0]?.name) || '',
+      }));
+    const combinedItems = [...approvals, ...nonApprovalUpdates];
     return (
       <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden", height: "100%", display: "flex", flexDirection: "column" }}>
         <div style={{ flex: 1, overflowY: "auto" }}>
-          {approvals.map((app) => {
+          {combinedItems.map((app) => {
             const isResponded = app.status === "approved" || app.status === "rejected";
             const respondedDate = app.respondedAt ? new Date(app.respondedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "";
             const respondedTime = app.respondedAt ? new Date(app.respondedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "";
@@ -2230,7 +2244,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 </div>
                 <div className="ai-actions" style={{ alignSelf: 'center', marginLeft: 'auto', flexShrink: 0 }}>
                   <button className="ai-btn" onClick={() => setViewApprovalApp(app)}>View</button>
-                  {!isResponded && (
+                  {!app.isPlainUpdate && !isResponded && (
                     <>
                       <button className="ai-btn approve" onClick={() => handleApprove(app.id)}>
                         <i className="ti ti-check" style={{ fontSize: 12 }}></i> {app.approveLabel || "Approve"}
@@ -2241,7 +2255,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 </div>
               </div>
             );
-          })}         {approvals.length === 0 && (
+          })}         {combinedItems.length === 0 && (
             <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", color: C.text3, fontSize: 12, padding: 24, boxSizing: "border-box" }}>No pending approvals. All caught up!</div>
           )}
         </div>
@@ -2294,29 +2308,31 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                   );
                 })()}
               </div>
-              <div style={{ display: "flex", gap: 8, padding: "14px 20px", borderTop: "1px solid " + C.border }}>
-                <button
-                  className="ai-btn approve"
-                  style={{ flex: 1, padding: "10px", fontSize: 13 }}
-                  onClick={() => {
-                    handleApprove(viewApprovalApp.id);
-                    setViewApprovalApp(null);
-                  }}
-                >
-                  <i className="ti ti-check" style={{ fontSize: 13 }}></i> {viewApprovalApp.approveLabel || "Approve"}
-                </button>
-                <button
-                  className="ai-btn reject"
-                  style={{ flex: 1, padding: "10px", fontSize: 13 }}
-                  onClick={() => {
-                    setRejectModalApp(viewApprovalApp);
-                    setRejectReasonText("");
-                    setViewApprovalApp(null);
-                  }}
-                >
-                  {viewApprovalApp.rejectLabel || "Review"}
-                </button>
-              </div>
+              {!viewApprovalApp.isPlainUpdate && viewApprovalApp.status !== "approved" && viewApprovalApp.status !== "rejected" && (
+                <div style={{ display: "flex", gap: 8, padding: "14px 20px", borderTop: "1px solid " + C.border }}>
+                  <button
+                    className="ai-btn approve"
+                    style={{ flex: 1, padding: "10px", fontSize: 13 }}
+                    onClick={() => {
+                      handleApprove(viewApprovalApp.id);
+                      setViewApprovalApp(null);
+                    }}
+                  >
+                    <i className="ti ti-check" style={{ fontSize: 13 }}></i> {viewApprovalApp.approveLabel || "Approve"}
+                  </button>
+                  <button
+                    className="ai-btn reject"
+                    style={{ flex: 1, padding: "10px", fontSize: 13 }}
+                    onClick={() => {
+                      setRejectModalApp(viewApprovalApp);
+                      setRejectReasonText("");
+                      setViewApprovalApp(null);
+                    }}
+                  >
+                    {viewApprovalApp.rejectLabel || "Review"}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}

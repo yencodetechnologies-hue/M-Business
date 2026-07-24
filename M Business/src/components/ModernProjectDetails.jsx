@@ -425,6 +425,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   });
   const [isCustomUpdateTypeMode, setIsCustomUpdateTypeMode] = useState(false);
   const [customUpdateTypeInput, setCustomUpdateTypeInput] = useState('');
+  const [isCustomEditUpdateTypeMode, setIsCustomEditUpdateTypeMode] = useState(false);
+  const [customEditUpdateTypeInput, setCustomEditUpdateTypeInput] = useState('');
   const [sendToTeam, setSendToTeam] = useState(true);
   const [sendToClient, setSendToClient] = useState(true);
   const [updateSelectedMembers, setUpdateSelectedMembers] = useState([]);
@@ -441,6 +443,20 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showUpdateMembersDropdown]);
+
+  const [showEditUpdateMembersDropdown, setShowEditUpdateMembersDropdown] = useState(false);
+  const editUpdateMembersDropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (!showEditUpdateMembersDropdown) return;
+    const handleClickOutside = (e) => {
+      if (editUpdateMembersDropdownRef.current && !editUpdateMembersDropdownRef.current.contains(e.target)) {
+        setShowEditUpdateMembersDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showEditUpdateMembersDropdown]);
   const [postingUpdate, setPostingUpdate] = useState(false);
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [showEditBudgetModal, setShowEditBudgetModal] = useState(false);
@@ -2710,6 +2726,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                               attachments: (upd.attachments && upd.attachments.length > 0)
                                                 ? [...upd.attachments]
                                                 : (upd.fileUrl ? [{ name: upd.fileName, url: upd.fileUrl, type: upd.fileType }] : []),
+                                              recipients: upd.recipients || [],
+                                              type: upd.type || 'general',
+                                              isApprovalRequest: !!upd.isApprovalRequest,
                                             });
                                           }}
                                           style={{ padding: '4px 10px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#fff', color: P.primary, fontSize: 11, fontWeight: 700, cursor: 'pointer', marginLeft: 'auto' }}
@@ -2794,18 +2813,132 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setEditingUpdate(null)}>
                     <div style={{ background: '#fff', borderRadius: 16, padding: '24px 24px 20px', width: '100%', maxWidth: 520, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
                       <div style={{ fontSize: 16, fontWeight: 800, color: P.textDark, marginBottom: 16 }}>Edit Update</div>
-                      <input
-                        value={editingUpdate.title}
-                        onChange={e => setEditingUpdate(prev => ({ ...prev, title: e.target.value }))}
-                        placeholder="Title"
-                        style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 13, marginBottom: 10, boxSizing: 'border-box' }}
-                      />
-                      <textarea
-                        value={editingUpdate.text}
-                        onChange={e => setEditingUpdate(prev => ({ ...prev, text: e.target.value }))}
-                        placeholder="Update details…"
-                        style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 13, height: 80, resize: 'vertical', marginBottom: 12, boxSizing: 'border-box', fontFamily: 'inherit' }}
-                      />
+
+                      <div style={{ marginBottom: 14 }}>
+                        <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Select Team Members</div>
+                        <div style={{ position: 'relative' }} ref={editUpdateMembersDropdownRef}>
+                          <div
+                            onClick={() => setShowEditUpdateMembersDropdown(v => !v)}
+                            style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.purple}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', background: '#fff', color: (editingUpdate.recipients || []).length ? P.textDark : P.textLight, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxSizing: 'border-box' }}
+                          >
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {(editingUpdate.recipients || []).length === 0 ? '-- Select Team Members --' : editingUpdate.recipients.join(', ')}
+                            </span>
+                            <i className={`ti ${showEditUpdateMembersDropdown ? 'ti-chevron-up' : 'ti-chevron-down'}`} style={{ fontSize: 14, flexShrink: 0, marginLeft: 8 }} />
+                          </div>
+                          {showEditUpdateMembersDropdown && (
+                            <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, background: '#fff', border: `1.5px solid ${P.purple}`, borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 20, maxHeight: 200, overflowY: 'auto' }}>
+                              {(currProject.assignedTo || []).length === 0 && (
+                                <div style={{ padding: '10px 12px', fontSize: 12, color: P.textLight }}>No team members assigned to this project.</div>
+                              )}
+                              {(currProject.assignedTo || []).map((name, i) => {
+                                const checked = (editingUpdate.recipients || []).includes(name);
+                                return (
+                                  <label key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: 13, color: P.textDark, cursor: 'pointer' }}>
+                                    <input type="checkbox" checked={checked} onChange={() => setEditingUpdate(prev => ({ ...prev, recipients: checked ? (prev.recipients || []).filter(n => n !== name) : [...(prev.recipients || []), name] }))} />
+                                    {name}
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', gap: 12, marginBottom: 14, flexWrap: 'wrap' }}>
+                        <div style={{ flex: 1, minWidth: 180 }}>
+                          <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Update Type</div>
+                          {isCustomEditUpdateTypeMode ? (
+                            <input
+                              type="text"
+                              autoFocus
+                              value={customEditUpdateTypeInput}
+                              onChange={e => setCustomEditUpdateTypeInput(e.target.value)}
+                              onKeyDown={e => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  const val = customEditUpdateTypeInput.trim();
+                                  if (!val) return;
+                                  if (!customUpdateTypes.includes(val)) {
+                                    const next = [...customUpdateTypes, val];
+                                    setCustomUpdateTypes(next);
+                                    localStorage.setItem('mb_customUpdateTypes', JSON.stringify(next));
+                                  }
+                                  setEditingUpdate(prev => ({ ...prev, type: val }));
+                                  setIsCustomEditUpdateTypeMode(false);
+                                }
+                              }}
+                              onBlur={() => {
+                                const val = customEditUpdateTypeInput.trim();
+                                if (val) {
+                                  if (!customUpdateTypes.includes(val)) {
+                                    const next = [...customUpdateTypes, val];
+                                    setCustomUpdateTypes(next);
+                                    localStorage.setItem('mb_customUpdateTypes', JSON.stringify(next));
+                                  }
+                                  setEditingUpdate(prev => ({ ...prev, type: val }));
+                                }
+                                setIsCustomEditUpdateTypeMode(false);
+                              }}
+                              placeholder="Enter custom update type"
+                              style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', boxSizing: 'border-box' }}
+                            />
+                          ) : (
+                            <select
+                              value={editingUpdate.type || ''}
+                              onChange={e => {
+                                const val = e.target.value;
+                                if (val === '__custom__') {
+                                  setCustomEditUpdateTypeInput('');
+                                  setIsCustomEditUpdateTypeMode(true);
+                                } else {
+                                  setEditingUpdate(prev => ({ ...prev, type: val }));
+                                }
+                              }}
+                              style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif' }}
+                            >
+                              <option value="">Select update type...</option>
+                              <option value="general">General</option>
+                              <option value="progress">Progress</option>
+                              <option value="billing">Billing</option>
+                              <option value="milestone">Milestone</option>
+                              {customUpdateTypes.map(t => <option key={t} value={t}>{t}</option>)}
+                              <option value="__custom__">+ Custom</option>
+                            </select>
+                          )}
+                        </div>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: P.textMid, cursor: 'pointer', paddingTop: 22, whiteSpace: 'nowrap' }}>
+                          <input
+                            type="checkbox"
+                            checked={!!editingUpdate.isApprovalRequest}
+                            onChange={e => setEditingUpdate(prev => ({ ...prev, isApprovalRequest: e.target.checked }))}
+                            style={{ accentColor: P.primary, width: 15, height: 15, cursor: 'pointer' }}
+                          />
+                          <i className="ti ti-clipboard-check" style={{ fontSize: 14 }} /> Approval Request
+                        </label>
+                      </div>
+
+                      <div style={{ marginBottom: 14 }}>
+                        <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Update Title *</div>
+                        <input
+                          type="text"
+                          value={editingUpdate.title}
+                          onChange={e => setEditingUpdate(prev => ({ ...prev, title: e.target.value }))}
+                          placeholder="e.g. Checkout flow 80% complete"
+                          style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', boxSizing: 'border-box' }}
+                        />
+                      </div>
+
+                      <div style={{ marginBottom: 14 }}>
+                        <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Details</div>
+                        <textarea
+                          value={editingUpdate.text}
+                          onChange={e => setEditingUpdate(prev => ({ ...prev, text: e.target.value }))}
+                          placeholder="What's done, what's next, any blockers or decisions needed..."
+                          rows={3}
+                          style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', boxSizing: 'border-box', resize: 'vertical' }}
+                        />
+                      </div>
                       {editingUpdate.attachments.length > 0 && (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
                           {editingUpdate.attachments.map((att, i) => (
@@ -2863,17 +2996,45 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         <button onClick={() => setEditingUpdate(null)} style={{ padding: '9px 18px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: '#fff', color: P.textDark, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Cancel</button>
                         <button
                           onClick={async () => {
+                            const original = currProject.updates?.[editingUpdate.index] || {};
+                            const wasApprovalRequest = !!original.isApprovalRequest;
+                            const nowApprovalRequest = !!editingUpdate.isApprovalRequest;
                             const updatedUpdates = [...(currProject.updates || [])];
                             updatedUpdates[editingUpdate.index] = {
-                              ...updatedUpdates[editingUpdate.index],
+                              ...original,
                               title: editingUpdate.title,
                               text: editingUpdate.text,
                               attachments: editingUpdate.attachments,
+                              recipients: editingUpdate.recipients || original.recipients || [],
+                              type: editingUpdate.type || original.type || 'general',
+                              isApprovalRequest: nowApprovalRequest,
+                              approvalStatus: nowApprovalRequest ? (original.approvalStatus || 'pending') : undefined,
                             };
                             setCurrProject(prev => ({ ...prev, updates: updatedUpdates }));
                             setEditingUpdate(null);
                             try {
                               await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { updates: updatedUpdates });
+
+                              if (nowApprovalRequest && !wasApprovalRequest && resolvedClientId) {
+                                const approvalCompanyId = user?.companyId || user?.company || user?._id || user?.id || currProject.companyId || '';
+                                await axios.post(`${BASE_URL}/api/approvals`, {
+                                  companyId: approvalCompanyId,
+                                  clientId: resolvedClientId,
+                                  recipientType: 'client',
+                                  senderName: user?.name || user?.clientName || 'Admin',
+                                  title: editingUpdate.title,
+                                  desc: editingUpdate.text,
+                                  icon: 'ti-file-text',
+                                  approveLabel: 'Approve',
+                                  rejectLabel: 'Review',
+                                  sourceType: 'project',
+                                  projectId: currProject._id || '',
+                                  fileUrl: editingUpdate.attachments?.[0]?.url || '',
+                                  fileName: editingUpdate.attachments?.[0]?.name || '',
+                                });
+                                loadProjectApprovals();
+                              }
+
                               if (onUpdate) onUpdate();
                             } catch (err) {
                               console.error('Failed to save update:', err.response?.data || err.message);

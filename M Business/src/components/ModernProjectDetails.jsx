@@ -2071,14 +2071,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   />
                 )}
               </div>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-                <input
-                  type="date"
-                  value={editMilestoneDate}
-                  onChange={e => setEditMilestoneDate(e.target.value)}
-                  style={{ padding: '6px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', flex: 1, background: '#fff', color: editMilestoneDate ? P.textDark : '#A0AEC0', fontFamily: 'Nunito, sans-serif', cursor: 'pointer', minWidth: 140 }}
-                />
-              </div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 8, flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: 140 }}>
                   <label style={{ fontSize: 10, fontWeight: 700, color: P.textLight, display: 'block', marginBottom: 3 }}>Start Date</label>

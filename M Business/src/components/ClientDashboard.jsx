@@ -1859,28 +1859,15 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             </button>
           ))}
         </div>
-        <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden" }}>
+        <div className="files-grid">
           {filteredFiles.map((file, idx) => (
-            <div key={idx} className="invoice-item" onClick={() => {
+            <div key={idx} className="file-card" onClick={() => {
               if (file.isLetterhead && file.raw?.htmlContent) { setSelectedDoc(file.raw); }
               else if (isPreviewableFile(file)) { setPreviewFile(file); }
               else if (file.url) { window.open(file.url, "_blank", "noopener"); }
             }}>
-              <div className="inv-icon" style={{ background: file.bg, color: file.col }}><i className={`ti ${file.icon}`}></i></div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="inv-id" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.name}</div>
-                <div className="inv-desc" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.description || file.meta}</div>
-              </div>
-              <div style={{ textAlign: "right", marginRight: 10 }}>
-                <div className="inv-date">{file.date}</div>
-              </div>
-              <div className="inv-dl" title="View" onClick={(e) => {
-                e.stopPropagation();
-                if (file.isLetterhead && file.raw?.htmlContent) { setSelectedDoc(file.raw); return; }
-                if (!isPreviewableFile(file)) return;
-                setPreviewFile(file);
-              }}><i className="ti ti-eye"></i></div>
-              <div className="inv-dl" title="Download" onClick={(e) => {
+              {file.isNew && <span className="fc-new-badge">New</span>}
+              <div className="fc-download" title="Download" onClick={(e) => {
                 e.stopPropagation();
                 if (file.isLetterhead && file.raw?.htmlContent) {
                   const blob = new Blob([file.raw.htmlContent], { type: "text/html" });
@@ -1894,10 +1881,14 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                   downloadSingleFile(file);
                 }
               }}><i className="ti ti-download"></i></div>
+              <div className="fc-icon" style={{ background: file.bg, color: file.col }}><i className={`ti ${file.icon}`}></i></div>
+              <div className="fc-name">{file.name}</div>
+              <div className="fc-meta">{file.description || file.meta}</div>
+              <div className="fc-date">{file.date}</div>
             </div>
           ))}
           {filteredFiles.length === 0 && (
-            <div style={{ padding: 40, textAlign: "center", color: C.text3 }}>No files found.</div>
+            <div style={{ padding: 40, textAlign: "center", color: C.text3, gridColumn: "1 / -1" }}>No files found.</div>
           )}
         </div>
       </div>

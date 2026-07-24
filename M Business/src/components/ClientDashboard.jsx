@@ -978,22 +978,17 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   ];
 
   // Convert uploaded docs to matching file card format
-  const docCards = docs.map(d => {
-    const sentDate = d.dateSent ? new Date(d.dateSent) : new Date();
-    const isRecent = (Date.now() - sentDate.getTime()) < 3 * 24 * 60 * 60 * 1000;
-    return {
-      name: d.docType ? `${d.docType.charAt(0).toUpperCase() + d.docType.slice(1)}_Document.pdf` : "Document.pdf",
-      meta: `PDF · ${(d.htmlContent?.length ? (d.htmlContent.length / 1024).toFixed(1) : "120")} KB`,
-      date: sentDate.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
-      type: "Documents",
-      icon: "ti-file-type-pdf",
-      bg: C.redBg,
-      col: C.red,
-      raw: d,
-      isLetterhead: true,
-      isNew: isRecent
-    };
-  });
+  const docCards = docs.map(d => ({
+    name: d.docType ? `${d.docType.charAt(0).toUpperCase() + d.docType.slice(1)}_Document.pdf` : "Document.pdf",
+    meta: `PDF · ${(d.htmlContent?.length ? (d.htmlContent.length / 1024).toFixed(1) : "120")} KB`,
+    date: new Date(d.dateSent || Date.now()).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
+    type: "Documents",
+    icon: "ti-file-type-pdf",
+    bg: C.redBg,
+    col: C.red,
+    raw: d,
+    isLetterhead: true
+  }));
 
   const allFilesBase = [...docCards, ...(clientDocuments || []), ...(projects.flatMap(p => p.files || []))
     .filter(f => {
@@ -2237,12 +2232,14 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             const respondedDate = app.respondedAt ? new Date(app.respondedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "";
             const respondedTime = app.respondedAt ? new Date(app.respondedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "";
             return (
-              <div key={app.id} className="approval-item" style={{ flexWrap: 'wrap', alignItems: 'center' }}>
+              <div key={app.id} className="approval-item" style={{ flexWrap: 'nowrap', alignItems: 'center' }}>
                 <div className="ai-icon"><i className={`ti ${app.icon}`}></i></div>
-                <div style={{ flex: 1, minWidth: 160 }}>
+                <div style={{ flex: 1, minWidth: 0, alignSelf: 'center' }}>
                   <div className="ai-title">{app.title}</div>
                   <div className="ai-desc">{app.desc}</div>
                   {app.senderName && <div style={{ fontSize: 10, color: C.text3, marginTop: 2 }}>From {app.senderName}</div>}
+                </div>
+                <div className="ai-actions" style={{ alignSelf: 'center', marginLeft: 'auto', flexShrink: 0 }}>
                   {isResponded && (
                     <div style={{ fontSize: 11, fontWeight: 700, marginTop: 4, color: app.status === "approved" ? C.green : C.red, display: "flex", alignItems: "center", gap: 4 }}>
                       <i className={`ti ${app.status === "approved" ? "ti-circle-check" : "ti-circle-x"}`} style={{ fontSize: 12 }}></i>

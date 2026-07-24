@@ -1002,6 +1002,8 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const [viewClientModal, setViewClientModal] = useState(false);
 
   const [docUploading, setDocUploading] = useState(false);
+  const [editingDocIndex, setEditingDocIndex] = useState(null);
+  const [editingDocName, setEditingDocName] = useState("");
 
   const statusDropRef = useRef(null);
 
@@ -1769,22 +1771,113 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
                 padding: 12, background: "#F5FAFA",
 
-                border: "1.5px solid #E0EEF0", borderRadius: 10, cursor: "pointer"
+                border: "1.5px solid #E0EEF0", borderRadius: 10, position: "relative"
 
               }}>
 
                 <div style={{ fontSize: 22, marginBottom: 8 }}>📄</div>
 
                 <div style={{ fontSize: 11, fontWeight: 700, color: "#1A2E35" }}>
-
                   {d.name || d.fileName || "Document"}
-
                 </div>
 
                 <div style={{ fontSize: 10, color: "#A0B8BE", marginTop: 2 }}>
 
                   {d.size || d.type || "—"}
 
+                </div>
+
+                <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
+                  <label
+                    style={{ flex: 1, padding: "4px 0", fontSize: 10, fontWeight: 700, color: "var(--app-accent, #00BCD4)", background: "#fff", border: "1px solid #C5DDE0", borderRadius: 6, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}
+                  >
+                    <i className="ti ti-edit" style={{ fontSize: 11 }} /> Edit
+                    <input
+                      type="file"
+                      style={{ display: "none" }}
+                      onChange={async (e) => {
+                        const file = e.target.files[0];
+                        e.target.value = "";
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onloadend = async () => {
+                          const base64 = reader.result;
+                          const replacedDoc = {
+                            name: file.name,
+                            fileName: file.name,
+                            type: file.type,
+                            size: (file.size / 1024).toFixed(1) + " KB",
+                            url: base64,
+                            uploadedAt: new Date().toISOString()
+                          };
+                          const currentDocs = activeClient?.documents || activeClient?.docs || [];
+                          const updatedDocs = currentDocs.map((doc, idx) => idx === i ? replacedDoc : doc);
+
+                          let putSucceeded = false;
+                          let res;
+                          try {
+                            res = await axios.put(`${BASE_URL}/api/clients/${activeClient._id}`, { documents: updatedDocs });
+                            putSucceeded = true;
+                          } catch (err) {
+                            console.error("Replace document PUT request failed:", err);
+                          }
+
+                          if (putSucceeded) {
+                            try {
+                              const savedClient = res?.data?.client;
+                              setActiveClient(prev => savedClient ? savedClient : { ...prev, documents: updatedDocs });
+                              setClients(prev => prev.map(c => c._id === activeClient._id ? (savedClient || { ...c, documents: updatedDocs }) : c));
+                            } catch (stateErr) {
+                              console.error("Replace document succeeded but local state update failed:", stateErr);
+                            }
+                            showToast("Yes Document replaced!");
+                          } else {
+                            showToast("❌ Failed to replace document!");
+                          }
+                        };
+                        reader.onerror = () => showToast("❌ Failed to read file!");
+                        reader.readAsDataURL(file);
+                      }}
+                    />
+                  </label>
+               <button
+                    onClick={async () => {
+                      if (!window.confirm("Delete this document?")) return;
+                      const currentDocs = activeClient?.documents || activeClient?.docs || [];
+                      const updatedDocs = currentDocs.filter((_, idx) => idx !== i);
+
+                      // Update UI immediately so the card disappears right away,
+                      // without waiting for the network round trip.
+                      setActiveClient(prev => ({ ...prev, documents: updatedDocs }));
+                      setClients(prev => prev.map(c => c._id === activeClient._id ? { ...c, documents: updatedDocs } : c));
+
+                      let putSucceeded = false;
+                      let res;
+                      try {
+                        res = await axios.put(`${BASE_URL}/api/clients/${activeClient._id}`, { documents: updatedDocs });
+                        putSucceeded = true;
+                      } catch (err) {
+                        console.error("Delete document PUT request failed:", err);
+                      }
+
+                      if (putSucceeded) {
+                        const savedClient = res?.data?.client;
+                        if (savedClient) {
+                          setActiveClient(savedClient);
+                          setClients(prev => prev.map(c => c._id === activeClient._id ? savedClient : c));
+                        }
+                        showToast("Yes Document deleted!");
+                      } else {
+                        // Roll back the optimistic removal since the delete didn't actually save.
+                        setActiveClient(prev => ({ ...prev, documents: currentDocs }));
+                        setClients(prev => prev.map(c => c._id === activeClient._id ? { ...c, documents: currentDocs } : c));
+                        showToast("❌ Failed to delete document!");
+                      }
+                    }}
+                    style={{ flex: 1, padding: "4px 0", fontSize: 10, fontWeight: 700, color: "#EF4444", background: "#fff", border: "1px solid #FECACA", borderRadius: 6, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}
+                  >
+                    <i className="ti ti-trash" style={{ fontSize: 11 }} /> Delete
+                  </button>
                 </div>
 
               </div>

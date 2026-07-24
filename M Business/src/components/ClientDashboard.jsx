@@ -1857,14 +1857,14 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     });
 
     const milestoneProgressBlock = (
-      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", padding: 22, marginBottom: 14 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: C.text2, marginBottom: 18 }}>Milestone Progress</div>
+      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", padding: 22, marginBottom: 0, height: 233, boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
+
         {milestones.length > 0 ? (
           <div className="steps-grid" style={{ gridTemplateColumns: `repeat(${milestones.length}, 1fr)` }}>
             {stepNodes}
           </div>
         ) : (
-          <div style={{ minHeight: 120, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", color: C.text3, fontSize: 12, padding: 24, boxSizing: "border-box" }} key="milestone-empty-state">
+          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", color: C.text3, fontSize: 12, padding: 24, boxSizing: "border-box" }} key="milestone-empty-state">
             No milestones assigned. All caught up!
           </div>
         )}
@@ -2098,25 +2098,14 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     const firstUnpaid = unpaidInvoices[0];
 
     return (
-      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden" }}>
-        {/* Summary Bar */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", padding: "14px 18px", background: C.surface2, borderBottom: "1px solid " + C.border, gap: 0 }}>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: "16px", fontWeight: "800", color: C.green }}>₹{totalPaid.toLocaleString("en-IN")}</div>
-            <div style={{ fontSize: "10px", color: C.text3, fontWeight: "600", marginTop: "1px" }}>Paid</div>
-          </div>
-          <div style={{ textAlign: "center", borderLeft: "1px solid " + C.border, borderRight: "1px solid " + C.border }}>
-            <div style={{ fontSize: "16px", fontWeight: "800", color: C.amber }}>₹{totalPending.toLocaleString("en-IN")}</div>
-            <div style={{ fontSize: "10px", color: C.text3, fontWeight: "600", marginTop: "1px" }}>Pending</div>
-          </div>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: "16px", fontWeight: "800", color: C.text }}>₹{totalInvoiced.toLocaleString("en-IN")}</div>
-            <div style={{ fontSize: "10px", color: C.text3, fontWeight: "600", marginTop: "1px" }}>Total</div>
-          </div>
-        </div>
-
+      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden", height: "100%", display: "flex", flexDirection: "column" }}>
         {/* Invoices List */}
-        <div style={{ maxHeight: 340, overflowY: 'auto' }}>
+        <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
+          {finalInvoicesList.length === 0 && (
+            <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", color: C.text3, fontSize: 12, padding: 24, boxSizing: "border-box" }}>
+              No Invoices Found
+            </div>
+          )}
           {finalInvoicesList.map((inv) => (
             <div key={inv.id} className="invoice-item" onClick={() => {
               if (inv.status !== "paid") {
@@ -2139,24 +2128,24 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 <div className="inv-date">{inv.status === "paid" ? inv.date : `Due ${inv.dueDate}`}</div>
               </div>
               <span className={`badge ${inv.status}`}>{inv.status}</span>
-              <div className="inv-dl" title={inv.status === "paid" ? "Download Receipt" : "Not yet paid"} style={{ marginLeft: "8px" }} onClick={(e) => {
-                e.stopPropagation();
-                if (inv.status === "paid") setReceiptInvoice(inv);
-              }}>
-                <i className={inv.status === "paid" ? "ti ti-receipt" : "ti ti-download"}></i>
-              </div>
+              {inv.status !== "paid" ? (
+                <button
+                  onClick={(e) => { e.stopPropagation(); startPayment(inv); }}
+                  style={{ marginLeft: "8px", padding: "6px 12px", background: C.teal, color: "#fff", border: "none", borderRadius: "8px", fontSize: "11px", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap", flexShrink: 0 }}
+                >
+                  <i className="ti ti-credit-card" style={{ fontSize: "12px" }}></i> Pay
+                </button>
+              ) : (
+                <div className="inv-dl" title="Download Receipt" style={{ marginLeft: "8px" }} onClick={(e) => {
+                  e.stopPropagation();
+                  setReceiptInvoice(inv);
+                }}>
+                  <i className="ti ti-receipt"></i>
+                </div>
+              )}
             </div>
           ))}
         </div>
-
-        {/* Pay Now Button */}
-        {firstUnpaid && (
-          <div style={{ padding: "14px 18px", borderTop: "1px solid " + C.border, background: C.surface2 }}>
-            <button onClick={() => startPayment(firstUnpaid)} style={{ width: "100%", padding: "11px", background: C.teal, color: "#fff", border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", boxShadow: "0 3px 10px rgba(0,188,212,.25)" }}>
-              <i className="ti ti-credit-card" style={{ fontSize: "15px" }}></i> Pay ₹{(firstUnpaid.total - firstUnpaid.amountPaid).toLocaleString("en-IN")} Now
-            </button>
-          </div>
-        )}
       </div>
     );
   }
@@ -2332,7 +2321,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       }));
     const combinedItems = [...approvals, ...nonApprovalUpdates];
     return (
-      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden", height: "100%", display: "flex", flexDirection: "column" }}>
+      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", padding: 22, marginBottom: 0, height: 233, boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
         <div style={{ flex: 1, overflowY: "auto" }}>
           {combinedItems.map((app) => {
             const isResponded = app.status === "approved" || app.status === "rejected";
@@ -2777,12 +2766,12 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                       Project Timeline
                     </div>
                   </div>
-                  {portalSettings.showMilestones && (() => {
+                  {(() => {
                     const { milestoneProgressBlock, ganttChartBlock } = renderTimelineComponent();
                     return (
                       <div style={{ flex: 1, display: "flex", flexDirection: "column", opacity: 1 }} id="milestone-progress-block">
                         {milestoneProgressBlock}
-                        {ganttChartBlock}
+                        {portalSettings.showMilestones && ganttChartBlock}
                       </div>
                     );
                   })()}
@@ -2848,7 +2837,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     <i className="ti ti-arrow-right" style={{ fontSize: 13 }}></i> View All
                   </div>
                 </div>
-                {renderInvoicesComponent()}
+                <div style={{ flex: 1, minHeight: 0 }}>{renderInvoicesComponent()}</div>
               </div>
             </div>
             {/* Calendar */}
@@ -2877,15 +2866,15 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             </div>
             {/* Activity and Feedback */}
             <div>
-              <div className="sec-header">
-                <div className="sec-title">
-                  <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-history"></i></div>
-                  Activity & Feedback
-                </div>
-              </div>
               <div className="two-col" style={{ alignItems: "stretch" }}>
                 <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-                  <div className="activity-feed" style={{ flex: 1 }}>
+                  <div className="sec-header">
+                    <div className="sec-title">
+                      <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-history"></i></div>
+                      Activity & Feedback
+                    </div>
+                  </div>
+                  <div className="activity-feed" style={{ flex: 1, display: "flex", flexDirection: "column" }}>
                     {(() => {
                       const proj = targetProject || projects[0];
                       const projUpdates = (proj?.updates || [])
@@ -2912,7 +2901,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                         'ti-calendar': { bg: C.blueBg, color: C.blue },
                       };
                       return feedItems.length === 0 ? (
-                        <div style={{ fontSize: 12, color: C.text3, textAlign: 'center', padding: '12px 0' }}>No recent activity.</div>
+                        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: C.text3, textAlign: 'center' }}>No recent activity.</div>
                       ) : (
                         feedItems.map((item, idx) => {
                           const dc = dotColors[item.icon] || { bg: C.tealLight, color: C.teal };
@@ -2940,7 +2929,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                       Feedback
                     </div>
                   </div>
-                  <div style={{ flex: 1 }}>{renderFeedbackPanel()}</div>
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>{renderFeedbackPanel()}</div>
                 </div>
               </div>
             </div>    </>

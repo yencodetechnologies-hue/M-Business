@@ -2197,12 +2197,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
 
         {/* MAIN CONTENT GRID */}
-        <div className="mpd-grid-main-side">
+        <div className="mpd-grid-main-side" style={{ marginTop: 32 }}>
           {/* RIGHT COL — TASKS */}
-
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', order: 2 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', order: 2, marginLeft: 20, flex: '1 1 0%', minWidth: 0 }}>
             {/* TASKS COMPONENT */}
-            <div className="mpd-card" style={{ padding: 0, overflow: 'hidden', marginBottom: 20, display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+            <div className="mpd-card" style={{ padding: 0, overflow: 'hidden', marginBottom: 20, display: 'flex', flexDirection: 'column', height: 420, maxHeight: 420, boxSizing: 'border-box' }}>
               <div className="mpd-card-header" style={{ padding: '20px 24px 10px', marginBottom: 0 }}>
                 <div className="mpd-card-title"><i className="ti ti-list-check"></i> Tasks</div>
                 {!hideTopActions && (
@@ -2224,7 +2223,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   filteredTasks.map(t => {
                     const isDone = t.status === 'done' || t.status === 'completed' || t.checked === true;
                     return (
-                      <div key={t._id} className="mpd-task-row" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 0', borderBottom: `1px solid ${P.bg}` }}>
+                      <div key={t._id} className="mpd-task-row" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px', marginBottom: 8, borderRadius: 10, background: '#fff' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, cursor: 'pointer' }} onClick={() => handleToggleTask(t)}>
                           <div className={`mpd-task-chk ${isDone ? 'mpd-done' : ''}`}></div>
                           <div className={`mpd-task-prio ${t.priority === 'high' ? 'mpd-h' : (t.priority === 'medium' ? 'mpd-m' : 'mpd-l')}`}></div>
@@ -2301,11 +2300,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           </div>
 
           {/* LEFT COL — TABS (Updates / Activity Logs / Accounts) */}
-          <div style={{ order: 1 }}>
+          <div style={{ order: 1, marginRight: 20, flex: '1.6 1 0%', minWidth: 0 }}>
             {/* TABS - draggable scroll */}
-            <div className="mpd-card">          <div className="mpd-tabs"
+            <div className="mpd-card" style={{ padding: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: 420, maxHeight: 420, boxSizing: 'border-box' }}>          <div className="mpd-tabs"
               ref={tabsRef}
-              style={{ overflowX: 'auto', scrollbarWidth: 'none' }}
+              style={{ overflowX: 'auto', scrollbarWidth: 'none', marginBottom: 4 }}
             >
               {tabOrder.map(tab => {
                 let lbl = '', icon = null;
@@ -2346,7 +2345,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   className="mpd-btn mpd-btn-primary"
                   style={{ padding: '5px 12px', fontSize: 12, whiteSpace: 'nowrap' }}
                 >
-                  <i className="ti ti-plus" style={{ marginRight: 4 }}></i> Add/Update
+                  <i className="ti ti-plus" style={{ marginRight: 4 }}></i>Add Update
                 </button>
                 <span
                   onClick={() => {
@@ -2360,7 +2359,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 </span>
               </div>
             </div>
-              <div ref={tabContentRef} style={{ userSelect: 'none', overflow: 'visible', minHeight: 620 }}>
+              <div ref={tabContentRef} style={{ userSelect: 'none', overflowY: 'auto', flex: 1, minHeight: 0, padding: '0 4px', boxSizing: 'border-box' }}>
                 <div className={`mpd-tab-pane ${activeTab === 'activity' ? 'mpd-active' : ''}`}>
                   <div style={{ padding: '12px 16px', color: P.textLight, fontSize: 13 }}>
                     {(currProject.updates && currProject.updates.length > 0) ? (() => {
@@ -2919,7 +2918,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
                 {/* ── PAYMENTS TAB ── */}
                 <div className={`mpd-tab-pane ${activeTab === 'payments' ? 'mpd-active' : ''}`}>
-                  <div style={{ padding: '18px 0', overflow: 'visible' }}>
+                  <div style={{ padding: '18px 16px', overflow: 'visible', boxSizing: 'border-box' }}>
 
                     {/* STATS ROW */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 20, width: '100%' }}>

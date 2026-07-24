@@ -1740,7 +1740,16 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             </div>
           </div>
 
-          {user?.role !== 'client' && (
+          {user?.role === 'client' ? (
+            <div style={{ background: `linear-gradient(135deg, #004D5E, ${P.primary})`, borderRadius: P.radius, padding: '16px 22px', color: '#fff', flex: '1 1 50%', minWidth: 0, width: '100%', height: '100%', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+                <i className="ti ti-briefcase" style={{ fontSize: 17 }}></i> Project Status
+              </div>
+              <div style={{ fontSize: 13, opacity: 0.85, lineHeight: 1.5 }}>
+                Your project is currently <strong style={{ color: '#fff' }}>{currProject.status || 'Active'}</strong>. Reach out to your project manager any time from the Messages tab.
+              </div>
+            </div>
+          ) : (
             <div style={{ background: `linear-gradient(135deg, #004D5E, ${P.primary})`, borderRadius: P.radius, padding: '16px 22px', color: '#fff', flex: '1 1 50%', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 800, marginBottom: 8 }}>
                 <i className="ti ti-world" style={{ fontSize: 16 }}></i> Client Portal

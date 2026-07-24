@@ -978,17 +978,22 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   ];
 
   // Convert uploaded docs to matching file card format
-  const docCards = docs.map(d => ({
-    name: d.docType ? `${d.docType.charAt(0).toUpperCase() + d.docType.slice(1)}_Document.pdf` : "Document.pdf",
-    meta: `PDF · ${(d.htmlContent?.length ? (d.htmlContent.length / 1024).toFixed(1) : "120")} KB`,
-    date: new Date(d.dateSent || Date.now()).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
-    type: "Documents",
-    icon: "ti-file-type-pdf",
-    bg: C.redBg,
-    col: C.red,
-    raw: d,
-    isLetterhead: true
-  }));
+  const docCards = docs.map(d => {
+    const sentDate = d.dateSent ? new Date(d.dateSent) : new Date();
+    const isRecent = (Date.now() - sentDate.getTime()) < 3 * 24 * 60 * 60 * 1000;
+    return {
+      name: d.docType ? `${d.docType.charAt(0).toUpperCase() + d.docType.slice(1)}_Document.pdf` : "Document.pdf",
+      meta: `PDF · ${(d.htmlContent?.length ? (d.htmlContent.length / 1024).toFixed(1) : "120")} KB`,
+      date: sentDate.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
+      type: "Documents",
+      icon: "ti-file-type-pdf",
+      bg: C.redBg,
+      col: C.red,
+      raw: d,
+      isLetterhead: true,
+      isNew: isRecent
+    };
+  });
 
   const allFilesBase = [...docCards, ...(clientDocuments || []), ...(projects.flatMap(p => p.files || []))
     .filter(f => {
@@ -1019,6 +1024,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       if (/invoice/i.test(fname)) {
         fileType = 'Invoices';
       }
+      const uploadedDate = f.uploadedAt ? new Date(f.uploadedAt) : null;
+      const isRecent = uploadedDate && (Date.now() - uploadedDate.getTime()) < 3 * 24 * 60 * 60 * 1000;
       return {
         name: f.name || f.heading || 'File',
         meta: f.size ? `${Math.round(f.size / 1024)} KB` : (f.type || 'File'),
@@ -1028,7 +1035,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         bg,
         col,
         url: f.url,
-        description: f.description || ''
+        description: f.description || '',
+        isNew: isRecent
       };
     })];
 

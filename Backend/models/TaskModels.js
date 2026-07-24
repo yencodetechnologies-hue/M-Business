@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 
 const taskSchema = new mongoose.Schema(
   {
-    title:         { type: String, required: true, trim: true },
-    description:   { type: String, default: "" },
-    notes:         { type: String, default: "" },
+    title: { type: String, required: true, trim: true },
+    description: { type: String, default: "" },
+    notes: { type: String, default: "" },
     status: {
       type: String,
       default: "Not Started",
@@ -13,26 +13,26 @@ const taskSchema = new mongoose.Schema(
       type: String,
       default: "—",
     },
-assignTo:      { type: String, default: "Unassigned", set: v => Array.isArray(v) ? v.join(', ') : (v || "Unassigned") },
-    assignedTo:    [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    invitedMembers: [{ 
+    assignTo: { type: String, default: "Unassigned", set: v => Array.isArray(v) ? v.join(', ') : (v || "Unassigned") },
+    assignedTo: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    invitedMembers: [{
       email: { type: String, required: true },
       status: { type: String, enum: ["pending", "accepted", "rejected"], default: "pending" },
       invitedAt: { type: Date, default: Date.now },
       invitedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
     }],
-    autoAssign:    { type: Boolean, default: false },
-    type:          { type: String, default: "" },
-    milestone:     { type: String, default: "" },
-    date:          { type: String, default: "" },
-    time:          { type: String, default: "" },
+    autoAssign: { type: Boolean, default: false },
+    type: { type: String, default: "" },
+    milestone: { type: String, default: "" },
+    date: { type: String, default: "" },
+    time: { type: String, default: "" },
     estimatedTime: { type: String, default: "" },
-    checked:       { type: Boolean, default: false },
-    groupId:       { type: mongoose.Schema.Types.ObjectId, ref: "Group", required: true },
-    projectId:     { type: mongoose.Schema.Types.ObjectId, ref: "Project", default: null },
-    isDeleted:     { type: Boolean, default: false },
-    order:         { type: Number, default: 0 },
-    companyId:     { type: String, default: "" },
+    checked: { type: Boolean, default: false },
+    groupId: { type: mongoose.Schema.Types.ObjectId, ref: "Group", required: true },
+    projectId: { type: mongoose.Schema.Types.ObjectId, ref: "Project", required: true },
+    isDeleted: { type: Boolean, default: false },
+    order: { type: Number, default: 0 },
+    companyId: { type: String, default: "" },
     integrations: {
       gmail: { type: Boolean, default: false },
       slack: { type: Boolean, default: false },
@@ -42,7 +42,7 @@ assignTo:      { type: String, default: "Unassigned", set: v => Array.isArray(v)
     },
     subtasks: [{
       title: { type: String, required: true },
-      done:  { type: Boolean, default: false }
+      done: { type: Boolean, default: false }
     }],
     comments: [{
       user: { type: String, required: true },

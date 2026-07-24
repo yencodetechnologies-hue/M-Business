@@ -4482,7 +4482,7 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
         }}
 
-  onClickProject={(p) => {
+        onClickProject={(p) => {
           if (!p || (!p._id && !p.id)) return;
           onViewProject && onViewProject(p);
         }}

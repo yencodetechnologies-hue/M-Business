@@ -935,7 +935,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const projTasks = currTasks.filter(t => {
     if (!t || t.isDeleted) return false;
     const tPid = t.projectId ? (t.projectId._id ? String(t.projectId._id) : String(t.projectId)) : null;
-    return tPid === _pid || t.project === projName;
+    return tPid === _pid;
   });
   const totalTasks = projTasks.length || 0;
   const doneTasks = projTasks.filter(t => t.status === 'done' || t.status === 'completed').length || 0;
@@ -945,7 +945,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   // Milestone progress — drives the Overall Progress bar (milestone-only, not task-only)
   const milestonesArr = currProject.milestones || [];
   const doneMilestones = milestonesArr.filter(m => {
-    const mTasks = currTasks.filter(t => t.milestone === m.name && !t.isDeleted);
+    const mTasks = projTasks.filter(t => t.milestone === m.name && !t.isDeleted);
     const allTasksCompleted = mTasks.length > 0 && mTasks.every(t => t.status === 'done' || t.status === 'completed');
     // Count as done if manually marked done (works even with no tasks), OR if all its tasks are completed
     return m.done === true || allTasksCompleted;
@@ -1298,7 +1298,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     setEditMilestoneName(m.name || '');
     setEditMilestoneDate(m.date || '');
     const isPreset = MILESTONE_OPTIONS.filter(o => o !== "Custom").includes(m.name);
-    setIsCustomEditMilestoneMode(false);
+    setIsCustomEditMilestoneMode(!isPreset && !!m.name);
   };
 
   const handleUpdateMilestone = async (e) => {
@@ -1912,12 +1912,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', minWidth: Math.max(300, (currProject.milestones || []).length * 100) }}>
                 <div style={{ position: 'absolute', top: 18, left: '5%', right: '5%', height: 2, background: P.border, zIndex: 0 }} />
                 {(currProject.milestones || []).map((m, idx) => {
-                  const tasksForMilestone = currTasks.filter(t => t.milestone === m.name && !t.isDeleted);
+                  const tasksForMilestone = projTasks.filter(t => t.milestone === m.name && !t.isDeleted);
                   const allTasksCompleted = tasksForMilestone.length > 0 && tasksForMilestone.every(t => t.status === 'done' || t.status === 'completed');
                   const isDone = m.done === true || allTasksCompleted;
 
                   const firstNotDone = (currProject.milestones || []).findIndex(x => {
-                    const mTasks = currTasks.filter(t => t.milestone === x.name && !t.isDeleted);
+                    const mTasks = projTasks.filter(t => t.milestone === x.name && !t.isDeleted);
                     const mAllCompleted = mTasks.length > 0 && mTasks.every(t => t.status === 'done' || t.status === 'completed');
                     // A milestone with no tasks is never "done" — it's always pending
                     const xIsDone = mTasks.length > 0 ? (x.done === true || mAllCompleted) : false;
@@ -1988,12 +1988,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             /* LIST VIEW */
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '4px 0' }}>
               {(currProject.milestones || []).map((m, idx) => {
-                const tasksForMilestone = currTasks.filter(t => t.milestone === m.name && !t.isDeleted);
+                const tasksForMilestone = projTasks.filter(t => t.milestone === m.name && !t.isDeleted);
                 const allTasksCompleted = tasksForMilestone.length > 0 && tasksForMilestone.every(t => t.status === 'done' || t.status === 'completed');
                 // Only mark done if tasks exist AND all are completed, OR manually toggled with tasks present
                 const isDone = m.done === true || allTasksCompleted;
                 const firstNotDone = (currProject.milestones || []).findIndex(x => {
-                  const mTasks = currTasks.filter(t => t.milestone === x.name && !t.isDeleted);
+                  const mTasks = projTasks.filter(t => t.milestone === x.name && !t.isDeleted);
                   const mAllCompleted = mTasks.length > 0 && mTasks.every(t => t.status === 'done' || t.status === 'completed');
                   return x.done !== true && !mAllCompleted;
                 });

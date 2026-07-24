@@ -139,6 +139,7 @@ exports.createTask = async (req, res) => {
     } = req.body;
 
     const companyId = req.companyId || "";
+    if (!projectId) return res.status(400).json({ message: "projectId is required to create a task" });
     const group = await Group.findOne({ _id: groupId, isDeleted: false, companyId });
     if (!group) return res.status(400).json({ message: "Group not found or unauthorized" });
 

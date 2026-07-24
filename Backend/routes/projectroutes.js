@@ -359,16 +359,25 @@ router.put("/:id", async (req, res) => {
     }
 
     const companyId = req.companyId || "";
-    const project = await Project.findOne({ _id: rawId, companyId });
-    if (!project) return res.status(404).json({ msg: "Project not found or unauthorized" });
+    const existingProject = await Project.findOne({ _id: rawId, companyId });
+    if (!existingProject) return res.status(404).json({ msg: "Project not found or unauthorized" });
 
-    Object.keys(updateData).forEach(key => {
-      project[key] = updateData[key];
-    });
-    if (updateData.portalSettings) {
-      project.markModified('portalSettings');
+    let project;
+    try {
+      Object.keys(updateData).forEach(key => {
+        existingProject[key] = updateData[key];
+      });
+      if (updateData.portalSettings) {
+        existingProject.markModified('portalSettings');
+      }
+      project = await existingProject.save();
+    } catch (saveErr) {
+      console.error("PUT project validation error:", saveErr.errors ? JSON.stringify(saveErr.errors, null, 2) : saveErr.message);
+      if (saveErr.name === "ValidationError") {
+        return res.status(400).json({ msg: "Validation failed", error: saveErr.message, fields: Object.keys(saveErr.errors || {}) });
+      }
+      throw saveErr;
     }
-    await project.save();
 
     // Auto-update Project Status tracking entry
     try {

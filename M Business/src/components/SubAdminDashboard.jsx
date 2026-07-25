@@ -11421,7 +11421,25 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 }}
 
-                onUpdate={async () => { await fetchProjects(); await fetchTasks(); }}
+onUpdate={async (payload) => {
+  try {
+    if (payload && payload._id) {
+      const res = await axios.put(`${BASE_URL}/api/projects/${payload._id}`, payload);
+      const saved = res.data?.project || res.data;
+      await fetchProjects();
+      await fetchTasks();
+      const returnTo = sidebarOverride || "projects";
+      setSidebarOverride(null);
+      setActive(returnTo);
+      return saved;
+    } else {
+      await fetchProjects();
+      await fetchTasks();
+    }
+  } catch (e) {
+    console.error("Failed to update project:", e);
+  }
+}}
 
                 fetchTasks={fetchTasks}
 

@@ -3564,7 +3564,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 }
               }}
               className="mpd-btn mpd-btn-primary"
-              style={{ marginTop: 16 }}
+              style={{ marginTop: 16, width: 'auto', alignSelf: 'flex-start', padding: '10px 20px' }}
             >
               <i className="ti ti-device-floppy"></i> Update Project
             </button>

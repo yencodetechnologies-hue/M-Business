@@ -1181,7 +1181,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const activeProjDesc = activeProj?.description || "";
   const activeProjDeadline = activeProj?.deadline || activeProj?.end || "";
   const activeProjStatus = activeProj?.status || "";
-  const portalSettings = activeProj?.portalSettings || { enablePortal: true, showProgress: true, showMilestones: true, showTeam: false, allowMessages: true };
+  const portalSettings = { enablePortal: true, showProgress: true, showMilestones: true, ...(activeProj?.portalSettings || {}), showTeam: false, allowMessages: true };
 
   // If this portal link is tied to a specific project and that project has
   // had its client portal explicitly disabled, block access entirely rather
@@ -1783,7 +1783,14 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       return new Date(pStart.getTime() + fallbackSpanMs * frac);
     });
 
-    const ganttRows = milestones.map((m, idx) => {
+    const taskGanttItems = (Array.isArray(activeProj?.tasksList) ? activeProj.tasksList : (Array.isArray(tasks) ? tasks.filter(t => String(t.projectId || t.project) === String(activeProj?._id)) : [])).map(t => ({
+      name: t.title || t.name || 'Untitled Task',
+      date: t.dueDate || t.date || '',
+      startDate: t.startDate || t.createdAt || t.date || '',
+      done: t.status === 'Completed' || t.completed === true
+    }));
+    const ganttItems = [...taskGanttItems];
+    const ganttRows = ganttItems.map((m, idx) => {
       const prevMilestone = idx > 0 ? milestones[idx - 1] : null;
       const barStart = prevMilestone ? (prevMilestone.date ? new Date(prevMilestone.date) : resolvedDates[idx - 1]) : pStart;
       const barEnd = resolvedDates[idx];
@@ -2641,7 +2648,21 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       time: n.createdAt ? new Date(n.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
       icon: 'ti-bell'
     }));
-    const feedItems = [...projUpdates, ...notifItems].slice(0, 4);
+    const fileItems = (proj?.files || []).slice(0, 6).map((f, i) => ({
+      id: 'file-' + i,
+      title: `${f.uploadedBy || 'Someone'} uploaded ${f.name || 'a file'}`,
+      time: f.date ? new Date(f.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
+      icon: 'ti-upload'
+    }));
+    const milestoneItems = (proj?.milestones || []).filter(m => m.done).slice(0, 6).map((m, i) => ({
+      id: 'ms-' + i,
+      title: `Milestone ${m.name} completed`,
+      time: m.date ? new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
+      icon: 'ti-flag'
+    }));
+    const feedItems = [...fileItems, ...milestoneItems, ...projUpdates, ...notifItems]
+      .sort((a, b) => new Date(b.time) - new Date(a.time))
+      .slice(0, 4);
 
     const dotColors = {
       'ti-speakerphone': { bg: C.tealLight, color: C.teal },
@@ -2791,11 +2812,13 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     </div>
 
                     {/* Row 2: Gantt Chart | Messages & Chat */}
-                    {portalSettings.showMilestones && (
+                    {(portalSettings.showMilestones || portalSettings.allowMessages) && (
                       <div className="two-col" style={{ alignItems: "stretch" }}>
-                        <div style={{ display: "flex", flexDirection: "column" }}>
-                          {ganttChartBlock}
-                        </div>
+                        {portalSettings.showMilestones && (
+                          <div style={{ display: "flex", flexDirection: "column" }}>
+                            {ganttChartBlock}
+                          </div>
+                        )}
                         {portalSettings.allowMessages && (
                           <div style={{ display: "flex", flexDirection: "column" }}>
                             <div className="sec-header" style={{ marginBottom: 14 }}>
@@ -2900,7 +2923,21 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                         time: n.createdAt ? new Date(n.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
                         icon: 'ti-bell'
                       }));
-                      const feedItems = [...projUpdates, ...notifItems].slice(0, 4);
+                      const fileItems = (proj?.files || []).slice(0, 6).map((f, i) => ({
+                        id: 'file-' + i,
+                        title: `${f.uploadedBy || 'Someone'} uploaded ${f.name || 'a file'}`,
+                        time: f.date ? new Date(f.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
+                        icon: 'ti-upload'
+                      }));
+                      const milestoneItems = (proj?.milestones || []).filter(m => m.done).slice(0, 6).map((m, i) => ({
+                        id: 'ms-' + i,
+                        title: `Milestone ${m.name} completed`,
+                        time: m.date ? new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
+                        icon: 'ti-flag'
+                      }));
+                      const feedItems = [...fileItems, ...milestoneItems, ...projUpdates, ...notifItems]
+                        .sort((a, b) => new Date(b.time) - new Date(a.time))
+                        .slice(0, 4);
                       const dotColors = {
                         'ti-speakerphone': { bg: C.tealLight, color: C.teal },
                         'ti-bell': { bg: C.purpleBg, color: C.purple },
@@ -2955,7 +2992,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 </div>
                 {(() => {
                   const { milestoneProgressBlock, ganttChartBlock } = renderTimelineComponent();
-                  return <>{milestoneProgressBlock}{portalSettings.showMilestones && ganttChartBlock}</>;
+                  return <>{milestoneProgressBlock}{portalSettings.showMilestones}</>;
                 })()}
               </div>
 

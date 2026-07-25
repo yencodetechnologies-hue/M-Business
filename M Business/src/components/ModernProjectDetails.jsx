@@ -44,7 +44,7 @@ const P = {
 };
 
 const CSS = `
-.mpd-root { font-family:'Nunito',sans-serif; background:var(--bg); min-height:100vh; }
+.mpd-root { font-family:'Nunito',sans-serif; background:var(--bg); min-height:100vh; padding: 0 24px 24px; box-sizing: border-box; }
 .mpd-root * { box-sizing:border-box; }
 
 /* TOPBAR / BREADCRUMB */
@@ -55,7 +55,7 @@ const CSS = `
 .mpd-topbar-actions { display:flex; align-items:center; gap:10px; flex-wrap: wrap; }
 
 @media (max-width: 768px) {
-  .mpd-root { overflow-x: hidden; }
+  .mpd-root { overflow-x: hidden; padding: 0 14px 14px; }
   .mpd-topbar { flex-wrap: wrap; gap: 12px; }
   .mpd-topbar-actions { width: 100%; }
   .mpd-topbar-actions button { flex: 1 1 auto; min-width: 0; font-size: 12px; padding: 8px 10px; }
@@ -1279,6 +1279,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
         milestones: updatedMilestones
+      }, {
+        headers: { 'x-company-id': currProject?.companyId || '' }
       });
 
       // Update local state immediately so the new milestone shows up right away,
@@ -1293,8 +1295,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       if (onUpdate) onUpdate();
     } catch (err) {
       console.error("Failed to add milestone — FULL ERROR:", err);
-      console.error("Error stack:", err?.stack);
-      alert("Failed to add milestone. Details: " + (err?.message || String(err)));
+      console.error("Server response:", err?.response?.data);
+      alert("Failed to add milestone. Details: " + (err?.response?.data?.msg || err?.response?.data?.error || err?.message || String(err)));
     }
   };
 
@@ -1336,8 +1338,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
         milestones: updatedMilestones
+      }, {
+        headers: { 'x-company-id': currProject?.companyId || '' }
       });
-
       setEditingMilestoneIdx(null);
       setEditMilestoneName('');
       setEditMilestoneDate('');
@@ -1647,7 +1650,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         projectId: snapshotProjectId || '',
       });
 
-      const link = `${window.location.origin}/client-portal/${matched._id}`;
+      const newToken = tokenRes.data?.portalToken || tokenRes.data?.token;
+      const link = `${window.location.origin}/client-portal/${matched._id}${newToken ? `?token=${newToken}` : ''}`;
       setPortalLinkUrl(link);
       lastPortalProjectId.current = snapshotProjectId;
       return link;

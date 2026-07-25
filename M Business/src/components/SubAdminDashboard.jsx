@@ -1840,7 +1840,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                       }}
                     />
                   </label>
-               <button
+                  <button
                     onClick={async () => {
                       if (!window.confirm("Delete this document?")) return;
                       const currentDocs = activeClient?.documents || activeClient?.docs || [];
@@ -11421,25 +11421,25 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 }}
 
-onUpdate={async (payload) => {
-  try {
-    if (payload && payload._id) {
-      const res = await axios.put(`${BASE_URL}/api/projects/${payload._id}`, payload);
-      const saved = res.data?.project || res.data;
-      await fetchProjects();
-      await fetchTasks();
-      const returnTo = sidebarOverride || "projects";
-      setSidebarOverride(null);
-      setActive(returnTo);
-      return saved;
-    } else {
-      await fetchProjects();
-      await fetchTasks();
-    }
-  } catch (e) {
-    console.error("Failed to update project:", e);
-  }
-}}
+                onUpdate={async (payload) => {
+                  try {
+                    if (payload && payload._id) {
+                      const res = await axios.put(`${BASE_URL}/api/projects/${payload._id}`, payload);
+                      const saved = res.data?.project || res.data;
+                      await fetchProjects();
+                      await fetchTasks();
+                      const returnTo = sidebarOverride || "projects";
+                      setSidebarOverride(null);
+                      setActive(returnTo);
+                      return saved;
+                    } else {
+                      await fetchProjects();
+                      await fetchTasks();
+                    }
+                  } catch (e) {
+                    console.error("Failed to update project:", e);
+                  }
+                }}
 
                 fetchTasks={fetchTasks}
 

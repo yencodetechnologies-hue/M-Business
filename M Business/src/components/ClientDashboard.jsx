@@ -1290,7 +1290,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .hero-status-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
 
     /* ── PAGE BODY ── */
-    .cp-root .page-body { max-width: 1200px; margin: 0 auto; padding: 28px 24px 60px; display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+    .cp-root .page-body { max-width: 1200px; margin: 0 auto; padding: 28px 24px 60px; display: flex; flex-direction: column; gap: 28px; min-width: 0; box-sizing: border-box; }
+.cp-root .page-body.mpd-wide { max-width: 1440px; }
     .cp-root .page-body > * { min-width: 0; }
     .cp-root .page-body > *:not(.mpd-root) { overflow-x: auto; }
 
@@ -2740,7 +2741,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       {!(active === "projects" && selectedClientProject) && renderHero()}
 
       {/* Main Container */}
-      <div className="page-body">
+      <div className={`page-body${active === "projects" && selectedClientProject ? " mpd-wide" : ""}`}>
 
         {active === "dashboard" && (
           <>
@@ -2936,21 +2937,20 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         )}
         {active === "timeline" && (
           <div>
-            <div className="sec-header">
-              <div className="sec-title">
-                <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-calendar-stats"></i></div>
-                Project Timeline & Gantt Detail
+            <div className="two-col" style={{ alignItems: "stretch" }}>
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <div className="sec-header">
+                  <div className="sec-title">
+                    <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-calendar-stats"></i></div>
+                    Project Timeline & Gantt Detail
+                  </div>
+                </div>
+                {(() => {
+                  const { milestoneProgressBlock, ganttChartBlock } = renderTimelineComponent();
+                  return <>{milestoneProgressBlock}{portalSettings.showMilestones && ganttChartBlock}</>;
+                })()}
               </div>
-            </div>
-            <div className="two-col">
-              {portalSettings.showMilestones && (() => {
-                const { milestoneProgressBlock, ganttChartBlock } = renderTimelineComponent();
-                return <>{milestoneProgressBlock}{ganttChartBlock}</>;
-              })()}
-              <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-                {renderApprovalsComponent()}
-                {renderCalendarComponent()}
-              </div>
+
             </div>
           </div>
         )}

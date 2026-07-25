@@ -83,7 +83,7 @@ const CSS = `
 /* CARDS */
 .mpd-card { background:#fff; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,.07), 0 0 0 1px rgba(0,0,0,.04); padding:22px 24px; margin-bottom:20px; transition:box-shadow .2s; }
 .mpd-card:hover { box-shadow:0 6px 24px rgba(0,0,0,.1), 0 0 0 1px rgba(0,188,212,.08); }
-.mpd-milestones-card { padding:28px 30px; min-height:340px; }
+.mpd-milestones-card { padding:28px 30px; }
 .mpd-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
 .mpd-card-title { font-size:15px; font-weight:800; color:${P.textDark}; display:flex; align-items:center; gap:8px; }
 .mpd-card-title i { color:${P.primary}; font-size:18px; }
@@ -1907,7 +1907,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             </div>
           </div>
           {(!currProject.milestones || currProject.milestones.length === 0) ? (
-            <div style={{ padding: 20, textAlign: 'center', color: P.textLight, fontSize: 13 }}>No milestones defined.</div>
+            <div style={{ padding: '40px 24px', textAlign: 'center', color: P.textLight, fontSize: 13, boxSizing: 'border-box' }}>No milestones defined.</div>
           ) : milestoneView === 'timeline' ? (
             <div style={{ overflowX: 'auto', paddingBottom: 8 }}>
               <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', minWidth: Math.max(300, (currProject.milestones || []).length * 100) }}>
@@ -2174,9 +2174,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
 
         {/* MAIN CONTENT GRID */}
-        <div className="mpd-grid-main-side" style={{ marginTop: 20 }}>
+        <div className="mpd-grid-main-side" style={{ marginTop: 20, gap: 20 }}>
           {/* RIGHT COL — TASKS */}
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', order: 2, marginLeft: 20, flex: '1 1 0%', minWidth: 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', order: 2, flex: '1 1 0%', minWidth: 0 }}>
             {/* TASKS COMPONENT */}
             <div className="mpd-card" style={{ padding: 0, overflow: 'hidden', marginBottom: 20, display: 'flex', flexDirection: 'column', height: 420, maxHeight: 420, boxSizing: 'border-box' }}>
               <div className="mpd-card-header" style={{ padding: '20px 24px 10px', marginBottom: 0 }}>
@@ -2195,7 +2195,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               </div>
               <div ref={tabContentRef} style={{ userSelect: 'none', overflowY: 'auto', flex: 1, minHeight: 0, padding: '0 4px', boxSizing: 'border-box' }}>
                 {filteredTasks.length === 0 ? (
-                  <div style={{ padding: 20, minHeight: 460, display: 'flex', alignItems: 'center', justifyContent: 'center', color: P.textLight, fontSize: 13 }}>No tasks found for this filter.</div>
+                  <div style={{ padding: '20px 24px', minHeight: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', color: P.textLight, fontSize: 13, boxSizing: 'border-box' }}>No tasks found for this filter.</div>
                 ) : (
                   filteredTasks.map(t => {
                     const isDone = t.status === 'done' || t.status === 'completed' || t.checked === true;
@@ -2277,7 +2277,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           </div>
 
           {/* LEFT COL — TABS (Updates / Activity Logs / Accounts) */}
-          <div style={{ order: 1, marginRight: 20, flex: '1.6 1 0%', minWidth: 0 }}>
+          <div style={{ order: 1, flex: '1.6 1 0%', minWidth: 0 }}>
             {/* TABS - draggable scroll */}
             <div className="mpd-card" style={{ padding: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: 420, maxHeight: 420, boxSizing: 'border-box' }}>          <div className="mpd-tabs"
               ref={tabsRef}
@@ -2361,7 +2361,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           )}
                         </div>
                       );
-                    })() : <div style={{ textAlign: 'center', padding: 20, minHeight: 460, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Activity logs will appear here.</div>}
+                    })() : <div style={{ textAlign: 'center', padding: '20px 24px', minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', color: P.textLight, fontSize: 13, boxSizing: 'border-box' }}>Activity logs will appear here.</div>}
                   </div>
                 </div>
                 <div className={`mpd-tab-pane ${activeTab === 'updates' ? 'mpd-active' : ''}`}>
@@ -2652,7 +2652,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     </div>
                   )}
                   {(!currProject.updates || currProject.updates.length === 0) ? (
-                    <div style={{ padding: 20, paddingTop: 80, textAlign: 'center', color: P.textLight, fontSize: 13 }}>No updates posted yet.</div>
+                    <div style={{ padding: '20px 24px', minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', color: P.textLight, fontSize: 13, boxSizing: 'border-box' }}>No updates posted yet.</div>
                   ) : (() => {
                     const perPage = 10;
                     const totalPages = Math.ceil(currProject.updates.length / perPage);
@@ -2695,14 +2695,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                         display: 'inline-block', padding: '3px 10px', borderRadius: 20, fontSize: 10, fontWeight: 800, textTransform: 'uppercase',
                                         background: statusBg, color: statusColor,
                                       }}>{statusLabel}</span>
-                                      {linkedApproval && (
-                                        <>
-                                          <button onClick={() => setViewProjectApproval(linkedApproval)} style={{ padding: '4px 10px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: '#fff', color: P.primary, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>View</button>
-                                          {!hideTopActions && (
-                                            <button onClick={() => handleDeleteApproval(linkedApproval._id)} style={{ padding: '4px 10px', borderRadius: 8, border: '1.5px solid #FCA5A5', background: P.redLight, color: P.red, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Delete</button>
-                                          )}
-                                        </>
-                                      )}
+
                                       {!hideTopActions && (
                                         <button
                                           onClick={() => {
@@ -3433,7 +3426,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               )}
             </div>
             <div style={{ overflowY: 'auto', flex: 1 }}>
-              {assigned.length === 0 ? <div style={{ fontSize: 12, color: P.textLight }}>No team members assigned.</div> : null}
+              {assigned.length === 0 ? <div style={{ padding: '20px 24px', minHeight: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', fontSize: 13, color: P.textLight, boxSizing: 'border-box' }}>No team members assigned.</div> : null}
               {assigned.map((a, i) => (
                 <div key={i} className="mpd-member-row" style={{ display: 'flex', alignItems: 'center' }}>
                   <div className="mpd-av mpd-av-sm" style={{ background: getAvatarColor(a) }}>{getInitials(a)}</div>

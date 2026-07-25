@@ -1033,10 +1033,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   // Auto-calculate Total Budget = ALL Invoices (via mergedInvoices, which already
   // reflects instant local deletes/edits) + Additional Charges + Milestone Payments
   const billedFromInvoices = mergedInvoices.filter(Boolean).reduce((sum, inv) => {
-    const invAmount = parseAmt(inv.amount) || parseAmt(inv.total);
-    const taxPercent = parseAmt(inv.taxPercent);
-    const taxAmt = inv.taxType === 'inclusive' ? 0 : Math.round(invAmount * (taxPercent / 100));
-    return sum + invAmount + taxAmt;
+    const invAmount = parseAmt(inv.total) || parseAmt(inv.amount);
+    return sum + invAmount;
   }, 0);
   // Only fall back to manually entered billed value if the project has
   // never had any invoices at all (not just zero after deletion)
@@ -3567,7 +3565,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               <span className="mpd-lbl">Total Budget <span style={{ fontSize: 9, color: '#94A3B8', fontWeight: 600, marginLeft: 4 }}></span></span>
               <span className="mpd-val">{currency}{budgetAmt.toLocaleString()}</span>
             </div>
-            {[ ['Advance Paid', 'advance', autoAdvanceTotal, 'mpd-p'], ['Received', 'received', received, 'mpd-g']].map(([lbl, key, val, cls]) => (
+            {[['Advance Paid', 'advance', autoAdvanceTotal, 'mpd-p'], ['Received', 'received', received, 'mpd-g']].map(([lbl, key, val, cls]) => (
               <div key={key} className="mpd-brow">
                 <span className="mpd-lbl">{lbl}</span>
                 <span className={`mpd-val ${cls}`}>{currency}{val.toLocaleString()}</span>

@@ -83,7 +83,7 @@ const CSS = `
 /* CARDS */
 .mpd-card { background:#fff; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,.07), 0 0 0 1px rgba(0,0,0,.04); padding:32px 36px !important; margin-bottom:20px; transition:box-shadow .2s; box-sizing: border-box !important; }
 .mpd-card:hover { box-shadow:0 6px 24px rgba(0,0,0,.1), 0 0 0 1px rgba(0,188,212,.08); }
-.mpd-milestones-card { padding:32px 36px !important; margin-bottom:24px; box-sizing: border-box !important; }
+.mpd-milestones-card { padding:48px 36px !important; margin-bottom:24px; box-sizing: border-box !important; }
 .mpd-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
 .mpd-card-title { font-size:15px; font-weight:800; color:${P.textDark}; display:flex; align-items:center; gap:8px; }
 .mpd-card-title i { color:${P.primary}; font-size:18px; }
@@ -1957,7 +1957,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
 
         {/* MILESTONES STANDALONE CARD */}
-        <div className="mpd-card mpd-milestones-card" style={{ display: 'flex', flexDirection: 'column', paddingTop: 48, paddingBottom: 48 }}>
+        <div className="mpd-card mpd-milestones-card">
           <div className="mpd-card-header" style={{ paddingBottom: 6, paddingTop: 4, paddingLeft: 4, paddingRight: 4 }}>
             <div className="mpd-card-title"><i className="ti ti-flag"></i> Milestone Progress</div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -1985,8 +1985,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           {(!currProject.milestones || currProject.milestones.length === 0) ? (
             <div style={{ padding: '48px 32px', textAlign: 'center', color: P.textLight, fontSize: 13, boxSizing: 'border-box' }}>No milestones defined.</div>
           ) : milestoneView === 'timeline' ? (
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 60 }}>
+            <div style={{ overflowX: 'auto', paddingBottom: 8 }}>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', minWidth: Math.max(300, (currProject.milestones || []).length * 100) }}>
                 <div style={{ position: 'absolute', top: 18, left: '5%', right: '5%', height: 2, background: P.border, zIndex: 0 }} />
                 {(currProject.milestones || []).map((m, idx) => {
                   const tasksForMilestone = projTasks.filter(t => t.milestone === m.name && !t.isDeleted);

@@ -1057,16 +1057,16 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
               <label className="mpc-checkbox-label">
-                <input type="checkbox" checked={portalOpts.showProgress} onChange={e => setPortalOpts({ ...portalOpts, showProgress: e.target.checked })} disabled={!portalOpts.enablePortal} />
+                <input type="checkbox" checked={!!portalOpts.showProgress} onChange={e => setPortalOpts({ ...portalOpts, showProgress: e.target.checked })} />
                 Show project progress to client
               </label>
               <label className="mpc-checkbox-label">
-                <input type="checkbox" checked={portalOpts.showMilestones} onChange={e => setPortalOpts({ ...portalOpts, showMilestones: e.target.checked })} disabled={!portalOpts.enablePortal} />
+                <input type="checkbox" checked={!!portalOpts.showMilestones} onChange={e => setPortalOpts({ ...portalOpts, showMilestones: e.target.checked })} />
                 Show milestones to client
               </label>
 
               <label className="mpc-checkbox-label">
-                <input type="checkbox" checked={portalOpts.allowMessages} onChange={e => setPortalOpts({ ...portalOpts, allowMessages: e.target.checked })} disabled={!portalOpts.enablePortal} />
+                <input type="checkbox" checked={!!portalOpts.allowMessages} onChange={e => setPortalOpts({ ...portalOpts, allowMessages: e.target.checked })} />
                 Allow client to send messages
               </label>
             </div>

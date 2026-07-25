@@ -379,15 +379,22 @@ export default function ModernProjectsPage({ user }) {
               tasks={tasksForProject(selectedProject)}
               onUpdate={async (updated) => {
                 try {
+                  console.log('Sending project update:', updated);
                   const res = await axios.put(`${BASE_URL}/api/projects/${updated._id || updated.id}`, updated, {
                     headers: { 'x-company-id': user?.companyId || user?._id || user?.id || '' }
                   });
                   const savedProject = res.data.project || res.data;
+                  console.log('Received saved project:', savedProject);
+                  if (!savedProject || !savedProject._id) {
+                    console.error('Update returned no project, keeping current view');
+                    return null;
+                  }
                   setProjects(prev => prev.map(p => (p._id === savedProject._id ? savedProject : p)));
-                  setSelectedProject(prev => (prev && prev._id === savedProject._id ? savedProject : prev));
+                  setSelectedProject(savedProject);
                   return savedProject;
                 } catch (err) {
-                  console.error('Failed to update project:', err);
+                  console.error('Failed to update project:', err.response?.data || err.message);
+                  return null;
                 }
               }}
               fromClientContext={false}

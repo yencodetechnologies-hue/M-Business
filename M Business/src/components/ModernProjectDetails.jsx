@@ -3548,7 +3548,19 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             </label>
             <button
               type="button"
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onUpdate && onUpdate({ _id: currProject._id, id: currProject.id, portalSettings: localPortalOpts }); }}
+              onClick={async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (!onUpdate) return;
+                const payload = { ...currProject, portalSettings: { ...localPortalOpts } };
+                const saved = await onUpdate(payload);
+                if (saved && saved._id) {
+                  setCurrProject(saved);
+                  setLocalPortalOpts(saved.portalSettings || {});
+                } else {
+                  console.error('Update Project: save failed or returned no data', saved);
+                }
+              }}
               className="mpd-btn mpd-btn-primary"
               style={{ marginTop: 16 }}
             >

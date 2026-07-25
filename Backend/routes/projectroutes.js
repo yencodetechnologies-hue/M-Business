@@ -358,19 +358,32 @@ router.put("/:id", async (req, res) => {
       delete updateData.portalOpts;
     }
 
-    const companyId = req.companyId || "";
+    const companyId = req.companyId || req.headers['x-company-id'] || "";
+    if (!companyId) {
+      console.error("PUT project: missing companyId on request");
+      return res.status(400).json({ msg: "Missing company context (x-company-id header)" });
+    }
     const existingProject = await Project.findOne({ _id: rawId, companyId });
-    if (!existingProject) return res.status(404).json({ msg: "Project not found or unauthorized" });
+    if (!existingProject) {
+      console.error("PUT project: not found for id", rawId, "companyId", companyId);
+      return res.status(404).json({ msg: "Project not found or unauthorized" });
+    }
 
     let project;
     try {
       Object.keys(updateData).forEach(key => {
-        existingProject[key] = updateData[key];
+        if (key === 'portalSettings' && updateData.portalSettings && typeof updateData.portalSettings === 'object') {
+          existingProject.portalSettings = {
+            ...(existingProject.portalSettings ? existingProject.portalSettings.toObject?.() || existingProject.portalSettings : {}),
+            ...updateData.portalSettings
+          };
+        } else {
+          existingProject[key] = updateData[key];
+        }
       });
-      if (updateData.portalSettings) {
-        existingProject.markModified('portalSettings');
-      }
+      existingProject.markModified('portalSettings');
       project = await existingProject.save();
+      console.log('Saved project portalSettings:', project.portalSettings);
     } catch (saveErr) {
       console.error("PUT project validation error:", saveErr.errors ? JSON.stringify(saveErr.errors, null, 2) : saveErr.message);
       if (saveErr.name === "ValidationError") {

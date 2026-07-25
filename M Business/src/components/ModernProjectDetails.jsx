@@ -1957,7 +1957,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
 
         {/* MILESTONES STANDALONE CARD */}
-        <div className="mpd-card mpd-milestones-card">
+        <div className="mpd-card mpd-milestones-card" style={{ display: 'flex', flexDirection: 'column', paddingTop: 48, paddingBottom: 48 }}>
           <div className="mpd-card-header" style={{ paddingBottom: 6, paddingTop: 4, paddingLeft: 4, paddingRight: 4 }}>
             <div className="mpd-card-title"><i className="ti ti-flag"></i> Milestone Progress</div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -1985,8 +1985,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           {(!currProject.milestones || currProject.milestones.length === 0) ? (
             <div style={{ padding: '48px 32px', textAlign: 'center', color: P.textLight, fontSize: 13, boxSizing: 'border-box' }}>No milestones defined.</div>
           ) : milestoneView === 'timeline' ? (
-            <div style={{ overflowX: 'auto', paddingBottom: 8 }}>
-              <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', minWidth: Math.max(300, (currProject.milestones || []).length * 100) }}>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 60 }}>
                 <div style={{ position: 'absolute', top: 18, left: '5%', right: '5%', height: 2, background: P.border, zIndex: 0 }} />
                 {(currProject.milestones || []).map((m, idx) => {
                   const tasksForMilestone = projTasks.filter(t => t.milestone === m.name && !t.isDeleted);
@@ -2870,7 +2870,14 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
                 {editingUpdate && (
                   <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setEditingUpdate(null)}>
-                    <div style={{ background: '#fff', borderRadius: 16, padding: '24px 24px 20px', width: '100%', maxWidth: 520, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+                    <div style={{ background: '#fff', borderRadius: 16, padding: '24px 24px 20px', width: '100%', maxWidth: 520, boxShadow: '0 20px 60px rgba(0,0,0,0.2)', position: 'relative' }} onClick={e => e.stopPropagation()}>
+                      <button
+                        type="button"
+                        onClick={() => setEditingUpdate(null)}
+                        style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: P.textLight }}
+                      >
+                        ✕
+                      </button>
                       <div style={{ fontSize: 16, fontWeight: 800, color: P.textDark, marginBottom: 16 }}>Edit Update</div>
 
                       <div style={{ marginBottom: 14 }}>
@@ -3052,7 +3059,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         {editUpdateAttaching ? 'Uploading…' : ' Add / Replace Image or File'}
                       </button>
                       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-                        <button onClick={() => setEditingUpdate(null)} style={{ padding: '9px 18px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: '#fff', color: P.textDark, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Cancel</button>
                         <button
                           onClick={async () => {
                             const original = currProject.updates?.[editingUpdate.index] || {};
@@ -3107,10 +3113,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   console.warn('No linkedApproval found to delete for title:', original.title, '— projectApprovals may be stale or title mismatched.');
                                 }
                                 await loadProjectApprovals();
-                              } else if (nowApprovalRequest && wasApprovalRequest && linkedApproval && linkedApproval.title !== editingUpdate.title) {
+                              } else if (nowApprovalRequest && wasApprovalRequest && linkedApproval) {
+                                const primaryAttachment = (editingUpdate.attachments || [])[0] || null;
                                 await axios.patch(`${BASE_URL}/api/approvals/${linkedApproval._id}`, {
                                   title: editingUpdate.title,
                                   desc: editingUpdate.text,
+                                  fileUrl: primaryAttachment ? primaryAttachment.url : '',
+                                  fileName: primaryAttachment ? primaryAttachment.name : '',
                                 });
                                 loadProjectApprovals();
                               }

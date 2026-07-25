@@ -96,6 +96,22 @@ router.post("/", async (req, res) => {
         res.status(500).json({ msg: err.message });
     }
 });
+// ── PATCH edit an approval's content (title/desc/attachment) ───────────────
+router.patch("/:id", async (req, res) => {
+    try {
+        const { title, desc, fileUrl, fileName } = req.body;
+        const update = {};
+        if (title !== undefined) update.title = title;
+        if (desc !== undefined) update.desc = desc;
+        if (fileUrl !== undefined) update.fileUrl = fileUrl;
+        if (fileName !== undefined) update.fileName = fileName;
+        const doc = await Approval.findByIdAndUpdate(req.params.id, update, { new: true });
+        if (!doc) return res.status(404).json({ msg: "Approval not found" });
+        res.json(doc);
+    } catch (err) {
+        res.status(500).json({ msg: err.message });
+    }
+});
 
 // ── PATCH respond to an approval (approve / reject) ────────────────────────
 router.patch("/:id/respond", async (req, res) => {

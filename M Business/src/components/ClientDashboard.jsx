@@ -1181,7 +1181,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const activeProjDesc = activeProj?.description || "";
   const activeProjDeadline = activeProj?.deadline || activeProj?.end || "";
   const activeProjStatus = activeProj?.status || "";
-  const portalSettings = { enablePortal: true, showProgress: true, showMilestones: true, ...(activeProj?.portalSettings || {}), showTeam: false, allowMessages: true };
+  const portalSettings = { enablePortal: true, showProgress: true, showMilestones: true, allowMessages: true, ...(activeProj?.portalSettings || {}), showTeam: false };
 
   // If this portal link is tied to a specific project and that project has
   // had its client portal explicitly disabled, block access entirely rather
@@ -1347,7 +1347,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .ft-filter { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--border); background: var(--surface); color: var(--text2); transition: all .15s; }
     .cp-root .ft-filter.active { background: var(--teal); color: #fff; border-color: var(--teal); }
     .cp-root .ft-filter:hover:not(.active) { border-color: var(--teal); color: var(--teal); }
-    .cp-root .mpd-milestones-card { padding: 32px 36px !important; box-sizing: border-box !important; }
+    .cp-root .mpd-milestones-card { padding: 48px 36px !important; box-sizing: border-box !important; }
 .cp-root .mpd-proj-header { padding: 32px 36px !important; box-sizing: border-box !important; }
 .cp-root .mpd-card { padding: 32px 36px !important; box-sizing: border-box !important; }
 .cp-root .mpd-brow { padding: 16px 0 !important; }

@@ -567,7 +567,7 @@ export default function ProjectPaymentModals({
 
             <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="checkbox" id="notify-inv" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
-              <label htmlFor="notify-inv" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>Send to Client Portal (Notify Client)</label>
+              <label htmlFor="notify-inv" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>Send to Client Portal</label>
             </div>
 
             <div style={btnRowStyle}>
@@ -703,7 +703,7 @@ export default function ProjectPaymentModals({
 
             <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="checkbox" id="notify-pay" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
-              <label htmlFor="notify-pay" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>Send to Client Portal (Notify Client)</label>
+              <label htmlFor="notify-pay" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>Send to Client Portal </label>
             </div>
 
             <div style={btnRowStyle}>
@@ -766,7 +766,7 @@ export default function ProjectPaymentModals({
 
             <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="checkbox" id="notify-adv" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
-              <label htmlFor="notify-adv" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>Send to Client Portal (Notify Client)</label>
+              <label htmlFor="notify-adv" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>Send to Client Portal </label>
             </div>
 
             <div style={btnRowStyle}>
@@ -857,7 +857,7 @@ export default function ProjectPaymentModals({
             <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="checkbox" id="notify-mil" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
               <label htmlFor="notify-mil" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>
-                Send to Client Portal (Notify Client)
+                Send to Client Portal 
               </label>
             </div>
 
@@ -915,7 +915,7 @@ export default function ProjectPaymentModals({
 
             <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="checkbox" id="notify-add" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
-              <label htmlFor="notify-add" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>Send to Client Portal (Notify Client)</label>
+              <label htmlFor="notify-add" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>Send to Client Portal </label>
             </div>
 
             <div style={btnRowStyle}>

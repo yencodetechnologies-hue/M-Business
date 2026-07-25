@@ -602,6 +602,26 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     }
   };
 
+  const handleInvoiceStatusChange = async (inv, newStatus) => {
+    try {
+      if (inv._source === 'global' && inv._globalId) {
+        await axios.patch(`${BASE_URL}/api/invoices/${inv._globalId}/status`, { status: newStatus });
+        setProjectInvoices(prev => prev.map(g => g.id === inv._globalId ? { ...g, status: newStatus } : g));
+      } else {
+        const updatedInvoices = (currProject.invoices || []).map(x =>
+          x.invoiceNo === inv.invoiceNo ? { ...x, status: newStatus } : x
+        );
+        await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { invoices: updatedInvoices });
+        setCurrProject(prev => ({ ...prev, invoices: updatedInvoices }));
+      }
+      fetchProjectInvoices();
+      loadLatest();
+    } catch (err) {
+      console.error('Failed to update invoice status:', err);
+      alert('Failed to update invoice status.');
+    }
+  };
+
   const handleSendSelectedToPortal = async (targetClient) => {
     if (selectedPaymentItems.length === 0) return;
     const arrayKeyMap = { inv: 'invoices', pay: 'paymentsReceived', adv: 'advances', add: 'additionalCharges', mile: 'milestonePayments', exp: 'expenses' };
@@ -1002,7 +1022,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const pending = Math.max(0, billed - received);
   // Always calculate spent from expenses array (source of truth)
   const spent = (currProject.expenses || []).reduce((sum, exp) => sum + parseAmt(exp.amount), 0);
-  const remaining = budgetAmt > 0 ? (budgetAmt - spent) : 0;
+  const remaining = budgetAmt > 0 ? (budgetAmt - received) : 0;
   const budgetUsedPct = budgetAmt > 0 ? Math.min(Math.round((spent / budgetAmt) * 100), 100) : 0;
   const budgetExceeded = budgetAmt > 0 && spent > budgetAmt;
   const overageAmt = budgetExceeded ? (spent - budgetAmt) : 0;
@@ -1827,6 +1847,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <div style={{ flex: 1 }}>
               <div className="mpd-prog-num" style={{ color: remaining < 0 ? '#DC2626' : undefined }}>{remaining < 0 ? `-${currency}${Math.abs(remaining).toLocaleString()}` : `${currency}${remaining.toLocaleString()}`}</div>
               <div className="mpd-prog-lbl">Remaining Budget</div>
+              {budgetAmt > 0 && (
+                <>
+                  <div className="mpd-progress-bg" style={{ marginTop: 8 }}><div className="mpd-progress-fill mpd-purple" style={{ width: `${Math.min(Math.round((received / budgetAmt) * 100), 100)}%` }}></div></div>
+                  <div className="mpd-prog-sub">{currency}{received.toLocaleString()} of {currency}{budgetAmt.toLocaleString()} received</div>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -3424,7 +3450,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               </div>
             </div>{/* end tabContentRef wrapper */}
           </div>
-        </div>{/* end mpd-grid-main-side */}
+        </div > {/* end mpd-grid-main-side */}
 
         {/* TEAM + BUDGET — side by side */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch', marginTop: 24 }}>
@@ -3523,10 +3549,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
             <div style={{ marginTop: 10 }}>
               <div className="mpd-progress-bg">
-                <div className="mpd-progress-fill" style={{ width: `${Math.min(budgetUsedPct, 100)}%`, background: budgetExceeded ? '#EF4444' : budgetUsedPct > 80 ? '#F97316' : '#8B5CF6' }}></div>
+                <div className="mpd-progress-fill mpd-purple" style={{ width: `${budgetAmt > 0 ? Math.min(Math.round((received / budgetAmt) * 100), 100) : 0}%` }}></div>
               </div>
-              <div style={{ fontSize: 11, color: budgetExceeded ? '#DC2626' : P.textLight, marginTop: 4, fontWeight: budgetExceeded ? 800 : 600 }}>
-                {budgetUsedPct}% used · {currency}{spent.toLocaleString()} of {currency}{budgetAmt.toLocaleString()}
+              <div style={{ fontSize: 11, color: P.textLight, marginTop: 4, fontWeight: 600 }}>
+                {budgetAmt > 0 ? Math.round((received / budgetAmt) * 100) : 0}% received · {currency}{received.toLocaleString()} of {currency}{budgetAmt.toLocaleString()}
               </div>
             </div>
 
@@ -3574,40 +3600,42 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
           </div >
         </div >
-      )}
-      {previewProjectFile && (() => {
-        const fname = (previewProjectFile.name || previewProjectFile.url || '').toLowerCase();
-        const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/.test(fname) || (previewProjectFile.type || '').startsWith('image/');
-        const isPdf = /\.pdf$/.test(fname) || (previewProjectFile.type || '').includes('pdf');
-        return (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 99997, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setPreviewProjectFile(null)}>
-            <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: P.radius, width: '100%', maxWidth: isPdf ? 900 : 640, maxHeight: '90vh', boxShadow: '0 8px 32px rgba(0,0,0,0.25)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ background: `linear-gradient(135deg,${P.primary},${P.primaryDark})`, padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-                <span style={{ color: '#fff', fontWeight: 800, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{previewProjectFile.name}</span>
-                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-                  <a href={previewProjectFile.url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <i className="ti ti-external-link"></i> Open
-                  </a>
-                  <button onClick={() => setPreviewProjectFile(null)} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer' }}>✕</button>
+      )
+      }
+      {
+        previewProjectFile && (() => {
+          const fname = (previewProjectFile.name || previewProjectFile.url || '').toLowerCase();
+          const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/.test(fname) || (previewProjectFile.type || '').startsWith('image/');
+          const isPdf = /\.pdf$/.test(fname) || (previewProjectFile.type || '').includes('pdf');
+          return (
+            <div style={{ position: 'fixed', inset: 0, zIndex: 99997, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setPreviewProjectFile(null)}>
+              <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: P.radius, width: '100%', maxWidth: isPdf ? 900 : 640, maxHeight: '90vh', boxShadow: '0 8px 32px rgba(0,0,0,0.25)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ background: `linear-gradient(135deg,${P.primary},${P.primaryDark})`, padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+                  <span style={{ color: '#fff', fontWeight: 800, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{previewProjectFile.name}</span>
+                  <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                    <a href={previewProjectFile.url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 5 }}>
+                      <i className="ti ti-external-link"></i> Open
+                    </a>
+                    <button onClick={() => setPreviewProjectFile(null)} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer' }}>✕</button>
+                  </div>
+                </div>
+                <div style={{ flex: 1, overflow: 'auto', background: P.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200 }}>
+                  {isImage ? (
+                    <img src={previewProjectFile.url} alt={previewProjectFile.name} style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain', display: 'block' }} />
+                  ) : isPdf ? (
+                    <iframe src={previewProjectFile.url} title={previewProjectFile.name} style={{ width: '100%', height: '80vh', border: 'none' }} />
+                  ) : (
+                    <div style={{ padding: 40, textAlign: 'center' }}>
+                      <i className="ti ti-file-text" style={{ fontSize: 40, color: P.primary }}></i>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark, marginTop: 10 }}>Preview not available for this file type</div>
+                      <div style={{ fontSize: 12, color: P.textLight, marginTop: 4 }}>Use "Open" above to view it in a new tab.</div>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div style={{ flex: 1, overflow: 'auto', background: P.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200 }}>
-                {isImage ? (
-                  <img src={previewProjectFile.url} alt={previewProjectFile.name} style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain', display: 'block' }} />
-                ) : isPdf ? (
-                  <iframe src={previewProjectFile.url} title={previewProjectFile.name} style={{ width: '100%', height: '80vh', border: 'none' }} />
-                ) : (
-                  <div style={{ padding: 40, textAlign: 'center' }}>
-                    <i className="ti ti-file-text" style={{ fontSize: 40, color: P.primary }}></i>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark, marginTop: 10 }}>Preview not available for this file type</div>
-                    <div style={{ fontSize: 12, color: P.textLight, marginTop: 4 }}>Use "Open" above to view it in a new tab.</div>
-                  </div>
-                )}
-              </div>
             </div>
-          </div>
-        );
-      })()
+          );
+        })()
       }
 
       {/* Add Task Modal */} {

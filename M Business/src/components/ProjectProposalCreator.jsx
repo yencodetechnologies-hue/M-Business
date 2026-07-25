@@ -1414,11 +1414,16 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   };
   const openNewModal = () => { setView("form"); };
 
-  const saveDoc = (d = doc) => {
+  const saveDoc = async (d = doc) => {
     const nd = { ...d, updated: new Date().toISOString(), client: d.client || d.clientName || "" };
-    persist(nd);
-    setDoc(nd);
-    flash(" Saved!");
+    const saved = await persist(nd);
+    if (saved) {
+      setDoc(saved);
+      setProposals(prev => prev.map(p => (p._id === saved._id || p.id === saved.id) ? saved : p));
+      flash(" Saved!");
+    } else {
+      flash(" Save failed — please try again");
+    }
   };
   const shareProposal = async (p = doc) => {
     await shareProposalAsPDF(p, companyName, async (proposal) => {
@@ -2005,6 +2010,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                             {openMenuId === (p.id || p._id) && (
                               <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 28, right: 0, background: "#fff", border: "1.5px solid #e0eef0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 999, minWidth: 160, overflow: "hidden" }}>
                                 <div onClick={e => { setOpenMenuId(null); setViewingProposal(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-eye" style={{ color: " var(--app-accent, var(--app-accent, #00BCD4))" }}></i> View</div>
+                                <div onClick={e => { setOpenMenuId(null); setDoc(p); setPage(0); setView("form"); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-edit" style={{ color: "#F59E0B" }}></i> Edit</div>
                                 <div onClick={e => { setOpenMenuId(null); shareProposalPDF(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-share" style={{ color: "#7C5CFC" }}></i> Share</div>
                                 <div onClick={e => { setOpenMenuId(null); printProposal(p); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1A2E35", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid #f0f4f8" }} onMouseEnter={e => e.currentTarget.style.background = "#f0fdfe"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-download" style={{ color: "#2563EB" }}></i> PDF</div>
                                 <div onClick={e => { setOpenMenuId(null); deleteProposal(p.id, p._id, e); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }} onMouseEnter={e => e.currentTarget.style.background = "#fff1f2"} onMouseLeave={e => e.currentTarget.style.background = ""}><i className="ti ti-trash" style={{ color: "#EF4444" }}></i> Delete</div>

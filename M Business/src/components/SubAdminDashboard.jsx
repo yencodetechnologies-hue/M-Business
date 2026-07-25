@@ -7843,7 +7843,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     fetchPendingLeaves(); fetchEmployeeDocs(); fetchNotifications();
     const notifPollInterval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(notifPollInterval);
-  }, [user]); // Close notification panel when clicking outside
+  }, [user]);
+
+  useEffect(() => {
+    if (active === "invoices") {
+      fetchInvoices();
+    }
+  }, [active]);
+  // Close notification panel when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (showNotifPanel && !e.target.closest('.topbar-icon')) {
@@ -8141,13 +8148,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       const res = await axios.get(BASE_URL + "/api/invoices");
 
-      setInvoices(res.data.invoices || []);
+      const list = res.data.invoices || [];
+
+      setInvoices(list);
+
+      try { localStorage.setItem("cached_invoices", JSON.stringify(list)); } catch { }
 
     } catch (e) {
 
       console.log("Fetch invoices error:", e);
-
-      setInvoices([]);
 
     }
 

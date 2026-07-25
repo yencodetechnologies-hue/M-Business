@@ -2792,17 +2792,19 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 return (
                   <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                     {/* Row 1: Milestone Progress | Team + Pending Approvals */}
-                    <div className="two-col" style={{ alignItems: "stretch" }}>
-                      <div style={{ display: "flex", flexDirection: "column" }}>
-                        <div className="sec-header">
-                          <div className="sec-title">
-                            <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-calendar-stats"></i></div>
-                            Project Timeline
+                    <div className={portalSettings.showMilestones ? "two-col" : ""} style={{ alignItems: "stretch", display: portalSettings.showMilestones ? undefined : "flex" }}>
+                      {portalSettings.showMilestones && (
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                          <div className="sec-header">
+                            <div className="sec-title">
+                              <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-calendar-stats"></i></div>
+                              Project Timeline
+                            </div>
                           </div>
+                          {milestoneProgressBlock}
                         </div>
-                        {portalSettings.showMilestones && milestoneProgressBlock}
-                      </div>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                      )}
+                      <div style={{ display: "flex", flexDirection: "column", gap: 20, flex: 1 }}>
                         {portalSettings.showTeam && renderTeamComponent()}
                         <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
                           <div className="sec-header">
@@ -2820,14 +2822,14 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
                     {/* Row 2: Gantt Chart | Messages & Chat */}
                     {(portalSettings.showMilestones || portalSettings.allowMessages) && (
-                      <div className="two-col" style={{ alignItems: "stretch" }}>
+                      <div className={portalSettings.showMilestones && portalSettings.allowMessages ? "two-col" : ""} style={{ alignItems: "stretch", display: (portalSettings.showMilestones && portalSettings.allowMessages) ? undefined : "flex" }}>
                         {portalSettings.showMilestones && (
-                          <div style={{ display: "flex", flexDirection: "column" }}>
+                          <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
                             {ganttChartBlock}
                           </div>
                         )}
                         {portalSettings.allowMessages && (
-                          <div style={{ display: "flex", flexDirection: "column" }}>
+                          <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
                             <div className="sec-header" style={{ marginBottom: 14 }}>
                               <div className="sec-title">
                                 <div className="sec-title-icon" style={{ background: C.purpleBg, color: C.purple }}><i className="ti ti-message-2"></i></div>
@@ -3212,7 +3214,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           </div>
         )}
 
-        {active === "messages" && portalsettings.allowmessages && (
+        {active === "messages" && portalSettings.allowMessages && (
           <div>
             <div className="sec-header">
               <div className="sec-title">

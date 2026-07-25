@@ -101,8 +101,8 @@ const CSS = `
 .mpd-pm-item { display:flex; align-items:center; gap:6px; font-size:12px; color:${P.textMid}; background:${P.bg}; padding:5px 10px; border-radius:8px; }
 .mpd-pm-item i { color:${P.primary}; font-size:14px; }
 .mpd-pm-item strong { color:${P.textDark}; font-weight:700; }
-.mpd-ph-right { display:flex; flex-direction:column; align-items:flex-end; gap:12px; }
-.mpd-budget-box { text-align:right; background:linear-gradient(135deg,${P.primaryLight},#fff); border:1.5px solid rgba(0,188,212,.15); border-radius:14px; padding:18px 20px; min-width:160px; margin-top: 4px; }
+.mpd-ph-right { display:flex; flex-direction:column; align-items:flex-end; gap:12px; margin-left: auto; }
+.mpd-budget-box { text-align:right; background:linear-gradient(135deg,${P.primaryLight},#fff); border:1.5px solid rgba(0,188,212,.15); border-radius:14px; padding:18px 20px; min-width:160px; margin-top: 0; }
 .mpd-budget-box .mpd-lbl { font-size:10px; color:${P.primary}; font-weight:800; text-transform:uppercase; letter-spacing:.7px; }
 .mpd-budget-box .mpd-amt { font-size:26px; font-weight:900; color:${P.textDark}; letter-spacing:-.5px; }
 .mpd-budget-box .mpd-sub { font-size:12px; color:${P.textLight}; }
@@ -1707,7 +1707,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
         {/* HEADER + CLIENT PORTAL — side by side, 50/50 */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch', marginBottom: 24 }}>
-          <div className="mpd-proj-header" style={{ flex: '1 1 50%', minWidth: 0, paddingTop: 8, paddingLeft: 6, paddingRight: 6 }}>
+          <div className="mpd-proj-header" style={{ flex: '1 1 50%', minWidth: 0, paddingTop: 8, paddingLeft: 6, paddingRight: 6, height: '100%', boxSizing: 'border-box', flexWrap: 'nowrap' }}>
             <div className="mpd-ph-left">
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
                 <div className="mpd-proj-name">{projName}</div>
@@ -1728,8 +1728,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 <div className="mpd-pm-item"><i className="ti ti-tag"></i> <strong>{category}</strong></div>
               </div>
             </div>
-            <div className="mpd-ph-right">
-              <div className="mpd-budget-box">
+            <div className="mpd-ph-right" style={{ alignSelf: 'flex-start', justifyContent: 'flex-start', flexShrink: 0 }}>
+              <div className="mpd-budget-box" style={{ marginTop: 0, whiteSpace: 'nowrap' }}>
                 <div className="mpd-lbl">Total Budget</div>
                 <div className="mpd-amt">{budgetAmt ? `${currency}${budgetAmt.toLocaleString()}` : '—'}</div>
                 {budgetAmt > 0 && <div className="mpd-sub">Spent {currency}{spent.toLocaleString()} &nbsp;·&nbsp; <span className="mpd-g">Rem {currency}{remaining.toLocaleString()}</span></div>}
@@ -1756,7 +1756,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               </div>
             </div>
           ) : (
-            <div style={{ background: `linear-gradient(135deg, #004D5E, ${P.primary})`, borderRadius: P.radius, padding: '16px 22px', color: '#fff', flex: '1 1 50%', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ background: `linear-gradient(135deg, #004D5E, ${P.primary})`, borderRadius: P.radius, padding: '16px 22px', color: '#fff', flex: '1 1 50%', minWidth: 0, display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 800, marginBottom: 8 }}>
                 <i className="ti ti-world" style={{ fontSize: 16 }}></i> Client Portal
               </div>

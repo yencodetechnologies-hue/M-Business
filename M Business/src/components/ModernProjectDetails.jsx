@@ -48,7 +48,7 @@ const CSS = `
 .mpd-root * { box-sizing:border-box; }
 
 /* TOPBAR / BREADCRUMB */
-.mpd-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+.mpd-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; padding-top: 4px; }
 .mpd-breadcrumb { display:flex; align-items:center; gap:6px; font-size:13px; color:${P.textLight}; font-weight:700; }
 .mpd-breadcrumb a { color:${P.primary}; cursor:pointer; text-decoration:none; transition:color .15s; }
 .mpd-breadcrumb a:hover { color:${P.primaryDark}; text-decoration:underline; }
@@ -81,15 +81,15 @@ const CSS = `
 .mpc-checkbox-label input { accent-color:${P.primary}; width:16px; height:16px; cursor:pointer; }
 
 /* CARDS */
-.mpd-card { background:#fff; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,.07), 0 0 0 1px rgba(0,0,0,.04); padding:26px 32px; margin-bottom:20px; transition:box-shadow .2s; }
+.mpd-card { background:#fff; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,.07), 0 0 0 1px rgba(0,0,0,.04); padding:32px 36px !important; margin-bottom:20px; transition:box-shadow .2s; box-sizing: border-box !important; }
 .mpd-card:hover { box-shadow:0 6px 24px rgba(0,0,0,.1), 0 0 0 1px rgba(0,188,212,.08); }
-.mpd-milestones-card { padding:26px 32px; margin-bottom:24px; }
+.mpd-milestones-card { padding:32px 36px !important; margin-bottom:24px; box-sizing: border-box !important; }
 .mpd-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
 .mpd-card-title { font-size:15px; font-weight:800; color:${P.textDark}; display:flex; align-items:center; gap:8px; }
 .mpd-card-title i { color:${P.primary}; font-size:18px; }
 
 /* HEADER SECTION */
-.mpd-proj-header { background:#fff; border-radius:18px; padding:24px 32px; box-shadow:0 4px 24px rgba(0,188,212,.1), 0 0 0 1px rgba(0,188,212,.08); margin-bottom:20px; display:flex; flex-wrap: wrap; align-items:flex-start; justify-content:space-between; gap:20px; position:relative; overflow:visible; box-sizing: border-box; width: 100%; }
+.mpd-proj-header { background:#fff; border-radius:18px; padding:32px 36px !important; box-shadow:0 4px 24px rgba(0,188,212,.1), 0 0 0 1px rgba(0,188,212,.08); margin-bottom:20px; display:flex; flex-wrap: wrap; align-items:flex-start; justify-content:space-between; gap:20px; position:relative; overflow:visible; box-sizing: border-box !important; width: 100%; }
 @media (max-width: 700px) {
   .mpd-proj-header { flex-direction: column; }
   .mpd-ph-right { align-items: flex-start; width: 100%; }
@@ -124,7 +124,7 @@ const CSS = `
 
 /* KPIs */
 .mpd-kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px; }
-.mpd-kpi { background:#fff; border-radius:16px; padding:18px; box-shadow:0 2px 12px rgba(0,0,0,.07); display:flex; align-items:center; gap:12px; border:1px solid rgba(0,0,0,.05); transition:all .2s cubic-bezier(.4,0,.2,1); }
+.mpd-kpi { background:#fff; border-radius:16px; padding:20px 22px; box-shadow:0 2px 12px rgba(0,0,0,.07); display:flex; align-items:flex-start; gap:14px; border:1px solid rgba(0,0,0,.05); transition:all .2s cubic-bezier(.4,0,.2,1); }
 .mpd-kpi:hover { transform:translateY(-3px); box-shadow:0 8px 28px rgba(0,0,0,.12); border-color:rgba(0,188,212,.15); }
 .mpd-kpi-icon { width:44px; height:44px; border-radius:13px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .mpd-kpi-icon i { font-size:21px; }
@@ -136,13 +136,14 @@ const CSS = `
 
 /* PROGRESS — 4 separate equal-width summary cards */
 .mpd-prog-card { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:0; margin-bottom:0; }
-.mpd-prog-item { background:#fff; border-radius:16px; padding:24px 28px; box-shadow:0 2px 12px rgba(0,0,0,.07); border:1px solid rgba(0,0,0,.05); min-width:0; }
+.mpd-prog-item > div:last-child { padding-right: 14px; box-sizing: border-box; }
+.mpd-prog-item { background:#fff; border-radius:16px; padding:32px 30px; box-shadow:0 2px 12px rgba(0,0,0,.07); border:1px solid rgba(0,0,0,.05); min-width:0; min-height:130px; box-sizing: border-box; }
 .mpd-prog-item .mpd-progress-bg { width:100%; }
 @media (max-width: 900px) { .mpd-prog-card { grid-template-columns:repeat(2,1fr); } }
 @media (max-width: 480px) { .mpd-prog-card { grid-template-columns:1fr; } }
 .mpd-prog-num { font-size:22px; font-weight:900; color:${P.textDark}; letter-spacing:-.3px; }
 .mpd-prog-lbl { font-size:11px; color:${P.textLight}; font-weight:700; text-transform:uppercase; letter-spacing:.6px; margin-bottom:8px; }
-.mpd-progress-bg { background:${P.bg}; border-radius:20px; height:8px; overflow:hidden; }
+.mpd-progress-bg { background:${P.bg}; border-radius:20px; height:8px; overflow:hidden; margin-right:6px; }
 .mpd-progress-fill { height:100%; border-radius:20px; background:linear-gradient(90deg,${P.primary},${P.primaryDark}); transition:width .6s cubic-bezier(.4,0,.2,1); box-shadow:0 0 8px rgba(0,188,212,.4); }
 .mpd-progress-fill.mpd-green { background:linear-gradient(90deg,${P.green},#059669); box-shadow:0 0 8px rgba(38,194,129,.4); }
 .mpd-progress-fill.mpd-orange { background:linear-gradient(90deg,${P.orange},#D97706); box-shadow:0 0 8px rgba(245,158,11,.4); }
@@ -167,7 +168,7 @@ const CSS = `
 
 /* TASKS LIST */
 .mpd-task-filters { display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap; }
-.mpd-tf { padding:5px 14px; border-radius:20px; font-size:12px; font-weight:700; border:1.5px solid ${P.border}; background:transparent; color:${P.textMid}; cursor:pointer; font-family:'Nunito',sans-serif; transition:all .2s; }
+.mpd-tf { padding:5px 14px; margin-right: 8px; border-radius:20px; font-size:12px; font-weight:700; border:1.5px solid ${P.border}; background:transparent; color:${P.textMid}; cursor:pointer; font-family:'Nunito',sans-serif; transition:all .2s; }
 .mpd-tf.mpd-on, .mpd-tf:hover { background:linear-gradient(135deg,${P.primary},${P.primaryDark}); border-color:${P.primary}; color:#fff; box-shadow:0 3px 10px rgba(0,188,212,.3); }
 .mpd-task-row { display:flex; align-items:center; gap:10px; padding:11px 0; border-bottom:1px solid ${P.bg}; cursor:pointer; transition:all .15s; border-radius:8px; }
 .mpd-task-row:last-child { border-bottom:none; }
@@ -187,7 +188,7 @@ const CSS = `
 
 /* TABS */
 .mpd-tabs { display:flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; border-bottom:2px solid ${P.border}; margin-bottom:20px; }
-.mpd-tab-btn { flex-shrink:0; white-space:nowrap; padding:10px 18px; font-size:13px; font-weight:700; color:${P.textMid}; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .2s; background:transparent; border-top:none; border-left:none; border-right:none; font-family:'Nunito',sans-serif; }
+.mpd-tab-btn { flex-shrink:0; white-space:nowrap; padding:10px 18px; margin-right: 6px; font-size:13px; font-weight:700; color:${P.textMid}; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .2s; background:transparent; border-top:none; border-left:none; border-right:none; font-family:'Nunito',sans-serif; }
 .mpd-tab-btn:hover { color:${P.primary}; background:${P.primaryLight}; border-radius:8px 8px 0 0; }
 .mpd-tab-btn.mpd-active { color:${P.primary}; border-bottom-color:${P.primary}; }
 .mpd-tab-pane { display:none; overflow:visible; }
@@ -197,14 +198,14 @@ const CSS = `
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
 /* TEAM SIDEBAR */
-.mpd-member-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid ${P.bg}; transition:background .15s; border-radius:8px; }
+.mpd-member-row { display:flex; align-items:center; gap:10px; padding:14px 8px; border-bottom:1px solid ${P.bg}; transition:background .15s; border-radius:8px; }
 .mpd-member-row:last-child { border-bottom:none; }
 .mpd-member-row:hover { background:${P.bg}; padding-left:6px; padding-right:6px; }
 .mpd-av { border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; flex-shrink:0; box-shadow:0 2px 6px rgba(0,0,0,.15); }
 .mpd-av-sm { width:32px; height:32px; font-size:11px; }
 
 /* BUDGET SIDEBAR */
-.mpd-brow { display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid ${P.bg}; font-size:13px; }
+.mpd-brow { display:flex; justify-content:space-between; padding:16px 0; border-bottom:1px solid ${P.bg}; font-size:13px; }
 .mpd-brow:last-child { border-bottom:none; }
 .mpd-brow .mpd-lbl { color:${P.textLight}; font-weight:600; }
 .mpd-brow .mpd-val { font-weight:800; color:${P.textDark}; }
@@ -704,7 +705,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       document.head.appendChild(tag);
     }
     tag.textContent = CSS;
-  }, []);
+  });
 
   // Load fresh data once on mount and when project _id changes.
   //
@@ -1690,7 +1691,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         {/* CSS injected once via useEffect above */}
 
         {/* TOPBAR */}
-        <div className="mpd-topbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="mpd-topbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
           <div className="mpd-breadcrumb">
             <a onClick={onBack}>Projects</a>
             <i className="ti ti-chevron-right" style={{ fontSize: 14 }}></i>
@@ -1706,7 +1707,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
         {/* HEADER + CLIENT PORTAL — side by side, 50/50 */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch', marginBottom: 24 }}>
-          <div className="mpd-proj-header" style={{ flex: '1 1 50%', minWidth: 0 }}>
+          <div className="mpd-proj-header" style={{ flex: '1 1 50%', minWidth: 0, paddingTop: 8, paddingLeft: 6, paddingRight: 6 }}>
             <div className="mpd-ph-left">
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
                 <div className="mpd-proj-name">{projName}</div>
@@ -1796,17 +1797,17 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
         {/* PROGRESS + SUMMARY — single row, 4 equal-width cards */}
         <div className="mpd-prog-card" style={{ marginBottom: 24 }}>
-          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
-            <div className="mpd-kpi-icon" style={{ background: P.primaryLight || '#E0F2FE', flexShrink: 0 }}><i className="ti ti-chart-donut" style={{ color: P.primary }}></i></div>
+          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 16, paddingTop: 26, paddingLeft: 26 }}>
+            <div className="mpd-kpi-icon" style={{ background: P.primaryLight || '#E0F2FE', flexShrink: 0, marginTop: 6, marginLeft: 4 }}><i className="ti ti-chart-donut" style={{ color: P.primary }}></i></div>
             <div style={{ flex: 1 }}>
               <div className="mpd-prog-num">{progressPct}%</div>
               <div className="mpd-prog-lbl">Overall Milestones</div>
-              <div className="mpd-progress-bg"><div className="mpd-progress-fill" style={{ width: `${progressPct}%` }}></div></div>
+              <div className="mpd-progress-bg" style={{ marginRight: 16, maxWidth: 'calc(100% - 16px)' }}><div className="mpd-progress-fill" style={{ width: `${progressPct}%` }}></div></div>
               <div className="mpd-prog-sub">{doneMilestones} of {totalMilestones} milestones</div>
             </div>
           </div>
-          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
-            <div className="mpd-kpi-icon" style={{ background: P.purpleLight, flexShrink: 0 }}><i className="ti ti-chart-bar" style={{ color: P.purple }}></i></div>
+          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 14, paddingTop: 26, paddingLeft: 26 }}>
+            <div className="mpd-kpi-icon" style={{ background: P.purpleLight, flexShrink: 0, marginTop: 6, marginLeft: 4 }}><i className="ti ti-chart-bar" style={{ color: P.purple }}></i></div>
             <div style={{ flex: 1 }}>
               <div className="mpd-prog-num">{budgetUsedPct}%</div>
               <div className="mpd-prog-lbl">Budget Used</div>
@@ -1814,15 +1815,15 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               <div className="mpd-prog-sub">{currency}{spent.toLocaleString()} of {currency}{budgetAmt.toLocaleString()}</div>
             </div>
           </div>
-          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
-            <div className="mpd-kpi-icon" style={{ background: '#FEE2E2', flexShrink: 0 }}><i className="ti ti-arrow-up-right" style={{ color: '#EF4444' }}></i></div>
+          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 14, paddingTop: 26, paddingLeft: 26 }}>
+            <div className="mpd-kpi-icon" style={{ background: '#FEE2E2', flexShrink: 0, marginTop: 6, marginLeft: 4 }}><i className="ti ti-arrow-up-right" style={{ color: '#EF4444' }}></i></div>
             <div style={{ flex: 1 }}>
               <div className="mpd-prog-num">{currency}{spent.toLocaleString()}</div>
               <div className="mpd-prog-lbl">Spent Amount</div>
             </div>
           </div>
-          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
-            <div className="mpd-kpi-icon" style={{ background: P.purpleLight, flexShrink: 0 }}><i className="ti ti-pig-money" style={{ color: P.purple }}></i></div>
+          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 14, paddingTop: 26, paddingLeft: 26 }}>
+            <div className="mpd-kpi-icon" style={{ background: P.purpleLight, flexShrink: 0, marginTop: 6, marginLeft: 4 }}><i className="ti ti-pig-money" style={{ color: P.purple }}></i></div>
             <div style={{ flex: 1 }}>
               <div className="mpd-prog-num" style={{ color: remaining < 0 ? '#DC2626' : undefined }}>{remaining < 0 ? `-${currency}${Math.abs(remaining).toLocaleString()}` : `${currency}${remaining.toLocaleString()}`}</div>
               <div className="mpd-prog-lbl">Remaining Budget</div>
@@ -1892,7 +1893,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
         {/* MILESTONES STANDALONE CARD */}
         <div className="mpd-card mpd-milestones-card">
-          <div className="mpd-card-header">
+          <div className="mpd-card-header" style={{ paddingBottom: 6, paddingTop: 4, paddingLeft: 4, paddingRight: 4 }}>
             <div className="mpd-card-title"><i className="ti ti-flag"></i> Milestone Progress</div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               <div style={{ display: 'flex', background: P.bg, borderRadius: 8, border: `1px solid ${P.border}`, overflow: 'hidden' }}>
@@ -1917,7 +1918,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             </div>
           </div>
           {(!currProject.milestones || currProject.milestones.length === 0) ? (
-            <div style={{ padding: '40px 24px', textAlign: 'center', color: P.textLight, fontSize: 13, boxSizing: 'border-box' }}>No milestones defined.</div>
+            <div style={{ padding: '48px 32px', textAlign: 'center', color: P.textLight, fontSize: 13, boxSizing: 'border-box' }}>No milestones defined.</div>
           ) : milestoneView === 'timeline' ? (
             <div style={{ overflowX: 'auto', paddingBottom: 8 }}>
               <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', minWidth: Math.max(300, (currProject.milestones || []).length * 100) }}>
@@ -2189,14 +2190,14 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%', order: 2, flex: '1 1 0%', minWidth: 0 }}>
             {/* TASKS COMPONENT */}
             <div className="mpd-card" style={{ padding: 0, overflow: 'hidden', marginBottom: 20, display: 'flex', flexDirection: 'column', height: 420, maxHeight: 420, boxSizing: 'border-box' }}>
-              <div className="mpd-card-header" style={{ padding: '22px 24px 10px', marginBottom: 0 }}>
+              <div className="mpd-card-header" style={{ padding: '16px 18px 8px', marginBottom: 0 }}>
                 <div className="mpd-card-title"><i className="ti ti-list-check"></i> Tasks</div>
                 {!hideTopActions && (
                   <button className="mpd-btn mpd-btn-outline" onClick={() => { setEditingTask(null); setNewTaskTitle(''); setNewTaskDesc(''); setNewTaskPriority('medium'); setNewTaskAssignTo([]); setNewTaskDue(''); setNewTaskMilestone(''); setShowAddTaskModal(true); }} style={{ padding: '6px 12px', fontSize: 12 }}><i className="ti ti-plus"></i> Add Task</button>
                 )}
 
               </div>
-              <div style={{ padding: '0 24px 14px' }}>
+              <div style={{ padding: '0 18px 14px' }}>
                 <div className="mpd-task-filters">
                   <button className={`mpd-tf ${taskFilter === 'all' ? 'mpd-on' : ''}`} onClick={() => setTaskFilter('all')}>All ({totalTasks})</button>
                   <button className={`mpd-tf ${taskFilter === 'inprog' ? 'mpd-on' : ''}`} onClick={() => setTaskFilter('inprog')}>In Progress ({inprogTasks})</button>
@@ -3428,7 +3429,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         {/* TEAM + BUDGET — side by side */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch', marginTop: 24 }}>
           {/* TEAM SIDEBAR */}
-          <div className="mpd-card" style={{ marginBottom: 0, display: 'flex', flexDirection: 'column', maxHeight: 360 }}>
+          <div className="mpd-card" style={{ marginBottom: 0, display: 'flex', flexDirection: 'column', height: '100%', paddingTop: 8, paddingLeft: 6, paddingRight: 6 }}>
             <div className="mpd-card-header">
               <div className="mpd-card-title"><i className="ti ti-users"></i> Team</div>
               {!hideTopActions && (
@@ -3444,7 +3445,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   <div className="mpd-av mpd-av-sm" style={{ background: getAvatarColor(a) }}>{getInitials(a)}</div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>{a}</div>
-                    <div style={{ fontSize: 11, color: P.textLight }}>{employees.find(e => (e.name || e.employeeName) === a)?.role || 'Member'}</div>
+                    <div style={{ fontSize: 11, color: P.textLight }}>{employees.find(e => (e.name || e.employeeName) === a)?.role || 'employee'}</div>
                   </div>
                   {user?.role !== 'employee' && !hideTopActions && (
                     <div style={{ display: 'flex', gap: 4 }}>
@@ -3477,7 +3478,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           </div>
 
           {/* BUDGET */}
-          <div className="mpd-card" style={{ marginBottom: 0 }}>
+          <div className="mpd-card" style={{ marginBottom: 0, paddingTop: 8, paddingLeft: 6, paddingRight: 6, display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div className="mpd-card-header">
               <div className="mpd-card-title"><i className="ti ti-wallet"></i> Budget</div>
               {!hideTopActions && (
@@ -3496,7 +3497,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               </div>
             )}
             <div className="mpd-brow">
-              <span className="mpd-lbl">Total Budget <span style={{ fontSize: 9, color: '#94A3B8', fontWeight: 600, marginLeft: 4 }}>(auto)</span></span>
+              <span className="mpd-lbl">Total Budget <span style={{ fontSize: 9, color: '#94A3B8', fontWeight: 600, marginLeft: 4 }}></span></span>
               <span className="mpd-val">{currency}{budgetAmt.toLocaleString()}</span>
             </div>
             {[['Billed', 'billed', billed, ''], ['Advance Paid', 'advance', autoAdvanceTotal, 'mpd-p'], ['Received', 'received', received, 'mpd-g']].map(([lbl, key, val, cls]) => (
@@ -3513,24 +3514,22 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               <span className="mpd-lbl">Spent (Expenses)</span>
               <span className="mpd-val" style={{ color: budgetExceeded ? '#DC2626' : undefined, fontWeight: budgetExceeded ? 800 : 700 }}>{currency}{spent.toLocaleString()}</span>
             </div>
-            {budgetAmt > 0 && (
-              <div className="mpd-brow">
-                <span className="mpd-lbl">Remaining Budget</span>
-                <span className="mpd-val" style={{ color: remaining < 0 ? '#DC2626' : '#7C3AED', fontWeight: 800 }}>
-                  {remaining < 0 ? `-${currency}${Math.abs(remaining).toLocaleString()}` : `${currency}${remaining.toLocaleString()}`}
-                </span>
+            <div className="mpd-brow">
+              <span className="mpd-lbl">Remaining Budget</span>
+              <span className="mpd-val" style={{ color: remaining < 0 ? '#DC2626' : '#7C3AED', fontWeight: 800 }}>
+                {remaining < 0 ? `-${currency}${Math.abs(remaining).toLocaleString()}` : `${currency}${remaining.toLocaleString()}`}
+              </span>
+            </div>
+
+            <div style={{ marginTop: 10 }}>
+              <div className="mpd-progress-bg">
+                <div className="mpd-progress-fill" style={{ width: `${Math.min(budgetUsedPct, 100)}%`, background: budgetExceeded ? '#EF4444' : budgetUsedPct > 80 ? '#F97316' : '#8B5CF6' }}></div>
               </div>
-            )}
-            {budgetAmt > 0 && (
-              <div style={{ marginTop: 10 }}>
-                <div className="mpd-progress-bg">
-                  <div className="mpd-progress-fill" style={{ width: `${Math.min(budgetUsedPct, 100)}%`, background: budgetExceeded ? '#EF4444' : budgetUsedPct > 80 ? '#F97316' : '#8B5CF6' }}></div>
-                </div>
-                <div style={{ fontSize: 11, color: budgetExceeded ? '#DC2626' : P.textLight, marginTop: 4, fontWeight: budgetExceeded ? 800 : 600 }}>
-                  {budgetUsedPct}% used · {currency}{spent.toLocaleString()} of {currency}{budgetAmt.toLocaleString()}
-                </div>
+              <div style={{ fontSize: 11, color: budgetExceeded ? '#DC2626' : P.textLight, marginTop: 4, fontWeight: budgetExceeded ? 800 : 600 }}>
+                {budgetUsedPct}% used · {currency}{spent.toLocaleString()} of {currency}{budgetAmt.toLocaleString()}
               </div>
-            )}
+            </div>
+
           </div>
         </div>
 

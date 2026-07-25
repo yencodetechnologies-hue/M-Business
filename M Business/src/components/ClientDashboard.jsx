@@ -1347,7 +1347,14 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .ft-filter { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--border); background: var(--surface); color: var(--text2); transition: all .15s; }
     .cp-root .ft-filter.active { background: var(--teal); color: #fff; border-color: var(--teal); }
     .cp-root .ft-filter:hover:not(.active) { border-color: var(--teal); color: var(--teal); }
-    .cp-root .files-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; padding: 16px 18px; }
+    .cp-root .mpd-milestones-card { padding: 32px 36px !important; box-sizing: border-box !important; }
+.cp-root .mpd-proj-header { padding: 32px 36px !important; box-sizing: border-box !important; }
+.cp-root .mpd-card { padding: 32px 36px !important; box-sizing: border-box !important; }
+.cp-root .mpd-brow { padding: 16px 0 !important; }
+.cp-root .mpd-tab-btn { margin-right: 6px !important; padding: 10px 18px !important; }
+.cp-root .mpd-tf { margin-right: 8px !important; }
+.cp-root .mpd-member-row { padding: 14px 8px !important; }
+.cp-root .mpd-topbar { margin-bottom: 28px !important; padding-top: 4px !important; }
     .cp-root .file-card { background: var(--surface2); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px; cursor: pointer; transition: all .2s; position: relative; overflow: hidden; }
     .cp-root .file-card:hover { border-color: var(--teal); box-shadow: 0 4px 14px rgba(0,188,212,.1); transform: translateY(-1px); }
     .cp-root .fc-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 10px; }

@@ -551,6 +551,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   // ── Share a single invoice directly with its client's portal ──────────
   const [sharingInvoiceNo, setSharingInvoiceNo] = useState(null);
+  const [invoicePaymentModal, setInvoicePaymentModal] = useState(null);
+  const [invoicePaymentData, setInvoicePaymentData] = useState({ amountPaid: 0, paymentMode: 'GPay', paymentDate: new Date().toISOString().split('T')[0], transactionId: '' });
   const handleShareToClient = async (inv) => {
     const invNo = inv.invoiceNo;
     if (!invNo) { alert('This invoice has no invoice number and cannot be shared.'); return; }
@@ -603,13 +605,28 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   };
 
   const handleInvoiceStatusChange = async (inv, newStatus) => {
+    if (newStatus === 'paid' || newStatus === 'part_paid') {
+      const remaining = Math.max(0, (parseAmt(inv.total) || parseAmt(inv.amount) || 0) - (parseAmt(inv.amountPaid) || 0));
+      setInvoicePaymentData({
+        amountPaid: newStatus === 'paid' ? remaining : 0,
+        paymentMode: 'GPay',
+        paymentDate: new Date().toISOString().split('T')[0],
+        transactionId: ''
+      });
+      setInvoicePaymentModal({ inv, newStatus });
+      return;
+    }
+    await applyInvoiceStatusChange(inv, newStatus, {});
+  };
+
+  const applyInvoiceStatusChange = async (inv, newStatus, paymentDetails = {}) => {
     try {
       if (inv._source === 'global' && inv._globalId) {
-        await axios.patch(`${BASE_URL}/api/invoices/${inv._globalId}/status`, { status: newStatus });
-        setProjectInvoices(prev => prev.map(g => g.id === inv._globalId ? { ...g, status: newStatus } : g));
+        await axios.patch(`${BASE_URL}/api/invoices/${inv._globalId}/status`, { status: newStatus, ...paymentDetails });
+        setProjectInvoices(prev => prev.map(g => g.id === inv._globalId ? { ...g, status: newStatus, amountPaid: paymentDetails.amountPaid ?? g.amountPaid } : g));
       } else {
         const updatedInvoices = (currProject.invoices || []).map(x =>
-          x.invoiceNo === inv.invoiceNo ? { ...x, status: newStatus } : x
+          x.invoiceNo === inv.invoiceNo ? { ...x, status: newStatus, ...paymentDetails } : x
         );
         await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { invoices: updatedInvoices });
         setCurrProject(prev => ({ ...prev, invoices: updatedInvoices }));
@@ -3962,6 +3979,91 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         setModalsState={(newState) => { setPaymentModalsState(newState); }}
         onSaveSuccess={(updatedFields) => { if (updatedFields) setCurrProject(prev => ({ ...prev, ...updatedFields })); loadLatest(); fetchProjectInvoices(); if (onUpdate) onUpdate(); }}
       />
+
+      {/* Invoice Payment Modal */}
+      {invoicePaymentModal && (() => {
+        const { inv: pInv, newStatus } = invoicePaymentModal;
+        const totalAmt = parseAmt(pInv.total) || parseAmt(pInv.amount) || 0;
+        const prevPaid = parseAmt(pInv.amountPaid) || 0;
+        const balanceDue = Math.max(0, totalAmt - prevPaid);
+        return (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+            <div style={{ background: '#fff', borderRadius: P.radius, width: '100%', maxWidth: 400, padding: 28, boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: P.textDark }}>Payment Information</h3>
+                <button onClick={() => setInvoicePaymentModal(null)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: P.textLight }}>✕</button>
+              </div>
+              <div style={{ background: P.bg, borderRadius: 10, padding: 14, marginBottom: 18 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{ fontSize: 12, color: P.textLight }}>Total Amount:</span>
+                  <span style={{ fontSize: 13, fontWeight: 800 }}>{currency}{totalAmt.toLocaleString()}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{ fontSize: 12, color: P.textLight }}>Previously Paid:</span>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: P.green }}>{currency}{prevPaid.toLocaleString()}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 6, borderTop: `1px dashed ${P.border}` }}>
+                  <span style={{ fontSize: 12, color: '#ea580c', fontWeight: 700 }}>Balance Due:</span>
+                  <span style={{ fontSize: 14, fontWeight: 900, color: '#ea580c' }}>{currency}{balanceDue.toLocaleString()}</span>
+                </div>
+              </div>
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: P.textLight, marginBottom: 6, textTransform: 'uppercase' }}>
+                  {newStatus === 'paid' ? 'Final Payment Amount' : 'New Payment Amount (Advance)'}
+                </label>
+                <input
+                  type="number"
+                  value={invoicePaymentData.amountPaid === 0 ? '' : invoicePaymentData.amountPaid}
+                  onChange={e => setInvoicePaymentData(p => ({ ...p, amountPaid: e.target.value === '' ? 0 : Number(e.target.value) }))}
+                  placeholder="Enter amount"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 15, fontWeight: 700, outline: 'none', boxSizing: 'border-box' }}
+                />
+              </div>
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: P.textLight, marginBottom: 6, textTransform: 'uppercase' }}>Payment Mode</label>
+                <select
+                  value={invoicePaymentData.paymentMode}
+                  onChange={e => setInvoicePaymentData(p => ({ ...p, paymentMode: e.target.value }))}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none' }}
+                >
+                  {['GPay', 'PhonePe', 'NEFT', 'RTGS', 'UPI', 'Net Banking', 'Cash', 'Other'].map(m => <option key={m} value={m}>{m}</option>)}
+                </select>
+              </div>
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: P.textLight, marginBottom: 6, textTransform: 'uppercase' }}>Payment Date</label>
+                <input
+                  type="date"
+                  value={invoicePaymentData.paymentDate}
+                  onChange={e => setInvoicePaymentData(p => ({ ...p, paymentDate: e.target.value }))}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
+                />
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: P.textLight, marginBottom: 6, textTransform: 'uppercase' }}>Transaction ID</label>
+                <input
+                  type="text"
+                  value={invoicePaymentData.transactionId}
+                  onChange={e => setInvoicePaymentData(p => ({ ...p, transactionId: e.target.value }))}
+                  placeholder="e.g. UTR123456789"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button onClick={() => setInvoicePaymentModal(null)} style={{ flex: 1, padding: 12, background: P.bg, border: `1px solid ${P.border}`, borderRadius: 10, fontSize: 13, fontWeight: 700, color: P.primary, cursor: 'pointer' }}>Cancel</button>
+                <button
+                  onClick={async () => {
+                    await applyInvoiceStatusChange(pInv, newStatus, invoicePaymentData);
+                    setInvoicePaymentModal(null);
+                  }}
+                  style={{ flex: 1, padding: 12, background: newStatus === 'paid' ? 'linear-gradient(135deg,#16a34a,#15803d)' : `linear-gradient(135deg,${P.primary},${P.primaryDark})`, border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#fff', cursor: 'pointer' }}
+                >
+                  {newStatus === 'paid' ? 'Confirm Full Payment' : 'Confirm Part Payment'}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Send to Client Popup */}
       {

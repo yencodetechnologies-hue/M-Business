@@ -1832,10 +1832,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                             color: isPaid ? "var(--green)" : isOverdue ? "var(--red)" : isPending ? "var(--amber)" : "var(--text3)"
                           }}>
 
-                          <option value="pending">pending</option>
+                          <option value="unpaid">Pending</option>
+                          <option value="sent">Sent</option>
                           <option value="paid">Paid</option>
                           <option value="part_paid">Part Paid</option>
-
                           <option value="overdue">Overdue</option>
                           <option value="draft">Draft</option>
                         </select>

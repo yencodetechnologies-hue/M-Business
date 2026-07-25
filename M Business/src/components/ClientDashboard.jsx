@@ -1327,8 +1327,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .today-label { position: absolute; top: -18px; transform: translateX(-50%); font-size: 9px; font-weight: 800; color: var(--red); background: var(--red-bg); padding: 1px 6px; border-radius: 20px; white-space: nowrap; }
 
     /* ── PROGRESS STEPS ── */
-    .cp-root .steps-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; position: relative; }
-    .cp-root .steps-grid::before { content: ''; position: absolute; top: 18px; left: 10%; right: 10%; height: 2px; background: var(--border); z-index: 0; }
+    .cp-root .steps-grid { display: flex; justify-content: center; align-items: flex-start; gap: 0; position: relative; width: 100%; }
+    .cp-root .steps-grid::before { content: ''; position: absolute; top: 18px; left: calc(50% / var(--step-count, 1)); right: calc(50% / var(--step-count, 1)); height: 2px; background: var(--border); z-index: 0; }
+    .cp-root .step-item { flex: 0 1 160px; }
     .cp-root .step-item { display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; z-index: 1; }
     .cp-root .step-circle { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; border: 2px solid transparent; transition: all .2s; cursor: pointer; }
     .cp-root .step-circle.done { background: var(--teal); color: #fff; border-color: var(--teal); box-shadow: 0 3px 10px rgba(0,188,212,.3); }
@@ -1520,7 +1521,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       .cp-root .two-col, .cp-root .three-col { grid-template-columns: 1fr; }
       .cp-root .hero-stats { gap: 16px; }
       .cp-root .hero-right { display: none; }
-      .cp-root .steps-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+      .cp-root .steps-grid { flex-wrap: wrap; gap: 16px; }
       .cp-root .steps-grid::before { display: none; }
       .cp-root .tn-nav { display: none; }
       .cp-root .mobile-menu-btn { display: flex; }
@@ -1875,7 +1876,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", padding: 22, marginBottom: 0, height: 233, boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
 
         {milestones.length > 0 ? (
-          <div className="steps-grid" style={{ gridTemplateColumns: `repeat(${milestones.length}, 1fr)` }}>
+          <div className="steps-grid" style={{ "--step-count": milestones.length }}>
             {stepNodes}
           </div>
         ) : (
@@ -2033,7 +2034,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   // footprint/style as the Invoices & Payments card, instead of the large
   // grid used on the dedicated Files tab.
   function renderFilesOverviewComponent() {
-    const recentFiles = allFiles.slice(0, 9);
+    const recentFiles = allFiles;
+    // (scroll fix applied on the returned wrapper below)
     if (selectedDoc) {
       return (
         <div style={{ display: "flex", flexDirection: "column", background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", padding: 20 }}>
@@ -2850,7 +2852,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             {/* Files & Documents and Invoices & Payments */}
             <div className="two-col" style={{ alignItems: "stretch" }}>
               {/* Files & Documents */}
-              <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+              <div style={{ display: "flex", flexDirection: "column", height: "100%", maxHeight: 420 }}>
                 <div className="sec-header">
                   <div className="sec-title" onClick={() => setActive('files')} style={{ cursor: 'pointer' }}>
                     <div className="sec-title-icon" style={{ background: C.blueBg, color: C.blue }}><i className="ti ti-files"></i></div>
@@ -2864,11 +2866,11 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     </div>
                   </div>
                 </div>
-                <div style={{ flex: 1, minHeight: 0 }}>{renderFilesOverviewComponent()}</div>
+                <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>{renderFilesOverviewComponent()}</div>
               </div>
 
               {/* Invoices */}
-              <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+              <div style={{ display: "flex", flexDirection: "column", height: "100%", maxHeight: 420 }}>
                 <div className="sec-header">
                   <div className="sec-title" onClick={() => setActive('payments')} style={{ cursor: 'pointer' }}>
                     <div className="sec-title-icon" style={{ background: C.greenBg, color: C.green }}><i className="ti ti-receipt-2"></i></div>

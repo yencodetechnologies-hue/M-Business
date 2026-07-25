@@ -1291,7 +1291,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
     /* ── PAGE BODY ── */
     .cp-root .page-body { max-width: 1200px; margin: 0 auto; padding: 28px 24px 60px; display: flex; flex-direction: column; gap: 28px; min-width: 0; box-sizing: border-box; }
-.cp-root .page-body.mpd-wide { max-width: 1440px; }
+.cp-root .page-body.mpd-wide { max-width: 1440px; width: 100%; padding: 28px 32px 60px; box-sizing: border-box; }
     .cp-root .page-body > * { min-width: 0; }
     .cp-root .page-body > *:not(.mpd-root) { overflow-x: auto; }
 

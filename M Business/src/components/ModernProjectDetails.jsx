@@ -81,15 +81,19 @@ const CSS = `
 .mpc-checkbox-label input { accent-color:${P.primary}; width:16px; height:16px; cursor:pointer; }
 
 /* CARDS */
-.mpd-card { background:#fff; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,.07), 0 0 0 1px rgba(0,0,0,.04); padding:22px 24px; margin-bottom:20px; transition:box-shadow .2s; }
+.mpd-card { background:#fff; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,.07), 0 0 0 1px rgba(0,0,0,.04); padding:26px 32px; margin-bottom:20px; transition:box-shadow .2s; }
 .mpd-card:hover { box-shadow:0 6px 24px rgba(0,0,0,.1), 0 0 0 1px rgba(0,188,212,.08); }
-.mpd-milestones-card { padding:28px 30px; }
+.mpd-milestones-card { padding:26px 32px; margin-bottom:24px; }
 .mpd-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
 .mpd-card-title { font-size:15px; font-weight:800; color:${P.textDark}; display:flex; align-items:center; gap:8px; }
 .mpd-card-title i { color:${P.primary}; font-size:18px; }
 
 /* HEADER SECTION */
-.mpd-proj-header { background:#fff; border-radius:18px; padding:24px 28px; box-shadow:0 4px 24px rgba(0,188,212,.1), 0 0 0 1px rgba(0,188,212,.08); margin-bottom:20px; display:flex; align-items:flex-start; justify-content:space-between; gap:20px; position:relative; overflow:hidden; }
+.mpd-proj-header { background:#fff; border-radius:18px; padding:24px 32px; box-shadow:0 4px 24px rgba(0,188,212,.1), 0 0 0 1px rgba(0,188,212,.08); margin-bottom:20px; display:flex; flex-wrap: wrap; align-items:flex-start; justify-content:space-between; gap:20px; position:relative; overflow:visible; box-sizing: border-box; width: 100%; }
+@media (max-width: 700px) {
+  .mpd-proj-header { flex-direction: column; }
+  .mpd-ph-right { align-items: flex-start; width: 100%; }
+}
 .mpd-proj-header::before { content:''; position:absolute; top:-40px; right:-40px; width:180px; height:180px; background:radial-gradient(circle,rgba(0,188,212,.08) 0%,transparent 70%); pointer-events:none; }
 .mpd-ph-left .mpd-proj-name { font-size:24px; font-weight:900; color:${P.textDark}; margin-bottom:8px; letter-spacing:-.3px; }
 .mpd-ph-left .mpd-proj-desc { font-size:13px; color:${P.textMid}; line-height:1.7; max-width:560px; margin-bottom:14px; }
@@ -98,7 +102,7 @@ const CSS = `
 .mpd-pm-item i { color:${P.primary}; font-size:14px; }
 .mpd-pm-item strong { color:${P.textDark}; font-weight:700; }
 .mpd-ph-right { display:flex; flex-direction:column; align-items:flex-end; gap:12px; }
-.mpd-budget-box { text-align:right; background:linear-gradient(135deg,${P.primaryLight},#fff); border:1.5px solid rgba(0,188,212,.15); border-radius:14px; padding:12px 18px; }
+.mpd-budget-box { text-align:right; background:linear-gradient(135deg,${P.primaryLight},#fff); border:1.5px solid rgba(0,188,212,.15); border-radius:14px; padding:18px 20px; min-width:160px; margin-top: 4px; }
 .mpd-budget-box .mpd-lbl { font-size:10px; color:${P.primary}; font-weight:800; text-transform:uppercase; letter-spacing:.7px; }
 .mpd-budget-box .mpd-amt { font-size:26px; font-weight:900; color:${P.textDark}; letter-spacing:-.5px; }
 .mpd-budget-box .mpd-sub { font-size:12px; color:${P.textLight}; }
@@ -131,8 +135,8 @@ const CSS = `
 .mpd-kpi-trend.mpd-down { color:${P.red}; }
 
 /* PROGRESS — 4 separate equal-width summary cards */
-.mpd-prog-card { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:20px; margin-bottom:20px; }
-.mpd-prog-item { background:#fff; border-radius:16px; padding:18px 20px; box-shadow:0 2px 12px rgba(0,0,0,.07); border:1px solid rgba(0,0,0,.05); min-width:0; }
+.mpd-prog-card { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:0; margin-bottom:0; }
+.mpd-prog-item { background:#fff; border-radius:16px; padding:24px 28px; box-shadow:0 2px 12px rgba(0,0,0,.07); border:1px solid rgba(0,0,0,.05); min-width:0; }
 .mpd-prog-item .mpd-progress-bg { width:100%; }
 @media (max-width: 900px) { .mpd-prog-card { grid-template-columns:repeat(2,1fr); } }
 @media (max-width: 480px) { .mpd-prog-card { grid-template-columns:1fr; } }
@@ -1695,7 +1699,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         </div>
 
         {/* HEADER + CLIENT PORTAL — side by side, 50/50 */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch', marginBottom: 24 }}>
           <div className="mpd-proj-header" style={{ flex: '1 1 50%', minWidth: 0 }}>
             <div className="mpd-ph-left">
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
@@ -1785,8 +1789,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         </div>
 
         {/* PROGRESS + SUMMARY — single row, 4 equal-width cards */}
-        <div className="mpd-prog-card">
-          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+        <div className="mpd-prog-card" style={{ marginBottom: 24 }}>
+          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
             <div className="mpd-kpi-icon" style={{ background: P.primaryLight || '#E0F2FE', flexShrink: 0 }}><i className="ti ti-chart-donut" style={{ color: P.primary }}></i></div>
             <div style={{ flex: 1 }}>
               <div className="mpd-prog-num">{progressPct}%</div>
@@ -2174,12 +2178,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
 
         {/* MAIN CONTENT GRID */}
-        <div className="mpd-grid-main-side" style={{ marginTop: 20, gap: 20 }}>
+        <div className="mpd-grid-main-side" style={{ marginTop: 24, gap: 20, marginBottom: 24 }}>
           {/* RIGHT COL — TASKS */}
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%', order: 2, flex: '1 1 0%', minWidth: 0 }}>
             {/* TASKS COMPONENT */}
             <div className="mpd-card" style={{ padding: 0, overflow: 'hidden', marginBottom: 20, display: 'flex', flexDirection: 'column', height: 420, maxHeight: 420, boxSizing: 'border-box' }}>
-              <div className="mpd-card-header" style={{ padding: '20px 24px 10px', marginBottom: 0 }}>
+              <div className="mpd-card-header" style={{ padding: '22px 24px 10px', marginBottom: 0 }}>
                 <div className="mpd-card-title"><i className="ti ti-list-check"></i> Tasks</div>
                 {!hideTopActions && (
                   <button className="mpd-btn mpd-btn-outline" onClick={() => { setEditingTask(null); setNewTaskTitle(''); setNewTaskDesc(''); setNewTaskPriority('medium'); setNewTaskAssignTo([]); setNewTaskDue(''); setNewTaskMilestone(''); setShowAddTaskModal(true); }} style={{ padding: '6px 12px', fontSize: 12 }}><i className="ti ti-plus"></i> Add Task</button>
@@ -2279,7 +2283,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           {/* LEFT COL — TABS (Updates / Activity Logs / Accounts) */}
           <div style={{ order: 1, flex: '1.6 1 0%', minWidth: 0 }}>
             {/* TABS - draggable scroll */}
-            <div className="mpd-card" style={{ padding: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: 420, maxHeight: 420, boxSizing: 'border-box' }}>          <div className="mpd-tabs"
+            <div className="mpd-card" style={{ padding: 22, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: 420, maxHeight: 420, boxSizing: 'border-box' }}>          <div className="mpd-tabs"
               ref={tabsRef}
               style={{ overflowX: 'auto', scrollbarWidth: 'none', marginBottom: 4 }}
             >
@@ -2316,14 +2320,16 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               })}
 
               <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, paddingRight: 12, fontSize: 13, color: '#9CA3AF', userSelect: 'none', whiteSpace: 'nowrap' }}>
-                <button
-                  type="button"
-                  onClick={() => { setActiveTab('updates'); setShowUpdateModal(true); }}
-                  className="mpd-btn mpd-btn-primary"
-                  style={{ padding: '5px 12px', fontSize: 12, whiteSpace: 'nowrap' }}
-                >
-                  <i className="ti ti-plus" style={{ marginRight: 4 }}></i>Add Update
-                </button>
+                {!hideTopActions && (
+                  <button
+                    type="button"
+                    onClick={() => { setActiveTab('updates'); setShowUpdateModal(true); }}
+                    className="mpd-btn mpd-btn-primary"
+                    style={{ padding: '5px 12px', fontSize: 12, whiteSpace: 'nowrap' }}
+                  >
+                    <i className="ti ti-plus" style={{ marginRight: 4 }}></i>Add Update
+                  </button>
+                )}
                 <span
                   onClick={() => {
                     const idx = tabOrder.indexOf(activeTab);
@@ -3414,7 +3420,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         </div>{/* end mpd-grid-main-side */}
 
         {/* TEAM + BUDGET — side by side */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch', marginTop: 24 }}>
           {/* TEAM SIDEBAR */}
           <div className="mpd-card" style={{ marginBottom: 0, display: 'flex', flexDirection: 'column', maxHeight: 360 }}>
             <div className="mpd-card-header">
@@ -3523,33 +3529,35 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         </div>
 
       </div >
-      <div className="mpd-card" style={{ marginTop: 20 }}>
-        <div className="mpd-section-heading"><i className="ti ti-building" /> Client Portal Settings</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 14 }}>
-          <label className="mpc-checkbox-label">
-            <input type="checkbox" checked={!!localPortalOpts?.showProgress} onChange={e => setLocalPortalOpts(prev => ({ ...(prev || {}), showProgress: e.target.checked }))} />
-            Show project progress to client
-          </label>
-          <label className="mpc-checkbox-label">
-            <input type="checkbox" checked={!!localPortalOpts.showMilestones} onChange={e => setLocalPortalOpts({ ...localPortalOpts, showMilestones: e.target.checked })} />
-            Show milestones to client
-          </label>
+      {!hideTopActions && (
+        <div className="mpd-card" style={{ marginTop: 20 }}>
+          <div className="mpd-section-heading"><i className="ti ti-building" /> Client Portal Settings</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 14 }}>
+            <label className="mpc-checkbox-label">
+              <input type="checkbox" checked={!!localPortalOpts?.showProgress} onChange={e => setLocalPortalOpts(prev => ({ ...(prev || {}), showProgress: e.target.checked }))} />
+              Show project progress to client
+            </label>
+            <label className="mpc-checkbox-label">
+              <input type="checkbox" checked={!!localPortalOpts.showMilestones} onChange={e => setLocalPortalOpts({ ...localPortalOpts, showMilestones: e.target.checked })} />
+              Show milestones to client
+            </label>
 
-          <label className="mpc-checkbox-label">
-            <input type="checkbox" checked={!!localPortalOpts.allowMessages} onChange={e => setLocalPortalOpts({ ...localPortalOpts, allowMessages: e.target.checked })} />
-            Allow client to send messages
-          </label>
-          <button
-            type="button"
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onUpdate && onUpdate({ _id: currProject._id, id: currProject.id, portalSettings: localPortalOpts }); }}
-            className="mpd-btn mpd-btn-primary"
-            style={{ marginTop: 16 }}
-          >
-            <i className="ti ti-device-floppy"></i> Update Project
-          </button>
+            <label className="mpc-checkbox-label">
+              <input type="checkbox" checked={!!localPortalOpts.allowMessages} onChange={e => setLocalPortalOpts({ ...localPortalOpts, allowMessages: e.target.checked })} />
+              Allow client to send messages
+            </label>
+            <button
+              type="button"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onUpdate && onUpdate({ _id: currProject._id, id: currProject.id, portalSettings: localPortalOpts }); }}
+              className="mpd-btn mpd-btn-primary"
+              style={{ marginTop: 16 }}
+            >
+              <i className="ti ti-device-floppy"></i> Update Project
+            </button>
 
+          </div >
         </div >
-      </div >
+      )}
       {previewProjectFile && (() => {
         const fname = (previewProjectFile.name || previewProjectFile.url || '').toLowerCase();
         const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/.test(fname) || (previewProjectFile.type || '').startsWith('image/');

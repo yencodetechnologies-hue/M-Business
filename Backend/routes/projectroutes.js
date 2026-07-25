@@ -23,7 +23,7 @@ router.get("/", async (req, res) => {
 // real single-project handler is never reached.
 router.get("/:id", async (req, res) => {
   try {
-    const companyId = req.companyId || "";
+    const companyId = req.companyId || req.headers['x-company-id'] || "";
     const project = await Project.findOne({ _id: req.params.id, companyId });
     if (!project) return res.status(404).json({ msg: "Project not found" });
     res.json(project);
@@ -41,7 +41,7 @@ router.get("/:id", async (req, res) => {
 // and returns an empty/wrong array instead of the project document.
 router.get("/:id", async (req, res) => {
   try {
-    const companyId = req.companyId || "";
+    const companyId = req.companyId || req.headers['x-company-id'] || "";
     const project = await Project.findOne({ _id: req.params.id, companyId });
     if (!project) return res.status(404).json({ msg: "Project not found" });
     res.json(project);

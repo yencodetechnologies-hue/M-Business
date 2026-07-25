@@ -654,7 +654,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     setLoadingProject(true);
     try {
       const [pRes, tRes] = await Promise.all([
-        axios.get(`${BASE_URL}/api/projects/${project._id}`),
+        axios.get(`${BASE_URL}/api/projects/${project._id}`, {
+          headers: { 'x-company-id': project?.companyId || currProject?.companyId || '' }
+        }),
         axios.get(`${BASE_URL}/api/tasks`, {
           headers: { 'x-company-id': project?.companyId || '' }
         })

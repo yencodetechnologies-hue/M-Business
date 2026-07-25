@@ -2759,53 +2759,61 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             {/* Timeline */}
             <div>
 
-              <div className="two-col" style={{ alignItems: "stretch" }}>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <div className="sec-header">
-                    <div className="sec-title">
-                      <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-calendar-stats"></i></div>
-                      Project Timeline
-                    </div>
-                  </div>
-                  {(() => {
-                    const { milestoneProgressBlock, ganttChartBlock } = renderTimelineComponent();
-                    return (
-                      <div style={{ flex: 1, display: "flex", flexDirection: "column", opacity: 1 }} id="milestone-progress-block">
-                        {milestoneProgressBlock}
-                        {portalSettings.showMilestones && ganttChartBlock}
-                      </div>
-                    );
-                  })()}
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-                  {portalSettings.showTeam && renderTeamComponent()}
-                  <div style={{ display: "flex", flexDirection: "column", height: 233 }}>
-                    <div className="sec-header">
-                      <div className="sec-title">
-                        <div className="sec-title-icon" style={{ background: C.redBg, color: C.red }}><i className="ti ti-clipboard-check"></i></div>
-                        Pending Approvals
-                      </div>
-                    </div>
-                    <div style={{ flex: 1, minHeight: 0 }}>
-                      {renderApprovalsComponent()}
-                    </div>
-                  </div>
-                  {portalSettings.allowMessages && (
-                    <div>
-                      <div className="sec-header">
-                        <div className="sec-title">
-                          <div className="sec-title-icon" style={{ background: C.purpleBg, color: C.purple }}><i className="ti ti-message-2"></i></div>
-                          Messages & Chat
-
+              {(() => {
+                const { milestoneProgressBlock, ganttChartBlock } = renderTimelineComponent();
+                return (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                    {/* Row 1: Milestone Progress | Team + Pending Approvals */}
+                    <div className="two-col" style={{ alignItems: "stretch" }}>
+                      <div style={{ display: "flex", flexDirection: "column" }}>
+                        <div className="sec-header">
+                          <div className="sec-title">
+                            <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-calendar-stats"></i></div>
+                            Project Timeline
+                          </div>
                         </div>
-
+                        {portalSettings.showMilestones && milestoneProgressBlock}
                       </div>
-                      {renderMessagesComponent()}
+                      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                        {portalSettings.showTeam && renderTeamComponent()}
+                        <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+                          <div className="sec-header">
+                            <div className="sec-title">
+                              <div className="sec-title-icon" style={{ background: C.redBg, color: C.red }}><i className="ti ti-clipboard-check"></i></div>
+                              Pending Approvals
+                            </div>
+                          </div>
+                          <div style={{ flex: 1, minHeight: 233 }}>
+                            {renderApprovalsComponent()}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </div>
-              </div>
-            </div>
+
+                    {/* Row 2: Gantt Chart | Messages & Chat */}
+                    {portalSettings.showMilestones && (
+                      <div className="two-col" style={{ alignItems: "stretch" }}>
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                          {ganttChartBlock}
+                        </div>
+                        {portalSettings.allowMessages && (
+                          <div style={{ display: "flex", flexDirection: "column" }}>
+                            <div className="sec-header" style={{ marginBottom: 14 }}>
+                              <div className="sec-title">
+                                <div className="sec-title-icon" style={{ background: C.purpleBg, color: C.purple }}><i className="ti ti-message-2"></i></div>
+                                Messages & Chat
+                              </div>
+                            </div>
+                            <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+                              {renderMessagesComponent()}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}   </div>
 
             {/* Files & Documents and Invoices & Payments */}
             <div className="two-col" style={{ alignItems: "stretch" }}>

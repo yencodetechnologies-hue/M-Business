@@ -621,16 +621,40 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   const applyInvoiceStatusChange = async (inv, newStatus, paymentDetails = {}) => {
     try {
+      const prevPaid = parseAmt(inv.amountPaid) || 0;
+      const newAmountPaid = paymentDetails.amountPaid !== undefined
+        ? prevPaid + Number(paymentDetails.amountPaid || 0)
+        : prevPaid;
+      const finalPaymentDetails = { ...paymentDetails, amountPaid: newAmountPaid };
+
       if (inv._source === 'global' && inv._globalId) {
-        await axios.patch(`${BASE_URL}/api/invoices/${inv._globalId}/status`, { status: newStatus, ...paymentDetails });
-        setProjectInvoices(prev => prev.map(g => g.id === inv._globalId ? { ...g, status: newStatus, amountPaid: paymentDetails.amountPaid ?? g.amountPaid } : g));
+        await axios.patch(`${BASE_URL}/api/invoices/${inv._globalId}/status`, { status: newStatus, ...finalPaymentDetails });
+        setProjectInvoices(prev => prev.map(g => g.id === inv._globalId ? { ...g, status: newStatus, amountPaid: newAmountPaid } : g));
       } else {
         const updatedInvoices = (currProject.invoices || []).map(x =>
-          x.invoiceNo === inv.invoiceNo ? { ...x, status: newStatus, ...paymentDetails } : x
+          x.invoiceNo === inv.invoiceNo ? { ...x, status: newStatus, ...finalPaymentDetails } : x
         );
         await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { invoices: updatedInvoices });
         setCurrProject(prev => ({ ...prev, invoices: updatedInvoices }));
       }
+
+      // Record this payment into paymentsReceived so Budget's Received/Pending totals update too
+      const paymentAmt = Number(paymentDetails.amountPaid || 0);
+      if (paymentAmt > 0) {
+        const newPaymentRecord = {
+          paymentNo: `PAY-${String((currProject.paymentsReceived || []).length + 1).padStart(3, '0')}`,
+          linkedInvoice: inv.invoiceNo,
+          amount: paymentAmt,
+          dueDate: inv.dueDate || '',
+          paymentDate: paymentDetails.paymentDate || new Date().toISOString().split('T')[0],
+          paymentMode: paymentDetails.paymentMode || '',
+          transactionId: paymentDetails.transactionId || '',
+        };
+        const updatedPayments = [...(currProject.paymentsReceived || []), newPaymentRecord];
+        setCurrProject(prev => ({ ...prev, paymentsReceived: updatedPayments }));
+        await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { paymentsReceived: updatedPayments });
+      }
+
       fetchProjectInvoices();
       loadLatest();
     } catch (err) {
@@ -3543,7 +3567,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               <span className="mpd-lbl">Total Budget <span style={{ fontSize: 9, color: '#94A3B8', fontWeight: 600, marginLeft: 4 }}></span></span>
               <span className="mpd-val">{currency}{budgetAmt.toLocaleString()}</span>
             </div>
-            {[['Billed', 'billed', billed, ''], ['Advance Paid', 'advance', autoAdvanceTotal, 'mpd-p'], ['Received', 'received', received, 'mpd-g']].map(([lbl, key, val, cls]) => (
+            {[ ['Advance Paid', 'advance', autoAdvanceTotal, 'mpd-p'], ['Received', 'received', received, 'mpd-g']].map(([lbl, key, val, cls]) => (
               <div key={key} className="mpd-brow">
                 <span className="mpd-lbl">{lbl}</span>
                 <span className={`mpd-val ${cls}`}>{currency}{val.toLocaleString()}</span>

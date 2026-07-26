@@ -18,7 +18,7 @@
     html,
     body {
       margin: 0;
-      background: #f5f3ff;
+      background: #F5FAFA;
     }
 
     html.dark-mode,
@@ -41,11 +41,22 @@
     (function () {
       try {
         var dm = localStorage.getItem("empDarkMode") === "true" || localStorage.getItem("adminDarkMode") === "true";
+        var THEMES = {
+          purple: { sidebar: "#7c3aed", bg: "#f5f3ff" },
+          ocean: { sidebar: "#0284c7", bg: "#f0f9ff" },
+          forest: { sidebar: "#16a34a", bg: "#f0fdf4" },
+          sunset: { sidebar: "#ea580c", bg: "#fff7ed" },
+          teal: { sidebar: "#7c3aed", bg: "#F5FAFA" }
+        };
+        var appTheme = localStorage.getItem("appTheme") || "teal";
+        var t = THEMES[appTheme] || THEMES.teal;
         if (dm) {
           document.documentElement.classList.add("dark-mode");
           document.documentElement.style.setProperty("--app-bg", "#0a1628");
+          document.documentElement.style.setProperty("--app-sidebar", "#0a1628");
         } else {
-          document.documentElement.style.setProperty("--app-bg", "#f5f3ff");
+          document.documentElement.style.setProperty("--app-bg", t.bg);
+          document.documentElement.style.setProperty("--app-sidebar", t.sidebar);
         }
       } catch (e) { }
     })();

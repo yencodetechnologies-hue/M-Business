@@ -613,6 +613,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           respondedAt: a.respondedAt || a.updatedAt || null,
           fileUrl: a.fileUrl,
           fileName: a.fileName,
+          attachments: a.attachments || [],
           recipientType: a.recipientType,
         })) : []);
 
@@ -715,6 +716,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           respondedAt: a.respondedAt || a.updatedAt || null,
           fileUrl: a.fileUrl,
           fileName: a.fileName,
+          attachments: a.attachments || [],
           recipientType: a.recipientType,
         })) : []);
 

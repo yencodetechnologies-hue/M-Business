@@ -2682,7 +2682,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                     };
                                     const updatedUpdates = [newUpdate, ...(currProject.updates || [])];
                                     setCurrProject(prev => ({ ...prev, updates: updatedUpdates }));
-                                    const putRes = await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { updates: updatedUpdates });
+                                    const putPromise = axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { updates: updatedUpdates });
 
                                     if (isApprovalRequest && resolvedClientId) {
                                       const approvalCompanyId = user?.companyId || user?.company || user?._id || user?.id || currProject.companyId || '';
@@ -2700,11 +2700,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                         projectId: currProject._id || '',
                                         fileUrl: primaryAttachment ? primaryAttachment.url : '',
                                         fileName: primaryAttachment ? primaryAttachment.name : '',
+                                        attachments,
                                       });
-                                      loadProjectApprovals();
                                     }
 
-                                    await loadLatest();
+                                    await putPromise;
+                                    loadProjectApprovals();
                                     if (onUpdate) onUpdate();
                                     setUpdateText('');
                                     setUpdateTitle('');

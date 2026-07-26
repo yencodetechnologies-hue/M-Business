@@ -11721,7 +11721,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { if (jumpProject) { setSidebarOverride(sidebarOverride || "projects"); setActive("project-details"); return; } const returnTo = sidebarOverride || prevActiveBeforeInvoice || "dashboard"; setSidebarOverride(null); setActive(returnTo); }} onSaveSuccess={() => {
+            {validActive === "invoices" && <InvoiceCreator forceListView={!jumpProject && !invoicePrefill && !jumpInvoice} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { if (jumpProject) { setSidebarOverride(sidebarOverride || "projects"); setActive("project-details"); return; } const returnTo = sidebarOverride || prevActiveBeforeInvoice || "dashboard"; setSidebarOverride(null); setActive(returnTo); }} onSaveSuccess={() => {
               if (jumpProject && (jumpProject._id || jumpProject.id)) {
                 setSidebarOverride(sidebarOverride || "projects");
                 setActive("project-details");

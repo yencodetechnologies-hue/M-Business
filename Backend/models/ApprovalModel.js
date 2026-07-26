@@ -16,6 +16,7 @@ const ApprovalSchema = new mongoose.Schema({
     projectId: { type: String, default: '' },
     fileUrl: { type: String, default: '' },
     fileName: { type: String, default: '' },
+    attachments: { type: [{ name: String, url: String, type: String }], default: [] },
     status: { type: String, default: 'pending' },
     rejectReason: { type: String, default: '' },
     respondedAt: { type: Date, default: null },

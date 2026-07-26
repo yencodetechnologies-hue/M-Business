@@ -5959,7 +5959,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
 
 
-function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, companyLogo, onLogoChange, enforceMySubscriptions, onLogoUploadClick, setSelectedProjectForTasks, desktopOpen, setJumpProject, setJumpInvoicePrefill }) {
+function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, companyLogo, onLogoChange, enforceMySubscriptions, onLogoUploadClick, setSelectedProjectForTasks, desktopOpen, setJumpProject, setJumpInvoicePrefill, setInvoicePrefill, setSidebarNavClickId }) {
   const items = navItems || NAV;
 
   const [isDesktopWidth, setIsDesktopWidth] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 769);
@@ -6147,6 +6147,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
                             setJumpProject(null);
                             setJumpInvoicePrefill(null);
                             if (typeof setInvoicePrefill === "function") setInvoicePrefill(null);
+                            setSidebarNavClickId(id => id + 1);
                             try {
                               localStorage.removeItem("invoiceCreatorStep_subadmin");
                               localStorage.removeItem("invoiceCreatorEditingId_subadmin");
@@ -6981,6 +6982,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     } catch (e) { }
     return null;
   });
+  const [sidebarNavClickId, setSidebarNavClickId] = useState(0);
+
 
   useEffect(() => {
     try {
@@ -9720,6 +9723,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             desktopOpen={desktopSidebarOpen}
             setJumpProject={setJumpProject}
             setJumpInvoicePrefill={setJumpInvoicePrefill}
+            setInvoicePrefill={setInvoicePrefill}
+            setSidebarNavClickId={setSidebarNavClickId}
           />
 
         </div>
@@ -11721,10 +11726,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {validActive === "invoices" && <InvoiceCreator forceListView={!jumpProject && !invoicePrefill && !jumpInvoice} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { if (jumpProject) { setSidebarOverride(sidebarOverride || "projects"); setActive("project-details"); return; } const returnTo = sidebarOverride || prevActiveBeforeInvoice || "dashboard"; setSidebarOverride(null); setActive(returnTo); }} onSaveSuccess={() => {
+            {validActive === "invoices" && <InvoiceCreator key={`invoices-${sidebarNavClickId}`} forceListView={!jumpProject && !invoicePrefill && !jumpInvoice} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { if (jumpProject) { setSidebarOverride(sidebarOverride || "projects"); setActive("project-details"); return; } const returnTo = sidebarOverride || prevActiveBeforeInvoice || "dashboard"; setSidebarOverride(null); setActive(returnTo); }} onSaveSuccess={() => {
               if (jumpProject && (jumpProject._id || jumpProject.id)) {
                 setSidebarOverride(sidebarOverride || "projects");
                 setActive("project-details");
+                if (typeof setInvoicePrefill === "function") setInvoicePrefill(null);
                 return;
               }
               if (!jumpInvoice && !newInvoicePrefill && !jumpInvoicePrefill) {

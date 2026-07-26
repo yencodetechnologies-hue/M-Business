@@ -53,6 +53,7 @@ router.get("/project/:projectId", async (req, res) => {
 router.post("/", async (req, res) => {
     try {
         const { companyId, clientId, recipientType, teamMemberId, senderName, title, desc, icon, approveLabel, rejectLabel, sourceType, sourceId, projectId, fileUrl, fileName, attachments } = req.body;
+        console.log("Incoming attachments payload:", JSON.stringify(attachments));
         if (!companyId || !title) {
             return res.status(400).json({ msg: "companyId and title are required" });
         }

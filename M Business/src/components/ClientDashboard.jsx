@@ -2072,7 +2072,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
     return (
       <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden", padding: "16px 18px", height: "100%", display: "flex", flexDirection: "column" }}>
-        <div className="files-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)", alignContent: "start" }}>
+        <div className="files-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)", alignContent: "start", height: "100%" }}>
           {recentFiles.map((file, idx) => (
             <div key={idx} className="file-card" onClick={() => {
               if (file.isLetterhead && file.raw?.htmlContent) { setSelectedDoc(file.raw); }
@@ -2866,7 +2866,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     </div>
                   </div>
                 </div>
-                <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>{renderFilesOverviewComponent()}</div>
+                <div style={{ flex: 1, minHeight: 0, maxHeight: 340, overflowY: "scroll", overscrollBehavior: "contain" }}>{renderFilesOverviewComponent()}</div>
               </div>
 
               {/* Invoices */}

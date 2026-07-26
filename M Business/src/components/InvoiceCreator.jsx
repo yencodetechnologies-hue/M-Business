@@ -400,7 +400,12 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   }, [step]); // "list" | "form" | "preview"
   const [showAddClient, setShowAddClient] = useState(false);
   const [internalNav, setInternalNav] = useState(false);
-  const [invoiceList, setInvoiceList] = useState([]);
+  const [invoiceList, setInvoiceList] = useState(() => {
+    try {
+      const c = localStorage.getItem("cached_invoices");
+      return c ? JSON.parse(c) : [];
+    } catch { return []; }
+  });
   const [listLoading, setListLoading] = useState(false);
 
   useEffect(() => {
@@ -772,11 +777,11 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
   // ── Fetch list ----------------------------------------------
   const fetchList = async () => {
-    setListLoading(true);
     try {
       const res = await axios.get(`${BASE_URL}/api/invoices?_t=${Date.now()}`);
       if (res.data.success && Array.isArray(res.data.invoices)) {
         setInvoiceList(res.data.invoices);
+        try { localStorage.setItem("cached_invoices", JSON.stringify(res.data.invoices)); } catch { }
       } else {
         console.warn("Invoice list fetch returned unexpected shape, falling back to local drafts");
         setInvoiceList(loadAllDrafts());
@@ -784,8 +789,6 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     } catch (err) {
       console.error("Invoice list fetch failed, falling back to local drafts", err);
       setInvoiceList(loadAllDrafts());
-    } finally {
-      setListLoading(false);
     }
   };
 

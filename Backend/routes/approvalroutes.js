@@ -52,7 +52,7 @@ router.get("/project/:projectId", async (req, res) => {
 // ── POST create a new approval request (subadmin side) ────────────────────
 router.post("/", async (req, res) => {
     try {
-        const { companyId, clientId, recipientType, teamMemberId, senderName, title, desc, icon, approveLabel, rejectLabel, sourceType, sourceId, projectId, fileUrl, fileName, attachments } = req.body;
+        const { companyId, clientId, recipientType, teamMemberId, senderName, title, desc, icon, approveLabel, rejectLabel, sourceType, sourceId, projectId, fileUrl, fileName } = req.body;
         if (!companyId || !title) {
             return res.status(400).json({ msg: "companyId and title are required" });
         }
@@ -75,7 +75,6 @@ router.post("/", async (req, res) => {
             projectId: projectId || "",
             fileUrl: fileUrl || "",
             fileName: fileName || "",
-            attachments: Array.isArray(attachments) ? attachments : [],
         });
         await approval.save();
 

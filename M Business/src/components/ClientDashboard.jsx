@@ -613,7 +613,6 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           respondedAt: a.respondedAt || a.updatedAt || null,
           fileUrl: a.fileUrl,
           fileName: a.fileName,
-          attachments: Array.isArray(a.attachments) ? a.attachments : [],
           recipientType: a.recipientType,
         })) : []);
 
@@ -716,7 +715,6 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           respondedAt: a.respondedAt || a.updatedAt || null,
           fileUrl: a.fileUrl,
           fileName: a.fileName,
-          attachments: Array.isArray(a.attachments) ? a.attachments : [],
           recipientType: a.recipientType,
         })) : []);
 
@@ -2073,8 +2071,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     }
 
     return (
-      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", padding: "16px 18px", display: "flex", flexDirection: "column", maxHeight: 340, overflowY: "auto" }}>
-        <div className="files-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)", alignContent: "start" }}>
+      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden", padding: "16px 18px", height: "100%", display: "flex", flexDirection: "column" }}>
+        <div className="files-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)", alignContent: "start", height: "100%" }}>
           {recentFiles.map((file, idx) => (
             <div key={idx} className="file-card" onClick={() => {
               if (file.isLetterhead && file.raw?.htmlContent) { setSelectedDoc(file.raw); }
@@ -2650,33 +2648,29 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       .slice(0, 6).map((upd, i) => ({
         id: 'upd-' + i,
         title: upd.text || upd.title || 'Project update posted',
-        rawTime: upd.date || 0,
         time: upd.date ? new Date(upd.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
         icon: 'ti-speakerphone'
       }));
     const notifItems = notifs.slice(0, 3).map((n, i) => ({
       id: 'notif-' + i,
       title: n.text || 'Notification',
-      rawTime: n.createdAt || 0,
       time: n.createdAt ? new Date(n.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
       icon: 'ti-bell'
     }));
     const fileItems = (proj?.files || []).slice(0, 6).map((f, i) => ({
       id: 'file-' + i,
       title: `${f.uploadedBy || 'Someone'} uploaded ${f.name || 'a file'}`,
-      rawTime: f.date || 0,
       time: f.date ? new Date(f.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
       icon: 'ti-upload'
     }));
     const milestoneItems = (proj?.milestones || []).filter(m => m.done).slice(0, 6).map((m, i) => ({
       id: 'ms-' + i,
       title: `Milestone ${m.name} completed`,
-      rawTime: m.date || 0,
       time: m.date ? new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
       icon: 'ti-flag'
     }));
     const feedItems = [...fileItems, ...milestoneItems, ...projUpdates, ...notifItems]
-      .sort((a, b) => new Date(b.rawTime) - new Date(a.rawTime))
+      .sort((a, b) => new Date(b.time) - new Date(a.time))
       .slice(0, 4);
 
     const dotColors = {
@@ -2872,7 +2866,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     </div>
                   </div>
                 </div>
-                <div style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>{renderFilesOverviewComponent()}</div>
+                <div style={{ flex: 1, minHeight: 0, maxHeight: 340, overflowY: "scroll", overscrollBehavior: "contain" }}>{renderFilesOverviewComponent()}</div>
               </div>
 
               {/* Invoices */}

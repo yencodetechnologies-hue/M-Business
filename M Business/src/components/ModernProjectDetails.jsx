@@ -2700,7 +2700,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                         projectId: currProject._id || '',
                                         fileUrl: primaryAttachment ? primaryAttachment.url : '',
                                         fileName: primaryAttachment ? primaryAttachment.name : '',
-                                        attachments,
                                       });
                                       loadProjectApprovals();
                                     }

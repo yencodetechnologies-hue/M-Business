@@ -2650,29 +2650,33 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       .slice(0, 6).map((upd, i) => ({
         id: 'upd-' + i,
         title: upd.text || upd.title || 'Project update posted',
+        rawTime: upd.date || 0,
         time: upd.date ? new Date(upd.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
         icon: 'ti-speakerphone'
       }));
     const notifItems = notifs.slice(0, 3).map((n, i) => ({
       id: 'notif-' + i,
       title: n.text || 'Notification',
+      rawTime: n.createdAt || 0,
       time: n.createdAt ? new Date(n.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
       icon: 'ti-bell'
     }));
     const fileItems = (proj?.files || []).slice(0, 6).map((f, i) => ({
       id: 'file-' + i,
       title: `${f.uploadedBy || 'Someone'} uploaded ${f.name || 'a file'}`,
+      rawTime: f.date || 0,
       time: f.date ? new Date(f.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
       icon: 'ti-upload'
     }));
     const milestoneItems = (proj?.milestones || []).filter(m => m.done).slice(0, 6).map((m, i) => ({
       id: 'ms-' + i,
       title: `Milestone ${m.name} completed`,
+      rawTime: m.date || 0,
       time: m.date ? new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
       icon: 'ti-flag'
     }));
     const feedItems = [...fileItems, ...milestoneItems, ...projUpdates, ...notifItems]
-      .sort((a, b) => new Date(b.time) - new Date(a.time))
+      .sort((a, b) => new Date(b.rawTime) - new Date(a.rawTime))
       .slice(0, 4);
 
     const dotColors = {

@@ -2067,7 +2067,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     }
 
     return (
-      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", padding: "16px 18px", display: "flex", flexDirection: "column", maxHeight: 340, overflowY: "auto" }}>
+      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", padding: "16px 18px", display: "flex", flexDirection: "column", height: "100%", maxHeight: "none", overflowY: "auto" }}>
         <div className="files-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)", alignContent: "start" }}>
           {recentFiles.map((file, idx) => (
             <div key={idx} className="file-card" onClick={() => {
@@ -2097,7 +2097,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             </div>
           ))}
           {recentFiles.length === 0 && (
-            <div style={{ padding: 30, textAlign: "center", color: C.text3, fontSize: 12, gridColumn: "1 / -1" }}>No files found.</div>
+            <div style={{ padding: 30, textAlign: "center", color: C.text3, fontSize: 12, fontWeight: 800, gridColumn: "1 / -1" }}>No files found.</div>
           )}
         </div>
       </div>
@@ -2859,10 +2859,10 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     {downloadingAll ? "Downloading..." : "Download All"}
                   </div>
                 </div>
-                <div style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>{renderFilesOverviewComponent()}</div>
+                <div style={{ flex: 1, minHeight: 0, overflow: "auto" }}>{renderFilesOverviewComponent()}</div>
               </div>
 
-              {/* Invoices */}
+              {/* Invoices & Payments */}
               <div style={{ display: "flex", flexDirection: "column", height: 480, overflow: "hidden" }}>
                 <div className="sec-header">
                   <div className="sec-title" onClick={() => setActive('payments')} style={{ cursor: 'pointer' }}>
@@ -2873,9 +2873,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     <i className="ti ti-arrow-right" style={{ fontSize: 13 }}></i> View All
                   </div>
                 </div>
-                <div style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>{renderInvoicesComponent()}</div>
-              </div>
-            </div>
+                <div style={{ flex: 1, minHeight: 0, overflow: "hidden", background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px" }}>{renderInvoicesComponent()}</div>
+              </div>    </div>
             {/* Calendar */}
 
 

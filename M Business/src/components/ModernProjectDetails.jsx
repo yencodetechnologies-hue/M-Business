@@ -3602,45 +3602,47 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
       </div >
       {!hideTopActions && (
-        <div className="mpd-card" style={{ marginTop: 20 }}>
-          <div className="mpd-section-heading"><i className="ti ti-building" /> Client Portal Settings</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 14 }}>
-            <label className="mpc-checkbox-label">
-              <input type="checkbox" checked={!!localPortalOpts?.showProgress} onChange={e => setLocalPortalOpts(prev => ({ ...(prev || {}), showProgress: e.target.checked }))} />
-              Show project progress to client
-            </label>
-            <label className="mpc-checkbox-label">
-              <input type="checkbox" checked={!!localPortalOpts.showMilestones} onChange={e => setLocalPortalOpts({ ...localPortalOpts, showMilestones: e.target.checked })} />
-              Show milestones to client
-            </label>
+        <div style={{ display: 'flex', gap: 20, marginTop: 20, alignItems: 'flex-start' }}>
+          <div className="mpd-card" style={{ flex: '1 1 0%', marginTop: 0 }}>
+            <div className="mpd-section-heading"><i className="ti ti-building" /> Client Portal Settings</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 14 }}>
+              <label className="mpc-checkbox-label">
+                <input type="checkbox" checked={!!localPortalOpts?.showProgress} onChange={e => setLocalPortalOpts(prev => ({ ...(prev || {}), showProgress: e.target.checked }))} />
+                Show project progress to client
+              </label>
+              <label className="mpc-checkbox-label">
+                <input type="checkbox" checked={!!localPortalOpts.showMilestones} onChange={e => setLocalPortalOpts({ ...localPortalOpts, showMilestones: e.target.checked })} />
+                Show milestones to client
+              </label>
 
-            <label className="mpc-checkbox-label">
-              <input type="checkbox" checked={!!localPortalOpts.allowMessages} onChange={e => setLocalPortalOpts({ ...localPortalOpts, allowMessages: e.target.checked })} />
-              Allow client to send messages
-            </label>
-            <button
-              type="button"
-              onClick={async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (!onUpdate) return;
-                const payload = { ...currProject, portalSettings: { ...localPortalOpts } };
-                const saved = await onUpdate(payload);
-                if (saved && saved._id) {
-                  setCurrProject(saved);
-                  setLocalPortalOpts(saved.portalSettings || {});
-                } else {
-                  console.error('Update Project: save failed or returned no data', saved);
-                }
-              }}
-              className="mpd-btn mpd-btn-primary"
-              style={{ marginTop: 16, width: 'auto', alignSelf: 'flex-start', padding: '10px 20px' }}
-            >
-              <i className="ti ti-device-floppy"></i> Update Project
-            </button>
+              <label className="mpc-checkbox-label">
+                <input type="checkbox" checked={!!localPortalOpts.allowMessages} onChange={e => setLocalPortalOpts({ ...localPortalOpts, allowMessages: e.target.checked })} />
+                Allow client to send messages
+              </label>
+              <button
+                type="button"
+                onClick={async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (!onUpdate) return;
+                  const payload = { ...currProject, portalSettings: { ...localPortalOpts } };
+                  const saved = await onUpdate(payload);
+                  if (saved && saved._id) {
+                    setCurrProject(saved);
+                    setLocalPortalOpts(saved.portalSettings || {});
+                  } else {
+                    console.error('Update Project: save failed or returned no data', saved);
+                  }
+                }}
+                className="mpd-btn mpd-btn-primary"
+                style={{ marginTop: 16, width: 'auto', alignSelf: 'flex-start', padding: '10px 20px' }}
+              >
+                <i className="ti ti-device-floppy"></i> Update Project
+              </button>
 
+            </div >
           </div >
-        </div >
+        </div>
       )
       }
       {

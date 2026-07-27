@@ -126,11 +126,11 @@ const res = await fetch(`/api/tasks?person=${encodeURIComponent(user.name)}`, {
       {toast && <div className="toast show"><i className="ti ti-check"></i> {toast}</div>}
 
       {/* Share Onboarding Link Card (Kept as requested) */}
-      <div style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.2)", marginBottom: 6 }}>
+      <div className="employees-onboard-card" style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.2)", marginBottom: 6 }}>
         <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🔗</div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Employee Onboarding Link</div>
-          <div style={{ fontSize: 12, color: "#ffffff", fontFamily: "monospace", wordBreak: "break-all" }}>{onboardingLink}</div>
+          <div className="onboard-link-text" style={{ fontSize: 12, color: "#ffffff", fontFamily: "monospace", wordBreak: "break-all" }}>{onboardingLink}</div>
         </div>
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
           <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "✅ Copied!" : "📋 Copy Link"}</button>

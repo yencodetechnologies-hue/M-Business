@@ -344,13 +344,14 @@
 /* ---------- Buttons / actions that shouldn't overflow ---------- */
 @media (max-width: 480px) {
 
-    .create-btn,
-    .header-actions button,
-    .page-header button {
+    .create-btn:not(.compact-action-btn),
+    .header-actions button:not(.compact-action-btn),
+    .page-header button:not(.compact-action-btn) {
         width: 100% !important;
         justify-content: center !important;
     }
 
+    .page-header .compact-action-btn,
     .compact-action-btn {
         width: auto !important;
         max-width: none !important;
@@ -358,6 +359,50 @@
         font-size: 13px !important;
         white-space: nowrap !important;
         border-radius: 10px !important;
+    }
+}
+
+/* ---------- Employees page: onboarding card + header ---------- */
+@media (max-width: 480px) {
+
+    .employees-onboard-card {
+        flex-wrap: nowrap !important;
+        overflow: hidden !important;
+        padding: 14px 16px !important;
+        gap: 10px !important;
+    }
+
+    .employees-onboard-card .onboard-link-text {
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        word-break: normal !important;
+    }
+
+    .employees-onboard-card .onboard-actions {
+        gap: 6px !important;
+    }
+
+    .employees-onboard-card .onboard-actions button {
+        padding: 8px 10px !important;
+        font-size: 11px !important;
+        white-space: nowrap !important;
+    }
+
+    .employees-page-header {
+        flex-wrap: nowrap !important;
+        gap: 8px !important;
+    }
+
+    .employees-page-header h1 {
+        font-size: 18px !important;
+        white-space: nowrap !important;
+    }
+
+    .employees-page-header .create-btn {
+        padding: 8px 14px !important;
+        font-size: 12px !important;
+        white-space: nowrap !important;
     }
 }
 

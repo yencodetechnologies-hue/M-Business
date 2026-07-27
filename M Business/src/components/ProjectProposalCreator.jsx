@@ -1955,10 +1955,10 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
           </div>
 
           {/* MAIN GRID */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 20, alignItems: "start" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
             {/* LEFT – PROPOSALS */}
-            <div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
               {loading ? (
                 <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--text3,#A0B8BE)", fontSize: 14 }}></div>
               ) : filtered.length === 0 ? (
@@ -2020,7 +2020,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                         </div>
 
                         {/* Body */}
-                        <div style={{ padding: "16px 20px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, borderBottom: "1px solid var(--border,#E0EEF0)" }}>
+                        <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 10, borderBottom: "1px solid var(--border,#E0EEF0)" }}>
                           <div>
                             <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text3,#A0B8BE)", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4 }}>Proposal Value</div>
                             <div style={{ fontSize: 14, fontWeight: 800, color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))" }}>₹{value.toLocaleString("en-IN")}</div>
@@ -2084,7 +2084,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
             </div>
 
             {/* RIGHT COL */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
 
               {/* PIPELINE SUMMARY */}
               <div style={{ background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 16, padding: 20 }}>

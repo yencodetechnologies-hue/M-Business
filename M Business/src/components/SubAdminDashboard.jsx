@@ -1542,7 +1542,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
       ) : clientProjects.map((p, i) => (
 
-        <div key={i} style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 12, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14 }}>
+        <div key={p._id || i} style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 12, padding: "16px 18px", display: "flex", alignItems: "center", gap: 14, minHeight: 64, flexWrap: "wrap", overflow: "hidden" }}>
 
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "var(--teal-light, var(--teal-light, #E0F7FA))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>📁</div>
 
@@ -1564,7 +1564,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", flexShrink: 0 }}>
 
             <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#E8FAF3", color: "#26C281" }}>{p.status || "Active"}</span>
 
@@ -3118,7 +3118,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
       {/* Share Onboarding Link Card (Kept as requested) */}
 
-      <div style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.2)", marginBottom: 6 }}>
+      <div className="employees-onboard-card" style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.2)", marginBottom: 6 }}>
 
         <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -3131,11 +3131,11 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
           <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Employee Onboarding Link</div>
 
-          <div style={{ fontSize: 12, color: "#ffffff", fontFamily: "monospace", wordBreak: "break-all" }}>{onboardingLink}</div>
+          <div className="onboard-link-text" style={{ fontSize: 12, color: "#ffffff", fontFamily: "monospace", wordBreak: "break-all" }}>{onboardingLink}</div>
 
         </div>
 
-        <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+        <div className="onboard-actions" style={{ display: "flex", gap: 8, flexShrink: 0 }}>
 
           <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "Copied!" : "📋 Copy Link"}</button>
 
@@ -3164,7 +3164,7 @@ ${onboardingLink}`;
       </div>
 
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+      <div className="employees-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
         <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1A2332", margin: 0 }}>Employees</h1>
         <button className="create-btn" onClick={onAddEmployeeClick} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           <i className="ti ti-plus"></i> New Employee
@@ -5379,7 +5379,7 @@ function InterviewPage({ companyId, companyName }) {
 
         <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Candidate Application Link</div><div style={{ fontSize: 12, color: "#ffffff", fontFamily: "monospace", wordBreak: "break-all" }}>{appLink}</div></div>
 
-        <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+        <div className="onboard-actions" style={{ display: "flex", gap: 8, flexShrink: 0 }}>
 
           <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "Copied!" : "📋 Copy Link"}</button>
 

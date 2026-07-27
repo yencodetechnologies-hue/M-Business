@@ -793,7 +793,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                       }
                     }}
                   >
-                    <option>Other</option>
+                    <option>Custom</option>
                     <option>Web Development</option>
                     <option>Mobile App Development</option>
                     <option>UI/UX Design</option>

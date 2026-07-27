@@ -523,6 +523,12 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     const name = (file?.name || file?.fileName || "").toLowerCase();
     if (mime.includes("pdf") || name.endsWith(".pdf")) return "pdf";
     if (mime.includes("image") || /\.(jpg|jpeg|png|gif|webp|svg)$/.test(name)) return "image";
+    if (mime === "text/plain" || name.endsWith(".txt")) return "text";
+    if (
+      mime.includes("word") || mime.includes("excel") || mime.includes("powerpoint") ||
+      mime.includes("spreadsheet") || mime.includes("presentation") ||
+      /\.(doc|docx|xls|xlsx|ppt|pptx)$/.test(name)
+    ) return "office";
     return null;
   };
 
@@ -3566,6 +3572,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               <div style={{ flex: 1, background: "#f4f4f4", display: "flex", alignItems: "center", justifyContent: "center", overflow: "auto" }}>
                 {isPreviewableFile(previewFile) === "image" ? (
                   <img src={previewFile.url} alt={previewFile.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
+                ) : isPreviewableFile(previewFile) === "office" ? (
+                  <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(previewFile.url)}&embedded=true`} title={previewFile.name} style={{ width: "100%", height: "100%", border: "none" }} />
                 ) : (
                   <iframe src={previewFile.url} title={previewFile.name} style={{ width: "100%", height: "100%", border: "none" }} />
                 )}

@@ -3038,7 +3038,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               setEditingUpdate(prev => prev ? ({ ...prev, attachments: [...prev.attachments, { name: file.name, url: resolvedUrl, type: file.type }] }) : prev);
                             } catch (err) {
                               console.error('Attachment upload failed:', file.name, err);
-                              alert(`Failed to upload ${file.name}.`);
+                              const serverMsg = err?.response?.data?.msg || err?.response?.data?.error?.message || err?.message;
+                              alert(`Failed to upload ${file.name}: ${serverMsg}`);
                             }
                           }
                           setEditUpdateAttaching(false);
@@ -3500,7 +3501,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           </div>
         </div > {/* end mpd-grid-main-side */}
 
-        <div className="mpd-card" style={{ marginTop: 20, maxHeight: 500, overflowY: 'auto' }}>
+        <div className="mpd-card" style={{ marginTop: 20, maxHeight: 700, overflowY: 'auto' }}>
           <div className="mpd-card-title" style={{ marginBottom: 14 }}>
             <i className="ti ti-arrows-exchange"></i> Accounts
           </div>

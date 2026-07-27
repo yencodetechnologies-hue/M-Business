@@ -1788,11 +1788,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               </div>
             </div>
             <div className="mpd-ph-right" style={{ alignSelf: 'flex-start', justifyContent: 'flex-start', flexShrink: 0 }}>
-              <div className="mpd-budget-box" style={{ marginTop: 0, whiteSpace: 'nowrap' }}>
-                <div className="mpd-lbl">Total Budget</div>
-                <div className="mpd-amt">{budgetAmt ? `${currency}${budgetAmt.toLocaleString()}` : '—'}</div>
-                {budgetAmt > 0 && <div className="mpd-sub">Spent {currency}{spent.toLocaleString()} &nbsp;·&nbsp; <span className="mpd-g">Rem {currency}{remaining.toLocaleString()}</span></div>}
-              </div>
+
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
 
                 {onNewQuotation && (

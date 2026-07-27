@@ -574,7 +574,7 @@ export default function ModernProjectsPage({ user }) {
             </div>
           )}{/* Grid */}
           {!loading && (
-            <div className="m-projects-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+            <div className="m-projects-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20 }}>
               {filtered.map((p, idx) => {
                 const { label: statusLabel, cls } = normStatus(p.status);
                 const pt = tasksForProject(p);
@@ -634,7 +634,7 @@ export default function ModernProjectsPage({ user }) {
                       {p.category && <span style={{ padding: '3px 9px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: 'var(--teal-light, var(--teal-light, #E0F7FA))', color: '#0097A7' }}>{p.category}</span>}
                     </div>
 
-                    <div className="m-pc-desc" style={{ wordBreak: 'break-word', overflowWrap: 'break-word', whiteSpace: 'pre-wrap', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.description || p.purpose || 'No description.'}</div>
+                    <div className="m-pc-desc">{p.description || p.purpose || 'No description.'}</div>
 
                     <div style={{ display: 'flex', gap: 16, marginBottom: 8, flexWrap: 'wrap' }}>
                       {p.start && <span style={{ fontSize: 11, color: '#718096', display: 'flex', alignItems: 'center', gap: 4 }}><i className="ti ti-calendar-event" style={{ fontSize: 12 }}></i> Start: <strong style={{ color: '#4A5568' }}>{new Date(p.start).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</strong></span>}

@@ -963,6 +963,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const handleApprove = async (id) => {
     const respondedAt = new Date().toISOString();
     setApprovals(prev => prev.map(a => a.id === id ? { ...a, status: "approved", respondedAt } : a));
+    setViewApprovalApp(prev => prev && prev.id === id ? { ...prev, status: "approved", respondedAt } : prev);
+    setViewApprovalApp(prev => prev && prev.id === id ? { ...prev, status: "approved", respondedAt } : prev);
     try {
       await axios.patch(`${BASE_URL}/api/approvals/${id}/respond`, { status: "approved", respondedAt });
     } catch (err) {
@@ -977,6 +979,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     const respondedAt = new Date().toISOString();
     const reason = rejectReasonText.trim();
     setApprovals(prev => prev.map(a => a.id === id ? { ...a, status: "rejected", rejectReason: reason, respondedAt } : a));
+    setViewApprovalApp(prev => prev && prev.id === id ? { ...prev, status: "rejected", rejectReason: reason, respondedAt } : prev);
     setRejectModalApp(null);
     try {
       await axios.patch(`${BASE_URL}/api/approvals/${id}/respond`, { status: "rejected", rejectReason: reason, respondedAt });
@@ -1921,7 +1924,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 ))}
               </div>
               {milestones.length > 0 ? ganttRows : (
-                <div style={{ padding: 20, textAlign: 'center', color: C.text3, fontSize: 13 }}>No Task to display.</div>
+                <div style={{ padding: 20, color: C.text3, fontSize: 13, height: "100%", display: "flex", alignItems: "center", justifyContent: "center", minHeight: 300, boxSizing: "border-box" }}>No Task to display.</div>
               )}
             </div>
           </div>
@@ -2020,7 +2023,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             </div>
           ))}
           {filteredFiles.length === 0 && (
-            <div style={{ height: 233, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", color: C.text3, gridColumn: "1 / -1" }}>No files found.</div>
+            <div style={{ height: "100%", minHeight: 300, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", color: C.text3, gridColumn: "1 / -1", boxSizing: "border-box" }}>No files found.</div>
           )}
         </div>
       </div>
@@ -2116,7 +2119,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         {/* Invoices List */}
         <div style={{ flex: 1, minHeight: 0, maxHeight: "100%", overflowY: 'auto', display: "grid", gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: 14, alignContent: "start", padding: 4 }}>
           {finalInvoicesList.length === 0 && (
-            <div style={{ gridColumn: "1 / -1", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", color: C.text3, fontSize: 12, padding: 24, boxSizing: "border-box" }}>
+            <div style={{ gridColumn: "1 / -1", height: "100%", minHeight: 300, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", color: C.text3, fontSize: 12, padding: 24, boxSizing: "border-box" }}>
               No Invoices Found
             </div>
           )}
@@ -2206,7 +2209,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       <div className="messages-panel">
         <div className="msg-list">
           {chatMessages.length === 0 ? (
-            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: C.text3, fontSize: 12, textAlign: "center", padding: "20px" }}>
+            <div style={{ flex: 1, minHeight: 0, height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: C.text3, fontSize: 12, textAlign: "center", padding: "20px", boxSizing: "border-box" }}>
               No messages yet. Say hello to start the conversation.
             </div>
           ) : (

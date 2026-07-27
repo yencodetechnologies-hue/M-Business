@@ -874,7 +874,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       console.error("Failed to load project approvals", err);
     }
   };
-  useEffect(() => { if (currProject?._id) loadProjectApprovals(); }, [currProject?._id]);
+  useEffect(() => {
+    if (!currProject?._id) return;
+    loadProjectApprovals();
+    const interval = setInterval(loadProjectApprovals, 5000);
+    return () => clearInterval(interval);
+  }, [currProject?._id]);
 
   const handleDeleteApproval = async (approvalId) => {
     if (!confirm("Delete this approval request?")) return;

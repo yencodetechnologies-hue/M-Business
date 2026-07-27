@@ -154,6 +154,10 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   // it can be saved on the project and used for an exact, unambiguous match.
   const [clientId, setClientId] = useState(editProject?.clientId || prefillClient?._id || '');
   const [category, setCategory] = useState(editProject?.category || 'Web Development');
+  const [categoryIsCustom, setCategoryIsCustom] = useState(() => {
+    const preset = ['Web Development', 'Mobile App Development', 'UI/UX Design', 'Digital Marketing', 'IT Consulting', 'E-commerce'];
+    return !!editProject?.category && !preset.includes(editProject.category);
+  });
   const [priority, setPriority] = useState(editProject?.priority || 'medium');
   const [status, setStatus] = useState(editProject?.status || 'Active');
   const [progress, setProgress] = useState(editProject?.progress || 0);
@@ -763,6 +767,43 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                   <div style={{ color: '#EF4444', fontSize: 12, fontWeight: 700, marginTop: 4 }}>Required</div>
                 )}
               </div>
+            </div>
+
+            <div className="mpc-form-2col">
+              <div className="mpc-form-group">
+                <label>Project Category</label>
+                {categoryIsCustom ? (
+                  <input
+                    type="text"
+                    value={category}
+                    autoFocus
+                    placeholder="Enter custom category"
+                    onChange={e => setCategory(e.target.value)}
+                    onBlur={() => { if (!category.trim()) setCategoryIsCustom(false); }}
+                  />
+                ) : (
+                  <select
+                    value={['Web Development', 'Mobile App Development', 'UI/UX Design', 'Digital Marketing', 'IT Consulting', 'E-commerce'].includes(category) ? category : (category ? 'Other' : '')}
+                    onChange={e => {
+                      if (e.target.value === 'Other') {
+                        setCategory('');
+                        setCategoryIsCustom(true);
+                      } else {
+                        setCategory(e.target.value);
+                      }
+                    }}
+                  >
+                    <option>Web Development</option>
+                    <option>Mobile App Development</option>
+                    <option>UI/UX Design</option>
+                    <option>Digital Marketing</option>
+                    <option>IT Consulting</option>
+                    <option>E-commerce</option>
+                    <option>Other</option>
+                  </select>
+                )}
+              </div>
+              <div />
             </div>
 
             <div className="mpc-form-group">

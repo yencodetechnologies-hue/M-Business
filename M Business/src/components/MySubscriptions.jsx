@@ -570,6 +570,15 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
     `;
     printWindow.document.write(content);
     printWindow.document.close();
+    printWindow.onload = () => {
+      printWindow.focus();
+      printWindow.print();
+      printWindow.onafterprint = () => printWindow.close();
+    };
+    printWindow.onload = () => {
+      printWindow.focus();
+      printWindow.print();
+    };
   };
 
   useEffect(() => {
@@ -1301,7 +1310,9 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
               <button onClick={() => setViewInvoice(null)} style={{ position: "absolute", top: 20, right: 20, background: "#f1f5f9", border: "none", color: "#64748b", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
                 <div style={{ position: "relative", marginBottom: 20 }}>
-                  <div style={{ width: 80, height: 80, background: "#f8fafc", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, border: "1px solid #e2e8f0" }}></div>
+                  <div style={{ width: 80, height: 80, background: "#f8fafc", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, border: "1px solid #e2e8f0", overflow: "hidden" }}>
+                    {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : <i className="ti ti-receipt" style={{ color: "#94a3b8" }}></i>}
+                  </div>
 
                 </div>
                 <div style={{ fontSize: 15, fontWeight: 600, color: "#64748b", marginBottom: 8 }}>Invoice paid</div>

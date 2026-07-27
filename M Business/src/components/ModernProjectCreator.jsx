@@ -793,22 +793,20 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                       }
                     }}
                   >
+                    <option>Other</option>
                     <option>Web Development</option>
                     <option>Mobile App Development</option>
                     <option>UI/UX Design</option>
                     <option>Digital Marketing</option>
                     <option>IT Consulting</option>
                     <option>E-commerce</option>
-                    <option>Other</option>
                   </select>
                 )}
               </div>
-              <div />
-            </div>
-
-            <div className="mpc-form-group">
-              <label>Description</label>
-              <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Describe the project scope, goals and deliverables..." />
+              <div className="mpc-form-group">
+                <label>Description</label>
+                <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Describe the project scope, goals and deliverables..." />
+              </div>
             </div>
 
 

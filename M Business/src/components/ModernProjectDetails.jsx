@@ -3493,7 +3493,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         </div > {/* end mpd-grid-main-side */}
 
         {/* TEAM + BUDGET — side by side */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch', marginTop: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch', marginTop: 24, marginLeft: 0, paddingLeft: 0 }}>
           {/* TEAM SIDEBAR */}
           <div className="mpd-card" style={{ marginBottom: 0, display: 'flex', flexDirection: 'column', height: '100%', paddingTop: 8, paddingLeft: 6, paddingRight: 6 }}>
             <div className="mpd-card-header">
@@ -3601,8 +3601,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
       </div >
       {!hideTopActions && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginTop: 20, alignItems: 'start' }}>
-          <div className="mpd-card" style={{ padding: 22, height: 300, maxHeight: 300, display: 'flex', flexDirection: 'column', overflow: 'hidden', boxSizing: 'border-box' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginTop: 20, alignItems: 'start', marginLeft: 0, paddingLeft: 0 }}>
+          <div className="mpd-card" style={{ marginBottom: 0, marginLeft: 0, display: 'flex', flexDirection: 'column', height: 300, maxHeight: 300, overflow: 'hidden', paddingTop: 8, paddingLeft: 6, paddingRight: 6, boxSizing: 'border-box' }}>
             <div className="mpd-section-heading" style={{ flexShrink: 0 }}><i className="ti ti-history" /> Activity Logs</div>
             <div style={{ marginTop: 10, flex: 1, overflowY: 'auto', minHeight: 0 }}>
               {(currProject.updates && currProject.updates.length > 0) ? (

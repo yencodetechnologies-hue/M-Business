@@ -141,6 +141,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   const [fieldErrors, setFieldErrors] = useState({}); // { name: true, client: true }
   const nameRef = useRef(null);
   const clientRef = useRef(null);
+  const pendingReopenAddEmployee = useRef(false);
 
   // Form State
   const [name, setName] = useState(editProject?.name || '');
@@ -394,6 +395,10 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   useEffect(() => {
     if (Array.isArray(employees) && employees.length) {
       setLocalEmployees(employees);
+      if (pendingReopenAddEmployee.current) {
+        pendingReopenAddEmployee.current = false;
+        setShowAddEmployee(true);
+      }
     }
   }, [employees]);
 

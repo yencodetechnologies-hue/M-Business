@@ -25,6 +25,8 @@ const invoiceSchema = new mongoose.Schema({
   companyEmail: String,
   companyPhone: String,
   companyAddress: String,
+  fromGST: { type: String, default: "" },
+  placeOfSupply: { type: String, default: "" },
   currency: { type: String, default: "₹" },
   upiId: { type: String, default: "" },
   bankName: { type: String, default: "" },

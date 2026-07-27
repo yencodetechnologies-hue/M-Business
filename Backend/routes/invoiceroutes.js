@@ -345,6 +345,8 @@ router.post("/", async (req, res) => {
       companyEmail: inv.companyEmail || "",
       companyPhone: inv.companyPhone || "",
       companyAddress: inv.companyAddress || "",
+      fromGST: inv.fromGST || "",
+      placeOfSupply: inv.placeOfSupply || "",
       items: items.map((i) => ({
         description: i.description || "",
         quantity: parseFloat(i.quantity) || 0,

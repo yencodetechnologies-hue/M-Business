@@ -1951,7 +1951,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
 
         {/* MILESTONES STANDALONE CARD */}
-        <div className="mpd-card mpd-milestones-card">
+        <div className="mpd-card mpd-milestones-card" style={{ marginBottom: 12 }}>
           <div className="mpd-card-header" style={{ paddingBottom: 6, paddingLeft: 4, paddingRight: 4 }}>
             <div className="mpd-card-title"><i className="ti ti-flag"></i> Milestone Progress</div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -1979,8 +1979,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           {(!currProject.milestones || currProject.milestones.length === 0) ? (
             <div style={{ padding: '48px 32px', textAlign: 'center', color: P.textLight, fontSize: 13, boxSizing: 'border-box' }}>No milestones defined.</div>
           ) : milestoneView === 'timeline' ? (
-            <div style={{ overflowX: 'auto', paddingBottom: 8 }}>
-              <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', minWidth: Math.max(300, (currProject.milestones || []).length * 100) }}>
+            <div style={{ overflowX: 'auto', paddingBottom: 0 }}>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', minWidth: Math.max(300, (currProject.milestones || []).length * 100), marginBottom: 0 }}>
                 <div style={{ position: 'absolute', top: 18, left: '5%', right: '5%', height: 2, background: P.border, zIndex: 0 }} />
                 {(currProject.milestones || []).map((m, idx) => {
                   const tasksForMilestone = projTasks.filter(t => t.milestone === m.name && !t.isDeleted);

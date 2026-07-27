@@ -4,7 +4,8 @@
 import re
 
 # We will replace the "Has Subscription" block from const daysLeft = ... until {activeTab === "upgrade" &&
-# Actually, I'll just replace the eturn ( block for the Has Subscription part.
+# Actually, I'll just replace the 
+eturn ( block for the Has Subscription part.
 
 new_subscription_ui = """
           <div style={{ background: "var(--teal)", borderRadius: 20, padding: "32px 40px", color: "#fff", display: "flex", justifyContent: "space-between", position: "relative", overflow: "hidden", marginBottom: 10 }}>
@@ -58,18 +59,30 @@ new_subscription_ui = """
           <h3 style={{ fontSize: 16, fontWeight: 800, color: "var(--text)", margin: "10px 0 0" }}>Plan Usage</h3>
           
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
-            {/* Usage Cards */}
-            {[
-              { icon: "ti-building", label: "COMPANY NAMES", count: subscription.clientCount || 0, limit: subscription.clientLimit || 5, color: "var(--red)" },
-              { icon: "ti-users", label: "EMPLOYEES", count: subscription.employeeCount || 0, limit: subscription.employeeLimit || 20, color: "var(--green)" },
-              { icon: "ti-user-star", label: "MANAGERS", count: subscription.managerCount || 0, limit: subscription.managerLimit || 1, color: "var(--amber)" },
-              { icon: "ti-briefcase", label: "PROJECTS", count: subscription.projectCount || 0, limit: 10, color: "var(--teal)" },
-              { icon: "ti-file-invoice", label: "INVOICES", count: subscription.invoiceCount || 0, limit: 10, color: "var(--blue)" },
-              { icon: "ti-database", label: "STORAGE", count: "2.2", limit: 10, unit: "GB", color: "var(--purple)" },
-            ].map((stat, i) => {
+            {(() => {
+              const parseLimit = (val, fallback) => {
+                if (val === undefined || val === null || val === "") return fallback;
+                if (typeof val === "number") return val;
+                const s = String(val).toLowerCase();
+                if (s.includes("unlimited") || s.includes("infinity")) return Infinity;
+                const m = s.match(/\d+(\.\d+)?/);
+                return m ? parseFloat(m[0]) : fallback;
+              };
+              return [
+                { icon: "ti-building", label: "COMPANY NAMES", count: subscription.clientCount || 0, limit: parseLimit(subscription.clientLimit, 5), color: "var(--red)" },
+                { icon: "ti-users", label: "EMPLOYEES", count: subscription.employeeCount || 0, limit: parseLimit(subscription.employeeLimit, 20), color: "var(--green)" },
+                { icon: "ti-user-star", label: "MANAGERS", count: subscription.managerCount || 0, limit: parseLimit(subscription.managerLimit, 1), color: "var(--amber)" },
+                { icon: "ti-briefcase", label: "PROJECTS", count: subscription.projectCount || 0, limit: 10, color: "var(--teal)" },
+                { icon: "ti-file-invoice", label: "INVOICES", count: subscription.invoiceCount || 0, limit: 10, color: "var(--blue)" },
+                { icon: "ti-database", label: "STORAGE", count: subscription.storageUsedGB ?? "2.2", limit: parseLimit(subscription.storageLimitGB, 10), unit: "GB", color: "var(--purple)" },
+              ];
+            })().map((stat, i) => {
               const numCount = typeof stat.count === 'string' ? parseFloat(stat.count) : stat.count;
-              const pct = stat.limit === "Unlimited" ? 0 : Math.min(100, Math.round((numCount / stat.limit) * 100));
-              const isOver = pct >= 100;
+              const isUnlimited = stat.limit === Infinity;
+              const pct = isUnlimited ? 0 : Math.min(100, Math.round((numCount / stat.limit) * 100));
+              const isOver = !isUnlimited && pct >= 100;
+              const remaining = isUnlimited ? "Unlimited" : Math.max(0, stat.limit - numCount);
+              const limitLabel = isUnlimited ? "Unlimited" : stat.limit;
               const remaining = stat.limit === "Unlimited" ? "Unlimited" : Math.max(0, stat.limit - numCount);
               
               return (
@@ -84,7 +97,7 @@ new_subscription_ui = """
                   <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", letterSpacing: 0.5, marginBottom: 4 }}>{stat.label}</div>
                   <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 16 }}>
                     <div style={{ fontSize: 24, fontWeight: 800, color: "var(--text)" }}>{stat.count} {stat.unit || ""}</div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text3)" }}>/ {stat.limit} {stat.unit ? "limit" : "limit"}</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text3)" }}>/ {limitLabel} {stat.unit ? "limit" : "limit"}</div>
                   </div>
                   
                   <div style={{ height: 6, background: "var(--bg)", borderRadius: 3, overflow: "hidden", marginBottom: 10 }}>

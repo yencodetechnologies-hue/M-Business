@@ -3500,7 +3500,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           </div>
         </div > {/* end mpd-grid-main-side */}
 
-        <div className="mpd-card" style={{ marginTop: 20 }}>
+        <div className="mpd-card" style={{ marginTop: 20, maxHeight: 500, overflowY: 'auto' }}>
           <div className="mpd-card-title" style={{ marginBottom: 14 }}>
             <i className="ti ti-arrows-exchange"></i> Accounts
           </div>

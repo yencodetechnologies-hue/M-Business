@@ -252,10 +252,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       const saved = localStorage.getItem('project_tabs_order');
       if (saved) {
         const order = JSON.parse(saved);
-        return order[0] || 'updates';
+        return order[0] || 'payments';
       }
     } catch (e) { }
-    return 'updates';
+    return 'payments';
   });
   const [infoExpanded, setInfoExpanded] = useState(false);
   const [previewInvoice, setPreviewInvoice] = useState(null);
@@ -346,7 +346,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   const tabsRef = useRef(null);
   const tabContentRef = useRef(null);
-  const [tabOrder, setTabOrder] = useState(['updates', 'activity', 'payments']);
+  const [tabOrder, setTabOrder] = useState(['payments', 'updates', 'activity']);
 
   useEffect(() => {
     localStorage.setItem('project_tabs_order', JSON.stringify(tabOrder));
@@ -2349,10 +2349,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               ref={tabsRef}
               style={{ overflowX: 'auto', scrollbarWidth: 'none', marginBottom: 4 }}
             >
-              {tabOrder.map(tab => {
+              {tabOrder.filter(tab => tab !== 'activity').map(tab => {
                 let lbl = '', icon = null;
                 if (tab === 'updates') lbl = 'Updates';
-                if (tab === 'activity') lbl = 'Activity Logs';
                 if (tab === 'payments') { lbl = 'Accounts'; icon = 'ti-arrows-exchange'; }
                 return (
                   <button
@@ -2382,7 +2381,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               })}
 
               <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, paddingRight: 12, fontSize: 13, color: '#9CA3AF', userSelect: 'none', whiteSpace: 'nowrap' }}>
-                {!hideTopActions && (
+                {!hideTopActions && activeTab === 'updates' && (
                   <button
                     type="button"
                     onClick={() => { setActiveTab('updates'); setShowUpdateModal(true); }}
@@ -3602,10 +3601,26 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
       </div >
       {!hideTopActions && (
-        <div style={{ display: 'flex', gap: 20, marginTop: 20, alignItems: 'flex-start' }}>
-          <div className="mpd-card" style={{ flex: '1 1 0%', marginTop: 0 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginTop: 20, alignItems: 'start' }}>
+          <div className="mpd-card" style={{ padding: 22, height: 300, maxHeight: 300, display: 'flex', flexDirection: 'column', overflow: 'hidden', boxSizing: 'border-box' }}>
+            <div className="mpd-section-heading" style={{ flexShrink: 0 }}><i className="ti ti-history" /> Activity Logs</div>
+            <div style={{ marginTop: 10, flex: 1, overflowY: 'auto', minHeight: 0 }}>
+              {(currProject.updates && currProject.updates.length > 0) ? (
+                <div style={{ textAlign: 'left' }}>
+                  {currProject.updates.slice(0, 10).map((upd, idx) => (
+                    <div key={idx} style={{ padding: '8px 0', borderBottom: `1px solid ${P.bg}`, fontSize: 12.5, color: P.textMid }}>
+                      Update posted: <strong>{upd.text}</strong> by {upd.author} on {new Date(upd.date).toLocaleDateString()}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ textAlign: 'center', padding: '20px 24px', minHeight: 240, display: 'flex', alignItems: 'center', justifyContent: 'center', color: P.textLight, fontSize: 13, boxSizing: 'border-box' }}>Activity logs will appear here.</div>
+              )}
+            </div>
+          </div>
+          <div className="mpd-card" style={{ flex: '1 1 0%', marginTop: 0, height: 300, maxHeight: 300, overflow: 'hidden', boxSizing: 'border-box' }}>
             <div className="mpd-section-heading"><i className="ti ti-building" /> Client Portal Settings</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 14 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 14, height: 233 }}>
               <label className="mpc-checkbox-label">
                 <input type="checkbox" checked={!!localPortalOpts?.showProgress} onChange={e => setLocalPortalOpts(prev => ({ ...(prev || {}), showProgress: e.target.checked }))} />
                 Show project progress to client

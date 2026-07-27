@@ -79,7 +79,7 @@ router.post("/", upload.single("file"), async (req, res) => {
   const uploadStream = cloudinary.uploader.upload_stream(
     {
       folder: "mbusiness/uploads",
-      resource_type: resourceType,
+      resource_type: req.file.mimetype.startsWith("image/") ? "image" : "raw",
     },
     async (error, result) => {
       if (error) {

@@ -2089,19 +2089,18 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                       <div className="inv-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", gap: 20 }}>
                         <div>
                           {effectiveLogo ? (
-                            <img src={effectiveLogo} alt="logo" style={{ height: 85, maxWidth: "100%", borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />
+                            <img src={effectiveLogo} alt="logo" style={{ height: 85, maxWidth: "100%", borderRadius: 10, objectFit: "contain" }} />
                           ) : (
-                            <div style={{ height: 60, width: 60, background: currentT.logoColor || "var(--app-accent)", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
+                            <div style={{ height: 60, width: 60, background: currentT.logoColor || "var(--app-accent)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
                               {effectiveCompanyName[0] || "?"}
                             </div>
                           )}
-                          <div style={{ fontSize: 24, fontWeight: 900, color: "#0f1c2e", textTransform: "uppercase", letterSpacing: 1 }}>{inv.companyName || effectiveCompanyName}</div>
-                          {inv.companyEmail && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 3 }}>{inv.companyEmail}</div>}
-                          {inv.companyPhone && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{inv.companyPhone}</div>}
-                          {inv.companyAddress && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{inv.companyAddress}</div>}
                         </div>
                         <div className="inv-hright" style={{ textAlign: "right" }}>
-                          <div style={{ fontSize: 36, fontWeight: 900, color: `${currentT.primaryColor}1a`, letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>INVOICE</div>
+                          <div style={{ fontSize: 20, fontWeight: 900, color: "#0f1c2e", textTransform: "uppercase", letterSpacing: 1 }}>{inv.companyName || effectiveCompanyName}</div>
+                          {inv.companyAddress && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 3 }}>{inv.companyAddress}</div>}
+                          {inv.fromGST && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2, fontWeight: 700 }}>GSTIN: {inv.fromGST}</div>}
+                          <div style={{ fontSize: 36, fontWeight: 900, color: currentT.primaryColor, letterSpacing: -2, lineHeight: 1, marginBottom: 10 }}>INVOICE</div>
                           <div style={{ fontSize: 16, fontWeight: 800, color: currentT.primaryColor || "var(--app-accent)" }}>{inv.invoiceNo}</div>
                           <div style={{ fontSize: 10, fontWeight: 700, color: currentT.primaryColor || "var(--app-accent)", marginTop: 3 }}>
                             {inv.invoiceType === "Custom" ? (inv.customInvoiceType || "Custom") : (inv.invoiceType || "Milestone")}
@@ -2394,6 +2393,16 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <div className="inv-creator-form-group">
                   <label className="inv-creator-form-label">Invoice Date</label>
                   <input className="inv-creator-form-input" type="date" value={inv.date} onChange={(e) => upd("date", e.target.value)} />
+                </div>
+              </div>
+              <div className="inv-creator-form-row">
+                <div className="inv-creator-form-group">
+                  <label className="inv-creator-form-label">Your GST Number</label>
+                  <input className="inv-creator-form-input" type="text" value={inv.fromGST || ""} onChange={(e) => upd("fromGST", e.target.value)} placeholder="e.g. 33AAGCV1862N1ZZ" />
+                </div>
+                <div className="inv-creator-form-group">
+                  <label className="inv-creator-form-label">Place of Supply</label>
+                  <input className="inv-creator-form-input" type="text" value={inv.placeOfSupply || ""} onChange={(e) => upd("placeOfSupply", e.target.value)} placeholder="e.g. Tamil Nadu (33)" />
                 </div>
               </div>
               <div className="inv-creator-form-row">
@@ -2944,48 +2953,29 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             <div className="invoice-preview" style={{ padding: "20px", fontFamily: currentT.fontFamily, fontSize: "11px", color: "#1A2E35", background: "#fff", minHeight: "560px" }}>
 
               {/* HEADER */}
-              <div className="inv-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px", paddingBottom: "12px", borderBottom: currentT.headerUnderline }}>
+              <div className="inv-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
                 <div className="inv-logo-area">
                   {effectiveLogo ? (
-                    <img src={effectiveLogo} alt="logo" style={{ height: 40, width: "auto", borderRadius: 6, marginBottom: 8, objectFit: "contain" }} />
+                    <img src={effectiveLogo} alt="logo" style={{ height: 40, width: "auto", borderRadius: 6, objectFit: "contain" }} />
                   ) : (
-                    <div className="inv-logo-box" style={{ width: "40px", height: "40px", borderRadius: "8px", background: currentT.logoColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px", fontWeight: "900", color: "#fff", marginBottom: "8px" }}>
+                    <div className="inv-logo-box" style={{ width: "40px", height: "40px", borderRadius: "8px", background: currentT.logoColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px", fontWeight: "900", color: "#fff" }}>
                       {effectiveCompanyName ? effectiveCompanyName[0].toUpperCase() : "YT"}
                     </div>
                   )}
-                  <div className="inv-company-name" style={{ fontSize: "13px", fontWeight: "800", color: "#0f1c2e" }}>{inv.companyName || effectiveCompanyName}</div>
-                  <div className="inv-company-details" style={{ fontSize: "9px", color: "#64748b", lineHeight: "1.6", marginTop: "3px" }}>
-                    {inv.companyEmail && <div>{inv.companyEmail}</div>}
-                    {inv.companyPhone && <div>{inv.companyPhone}</div>}
-                    {inv.companyAddress && <div>{inv.companyAddress}</div>}
-                  </div>
                 </div>
                 <div className="inv-title-area" style={{ textAlign: "right" }}>
-                  <div className="inv-title-word" style={{ fontSize: "24px", fontWeight: "900", color: currentT.primaryColor, letterSpacing: "-.5px" }}>INVOICE</div>
+                  <div className="inv-company-name" style={{ fontSize: "14px", fontWeight: "800", color: "#0f1c2e" }}>{inv.companyName || effectiveCompanyName}</div>
+                  <div className="inv-company-details" style={{ fontSize: "9px", color: "#64748b", lineHeight: "1.6", marginTop: "3px" }}>
+                    {inv.companyAddress && <div>{inv.companyAddress}</div>}
+                    {inv.fromGST && <div style={{ fontWeight: 700 }}>GSTIN: {inv.fromGST}</div>}
+                  </div>
                   <div className="inv-id" style={{ fontSize: "11px", fontWeight: "700", color: "#0f1c2e", marginTop: "4px" }}>#{inv.invoiceNo}</div>
-                  <div className="inv-type" style={{ display: "inline-flex", alignItems: "center", padding: "2px 9px", borderRadius: "20px", fontSize: "9px", fontWeight: "700", marginTop: "4px", background: currentT.primaryColor, color: "#fff" }}>
-                    {inv.invoiceType === "Custom" ? (inv.customInvoiceType || "Custom") : (inv.invoiceType || "Milestone")}
-                  </div>
-                  <div className="inv-dates" style={{ fontSize: "9px", color: "#64748b", marginTop: "2px", lineHeight: "1.6" }}>
-                    <span>Issue: {inv.date ? new Date(inv.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</span><br />
-                    <span>Due: {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</span>
-                  </div>
-                  {inv.amountPaid < total ? (
-                    inv.amountPaid > 0 ? (
-                      <div className={`inv-status ${statusUpdating ? "draft" : "paid"}`} style={{ display: "inline-flex", alignItems: "center", padding: "3px 10px", borderRadius: "20px", fontSize: "9px", fontWeight: "700", marginTop: "6px", background: "var(--amber-bg)", color: "var(--amber)" }}>
-                        PART PAID
-                      </div>
-                    ) : null
-                  ) : (
-                    <div className={`inv-status ${statusUpdating ? "draft" : "paid"}`} style={{ display: "inline-flex", alignItems: "center", padding: "3px 10px", borderRadius: "20px", fontSize: "9px", fontWeight: "700", marginTop: "6px", background: "var(--green-bg)", color: "var(--green)" }}>
-                      PAID
-                    </div>
-                  )}
                 </div>
               </div>
+              <div className="inv-title-word" style={{ fontSize: "24px", fontWeight: "900", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: -6, marginBottom: 12, paddingBottom: 12, borderBottom: currentT.headerUnderline }}>INVOICE</div>
 
               {/* PARTIES */}
-              <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: inv.project ? "1fr 1fr" : "1fr", gap: "16px", marginBottom: "16px" }}>
+              <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
                 <div>
                   <div className="inv-party-label" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "4px" }}>Bill To</div>
                   <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "800", color: inv.client ? "#0f1c2e" : "#64748b" }}>{inv.client || "— Client Name —"}</div>
@@ -2996,19 +2986,25 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                         {selectedClient.email && <div>{selectedClient.email}</div>}
                         {selectedClient.phone && <div>{selectedClient.phone}</div>}
                         {selectedClient.address && <div>{selectedClient.address}</div>}
-                        {selectedClient.gstNumber && <div style={{ fontWeight: 700, color: currentT.primaryColor }}>GST: {selectedClient.gstNumber}</div>}
+                        {selectedClient.gstNumber && <div style={{ fontWeight: 700, color: currentT.primaryColor }}>GSTIN: {selectedClient.gstNumber}</div>}
                       </>
                     ) : (
                       <span style={{ color: "#64748b" }}>Enter client details in the form</span>
                     )}
                   </div>
+                  {inv.project && (
+                    <div style={{ marginTop: 10 }}>
+                      <div className="inv-party-label" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "4px" }}>Project</div>
+                      <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "800", color: "#0f1c2e" }}>{inv.project}</div>
+                    </div>
+                  )}
                 </div>
-                {inv.project && (
-                  <div>
-                    <div className="inv-party-label" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "4px" }}>Project</div>
-                    <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "800", color: "#0f1c2e" }}>{inv.project}</div>
-                  </div>
-                )}
+                <div style={{ fontSize: "9px", color: "#64748b", lineHeight: 1.9 }}>
+                  <div><strong style={{ color: "#0f1c2e" }}>Invoice No:</strong> {inv.invoiceNo}</div>
+                  <div><strong style={{ color: "#0f1c2e" }}>Invoice Date:</strong> {inv.date ? new Date(inv.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</div>
+                  <div><strong style={{ color: "#0f1c2e" }}>Place of Supply:</strong> {inv.placeOfSupply || "—"}</div>
+                  <div><strong style={{ color: "#0f1c2e" }}>Due Date:</strong> {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</div>
+                </div>
               </div>
 
               {/* ITEMS TABLE */}
@@ -3035,7 +3031,6 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                         <td style={{ padding: "6px 8px", fontSize: "10px", color: "#0f1c2e", textAlign: "right" }}>{formatCurrency(item.rate, inv.currency, false, false, inv.customCurrencySymbol)}</td>
                         <td style={{ padding: "6px 8px", fontSize: "10px", textAlign: "right", color: "#64748b" }}>{rateGst}% {isIncl ? "Incl" : ""}</td>
                         <td style={{ padding: "6px 8px", fontSize: "10px", color: "#0f1c2e", textAlign: "right", fontWeight: "700" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency, false, false, inv.customCurrencySymbol)}</td>
-
                       </tr>
                     );
                   })}
@@ -3044,7 +3039,6 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
               {/* TOTALS WITH QR SCANNER */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "12px", marginBottom: "16px" }}>
-                {/* QR Scanner */}
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", borderRadius: 8, padding: "8px", border: "1px solid var(--app-border)", minWidth: 95 }}>
                   <div style={{ fontSize: "8px", color: "#64748b", fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>SCAN INVOICE</div>
                   <div style={{ background: "#fff", padding: 5, borderRadius: 4, border: "1px solid var(--app-border)" }}>
@@ -3052,11 +3046,11 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                   </div>
                 </div>
 
-                {/* TOTALS */}
                 <div className="inv-totals" style={{ width: "200px" }}>
                   <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
                     <span className="lbl" style={{ color: "#64748b" }}>Subtotal</span>
-                    <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(subtotal, inv.currency, false, false, inv.customCurrencySymbol)}</span>                  </div>
+                    <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(subtotal, inv.currency, false, false, inv.customCurrencySymbol)}</span>
+                  </div>
                   <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
                     <span className="lbl" style={{ color: "#64748b" }}>GST / Tax</span>
                     <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(gstAmt, inv.currency, false, false, inv.customCurrencySymbol)}</span>
@@ -3065,8 +3059,6 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                     <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
                       <span className="lbl" style={{ color: "#64748b" }}>Paid (Advance)</span>
                       <span className="val" style={{ fontWeight: "700", color: "var(--green)" }}>-{formatCurrency(amountPaid, inv.currency, false, false, inv.customCurrencySymbol)}</span>
-                      <span className="val" style={{ fontWeight: "700", color: "var(--green)" }}>-{formatCurrency(amountPaid, inv.currency)}</span>
-
                     </div>
                   )}
                   <div className="inv-grand-row" style={{ display: "flex", justify: "space-between", padding: "6px 8px", background: "#0f1c2e", borderRadius: "6px", marginTop: "4px", color: "#fff" }}>
@@ -3075,6 +3067,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                   </div>
                 </div>
               </div>
+
               {/* Amount in Words */}
               <div style={{ marginTop: "8px", padding: "7px 12px", background: "#f8fafc", border: "1px dashed #CBD5E1", borderRadius: "6px" }}>
                 <span style={{ fontSize: "9px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.6px" }}>Amount in Words: </span>
@@ -3094,7 +3087,6 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 </div>
               )}
 
-              {/* FOOTER */}
               {/* FOOTER */}
               <div className="inv-footer" style={{ marginTop: "16px", paddingTop: "10px", borderTop: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
                 <div className="inv-notes" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -3142,7 +3134,6 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         {editingId && (
           <>
             <button onClick={() => shareInvoice({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "13px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }} title="Share Link"> Share</button>
-
           </>
         )}
 
@@ -3154,5 +3145,3 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     </div>
   );
 }
-
-

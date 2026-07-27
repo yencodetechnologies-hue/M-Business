@@ -2400,8 +2400,11 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     <div style={{ marginTop: 10, display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, maxHeight: 420, overflowY: "auto" }}>
                       {files.map((file, idx) => {
                         const fname = (file.name || file.url || "").toLowerCase();
-                        const isImage = /\.(jpg|jpeg|png|gif|webp)$/.test(fname) || (file.type || "").startsWith("image/");
-                        const isPdf = /\.pdf$/.test(fname);
+                  const isImage = /\.(jpg|jpeg|png|gif|webp)$/.test(fname) || (file.type || "").startsWith("image/");
+                        const isPdf = /\.pdf$/.test(fname) || (file.type || "").includes("pdf");
+                        const isTxt = /\.txt$/.test(fname) || (file.type || "") === "text/plain";
+                        const isOffice = /\.(doc|docx|xls|xlsx|ppt|pptx)$/.test(fname);
+                        const officeIcon = /\.(doc|docx)$/.test(fname) ? "ti-file-type-doc" : /\.(xls|xlsx)$/.test(fname) ? "ti-file-type-xls" : "ti-file-type-ppt";
                         return (
                           <div key={idx} style={{ border: "1.5px solid " + C.border, borderRadius: 12, overflow: "hidden", background: C.surface2, display: "flex", flexDirection: "column" }}>
                             {isImage ? (
@@ -2412,11 +2415,23 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                                 style={{ width: "100%", height: 100, objectFit: "cover", display: "block", background: "#f5f5f5", cursor: "pointer" }}
                               />
                             ) : isPdf ? (
-                              <iframe
-                                src={file.url}
-                                title={file.name || "Attached PDF"}
-                                style={{ width: "100%", height: 420, border: "none", display: "block" }}
-                              />
+                              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "16px 8px", gap: 6, background: C.surface2 }}>
+                                <i className="ti ti-file-type-pdf" style={{ fontSize: 36, color: "#EF4444" }}></i>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{file.name || "Attached PDF"}</div>
+                                <div style={{ fontSize: 11, color: C.text3 }}>Click "Open" below to view this PDF</div>
+                              </div>
+                            ) : isOffice ? (
+                              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "16px 8px", gap: 6 }}>
+                                <i className={`ti ${officeIcon}`} style={{ fontSize: 36, color: C.teal }}></i>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{file.name || "Attached file"}</div>
+                                <div style={{ fontSize: 11, color: C.text3 }}>Click "Open" below to view/download this file</div>
+                              </div>
+                            ) : isTxt ? (
+                              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "16px 8px", gap: 6 }}>
+                                <i className="ti ti-file-text" style={{ fontSize: 36, color: C.teal }}></i>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{file.name || "Attached file"}</div>
+                                <div style={{ fontSize: 11, color: C.text3 }}>Click "Open" below to view this text file</div>
+                              </div>
                             ) : (
                               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "16px 8px", gap: 6 }}>
                                 <i className="ti ti-file-text" style={{ fontSize: 36, color: C.teal }}></i>

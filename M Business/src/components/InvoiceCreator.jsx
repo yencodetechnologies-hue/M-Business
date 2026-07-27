@@ -2428,17 +2428,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                     )}
                   </div>
                 </div>
-                <div className="inv-creator-form-group">
-                  <label className="inv-creator-form-label">Category</label>
-                  <select className="inv-creator-form-select" value={inv.category || "Consulting"} onChange={(e) => upd("category", e.target.value)}>
-                    <option value="Advance Payment">Advance Payment</option>
-                    <option value="Additional Payment">Additional Payment</option>
-                    <option value="Milestone">Milestone</option>
-                    <option value="Final Invoice">Final Invoice</option>
-                    <option value="Monthly Retainer">Monthly Retainer</option>
-                    <option value="Consulting">Consulting</option>
-                  </select>
-                </div>
+
 
               </div>
             </div>

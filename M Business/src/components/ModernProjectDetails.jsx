@@ -2396,16 +2396,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     <i className="ti ti-plus" style={{ marginRight: 4 }}></i>Add Update
                   </button>
                 )}
-                <span
-                  onClick={() => {
-                    const idx = tabOrder.indexOf(activeTab);
-                    const nextIdx = (idx + 1) % tabOrder.length;
-                    setActiveTab(tabOrder[nextIdx]);
-                  }}
-                  style={{ cursor: 'pointer', padding: '4px 8px', borderRadius: 6, background: '#F3F4F6', color: '#4B5563' }}
-                >
-                  <i className="ti ti-chevron-right"></i>
-                </span>
+
               </div>
             </div>
               <div ref={tabContentRef} style={{ userSelect: 'none', overflowY: 'auto', flex: 1, minHeight: 0, padding: '0 4px', boxSizing: 'border-box' }}>
@@ -3940,24 +3931,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
       </div >
       {!hideTopActions && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginTop: 20, alignItems: 'start', marginLeft: 0, paddingLeft: 0 }}>
-          <div className="mpd-card" style={{ marginBottom: 0, marginLeft: 0, display: 'flex', flexDirection: 'column', height: 300, maxHeight: 300, overflow: 'hidden', paddingTop: 8, paddingLeft: 6, paddingRight: 6, boxSizing: 'border-box' }}>
-            <div className="mpd-section-heading" style={{ flexShrink: 0 }}><i className="ti ti-history" /> Activity Logs</div>
-            <div style={{ marginTop: 10, flex: 1, overflowY: (currProject.updates && currProject.updates.length > 0) ? 'auto' : 'hidden', minHeight: 0 }}>
-              {(currProject.updates && currProject.updates.length > 0) ? (
-                <div style={{ textAlign: 'left' }}>
-                  {currProject.updates.slice(0, 10).map((upd, idx) => (
-                    <div key={idx} style={{ padding: '8px 0', borderBottom: `1px solid ${P.bg}`, fontSize: 12.5, color: P.textMid }}>
-                      Update posted: <strong>{upd.text}</strong> by {upd.author} on {new Date(upd.date).toLocaleDateString()}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div style={{ textAlign: 'center', padding: '20px 24px', minHeight: 240, display: 'flex', alignItems: 'center', justifyContent: 'center', color: P.textLight, fontSize: 13, boxSizing: 'border-box' }}>Activity logs will appear here.</div>
-              )}
-            </div>
-          </div>
-          <div className="mpd-card" style={{ flex: '1 1 0%', marginTop: 0, height: 300, maxHeight: 300, overflow: 'hidden', boxSizing: 'border-box' }}>
+        <div style={{ marginTop: 20, marginLeft: 0, paddingLeft: 0 }}>
+          <div className="mpd-card" style={{ marginTop: 0, height: 300, maxHeight: 300, overflow: 'hidden', boxSizing: 'border-box' }}>
             <div className="mpd-section-heading"><i className="ti ti-building" /> Client Portal Settings</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 14, height: 233 }}>
               <label className="mpc-checkbox-label">

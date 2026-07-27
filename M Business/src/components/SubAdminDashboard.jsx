@@ -6953,25 +6953,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [projectDetailsReadOnly, setProjectDetailsReadOnly] = useState(false);
   const [activeClientIdForReturn, setActiveClientIdForReturn] = useState(null);
 
-  const [jumpInvoice, setJumpInvoice] = useState(() => {
-    try {
-      const savedId = localStorage.getItem("jumpInvoiceId_subadmin");
-      const savedActive = localStorage.getItem("activeTab_subadmin");
-      if (savedId && savedActive === "invoices") return { id: savedId, invoiceNo: savedId, _restoring: true };
-    } catch (e) { }
-    return null;
-  });
-
-  useEffect(() => {
-    try {
-      if (jumpInvoice?.id || jumpInvoice?.invoiceNo) {
-        localStorage.setItem("jumpInvoiceId_subadmin", jumpInvoice.id || jumpInvoice.invoiceNo);
-      } else {
-        localStorage.removeItem("jumpInvoiceId_subadmin");
-      }
-    } catch (e) { }
-  }, [jumpInvoice]);
-
+  const [jumpInvoice, setJumpInvoice] = useState(null);
   const [invoicePrefill, setInvoicePrefill] = useState(() => {
     try {
       const saved = localStorage.getItem("invoicePrefill_subadmin");

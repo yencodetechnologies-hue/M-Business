@@ -1088,7 +1088,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
             <div className="mpc-pv-row"><span className="mpc-pv-label">Budget</span><span className="mpc-pv-val">{budget ? `${currency}${Number(budget).toLocaleString()}` : '—'}</span></div>
             {budget && (
               <>
-                <div className="mpc-pv-row"><span className="mpc-pv-label">Billed</span><span className="mpc-pv-val">{currency}{Number(billed || 0).toLocaleString()}</span></div>
+
                 <div className="mpc-pv-row"><span className="mpc-pv-label">Received</span><span className="mpc-pv-val">{currency}{Number(received || 0).toLocaleString()}</span></div>
                 <div className="mpc-pv-row"><span className="mpc-pv-label">Pending</span><span className="mpc-pv-val">{currency}{Number(pending || 0).toLocaleString()}</span></div>
                 <div className="mpc-pv-row"><span className="mpc-pv-label">Spent</span><span className="mpc-pv-val">{currency}{Number(spent || 0).toLocaleString()}</span></div>

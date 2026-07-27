@@ -940,6 +940,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const [rejectModalApp, setRejectModalApp] = useState(null);
   const [rejectReasonText, setRejectReasonText] = useState("");
   const [viewApprovalApp, setViewApprovalApp] = useState(null);
+  const [lightboxImages, setLightboxImages] = useState(null);
 
   // Portal mode has no real login form — the client's "session" is just the
   // decoded token from the link. Once they sign out (or the token is
@@ -2106,14 +2107,14 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
 
 
   // Render Invoices helper
-  function renderInvoicesComponent() {
+  function renderInvoicesComponent(columns = 1) {
     const unpaidInvoices = finalInvoicesList.filter(inv => inv.status !== "paid");
     const firstUnpaid = unpaidInvoices[0];
 
     return (
       <div style={{ background: "transparent", height: "100%", maxHeight: "100%", display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0 }}>
         {/* Invoices List */}
-        <div style={{ flex: 1, minHeight: 0, maxHeight: "100%", overflowY: 'auto', display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14, alignContent: "start", padding: 4 }}>
+        <div style={{ flex: 1, minHeight: 0, maxHeight: "100%", overflowY: 'auto', display: "grid", gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: 14, alignContent: "start", padding: 4 }}>
           {finalInvoicesList.length === 0 && (
             <div style={{ gridColumn: "1 / -1", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", color: C.text3, fontSize: 12, padding: 24, boxSizing: "border-box" }}>
               No Invoices Found
@@ -2131,14 +2132,14 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 <i className={inv.status === "paid" ? "ti ti-circle-check" : "ti ti-clock"}></i>
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="inv-id">{inv.invoiceNo}</div>
+                <div className="inv-id" style={{ whiteSpace: "nowrap" }}>{inv.invoiceNo}</div>
                 <div className="inv-desc">{inv.desc}</div>
               </div>
-              <div style={{ textAlign: "right", marginRight: "10px" }}>
-                <div className="inv-amount" style={{ color: inv.status === "paid" ? C.green : C.amber }}>
+              <div style={{ textAlign: "right", marginRight: "10px", flexShrink: 0 }}>
+                <div className="inv-amount" style={{ color: inv.status === "paid" ? C.green : C.amber, whiteSpace: "nowrap" }}>
                   ₹{inv.total.toLocaleString("en-IN")}
                 </div>
-                <div className="inv-date">{inv.status === "paid" ? inv.date : `Due ${inv.dueDate}`}</div>
+                <div className="inv-date" style={{ whiteSpace: "nowrap" }}>{inv.status === "paid" ? inv.date : `Due ${inv.dueDate}`}</div>
               </div>
               <span className={`badge ${inv.status}`}>{inv.status}</span>
               {inv.status !== "paid" ? (
@@ -2404,7 +2405,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                               <img
                                 src={file.url}
                                 alt={file.name || "Attached file"}
-                                style={{ width: "100%", maxHeight: 420, objectFit: "contain", display: "block", background: "#000" }}
+                                onClick={() => setLightboxImages({ list: files.filter(f => /\.(jpg|jpeg|png|gif|webp)$/.test((f.name || f.url || "").toLowerCase()) || (f.type || "").startsWith("image/")), index: idx })}
+                                style={{ width: "100%", height: 100, objectFit: "cover", display: "block", background: "#f5f5f5", cursor: "pointer" }}
                               />
                             ) : isPdf ? (
                               <iframe
@@ -2460,6 +2462,22 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {lightboxImages && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 100000, background: "rgba(0,0,0,0.9)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => setLightboxImages(null)}>
+            <button onClick={() => setLightboxImages(null)} style={{ position: "absolute", top: 20, right: 24, background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", width: 40, height: 40, borderRadius: 10, fontSize: 20, cursor: "pointer" }}>✕</button>
+            {lightboxImages.list.length > 1 && (
+              <button onClick={(e) => { e.stopPropagation(); setLightboxImages(prev => ({ ...prev, index: (prev.index - 1 + prev.list.length) % prev.list.length })); }} style={{ position: "absolute", left: 24, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", width: 44, height: 44, borderRadius: "50%", fontSize: 20, cursor: "pointer" }}>‹</button>
+            )}
+            <img src={lightboxImages.list[lightboxImages.index]?.url} alt="" style={{ maxWidth: "90%", maxHeight: "85vh", objectFit: "contain", borderRadius: 8 }} onClick={(e) => e.stopPropagation()} />
+            {lightboxImages.list.length > 1 && (
+              <button onClick={(e) => { e.stopPropagation(); setLightboxImages(prev => ({ ...prev, index: (prev.index + 1) % prev.list.length })); }} style={{ position: "absolute", right: 24, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", width: 44, height: 44, borderRadius: "50%", fontSize: 20, cursor: "pointer" }}>›</button>
+            )}
+            {lightboxImages.list.length > 1 && (
+              <div style={{ position: "absolute", bottom: 24, left: "50%", transform: "translateX(-50%)", color: "#fff", fontSize: 13, fontWeight: 700 }}>{lightboxImages.index + 1} / {lightboxImages.list.length}</div>
+            )}
           </div>
         )}
 
@@ -3111,7 +3129,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               </div>
             </div>
             <div style={{ margin: "0 auto", background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden" }}>
-              {renderInvoicesComponent()}
+              {renderInvoicesComponent(2)}
             </div>
           </div>
         )}

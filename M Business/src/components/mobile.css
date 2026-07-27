@@ -47,6 +47,34 @@
     }
 }
 
+@media (max-width: 768px) {
+    .client-overview-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .client-detail-panel {
+        overflow-y: visible !important;
+        max-height: none !important;
+        padding: 0 12px !important;
+    }
+
+    .client-detail-panel [style*="padding: \"0 28px\""],
+    .client-detail-panel>div>div[style*="0 28px"] {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .client-tabs-row {
+        padding: 0 16px !important;
+    }
+
+    .client-tab-content {
+        padding: 16px !important;
+    }
+}
+
 @media (max-width: 480px) {
     table {
         display: block !important;

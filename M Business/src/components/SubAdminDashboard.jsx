@@ -2370,7 +2370,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             {/* TABS */}
 
-            <div style={{ background: "#fff", borderBottom: "1.5px solid #E0EEF0", padding: "0 28px", display: "flex", flexShrink: 0, overflowX: "auto" }}>
+            <div className="client-tabs-row" style={{ background: "#fff", borderBottom: "1.5px solid #E0EEF0", padding: "0 28px", display: "flex", flexShrink: 0, overflowX: "auto" }}>
 
               {[
 
@@ -2402,7 +2402,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             {/* TAB CONTENT */}
 
-            <div style={{ flex: 1, overflowY: "auto", padding: "20px 28px" }}>
+            <div className="client-tab-content" style={{ flex: 1, overflowY: "auto", padding: "20px 28px" }}>
 
               {renderTabContent()}
 

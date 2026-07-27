@@ -39,6 +39,28 @@
     }
 }
 
+@media (max-width: 480px) {
+    .main-content {
+        overflow-y: auto !important;
+        height: auto !important;
+        min-height: 100vh !important;
+    }
+}
+
+@media (max-width: 480px) {
+    table {
+        display: block !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    .main-content,
+    .page-content {
+        overflow-x: hidden !important;
+    }
+}
+
 /* ---------- Sidebars (covers .sidebar AND .emp-sidebar family) ---------- */
 @media (max-width: 768px) {
 
@@ -183,6 +205,45 @@
     }
 }
 
+@media (max-width: 768px) {
+    .client-detail-layout {
+        flex-direction: column !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+    }
+
+    .client-list-panel {
+        width: 100% !important;
+        min-width: 0 !important;
+        border-right: none !important;
+        border-bottom: 1.5px solid #E0EEF0 !important;
+        max-height: 260px !important;
+    }
+
+    .client-detail-panel {
+        overflow: visible !important;
+        min-height: 0 !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .client-overview-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .client-detail-panel {
+        overflow-y: auto !important;
+        max-height: none !important;
+    }
+
+    .client-detail-panel>div[style*="overflowY"] {
+        overflow-y: visible !important;
+        overflow: visible !important;
+        max-height: none !important;
+    }
+}
+
 /* ---------- Modals ---------- */
 @media (max-width: 768px) {
 
@@ -237,6 +298,12 @@
     .page-header button {
         width: 100% !important;
         justify-content: center !important;
+    }
+
+    .compact-action-btn {
+        width: auto !important;
+        padding: 8px 14px !important;
+        font-size: 12px !important;
     }
 }
 

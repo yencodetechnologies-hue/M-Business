@@ -1338,7 +1338,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
     return (
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+      <div className="client-overview-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
 
         {/* Contact Info */}
 
@@ -1951,7 +1951,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       return `${window.location.origin}/client-portal/${c._id}?token=${res.data.token}`;
     };
 
-const handleOpenPortal = async () => {
+    const handleOpenPortal = async () => {
       const url = await buildPortalTokenUrl();
       window.open(url, "_blank");
     };
@@ -2140,12 +2140,12 @@ const handleOpenPortal = async () => {
   const inactiveClientsCount = clients.filter(c => (c.status || "").toLowerCase() === "inactive").length;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "auto", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 100%)", padding: "24px 28px" }}>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100%", height: "auto", overflowY: "auto", overflowX: "hidden", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 100%)", padding: "24px 28px" }}>
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1A2332", margin: 0 }}>Clients</h1>
-        <button className="create-btn" onClick={onAddClient} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <button className="create-btn compact-action-btn" onClick={onAddClient} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           <i className="ti ti-plus"></i> New Client
         </button>
       </div>
@@ -2173,8 +2173,8 @@ const handleOpenPortal = async () => {
 
 
       {/* LEFT-PANEL + DETAIL VIEW (always visible, embedded below stat cards) */}
-      <div style={{ display: "flex", position: "relative", flex: 1, minHeight: 500, background: "#fff", marginTop: 4, border: "1.5px solid #E0EEF0", borderRadius: 14, overflow: "hidden" }}>
-        <div style={{ width: 260, minWidth: 260, borderRight: "1.5px solid #E0EEF0", display: "flex", flexDirection: "column", background: "#fff", overflow: "hidden" }}>
+      <div className="client-detail-layout" style={{ display: "flex", position: "relative", flex: 1, minHeight: 500, background: "#fff", marginTop: 4, border: "1.5px solid #E0EEF0", borderRadius: 14, overflow: "hidden" }}>
+        <div className="client-list-panel" style={{ width: 260, minWidth: 260, borderRight: "1.5px solid #E0EEF0", display: "flex", flexDirection: "column", background: "#fff", overflow: "hidden" }}>
 
           {/* Search + Add */}
           <div style={{ padding: "14px 12px 8px", borderBottom: "1px solid #E0EEF0", flexShrink: 0 }}>
@@ -2244,7 +2244,7 @@ const handleOpenPortal = async () => {
 
         {activeClient ? (
 
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
+          <div className="client-detail-panel" style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
 
 
 

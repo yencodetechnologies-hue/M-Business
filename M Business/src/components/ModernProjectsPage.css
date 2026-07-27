@@ -688,13 +688,14 @@
   color: var(--text2);
   line-height: 1.4;
   margin: 6px 0 8px;
-  word-break: break-word;
+  word-break: break-all;
   overflow-wrap: anywhere;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   min-width: 0;
+  max-height: 2.8em;
 }
 
 .modern-app .m-pc-progress-label {

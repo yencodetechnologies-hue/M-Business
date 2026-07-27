@@ -2282,10 +2282,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                               <div style={{ fontSize: 16, fontWeight: 800, color: currentT.primaryColor || "var(--app-accent)" }}>{inv.invoiceNo}</div>
                               <div style={{ fontSize: 10, fontWeight: 700, color: currentT.primaryColor || "var(--app-accent)", marginTop: 3 }}>
                                 {inv.invoiceType === "Custom" ? (inv.customInvoiceType || "Custom") : (inv.invoiceType || "Milestone")}
-                              </div>   {inv.orderNo && <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 3 }}>Order # {inv.orderNo}</div>}
-                              <div style={{ fontSize: 11, fontWeight: 700, color: currentT.primaryColor || "var(--app-accent)", marginTop: 3 }}>
-                                {inv.invoiceType === "Custom" ? (inv.customInvoiceType || "Custom") : (inv.invoiceType || "Milestone")}
                               </div>
+                              {inv.orderNo && <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 3 }}>Order # {inv.orderNo}</div>}
                               <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
                                 <div style={{ textAlign: "right" }}>
                                   <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>

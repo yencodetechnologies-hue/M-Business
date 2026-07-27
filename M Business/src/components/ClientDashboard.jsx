@@ -2400,7 +2400,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     <div style={{ marginTop: 10, display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, maxHeight: 420, overflowY: "auto" }}>
                       {files.map((file, idx) => {
                         const fname = (file.name || file.url || "").toLowerCase();
-                  const isImage = /\.(jpg|jpeg|png|gif|webp)$/.test(fname) || (file.type || "").startsWith("image/");
+                        const isImage = /\.(jpg|jpeg|png|gif|webp)$/.test(fname) || (file.type || "").startsWith("image/");
                         const isPdf = /\.pdf$/.test(fname) || (file.type || "").includes("pdf");
                         const isTxt = /\.txt$/.test(fname) || (file.type || "") === "text/plain";
                         const isOffice = /\.(doc|docx|xls|xlsx|ppt|pptx)$/.test(fname);

@@ -375,8 +375,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     const sessionKey = pathClientId ? `portalSession_${pathClientId}` : null;
 
     try {
-      const params = new URLSearchParams(window.location.search);
-      const token = params.get("token");
+      const token = window.__PORTAL_TOKEN__ || new URLSearchParams(window.location.search).get("token");
 
       if (token) {
         // Clean token from URL immediately (keeps it out of browser history)

@@ -1830,13 +1830,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 <button onClick={async () => {
                   const link = portalLinkUrl || await generatePortalLink();
                   if (!link) return;
-                  const cleanLink = link.split('?')[0];
-                  sessionStorage.setItem('__portal_auth_token__', link.split('?token=')[1] || '');
-                  const newTab = window.open('about:blank', '_blank');
-                  if (newTab) {
-                    newTab.document.title = 'Opening Client Portal…';
-                    newTab.location.replace(link);
-                  }
+                  window.open(link, '_blank');
                 }} style={{ padding: '10px', borderRadius: 9, border: 'none', background: '#fff', color: P.primaryDark, fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                   <i className="ti ti-external-link"></i> Open Portal
                 </button>

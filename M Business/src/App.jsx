@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import AuthPage from "./components/AuthPage";
 import Dashboard from "./components/SubAdminDashboard";
 const AdminDashboard = lazy(() => import("./components/AdminDashboard"));
-const ClientDashboard = lazy(() => import("./components/ClientDashboard"));
+import ClientDashboard from "./components/ClientDashboard";
 const EmployeeDashboard = lazy(() => import("./components/EmployeeDashboard"));
 const InvoiceViewer = lazy(() => import("./components/InvoiceViewer"));
 const QuotationViewer = lazy(() => import("./components/QuotationViewer"));
@@ -121,7 +121,7 @@ export default function App() {
   return (
     <Router>
       <ToastContainer position="top-right" autoClose={3000} />
-      <Suspense fallback={null}>
+      <Suspense fallback={<div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F3F8F9" }}><div style={{ width: 36, height: 36, border: "3px solid #E0EEF0", borderTop: "3px solid #00BCD4", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /></div>}>
         <Routes>
           <Route path="/" element={getRootPage()} />
           <Route path="/add-account" element={<AuthPage setUser={(u) => { handleSetUser(u); window.location.href = "/"; }} initialTab="register" />} />

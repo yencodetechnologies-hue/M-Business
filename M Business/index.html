@@ -46,17 +46,30 @@
           ocean: { sidebar: "#0284c7", bg: "#f0f9ff" },
           forest: { sidebar: "#16a34a", bg: "#f0fdf4" },
           sunset: { sidebar: "#ea580c", bg: "#fff7ed" },
-          teal: { sidebar: "#7c3aed", bg: "#F5FAFA" }
+          rose: { sidebar: "#e11d48", bg: "#fff1f2" },
+          slate: { sidebar: "#475569", bg: "#f8fafc" },
+          mint: { sidebar: "#0d9488", bg: "#f0fdfa" },
+          candy: { sidebar: "#c026d3", bg: "#fdf4ff" },
+          teal: { sidebar: "#00BCD4", bg: "#F5FAFA" }
         };
         var appTheme = localStorage.getItem("appTheme") || "teal";
-        var t = THEMES[appTheme] || THEMES.teal;
+        var sidebarColor, bgColor;
+        if (appTheme === "custom") {
+          var customColor = localStorage.getItem("appCustomColor") || "#00BCD4";
+          sidebarColor = customColor;
+          bgColor = "#F5FAFA";
+        } else {
+          var t = THEMES[appTheme] || THEMES.teal;
+          sidebarColor = t.sidebar;
+          bgColor = t.bg;
+        }
         if (dm) {
           document.documentElement.classList.add("dark-mode");
           document.documentElement.style.setProperty("--app-bg", "#0a1628");
           document.documentElement.style.setProperty("--app-sidebar", "#0a1628");
         } else {
-          document.documentElement.style.setProperty("--app-bg", t.bg);
-          document.documentElement.style.setProperty("--app-sidebar", t.sidebar);
+          document.documentElement.style.setProperty("--app-bg", bgColor);
+          document.documentElement.style.setProperty("--app-sidebar", sidebarColor);
         }
       } catch (e) { }
     })();
@@ -64,6 +77,18 @@
 </head>
 
 <body>
+  <script>
+    (function () {
+      if (window.location.pathname.startsWith('/client-portal/') && window.location.search.includes('token=')) {
+        var params = new URLSearchParams(window.location.search);
+        var token = params.get('token');
+        if (token) {
+          window.__PORTAL_TOKEN__ = token;
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      }
+    })();
+  </script>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
 </body>

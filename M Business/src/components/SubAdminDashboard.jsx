@@ -1951,14 +1951,10 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       return `${window.location.origin}/client-portal/${c._id}?token=${res.data.token}`;
     };
 
-    const handleOpenPortal = async () => {
-      const newTab = window.open("", "_blank");
+const handleOpenPortal = async () => {
       const url = await buildPortalTokenUrl();
-      if (newTab) {
-        newTab.location.href = url;
-      }
+      window.open(url, "_blank");
     };
-
     const handleCopyLink = async () => {
       const url = await buildPortalTokenUrl();
       navigator.clipboard.writeText(url);

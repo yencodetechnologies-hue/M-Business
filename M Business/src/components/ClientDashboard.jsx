@@ -758,7 +758,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     // refreshes so only the very first load shows a loading state.
     const interval = setInterval(() => {
       fetchAllSilent();
-    }, 30000);
+    }, 5000);
     return () => clearInterval(interval);
   }, [user?._id, clientName]);
 

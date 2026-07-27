@@ -2795,10 +2795,18 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                         <button
                                           onClick={async () => {
                                             if (!window.confirm('Delete this update? This cannot be undone.')) return;
+                                            const deletedUpdate = (currProject.updates || [])[updatesPage * 10 + idx];
                                             const updatedUpdates = (currProject.updates || []).filter((_, i2) => i2 !== (updatesPage * 10 + idx));
                                             setCurrProject(prev => ({ ...prev, updates: updatedUpdates }));
                                             try {
                                               await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { updates: updatedUpdates });
+                                              const linkedApproval = (projectApprovals || []).find(a =>
+                                                a.title === deletedUpdate?.title && String(a.projectId || '') === String(currProject._id || '')
+                                              );
+                                              if (linkedApproval) {
+                                                await axios.delete(`${BASE_URL}/api/approvals/${linkedApproval._id}`);
+                                                setProjectApprovals(prev => prev.filter(a => a._id !== linkedApproval._id));
+                                              }
                                               if (onUpdate) onUpdate();
                                             } catch (err) {
                                               console.error('Failed to delete update:', err.response?.data || err.message);

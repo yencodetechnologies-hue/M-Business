@@ -1124,7 +1124,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
 
             <div className="mpc-pv-row"><span className="mpc-pv-label">Name</span><span className="mpc-pv-val">{name || '—'}</span></div>
             <div className="mpc-pv-row"><span className="mpc-pv-label">Client</span><span className="mpc-pv-val">{client || '—'}</span></div>
-            <div className="mpc-pv-row"><span className="mpc-pv-label">Category</span><span className="mpc-pv-val">{category}</span></div>
+            <div className="mpc-pv-row"><span className="mpc-pv-label">Project Category</span><span className="mpc-pv-val">{category}</span></div>
             <div className="mpc-pv-row"><span className="mpc-pv-label">Status</span><span className="mpc-pv-val">{status}</span></div>
             <div className="mpc-pv-row"><span className="mpc-pv-label">Priority</span><span className="mpc-pv-val">{priority.charAt(0).toUpperCase() + priority.slice(1)}</span></div>
             <div className="mpc-pv-row"><span className="mpc-pv-label">Start</span><span className="mpc-pv-val">{start ? new Date(start).toLocaleDateString() : '—'}</span></div>

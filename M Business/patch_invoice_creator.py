@@ -96,7 +96,7 @@ live_preview_content = '''
             </div>
 
             {/* LIVE INVOICE PREVIEW */}
-            <div className="invoice-preview" style={{ padding: "28px 32px", fontFamily: currentT.fontFamily, fontSize: "13px", color: "#1A2E35", background: "#fff", minHeight: "1000px", maxWidth: 794 }}>
+            <div className="invoice-preview" style={{ padding: "20mm 18mm", fontFamily: currentT.fontFamily, fontSize: "12px", lineHeight: 1.5, color: "#1A2E35", background: "#fff", width: "210mm", height: "297mm", maxWidth: "210mm", boxSizing: "border-box", margin: "0 auto" }}>
               
               {/* HEADER */}
               <div className="inv-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px", paddingBottom: "12px", borderBottom: currentT.headerUnderline }}>

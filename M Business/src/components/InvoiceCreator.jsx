@@ -377,7 +377,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
       <div className="inv-title-word" style={{ fontSize: "24px", fontWeight: "900", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: -6, marginBottom: 12, paddingBottom: 12, borderBottom: currentT.headerUnderline }}>INVOICE</div>
 
       {/* PARTIES */}
-      <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
+      <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "24px" }}>
         <div>
           <div className="inv-party-label" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "4px" }}>Bill To</div>
           <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "800", color: inv.client ? "#0f1c2e" : "#64748b" }}>{inv.client || "— Client Name —"}</div>
@@ -410,15 +410,15 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
       </div>
 
       {/* ITEMS TABLE */}
-      <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "16px" }}>
+      <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "24px" }}>
         <thead>
           <tr style={{ background: "#f8fafc" }}>
-            <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "800", color: "#64748b", textAlign: "left" }}>#</th>
-            <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "800", color: "#64748b", textAlign: "left" }}>Description</th>
-            <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Qty</th>
-            <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Unit Price</th>
-            <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Tax %</th>
-            <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Total</th>
+            <th style={{ padding: "10px 12px", fontSize: "10px", fontWeight: "800", color: "#64748b", textAlign: "left" }}>#</th>
+            <th style={{ padding: "10px 12px", fontSize: "10px", fontWeight: "800", color: "#64748b", textAlign: "left" }}>Description</th>
+            <th style={{ padding: "10px 12px", fontSize: "10px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Qty</th>
+            <th style={{ padding: "10px 12px", fontSize: "10px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Unit Price</th>
+            <th style={{ padding: "10px 12px", fontSize: "10px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Tax %</th>
+            <th style={{ padding: "10px 12px", fontSize: "10px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Total</th>
           </tr>
         </thead>
         <tbody>
@@ -427,12 +427,12 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
             const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
             return (
               <tr key={item.id} style={{ borderBottom: "1px solid var(--app-border)" }}>
-                <td style={{ padding: "6px 8px", fontSize: "10px", color: "#0f1c2e" }}>{idx + 1}</td>
-                <td style={{ padding: "6px 8px", fontSize: "10px", color: "#0f1c2e" }}>{item.description || "—"}</td>
-                <td style={{ padding: "6px 8px", fontSize: "10px", color: "#0f1c2e", textAlign: "right" }}>{item.quantity}</td>
-                <td style={{ padding: "6px 8px", fontSize: "10px", color: "#0f1c2e", textAlign: "right" }}>{formatCurrency(item.rate, inv.currency, false, false, inv.customCurrencySymbol)}</td>
-                <td style={{ padding: "6px 8px", fontSize: "10px", textAlign: "right", color: "#64748b" }}>{rateGst}% {isIncl ? "Incl" : ""}</td>
-                <td style={{ padding: "6px 8px", fontSize: "10px", color: "#0f1c2e", textAlign: "right", fontWeight: "700" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency, false, false, inv.customCurrencySymbol)}</td>
+                <td style={{ padding: "10px 12px", fontSize: "12px", color: "#0f1c2e" }}>{idx + 1}</td>
+                <td style={{ padding: "10px 12px", fontSize: "12px", color: "#0f1c2e" }}>{item.description || "—"}</td>
+                <td style={{ padding: "10px 12px", fontSize: "12px", color: "#0f1c2e", textAlign: "right" }}>{item.quantity}</td>
+                <td style={{ padding: "10px 12px", fontSize: "12px", color: "#0f1c2e", textAlign: "right" }}>{formatCurrency(item.rate, inv.currency, false, false, inv.customCurrencySymbol)}</td>
+                <td style={{ padding: "10px 12px", fontSize: "12px", textAlign: "right", color: "#64748b" }}>{rateGst}% {isIncl ? "Incl" : ""}</td>
+                <td style={{ padding: "10px 12px", fontSize: "12px", color: "#0f1c2e", textAlign: "right", fontWeight: "700" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency, false, false, inv.customCurrencySymbol)}</td>
               </tr>
             );
           })}
@@ -440,7 +440,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
       </table>
 
       {/* TOTALS WITH QR SCANNER */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "12px", marginBottom: "16px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "20px", marginBottom: "24px" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", borderRadius: 8, padding: "8px", border: "1px solid var(--app-border)", minWidth: 95 }}>
           <div style={{ fontSize: "8px", color: "#64748b", fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>SCAN INVOICE</div>
           <div style={{ background: "#fff", padding: 5, borderRadius: 4, border: "1px solid var(--app-border)" }}>
@@ -490,7 +490,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
       )}
 
       {/* FOOTER */}
-      <div className="inv-footer" style={{ marginTop: "16px", paddingTop: "10px", borderTop: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+      <div className="inv-footer" style={{ marginTop: "24px", paddingTop: "16px", borderTop: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
         <div className="inv-notes" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
           {inv.notes && (
             <div>
@@ -549,21 +549,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     }
   }, [forceListView]);
 
-  useEffect(() => {
-    try { localStorage.setItem("invoiceCreatorStep_subadmin", step); } catch (e) { }
-  }, [step]);
 
-  useEffect(() => {
-    try { localStorage.setItem("invoiceCreatorStep_subadmin", step); } catch (e) { }
-  }, [step]);
-
-  useEffect(() => {
-    try { localStorage.setItem("invoiceCreatorStep_subadmin", step); } catch (e) { }
-  }, [step]);
-
-  useEffect(() => {
-    try { localStorage.setItem("invoiceCreatorStep_subadmin", step); } catch (e) { }
-  }, [step]); // "list" | "form" | "preview"
   const [showAddClient, setShowAddClient] = useState(false);
   const [internalNav, setInternalNav] = useState(false);
   const [invoiceList, setInvoiceList] = useState(() => {
@@ -822,14 +808,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   useEffect(() => {
     try { localStorage.setItem("invoiceCreatorItems_subadmin", JSON.stringify(items)); } catch (e) { }
   }, [items]);
-  const [editingId, setEditingId] = useState(() => {
-    try {
-      const savedStep = localStorage.getItem("invoiceCreatorStep_subadmin");
-      const savedId = localStorage.getItem("invoiceCreatorEditingId_subadmin");
-      if (savedStep === "preview" && savedId) return savedId;
-    } catch (e) { }
-    return null;
-  }); // backend _id if editing existing
+  const [editingId, setEditingId] = useState(null); // backend _id if editing existing
 
 
 
@@ -1920,13 +1899,14 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                   <th>Client</th>
                   <th>Project</th>
                   <th>Category</th>
+                  <th>GST No.</th>
+                  <th>Place of Supply</th>
                   <th>Amount</th>
                   <th>Issue Date</th>
                   <th>Due Date</th>
                   <th>Status</th>
                   <th>Actions</th>
-                </tr>
-              </thead>
+                </tr>         </thead>
               <tbody>
                 {listLoading ? (
                   <tr><td colSpan={10} style={{ textAlign: "center", padding: 40, color: "var(--text3)" }}></td></tr>
@@ -1977,6 +1957,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                           isDraft ? <span className="badge draft">Draft</span> :
                             <span className="badge" style={{ background: "var(--purple-bg)", color: "var(--purple)" }}>Milestone</span>}
                       </td>
+                      <td style={{ color: "var(--text2)" }}>{invD.fromGST || entry.fromGST || "—"}</td>
+                      <td style={{ color: "var(--text2)" }}>{invD.placeOfSupply || entry.placeOfSupply || "—"}</td>
                       <td className={isPaid || isPartPaid ? "amount-pos" : ""}>{formatCurrency(entry.total, entry.inv?.currency || inv.currency)}</td>
                       <td style={{ color: "var(--text2)" }}>{formatDate(invD.date || entry.date)}</td>
                       <td style={{ color: isOverdue ? "var(--red)" : isPending ? "var(--amber)" : "var(--text2)", fontWeight: isOverdue || isPending ? 700 : 400 }}>
@@ -2219,248 +2201,12 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               <button onClick={() => triggerPDFShare({ id: editingId, invoiceNo: inv.invoiceNo, total: total }, "print")} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>Print / PDF</button>
             </div>
 
-            {/* Pagination Logic */}
-            {(() => {
-              const ITEMS_PER_PAGE_FIRST = 10;
-              const ITEMS_PER_PAGE_REST = 16;
-              const pages = [];
-              if (items.length <= ITEMS_PER_PAGE_FIRST) {
-                pages.push(items);
-              } else {
-                pages.push(items.slice(0, ITEMS_PER_PAGE_FIRST));
-                let remaining = items.slice(ITEMS_PER_PAGE_FIRST);
-                while (remaining.length > 0) {
-                  pages.push(remaining.slice(0, ITEMS_PER_PAGE_REST));
-                  remaining = remaining.slice(ITEMS_PER_PAGE_REST);
-                }
-              }
-
-              return (
-                <div className="print-wrapper" style={{ display: "flex", flexDirection: "column", gap: "40px", alignItems: "center", width: "100%" }}>
-                  {pages.map((pageItems, pageIndex) => {
-                    const isFirstPage = pageIndex === 0;
-                    const isLastPage = pageIndex === pages.length - 1;
-                    const globalItemOffset = isFirstPage ? 0 : ITEMS_PER_PAGE_FIRST + ((pageIndex - 1) * ITEMS_PER_PAGE_REST);
-
-                    return (
-                      <div key={pageIndex} className="invoice-paper print-container" style={{ position: "relative", maxWidth: 794, margin: "0 auto", background: "#fff", borderRadius: 18, boxShadow: "0 24px 80px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)", display: "flex", flexDirection: "column", minHeight: 1122, width: "100%" }}>
-                        {/* Header */}
-                        {isFirstPage && (<div className="avoid-break" style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "visible", flexShrink: 0, borderBottom: "1px solid var(--app-border)" }}>
-                          <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: `radial-gradient(circle, ${currentT.primaryColor}0d, transparent)`, top: -80, right: -40, pointerEvents: "none" }} />
-                          <div className="inv-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", gap: 20 }}>
-                            <div>
-                              {effectiveLogo ? (
-                                <img src={effectiveLogo} alt="logo" style={{ height: 85, maxWidth: "100%", borderRadius: 10, objectFit: "contain" }} />
-                              ) : (
-                                <div style={{ height: 60, width: 60, background: currentT.logoColor || "var(--app-accent)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
-                                  {effectiveCompanyName[0] || "?"}
-                                </div>
-                              )}
-                            </div>
-                            <div className="inv-hright" style={{ textAlign: "right" }}>
-                              <div style={{ fontSize: 20, fontWeight: 900, color: "#0f1c2e", textTransform: "uppercase", letterSpacing: 1 }}>{inv.companyName || effectiveCompanyName}</div>
-                              {inv.companyAddress && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 3 }}>{inv.companyAddress}</div>}
-                              {inv.fromGST && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2, fontWeight: 700 }}>GSTIN: {inv.fromGST}</div>}
-                              <div style={{ fontSize: 36, fontWeight: 900, color: currentT.primaryColor, letterSpacing: -2, lineHeight: 1, marginBottom: 10 }}>INVOICE</div>
-                              <div style={{ fontSize: 16, fontWeight: 800, color: currentT.primaryColor || "var(--app-accent)" }}>{inv.invoiceNo}</div>
-                              <div style={{ fontSize: 10, fontWeight: 700, color: currentT.primaryColor || "var(--app-accent)", marginTop: 3 }}>
-                                {inv.invoiceType === "Custom" ? (inv.customInvoiceType || "Custom") : (inv.invoiceType || "Milestone")}
-                              </div>
-                              {inv.orderNo && <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 3 }}>Order # {inv.orderNo}</div>}
-                              <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
-                                <div style={{ textAlign: "right" }}>
-                                  <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
-                                  <div style={{ fontSize: 12, color: "#0f1c2e", fontWeight: 700 }}>{formatDate(inv.date)}</div>
-                                </div>
-                                <div style={{ textAlign: "right" }}>
-                                  <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DUE DATE</div>
-                                  <div style={{ fontSize: 12, color: "#ea580c", fontWeight: 700 }}>{formatDate(inv.dueDate)}</div>
-                                </div>
-                              </div>
-                              {(balanceDue > 0 && amountPaid > 0) ? (
-                                <div style={{ marginTop: 12, textAlign: "right" }}>
-                                  <span style={{
-                                    display: "inline-block",
-                                    padding: "4px 14px",
-                                    border: "1.5px solid #f59e0b",
-                                    borderRadius: 20,
-                                    color: "#b45309",
-                                    fontSize: 11,
-                                    fontWeight: 800,
-                                    background: "#fef3c7",
-                                    letterSpacing: 1
-                                  }}>
-                                    PART PAID
-                                  </span>
-                                </div>
-                              ) : balanceDue <= 0 ? (
-                                <div style={{ marginTop: 12, textAlign: "right" }}>
-                                  <span style={{
-                                    display: "inline-block",
-                                    padding: "4px 14px",
-                                    border: "1.5px solid #10b981",
-                                    borderRadius: 20,
-                                    color: "#059669",
-                                    fontSize: 11,
-                                    fontWeight: 800,
-                                    background: "#d1fae5",
-                                    letterSpacing: 1
-                                  }}>
-                                    PAID
-                                  </span>
-                                </div>
-                              ) : null}
-                              {inv.project && (
-                                <div style={{ marginTop: 24, textAlign: "right" }}>
-                                  <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 2, marginBottom: 6 }}>PROJECT</div>
-                                  <div style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e", lineHeight: 1.4 }}>{inv.project}</div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>)}
-
-                        {/* Bill To */}
-                        {isFirstPage && (<div className="inv-btgrid avoid-break" style={{ display: "grid", gridTemplateColumns: "1fr", borderBottom: "2px solid var(--app-border)", flexShrink: 0 }}>
-                          <div style={{ padding: "20px 32px" }}>
-                            <div style={{ fontSize: 9, color: "#64748b", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>BILL TO</div>
-                            <div style={{ fontSize: 17, fontWeight: 800, color: "#0f1c2e" }}>{inv.client || "—"}</div>
-                            {selectedClient?.companyName && <div style={{ fontSize: 13, color: currentT.primaryColor || "var(--app-accent)", fontWeight: 600, marginTop: 2 }}>{selectedClient.companyName}</div>}
-                            {selectedClient?.email && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 5 }}> {selectedClient.email}</div>}
-                            {selectedClient?.phone && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}> {selectedClient.phone}</div>}
-                            {selectedClient?.gstNumber && <div style={{ fontSize: 12, color: currentT.primaryColor || "var(--app-accent)", marginTop: 4, fontWeight: 600 }}> GST: {selectedClient.gstNumber}</div>}
-                          </div>
-                        </div>)}
-
-                        {/* Items */}
-                        <div className="inv-table-wrap" style={{ padding: isFirstPage ? "22px 32px" : "80px 32px 22px", overflowX: "auto", flexShrink: 0 }}>
-                          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
-                            <thead>
-                              <tr className="avoid-break" style={{ background: "#f8fafc" }}>
-                                {["#", "Description", "Qty", "Unit Rate", "Tax Rate", "Amount"].map((h, i) => (
-                                  <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 800, color: "#64748b", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty", "Tax Rate"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
-                                ))}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {pageItems.map((item, idx) => {
-                                const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
-                                const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
-                                return (
-                                  <tr key={item.id} className="avoid-break" style={{ borderBottom: "1px solid var(--app-border)" }}>
-                                    <td style={{ padding: "12px 11px", color: "#64748b", fontWeight: 700, fontSize: 12 }}>{String(globalItemOffset + idx + 1).padStart(2, "0")}</td>
-                                    <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#0f1c2e" }}>{item.description || "—"}</td>
-                                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
-                                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, inv.currency, false, false, inv.customCurrencySymbol)}</td>
-                                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#6b7280" }}>{rateGst}% {isIncl ? "(Incl)" : ""}</td>
-                                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency, false, false, inv.customCurrencySymbol)}</td>
-                                  </tr>
-                                );
-                              })}
-                            </tbody>
-                          </table>
-                        </div>
-
-                        {isLastPage && (<>
-                          {/* Totals with QR Scanner */}
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", padding: "0 32px 16px" }}>
-                            {/* QR Scanner */}
-                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", borderRadius: 8, padding: "8px", border: "1px solid var(--app-border)", minWidth: 95 }}>
-                              <div style={{ fontSize: "8px", color: "#64748b", fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>SCAN INVOICE</div>
-                              <div style={{ background: "#fff", padding: 5, borderRadius: 4, border: "1px solid var(--app-border)" }}>
-                                <QRCodeSVG value={qrData} size={80} bgColor="#ffffff" fgColor="#0f1c2e" />
-                              </div>
-                            </div>
-
-                            {/* Totals */}
-                            <div className="inv-totals" style={{ width: "200px" }}>
-                              <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                                <span className="lbl" style={{ color: "#64748b" }}>Subtotal</span>
-                                <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(subtotal, inv.currency, false, false, inv.customCurrencySymbol)}</span>
-                              </div>
-                              <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                                <span className="lbl" style={{ color: "#64748b" }}>GST / Tax</span>
-                                <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(gstAmt, inv.currency, false, false, inv.customCurrencySymbol)}</span>
-                              </div>
-                              {amountPaid > 0 && (
-                                <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                                  <span className="lbl" style={{ color: "#64748b" }}>Paid (Advance)</span>
-                                  <span className="val" style={{ fontWeight: "700", color: "var(--green)" }}>-{formatCurrency(amountPaid, inv.currency, false, false, inv.customCurrencySymbol)}</span>
-                                </div>
-                              )}
-                              <div className="inv-grand-row" style={{ display: "flex", justify: "space-between", padding: "6px 8px", background: "#0f1c2e", borderRadius: "6px", marginTop: "4px", color: "#fff" }}>
-                                <span className="lbl" style={{ fontSize: "10px", fontWeight: "800" }}>Balance Due</span>
-                                <span className="val" style={{ fontSize: "12px", fontWeight: "900" }}>{formatCurrency(balanceDue, inv.currency, false, false, inv.customCurrencySymbol)}</span>
-                              </div>
-                            </div>
-                          </div>
-                          {/* Amount in Words */}
-                          <div style={{ margin: "8px 32px 0", padding: "7px 12px", background: "#f8fafc", border: "1px dashed #CBD5E1", borderRadius: "6px" }}>
-                            <span style={{ fontSize: "9px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.6px" }}>Amount in Words: </span>
-                            <span style={{ fontSize: "9px", fontWeight: "800", color: "#0f1c2e" }}>{inv.currency === 'INR' ? 'INR ' : (inv.currency || 'INR') + ' '}{numberToWords(Math.round(balanceDue))}</span>
-                          </div>
-
-                          {/* Payment details */}
-                          {(inv.bankName || inv.accountNumber || inv.ifscCode || inv.upiId) && (
-                            <div className="inv-bank" style={{ margin: "12px 32px 0", padding: "8px 10px", background: currentT.primaryBg, borderRadius: "6px", borderLeft: `3px solid ${currentT.primaryColor}` }}>
-                              <div className="inv-bank-title" style={{ fontSize: "9px", fontWeight: "700", color: currentT.primaryColor, marginBottom: "3px" }}>Payment Details</div>
-                              <div className="inv-bank-detail" style={{ fontSize: "9px", color: "#0f1c2e", lineHeight: "1.5" }}>
-                                {inv.bankName && <span>Bank: {inv.bankName} &nbsp;|&nbsp; </span>}
-                                {inv.accountNumber && <span>A/C: {inv.accountNumber} &nbsp;|&nbsp; </span>}
-                                {inv.ifscCode && <span>IFSC: {inv.ifscCode}</span>}
-                                {inv.upiId && <div style={{ marginTop: "2px" }}>UPI: {inv.upiId}</div>}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Notes & Terms + Signature */}
-                          <div className="inv-footer avoid-break" style={{ margin: "16px 32px 24px", paddingTop: "10px", borderTop: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-                            <div className="inv-notes" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
-                              {inv.notes && (
-                                <div>
-                                  <div className="inv-notes-title" style={{ fontSize: "10px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Notes</div>
-                                  <div className="inv-notes-text" style={{ fontSize: "10px", color: "#64748b", lineHeight: "1.5" }}>{inv.terms}</div>
-                                </div>
-                              )}
-                              {inv.terms && (
-                                <div>
-                                  <div className="inv-notes-title" style={{ fontSize: "10px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Terms & Conditions</div>
-                                  <div className="inv-notes-text" style={{ fontSize: "10px", color: "#64748b", lineHeight: "1.5" }}>{inv.terms}</div>
-                                </div>
-                              )}
-                            </div>
-                            <div className="inv-sig" style={{ textAlign: "right", minWidth: "120px" }}>
-                              <div style={{ height: "35px", display: "flex", alignItems: "flex-end", justifyContent: "flex-end", marginBottom: "3px" }}>
-                                {inv.signature ? (
-                                  inv.signatureType === "image" ? (
-                                    <img src={inv.signature} alt="Signature" style={{ maxHeight: "30px", maxWidth: "120px", objectFit: "contain" }} />
-                                  ) : (
-                                    <div style={{ fontFamily: "'Dancing Script', cursive", fontSize: "16px", fontWeight: "bold", color: "#1a2e35" }}>{inv.signature}</div>
-                                  )
-                                ) : null}
-                              </div>
-                              <div className="inv-sig-line" style={{ width: "100%", height: "1px", background: "var(--app-border)", marginBottom: "3px" }}></div>
-                              <div className="inv-sig-name" style={{ fontSize: "9px", fontWeight: "700", color: "#0f1c2e" }}>{inv.companyName || effectiveCompanyName}</div>
-                              <div className="inv-sig-role" style={{ fontSize: "8px", color: "#64748b" }}>Authorized Signatory</div>
-                            </div>
-                          </div>
-
-                        </>)}
-
-                        <div className="flex-spacer" style={{ flex: 1 }} />
-
-                        {/* Footer message */}
-                        <div style={{ background: "#ffffff", borderTop: "2px solid #f1f5f9", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, pageBreakBefore: "auto", breakBefore: "auto" }}>
-                          <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{effectiveCompanyName}</div>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: currentT.primaryColor || "#7c3aed" }}>{inv.footerMessage}</div>
-                          <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{inv.invoiceNo}</div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })()}
+            {/* LIVE INVOICE PREVIEW (matches Document Live Preview exactly) */}
+            <InvoiceLivePreview
+              inv={inv} items={items} effectiveLogo={effectiveLogo} effectiveCompanyName={effectiveCompanyName}
+              selectedClient={selectedClient} currentT={currentT} subtotal={subtotal} gstAmt={gstAmt}
+              balanceDue={balanceDue} amountPaid={amountPaid} qrData={qrData}
+            />
           </div>
         </ModalInner>
       </ModalOuter>
@@ -3135,7 +2881,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               <div className="inv-title-word" style={{ fontSize: "24px", fontWeight: "900", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: -6, marginBottom: 12, paddingBottom: 12, borderBottom: currentT.headerUnderline }}>INVOICE</div>
 
               {/* PARTIES */}
-              <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
+              <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "24px" }}>
                 <div>
                   <div className="inv-party-label" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "4px" }}>Bill To</div>
                   <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "800", color: inv.client ? "#0f1c2e" : "#64748b" }}>{inv.client || "— Client Name —"}</div>
@@ -3168,15 +2914,15 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               </div>
 
               {/* ITEMS TABLE */}
-              <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "16px" }}>
+              <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "24px" }}>
                 <thead>
                   <tr style={{ background: "#f8fafc" }}>
-                    <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "800", color: "#64748b", textAlign: "left" }}>#</th>
-                    <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "800", color: "#64748b", textAlign: "left" }}>Description</th>
-                    <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Qty</th>
-                    <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Unit Price</th>
-                    <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Tax %</th>
-                    <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Total</th>
+                    <th style={{ padding: "10px 12px", fontSize: "10px", fontWeight: "800", color: "#64748b", textAlign: "left" }}>#</th>
+                    <th style={{ padding: "10px 12px", fontSize: "10px", fontWeight: "800", color: "#64748b", textAlign: "left" }}>Description</th>
+                    <th style={{ padding: "10px 12px", fontSize: "10px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Qty</th>
+                    <th style={{ padding: "10px 12px", fontSize: "10px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Unit Price</th>
+                    <th style={{ padding: "10px 12px", fontSize: "10px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Tax %</th>
+                    <th style={{ padding: "10px 12px", fontSize: "10px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Total</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -3198,7 +2944,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               </table>
 
               {/* TOTALS WITH QR SCANNER */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "12px", marginBottom: "16px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "20px", marginBottom: "24px" }}>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", borderRadius: 8, padding: "8px", border: "1px solid var(--app-border)", minWidth: 95 }}>
                   <div style={{ fontSize: "8px", color: "#64748b", fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>SCAN INVOICE</div>
                   <div style={{ background: "#fff", padding: 5, borderRadius: 4, border: "1px solid var(--app-border)" }}>
@@ -3248,7 +2994,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               )}
 
               {/* FOOTER */}
-              <div className="inv-footer" style={{ marginTop: "16px", paddingTop: "10px", borderTop: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+              <div className="inv-footer" style={{ marginTop: "24px", paddingTop: "16px", borderTop: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
                 <div className="inv-notes" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
                   {inv.notes && (
                     <div>

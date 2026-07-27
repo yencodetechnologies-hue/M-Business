@@ -96,7 +96,7 @@ live_preview_content = '''
             </div>
 
             {/* LIVE INVOICE PREVIEW */}
-            <div className="invoice-preview" style={{ padding: "20px", fontFamily: currentT.fontFamily, fontSize: "11px", color: "#1A2E35", background: "#fff", minHeight: "560px" }}>
+            <div className="invoice-preview" style={{ padding: "28px 32px", fontFamily: currentT.fontFamily, fontSize: "13px", color: "#1A2E35", background: "#fff", minHeight: "1000px", maxWidth: 794 }}>
               
               {/* HEADER */}
               <div className="inv-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px", paddingBottom: "12px", borderBottom: currentT.headerUnderline }}>
@@ -129,7 +129,7 @@ live_preview_content = '''
               </div>
 
               {/* PARTIES */}
-              <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
+              <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "24px" }}>
                 <div>
                   <div className="inv-party-label" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "4px" }}>From</div>
                   <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "800", color: "var(--text)" }}>{inv.companyName || effectiveCompanyName}</div>
@@ -158,7 +158,7 @@ live_preview_content = '''
               </div>
 
               {/* ITEMS TABLE */}
-              <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "16px" }}>
+              <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "24px" }}>
                 <thead>
                   <tr style={{ background: currentT.logoColor || "var(--app-accent)" }}>
                     <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "700", color: "#fff", textAlign: "left" }}>#</th>
@@ -217,7 +217,7 @@ live_preview_content = '''
               )}
 
               {/* FOOTER */}
-              <div className="inv-footer" style={{ marginTop: "16px", paddingTop: "10px", borderTop: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+              <div className="inv-footer" style={{ marginTop: "24px", paddingTop: "16px", borderTop: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
                 <div className="inv-notes" style={{ flex: 1 }}>
                   {inv.notes && (
                     <>

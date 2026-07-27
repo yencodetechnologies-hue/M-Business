@@ -347,6 +347,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const tabsRef = useRef(null);
   const tabContentRef = useRef(null);
   const [tabOrder, setTabOrder] = useState(['payments', 'updates', 'activity']);
+  useEffect(() => { if (activeTab === 'payments') setActiveTab('updates'); }, [activeTab]);
 
   useEffect(() => {
     localStorage.setItem('project_tabs_order', JSON.stringify(tabOrder));
@@ -2354,10 +2355,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               ref={tabsRef}
               style={{ overflowX: 'auto', scrollbarWidth: 'none', marginBottom: 4 }}
             >
-              {tabOrder.filter(tab => tab !== 'activity').map(tab => {
+              {tabOrder.filter(tab => tab !== 'activity' && tab !== 'payments').map(tab => {
                 let lbl = '', icon = null;
                 if (tab === 'updates') lbl = 'Updates';
-                if (tab === 'payments') { lbl = 'Accounts'; icon = 'ti-arrows-exchange'; }
                 return (
                   <button
                     key={tab}
@@ -3508,6 +3508,325 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             </div>{/* end tabContentRef wrapper */}
           </div>
         </div > {/* end mpd-grid-main-side */}
+
+        <div style={{ padding: '18px 16px', overflow: 'visible', boxSizing: 'border-box' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 20, width: '100%' }}>
+            {(() => {
+              const liveAdvanceTotal = (currProject.advances || []).reduce((s, a) => s + parseAmt(a.amount), 0);
+              const liveAdditionalTotal = (currProject.additionalCharges || []).reduce((s, a) => s + parseAmt(a.amount), 0);
+              const liveBilled = mergedInvoices.reduce((s, inv) => s + parseAmt(inv.amount), 0);
+              const liveReceived = (currProject.paymentsReceived || []).reduce((s, p) => s + parseAmt(p.amount), 0);
+              const livePending = Math.max(0, liveBilled - liveReceived);
+              return [
+                { lbl: 'Total Invoiced', val: `${currency}${liveBilled.toLocaleString()}`, sub: `${mergedInvoices.length} invoice(s)`, color: '#3B82F6', icon: 'ti-file-invoice' },
+                { lbl: 'Received', val: `${currency}${liveReceived.toLocaleString()}`, sub: `${liveBilled > 0 ? Math.round((liveReceived / liveBilled) * 100) : 0}% collected`, color: '#22C55E', icon: 'ti-circle-check' },
+                { lbl: 'Outstanding', val: `${currency}${livePending.toLocaleString()}`, sub: 'Balance due', color: '#EF4444', icon: 'ti-alert-circle' },
+              ];
+            })().map(s => (
+              <div key={s.lbl} style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 12, padding: '14px 16px', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: s.color, borderRadius: '12px 12px 0 0' }}></div>
+                <i className={`ti ${s.icon}`} style={{ position: 'absolute', top: 14, right: 14, fontSize: 20, opacity: .13, color: s.color }}></i>
+                <div style={{ fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 5 }}>{s.lbl}</div>
+                <div style={{ fontSize: 20, fontWeight: 900, color: '#0D1B2A', letterSpacing: '-.5px', lineHeight: 1 }}>{s.val}</div>
+                <div style={{ fontSize: 11, color: '#7B8FA1', fontWeight: 600, marginTop: 4 }}>{s.sub}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 18, width: '100%' }}>
+            {[
+              { key: 'inv', label: 'Invoice', desc: 'Standard billing', icon: 'ti-file-invoice', color: '#3B82F6', bg: 'rgba(59,130,246,.1)' },
+              { key: 'pay', label: 'Payment', desc: 'Received amounts', icon: 'ti-credit-card', color: '#22C55E', bg: 'rgba(34,197,94,.1)' },
+              { key: 'exp', label: 'Expenses', desc: 'Project costs', icon: 'ti-receipt', color: '#6B7280', bg: 'rgba(107,114,128,.1)' },
+            ].map(t => (
+              <div key={t.key}
+                onClick={() => { setActivePayTab(t.key); setSelectedPaymentItems([]); }}
+                style={{ background: activePayTab === t.key ? ' var(--app-accent, var(--app-accent, #00BCD4))' : '#fff', border: `1px solid ${activePayTab === t.key ? ' var(--app-accent, var(--app-accent, #00BCD4))' : '#E8EDF2'}`, borderRadius: 12, padding: '14px 12px', textAlign: 'center', cursor: 'pointer', transition: 'all .15s', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
+              >
+                <div style={{ width: 38, height: 38, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px', fontSize: 18, background: activePayTab === t.key ? 'rgba(255,255,255,.25)' : t.bg, color: activePayTab === t.key ? '#fff' : t.color }}>
+                  <i className={`ti ${t.icon}`}></i>
+                </div>
+                <div style={{ fontSize: 12, fontWeight: 800, color: activePayTab === t.key ? '#fff' : '#0D1B2A' }}>{t.label}</div>
+                <div style={{ fontSize: 10, fontWeight: 600, color: activePayTab === t.key ? 'rgba(255,255,255,.75)' : '#7B8FA1', marginTop: 2 }}>{t.desc}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, marginBottom: 8 }}>
+            {selectedPaymentItems.length > 0 && activePayTab === 'inv' && (
+              <button onClick={() => { setTargetPortalClient(currProject.client); setShowSendPopup(true); }} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#22C55E', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                <i className="ti ti-send" style={{ fontSize: 13 }}></i> Send ({selectedPaymentItems.length})
+              </button>
+            )}
+            {!hideTopActions && (() => {
+              const btnMap = {
+                inv: { label: 'New Invoice', modal: 'showNewInvoice', icon: 'ti-file-invoice' },
+                pay: { label: 'Record Payment', modal: 'showPayment', icon: 'ti-credit-card' },
+                exp: { label: 'Add Expense', modal: 'showExpense', icon: 'ti-receipt' },
+              };
+              const b = btnMap[activePayTab] || btnMap['inv'];
+              return (
+                <button
+                  onClick={() => {
+                    if (b.modal === 'showNewInvoice' && onNewInvoice) {
+                      onNewInvoice(currProject);
+                    } else {
+                      setPaymentModalsState(prev => ({ ...prev, [b.modal]: true }));
+                    }
+                  }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: ' var(--app-accent, var(--app-accent, #00BCD4))', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none' }}
+                >
+                  <i className={`ti ${b.icon}`} style={{ fontSize: 13 }}></i> {b.label}
+                </button>
+              );
+            })()}
+          </div>
+
+          {mergedInvoices.length > 0 && (
+            <div data-paytab="inv" style={{ display: 'block', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'visible', marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
+                <i className="ti ti-file-invoice" style={{ color: '#3B82F6', fontSize: 15, marginRight: 8 }}></i>
+                <span style={{ fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>Invoices</span>
+                <span style={{ background: 'rgba(59,130,246,.1)', color: '#3B82F6', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{mergedInvoices.length}</span>
+              </div>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 900 }}>
+                  <thead><tr style={{ background: '#F8FAFC' }}>{['', 'Invoice ID', 'Client', 'Project', 'Category', 'Amount', 'Issue Date', 'Due Date', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
+                  <tbody>
+                    {mergedInvoices.map((inv, i) => (
+                      <tr
+                        key={inv.invoiceNo || i}
+                        onClick={() => onViewInvoice ? onViewInvoice({ ...inv, project: inv.projectName || currProject?.name, client: inv.clientName || inv.client }, currProject) : setPreviewInvoice(inv)}
+                        style={{ borderBottom: '1px solid #F1F5F9', cursor: 'pointer' }}
+                      >
+                        <td style={{ padding: '12px 14px' }} onClick={(e) => e.stopPropagation()}>
+                          <input type="checkbox" checked={selectedPaymentItems.includes(i)} onChange={() => setSelectedPaymentItems(prev => prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i])} />
+                        </td>
+                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: ' var(--app-accent, #00BCD4)' }}>{inv.invoiceNo || `INV-00${i + 1}`}</td>
+                        <td style={{ padding: '12px 14px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#0097A7', color: '#fff', fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                              {(inv.client || currProject.client || '?')[0]?.toUpperCase()}
+                            </div>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: '#374151' }}>{inv.client || currProject.client || '—'}</span>
+                          </div>
+                        </td>
+                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{currProject.name || '—'}</td>
+                        <td style={{ padding: '12px 14px' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>
+                          <span style={{ background: '#EDE9FE', color: '#7C3AED', fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20 }}>{inv.category || 'Milestone'}</span>
+                        </td>
+                        <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(parseAmt(inv.total) || parseAmt(inv.amount) || 0).toLocaleString()}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.date || inv.issueDate ? new Date(inv.date || inv.issueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#F59E0B' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                        <td style={{ padding: '12px 14px' }} onClick={(e) => e.stopPropagation()}>
+                          <select
+                            value={inv.status || 'draft'}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) => handleInvoiceStatusChange(inv, e.target.value)} style={{ background: 'transparent', border: 'none', fontSize: 10, fontWeight: 800, cursor: 'pointer', outline: 'none', color: inv.status === 'Paid' || inv.status === 'paid' ? '#15803D' : '#B45309' }}
+                          >
+                            <option value="draft">Draft</option>
+                            <option value="sent">Sent</option>
+                            <option value="part_paid">Part Paid</option>
+                            <option value="paid">Paid</option>
+                            <option value="unpaid">Unpaid</option>
+                            <option value="overdue">Overdue</option>
+                          </select>
+                        </td>
+                        <td style={{ padding: '12px 14px' }} onClick={(e) => e.stopPropagation()}>
+                          <div style={{ display: 'flex', gap: 4 }}>
+                            <button onClick={() => onViewInvoice ? onViewInvoice({ ...inv, project: inv.projectName || currProject?.name, client: inv.clientName || inv.client }, currProject) : setPreviewInvoice(inv)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-eye"></i></button>
+                            <button onClick={() => { if (onNewInvoice) { onNewInvoice(currProject, inv); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+                            <button
+                              title="Share to Client"
+                              disabled={sharingInvoiceNo === inv.invoiceNo}
+                              onClick={() => handleShareToClient(inv)}
+                              style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: sharingInvoiceNo === inv.invoiceNo ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: sharingInvoiceNo === inv.invoiceNo ? '#CBD5E1' : '#0EA5E9' }}
+                            >
+                              <i className={sharingInvoiceNo === inv.invoiceNo ? "ti ti-loader-2" : "ti ti-send"}></i>
+                            </button>
+                            <button onClick={() => handleDeleteInvoice(inv)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {(currProject.advances || []).length > 0 && (
+            <div style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
+                <i className="ti ti-pig-money" style={{ color: '#8B5CF6', fontSize: 15, marginRight: 8 }}></i>
+                <span style={{ fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>Advance Payments</span>
+                <span style={{ background: '#EDE9FE', color: '#7C3AED', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{(currProject.advances || []).length}</span>
+              </div>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 900 }}>
+                  <thead><tr style={{ background: '#F8FAFC' }}>{['Advance #', 'Description', 'Amount', 'Date', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
+                  <tbody>
+                    {(currProject.advances || []).map((rec, i) => (
+                      <tr key={i} style={{ borderBottom: '1px solid #F1F5F9', cursor: 'pointer' }}>
+                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.advanceNo || `ADV-00${i + 1}`}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }}>{rec.description || '—'}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{rec.date ? new Date(rec.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                        <td style={{ padding: '12px 14px' }}><span style={{ background: rec.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: rec.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.status || 'Pending'}</span></td>
+                        <td style={{ padding: '12px 14px' }}>
+                          <div style={{ display: 'flex', gap: 4 }}>
+                            <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdvance: true, editData: rec, editIndex: i }))} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+                            <button onClick={() => handleDeleteRecord('advances', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {(currProject.additionalCharges || []).length > 0 && (
+            <div style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
+                <i className="ti ti-circle-plus" style={{ color: '#F97316', fontSize: 15, marginRight: 8 }}></i>
+                <span style={{ fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>Additional Charges</span>
+                <span style={{ background: '#FFEDD5', color: '#C2410C', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{(currProject.additionalCharges || []).length}</span>
+              </div>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 900 }}>
+                  <thead><tr style={{ background: '#F8FAFC' }}>{['Charge #', 'Description', 'Amount', 'Date', 'Category', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
+                  <tbody>
+                    {(currProject.additionalCharges || []).map((rec, i) => (
+                      <tr key={i} style={{ borderBottom: '1px solid #F1F5F9', borderLeft: `3px solid ${rec.status === 'Paid' ? '#22C55E' : '#F59E0B'}` }}>
+                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.chargeNo || `CHG-00${i + 1}`}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }}>{rec.description || '—'}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{rec.date ? new Date(rec.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                        <td style={{ padding: '12px 14px' }}><span style={{ background: '#FFEDD5', color: '#C2410C', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.category || 'Other'}</span></td>
+                        <td style={{ padding: '12px 14px' }}><span style={{ background: rec.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: rec.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.status || 'Pending'}</span></td>
+                        <td style={{ padding: '12px 14px' }}>
+                          <div style={{ display: 'flex', gap: 4 }}>
+                            <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showAdditional: true, editData: rec, editIndex: i }))} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+                            <button onClick={() => handleDeleteRecord('additionalCharges', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {(currProject.milestonePayments || []).length > 0 && (
+            <div style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
+                <i className="ti ti-flag" style={{ color: '#F59E0B', fontSize: 15, marginRight: 8 }}></i>
+                <span style={{ fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>Milestone Payments</span>
+                <span style={{ background: '#FEF3C7', color: '#B45309', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{(currProject.milestonePayments || []).length}</span>
+              </div>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 900 }}>
+                  <thead><tr style={{ background: '#F8FAFC' }}>{['Milestone #', 'Name', 'Amount', 'Due Date', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
+                  <tbody>
+                    {(currProject.milestonePayments || []).map((rec, i) => (
+                      <tr key={i} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.milestoneNo || `MIL-00${i + 1}`}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }}>{rec.name || rec.description || '—'}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{(rec.dueDate || rec.date) ? new Date(rec.dueDate || rec.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                        <td style={{ padding: '12px 14px' }}><span style={{ background: rec.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: rec.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.status || 'Pending'}</span></td>
+                        <td style={{ padding: '12px 14px' }}>
+                          <div style={{ display: 'flex', gap: 4 }}>
+                            <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showMilestonePayment: true, editData: rec, editIndex: i }))} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+                            <button onClick={() => handleDeleteRecord('milestonePayments', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {(currProject.paymentsReceived || []).length > 0 && (
+            <div style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
+                <i className="ti ti-credit-card" style={{ color: '#22C55E', fontSize: 15, marginRight: 8 }}></i>
+                <span style={{ fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>Payments Received</span>
+                <span style={{ background: '#DCFCE7', color: '#15803D', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{(currProject.paymentsReceived || []).length}</span>
+              </div>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}>
+                  <thead><tr style={{ background: '#F8FAFC' }}>{['Payment #', 'Linked Invoice', 'Amount', 'Due Date', 'Payment Date', 'Mode', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
+                  <tbody>
+                    {(currProject.paymentsReceived || []).map((rec, i) => {
+                      const localInvDueDate = (currProject.invoices || []).find(inv => inv.invoiceNo === rec.linkedInvoice)?.dueDate;
+                      const globalInvDueDate = mergedInvoices.find(inv => inv.invoiceNo === rec.linkedInvoice)?.dueDate;
+                      const effectiveDueDate = rec.dueDate || localInvDueDate || globalInvDueDate || null;
+                      const isLate = effectiveDueDate && rec.paymentDate && new Date(rec.paymentDate) > new Date(effectiveDueDate);
+                      return (
+                        <tr key={i} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                          <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.paymentNo || `PAY-00${i + 1}`}</td>
+                          <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))' }}>{rec.linkedInvoice || '—'}</td>
+                          <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
+                          <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: isLate ? '#EF4444' : '#2D3E50' }}>
+                            {effectiveDueDate ? new Date(effectiveDueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                            {isLate && <div style={{ fontSize: 9, fontWeight: 800, color: '#EF4444' }}>LATE</div>}
+                          </td>
+                          <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{rec.paymentDate ? new Date(rec.paymentDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                          <td style={{ padding: '12px 14px', fontSize: 11, fontWeight: 800, color: '#475569' }}>{rec.paymentMode || '—'}</td>
+                          <td style={{ padding: '12px 14px' }}>
+                            <div style={{ display: 'flex', gap: 4 }}>
+                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showPayment: true, editData: rec, editIndex: i }))} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+                              <button onClick={() => handleDeleteRecord('paymentsReceived', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {(currProject.expenses || []).length > 0 && (
+            <div style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
+                <i className="ti ti-receipt" style={{ color: '#6B7280', fontSize: 15, marginRight: 8 }}></i>
+                <span style={{ fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>Expenses</span>
+                <span style={{ background: '#F3F4F6', color: '#374151', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{(currProject.expenses || []).length}</span>
+              </div>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 900 }}>
+                  <thead><tr style={{ background: '#F8FAFC' }}>{['Expense #', 'Description', 'Amount', 'Date', 'Category', 'Status', 'Actions'].map(h => <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', borderBottom: '1px solid #E8EDF2', whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
+                  <tbody>
+                    {(currProject.expenses || []).map((rec, i) => (
+                      <tr key={i} style={{ borderBottom: '1px solid #F1F5F9', borderLeft: `3px solid ${rec.status === 'Paid' ? '#22C55E' : '#F59E0B'}` }}>
+                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.expenseNo || `EXP-00${i + 1}`}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }}>{rec.description || '—'}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(rec.amount || 0).toLocaleString()}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }}>{rec.date ? new Date(rec.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                        <td style={{ padding: '12px 14px' }}><span style={{ background: '#FFEDD5', color: '#C2410C', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.category || 'Other'}</span></td>
+                        <td style={{ padding: '12px 14px' }}><span style={{ background: rec.status === 'Paid' ? '#DCFCE7' : '#FEF3C7', color: rec.status === 'Paid' ? '#15803D' : '#B45309', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800 }}>{rec.status || 'Pending'}</span></td>
+                        <td style={{ padding: '12px 14px' }}>
+                          <div style={{ display: 'flex', gap: 4 }}>
+                            <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showExpense: true, editData: rec, editIndex: i }))} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+                            <button onClick={() => handleDeleteRecord('expenses', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}><i className="ti ti-trash"></i></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* TEAM + BUDGET — side by side */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch', marginTop: 24, marginLeft: 0, paddingLeft: 0 }}>

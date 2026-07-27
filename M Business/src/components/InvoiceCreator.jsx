@@ -352,7 +352,7 @@ function CanvasSignature({ onSave }) {
 }
 function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, selectedClient, currentT, subtotal, gstAmt, balanceDue, amountPaid, qrData }) {
   return (
-    <div className="invoice-preview" style={{ padding: "20px", fontFamily: currentT.fontFamily, fontSize: "11px", color: "#1A2E35", background: "#fff", minHeight: "560px" }}>
+    <div className="invoice-preview" style={{ padding: "20px", fontFamily: currentT.fontFamily, fontSize: "11px", color: "#1A2E35", background: "#fff", minHeight: "560px", "--live-preview-padding": "20px" }}>
 
       {/* HEADER */}
       <div className="inv-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
@@ -3127,7 +3127,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             </div>
 
             {/* LIVE INVOICE PREVIEW */}
-            <div className="invoice-preview" style={{ padding: "20px", fontFamily: currentT.fontFamily, fontSize: "11px", color: "#1A2E35", background: "#fff", minHeight: "560px" }}>
+            <div className="invoice-preview" style={{ padding: "20px", fontFamily: currentT.fontFamily, fontSize: "11px", color: "#1A2E35", background: "#fff", minHeight: "560px", "--live-preview-padding": "20px" }}>
 
               {/* HEADER */}
               <div className="inv-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>

@@ -3068,7 +3068,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               recipients: editingUpdate.recipients || original.recipients || [],
                               type: editingUpdate.type || original.type || 'general',
                               isApprovalRequest: nowApprovalRequest,
-                              approvalStatus: nowApprovalRequest ? (original.approvalStatus || 'pending') : undefined,
+                              approvalStatus: nowApprovalRequest ? 'pending' : undefined,
                             };
                             setCurrProject(prev => ({ ...prev, updates: updatedUpdates }));
                             setEditingUpdate(null);
@@ -3117,6 +3117,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   fileUrl: primaryAttachment ? primaryAttachment.url : '',
                                   fileName: primaryAttachment ? primaryAttachment.name : '',
                                   attachments: editingUpdate.attachments || [],
+                                  status: 'pending',
+                                  respondedAt: null,
+                                  rejectReason: '',
                                 });
                                 loadProjectApprovals();
                               }

@@ -2040,15 +2040,12 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             </table>
           </div>
 
-          {/* PAGINATION */}
-          <div className="pagination">
-            <div className="page-info">Showing {enriched.length} of {enriched.length} invoices</div>
-            <div className="page-btns">
-              <button className="page-btn"><i className="ti ti-chevron-left" style={{ fontSize: 14 }}></i></button>
-              <button className="page-btn active">1</button>
-              <button className="page-btn"><i className="ti ti-chevron-right" style={{ fontSize: 14 }}></i></button>
-            </div>
-          </div>
+          {/* LIVE INVOICE PREVIEW (matches Document Live Preview exactly) */}
+          <InvoiceLivePreview
+            inv={inv} items={items} effectiveLogo={effectiveLogo} effectiveCompanyName={effectiveCompanyName}
+            selectedClient={selectedClient} currentT={currentT} subtotal={subtotal} gstAmt={gstAmt}
+            balanceDue={balanceDue} amountPaid={amountPaid} qrData={qrData}
+          />
         </div>
 
         {/* BOTTOM ROW */}

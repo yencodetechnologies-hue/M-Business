@@ -3110,7 +3110,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 Invoices & Payments History
               </div>
             </div>
-            <div style={{ margin: "0 auto" }}>
+            <div style={{ margin: "0 auto", background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden" }}>
               {renderInvoicesComponent()}
             </div>
           </div>

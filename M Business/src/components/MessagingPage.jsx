@@ -125,13 +125,13 @@ export default function MessagingPage({ user }) {
           <button className={`ctab ${convFilter === "all" ? "active" : ""}`} onClick={() => setConvFilter("all")}>All <span style={{ background: "var(--teal)", color: "#fff", fontSize: 9, padding: "1px 5px", borderRadius: 20, marginLeft: 4 }}>{users.length}</span></button>
           <button className={`ctab ${convFilter === "internal" ? "active" : ""}`} onClick={() => setConvFilter("internal")}>Internal</button>
           <button className={`ctab ${convFilter === "clients" ? "active" : ""}`} onClick={() => setConvFilter("clients")}>Clients</button>
-          <button className={`ctab ${convFilter === "groups" ? "active" : ""}`} onClick={() => setConvFilter("groups")}>Groups</button>
+
         </div>
 
         <div className="conv-list">
           {convFilter === "groups" ? (
             <div style={{ padding: "30px 16px", textAlign: "center", color: "var(--app-muted, #94A3B0)", fontSize: 13 }}>
-              Group conversations aren't available yet.
+       
             </div>
           ) : users.filter(u => {
             if (convFilter === "all") return true;

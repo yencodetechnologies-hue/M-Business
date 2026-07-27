@@ -1952,7 +1952,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
         {/* MILESTONES STANDALONE CARD */}
         <div className="mpd-card mpd-milestones-card">
-          <div className="mpd-card-header" style={{ paddingBottom: 6, paddingTop: 4, paddingLeft: 4, paddingRight: 4 }}>
+          <div className="mpd-card-header" style={{ paddingBottom: 6, paddingLeft: 4, paddingRight: 4 }}>
             <div className="mpd-card-title"><i className="ti ti-flag"></i> Milestone Progress</div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               <div style={{ display: 'flex', background: P.bg, borderRadius: 8, border: `1px solid ${P.border}`, overflow: 'hidden' }}>

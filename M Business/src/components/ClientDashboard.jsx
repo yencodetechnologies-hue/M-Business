@@ -1883,7 +1883,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           </div>
         ) : (
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", color: C.text3, fontSize: 12, padding: 24, boxSizing: "border-box" }} key="milestone-empty-state">
-            No milestones assigned. All caught up!
+            No Timeline Assigned. All caught up!
           </div>
         )}
       </div>
@@ -1996,7 +1996,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             </button>
           ))}
         </div>
-        <div className="files-grid">
+        <div className="files-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
           {filteredFiles.map((file, idx) => (
             <div key={idx} className="file-card" onClick={() => {
               if (file.isLetterhead && file.raw?.htmlContent) { setSelectedDoc(file.raw); }
@@ -2117,11 +2117,11 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     const firstUnpaid = unpaidInvoices[0];
 
     return (
-      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden", height: "100%", display: "flex", flexDirection: "column" }}>
+      <div style={{ background: "transparent", height: "100%", maxHeight: "100%", display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0 }}>
         {/* Invoices List */}
-        <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
+        <div style={{ flex: 1, minHeight: 0, maxHeight: "100%", overflowY: 'auto', display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14, alignContent: "start", padding: 4 }}>
           {finalInvoicesList.length === 0 && (
-            <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", color: C.text3, fontSize: 12, padding: 24, boxSizing: "border-box" }}>
+            <div style={{ gridColumn: "1 / -1", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", color: C.text3, fontSize: 12, padding: 24, boxSizing: "border-box" }}>
               No Invoices Found
             </div>
           )}
@@ -2379,7 +2379,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               </div>
             );
           })}         {combinedItems.length === 0 && (
-            <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", color: C.text3, fontSize: 12, padding: 24, boxSizing: "border-box" }}>No pending approvals. All caught up!</div>
+            <div style={{ gridColumn: "1 / -1", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", color: C.text3, fontSize: 12, padding: 24, boxSizing: "border-box" }}>No pending approvals. All caught up!</div>
           )}
         </div>
 
@@ -2828,12 +2828,12 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     {(portalSettings.showMilestones || portalSettings.allowMessages) && (
                       <div className={portalSettings.showMilestones && portalSettings.allowMessages ? "two-col" : ""} style={{ alignItems: "stretch", display: (portalSettings.showMilestones && portalSettings.allowMessages) ? undefined : "flex" }}>
                         {portalSettings.showMilestones && (
-                          <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+                          <div style={{ display: "flex", flexDirection: "column", height: 420, overflow: "hidden" }}>
                             {ganttChartBlock}
                           </div>
                         )}
                         {portalSettings.allowMessages && (
-                          <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+                          <div style={{ display: "flex", flexDirection: "column", height: 420, overflow: "hidden" }}>
                             <div className="sec-header" style={{ marginBottom: 14 }}>
                               <div className="sec-title">
                                 <div className="sec-title-icon" style={{ background: C.purpleBg, color: C.purple }}><i className="ti ti-message-2"></i></div>
@@ -2854,25 +2854,22 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             {/* Files & Documents and Invoices & Payments */}
             <div className="two-col" style={{ alignItems: "stretch" }}>
               {/* Files & Documents */}
-              <div style={{ display: "flex", flexDirection: "column", height: "100%", maxHeight: 420 }}>
+              <div style={{ display: "flex", flexDirection: "column", height: 420, overflow: "hidden" }}>
                 <div className="sec-header">
                   <div className="sec-title" onClick={() => setActive('files')} style={{ cursor: 'pointer' }}>
                     <div className="sec-title-icon" style={{ background: C.blueBg, color: C.blue }}><i className="ti ti-files"></i></div>
                     Files & Documents
                   </div>
-                  <div style={{ display: "flex", gap: 8 }}>
-
-                    <div className="sec-action" onClick={handleDownloadAll} style={{ opacity: downloadingAll ? 0.6 : 1, cursor: downloadingAll ? "not-allowed" : "pointer", pointerEvents: downloadingAll ? "none" : "auto" }}>
-                      <i className={`ti ${downloadingAll ? "ti-loader-2" : "ti-download"}`} style={{ fontSize: 13, animation: downloadingAll ? "spin 1s linear infinite" : "none" }}></i>
-                      {downloadingAll ? "Downloading..." : "Download All"}
-                    </div>
+                  <div className="sec-action" onClick={handleDownloadAll} style={{ opacity: downloadingAll ? 0.6 : 1, cursor: downloadingAll ? "not-allowed" : "pointer", pointerEvents: downloadingAll ? "none" : "auto" }}>
+                    <i className={`ti ${downloadingAll ? "ti-loader-2" : "ti-download"}`} style={{ fontSize: 13, animation: downloadingAll ? "spin 1s linear infinite" : "none" }}></i>
+                    {downloadingAll ? "Downloading..." : "Download All"}
                   </div>
                 </div>
                 <div style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>{renderFilesOverviewComponent()}</div>
               </div>
 
               {/* Invoices */}
-              <div style={{ display: "flex", flexDirection: "column", height: "100%", maxHeight: 420 }}>
+              <div style={{ display: "flex", flexDirection: "column", height: 420, overflow: "hidden" }}>
                 <div className="sec-header">
                   <div className="sec-title" onClick={() => setActive('payments')} style={{ cursor: 'pointer' }}>
                     <div className="sec-title-icon" style={{ background: C.greenBg, color: C.green }}><i className="ti ti-receipt-2"></i></div>
@@ -2882,7 +2879,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     <i className="ti ti-arrow-right" style={{ fontSize: 13 }}></i> View All
                   </div>
                 </div>
-                <div style={{ flex: 1, minHeight: 0 }}>{renderInvoicesComponent()}</div>
+                <div style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>{renderInvoicesComponent()}</div>
               </div>
             </div>
             {/* Calendar */}
@@ -2995,7 +2992,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         )}
         {active === "timeline" && (
           <div>
-            <div className="two-col" style={{ alignItems: "stretch" }}>
+            <div style={{ display: "block" }}>
               <div style={{ display: "flex", flexDirection: "column" }}>
                 <div className="sec-header">
                   <div className="sec-title">
@@ -3039,9 +3036,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               <div style={{ fontSize: 12, color: C.text3, fontWeight: 600 }}>{proposals.length} proposal{proposals.length !== 1 ? "s" : ""} received</div>
             </div>
             {proposals.length === 0 ? (
-              <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 16, padding: "48px 24px", textAlign: "center" }}>
-                <div style={{ fontSize: 36, marginBottom: 12 }}>📂</div>
-                <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 6 }}>No Proposals Yet</div>
+              <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 16, height: 233, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px", boxSizing: "border-box", textAlign: "center" }}>
+                <div style={{ fontSize: 22, marginBottom: 8 }}>📂</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 4 }}>No Proposals Yet</div>
                 <div style={{ fontSize: 13, color: C.text3 }}>Project proposals sent to you will appear here.</div>
               </div>
             ) : (
@@ -3120,7 +3117,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 Invoices & Payments History
               </div>
             </div>
-            <div style={{ maxWidth: 800, margin: "0 auto" }}>
+            <div style={{ margin: "0 auto" }}>
               {renderInvoicesComponent()}
             </div>
           </div>
@@ -3134,12 +3131,12 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 My Quotations
               </div>
             </div>
-            <div style={{ maxWidth: 800, margin: "0 auto" }}>
+            <div style={{ margin: "0 auto" }}>
               {quotations.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "48px 20px", color: C.text3 }}>
-                  <i className="ti ti-file-invoice" style={{ fontSize: 44, display: "block", marginBottom: 14, opacity: 0.35 }}></i>
-                  <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>No quotations yet</div>
-                  <div style={{ fontSize: 13 }}>When your service provider sends you a quotation, it will appear here.</div>
+                <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 16, height: 233, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px", boxSizing: "border-box", textAlign: "center" }}>
+                  <i className="ti ti-file-invoice" style={{ fontSize: 22, display: "block", marginBottom: 8, opacity: 0.35 }}></i>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 4 }}>No quotations yet</div>
+                  <div style={{ fontSize: 13, color: C.text3 }}>When your service provider sends you a quotation, it will appear here.</div>
                 </div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>

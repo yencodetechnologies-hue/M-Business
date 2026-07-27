@@ -1390,7 +1390,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .badge.overdue::before { background: var(--red); }
 
     /* ── MESSAGES / CHAT ── */
-    .cp-root .messages-panel { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; height: 420px; }
+    .cp-root .messages-panel { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; height: 100%; }
     .cp-root .msg-list { flex: 1; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
     .cp-root .msg-row { display: flex; gap: 8px; align-items: flex-end; }
     .cp-root .msg-row.mine { flex-direction: row-reverse; }
@@ -1921,7 +1921,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 ))}
               </div>
               {milestones.length > 0 ? ganttRows : (
-                <div style={{ padding: 20, textAlign: 'center', color: C.text3, fontSize: 13 }}>No milestones to display.</div>
+                <div style={{ padding: 20, textAlign: 'center', color: C.text3, fontSize: 13 }}>No Task to display.</div>
               )}
             </div>
           </div>
@@ -2846,13 +2846,13 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                         )}
                         {portalSettings.allowMessages && (
                           <div style={{ display: "flex", flexDirection: "column", height: 420, overflow: "hidden" }}>
-                            <div className="sec-header" style={{ marginBottom: 14 }}>
+                            <div className="sec-header" style={{ marginBottom: 14, flexShrink: 0 }}>
                               <div className="sec-title">
                                 <div className="sec-title-icon" style={{ background: C.purpleBg, color: C.purple }}><i className="ti ti-message-2"></i></div>
                                 Messages & Chat
                               </div>
                             </div>
-                            <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+                            <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
                               {renderMessagesComponent()}
                             </div>
                           </div>

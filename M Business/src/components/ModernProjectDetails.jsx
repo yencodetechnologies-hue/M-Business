@@ -1773,18 +1773,18 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 <span className={`mpd-status-badge ${badgeClass}`}>{currProject.status || 'Active'}</span>
                 <span className={`mpd-prio ${prioClass}`}>{priority.charAt(0).toUpperCase() + priority.slice(1)}</span>
               </div>
-              <div className="mpd-proj-desc">{currProject.description || "No description provided for this project."}</div>
-              <div className="mpd-ph-meta">
+              <div className="mpd-proj-desc" style={{ wordBreak: 'break-word', overflowWrap: 'break-word', whiteSpace: 'pre-wrap' }}>{currProject.description || "No description provided for this project."}</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <div className="mpd-pm-item"><i className="ti ti-building"></i> Client: <strong>{clientName}</strong></div>
-                <div className="mpd-pm-item"><i className="ti ti-calendar"></i> Start: <strong>{startD}</strong></div>
-                <div className="mpd-pm-item"><i className="ti ti-calendar-due"></i> Deadline: <strong>{endD}</strong></div>
-                {(currProject.contactPersonName || clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonName) && (
-                  <div className="mpd-pm-item"><i className="ti ti-user"></i> Contact: <strong>{currProject.contactPersonName || clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonName}</strong></div>
-                )}
+                <div className="mpd-pm-item"><i className="ti ti-tag"></i> Category: <strong>{category}</strong></div>
+                <div className="mpd-pm-item"><i className="ti ti-calendar"></i> Start Date: <strong>{startD}</strong></div>
+                <div className="mpd-pm-item"><i className="ti ti-calendar-due"></i> End Date: <strong>{endD}</strong></div>
                 {(currProject.contactPersonNo || clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonNo) && (
-                  <div className="mpd-pm-item"><i className="ti ti-phone"></i> <strong>{currProject.contactPersonNo || clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonNo}</strong></div>
+                  <div className="mpd-pm-item"><i className="ti ti-phone"></i> Contact Phone: <strong>{currProject.contactPersonNo || clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonNo}</strong></div>
                 )}
-                <div className="mpd-pm-item"><i className="ti ti-tag"></i> <strong>{category}</strong></div>
+                {(currProject.phone || clients?.find(c => (c.clientName || c.name) === clientName)?.phone) && (
+                  <div className="mpd-pm-item"><i className="ti ti-phone-call"></i> Office Phone: <strong>{currProject.phone || clients?.find(c => (c.clientName || c.name) === clientName)?.phone}</strong></div>
+                )}
               </div>
             </div>
             <div className="mpd-ph-right" style={{ alignSelf: 'flex-start', justifyContent: 'flex-start', flexShrink: 0 }}>

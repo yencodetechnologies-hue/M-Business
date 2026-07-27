@@ -2394,13 +2394,13 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     ? viewApprovalApp.attachments
                     : [{ name: viewApprovalApp.fileName, url: viewApprovalApp.fileUrl, type: "" }];
                   return (
-                    <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 10 }}>
+                    <div style={{ marginTop: 10, display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, maxHeight: 420, overflowY: "auto" }}>
                       {files.map((file, idx) => {
                         const fname = (file.name || file.url || "").toLowerCase();
                         const isImage = /\.(jpg|jpeg|png|gif|webp)$/.test(fname) || (file.type || "").startsWith("image/");
                         const isPdf = /\.pdf$/.test(fname);
                         return (
-                          <div key={idx} style={{ border: "1.5px solid " + C.border, borderRadius: 12, overflow: "hidden", background: C.surface2 }}>
+                          <div key={idx} style={{ border: "1.5px solid " + C.border, borderRadius: 12, overflow: "hidden", background: C.surface2, display: "flex", flexDirection: "column" }}>
                             {isImage ? (
                               <img
                                 src={file.url}
@@ -2415,18 +2415,18 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                                 style={{ width: "100%", height: 420, border: "none", display: "block" }}
                               />
                             ) : (
-                              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 16px", gap: 8 }}>
+                              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "16px 8px", gap: 6 }}>
                                 <i className="ti ti-file-text" style={{ fontSize: 36, color: C.teal }}></i>
                                 <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{file.name || "Attached file"}</div>
                                 <div style={{ fontSize: 11, color: C.text3 }}>Preview not available for this file type</div>
                               </div>
                             )}
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", borderTop: "1px solid " + C.border }}>
-                              <span style={{ fontSize: 12, fontWeight: 600, color: C.text2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 280 }}>
-                                <i className="ti ti-paperclip" style={{ marginRight: 5 }}></i>{file.name || "Attached file"}
+                            <div style={{ display: "flex", flexDirection: "column", gap: 4, padding: "8px 10px", borderTop: "1px solid " + C.border }}>
+                              <span style={{ fontSize: 10, fontWeight: 600, color: C.text2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                <i className="ti ti-paperclip" style={{ marginRight: 3 }}></i>{file.name || "Attached file"}
                               </span>
-                              <a href={file.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, fontWeight: 700, color: C.teal, textDecoration: "none", whiteSpace: "nowrap" }}>
-                                Open <i className="ti ti-external-link" style={{ marginLeft: 3 }}></i>
+                              <a href={file.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 10, fontWeight: 700, color: C.teal, textDecoration: "none" }}>
+                                Open <i className="ti ti-external-link" style={{ marginLeft: 2 }}></i>
                               </a>
                             </div>
                           </div>

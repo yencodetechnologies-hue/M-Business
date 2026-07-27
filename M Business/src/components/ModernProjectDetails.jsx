@@ -3095,6 +3095,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   projectId: currProject._id || '',
                                   fileUrl: editingUpdate.attachments?.[0]?.url || '',
                                   fileName: editingUpdate.attachments?.[0]?.name || '',
+                                  attachments: editingUpdate.attachments || [],
                                 });
                                 loadProjectApprovals();
                               } else if (!nowApprovalRequest && wasApprovalRequest) {
@@ -3115,6 +3116,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   desc: editingUpdate.text,
                                   fileUrl: primaryAttachment ? primaryAttachment.url : '',
                                   fileName: primaryAttachment ? primaryAttachment.name : '',
+                                  attachments: editingUpdate.attachments || [],
                                 });
                                 loadProjectApprovals();
                               }

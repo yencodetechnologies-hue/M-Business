@@ -1989,13 +1989,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     }
     return (
       <div className="files-panel">
-        <div className="files-toolbar">
-          {["All", "Designs", "Documents", "Reports"].map(filter => (
-            <button key={filter} className={`ft-filter ${fileFilter === filter ? "active" : ""}`} onClick={() => setFileFilter(filter)}>
-              {filter} ({filter === "All" ? allFiles.length : allFiles.filter(f => f.type === filter).length})
-            </button>
-          ))}
-        </div>
+
         <div className="files-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
           {filteredFiles.map((file, idx) => (
             <div key={idx} className="file-card" onClick={() => {
@@ -2025,7 +2019,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             </div>
           ))}
           {filteredFiles.length === 0 && (
-            <div style={{ padding: 40, textAlign: "center", color: C.text3, gridColumn: "1 / -1" }}>No files found.</div>
+            <div style={{ height: 140, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", color: C.text3, gridColumn: "1 / -1" }}>No files found.</div>
           )}
         </div>
       </div>
@@ -3037,9 +3031,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             </div>
             {proposals.length === 0 ? (
               <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 16, height: 233, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px", boxSizing: "border-box", textAlign: "center" }}>
-                <div style={{ fontSize: 22, marginBottom: 8 }}>📂</div>
+
                 <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 4 }}>No Proposals Yet</div>
-                <div style={{ fontSize: 13, color: C.text3 }}>Project proposals sent to you will appear here.</div>
+
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -3134,9 +3128,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             <div style={{ margin: "0 auto" }}>
               {quotations.length === 0 ? (
                 <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 16, height: 233, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px", boxSizing: "border-box", textAlign: "center" }}>
-                  <i className="ti ti-file-invoice" style={{ fontSize: 22, display: "block", marginBottom: 8, opacity: 0.35 }}></i>
+
                   <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 4 }}>No quotations yet</div>
-                  <div style={{ fontSize: 13, color: C.text3 }}>When your service provider sends you a quotation, it will appear here.</div>
+
                 </div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -3258,7 +3252,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             </div>
             {projects.length === 0 ? (
               <div style={{ background: C.surface, border: '1.5px solid ' + C.border, borderRadius: 16, padding: '48px 24px', textAlign: 'center' }}>
-                <div style={{ fontSize: 36, marginBottom: 12 }}>📂</div>
+
                 <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 6 }}>No Projects Yet</div>
                 <div style={{ fontSize: 13, color: C.text3 }}>Projects assigned to your account will appear here.</div>
               </div>

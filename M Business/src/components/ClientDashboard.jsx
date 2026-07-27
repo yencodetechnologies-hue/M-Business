@@ -2019,7 +2019,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             </div>
           ))}
           {filteredFiles.length === 0 && (
-            <div style={{ height: 140, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", color: C.text3, gridColumn: "1 / -1" }}>No files found.</div>
+            <div style={{ height: 233, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", color: C.text3, gridColumn: "1 / -1" }}>No files found.</div>
           )}
         </div>
       </div>
@@ -2846,9 +2846,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               })()}   </div>
 
             {/* Files & Documents and Invoices & Payments */}
-            <div className="two-col" style={{ alignItems: "stretch" }}>
+            <div className="two-col" style={{ alignItems: "stretch", gridTemplateColumns: "1fr 1fr" }}>
               {/* Files & Documents */}
-              <div style={{ display: "flex", flexDirection: "column", height: 420, overflow: "hidden" }}>
+              <div style={{ display: "flex", flexDirection: "column", height: 480, overflow: "hidden" }}>
                 <div className="sec-header">
                   <div className="sec-title" onClick={() => setActive('files')} style={{ cursor: 'pointer' }}>
                     <div className="sec-title-icon" style={{ background: C.blueBg, color: C.blue }}><i className="ti ti-files"></i></div>
@@ -2863,7 +2863,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
               </div>
 
               {/* Invoices */}
-              <div style={{ display: "flex", flexDirection: "column", height: 420, overflow: "hidden" }}>
+              <div style={{ display: "flex", flexDirection: "column", height: 480, overflow: "hidden" }}>
                 <div className="sec-header">
                   <div className="sec-title" onClick={() => setActive('payments')} style={{ cursor: 'pointer' }}>
                     <div className="sec-title-icon" style={{ background: C.greenBg, color: C.green }}><i className="ti ti-receipt-2"></i></div>
@@ -2890,7 +2890,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 </div>
                 <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>{renderCalendarComponent()}</div>
               </div>
-              <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+              <div style={{ display: "flex", flexDirection: "column", height: 480, overflow: "hidden" }}>
                 <div className="sec-header">
                   <div className="sec-title">
                     <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-user-circle"></i></div>

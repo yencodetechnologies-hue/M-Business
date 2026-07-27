@@ -100,13 +100,16 @@ router.post("/", async (req, res) => {
 // ── PATCH edit an approval's content (title/desc/attachment) ───────────────
 router.patch("/:id", async (req, res) => {
     try {
-        const { title, desc, fileUrl, fileName, attachments } = req.body;
+        const { title, desc, fileUrl, fileName, attachments, status, respondedAt, rejectReason } = req.body;
         const update = {};
         if (title !== undefined) update.title = title;
         if (desc !== undefined) update.desc = desc;
         if (fileUrl !== undefined) update.fileUrl = fileUrl;
         if (fileName !== undefined) update.fileName = fileName;
         if (attachments !== undefined) update.attachments = Array.isArray(attachments) ? attachments : [];
+        if (status !== undefined) update.status = status;
+        if (respondedAt !== undefined) update.respondedAt = respondedAt;
+        if (rejectReason !== undefined) update.rejectReason = rejectReason;
         const doc = await Approval.findByIdAndUpdate(req.params.id, update, { new: true });
         if (!doc) return res.status(404).json({ msg: "Approval not found" });
         res.json(doc);

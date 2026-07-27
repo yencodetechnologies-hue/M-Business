@@ -2456,36 +2456,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         </button>
                         <div className="mpd-upd-composer">
                           <div className="mpd-uc-body mpd-open">
-                            <div style={{ marginBottom: 14 }}>
-                              <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Select Team Members</div>
-                              <div style={{ position: 'relative' }} ref={updateMembersDropdownRef}>
-                                <div
-                                  onClick={() => setShowUpdateMembersDropdown(v => !v)}
-                                  style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.purple}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', background: '#fff', color: updateSelectedMembers.length ? P.textDark : P.textLight, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxSizing: 'border-box' }}
-                                >
-                                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                    {updateSelectedMembers.length === 0 ? '-- Select Team Members --' : updateSelectedMembers.join(', ')}
-                                  </span>
-                                  <i className={`ti ${showUpdateMembersDropdown ? 'ti-chevron-up' : 'ti-chevron-down'}`} style={{ fontSize: 14, flexShrink: 0, marginLeft: 8 }} />
-                                </div>
-                                {showUpdateMembersDropdown && (
-                                  <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, background: '#fff', border: `1.5px solid ${P.purple}`, borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 20, maxHeight: 200, overflowY: 'auto' }}>
-                                    {assigned.length === 0 && (
-                                      <div style={{ padding: '10px 12px', fontSize: 12, color: P.textLight }}>No team members assigned to this project.</div>
-                                    )}
-                                    {assigned.map((name, i) => {
-                                      const checked = updateSelectedMembers.includes(name);
-                                      return (
-                                        <label key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: 13, color: P.textDark, cursor: 'pointer' }}>
-                                          <input type="checkbox" checked={checked} onChange={() => setUpdateSelectedMembers(prev => checked ? prev.filter(n => n !== name) : [...prev, name])} />
-                                          {name}
-                                        </label>
-                                      );
-                                    })}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
+
 
                             <div style={{ display: 'flex', gap: 12, marginBottom: 14, flexWrap: 'wrap' }}>
                               <div style={{ flex: 1, minWidth: 180 }}>
@@ -2575,6 +2546,36 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                 rows={3}
                                 style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', boxSizing: 'border-box', resize: 'vertical' }}
                               />
+                            </div>
+                            <div style={{ marginBottom: 14 }}>
+                              <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Select Team Members</div>
+                              <div style={{ position: 'relative' }} ref={updateMembersDropdownRef}>
+                                <div
+                                  onClick={() => setShowUpdateMembersDropdown(v => !v)}
+                                  style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.purple}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', background: '#fff', color: updateSelectedMembers.length ? P.textDark : P.textLight, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxSizing: 'border-box' }}
+                                >
+                                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {updateSelectedMembers.length === 0 ? '-- Select Team Members --' : updateSelectedMembers.join(', ')}
+                                  </span>
+                                  <i className={`ti ${showUpdateMembersDropdown ? 'ti-chevron-up' : 'ti-chevron-down'}`} style={{ fontSize: 14, flexShrink: 0, marginLeft: 8 }} />
+                                </div>
+                                {showUpdateMembersDropdown && (
+                                  <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, background: '#fff', border: `1.5px solid ${P.purple}`, borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 20, maxHeight: 200, overflowY: 'auto' }}>
+                                    {assigned.length === 0 && (
+                                      <div style={{ padding: '10px 12px', fontSize: 12, color: P.textLight }}>No team members assigned to this project.</div>
+                                    )}
+                                    {assigned.map((name, i) => {
+                                      const checked = updateSelectedMembers.includes(name);
+                                      return (
+                                        <label key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: 13, color: P.textDark, cursor: 'pointer' }}>
+                                          <input type="checkbox" checked={checked} onChange={() => setUpdateSelectedMembers(prev => checked ? prev.filter(n => n !== name) : [...prev, name])} />
+                                          {name}
+                                        </label>
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </div>
                             </div>
 
                             <input

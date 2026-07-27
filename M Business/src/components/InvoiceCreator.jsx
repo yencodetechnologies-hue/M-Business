@@ -1890,7 +1890,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             }}><i className="ti ti-download" style={{ fontSize: 13 }}></i> Export CSV</button>
           </div>
 
-          <div style={{ overflowX: "auto" }}>
+          <div style={{ overflowX: "auto", maxHeight: "600px", overflowY: "auto" }}>
             <table>
               <thead>
                 <tr>

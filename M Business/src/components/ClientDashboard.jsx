@@ -379,6 +379,9 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       const token = params.get("token");
 
       if (token) {
+        // Clean token from URL immediately (keeps it out of browser history)
+        window.history.replaceState({}, document.title, window.location.pathname);
+
         // Real JWTs are 3 base64url segments: header.payload.signature.
         // We only need to read the payload (middle segment) here for
         // display purposes — the backend is what actually verifies the
@@ -416,8 +419,6 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           try { sessionStorage.setItem(sessionKey, JSON.stringify(sessionUser)); } catch (e) { }
         }
 
-        // Clean token from URL immediately (keeps it out of browser history)
-        window.history.replaceState({}, document.title, window.location.pathname);
         return sessionUser;
       }
 

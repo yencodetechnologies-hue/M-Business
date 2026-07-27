@@ -1952,8 +1952,11 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
     };
 
     const handleOpenPortal = async () => {
+      const newTab = window.open("", "_blank");
       const url = await buildPortalTokenUrl();
-      window.open(url, "_blank");
+      if (newTab) {
+        newTab.location.href = url;
+      }
     };
 
     const handleCopyLink = async () => {

@@ -533,15 +533,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     if (forceListView !== undefined && forceListView !== null && forceListView !== false) return "list";
     if (jumpInvoice && (jumpInvoice._id || jumpInvoice.id)) return "preview";
     if (newInvoicePrefill) return "form";
-    try {
-      const savedStep = localStorage.getItem("invoiceCreatorStep_subadmin");
-      const savedId = localStorage.getItem("invoiceCreatorEditingId_subadmin");
-      if (savedStep === "preview" && savedId) return "preview";
-      if (savedStep === "form") return "form";
-    } catch (e) { }
     return "list";
   });
-
   useEffect(() => {
     if (forceListView !== undefined && forceListView !== null && forceListView !== false) {
       setStep("list");
@@ -838,17 +831,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     return null;
   }); // backend _id if editing existing
 
-  useEffect(() => {
-    try {
-      if (step === "preview" && editingId) {
-        localStorage.setItem("invoiceCreatorStep_subadmin", "preview");
-        localStorage.setItem("invoiceCreatorEditingId_subadmin", editingId);
-      } else {
-        localStorage.removeItem("invoiceCreatorStep_subadmin");
-        localStorage.removeItem("invoiceCreatorEditingId_subadmin");
-      }
-    } catch (e) { }
-  }, [step, editingId]);
+
 
   // Restore the invoice's actual data (inv/items) into the preview after a
   // hard refresh, when we only have a persisted editingId (no jumpInvoice

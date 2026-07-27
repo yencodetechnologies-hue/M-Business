@@ -3509,7 +3509,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           </div>
         </div > {/* end mpd-grid-main-side */}
 
-        <div style={{ padding: '18px 16px', overflow: 'visible', boxSizing: 'border-box' }}>
+        <div className="mpd-card" style={{ marginTop: 20 }}>
+          <div className="mpd-card-title" style={{ marginBottom: 14 }}>
+            <i className="ti ti-arrows-exchange"></i> Accounts
+          </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 20, width: '100%' }}>
             {(() => {
               const liveAdvanceTotal = (currProject.advances || []).reduce((s, a) => s + parseAmt(a.amount), 0);

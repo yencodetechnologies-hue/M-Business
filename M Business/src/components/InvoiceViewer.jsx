@@ -240,7 +240,7 @@ export default function InvoiceViewer() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Dancing+Script:wght@700&display=swap');
         * { box-sizing: border-box; }
-        .inv-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(99,102,241,0.15); overflow: hidden; display: flex; flex-direction: column; min-height: 1050px; }
+        .inv-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(99,102,241,0.15); overflow: hidden; display: flex; flex-direction: column; min-height: 1122px; }
         @media print {
           @page { size: A4 portrait; margin: 12mm 14mm; }
           html, body { margin: 0 !important; padding: 0 !important; background: white !important; }

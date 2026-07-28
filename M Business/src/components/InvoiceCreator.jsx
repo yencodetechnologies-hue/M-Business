@@ -394,7 +394,8 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                     </div>
                     <div className="inv-id" style={{ fontSize: "14px", fontWeight: "700", color: "#0f1c2e", marginTop: "5px" }}>#{inv.invoiceNo}</div>
                   </div>
-                </div>     <div className="inv-title-word" style={{ fontSize: "28px", fontWeight: "600", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: 4, marginBottom: 20 }}>INVOICE</div>
+                </div>
+                <div className="inv-title-word" style={{ fontSize: "28px", fontWeight: "600", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: 4, marginBottom: 20 }}>INVOICE</div>
 
                 {/* BILL TO + INVOICE DETAILS BOX */}
                 <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", padding: "24px 28px", border: "1.5px solid #000000", borderRadius: "8px", marginBottom: "24px", alignItems: "start" }}>
@@ -421,7 +422,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                       </div>
                     )}
                   </div>
-                  <div style={{ fontSize: "13px", color: "#64748b", display: "flex", flexDirection: "column", textAlign: "right", alignSelf: "start" }}>
+                  <div style={{ fontSize: "13px", color: "#64748b", display: "flex", flexDirection: "column", textAlign: "left", alignSelf: "start", marginLeft: 80, width: "fit-content" }}>
                     <div><strong style={{ color: "#0f1c2e" }}>Invoice No:</strong> {inv.invoiceNo}</div>
                     <div><strong style={{ color: "#0f1c2e" }}>Invoice Date:</strong> {inv.date ? new Date(inv.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</div>
                     <div><strong style={{ color: "#0f1c2e" }}>Place of Supply:</strong> {inv.placeOfSupply || "—"}</div>
@@ -517,7 +518,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                 <div className="inv-footer" style={{ marginTop: "auto", paddingTop: "16px", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
                   <div className="inv-notes" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
                     {(inv.bankName || inv.accountNumber || inv.ifscCode || inv.upiId) && (
-                      <div className="inv-bank" style={{ padding: "8px 10px", background: currentT.primaryBg, borderRadius: "6px", borderLeft: `3px solid ${currentT.primaryColor}` }}>
+                      <div className="inv-bank" style={{ padding: "8px 10px", background: currentT.primaryBg, borderRadius: "6px", borderLeft: `3px solid ${currentT.primaryColor}`, width: "100%" }}>
                         <div className="inv-bank-title" style={{ fontSize: "9px", fontWeight: "700", color: currentT.primaryColor, marginBottom: "3px" }}>Payment Details</div>
                         <div className="inv-bank-detail" style={{ fontSize: "9px", color: "#0f1c2e", lineHeight: "1.5" }}>
                           {inv.bankName && <span>Bank: {inv.bankName} &nbsp;|&nbsp; </span>}

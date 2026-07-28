@@ -372,7 +372,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
         const isLastPage = pageIdx === pages.length - 1;
         const startIndex = pageIdx * INVOICE_ROWS_PER_PAGE;
         return (
-          <div key={pageIdx} className="invoice-preview invoice-paper" style={{ padding: "20px", fontFamily: currentT.fontFamily, fontSize: "11px", color: "#1A2E35", background: "#fff", minHeight: "1050px", display: "flex", flexDirection: "column", marginBottom: isLastPage ? 0 : 20, "--live-preview-padding": "20px" }}>
+          <div key={pageIdx} className="invoice-preview invoice-paper" style={{ padding: "48px", fontFamily: currentT.fontFamily, fontSize: "11px", color: "#1A2E35", background: "#fff", minHeight: "1050px", display: "flex", flexDirection: "column", marginBottom: isLastPage ? 0 : 20, "--live-preview-padding": "48px" }}>
 
             {isFirstPage ? (
               <>
@@ -396,14 +396,14 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                     <div className="inv-id" style={{ fontSize: "14px", fontWeight: "700", color: "#0f1c2e", marginTop: "5px" }}>#{inv.invoiceNo}</div>
                   </div>
                 </div>
-                <div className="inv-title-word" style={{ fontSize: "28px", fontWeight: "900", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: 4, marginBottom: 20 }}>INVOICE</div>
+                <div className="inv-title-word" style={{ fontSize: "28px", fontWeight: "600", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: 4, marginBottom: 20 }}>INVOICE</div>
 
                 {/* BILL TO + INVOICE DETAILS BOX */}
-                <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", padding: "18px", border: "1.5px solid var(--app-border)", borderRadius: "8px", marginBottom: "24px", alignItems: "start" }}>
+                <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", padding: "24px 28px", border: "1.5px solid var(--app-border)", borderRadius: "8px", marginBottom: "24px", alignItems: "start" }}>
                   <div>
                     <div className="inv-party-label" style={{ fontSize: "11px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "5px" }}>Bill To</div>
                     <div className="inv-party-name" style={{ fontSize: "16px", fontWeight: "800", color: inv.client ? "#0f1c2e" : "#64748b" }}>{inv.client || "— Client Name —"}</div>
-                    <div className="inv-party-detail" style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.7", marginTop: "4px" }}>
+                    <div className="inv-party-detail" style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", marginTop: "3px" }}>
                       {selectedClient ? (
                         <>
                           {selectedClient.companyName && <div>{selectedClient.companyName}</div>}
@@ -417,13 +417,13 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                       )}
                     </div>
                     {inv.project && (
-                      <div style={{ marginTop: 12 }}>
-                        <div className="inv-party-label" style={{ fontSize: "11px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "5px" }}>Project</div>
+                      <div style={{ marginTop: 8 }}>
+                        <div className="inv-party-label" style={{ fontSize: "11px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "3px" }}>Project</div>
                         <div className="inv-party-name" style={{ fontSize: "16px", fontWeight: "800", color: "#0f1c2e" }}>{inv.project}</div>
                       </div>
                     )}
                   </div>
-                  <div style={{ fontSize: "13px", color: "#64748b", lineHeight: 1.9, display: "flex", flexDirection: "column", gap: "6px", textAlign: "right" }}>
+                  <div style={{ fontSize: "13px", color: "#64748b", display: "flex", flexDirection: "column", textAlign: "right", alignSelf: "start" }}>
                     <div><strong style={{ color: "#0f1c2e" }}>Invoice No:</strong> {inv.invoiceNo}</div>
                     <div><strong style={{ color: "#0f1c2e" }}>Invoice Date:</strong> {inv.date ? new Date(inv.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</div>
                     <div><strong style={{ color: "#0f1c2e" }}>Place of Supply:</strong> {inv.placeOfSupply || "—"}</div>

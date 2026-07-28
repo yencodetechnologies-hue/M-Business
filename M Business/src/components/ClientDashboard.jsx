@@ -2449,1094 +2449,1102 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                               <span style={{ fontSize: 10, fontWeight: 600, color: C.text2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                 <i className="ti ti-paperclip" style={{ marginRight: 3 }}></i>{file.name || "Attached file"}
                               </span>
-                              <a href={file.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 10, fontWeight: 700, color: C.teal, textDecoration: "none" }}>
-                                Open <i className="ti ti-external-link" style={{ marginLeft: 2 }}></i>
-                              </a>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+                                                            <a                             href={isOffice ? `https://docs.google.com/gview?url=${encodeURIComponent(file.url)}&embedded=true` : file.url}
+                                                                                           target="_blank"
+                                                                                                                        rel="noopener noreferrer"
+                                                                                                                                             style={{ fontSize: 10, fontWeight: 700, color: C.teal, textDecoration: "none" }}
+                                                                                                                                                                        >
+                                                                                                                                                                                                      Open <i className="ti ti-external-link" style={{ marginLeft: 2 }}></i>                            </a>
+                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                      </div>
                   );
+                })}
+              </div>
+              );
                 })()}
-              </div>
-              {!viewApprovalApp.isPlainUpdate && viewApprovalApp.status !== "approved" && viewApprovalApp.status !== "rejected" && (
-                <div style={{ display: "flex", gap: 8, padding: "14px 20px", borderTop: "1px solid " + C.border }}>
-                  <button
-                    className="ai-btn approve"
-                    style={{ flex: 1, padding: "10px", fontSize: 13 }}
-                    onClick={() => {
-                      handleApprove(viewApprovalApp.id);
-                      setViewApprovalApp(null);
-                    }}
-                  >
-                    <i className="ti ti-check" style={{ fontSize: 13 }}></i> {viewApprovalApp.approveLabel || "Approve"}
-                  </button>
-                  <button
-                    className="ai-btn reject"
-                    style={{ flex: 1, padding: "10px", fontSize: 13 }}
-                    onClick={() => {
-                      setRejectModalApp(viewApprovalApp);
-                      setRejectReasonText("");
-                      setViewApprovalApp(null);
-                    }}
-                  >
-                    {viewApprovalApp.rejectLabel || "Review"}
-                  </button>
-                </div>
-              )}
             </div>
-          </div>
-        )}
-
-        {lightboxImages && (
-          <div style={{ position: "fixed", inset: 0, zIndex: 100000, background: "rgba(0,0,0,0.9)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => setLightboxImages(null)}>
-            <button onClick={() => setLightboxImages(null)} style={{ position: "absolute", top: 20, right: 24, background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", width: 40, height: 40, borderRadius: 10, fontSize: 20, cursor: "pointer" }}>✕</button>
-            {lightboxImages.list.length > 1 && (
-              <button onClick={(e) => { e.stopPropagation(); setLightboxImages(prev => ({ ...prev, index: (prev.index - 1 + prev.list.length) % prev.list.length })); }} style={{ position: "absolute", left: 24, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", width: 44, height: 44, borderRadius: "50%", fontSize: 20, cursor: "pointer" }}>‹</button>
-            )}
-            <img src={lightboxImages.list[lightboxImages.index]?.url} alt="" style={{ maxWidth: "90%", maxHeight: "85vh", objectFit: "contain", borderRadius: 8 }} onClick={(e) => e.stopPropagation()} />
-            {lightboxImages.list.length > 1 && (
-              <button onClick={(e) => { e.stopPropagation(); setLightboxImages(prev => ({ ...prev, index: (prev.index + 1) % prev.list.length })); }} style={{ position: "absolute", right: 24, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", width: 44, height: 44, borderRadius: "50%", fontSize: 20, cursor: "pointer" }}>›</button>
-            )}
-            {lightboxImages.list.length > 1 && (
-              <div style={{ position: "absolute", bottom: 24, left: "50%", transform: "translateX(-50%)", color: "#fff", fontSize: 13, fontWeight: 700 }}>{lightboxImages.index + 1} / {lightboxImages.list.length}</div>
-            )}
-          </div>
-        )}
-
-        {rejectModalApp && (
-          <div className="modal-overlay" onClick={() => setRejectModalApp(null)}>
-            <div className="modal-card" onClick={e => e.stopPropagation()}>
-              <div className="modal-header">
-                <span className="modal-title">Reject "{rejectModalApp.title}"</span>
-                <button className="modal-close" onClick={() => setRejectModalApp(null)}>&times;</button>
-              </div>
-              <div className="modal-body">
-                <div style={{ fontSize: 12, fontWeight: 700, color: C.text2 }}>Reason for rejection *</div>
-                <textarea
-                  value={rejectReasonText}
-                  onChange={e => setRejectReasonText(e.target.value)}
-                  rows={4}
-                  placeholder="Please explain what needs to change..."
-                  style={{ width: "100%", padding: "10px 12px", borderRadius: 9, border: "1.5px solid " + C.border, fontSize: 13, outline: "none", resize: "none", boxSizing: "border-box" }}
-                />
-                <button onClick={submitRejection} style={{ width: "100%", padding: "11px", background: C.red, color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-                  Submit Rejection
+            {!viewApprovalApp.isPlainUpdate && viewApprovalApp.status !== "approved" && viewApprovalApp.status !== "rejected" && (
+              <div style={{ display: "flex", gap: 8, padding: "14px 20px", borderTop: "1px solid " + C.border }}>
+                <button
+                  className="ai-btn approve"
+                  style={{ flex: 1, padding: "10px", fontSize: 13 }}
+                  onClick={() => {
+                    handleApprove(viewApprovalApp.id);
+                    setViewApprovalApp(null);
+                  }}
+                >
+                  <i className="ti ti-check" style={{ fontSize: 13 }}></i> {viewApprovalApp.approveLabel || "Approve"}
+                </button>
+                <button
+                  className="ai-btn reject"
+                  style={{ flex: 1, padding: "10px", fontSize: 13 }}
+                  onClick={() => {
+                    setRejectModalApp(viewApprovalApp);
+                    setRejectReasonText("");
+                    setViewApprovalApp(null);
+                  }}
+                >
+                  {viewApprovalApp.rejectLabel || "Review"}
                 </button>
               </div>
-            </div>
+            )}
           </div>
+          </div>
+    )
+  }
+
+  {
+    lightboxImages && (
+      <div style={{ position: "fixed", inset: 0, zIndex: 100000, background: "rgba(0,0,0,0.9)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => setLightboxImages(null)}>
+        <button onClick={() => setLightboxImages(null)} style={{ position: "absolute", top: 20, right: 24, background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", width: 40, height: 40, borderRadius: 10, fontSize: 20, cursor: "pointer" }}>✕</button>
+        {lightboxImages.list.length > 1 && (
+          <button onClick={(e) => { e.stopPropagation(); setLightboxImages(prev => ({ ...prev, index: (prev.index - 1 + prev.list.length) % prev.list.length })); }} style={{ position: "absolute", left: 24, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", width: 44, height: 44, borderRadius: "50%", fontSize: 20, cursor: "pointer" }}>‹</button>
+        )}
+        <img src={lightboxImages.list[lightboxImages.index]?.url} alt="" style={{ maxWidth: "90%", maxHeight: "85vh", objectFit: "contain", borderRadius: 8 }} onClick={(e) => e.stopPropagation()} />
+        {lightboxImages.list.length > 1 && (
+          <button onClick={(e) => { e.stopPropagation(); setLightboxImages(prev => ({ ...prev, index: (prev.index + 1) % prev.list.length })); }} style={{ position: "absolute", right: 24, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", width: 44, height: 44, borderRadius: "50%", fontSize: 20, cursor: "pointer" }}>›</button>
+        )}
+        {lightboxImages.list.length > 1 && (
+          <div style={{ position: "absolute", bottom: 24, left: "50%", transform: "translateX(-50%)", color: "#fff", fontSize: 13, fontWeight: 700 }}>{lightboxImages.index + 1} / {lightboxImages.list.length}</div>
         )}
       </div>
-    );
+    )
   }
-  // ── OVERVIEW SECTION ─────────────────────────────────────────
-  function renderOverviewSection() {
-    const totalProjects = projects.length;
-    const activeProjects = projects.filter(p => {
+
+  {
+    rejectModalApp && (
+      <div className="modal-overlay" onClick={() => setRejectModalApp(null)}>
+        <div className="modal-card" onClick={e => e.stopPropagation()}>
+          <div className="modal-header">
+            <span className="modal-title">Reject "{rejectModalApp.title}"</span>
+            <button className="modal-close" onClick={() => setRejectModalApp(null)}>&times;</button>
+          </div>
+          <div className="modal-body">
+            <div style={{ fontSize: 12, fontWeight: 700, color: C.text2 }}>Reason for rejection *</div>
+            <textarea
+              value={rejectReasonText}
+              onChange={e => setRejectReasonText(e.target.value)}
+              rows={4}
+              placeholder="Please explain what needs to change..."
+              style={{ width: "100%", padding: "10px 12px", borderRadius: 9, border: "1.5px solid " + C.border, fontSize: 13, outline: "none", resize: "none", boxSizing: "border-box" }}
+            />
+            <button onClick={submitRejection} style={{ width: "100%", padding: "11px", background: C.red, color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+              Submit Rejection
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+      </div >
+    );
+}
+// ── OVERVIEW SECTION ─────────────────────────────────────────
+function renderOverviewSection() {
+  const totalProjects = projects.length;
+  const activeProjects = projects.filter(p => {
+    const s = (p.status || '').toLowerCase();
+    return s === 'active' || s === 'in progress' || s === 'pending';
+  }).length;
+  const completedProjects = projects.filter(p => {
+    const s = (p.status || '').toLowerCase();
+    return s === 'completed' || s === 'done';
+  }).length;
+
+  // Overall progress = average of all project progress values
+  const overallProgress = totalProjects > 0
+    ? Math.round(projects.reduce((sum, p) => {
       const s = (p.status || '').toLowerCase();
-      return s === 'active' || s === 'in progress' || s === 'pending';
-    }).length;
-    const completedProjects = projects.filter(p => {
-      const s = (p.status || '').toLowerCase();
-      return s === 'completed' || s === 'done';
-    }).length;
+      const pct = p.progress ?? 0;
+      return sum + pct;
+    }, 0) / totalProjects)
+    : 0;
 
-    // Overall progress = average of all project progress values
-    const overallProgress = totalProjects > 0
-      ? Math.round(projects.reduce((sum, p) => {
-        const s = (p.status || '').toLowerCase();
-        const pct = p.progress ?? 0;
-        return sum + pct;
-      }, 0) / totalProjects)
-      : 0;
-
-    // Recent updates: project updates + notifications, newest first
-    // Only show updates explicitly sent to 'client'
-    const recentUpdates = [
-      ...projects.flatMap(p =>
-        (p.updates || [])
-          .filter(u => !u.visibleTo || u.visibleTo.includes('client') || u.visibleTo.includes('team'))
-          .map(u => ({
-            text: u.text || u.title || `Update on ${p.name}`,
-            date: u.date ? new Date(u.date) : null,
-            icon: 'ti-speakerphone',
-            color: C.teal,
-            bg: C.tealLight,
-            project: p.name,
-          }))
-      ),
-      ...notifs.map(n => ({
-        text: n.text || 'New notification',
-        date: n.createdAt ? new Date(n.createdAt) : null,
-        icon: 'ti-bell',
-        color: C.purple,
-        bg: C.purpleBg,
-        project: null,
-      })),
-      ...tasks
-        .filter(t => t.status === 'Done' || t.status === 'Completed')
-        .map(t => ({
-          text: `Task completed: ${t.title || t.name}`,
-          date: t.updatedAt ? new Date(t.updatedAt) : (t.createdAt ? new Date(t.createdAt) : null),
-          icon: 'ti-circle-check',
-          color: C.green,
-          bg: C.greenBg,
-          project: t.project || null,
-        })),
-    ]
-      .filter(u => u.date)
-      .sort((a, b) => b.date - a.date)
-      .slice(0, 5);
-
-    const fmt = (d) => d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-
-    const statCards = [
-      {
-        label: 'Total Projects',
-        value: totalProjects,
-        icon: 'ti-folder',
-        color: C.teal,
-        bg: C.tealLight,
-        sub: `${completedProjects} completed`,
-      },
-      {
-        label: 'Active Projects',
-        value: activeProjects,
-        icon: 'ti-player-play',
-        color: C.blue,
-        bg: C.blueBg,
-        sub: 'Currently running',
-      },
-      {
-        label: 'Completed',
-        value: completedProjects,
+  // Recent updates: project updates + notifications, newest first
+  // Only show updates explicitly sent to 'client'
+  const recentUpdates = [
+    ...projects.flatMap(p =>
+      (p.updates || [])
+        .filter(u => !u.visibleTo || u.visibleTo.includes('client') || u.visibleTo.includes('team'))
+        .map(u => ({
+          text: u.text || u.title || `Update on ${p.name}`,
+          date: u.date ? new Date(u.date) : null,
+          icon: 'ti-speakerphone',
+          color: C.teal,
+          bg: C.tealLight,
+          project: p.name,
+        }))
+    ),
+    ...notifs.map(n => ({
+      text: n.text || 'New notification',
+      date: n.createdAt ? new Date(n.createdAt) : null,
+      icon: 'ti-bell',
+      color: C.purple,
+      bg: C.purpleBg,
+      project: null,
+    })),
+    ...tasks
+      .filter(t => t.status === 'Done' || t.status === 'Completed')
+      .map(t => ({
+        text: `Task completed: ${t.title || t.name}`,
+        date: t.updatedAt ? new Date(t.updatedAt) : (t.createdAt ? new Date(t.createdAt) : null),
         icon: 'ti-circle-check',
         color: C.green,
         bg: C.greenBg,
-        sub: `${totalProjects > 0 ? Math.round((completedProjects / totalProjects) * 100) : 0}% success rate`,
-      },
-      {
-        label: 'Overall Progress',
-        value: `${overallProgress}%`,
-        icon: 'ti-chart-line',
-        color: C.amber,
-        bg: C.amberBg,
-        sub: 'Across all projects',
-      },
-    ];
+        project: t.project || null,
+      })),
+  ]
+    .filter(u => u.date)
+    .sort((a, b) => b.date - a.date)
+    .slice(0, 5);
 
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+  const fmt = (d) => d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
-        {/* Stat Cards */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-          gap: 16,
-        }}>
-          {statCards.map((card, i) => (
-            <div key={i} onClick={() => setActive('projects')} style={{
-              background: C.surface,
-              border: `1.5px solid ${C.border}`,
-              borderRadius: 16,
-              padding: '20px 18px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 10,
-              boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
-              cursor: 'pointer',
-              transition: 'all .2s',
-            }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = C.teal; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,188,212,.12)'; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.04)'; }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                <div style={{
-                  width: 40, height: 40, borderRadius: 12,
-                  background: card.bg, color: card.color,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 20, flexShrink: 0,
-                }}>
-                  <i className={`ti ${card.icon}`}></i>
-                </div>
-                <div>
-                  <div style={{ fontSize: 28, fontWeight: 900, color: C.text, lineHeight: 1 }}>
-                    {card.value}
-                  </div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: C.text2, marginTop: 2 }}>{card.label}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-
-
-      </div>
-    );
-  }
-  // Render Activity Feed helper
-  function renderActivityFeed() {
-    // Build from backend: project updates + notifications
-    const proj = targetProject || projects[0];
-    const projUpdates = (proj?.updates || [])
-      .filter(upd => !upd.visibleTo || upd.visibleTo.includes('client') || upd.visibleTo.includes('team'))
-      .slice(0, 6).map((upd, i) => ({
-        id: 'upd-' + i,
-        title: upd.text || upd.title || 'Project update posted',
-        time: upd.date ? new Date(upd.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
-        icon: 'ti-speakerphone'
-      }));
-    const notifItems = notifs.slice(0, 3).map((n, i) => ({
-      id: 'notif-' + i,
-      title: n.text || 'Notification',
-      time: n.createdAt ? new Date(n.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
-      icon: 'ti-bell'
-    }));
-    const fileItems = (proj?.files || []).slice(0, 6).map((f, i) => ({
-      id: 'file-' + i,
-      title: `${f.uploadedBy || 'Someone'} uploaded ${f.name || 'a file'}`,
-      time: f.date ? new Date(f.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
-      icon: 'ti-upload'
-    }));
-    const milestoneItems = (proj?.milestones || []).filter(m => m.done).slice(0, 6).map((m, i) => ({
-      id: 'ms-' + i,
-      title: `Milestone ${m.name} completed`,
-      time: m.date ? new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
-      icon: 'ti-flag'
-    }));
-    const feedItems = [...fileItems, ...milestoneItems, ...projUpdates, ...notifItems]
-      .sort((a, b) => new Date(b.time) - new Date(a.time))
-      .slice(0, 4);
-
-    const dotColors = {
-      'ti-speakerphone': { bg: C.tealLight, color: C.teal },
-      'ti-bell': { bg: C.purpleBg, color: C.purple },
-      'ti-upload': { bg: C.blueBg, color: C.blue },
-      'ti-flag': { bg: C.greenBg, color: C.green },
-      'ti-chart-line': { bg: C.amberBg, color: C.amber },
-      'ti-calendar': { bg: C.blueBg, color: C.blue },
-    };
-
-    return (
-      <div>
-        <div className="sec-header">
-          <div className="sec-title">
-            <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-history"></i></div>
-            Recent Activity
-          </div>
-        </div>
-        <div className="activity-feed">
-          {feedItems.length === 0 ? (
-            <div style={{ fontSize: 12, color: C.text3, textAlign: 'center', padding: '12px 0' }}>No recent activity.</div>
-          ) : (
-            feedItems.map((item, idx) => {
-              const dc = dotColors[item.icon] || { bg: C.tealLight, color: C.teal };
-              return (
-                <div key={item.id} className="af-item" onClick={() => setActive('timeline')} style={{ cursor: 'pointer' }}>
-                  <div className="af-dot-col">
-                    <div className="af-dot" style={{ background: dc.bg, color: dc.color }}><i className={`ti ${item.icon}`} style={{ fontSize: 13 }}></i></div>
-                    {idx < feedItems.length - 1 && <div className="af-line"></div>}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div className="af-title">{item.title}</div>
-                    <div className="af-time"><i className="ti ti-clock" style={{ fontSize: 11 }}></i> {item.time}</div>
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // Render Feedback helper
-  function renderFeedbackPanel() {
-    return (
-      <div className="feedback-panel">
-        <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 4 }}>How is the project going?</div>
-        <div style={{ fontSize: 12, color: C.text3, marginBottom: 10 }}>Your feedback helps us deliver better.</div>
-        <form onSubmit={submitFeedback}>
-          <div className="rating-row">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <span key={star} className={`star ${feedbackRating >= star ? "active" : ""}`} onClick={() => setFeedbackRating(star)}>★</span>
-            ))}
-          </div>
-          <textarea className="feedback-input" placeholder="Share your thoughts on the design, communication, progress…" value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} required></textarea>
-          <button className="feedback-submit" type="submit"><i className="ti ti-send" style={{ fontSize: 14, marginRight: 4 }}></i> Submit Feedback</button>
-        </form>
-      </div>
-    );
-  }
-
-  // Render Contact Card helper
-  function renderContactCard() {
-    const proj = targetProject || projects[0];
-    const managerName = proj?.manager || proj?.contactPersonName || 'Project Manager';
-    const managerPhone = proj?.contactPersonNo || proj?.managerPhone || '';
-    const managerEmail = proj?.managerEmail || proj?.contactEmail || '';
-    const initial = (managerName || 'P').trim().charAt(0).toUpperCase();
-    return (
-      <div className="contact-card" style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-        <div className="cc-label">Point of Contact</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
-          <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(255,255,255,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800, color: '#fff', flexShrink: 0, border: '2px solid rgba(255,255,255,.3)' }}>{initial}</div>
-          <div>
-            <div className="cc-name">{managerName}</div>
-            <div className="cc-role">{proj?.managerRole || `Project Lead, ${agencyName}`}</div>
-          </div>
-        </div>
-        <div className="cc-contacts">
-          {managerEmail && <div className="cc-contact-row"><i className="ti ti-mail"></i> {managerEmail}</div>}
-          {managerPhone && <div className="cc-contact-row"><i className="ti ti-phone"></i> {managerPhone}</div>}
-          {!managerEmail && !managerPhone && <div className="cc-contact-row" style={{ opacity: 0.6 }}><i className="ti ti-info-circle"></i> Contact details not set</div>}
-        </div>
-        <div className="cc-actions">
-          <button className="cc-btn" onClick={() => setActive("messages")}><i className="ti ti-message-2" style={{ fontSize: 13 }}></i> Message</button>
-          <button className="cc-btn" onClick={() => managerPhone ? window.open('tel:' + managerPhone) : alert("Phone not available")}><i className="ti ti-phone" style={{ fontSize: 13 }}></i> Call</button>
-        </div>
-      </div>
-    );
-  }
+  const statCards = [
+    {
+      label: 'Total Projects',
+      value: totalProjects,
+      icon: 'ti-folder',
+      color: C.teal,
+      bg: C.tealLight,
+      sub: `${completedProjects} completed`,
+    },
+    {
+      label: 'Active Projects',
+      value: activeProjects,
+      icon: 'ti-player-play',
+      color: C.blue,
+      bg: C.blueBg,
+      sub: 'Currently running',
+    },
+    {
+      label: 'Completed',
+      value: completedProjects,
+      icon: 'ti-circle-check',
+      color: C.green,
+      bg: C.greenBg,
+      sub: `${totalProjects > 0 ? Math.round((completedProjects / totalProjects) * 100) : 0}% success rate`,
+    },
+    {
+      label: 'Overall Progress',
+      value: `${overallProgress}%`,
+      icon: 'ti-chart-line',
+      color: C.amber,
+      bg: C.amberBg,
+      sub: 'Across all projects',
+    },
+  ];
 
   return (
-    <div className="cp-root">
-      <style>{CSS}</style>
-      {renderTopNav()}
-      {!(active === "projects" && selectedClientProject) && renderHero()}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-      {/* Main Container */}
-      <div className={`page-body${active === "projects" && selectedClientProject ? " mpd-wide" : ""}`}>
+      {/* Stat Cards */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+        gap: 16,
+      }}>
+        {statCards.map((card, i) => (
+          <div key={i} onClick={() => setActive('projects')} style={{
+            background: C.surface,
+            border: `1.5px solid ${C.border}`,
+            borderRadius: 16,
+            padding: '20px 18px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 10,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+            cursor: 'pointer',
+            transition: 'all .2s',
+          }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = C.teal; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,188,212,.12)'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.04)'; }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{
+                width: 40, height: 40, borderRadius: 12,
+                background: card.bg, color: card.color,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 20, flexShrink: 0,
+              }}>
+                <i className={`ti ${card.icon}`}></i>
+              </div>
+              <div>
+                <div style={{ fontSize: 28, fontWeight: 900, color: C.text, lineHeight: 1 }}>
+                  {card.value}
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: C.text2, marginTop: 2 }}>{card.label}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
 
-        {active === "dashboard" && (
-          <>
-            {/* Overview */}
-            <div>
-              <div className="sec-header">
-                <div className="sec-title">
-                  <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-layout-dashboard"></i></div>
-                  Overview
+
+
+    </div>
+  );
+}
+// Render Activity Feed helper
+function renderActivityFeed() {
+  // Build from backend: project updates + notifications
+  const proj = targetProject || projects[0];
+  const projUpdates = (proj?.updates || [])
+    .filter(upd => !upd.visibleTo || upd.visibleTo.includes('client') || upd.visibleTo.includes('team'))
+    .slice(0, 6).map((upd, i) => ({
+      id: 'upd-' + i,
+      title: upd.text || upd.title || 'Project update posted',
+      time: upd.date ? new Date(upd.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
+      icon: 'ti-speakerphone'
+    }));
+  const notifItems = notifs.slice(0, 3).map((n, i) => ({
+    id: 'notif-' + i,
+    title: n.text || 'Notification',
+    time: n.createdAt ? new Date(n.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
+    icon: 'ti-bell'
+  }));
+  const fileItems = (proj?.files || []).slice(0, 6).map((f, i) => ({
+    id: 'file-' + i,
+    title: `${f.uploadedBy || 'Someone'} uploaded ${f.name || 'a file'}`,
+    time: f.date ? new Date(f.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
+    icon: 'ti-upload'
+  }));
+  const milestoneItems = (proj?.milestones || []).filter(m => m.done).slice(0, 6).map((m, i) => ({
+    id: 'ms-' + i,
+    title: `Milestone ${m.name} completed`,
+    time: m.date ? new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
+    icon: 'ti-flag'
+  }));
+  const feedItems = [...fileItems, ...milestoneItems, ...projUpdates, ...notifItems]
+    .sort((a, b) => new Date(b.time) - new Date(a.time))
+    .slice(0, 4);
+
+  const dotColors = {
+    'ti-speakerphone': { bg: C.tealLight, color: C.teal },
+    'ti-bell': { bg: C.purpleBg, color: C.purple },
+    'ti-upload': { bg: C.blueBg, color: C.blue },
+    'ti-flag': { bg: C.greenBg, color: C.green },
+    'ti-chart-line': { bg: C.amberBg, color: C.amber },
+    'ti-calendar': { bg: C.blueBg, color: C.blue },
+  };
+
+  return (
+    <div>
+      <div className="sec-header">
+        <div className="sec-title">
+          <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-history"></i></div>
+          Recent Activity
+        </div>
+      </div>
+      <div className="activity-feed">
+        {feedItems.length === 0 ? (
+          <div style={{ fontSize: 12, color: C.text3, textAlign: 'center', padding: '12px 0' }}>No recent activity.</div>
+        ) : (
+          feedItems.map((item, idx) => {
+            const dc = dotColors[item.icon] || { bg: C.tealLight, color: C.teal };
+            return (
+              <div key={item.id} className="af-item" onClick={() => setActive('timeline')} style={{ cursor: 'pointer' }}>
+                <div className="af-dot-col">
+                  <div className="af-dot" style={{ background: dc.bg, color: dc.color }}><i className={`ti ${item.icon}`} style={{ fontSize: 13 }}></i></div>
+                  {idx < feedItems.length - 1 && <div className="af-line"></div>}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div className="af-title">{item.title}</div>
+                  <div className="af-time"><i className="ti ti-clock" style={{ fontSize: 11 }}></i> {item.time}</div>
                 </div>
               </div>
-              {renderOverviewSection()}
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Render Feedback helper
+function renderFeedbackPanel() {
+  return (
+    <div className="feedback-panel">
+      <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 4 }}>How is the project going?</div>
+      <div style={{ fontSize: 12, color: C.text3, marginBottom: 10 }}>Your feedback helps us deliver better.</div>
+      <form onSubmit={submitFeedback}>
+        <div className="rating-row">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <span key={star} className={`star ${feedbackRating >= star ? "active" : ""}`} onClick={() => setFeedbackRating(star)}>★</span>
+          ))}
+        </div>
+        <textarea className="feedback-input" placeholder="Share your thoughts on the design, communication, progress…" value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} required></textarea>
+        <button className="feedback-submit" type="submit"><i className="ti ti-send" style={{ fontSize: 14, marginRight: 4 }}></i> Submit Feedback</button>
+      </form>
+    </div>
+  );
+}
+
+// Render Contact Card helper
+function renderContactCard() {
+  const proj = targetProject || projects[0];
+  const managerName = proj?.manager || proj?.contactPersonName || 'Project Manager';
+  const managerPhone = proj?.contactPersonNo || proj?.managerPhone || '';
+  const managerEmail = proj?.managerEmail || proj?.contactEmail || '';
+  const initial = (managerName || 'P').trim().charAt(0).toUpperCase();
+  return (
+    <div className="contact-card" style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      <div className="cc-label">Point of Contact</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
+        <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(255,255,255,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800, color: '#fff', flexShrink: 0, border: '2px solid rgba(255,255,255,.3)' }}>{initial}</div>
+        <div>
+          <div className="cc-name">{managerName}</div>
+          <div className="cc-role">{proj?.managerRole || `Project Lead, ${agencyName}`}</div>
+        </div>
+      </div>
+      <div className="cc-contacts">
+        {managerEmail && <div className="cc-contact-row"><i className="ti ti-mail"></i> {managerEmail}</div>}
+        {managerPhone && <div className="cc-contact-row"><i className="ti ti-phone"></i> {managerPhone}</div>}
+        {!managerEmail && !managerPhone && <div className="cc-contact-row" style={{ opacity: 0.6 }}><i className="ti ti-info-circle"></i> Contact details not set</div>}
+      </div>
+      <div className="cc-actions">
+        <button className="cc-btn" onClick={() => setActive("messages")}><i className="ti ti-message-2" style={{ fontSize: 13 }}></i> Message</button>
+        <button className="cc-btn" onClick={() => managerPhone ? window.open('tel:' + managerPhone) : alert("Phone not available")}><i className="ti ti-phone" style={{ fontSize: 13 }}></i> Call</button>
+      </div>
+    </div>
+  );
+}
+
+return (
+  <div className="cp-root">
+    <style>{CSS}</style>
+    {renderTopNav()}
+    {!(active === "projects" && selectedClientProject) && renderHero()}
+
+    {/* Main Container */}
+    <div className={`page-body${active === "projects" && selectedClientProject ? " mpd-wide" : ""}`}>
+
+      {active === "dashboard" && (
+        <>
+          {/* Overview */}
+          <div>
+            <div className="sec-header">
+              <div className="sec-title">
+                <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-layout-dashboard"></i></div>
+                Overview
+              </div>
             </div>
+            {renderOverviewSection()}
+          </div>
 
-            {/* Timeline */}
-            <div>
+          {/* Timeline */}
+          <div>
 
-              {(() => {
-                const { milestoneProgressBlock, ganttChartBlock } = renderTimelineComponent();
-                return (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-                    {/* Row 1: Milestone Progress | Team + Pending Approvals */}
-                    <div className={portalSettings.showMilestones ? "two-col" : ""} style={{ alignItems: "stretch", display: portalSettings.showMilestones ? undefined : "flex" }}>
-                      {portalSettings.showMilestones && (
-                        <div style={{ display: "flex", flexDirection: "column" }}>
-                          <div className="sec-header">
-                            <div className="sec-title">
-                              <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-calendar-stats"></i></div>
-                              Project Timeline
-                            </div>
+            {(() => {
+              const { milestoneProgressBlock, ganttChartBlock } = renderTimelineComponent();
+              return (
+                <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                  {/* Row 1: Milestone Progress | Team + Pending Approvals */}
+                  <div className={portalSettings.showMilestones ? "two-col" : ""} style={{ alignItems: "stretch", display: portalSettings.showMilestones ? undefined : "flex" }}>
+                    {portalSettings.showMilestones && (
+                      <div style={{ display: "flex", flexDirection: "column" }}>
+                        <div className="sec-header">
+                          <div className="sec-title">
+                            <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-calendar-stats"></i></div>
+                            Project Timeline
                           </div>
-                          {milestoneProgressBlock}
                         </div>
-                      )}
-                      <div style={{ display: "flex", flexDirection: "column", gap: 20, flex: 1 }}>
-                        {portalSettings.showTeam && renderTeamComponent()}
-                        <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-                          <div className="sec-header">
-                            <div className="sec-title">
-                              <div className="sec-title-icon" style={{ background: C.redBg, color: C.red }}><i className="ti ti-clipboard-check"></i></div>
-                              Pending Approvals
-                            </div>
+                        {milestoneProgressBlock}
+                      </div>
+                    )}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 20, flex: 1 }}>
+                      {portalSettings.showTeam && renderTeamComponent()}
+                      <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+                        <div className="sec-header">
+                          <div className="sec-title">
+                            <div className="sec-title-icon" style={{ background: C.redBg, color: C.red }}><i className="ti ti-clipboard-check"></i></div>
+                            Pending Approvals
                           </div>
-                          <div style={{ flex: 1, minHeight: 233 }}>
-                            {renderApprovalsComponent()}
-                          </div>
+                        </div>
+                        <div style={{ flex: 1, minHeight: 233 }}>
+                          {renderApprovalsComponent()}
                         </div>
                       </div>
                     </div>
+                  </div>
 
-                    {/* Row 2: Gantt Chart | Messages & Chat */}
-                    {(portalSettings.showMilestones || portalSettings.allowMessages) && (
-                      <div className={portalSettings.showMilestones && portalSettings.allowMessages ? "two-col" : ""} style={{ alignItems: "stretch", display: (portalSettings.showMilestones && portalSettings.allowMessages) ? undefined : "flex" }}>
-                        {portalSettings.showMilestones && (
-                          <div style={{ display: "flex", flexDirection: "column", height: 420, overflow: "hidden" }}>
-                            {ganttChartBlock}
-                          </div>
-                        )}
-                        {portalSettings.allowMessages && (
-                          <div style={{ display: "flex", flexDirection: "column", height: 420, overflow: "hidden" }}>
-                            <div className="sec-header" style={{ marginBottom: 14, flexShrink: 0 }}>
-                              <div className="sec-title">
-                                <div className="sec-title-icon" style={{ background: C.purpleBg, color: C.purple }}><i className="ti ti-message-2"></i></div>
-                                Messages & Chat
-                              </div>
-                            </div>
-                            <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
-                              {renderMessagesComponent()}
+                  {/* Row 2: Gantt Chart | Messages & Chat */}
+                  {(portalSettings.showMilestones || portalSettings.allowMessages) && (
+                    <div className={portalSettings.showMilestones && portalSettings.allowMessages ? "two-col" : ""} style={{ alignItems: "stretch", display: (portalSettings.showMilestones && portalSettings.allowMessages) ? undefined : "flex" }}>
+                      {portalSettings.showMilestones && (
+                        <div style={{ display: "flex", flexDirection: "column", height: 420, overflow: "hidden" }}>
+                          {ganttChartBlock}
+                        </div>
+                      )}
+                      {portalSettings.allowMessages && (
+                        <div style={{ display: "flex", flexDirection: "column", height: 420, overflow: "hidden" }}>
+                          <div className="sec-header" style={{ marginBottom: 14, flexShrink: 0 }}>
+                            <div className="sec-title">
+                              <div className="sec-title-icon" style={{ background: C.purpleBg, color: C.purple }}><i className="ti ti-message-2"></i></div>
+                              Messages & Chat
                             </div>
                           </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}   </div>
-
-            {/* Files & Documents and Invoices & Payments */}
-            <div className="two-col" style={{ alignItems: "stretch", gridTemplateColumns: "1fr 1fr" }}>
-              {/* Files & Documents */}
-              <div style={{ display: "flex", flexDirection: "column", height: 480, overflow: "hidden" }}>
-                <div className="sec-header">
-                  <div className="sec-title" onClick={() => setActive('files')} style={{ cursor: 'pointer' }}>
-                    <div className="sec-title-icon" style={{ background: C.blueBg, color: C.blue }}><i className="ti ti-files"></i></div>
-                    Files & Documents
-                  </div>
-                  <div className="sec-action" onClick={handleDownloadAll} style={{ opacity: downloadingAll ? 0.6 : 1, cursor: downloadingAll ? "not-allowed" : "pointer", pointerEvents: downloadingAll ? "none" : "auto" }}>
-                    <i className={`ti ${downloadingAll ? "ti-loader-2" : "ti-download"}`} style={{ fontSize: 13, animation: downloadingAll ? "spin 1s linear infinite" : "none" }}></i>
-                    {downloadingAll ? "Downloading..." : "Download All"}
-                  </div>
+                          <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+                            {renderMessagesComponent()}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-                <div style={{ flex: 1, minHeight: 0, overflow: "auto" }}>{renderFilesOverviewComponent()}</div>
+              );
+            })()}   </div>
+
+          {/* Files & Documents and Invoices & Payments */}
+          <div className="two-col" style={{ alignItems: "stretch", gridTemplateColumns: "1fr 1fr" }}>
+            {/* Files & Documents */}
+            <div style={{ display: "flex", flexDirection: "column", height: 480, overflow: "hidden" }}>
+              <div className="sec-header">
+                <div className="sec-title" onClick={() => setActive('files')} style={{ cursor: 'pointer' }}>
+                  <div className="sec-title-icon" style={{ background: C.blueBg, color: C.blue }}><i className="ti ti-files"></i></div>
+                  Files & Documents
+                </div>
+                <div className="sec-action" onClick={handleDownloadAll} style={{ opacity: downloadingAll ? 0.6 : 1, cursor: downloadingAll ? "not-allowed" : "pointer", pointerEvents: downloadingAll ? "none" : "auto" }}>
+                  <i className={`ti ${downloadingAll ? "ti-loader-2" : "ti-download"}`} style={{ fontSize: 13, animation: downloadingAll ? "spin 1s linear infinite" : "none" }}></i>
+                  {downloadingAll ? "Downloading..." : "Download All"}
+                </div>
               </div>
+              <div style={{ flex: 1, minHeight: 0, overflow: "auto" }}>{renderFilesOverviewComponent()}</div>
+            </div>
 
-              {/* Invoices & Payments */}
-              <div style={{ display: "flex", flexDirection: "column", height: 480, overflow: "hidden" }}>
-                <div className="sec-header">
-                  <div className="sec-title" onClick={() => setActive('payments')} style={{ cursor: 'pointer' }}>
-                    <div className="sec-title-icon" style={{ background: C.greenBg, color: C.green }}><i className="ti ti-receipt-2"></i></div>
-                    Invoices & Payments
-                  </div>
-                  <div className="sec-action" onClick={() => setActive('payments')}>
-                    <i className="ti ti-arrow-right" style={{ fontSize: 13 }}></i> View All
-                  </div>
+            {/* Invoices & Payments */}
+            <div style={{ display: "flex", flexDirection: "column", height: 480, overflow: "hidden" }}>
+              <div className="sec-header">
+                <div className="sec-title" onClick={() => setActive('payments')} style={{ cursor: 'pointer' }}>
+                  <div className="sec-title-icon" style={{ background: C.greenBg, color: C.green }}><i className="ti ti-receipt-2"></i></div>
+                  Invoices & Payments
                 </div>
-                <div style={{ flex: 1, minHeight: 0, overflow: "hidden", background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px" }}>{renderInvoicesComponent()}</div>
-              </div>    </div>
-            {/* Calendar */}
+                <div className="sec-action" onClick={() => setActive('payments')}>
+                  <i className="ti ti-arrow-right" style={{ fontSize: 13 }}></i> View All
+                </div>
+              </div>
+              <div style={{ flex: 1, minHeight: 0, overflow: "hidden", background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px" }}>{renderInvoicesComponent()}</div>
+            </div>    </div>
+          {/* Calendar */}
 
 
-            {/* Meeting Schedule and Point of Contact */}
+          {/* Meeting Schedule and Point of Contact */}
+          <div className="two-col" style={{ alignItems: "stretch" }}>
+            <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+              <div className="sec-header">
+                <div className="sec-title">
+                  <div className="sec-title-icon" style={{ background: C.amberBg, color: C.amber }}><i className="ti ti-calendar-event"></i></div>
+                  Meeting Schedule
+                </div>
+              </div>
+              <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>{renderCalendarComponent()}</div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", height: 480, overflow: "hidden" }}>
+              <div className="sec-header">
+                <div className="sec-title">
+                  <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-user-circle"></i></div>
+                  Point of Contact
+                </div>
+              </div>
+              <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>{renderContactCard()}</div>
+            </div>
+          </div>
+          {/* Activity and Feedback */}
+          <div>
             <div className="two-col" style={{ alignItems: "stretch" }}>
               <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
                 <div className="sec-header">
                   <div className="sec-title">
-                    <div className="sec-title-icon" style={{ background: C.amberBg, color: C.amber }}><i className="ti ti-calendar-event"></i></div>
-                    Meeting Schedule
+                    <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-history"></i></div>
+                    Activity & Feedback
                   </div>
                 </div>
-                <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>{renderCalendarComponent()}</div>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", height: 480, overflow: "hidden" }}>
-                <div className="sec-header">
-                  <div className="sec-title">
-                    <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-user-circle"></i></div>
-                    Point of Contact
-                  </div>
-                </div>
-                <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>{renderContactCard()}</div>
-              </div>
-            </div>
-            {/* Activity and Feedback */}
-            <div>
-              <div className="two-col" style={{ alignItems: "stretch" }}>
-                <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-                  <div className="sec-header">
-                    <div className="sec-title">
-                      <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-history"></i></div>
-                      Activity & Feedback
-                    </div>
-                  </div>
-                  <div className="activity-feed" style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-                    {(() => {
-                      const proj = targetProject || projects[0];
-                      const projUpdates = (proj?.updates || [])
-                        .filter(upd => !upd.visibleTo || upd.visibleTo.includes('client') || upd.visibleTo.includes('team'))
-                        .slice(0, 3).map((upd, i) => ({
-                          id: 'upd-' + i,
-                          title: upd.text || upd.title || 'Project update posted',
-                          time: upd.date ? new Date(upd.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
-                          icon: 'ti-speakerphone'
-                        }));
-                      const notifItems = notifs.slice(0, 3).map((n, i) => ({
-                        id: 'notif-' + i,
-                        title: n.text || 'Notification',
-                        time: n.createdAt ? new Date(n.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
-                        icon: 'ti-bell'
+                <div className="activity-feed" style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+                  {(() => {
+                    const proj = targetProject || projects[0];
+                    const projUpdates = (proj?.updates || [])
+                      .filter(upd => !upd.visibleTo || upd.visibleTo.includes('client') || upd.visibleTo.includes('team'))
+                      .slice(0, 3).map((upd, i) => ({
+                        id: 'upd-' + i,
+                        title: upd.text || upd.title || 'Project update posted',
+                        time: upd.date ? new Date(upd.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
+                        icon: 'ti-speakerphone'
                       }));
-                      const fileItems = (proj?.files || []).slice(0, 6).map((f, i) => ({
-                        id: 'file-' + i,
-                        title: `${f.uploadedBy || 'Someone'} uploaded ${f.name || 'a file'}`,
-                        time: f.date ? new Date(f.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
-                        icon: 'ti-upload'
-                      }));
-                      const milestoneItems = (proj?.milestones || []).filter(m => m.done).slice(0, 6).map((m, i) => ({
-                        id: 'ms-' + i,
-                        title: `Milestone ${m.name} completed`,
-                        time: m.date ? new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
-                        icon: 'ti-flag'
-                      }));
-                      const feedItems = [...fileItems, ...milestoneItems, ...projUpdates, ...notifItems]
-                        .sort((a, b) => new Date(b.time) - new Date(a.time))
-                        .slice(0, 4);
-                      const dotColors = {
-                        'ti-speakerphone': { bg: C.tealLight, color: C.teal },
-                        'ti-bell': { bg: C.purpleBg, color: C.purple },
-                        'ti-upload': { bg: C.blueBg, color: C.blue },
-                        'ti-flag': { bg: C.greenBg, color: C.green },
-                        'ti-chart-line': { bg: C.amberBg, color: C.amber },
-                        'ti-calendar': { bg: C.blueBg, color: C.blue },
-                      };
-                      return feedItems.length === 0 ? (
-                        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: C.text3, textAlign: 'center' }}>No recent activity.</div>
-                      ) : (
-                        feedItems.map((item, idx) => {
-                          const dc = dotColors[item.icon] || { bg: C.tealLight, color: C.teal };
-                          return (
-                            <div key={item.id} className="af-item" onClick={() => setActive('timeline')} style={{ cursor: 'pointer' }}>
-                              <div className="af-dot-col">
-                                <div className="af-dot" style={{ background: dc.bg, color: dc.color }}><i className={`ti ${item.icon}`} style={{ fontSize: 13 }}></i></div>
-                                {idx < feedItems.length - 1 && <div className="af-line"></div>}
-                              </div>
-                              <div style={{ flex: 1 }}>
-                                <div className="af-title">{item.title}</div>
-                                <div className="af-time"><i className="ti ti-clock" style={{ fontSize: 11 }}></i> {item.time}</div>
-                              </div>
+                    const notifItems = notifs.slice(0, 3).map((n, i) => ({
+                      id: 'notif-' + i,
+                      title: n.text || 'Notification',
+                      time: n.createdAt ? new Date(n.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
+                      icon: 'ti-bell'
+                    }));
+                    const fileItems = (proj?.files || []).slice(0, 6).map((f, i) => ({
+                      id: 'file-' + i,
+                      title: `${f.uploadedBy || 'Someone'} uploaded ${f.name || 'a file'}`,
+                      time: f.date ? new Date(f.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
+                      icon: 'ti-upload'
+                    }));
+                    const milestoneItems = (proj?.milestones || []).filter(m => m.done).slice(0, 6).map((m, i) => ({
+                      id: 'ms-' + i,
+                      title: `Milestone ${m.name} completed`,
+                      time: m.date ? new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
+                      icon: 'ti-flag'
+                    }));
+                    const feedItems = [...fileItems, ...milestoneItems, ...projUpdates, ...notifItems]
+                      .sort((a, b) => new Date(b.time) - new Date(a.time))
+                      .slice(0, 4);
+                    const dotColors = {
+                      'ti-speakerphone': { bg: C.tealLight, color: C.teal },
+                      'ti-bell': { bg: C.purpleBg, color: C.purple },
+                      'ti-upload': { bg: C.blueBg, color: C.blue },
+                      'ti-flag': { bg: C.greenBg, color: C.green },
+                      'ti-chart-line': { bg: C.amberBg, color: C.amber },
+                      'ti-calendar': { bg: C.blueBg, color: C.blue },
+                    };
+                    return feedItems.length === 0 ? (
+                      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: C.text3, textAlign: 'center' }}>No recent activity.</div>
+                    ) : (
+                      feedItems.map((item, idx) => {
+                        const dc = dotColors[item.icon] || { bg: C.tealLight, color: C.teal };
+                        return (
+                          <div key={item.id} className="af-item" onClick={() => setActive('timeline')} style={{ cursor: 'pointer' }}>
+                            <div className="af-dot-col">
+                              <div className="af-dot" style={{ background: dc.bg, color: dc.color }}><i className={`ti ${item.icon}`} style={{ fontSize: 13 }}></i></div>
+                              {idx < feedItems.length - 1 && <div className="af-line"></div>}
                             </div>
-                          );
-                        })
-                      );
-                    })()}
-                  </div>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-                  <div className="sec-header">
-                    <div className="sec-title">
-                      <div className="sec-title-icon" style={{ background: C.purpleBg, color: C.purple }}><i className="ti ti-star"></i></div>
-                      Feedback
-                    </div>
-                  </div>
-                  <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>{renderFeedbackPanel()}</div>
+                            <div style={{ flex: 1 }}>
+                              <div className="af-title">{item.title}</div>
+                              <div className="af-time"><i className="ti ti-clock" style={{ fontSize: 11 }}></i> {item.time}</div>
+                            </div>
+                          </div>
+                        );
+                      })
+                    );
+                  })()}
                 </div>
               </div>
-            </div>    </>
-        )}
-        {active === "timeline" && (
-          <div>
-            <div style={{ display: "block" }}>
-              <div style={{ display: "flex", flexDirection: "column" }}>
+              <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
                 <div className="sec-header">
                   <div className="sec-title">
-                    <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-calendar-stats"></i></div>
-                    Project Timeline & Gantt Detail
+                    <div className="sec-title-icon" style={{ background: C.purpleBg, color: C.purple }}><i className="ti ti-star"></i></div>
+                    Feedback
                   </div>
                 </div>
-                {(() => {
-                  const { milestoneProgressBlock, ganttChartBlock } = renderTimelineComponent();
-                  return <>{milestoneProgressBlock}{portalSettings.showMilestones}</>;
-                })()}
+                <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>{renderFeedbackPanel()}</div>
               </div>
+            </div>
+          </div>    </>
+      )}
+      {active === "timeline" && (
+        <div>
+          <div style={{ display: "block" }}>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <div className="sec-header">
+                <div className="sec-title">
+                  <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-calendar-stats"></i></div>
+                  Project Timeline & Gantt Detail
+                </div>
+              </div>
+              {(() => {
+                const { milestoneProgressBlock, ganttChartBlock } = renderTimelineComponent();
+                return <>{milestoneProgressBlock}{portalSettings.showMilestones}</>;
+              })()}
+            </div>
 
+          </div>
+        </div>
+      )}
+
+      {active === "files" && (
+        <div>
+          <div className="sec-header">
+            <div className="sec-title">
+              <div className="sec-title-icon" style={{ background: C.blueBg, color: C.blue }}><i className="ti ti-files"></i></div>
+              Files & Documents Checklist
+            </div>
+            <div className="sec-action" onClick={handleDownloadAll} style={{ opacity: downloadingAll ? 0.6 : 1, cursor: downloadingAll ? "not-allowed" : "pointer", pointerEvents: downloadingAll ? "none" : "auto" }}>
+              <i className={`ti ${downloadingAll ? "ti-loader-2" : "ti-download"}`} style={{ fontSize: 13, animation: downloadingAll ? "spin 1s linear infinite" : "none" }}></i>
+              {downloadingAll ? "Downloading..." : "Download All"}
             </div>
           </div>
-        )}
+          {renderFilesComponent()}
+        </div>
+      )}
 
-        {active === "files" && (
-          <div>
-            <div className="sec-header">
-              <div className="sec-title">
-                <div className="sec-title-icon" style={{ background: C.blueBg, color: C.blue }}><i className="ti ti-files"></i></div>
-                Files & Documents Checklist
-              </div>
-              <div className="sec-action" onClick={handleDownloadAll} style={{ opacity: downloadingAll ? 0.6 : 1, cursor: downloadingAll ? "not-allowed" : "pointer", pointerEvents: downloadingAll ? "none" : "auto" }}>
-                <i className={`ti ${downloadingAll ? "ti-loader-2" : "ti-download"}`} style={{ fontSize: 13, animation: downloadingAll ? "spin 1s linear infinite" : "none" }}></i>
-                {downloadingAll ? "Downloading..." : "Download All"}
-              </div>
+      {active === "proposals" && (
+        <div>
+          <div className="sec-header">
+            <div className="sec-title">
+              <div className="sec-title-icon" style={{ background: "#EDE9FE", color: "#7C3AED" }}><i className="ti ti-presentation"></i></div>
+              Project Proposals
             </div>
-            {renderFilesComponent()}
+            <div style={{ fontSize: 12, color: C.text3, fontWeight: 600 }}>{proposals.length} proposal{proposals.length !== 1 ? "s" : ""} received</div>
           </div>
-        )}
+          {proposals.length === 0 ? (
+            <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 16, height: 233, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px", boxSizing: "border-box", textAlign: "center" }}>
 
-        {active === "proposals" && (
-          <div>
-            <div className="sec-header">
-              <div className="sec-title">
-                <div className="sec-title-icon" style={{ background: "#EDE9FE", color: "#7C3AED" }}><i className="ti ti-presentation"></i></div>
-                Project Proposals
-              </div>
-              <div style={{ fontSize: 12, color: C.text3, fontWeight: 600 }}>{proposals.length} proposal{proposals.length !== 1 ? "s" : ""} received</div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 4 }}>No Proposals Yet</div>
+
             </div>
-            {proposals.length === 0 ? (
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {proposals.map((prop, idx) => {
+                const st = (prop.status || "sent").toLowerCase();
+                const statusMap = {
+                  sent: { bg: "#EFF4FF", color: "#2563EB", label: "Sent" },
+                  pending: { bg: "#FEF3C7", color: "#B45309", label: "Under Review" },
+                  approved: { bg: "#DCFCE7", color: "#15803D", label: "Approved" },
+                  rejected: { bg: "#FEE2E2", color: "#DC2626", label: "Rejected" },
+                };
+                const badge = statusMap[st] || statusMap.sent;
+                const sentDate = prop.sentAt || prop.submittedAt || prop.updatedAt;
+                return (
+                  <div key={prop._id || idx} style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 14, padding: "18px 22px", display: "flex", alignItems: "center", gap: 18, boxShadow: "0 2px 10px rgba(0,0,0,.04)" }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 12, background: "#EDE9FE", color: "#7C3AED", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                      <i className="ti ti-presentation"></i>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{prop.title || "Untitled Proposal"}</div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                        {prop.value && (
+                          <span style={{ fontSize: 12, fontWeight: 700, color: C.teal }}>
+                            <i className="ti ti-currency-rupee" style={{ fontSize: 11 }}></i> {Number(prop.value).toLocaleString()}
+                          </span>
+                        )}
+                        {sentDate && (
+                          <span style={{ fontSize: 11, color: C.text3, fontWeight: 600 }}>
+                            <i className="ti ti-clock" style={{ fontSize: 11 }}></i> {new Date(sentDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                          </span>
+                        )}
+                        {prop.rejectNote && st === "rejected" && (
+                          <span style={{ fontSize: 11, color: "#DC2626", fontWeight: 600 }}>Note: {prop.rejectNote}</span>
+                        )}
+                        {prop.clientSignature && (
+                          <span style={{ fontSize: 11, color: C.green, fontWeight: 700 }}>
+                            <i className="ti ti-writing" style={{ fontSize: 11 }}></i> Signed by client
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+                      <span style={{ background: badge.bg, color: badge.color, borderRadius: 20, padding: "4px 12px", fontSize: 11, fontWeight: 800 }}>{badge.label}</span>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <button
+                          onClick={() => setViewingProposal(prop)}
+                          style={{ background: C.tealLight, color: C.teal, borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+                          <i className="ti ti-eye" style={{ fontSize: 13 }}></i> View
+                        </button>
+                        <button
+                          onClick={() => printProposal(prop)}
+                          style={{ background: C.surface2, color: C.text2, borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 700, border: "1.5px solid " + C.border, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+                          <i className="ti ti-printer" style={{ fontSize: 13 }}></i> PDF
+                        </button>
+                        <button
+                          onClick={() => shareProposalAsPDF(prop, agencyName, null)}
+                          style={{ background: C.surface2, color: C.text2, borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 700, border: "1.5px solid " + C.border, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+                          <i className="ti ti-share" style={{ fontSize: 13 }}></i> Share
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {active === "payments" && (
+        <div>
+          <div className="sec-header">
+            <div className="sec-title">
+              <div className="sec-title-icon" style={{ background: C.greenBg, color: C.green }}><i className="ti ti-receipt-2"></i></div>
+              Invoices & Payments History
+            </div>
+          </div>
+          <div style={{ margin: "0 auto", background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden" }}>
+            {renderInvoicesComponent(2)}
+          </div>
+        </div>
+      )}
+
+      {active === "quotations" && (
+        <div>
+          <div className="sec-header">
+            <div className="sec-title">
+              <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-file-invoice"></i></div>
+              My Quotations
+            </div>
+          </div>
+          <div style={{ margin: "0 auto" }}>
+            {quotations.length === 0 ? (
               <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 16, height: 233, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px", boxSizing: "border-box", textAlign: "center" }}>
 
-                <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 4 }}>No Proposals Yet</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 4 }}>No quotations yet</div>
 
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                {proposals.map((prop, idx) => {
-                  const st = (prop.status || "sent").toLowerCase();
-                  const statusMap = {
-                    sent: { bg: "#EFF4FF", color: "#2563EB", label: "Sent" },
-                    pending: { bg: "#FEF3C7", color: "#B45309", label: "Under Review" },
-                    approved: { bg: "#DCFCE7", color: "#15803D", label: "Approved" },
-                    rejected: { bg: "#FEE2E2", color: "#DC2626", label: "Rejected" },
-                  };
-                  const badge = statusMap[st] || statusMap.sent;
-                  const sentDate = prop.sentAt || prop.submittedAt || prop.updatedAt;
+                {quotations.map((q) => {
+                  const qt = q.qt || {};
+                  const items = q.items || [];
+                  const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity || i.qty) || 1), 0);
+                  const total = q.total || subtotal;
+                  const quoteDate = qt.quoteDate || qt.date || q.date || "";
+                  const validity = qt.validity || "30";
+                  const overview = qt.overview || qt.description || "";
+                  const notes = qt.notes || qt.terms || "";
                   return (
-                    <div key={prop._id || idx} style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 14, padding: "18px 22px", display: "flex", alignItems: "center", gap: 18, boxShadow: "0 2px 10px rgba(0,0,0,.04)" }}>
-                      <div style={{ width: 44, height: 44, borderRadius: 12, background: "#EDE9FE", color: "#7C3AED", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
-                        <i className="ti ti-presentation"></i>
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{prop.title || "Untitled Proposal"}</div>
-                        <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-                          {prop.value && (
-                            <span style={{ fontSize: 12, fontWeight: 700, color: C.teal }}>
-                              <i className="ti ti-currency-rupee" style={{ fontSize: 11 }}></i> {Number(prop.value).toLocaleString()}
-                            </span>
-                          )}
-                          {sentDate && (
-                            <span style={{ fontSize: 11, color: C.text3, fontWeight: 600 }}>
-                              <i className="ti ti-clock" style={{ fontSize: 11 }}></i> {new Date(sentDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                            </span>
-                          )}
-                          {prop.rejectNote && st === "rejected" && (
-                            <span style={{ fontSize: 11, color: "#DC2626", fontWeight: 600 }}>Note: {prop.rejectNote}</span>
-                          )}
-                          {prop.clientSignature && (
-                            <span style={{ fontSize: 11, color: C.green, fontWeight: 700 }}>
-                              <i className="ti ti-writing" style={{ fontSize: 11 }}></i> Signed by client
-                            </span>
-                          )}
+                    <div key={q.id} style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,188,212,0.06)" }}>
+
+                      {/* Header */}
+                      <div style={{ background: C.tealLighter, padding: "14px 18px", borderBottom: "1px solid " + C.border, display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 8 }}>
+                        <div>
+                          <div style={{ fontSize: 14, fontWeight: 800, color: C.teal }}>#{q.quoteNo}</div>
+                          {(q.project || qt.title) && <div style={{ fontSize: 12, color: C.text2, marginTop: 3, fontWeight: 600 }}>{q.project || qt.title}</div>}
+                        </div>
+                        <div style={{ textAlign: "right" }}>
+                          <span style={{ background: C.teal, color: "#fff", borderRadius: 20, fontSize: 11, fontWeight: 700, padding: "3px 12px" }}>Sent</span>
+                          {quoteDate && <div style={{ fontSize: 11, color: C.text3, marginTop: 5 }}>{new Date(quoteDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</div>}
                         </div>
                       </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-                        <span style={{ background: badge.bg, color: badge.color, borderRadius: 20, padding: "4px 12px", fontSize: 11, fontWeight: 800 }}>{badge.label}</span>
-                        <div style={{ display: "flex", gap: 8 }}>
-                          <button
-                            onClick={() => setViewingProposal(prop)}
-                            style={{ background: C.tealLight, color: C.teal, borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
-                            <i className="ti ti-eye" style={{ fontSize: 13 }}></i> View
-                          </button>
-                          <button
-                            onClick={() => printProposal(prop)}
-                            style={{ background: C.surface2, color: C.text2, borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 700, border: "1.5px solid " + C.border, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
-                            <i className="ti ti-printer" style={{ fontSize: 13 }}></i> PDF
-                          </button>
-                          <button
-                            onClick={() => shareProposalAsPDF(prop, agencyName, null)}
-                            style={{ background: C.surface2, color: C.text2, borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 700, border: "1.5px solid " + C.border, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
-                            <i className="ti ti-share" style={{ fontSize: 13 }}></i> Share
-                          </button>
+
+                      {/* Overview */}
+                      {overview && (
+                        <div style={{ padding: "10px 18px", background: C.surface2, borderBottom: "1px solid " + C.border, fontSize: 12, color: C.text2, lineHeight: 1.7 }}>
+                          {overview}
+                        </div>
+                      )}
+
+                      {/* Line Items */}
+                      <div style={{ padding: "14px 18px" }}>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: C.text3, textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 8 }}>Items / Services</div>
+                        {items.map((item, idx) => {
+                          const qty = parseFloat(item.quantity || item.qty) || 1;
+                          const rate = parseFloat(item.rate) || 0;
+                          return (
+                            <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 0", borderBottom: idx < items.length - 1 ? "1px solid " + C.border : "none", fontSize: 13 }}>
+                              <span style={{ color: C.text, fontWeight: 600 }}>{item.description || item.desc || "—"}</span>
+                              <span style={{ color: C.text2, fontSize: 12 }}>
+                                {qty} × ₹{rate.toLocaleString("en-IN")}
+                                <span style={{ fontWeight: 800, color: C.text, marginLeft: 12 }}>₹{(qty * rate).toLocaleString("en-IN")}</span>
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Total + Validity */}
+                      <div style={{ padding: "12px 18px", borderTop: "2px solid " + C.tealLight, background: C.surface2, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+                        <div style={{ fontSize: 11, color: C.amber, fontWeight: 700, background: C.amberBg, padding: "4px 12px", borderRadius: 8, borderLeft: "3px solid " + C.amber }}>
+                          ⏰ Valid for {validity === "Custom" ? "custom period" : `${validity} days`} from issue
+                        </div>
+                        <div style={{ textAlign: "right" }}>
+                          <div style={{ fontSize: 11, color: C.text3 }}>Total Quoted</div>
+                          <div style={{ fontSize: 20, fontWeight: 900, color: C.teal }}>₹{total.toLocaleString("en-IN")}</div>
                         </div>
                       </div>
+
+                      {/* Notes */}
+                      {notes && (
+                        <div style={{ padding: "10px 18px", borderTop: "1px solid " + C.border, fontSize: 11, color: C.text3, lineHeight: 1.7 }}>
+                          <span style={{ fontWeight: 700, color: C.teal2 }}>Notes: </span>{notes}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
               </div>
             )}
           </div>
-        )}
+        </div>
+      )}
 
-        {active === "payments" && (
-          <div>
-            <div className="sec-header">
-              <div className="sec-title">
-                <div className="sec-title-icon" style={{ background: C.greenBg, color: C.green }}><i className="ti ti-receipt-2"></i></div>
-                Invoices & Payments History
-              </div>
-            </div>
-            <div style={{ margin: "0 auto", background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden" }}>
-              {renderInvoicesComponent(2)}
+      {active === "messages" && portalSettings.allowMessages && (
+        <div>
+          <div className="sec-header">
+            <div className="sec-title">
+              <div className="sec-title-icon" style={{ background: C.purpleBg, color: C.purple }}><i className="ti ti-message-2"></i></div>
+              Messages & Received Documents
             </div>
           </div>
-        )}
-
-        {active === "quotations" && (
-          <div>
-            <div className="sec-header">
-              <div className="sec-title">
-                <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-file-invoice"></i></div>
-                My Quotations
-              </div>
-            </div>
-            <div style={{ margin: "0 auto" }}>
-              {quotations.length === 0 ? (
-                <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 16, height: 233, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px", boxSizing: "border-box", textAlign: "center" }}>
-
-                  <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 4 }}>No quotations yet</div>
-
-                </div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                  {quotations.map((q) => {
-                    const qt = q.qt || {};
-                    const items = q.items || [];
-                    const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity || i.qty) || 1), 0);
-                    const total = q.total || subtotal;
-                    const quoteDate = qt.quoteDate || qt.date || q.date || "";
-                    const validity = qt.validity || "30";
-                    const overview = qt.overview || qt.description || "";
-                    const notes = qt.notes || qt.terms || "";
-                    return (
-                      <div key={q.id} style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,188,212,0.06)" }}>
-
-                        {/* Header */}
-                        <div style={{ background: C.tealLighter, padding: "14px 18px", borderBottom: "1px solid " + C.border, display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 8 }}>
-                          <div>
-                            <div style={{ fontSize: 14, fontWeight: 800, color: C.teal }}>#{q.quoteNo}</div>
-                            {(q.project || qt.title) && <div style={{ fontSize: 12, color: C.text2, marginTop: 3, fontWeight: 600 }}>{q.project || qt.title}</div>}
-                          </div>
-                          <div style={{ textAlign: "right" }}>
-                            <span style={{ background: C.teal, color: "#fff", borderRadius: 20, fontSize: 11, fontWeight: 700, padding: "3px 12px" }}>Sent</span>
-                            {quoteDate && <div style={{ fontSize: 11, color: C.text3, marginTop: 5 }}>{new Date(quoteDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</div>}
-                          </div>
-                        </div>
-
-                        {/* Overview */}
-                        {overview && (
-                          <div style={{ padding: "10px 18px", background: C.surface2, borderBottom: "1px solid " + C.border, fontSize: 12, color: C.text2, lineHeight: 1.7 }}>
-                            {overview}
-                          </div>
-                        )}
-
-                        {/* Line Items */}
-                        <div style={{ padding: "14px 18px" }}>
-                          <div style={{ fontSize: 10, fontWeight: 700, color: C.text3, textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 8 }}>Items / Services</div>
-                          {items.map((item, idx) => {
-                            const qty = parseFloat(item.quantity || item.qty) || 1;
-                            const rate = parseFloat(item.rate) || 0;
-                            return (
-                              <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 0", borderBottom: idx < items.length - 1 ? "1px solid " + C.border : "none", fontSize: 13 }}>
-                                <span style={{ color: C.text, fontWeight: 600 }}>{item.description || item.desc || "—"}</span>
-                                <span style={{ color: C.text2, fontSize: 12 }}>
-                                  {qty} × ₹{rate.toLocaleString("en-IN")}
-                                  <span style={{ fontWeight: 800, color: C.text, marginLeft: 12 }}>₹{(qty * rate).toLocaleString("en-IN")}</span>
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </div>
-
-                        {/* Total + Validity */}
-                        <div style={{ padding: "12px 18px", borderTop: "2px solid " + C.tealLight, background: C.surface2, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
-                          <div style={{ fontSize: 11, color: C.amber, fontWeight: 700, background: C.amberBg, padding: "4px 12px", borderRadius: 8, borderLeft: "3px solid " + C.amber }}>
-                            ⏰ Valid for {validity === "Custom" ? "custom period" : `${validity} days`} from issue
-                          </div>
-                          <div style={{ textAlign: "right" }}>
-                            <div style={{ fontSize: 11, color: C.text3 }}>Total Quoted</div>
-                            <div style={{ fontSize: 20, fontWeight: 900, color: C.teal }}>₹{total.toLocaleString("en-IN")}</div>
-                          </div>
-                        </div>
-
-                        {/* Notes */}
-                        {notes && (
-                          <div style={{ padding: "10px 18px", borderTop: "1px solid " + C.border, fontSize: 11, color: C.text3, lineHeight: 1.7 }}>
-                            <span style={{ fontWeight: 700, color: C.teal2 }}>Notes: </span>{notes}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+          <div className="two-col">
+            {renderMessagesComponent()}
+            {renderFilesComponent()}
           </div>
-        )}
+        </div>
+      )}
 
-        {active === "messages" && portalSettings.allowMessages && (
-          <div>
-            <div className="sec-header">
-              <div className="sec-title">
-                <div className="sec-title-icon" style={{ background: C.purpleBg, color: C.purple }}><i className="ti ti-message-2"></i></div>
-                Messages & Received Documents
-              </div>
+      {active === "calendar" && (
+        <div>
+          <div className="sec-header">
+            <div className="sec-title">
+              <div className="sec-title-icon" style={{ background: C.amberBg, color: C.amber }}><i className="ti ti-calendar-event"></i></div>
+              Meeting Schedule & Business Calendar
             </div>
-            <div className="two-col">
-              {renderMessagesComponent()}
-              {renderFilesComponent()}
-            </div>
-          </div>
-        )}
-
-        {active === "calendar" && (
-          <div>
-            <div className="sec-header">
-              <div className="sec-title">
-                <div className="sec-title-icon" style={{ background: C.amberBg, color: C.amber }}><i className="ti ti-calendar-event"></i></div>
-                Meeting Schedule & Business Calendar
-              </div>
-              <button className="sec-action" onClick={() => alert("Request meeting slot modal opened.")}>
-                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Request Meeting
-              </button>
-            </div>
-            <div style={{ maxWidth: 700, margin: "0 auto" }}>
-              {renderCalendarComponent()}
-            </div>
-          </div>
-        )}
-
-        {active === "projects" && !selectedClientProject && (
-          <div>
-            <div className="sec-header">
-              <div className="sec-title">
-                <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-layout-kanban"></i></div>
-                My Projects
-              </div>
-              <div style={{ fontSize: 12, color: C.text3, fontWeight: 600 }}>{projects.length} project{projects.length !== 1 ? 's' : ''} assigned to you</div>
-            </div>
-            {projects.length === 0 ? (
-              <div style={{ background: C.surface, border: '1.5px solid ' + C.border, borderRadius: 16, padding: '48px 24px', textAlign: 'center' }}>
-
-                <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 6 }}>No Projects Yet</div>
-                <div style={{ fontSize: 13, color: C.text3 }}>Projects assigned to your account will appear here.</div>
-              </div>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 18 }}>
-                {projects.map((proj, idx) => {
-                  const s = (proj.status || '').toLowerCase();
-                  const isDone = s === 'done' || s === 'completed';
-                  const isHold = s.includes('hold');
-                  const pct = proj.progress || (isDone ? 100 : s === 'in progress' ? 55 : 20);
-                  const statusColor = isDone ? C.green : isHold ? C.amber : C.teal;
-                  const statusBg = isDone ? C.greenBg : isHold ? C.amberBg : C.tealLight;
-                  const endD = proj.end ? new Date(proj.end).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : proj.deadline || '—';
-                  return (
-                    <div key={proj._id || idx}
-                      onClick={() => { setSelectedClientProject(proj); setActive('projects'); }}
-                      style={{ background: C.surface, border: '1.5px solid ' + C.border, borderRadius: 16, padding: '20px 22px', cursor: 'pointer', transition: 'all .2s', boxShadow: '0 2px 12px rgba(0,188,212,.06)' }}
-                      onMouseEnter={e => { e.currentTarget.style.borderColor = C.teal; e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,188,212,.15)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                      onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,188,212,.06)'; e.currentTarget.style.transform = 'none'; }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10 }}>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{proj.name || 'Unnamed Project'}</div>
-                          <div style={{ fontSize: 12, color: C.text3, display: 'flex', alignItems: 'center', gap: 5 }}>
-                            <i className="ti ti-tag" style={{ fontSize: 11 }}></i>
-                            {proj.purpose || proj.category || 'Project'}
-                          </div>
-                        </div>
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: statusBg, color: statusColor, flexShrink: 0, marginLeft: 10 }}>
-                          <span style={{ width: 6, height: 6, borderRadius: '50%', background: statusColor, display: 'inline-block' }}></span>
-                          {proj.status || 'Active'}
-                        </span>
-                      </div>
-                      {proj.description && (
-                        <div style={{ fontSize: 12, color: C.text2, marginBottom: 12, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{proj.description}</div>
-                      )}
-                      {(proj.portalSettings?.showProgress ?? true) && (
-                        <div style={{ marginBottom: 10 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                            <span style={{ fontSize: 11, color: C.text3, fontWeight: 600 }}>Progress</span>
-                            <span style={{ fontSize: 12, fontWeight: 800, color: C.teal }}>{pct}%</span>
-                          </div>
-                          <div style={{ background: C.border, borderRadius: 20, height: 7, overflow: 'hidden' }}>
-                            <div style={{ width: pct + '%', height: '100%', borderRadius: 20, background: 'linear-gradient(90deg, ' + C.teal + ', ' + C.teal2 + ')', transition: 'width .4s ease' }}></div>
-                          </div>
-                        </div>
-                      )}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: C.text3, fontWeight: 600 }}>
-                          <i className="ti ti-calendar" style={{ fontSize: 12 }}></i>
-                          {endD}
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 700, color: C.teal }}>
-                          View Details <i className="ti ti-arrow-right" style={{ fontSize: 13 }}></i>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-        {active === "projects" && selectedClientProject && (
-          <ModernProjectDetails
-            key={selectedClientProject._id || selectedClientProject.id}
-            fromClientContext
-            hideTopActions
-            project={{
-              ...selectedClientProject,
-              contactEmail: selectedClientProject.contactEmail || user?.email || "",
-              contactPersonName: selectedClientProject.contactPersonName || "",
-              contactPersonNo: selectedClientProject.contactPersonNo || user?.phone || "",
-            }}
-            tasks={tasks.filter(t =>
-              String(t.projectId || t.project) === String(selectedClientProject._id || selectedClientProject.id)
-            )}
-            user={user}
-
-            onBack={() => setSelectedClientProject(null)}
-            onMessageTeam={() => setActive("messages")}
-            fetchProjects={async () => {
-              try {
-                const myClientId = portalMode
-                  ? (portalClientId || user?._id || user?.id || "")
-                  : (user?._id || user?.id || "");
-                const res = await axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}&clientId=${encodeURIComponent(myClientId)}`, {
-                  headers: { 'x-company-id': user?.companyId || "" }
-                });
-                const updated = res.data || [];
-                setProjects(updated);
-                const fresh = updated.find(p => String(p._id || p.id) === String(selectedClientProject._id || selectedClientProject.id));
-                if (fresh) setSelectedClientProject(fresh);
-              } catch (e) { console.error(e); }
-            }}
-            fetchTasks={async () => {
-              try {
-                const myClientId = portalMode
-                  ? (portalClientId || user?._id || user?.id || "")
-                  : (user?._id || user?.id || "");
-                const res = await axios.get(`${BASE_URL}/api/tasks/client/${encodeURIComponent(clientName)}?clientId=${encodeURIComponent(myClientId)}`, {
-                  headers: { 'x-company-id': user?.companyId || "" }
-                });
-                setTasks(res.data || []);
-              } catch (e) { console.error(e); }
-            }}
-          />
-        )}
-      </div>
-
-      {/* MOBILE BOTTOM NAV */}
-      <div className="mobile-bottom-nav">
-        <div className="mbn-inner">
-          <button className={`mbn-item ${active === "dashboard" ? "active" : ""}`} onClick={() => setActive("dashboard")}>
-            <i className="ti ti-layout-dashboard"></i>
-            <div className="mbn-label">Overview</div>
-          </button>
-          <button className={`mbn-item ${active === "projects" ? "active" : ""}`} onClick={() => setActive("projects")}>
-            <i className="ti ti-layout-kanban"></i>
-            <div className="mbn-label">Projects</div>
-          </button>
-          <button className={`mbn-item ${active === "files" ? "active" : ""}`} onClick={() => setActive("files")}>
-            <i className="ti ti-files"></i>
-            <div className="mbn-label">Files</div>
-          </button>
-          <button className={`mbn-item ${active === "payments" ? "active" : ""}`} onClick={() => setActive("payments")}>
-            <i className="ti ti-receipt-2"></i>
-            <div className="mbn-label">Invoices</div>
-          </button>
-          {portalSettings.allowMessages && (
-            <button className={`mbn-item ${active === "messages" ? "active" : ""}`} onClick={() => setActive("messages")}>
-              <i className="ti ti-message-2"></i>
-              <div className="mbn-label">Messages</div>
+            <button className="sec-action" onClick={() => alert("Request meeting slot modal opened.")}>
+              <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Request Meeting
             </button>
+          </div>
+          <div style={{ maxWidth: 700, margin: "0 auto" }}>
+            {renderCalendarComponent()}
+          </div>
+        </div>
+      )}
+
+      {active === "projects" && !selectedClientProject && (
+        <div>
+          <div className="sec-header">
+            <div className="sec-title">
+              <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-layout-kanban"></i></div>
+              My Projects
+            </div>
+            <div style={{ fontSize: 12, color: C.text3, fontWeight: 600 }}>{projects.length} project{projects.length !== 1 ? 's' : ''} assigned to you</div>
+          </div>
+          {projects.length === 0 ? (
+            <div style={{ background: C.surface, border: '1.5px solid ' + C.border, borderRadius: 16, padding: '48px 24px', textAlign: 'center' }}>
+
+              <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 6 }}>No Projects Yet</div>
+              <div style={{ fontSize: 13, color: C.text3 }}>Projects assigned to your account will appear here.</div>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 18 }}>
+              {projects.map((proj, idx) => {
+                const s = (proj.status || '').toLowerCase();
+                const isDone = s === 'done' || s === 'completed';
+                const isHold = s.includes('hold');
+                const pct = proj.progress || (isDone ? 100 : s === 'in progress' ? 55 : 20);
+                const statusColor = isDone ? C.green : isHold ? C.amber : C.teal;
+                const statusBg = isDone ? C.greenBg : isHold ? C.amberBg : C.tealLight;
+                const endD = proj.end ? new Date(proj.end).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : proj.deadline || '—';
+                return (
+                  <div key={proj._id || idx}
+                    onClick={() => { setSelectedClientProject(proj); setActive('projects'); }}
+                    style={{ background: C.surface, border: '1.5px solid ' + C.border, borderRadius: 16, padding: '20px 22px', cursor: 'pointer', transition: 'all .2s', boxShadow: '0 2px 12px rgba(0,188,212,.06)' }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = C.teal; e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,188,212,.15)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,188,212,.06)'; e.currentTarget.style.transform = 'none'; }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10 }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{proj.name || 'Unnamed Project'}</div>
+                        <div style={{ fontSize: 12, color: C.text3, display: 'flex', alignItems: 'center', gap: 5 }}>
+                          <i className="ti ti-tag" style={{ fontSize: 11 }}></i>
+                          {proj.purpose || proj.category || 'Project'}
+                        </div>
+                      </div>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: statusBg, color: statusColor, flexShrink: 0, marginLeft: 10 }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: statusColor, display: 'inline-block' }}></span>
+                        {proj.status || 'Active'}
+                      </span>
+                    </div>
+                    {proj.description && (
+                      <div style={{ fontSize: 12, color: C.text2, marginBottom: 12, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{proj.description}</div>
+                    )}
+                    {(proj.portalSettings?.showProgress ?? true) && (
+                      <div style={{ marginBottom: 10 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                          <span style={{ fontSize: 11, color: C.text3, fontWeight: 600 }}>Progress</span>
+                          <span style={{ fontSize: 12, fontWeight: 800, color: C.teal }}>{pct}%</span>
+                        </div>
+                        <div style={{ background: C.border, borderRadius: 20, height: 7, overflow: 'hidden' }}>
+                          <div style={{ width: pct + '%', height: '100%', borderRadius: 20, background: 'linear-gradient(90deg, ' + C.teal + ', ' + C.teal2 + ')', transition: 'width .4s ease' }}></div>
+                        </div>
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: C.text3, fontWeight: 600 }}>
+                        <i className="ti ti-calendar" style={{ fontSize: 12 }}></i>
+                        {endD}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 700, color: C.teal }}>
+                        View Details <i className="ti ti-arrow-right" style={{ fontSize: 13 }}></i>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
+      )}
+      {active === "projects" && selectedClientProject && (
+        <ModernProjectDetails
+          key={selectedClientProject._id || selectedClientProject.id}
+          fromClientContext
+          hideTopActions
+          project={{
+            ...selectedClientProject,
+            contactEmail: selectedClientProject.contactEmail || user?.email || "",
+            contactPersonName: selectedClientProject.contactPersonName || "",
+            contactPersonNo: selectedClientProject.contactPersonNo || user?.phone || "",
+          }}
+          tasks={tasks.filter(t =>
+            String(t.projectId || t.project) === String(selectedClientProject._id || selectedClientProject.id)
+          )}
+          user={user}
+
+          onBack={() => setSelectedClientProject(null)}
+          onMessageTeam={() => setActive("messages")}
+          fetchProjects={async () => {
+            try {
+              const myClientId = portalMode
+                ? (portalClientId || user?._id || user?.id || "")
+                : (user?._id || user?.id || "");
+              const res = await axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}&clientId=${encodeURIComponent(myClientId)}`, {
+                headers: { 'x-company-id': user?.companyId || "" }
+              });
+              const updated = res.data || [];
+              setProjects(updated);
+              const fresh = updated.find(p => String(p._id || p.id) === String(selectedClientProject._id || selectedClientProject.id));
+              if (fresh) setSelectedClientProject(fresh);
+            } catch (e) { console.error(e); }
+          }}
+          fetchTasks={async () => {
+            try {
+              const myClientId = portalMode
+                ? (portalClientId || user?._id || user?.id || "")
+                : (user?._id || user?.id || "");
+              const res = await axios.get(`${BASE_URL}/api/tasks/client/${encodeURIComponent(clientName)}?clientId=${encodeURIComponent(myClientId)}`, {
+                headers: { 'x-company-id': user?.companyId || "" }
+              });
+              setTasks(res.data || []);
+            } catch (e) { console.error(e); }
+          }}
+        />
+      )}
+    </div>
+
+    {/* MOBILE BOTTOM NAV */}
+    <div className="mobile-bottom-nav">
+      <div className="mbn-inner">
+        <button className={`mbn-item ${active === "dashboard" ? "active" : ""}`} onClick={() => setActive("dashboard")}>
+          <i className="ti ti-layout-dashboard"></i>
+          <div className="mbn-label">Overview</div>
+        </button>
+        <button className={`mbn-item ${active === "projects" ? "active" : ""}`} onClick={() => setActive("projects")}>
+          <i className="ti ti-layout-kanban"></i>
+          <div className="mbn-label">Projects</div>
+        </button>
+        <button className={`mbn-item ${active === "files" ? "active" : ""}`} onClick={() => setActive("files")}>
+          <i className="ti ti-files"></i>
+          <div className="mbn-label">Files</div>
+        </button>
+        <button className={`mbn-item ${active === "payments" ? "active" : ""}`} onClick={() => setActive("payments")}>
+          <i className="ti ti-receipt-2"></i>
+          <div className="mbn-label">Invoices</div>
+        </button>
+        {portalSettings.allowMessages && (
+          <button className={`mbn-item ${active === "messages" ? "active" : ""}`} onClick={() => setActive("messages")}>
+            <i className="ti ti-message-2"></i>
+            <div className="mbn-label">Messages</div>
+          </button>
+        )}
       </div>
-      {/* PROPOSAL VIEWER MODAL */}
-      {
-        viewingProposal && (
-          <ProposalViewerModal
-            proposal={viewingProposal}
-            clientName={clientName}
-            BASE_URL={BASE_URL}
-            onClose={() => setViewingProposal(null)}
-            onSigned={(updated) => {
-              setProposals(prev => prev.map(p => (p._id === updated._id ? updated : p)));
-              setViewingProposal(updated);
-            }}
-          />
-        )
-      }
-      {/* PAYMENT MODAL (CHECKOUT DIALOG OVERLAY) */}
-      {
-        payModalOpen && paymentInvoice && (
-          <div className="modal-overlay" onClick={() => setPayModalOpen(false)}>
-            <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header">
-                <span className="modal-title">Complete Payment</span>
-                <button className="modal-close" onClick={() => setPayModalOpen(false)}>&times;</button>
+    </div>
+    {/* PROPOSAL VIEWER MODAL */}
+    {
+      viewingProposal && (
+        <ProposalViewerModal
+          proposal={viewingProposal}
+          clientName={clientName}
+          BASE_URL={BASE_URL}
+          onClose={() => setViewingProposal(null)}
+          onSigned={(updated) => {
+            setProposals(prev => prev.map(p => (p._id === updated._id ? updated : p)));
+            setViewingProposal(updated);
+          }}
+        />
+      )
+    }
+    {/* PAYMENT MODAL (CHECKOUT DIALOG OVERLAY) */}
+    {
+      payModalOpen && paymentInvoice && (
+        <div className="modal-overlay" onClick={() => setPayModalOpen(false)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <span className="modal-title">Complete Payment</span>
+              <button className="modal-close" onClick={() => setPayModalOpen(false)}>&times;</button>
+            </div>
+            <div className="modal-body">
+              <div style={{ background: C.surface2, border: "1px solid " + C.border, borderRadius: 10, padding: 14, textAlign: "center" }}>
+                <div style={{ fontSize: 11, color: C.text3, textTransform: "uppercase", fontWeight: 700, letterSpacing: 0.5 }}>Amount Due</div>
+                <div style={{ fontSize: 28, fontWeight: 900, color: C.text, margin: "6px 0", fontFamily: "Nunito Sans" }}>
+                  ₹{(paymentInvoice.total - (paymentInvoice.amountPaid || 0)).toLocaleString("en-IN")}
+                </div>
+                <div style={{ fontSize: 11, color: C.text2 }}>Invoice {paymentInvoice.invoiceNo}</div>
               </div>
-              <div className="modal-body">
-                <div style={{ background: C.surface2, border: "1px solid " + C.border, borderRadius: 10, padding: 14, textAlign: "center" }}>
-                  <div style={{ fontSize: 11, color: C.text3, textTransform: "uppercase", fontWeight: 700, letterSpacing: 0.5 }}>Amount Due</div>
-                  <div style={{ fontSize: 28, fontWeight: 900, color: C.text, margin: "6px 0", fontFamily: "Nunito Sans" }}>
-                    ₹{(paymentInvoice.total - (paymentInvoice.amountPaid || 0)).toLocaleString("en-IN")}
+
+              <div style={{ fontSize: 12, fontWeight: 800, color: C.text2, marginTop: 4 }}>Select Payment Method</div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", border: "1.5px solid " + C.teal, borderRadius: 10, cursor: "pointer", background: C.tealLighter }}>
+                  <i className="ti ti-brand-google-play" style={{ fontSize: 20, color: C.teal }}></i>
+                  <div style={{ flex: 1, fontSize: 13, fontWeight: 700, color: C.text }}>Google Pay / UPI</div>
+                  <div style={{ width: 14, height: 14, borderRadius: "50%", background: C.teal, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }}></div>
                   </div>
-                  <div style={{ fontSize: 11, color: C.text2 }}>Invoice {paymentInvoice.invoiceNo}</div>
                 </div>
 
-                <div style={{ fontSize: 12, fontWeight: 800, color: C.text2, marginTop: 4 }}>Select Payment Method</div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", border: "1.5px solid " + C.teal, borderRadius: 10, cursor: "pointer", background: C.tealLighter }}>
-                    <i className="ti ti-brand-google-play" style={{ fontSize: 20, color: C.teal }}></i>
-                    <div style={{ flex: 1, fontSize: 13, fontWeight: 700, color: C.text }}>Google Pay / UPI</div>
-                    <div style={{ width: 14, height: 14, borderRadius: "50%", background: C.teal, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }}></div>
-                    </div>
-                  </div>
-
-
-                </div>
-
-                <button onClick={executePayment} disabled={paymentProcessing} style={{ width: "100%", padding: "12px", background: C.teal, color: "#fff", border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: "700", cursor: "pointer", marginTop: 8, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                  {paymentProcessing ? (
-                    <>Processing...</>
-                  ) : (
-                    <>Confirm & Pay ₹{(paymentInvoice.total - (paymentInvoice.amountPaid || 0)).toLocaleString("en-IN")}</>
-                  )}
-                </button>
               </div>
+
+              <button onClick={executePayment} disabled={paymentProcessing} style={{ width: "100%", padding: "12px", background: C.teal, color: "#fff", border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: "700", cursor: "pointer", marginTop: 8, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                {paymentProcessing ? (
+                  <>Processing...</>
+                ) : (
+                  <>Confirm & Pay ₹{(paymentInvoice.total - (paymentInvoice.amountPaid || 0)).toLocaleString("en-IN")}</>
+                )}
+              </button>
             </div>
           </div>
-        )
-      }
+        </div>
+      )
+    }
 
-      {/* RECEIPT MODAL */}
-      {
-        receiptInvoice && (
-          <div className="modal-overlay" onClick={() => setReceiptInvoice(null)}>
-            <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 480 }}>
-              <div className="modal-header">
-                <span className="modal-title">Payment Receipt</span>
-                <button className="modal-close" onClick={() => setReceiptInvoice(null)}>&times;</button>
-              </div>
-              <div className="modal-body">
-                <div id="receipt-print-area" style={{ background: "#fff", border: "1px solid " + C.border, borderRadius: 12, padding: 24 }}>
-                  <div style={{ textAlign: "center", marginBottom: 16 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: "50%", background: C.greenBg, color: C.green, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px" }}>
-                      <i className="ti ti-circle-check" style={{ fontSize: 22 }}></i>
-                    </div>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: C.green }}>Payment Successful</div>
+    {/* RECEIPT MODAL */}
+    {
+      receiptInvoice && (
+        <div className="modal-overlay" onClick={() => setReceiptInvoice(null)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 480 }}>
+            <div className="modal-header">
+              <span className="modal-title">Payment Receipt</span>
+              <button className="modal-close" onClick={() => setReceiptInvoice(null)}>&times;</button>
+            </div>
+            <div className="modal-body">
+              <div id="receipt-print-area" style={{ background: "#fff", border: "1px solid " + C.border, borderRadius: 12, padding: 24 }}>
+                <div style={{ textAlign: "center", marginBottom: 16 }}>
+                  <div style={{ width: 44, height: 44, borderRadius: "50%", background: C.greenBg, color: C.green, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px" }}>
+                    <i className="ti ti-circle-check" style={{ fontSize: 22 }}></i>
                   </div>
-
-                  <div style={{ textAlign: "center", marginBottom: 16, paddingBottom: 16, borderBottom: "1px dashed " + C.border }}>
-                    <div style={{ fontSize: 12, color: C.text3, fontWeight: 700 }}>{agencyName}</div>
-                    <div style={{ fontSize: 22, fontWeight: 900, color: C.text, margin: "4px 0" }}>
-                      ₹{(receiptInvoice.amountPaid || receiptInvoice.total).toLocaleString("en-IN")}
-                    </div>
-                  </div>
-
-                  {[
-                    ["Client", clientName],
-                    ["Invoice No.", receiptInvoice.invoiceNo],
-                    ["Project", receiptInvoice.project || receiptInvoice.desc || "-"],
-                    ["Payment Method", receiptInvoice.paymentMode || "GPay"],
-                    ["Transaction ID", receiptInvoice.transactionId || "-"],
-                    ["Payment Date", receiptInvoice.paymentDate || receiptInvoice.date || "-"],
-                    ["Status", "Paid"],
-                  ].map(([label, val]) => (
-                    <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", fontSize: 13 }}>
-                      <span style={{ color: C.text3, fontWeight: 600 }}>{label}</span>
-                      <span style={{ color: C.text, fontWeight: 700 }}>{val}</span>
-                    </div>
-                  ))}
+                  <div style={{ fontSize: 15, fontWeight: 800, color: C.green }}>Payment Successful</div>
                 </div>
 
-                <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
-                  <button onClick={() => window.print()} style={{ flex: 1, padding: "11px", background: C.surface2, color: C.text, border: "1px solid " + C.border, borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                    <i className="ti ti-printer"></i> Print
-                  </button>
-                  <style>{`
+                <div style={{ textAlign: "center", marginBottom: 16, paddingBottom: 16, borderBottom: "1px dashed " + C.border }}>
+                  <div style={{ fontSize: 12, color: C.text3, fontWeight: 700 }}>{agencyName}</div>
+                  <div style={{ fontSize: 22, fontWeight: 900, color: C.text, margin: "4px 0" }}>
+                    ₹{(receiptInvoice.amountPaid || receiptInvoice.total).toLocaleString("en-IN")}
+                  </div>
+                </div>
+
+                {[
+                  ["Client", clientName],
+                  ["Invoice No.", receiptInvoice.invoiceNo],
+                  ["Project", receiptInvoice.project || receiptInvoice.desc || "-"],
+                  ["Payment Method", receiptInvoice.paymentMode || "GPay"],
+                  ["Transaction ID", receiptInvoice.transactionId || "-"],
+                  ["Payment Date", receiptInvoice.paymentDate || receiptInvoice.date || "-"],
+                  ["Status", "Paid"],
+                ].map(([label, val]) => (
+                  <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", fontSize: 13 }}>
+                    <span style={{ color: C.text3, fontWeight: 600 }}>{label}</span>
+                    <span style={{ color: C.text, fontWeight: 700 }}>{val}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
+                <button onClick={() => window.print()} style={{ flex: 1, padding: "11px", background: C.surface2, color: C.text, border: "1px solid " + C.border, borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                  <i className="ti ti-printer"></i> Print
+                </button>
+                <style>{`
                   @media print {
                     body * { visibility: hidden; }
                     #receipt-print-area, #receipt-print-area * { visibility: visible; }
@@ -3551,35 +3559,37 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                     }
                   }
                 `}</style>
-                  <button onClick={() => downloadReceiptPdf(receiptInvoice, clientName, agencyName)} style={{ flex: 1, padding: "11px", background: C.teal, color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                    <i className="ti ti-download"></i> Download PDF
-                  </button>
-                </div>
+                <button onClick={() => downloadReceiptPdf(receiptInvoice, clientName, agencyName)} style={{ flex: 1, padding: "11px", background: C.teal, color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                  <i className="ti ti-download"></i> Download PDF
+                </button>
               </div>
             </div>
           </div>
-        )
-      }
+        </div>
+      )
+    }
 
-      {
-        previewFile && (
-          <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,0.75)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => setPreviewFile(null)}>
-            <div style={{ background: "#fff", width: "100%", maxWidth: 900, height: "85vh", borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }} onClick={(e) => e.stopPropagation()}>
-              <div style={{ padding: "14px 20px", borderBottom: "1px solid " + C.border, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
-                <div style={{ fontSize: 14, fontWeight: 800, color: C.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingRight: 12 }}>{previewFile.name}</div>
-                <button onClick={() => setPreviewFile(null)} style={{ background: C.bg, border: "1px solid " + C.border, color: C.text2, width: 30, height: 30, borderRadius: 8, cursor: "pointer", fontSize: 15, flexShrink: 0 }}>✕</button>
-              </div>
-              <div style={{ flex: 1, background: "#f4f4f4", display: "flex", alignItems: "center", justifyContent: "center", overflow: "auto" }}>
-                {isPreviewableFile(previewFile) === "image" ? (
-                  <img src={previewFile.url} alt={previewFile.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
-                ) : (
-                  <iframe src={previewFile.url} title={previewFile.name} style={{ width: "100%", height: "100%", border: "none" }} />
-                )}
-              </div>
+    {
+      previewFile && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,0.75)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => setPreviewFile(null)}>
+          <div style={{ background: "#fff", width: "100%", maxWidth: 900, height: "85vh", borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ padding: "14px 20px", borderBottom: "1px solid " + C.border, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+              <div style={{ fontSize: 14, fontWeight: 800, color: C.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingRight: 12 }}>{previewFile.name}</div>
+              <button onClick={() => setPreviewFile(null)} style={{ background: C.bg, border: "1px solid " + C.border, color: C.text2, width: 30, height: 30, borderRadius: 8, cursor: "pointer", fontSize: 15, flexShrink: 0 }}>✕</button>
+            </div>
+            <div style={{ flex: 1, background: "#f4f4f4", display: "flex", alignItems: "center", justifyContent: "center", overflow: "auto" }}>
+              {isPreviewableFile(previewFile) === "image" ? (
+                <img src={previewFile.url} alt={previewFile.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
+              ) : isPreviewableFile(previewFile) === "office" ? (
+                <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(previewFile.url)}&embedded=true`} title={previewFile.name} style={{ width: "100%", height: "100%", border: "none" }} />
+              ) : (
+                <iframe src={previewFile.url} title={previewFile.name} style={{ width: "100%", height: "100%", border: "none" }} />
+              )}
             </div>
           </div>
-        )
-      }
-    </div >
-  );
+        </div>
+      )
+    }
+  </div >
+);
 }

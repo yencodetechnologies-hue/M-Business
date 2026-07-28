@@ -177,7 +177,7 @@ function CompanyDropdown({ clients, value, onChange, error, onAddCompany }) {
           {onAddCompany && <div onClick={() => { setOpen(false); setSearch(""); onAddCompany(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "var(--app-surface)", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Company Name</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "#64748b", fontSize: 13 }}>No companies found</div>
-              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "#64748b" }}>{company}</div>}</div>{isSel && <i className="ti ti-check" style={{ fontSize: 14, color: "var(--app-accent)" }} />}</div>); })}
+              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "#64748b" }}>{company}</div>}</div></div>); })}
           </div>
         </div>
       )}
@@ -376,16 +376,11 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
       </div>
       <div className="inv-title-word" style={{ fontSize: "24px", fontWeight: "900", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: -6, marginBottom: 0 }}>INVOICE</div>
       <div style={{ display: "flex", justifyContent: "flex-end", fontSize: "9px", color: "#64748b", lineHeight: 1.9, paddingBottom: 12, borderBottom: currentT.headerUnderline, marginBottom: 20 }}>
-        <div style={{ textAlign: "right" }}>
-          <div><strong style={{ color: "#0f1c2e" }}>Invoice No:</strong> {inv.invoiceNo}</div>
-          <div><strong style={{ color: "#0f1c2e" }}>Invoice Date:</strong> {inv.date ? new Date(inv.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</div>
-          <div><strong style={{ color: "#0f1c2e" }}>Place of Supply:</strong> {inv.placeOfSupply || "—"}</div>
-          <div><strong style={{ color: "#0f1c2e" }}>Due Date:</strong> {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</div>
-        </div>
+
       </div>
 
       {/* PARTIES */}
-      <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "24px" }}>
+      <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
         <div>
           <div className="inv-party-label" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "4px" }}>Bill To</div>
           <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "800", color: inv.client ? "#0f1c2e" : "#64748b" }}>{inv.client || "— Client Name —"}</div>
@@ -409,7 +404,15 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
             </div>
           )}
         </div>
+        <div style={{ fontSize: "9px", color: "#64748b", lineHeight: 1.9, textAlign: "right" }}>
+          <div><strong style={{ color: "#0f1c2e" }}>Invoice No:</strong> {inv.invoiceNo}</div>
+          <div><strong style={{ color: "#0f1c2e" }}>Invoice Date:</strong> {inv.date ? new Date(inv.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</div>
+          <div><strong style={{ color: "#0f1c2e" }}>Place of Supply:</strong> {inv.placeOfSupply || "—"}</div>
+          <div><strong style={{ color: "#0f1c2e" }}>Due Date:</strong> {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</div>
+        </div>
       </div>
+
+
 
       {/* ITEMS TABLE */}
       <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "24px" }}>
@@ -2189,7 +2192,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
             {/* Toolbar */}
             <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
-              <button onClick={() => setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>✕ Close</button>
+              <button onClick={() => setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}> Close</button>
 
               <button onClick={() => setShareModalEntry({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 22px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>Share</button>
 

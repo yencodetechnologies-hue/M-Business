@@ -388,22 +388,22 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                     )}
                   </div>
                   <div className="inv-title-area" style={{ textAlign: "right" }}>
-                    <div className="inv-company-name" style={{ fontSize: "14px", fontWeight: "800", color: "#0f1c2e" }}>{inv.companyName || effectiveCompanyName}</div>
-                    <div className="inv-company-details" style={{ fontSize: "9px", color: "#64748b", lineHeight: "1.6", marginTop: "3px" }}>
+                    <div className="inv-company-name" style={{ fontSize: "18px", fontWeight: "800", color: "#0f1c2e" }}>{inv.companyName || effectiveCompanyName}</div>
+                    <div className="inv-company-details" style={{ fontSize: "12px", color: "#64748b", lineHeight: "1.7", marginTop: "4px" }}>
                       {inv.companyAddress && <div>{inv.companyAddress}</div>}
                       {inv.fromGST && <div style={{ fontWeight: 700 }}>GSTIN: {inv.fromGST}</div>}
                     </div>
-                    <div className="inv-id" style={{ fontSize: "11px", fontWeight: "700", color: "#0f1c2e", marginTop: "4px" }}>#{inv.invoiceNo}</div>
+                    <div className="inv-id" style={{ fontSize: "14px", fontWeight: "700", color: "#0f1c2e", marginTop: "5px" }}>#{inv.invoiceNo}</div>
                   </div>
                 </div>
-                <div className="inv-title-word" style={{ fontSize: "24px", fontWeight: "900", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: -6, marginBottom: 16 }}>INVOICE</div>
+                <div className="inv-title-word" style={{ fontSize: "28px", fontWeight: "900", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: 4, marginBottom: 20 }}>INVOICE</div>
 
                 {/* BILL TO + INVOICE DETAILS BOX */}
-                <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", padding: "16px", border: "1.5px solid var(--app-border)", borderRadius: "8px", marginBottom: "24px" }}>
+                <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", padding: "18px", border: "1.5px solid var(--app-border)", borderRadius: "8px", marginBottom: "24px", alignItems: "start" }}>
                   <div>
-                    <div className="inv-party-label" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "4px" }}>Bill To</div>
-                    <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "800", color: inv.client ? "#0f1c2e" : "#64748b" }}>{inv.client || "— Client Name —"}</div>
-                    <div className="inv-party-detail" style={{ fontSize: "9px", color: "#64748b", lineHeight: "1.6", marginTop: "2px" }}>
+                    <div className="inv-party-label" style={{ fontSize: "11px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "5px" }}>Bill To</div>
+                    <div className="inv-party-name" style={{ fontSize: "16px", fontWeight: "800", color: inv.client ? "#0f1c2e" : "#64748b" }}>{inv.client || "— Client Name —"}</div>
+                    <div className="inv-party-detail" style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.7", marginTop: "4px" }}>
                       {selectedClient ? (
                         <>
                           {selectedClient.companyName && <div>{selectedClient.companyName}</div>}
@@ -417,13 +417,13 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                       )}
                     </div>
                     {inv.project && (
-                      <div style={{ marginTop: 10 }}>
-                        <div className="inv-party-label" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "4px" }}>Project</div>
-                        <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "800", color: "#0f1c2e" }}>{inv.project}</div>
+                      <div style={{ marginTop: 12 }}>
+                        <div className="inv-party-label" style={{ fontSize: "11px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "5px" }}>Project</div>
+                        <div className="inv-party-name" style={{ fontSize: "16px", fontWeight: "800", color: "#0f1c2e" }}>{inv.project}</div>
                       </div>
                     )}
                   </div>
-                  <div style={{ fontSize: "9px", color: "#64748b", lineHeight: 1.9, textAlign: "right" }}>
+                  <div style={{ fontSize: "13px", color: "#64748b", lineHeight: 1.9, display: "flex", flexDirection: "column", gap: "6px", textAlign: "right" }}>
                     <div><strong style={{ color: "#0f1c2e" }}>Invoice No:</strong> {inv.invoiceNo}</div>
                     <div><strong style={{ color: "#0f1c2e" }}>Invoice Date:</strong> {inv.date ? new Date(inv.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</div>
                     <div><strong style={{ color: "#0f1c2e" }}>Place of Supply:</strong> {inv.placeOfSupply || "—"}</div>

@@ -5957,7 +5957,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 }
 
 
-function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, companyLogo, onLogoChange, enforceMySubscriptions, onLogoUploadClick, setSelectedProjectForTasks, desktopOpen, setJumpProject, setJumpInvoicePrefill, setInvoicePrefill, setSidebarNavClickId }) {
+function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, companyLogo, onLogoChange, enforceMySubscriptions, onLogoUploadClick, setSelectedProjectForTasks, desktopOpen, setJumpProject, setJumpInvoicePrefill, setInvoicePrefill, setSidebarNavClickId, setJumpInvoice }) {
   const items = navItems || NAV;
 
   const [isDesktopWidth, setIsDesktopWidth] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 769);
@@ -6145,6 +6145,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
                             setJumpProject(null);
                             setJumpInvoicePrefill(null);
                             if (typeof setInvoicePrefill === "function") setInvoicePrefill(null);
+                            if (typeof setJumpInvoice === "function") setJumpInvoice(null);
                             setSidebarNavClickId(id => id + 1);
                             try {
                               localStorage.removeItem("invoiceCreatorStep_subadmin");
@@ -6152,8 +6153,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
                               localStorage.removeItem("invoiceCreatorInv_subadmin");
                               localStorage.removeItem("invoiceCreatorItems_subadmin");
                             } catch (e) { }
-                          }
-                          if (sub.key === "projects") {
+                          } if (sub.key === "projects") {
                             setJumpProject(null);
                             if (typeof setProjectDetailsReadOnly === "function") setProjectDetailsReadOnly(false);
                           }
@@ -9706,6 +9706,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             setJumpInvoicePrefill={setJumpInvoicePrefill}
             setInvoicePrefill={setInvoicePrefill}
             setSidebarNavClickId={setSidebarNavClickId}
+            setJumpInvoice={setJumpInvoice}
           />
 
         </div>

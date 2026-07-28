@@ -405,11 +405,11 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                     <div className="inv-party-detail" style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", marginTop: "3px" }}>
                       {selectedClient ? (
                         <>
-                          {selectedClient.companyName && <div>{selectedClient.companyName}</div>}
-                          {selectedClient.email && <div>{selectedClient.email}</div>}
-                          {selectedClient.phone && <div>{selectedClient.phone}</div>}
-                          {selectedClient.address && <div>{selectedClient.address}</div>}
-                          {selectedClient.gstNumber && <div style={{ fontWeight: 700, color: "#0f1c2e" }}>GSTIN: {selectedClient.gstNumber}</div>}
+                          {selectedClient.companyName && <div style={{ color: "#0f1c2e" }}>{selectedClient.companyName}</div>}
+                          {selectedClient.email && <div style={{ color: "#0f1c2e" }}>{selectedClient.email}</div>}
+                          {selectedClient.phone && <div style={{ color: "#0f1c2e" }}>{selectedClient.phone}</div>}
+                          {selectedClient.address && <div style={{ color: "#0f1c2e" }}>{selectedClient.address}</div>}
+                          {selectedClient.gstNumber && <div style={{ color: "#0f1c2e" }}>GSTIN: {selectedClient.gstNumber}</div>}
                         </>
                       ) : (
                         <span style={{ color: "#64748b" }}>Enter client details in the form</span>
@@ -417,7 +417,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                     </div>
                     {inv.project && (
                       <div style={{ marginTop: 8 }}>
-                        <div className="inv-party-label" style={{ fontSize: "11px", fontWeight: "700", color: "#0f1c2e", textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "3px" }}>Project</div>
+                        <div className="inv-party-label" style={{ fontSize: "14px", fontWeight: "800", color: "#0f1c2e", textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "3px" }}>Project</div>
                         <div className="inv-party-name" style={{ fontSize: "16px", fontWeight: "800", color: "#0f1c2e" }}>{inv.project}</div>
                       </div>
                     )}

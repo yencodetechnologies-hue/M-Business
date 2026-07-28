@@ -725,7 +725,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const [sortOrder, setSortOrder] = useState("desc");
   const [clientFilter, setClientFilter] = useState("all");
   const [sigTab, setSigTab] = useState("draw");
-  const [viewAsModal, setViewAsModal] = useState(false);
+const [viewAsModal, setViewAsModal] = useState(!!(jumpInvoice && (jumpInvoice._id || jumpInvoice.id)));
   const [typedSig, setTypedSig] = useState("");
 
   const handleExportCSV = (data) => {

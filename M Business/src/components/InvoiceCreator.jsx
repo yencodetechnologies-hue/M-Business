@@ -725,7 +725,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const [sortOrder, setSortOrder] = useState("desc");
   const [clientFilter, setClientFilter] = useState("all");
   const [sigTab, setSigTab] = useState("draw");
-const [viewAsModal, setViewAsModal] = useState(!!(jumpInvoice && (jumpInvoice._id || jumpInvoice.id)));
+  const [viewAsModal, setViewAsModal] = useState(!!(jumpInvoice && (jumpInvoice._id || jumpInvoice.id)));
   const [typedSig, setTypedSig] = useState("");
 
   const handleExportCSV = (data) => {
@@ -2021,7 +2021,7 @@ const [viewAsModal, setViewAsModal] = useState(!!(jumpInvoice && (jumpInvoice._i
                       </td>
                       <td onClick={e => e.stopPropagation()}>
                         <div className="row-actions">
-                          <button className="row-btn" title="View" onClick={(e) => { e.stopPropagation(); setViewAsModal(false); loadEntry(entry, "preview"); window.scrollTo(0, 0); }}><i className="ti ti-eye"></i></button>
+                          <button className="row-btn" title="View" onClick={(e) => { e.stopPropagation(); setViewAsModal(true); loadEntry(entry, "preview"); window.scrollTo(0, 0); }}><i className="ti ti-eye"></i></button>
                           <button className="row-btn" title="Edit" onClick={(e) => { e.stopPropagation(); loadEntry(entry, "form"); window.scrollTo(0, 0); }}><i className="ti ti-edit"></i></button>
                           {(isPaid || isPartPaid) ? (
                             <button className="row-btn" title="Receipt" onClick={() => {

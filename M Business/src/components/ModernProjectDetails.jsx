@@ -3237,7 +3237,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               {mergedInvoices.map((inv, i) => (
                                 <tr
                                   key={inv.invoiceNo || i}
-                                  onClick={() => onViewInvoice ? onViewInvoice({ ...inv, project: inv.projectName || currProject?.name, client: inv.clientName || inv.client }, currProject) : setPreviewInvoice(inv)}
+                                  onClick={() => setPreviewInvoice(inv)}
                                   style={{ borderBottom: '1px solid #F1F5F9', cursor: 'pointer' }}
                                 >
                                   <td style={{ padding: '12px 14px' }} onClick={(e) => e.stopPropagation()}>
@@ -3252,13 +3252,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                       <span style={{ fontSize: 12, fontWeight: 700, color: '#374151' }}>{inv.client || currProject.client || '—'}</span>
                                     </div>
                                   </td>
-                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{currProject.name || '—'}</td>
-                                  <td style={{ padding: '12px 14px' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>
+                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }} onClick={() => setPreviewInvoice(inv)}>{currProject.name || '—'}</td>
+                                  <td style={{ padding: '12px 14px' }} onClick={() => setPreviewInvoice(inv)}>
                                     <span style={{ background: '#EDE9FE', color: '#7C3AED', fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20 }}>{inv.category || 'Milestone'}</span>
                                   </td>
                                   <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(parseAmt(inv.total) || parseAmt(inv.amount) || 0).toLocaleString()}</td>
-                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.date || inv.issueDate ? new Date(inv.date || inv.issueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
-                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#F59E0B' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }} onClick={() => setPreviewInvoice(inv)}>{inv.date || inv.issueDate ? new Date(inv.date || inv.issueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                                  <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#F59E0B' }} onClick={() => setPreviewInvoice(inv)}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
                                   <td style={{ padding: '12px 14px' }} onClick={(e) => e.stopPropagation()}>
                                     <select
                                       value={inv.status || 'draft'}
@@ -3275,7 +3275,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   </td>
                                   <td style={{ padding: '12px 14px' }} onClick={(e) => e.stopPropagation()}>
                                     <div style={{ display: 'flex', gap: 4 }}>
-                                      <button onClick={() => onViewInvoice ? onViewInvoice({ ...inv, project: inv.projectName || currProject?.name, client: inv.clientName || inv.client }, currProject) : setPreviewInvoice(inv)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-eye"></i></button>
+                                      <button onClick={() => setPreviewInvoice(inv)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-eye"></i></button>
                                       <button onClick={() => { if (onNewInvoice) { onNewInvoice(currProject, inv); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
 
                                       <button
@@ -3325,7 +3325,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                             {(currProject.advances || []).map((rec, i) => (
                               <tr
                                 key={inv.invoiceNo || i}
-                                onClick={() => onViewInvoice ? onViewInvoice({ ...inv, project: inv.projectName || currProject?.name, client: inv.clientName || inv.client }, currProject) : setPreviewInvoice(inv)}
+                                onClick={() => setPreviewInvoice(inv)}
                                 style={{ borderBottom: '1px solid #F1F5F9', cursor: 'pointer' }}
                               >
                                 <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#0D1B2A' }}>{rec.advanceNo || `ADV-00${i + 1}`}</td>
@@ -3591,7 +3591,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     {mergedInvoices.map((inv, i) => (
                       <tr
                         key={inv.invoiceNo || i}
-                        onClick={() => onViewInvoice ? onViewInvoice({ ...inv, project: inv.projectName || currProject?.name, client: inv.clientName || inv.client }, currProject) : setPreviewInvoice(inv)}
+                        onClick={() => setPreviewInvoice(inv)}
                         style={{ borderBottom: '1px solid #F1F5F9', cursor: 'pointer' }}
                       >
                         <td style={{ padding: '12px 14px' }} onClick={(e) => e.stopPropagation()}>
@@ -3606,13 +3606,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                             <span style={{ fontSize: 12, fontWeight: 700, color: '#374151' }}>{inv.client || currProject.client || '—'}</span>
                           </div>
                         </td>
-                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{currProject.name || '—'}</td>
-                        <td style={{ padding: '12px 14px' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>
+                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#374151' }} onClick={() => setPreviewInvoice(inv)}>{currProject.name || '—'}</td>
+                        <td style={{ padding: '12px 14px' }} onClick={() => setPreviewInvoice(inv)}>
                           <span style={{ background: '#EDE9FE', color: '#7C3AED', fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20 }}>{inv.category || 'Milestone'}</span>
                         </td>
                         <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 800, color: '#15803D' }}>{currency}{(parseAmt(inv.total) || parseAmt(inv.amount) || 0).toLocaleString()}</td>
-                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.date || inv.issueDate ? new Date(inv.date || inv.issueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
-                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#F59E0B' }} onClick={() => onViewInvoice ? onViewInvoice(currProject, inv) : setPreviewInvoice(inv)}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#2D3E50' }} onClick={() => setPreviewInvoice(inv)}>{inv.date || inv.issueDate ? new Date(inv.date || inv.issueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: '#F59E0B' }} onClick={() => setPreviewInvoice(inv)}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
                         <td style={{ padding: '12px 14px' }} onClick={(e) => e.stopPropagation()}>
                           <select
                             value={inv.status || 'draft'}
@@ -3629,7 +3629,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         </td>
                         <td style={{ padding: '12px 14px' }} onClick={(e) => e.stopPropagation()}>
                           <div style={{ display: 'flex', gap: 4 }}>
-                            <button onClick={() => onViewInvoice ? onViewInvoice({ ...inv, project: inv.projectName || currProject?.name, client: inv.clientName || inv.client }, currProject) : setPreviewInvoice(inv)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-eye"></i></button>
+                            <button onClick={() => setPreviewInvoice(inv)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-eye"></i></button>
                             <button onClick={() => { if (onNewInvoice) { onNewInvoice(currProject, inv); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
                             <button
                               title="Share to Client"
@@ -4462,17 +4462,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           return (
             <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '30px 16px' }}>
               <div style={{ background: '#fff', width: '100%', maxWidth: 640, borderRadius: 12, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'Arial,sans-serif', overflow: 'hidden' }}>
-                <div style={{ background: '#1A2332', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <i className="ti ti-file-invoice" style={{ color: ' var(--app-accent, var(--app-accent, #00BCD4))', fontSize: 18 }}></i>
-                    <span style={{ color: '#fff', fontWeight: 800, fontSize: 14 }}>Invoice Preview — {inv.invoiceNo}</span>
-                  </div>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button onClick={() => { setPreviewInvoice(null); setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo) })); }} style={{ padding: '6px 14px', background: '#fff', color: '#374151', border: '1px solid #E8EDF2', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}><i className="ti ti-edit"></i> Edit</button>
-                    <button onClick={() => { handleDeleteInvoice(inv); setPreviewInvoice(null); }} style={{ padding: '6px 14px', background: '#FEE2E2', color: '#EF4444', border: '1px solid #FECACA', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}><i className="ti ti-trash"></i> Delete</button>
-                    <button onClick={() => window.print()} style={{ padding: '6px 14px', background: ' var(--app-accent, var(--app-accent, #00BCD4))', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}><i className="ti ti-printer"></i> Print / PDF</button>
-                    <button onClick={() => setPreviewInvoice(null)} style={{ padding: '6px 14px', background: '#374151', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>✕</button>
-                  </div>
+                <div style={{ padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10, borderBottom: '1px solid #E8EDF2' }}>
+                  <button onClick={() => setPreviewInvoice(null)} style={{ padding: '10px 18px', background: '#fff', color: '#374151', border: '1.5px solid #e5e7eb', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Close</button>
+                  <button onClick={() => { setPreviewInvoice(null); setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: (currProject.invoices || []).findIndex(i => i.invoiceNo === inv.invoiceNo) })); }} style={{ padding: '10px 22px', background: '#eff6ff', color: '#2563eb', border: '1.5px solid #bfdbfe', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Share</button>
+                  <button onClick={() => window.print()} style={{ padding: '10px 22px', background: 'linear-gradient(135deg,var(--app-accent),var(--app-accent))', color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}><i className="ti ti-printer"></i> Print / PDF</button>
                 </div>
                 <div id="invoice-print-area" style={{ padding: '36px 40px', background: '#fff' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>

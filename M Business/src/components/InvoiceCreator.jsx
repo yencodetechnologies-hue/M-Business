@@ -395,13 +395,13 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                     <div className="inv-id" style={{ fontSize: "14px", fontWeight: "700", color: "#0f1c2e", marginTop: "5px" }}>#{inv.invoiceNo}</div>
                   </div>
                 </div>
-                <div className="inv-title-word" style={{ fontSize: "28px", fontWeight: "600", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: 4, marginBottom: 20 }}>INVOICE</div>
+                <div className="inv-title-word" style={{ fontSize: "26px", fontWeight: "600", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: 4 }}>INVOICE</div>
 
                 {/* BILL TO + INVOICE DETAILS BOX */}
                 <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", padding: "24px 28px", border: "1.5px solid #000000", marginBottom: "24px", alignItems: "start" }}>
                   <div>
-                    <div className="inv-party-label" style={{ fontSize: "16px", fontWeight: "800", color: "#0f1c2e", letterSpacing: ".8px", marginBottom: "5px" }}>Bill To</div>
-                    <div className="inv-party-name" style={{ fontSize: "14px", fontWeight: "800", color: inv.client ? "#0f1c2e" : "#64748b" }}>{inv.client || "— Client Name —"}</div>
+                    <div className="inv-party-label" style={{ fontSize: "13px", fontWeight: "700", color: "#0f1c2e", letterSpacing: ".8px", marginBottom: "5px" }}>Bill To</div>
+                    <div className="inv-party-name" style={{ fontSize: "13px", fontWeight: "700", color: inv.client ? "#0f1c2e" : "#64748b", textTransform: "uppercase", }}>{inv.client || "— Client Name —"}</div>
                     <div className="inv-party-detail" style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", marginTop: "3px" }}>
                       {selectedClient ? (
                         <>
@@ -417,8 +417,8 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                     </div>
                     {inv.project && (
                       <div style={{ marginTop: 8 }}>
-                        <div className="inv-party-label" style={{ fontSize: "14px", fontWeight: "800", color: "#0f1c2e", textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "3px" }}>Project</div>
-                        <div className="inv-party-name" style={{ fontSize: "16px", fontWeight: "800", color: "#0f1c2e" }}>{inv.project}</div>
+                        <div className="inv-party-label" style={{ fontSize: "13px", fontWeight: "700", color: "#0f1c2e", letterSpacing: ".8px", marginBottom: "3px" }}>Project</div>
+                        <div className="inv-party-name" style={{ fontSize: "13px", fontWeight: "700", color: "#0f1c2e" }}>{inv.project}</div>
                       </div>
                     )}
                   </div>

@@ -2172,80 +2172,75 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   // PREVIEW / PRINT
   // ------------------------------------------------------------
   if (step === "preview") {
-    const ModalOuter = React.Fragment;
-    const modalOuterProps = {};
-    const ModalInner = React.Fragment;
-    const modalInnerProps = {}; return (
-      <ModalOuter {...modalOuterProps}>
-        <ModalInner {...modalInnerProps}>
-          <div className={viewAsModal ? undefined : "print-wrapper"} style={viewAsModal ? undefined : { fontFamily: "'Plus Jakarta Sans', sans-serif", background: "var(--app-bg)", minHeight: "100vh", padding: "20px 12px" }}>
+    return (
+      <div style={{ position: "fixed", inset: 0, zIndex: 9998, background: "rgba(15,28,46,0.55)", overflowY: "auto", padding: "20px 12px" }} onClick={() => setStep("list")}>
+        <div onClick={(e) => e.stopPropagation()} style={{ maxWidth: 830, margin: "0 auto", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
-            {deleteTarget && <ConfirmModal invoiceNo={deleteTarget.invoiceNo} onConfirm={() => handleDelete(deleteTarget)} onCancel={() => setDeleteTarget(null)} />}
+          {deleteTarget && <ConfirmModal invoiceNo={deleteTarget.invoiceNo} onConfirm={() => handleDelete(deleteTarget)} onCancel={() => setDeleteTarget(null)} />}
 
 
-            {shareModalEntry && (
-              <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={() => { setShareModalEntry(null); setShareSelectedClientId(""); }}>
-                <div style={{ background: "#fff", borderRadius: 14, width: "100%", maxWidth: 360, display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={(e) => e.stopPropagation()}>
-                  <div style={{ padding: "16px 18px", borderBottom: "1.5px solid #e5e7eb", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div style={{ fontWeight: 800, fontSize: 15, color: "#0f1c2e" }}>Share with client</div>
-                    <button onClick={() => { setShareModalEntry(null); setShareSelectedClientId(""); }} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#6b7280" }}>✕</button>
-                  </div>
-                  <div style={{ padding: 18 }}>
-                    <label style={{ display: "block", fontSize: 12, color: "#64748b", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" }}>Select Client</label>
-                    <select
-                      value={shareSelectedClientId}
-                      onChange={(e) => setShareSelectedClientId(e.target.value)}
-                      style={{ width: "100%", border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 12px", fontSize: 14, color: "#0f1c2e", background: "var(--app-surface)", boxSizing: "border-box", outline: "none", fontFamily: "inherit" }}
-                    >
-                      <option value="">-- Select a client --</option>
-                      {clients && clients.length > 0 ? clients.map((c, idx) => {
-                        const id = c._id || c.id || String(idx);
-                        const name = c.clientName || c.name || "Unnamed Client";
-                        const company = c.companyName || c.company || "";
-                        return (
-                          <option key={id} value={id}>{name}{company ? ` (${company})` : ""}</option>
-                        );
-                      }) : null}
-                    </select>
-                    {(!clients || clients.length === 0) && (
-                      <div style={{ marginTop: 10, fontSize: 13, color: "#6b7280", textAlign: "center" }}>No clients found</div>
-                    )}
-                    <button
-                      disabled={!shareSelectedClientId}
-                      onClick={() => {
-                        const chosen = clients.find((c, idx) => (c._id || c.id || String(idx)) === shareSelectedClientId);
-                        if (chosen) {
-                          sendInvoiceToClient(shareModalEntry, chosen);
-                          setShareSelectedClientId("");
-                        }
-                      }}
-                      style={{ width: "100%", marginTop: 16, padding: "12px", background: shareSelectedClientId ? "linear-gradient(135deg,var(--app-accent),var(--app-accent))" : "#e5e7eb", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, color: shareSelectedClientId ? "#fff" : "#9ca3af", cursor: shareSelectedClientId ? "pointer" : "not-allowed", fontFamily: "inherit" }}
-                    >
-                      Send
-                    </button>
-                  </div>
+          {shareModalEntry && (
+            <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={() => { setShareModalEntry(null); setShareSelectedClientId(""); }}>
+              <div style={{ background: "#fff", borderRadius: 14, width: "100%", maxWidth: 360, display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={(e) => e.stopPropagation()}>
+                <div style={{ padding: "16px 18px", borderBottom: "1.5px solid #e5e7eb", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ fontWeight: 800, fontSize: 15, color: "#0f1c2e" }}>Share with client</div>
+                  <button onClick={() => { setShareModalEntry(null); setShareSelectedClientId(""); }} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#6b7280" }}>✕</button>
+                </div>
+                <div style={{ padding: 18 }}>
+                  <label style={{ display: "block", fontSize: 12, color: "#64748b", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" }}>Select Client</label>
+                  <select
+                    value={shareSelectedClientId}
+                    onChange={(e) => setShareSelectedClientId(e.target.value)}
+                    style={{ width: "100%", border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 12px", fontSize: 14, color: "#0f1c2e", background: "var(--app-surface)", boxSizing: "border-box", outline: "none", fontFamily: "inherit" }}
+                  >
+                    <option value="">-- Select a client --</option>
+                    {clients && clients.length > 0 ? clients.map((c, idx) => {
+                      const id = c._id || c.id || String(idx);
+                      const name = c.clientName || c.name || "Unnamed Client";
+                      const company = c.companyName || c.company || "";
+                      return (
+                        <option key={id} value={id}>{name}{company ? ` (${company})` : ""}</option>
+                      );
+                    }) : null}
+                  </select>
+                  {(!clients || clients.length === 0) && (
+                    <div style={{ marginTop: 10, fontSize: 13, color: "#6b7280", textAlign: "center" }}>No clients found</div>
+                  )}
+                  <button
+                    disabled={!shareSelectedClientId}
+                    onClick={() => {
+                      const chosen = clients.find((c, idx) => (c._id || c.id || String(idx)) === shareSelectedClientId);
+                      if (chosen) {
+                        sendInvoiceToClient(shareModalEntry, chosen);
+                        setShareSelectedClientId("");
+                      }
+                    }}
+                    style={{ width: "100%", marginTop: 16, padding: "12px", background: shareSelectedClientId ? "linear-gradient(135deg,var(--app-accent),var(--app-accent))" : "#e5e7eb", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, color: shareSelectedClientId ? "#fff" : "#9ca3af", cursor: shareSelectedClientId ? "pointer" : "not-allowed", fontFamily: "inherit" }}
+                  >
+                    Send
+                  </button>
                 </div>
               </div>
-            )}
-
-            {/* Toolbar */}
-            <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
-              <button onClick={() => setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}> Close</button>
-
-              <button onClick={() => setShareModalEntry({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 22px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>Share</button>
-
-              <button onClick={() => triggerPDFShare({ id: editingId, invoiceNo: inv.invoiceNo, total: total }, "print")} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>Print / PDF</button>
             </div>
+          )}
 
-            {/* LIVE INVOICE PREVIEW (matches Document Live Preview exactly) */}
-            <InvoiceLivePreview
-              inv={inv} items={items} effectiveLogo={effectiveLogo} effectiveCompanyName={effectiveCompanyName}
-              selectedClient={selectedClient} currentT={currentT} subtotal={subtotal} gstAmt={gstAmt}
-              balanceDue={balanceDue} amountPaid={amountPaid} qrData={qrData}
-            />
+          {/* Toolbar */}
+          <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
+            <button onClick={() => setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}> Close</button>
+
+            <button onClick={() => setShareModalEntry({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 22px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>Share</button>
+
+            <button onClick={() => triggerPDFShare({ id: editingId, invoiceNo: inv.invoiceNo, total: total }, "print")} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>Print / PDF</button>
           </div>
-        </ModalInner>
-      </ModalOuter>
+
+          {/* LIVE INVOICE PREVIEW (matches Document Live Preview exactly) */}
+          <InvoiceLivePreview
+            inv={inv} items={items} effectiveLogo={effectiveLogo} effectiveCompanyName={effectiveCompanyName}
+            selectedClient={selectedClient} currentT={currentT} subtotal={subtotal} gstAmt={gstAmt}
+            balanceDue={balanceDue} amountPaid={amountPaid} qrData={qrData}
+          />
+        </div>
+      </div>
     );
   }
   // ------------------------------------------------------------

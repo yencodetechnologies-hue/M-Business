@@ -441,12 +441,12 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
             {/* ITEMS TABLE */}
             <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "24px", border: "1px solid #cbd5e1" }}>
               <thead>
-                <tr style={{ background: "#0f1c2e" }}>
-                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#ffffff", backgroundColor: "#0f1c2e", textAlign: "left", width: "5%", border: "1px solid #0f1c2e" }}>#</th>
-                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#ffffff", backgroundColor: "#0f1c2e", textAlign: "left", width: "40%", border: "1px solid #0f1c2e" }}>Description</th>
-                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#ffffff", backgroundColor: "#0f1c2e", textAlign: "center", width: "10%", border: "1px solid #0f1c2e" }}>Qty</th>
-                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#ffffff", backgroundColor: "#0f1c2e", textAlign: "right", width: "20%", border: "1px solid #0f1c2e" }}>Rate</th>
-                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#ffffff", backgroundColor: "#0f1c2e", textAlign: "right", width: "20%", border: "1px solid #0f1c2e" }}>Amount</th>
+                <tr>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "left", width: "5%", background: currentT.primaryColor }}>#</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "left", width: "40%", background: currentT.primaryColor }}>Description</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "center", width: "10%", background: currentT.primaryColor }}>Qty</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "right", width: "20%", background: currentT.primaryColor }}>Rate</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "right", width: "20%", background: currentT.primaryColor }}>Amount</th>
                 </tr>
               </thead>   <tbody>
                 {pageItems.map((item, idx) => {

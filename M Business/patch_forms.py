@@ -25,7 +25,8 @@ for file_path, hash_val in files:
     )
 
     # Insert the template iframe return before the main form return
-    # Find the last eturn ( that represents the form. Usually after const hasErrors or at the end.
+    # Find the last 
+eturn ( that represents the form. Usually after const hasErrors or at the end.
     # Instead of regex, we can just look for const hasErrors = Object.keys(errors).length > 0;
     # and insert our if block right before it.
     
@@ -37,10 +38,10 @@ for file_path, hash_val in files:
           <button onClick={{() => setStep("list")}} style={{{{ padding: "8px 14px", background: "var(--app-bg)", border: "1.5px solid var(--app-border)", borderRadius: 8, cursor: "pointer", fontWeight: 700, color: "var(--app-muted)" }}}}>← Back to List</button>
         </div>
         <div style={{{{ flex: 1, overflow: "hidden", borderRadius: 16 }}}}>
-          <iframe src="/template-designer.html{hash_val}" style={{{{ width: "100%", height: "100%", border: "none" }}}} title="Template Designer" />
-        </div>
-      </div>
+        </ModalInner>
+      </ModalOuter>
     );
+  } );
   }}
 '''
     
@@ -49,7 +50,8 @@ for file_path, hash_val in files:
         if 'const hasErrors =' in content:
             content = content.replace('const hasErrors =', iframe_code + '\n  const hasErrors =')
         else:
-            # Insert before the last eturn (
+            # Insert before the last 
+eturn (
             match2 = re.search(r'(\n\s*return\s*\(.*?\);?\s*\}\s*)$', content, flags=re.DOTALL)
             if match2:
                 content = content[:match2.start()] + iframe_code + match2.group(1)

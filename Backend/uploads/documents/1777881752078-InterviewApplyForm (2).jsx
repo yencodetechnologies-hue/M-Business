@@ -216,8 +216,8 @@ export default function InterviewApplyForm() {
               <div style={S.successMetaItem}><span style={S.metaLabel}>Experience</span><span style={S.metaVal}>{exp}{exp === "Experienced" ? ` · ${form.years} yrs` : ""}</span></div>
             </div>
           </div>
-        </div>
-      </div>
+        </ModalInner>
+      </ModalOuter>
     );
   }
 

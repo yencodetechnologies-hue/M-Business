@@ -2180,8 +2180,8 @@ function PackagesPage({ packages, onViewPackage, onEditPackage }) {
           <p style={{ fontSize: 15, color: "#7c3aed", maxWidth: 400, margin: "0 auto", lineHeight: 1.6 }}>
             You don't have any packages assigned yet. Please contact your administrator to assign packages to your dashboard.
           </p>
-        </div>
-      </div>
+        </ModalInner>
+      </ModalOuter>
     );
   }
 

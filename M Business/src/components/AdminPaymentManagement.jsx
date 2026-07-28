@@ -3,28 +3,28 @@ import axios from 'axios';
 import { BASE_URL } from '../config';
 
 const AdminPaymentManagement = () => {
-const [payments, setPayments] = useState([]);
-const [stats, setStats] = useState(null);
-const [loading, setLoading] = useState(true);
-const [error, setError] = useState('');
-const [filter, setFilter] = useState({
+  const [payments, setPayments] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [filter, setFilter] = useState({
     status: '',
     type: '',
     userId: '',
     page: 1
   });
-const [selectedPayment, setSelectedPayment] = useState(null);
-const [showStatusModal, setShowStatusModal] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState(null);
+  const [showStatusModal, setShowStatusModal] = useState(false);
 
   useEffect(() => {
     fetchPayments();
     fetchStats();
   }, [filter]);
 
-const fetchPayments = async () => {
+  const fetchPayments = async () => {
     try {
       setLoading(true);
-const response = await axios.get(`${BASE_URL}/api/payments/all`, {
+      const response = await axios.get(`${BASE_URL}/api/payments/all`, {
         params: filter
       });
       setPayments(response.data.payments || []);
@@ -36,22 +36,22 @@ const response = await axios.get(`${BASE_URL}/api/payments/all`, {
     }
   };
 
-const fetchStats = async () => {
+  const fetchStats = async () => {
     try {
-const response = await axios.get(`${BASE_URL}/api/payments/stats`);
+      const response = await axios.get(`${BASE_URL}/api/payments/stats`);
       setStats(response.data);
     } catch (err) {
       console.error('Stats fetch error:', err);
     }
   };
 
-const handleStatusUpdate = async (paymentId, newStatus) => {
+  const handleStatusUpdate = async (paymentId, newStatus) => {
     try {
       await axios.put(`${BASE_URL}/api/payments/${paymentId}/status`, {
         status: newStatus,
         notes: `Status updated by admin`
       });
-      
+
       await fetchPayments();
       setShowStatusModal(false);
       setSelectedPayment(null);
@@ -61,7 +61,7 @@ const handleStatusUpdate = async (paymentId, newStatus) => {
     }
   };
 
-const formatDate = (date) => {
+  const formatDate = (date) => {
     return new Date(date).toLocaleDateString('en-IN', {
       day: '2-digit',
       month: 'short',
@@ -71,15 +71,15 @@ const formatDate = (date) => {
     });
   };
 
-const formatCurrency = (amount, currency = 'INR') => {
+  const formatCurrency = (amount, currency = 'INR') => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency
     }).format(amount);
   };
 
-const getStatusColor = (status) => {
-const colors = {
+  const getStatusColor = (status) => {
+    const colors = {
       completed: '#22C55E',
       pending: '#F59E0B',
       failed: '#EF4444',
@@ -89,8 +89,8 @@ const colors = {
     return colors[status] || '#6B7280';
   };
 
-const getTypeColor = (type) => {
-const colors = {
+  const getTypeColor = (type) => {
+    const colors = {
       subscription: '#8B5CF6',
       invoice: '#10B981',
       quotation: '#F59E0B',
@@ -105,8 +105,8 @@ const colors = {
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>        </div>
           <div style={{ color: '#666', fontSize: 14 }}>Loading payment data...</div>
-        </div>
-      </div>
+        </ModalInner>
+      </ModalOuter>
     );
   }
 
@@ -116,12 +116,12 @@ const colors = {
         <h2 style={{ margin: '0 0 20px 0', color: '#1e293b', fontSize: 28 }}>
           Payment Management
         </h2>
-        
+
         {/* Stats Cards */}
         {stats && (
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
             gap: 16,
             marginBottom: 30
           }}>
@@ -137,7 +137,7 @@ const colors = {
               </div>
               <div style={{ fontSize: 12, opacity: 0.9 }}>Total Revenue (INR)</div>
             </div>
-            
+
             <div style={{
               background: 'linear-gradient(135deg, #3B82F6, #2563eb)',
               color: 'white',
@@ -150,7 +150,7 @@ const colors = {
               </div>
               <div style={{ fontSize: 12, opacity: 0.9 }}>Total Transactions</div>
             </div>
-            
+
             <div style={{
               background: 'linear-gradient(135deg, #8B5CF6, var(--app-accent))',
               color: 'white',
@@ -163,7 +163,7 @@ const colors = {
               </div>
               <div style={{ fontSize: 12, opacity: 0.9 }}>Average Amount (INR)</div>
             </div>
-            
+
             <div style={{
               background: 'linear-gradient(135deg, #F59E0B, #d97706)',
               color: 'white',
@@ -504,7 +504,7 @@ const colors = {
             <h3 style={{ margin: '0 0 20px 0', color: '#1e293b' }}>
               Update Payment Status
             </h3>
-            
+
             <div style={{ marginBottom: 20 }}>
               <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 8 }}>
                 Payment ID: <strong>{selectedPayment.paymentId}</strong>

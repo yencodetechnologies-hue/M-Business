@@ -1983,7 +1983,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                   const isPending = !isPaid && !isPartPaid && !isDraft;
 
                   return (
-                    <tr key={entry.id || idx} onClick={() => { loadEntry(entry, "preview"); window.scrollTo(0, 0); }}>
+                    <tr key={entry.id || idx} onClick={() => { setViewAsModal(true); loadEntry(entry, "preview"); window.scrollTo(0, 0); }}>
                       <td onClick={e => e.stopPropagation()}><input type="checkbox" className="cb" /></td>
                       <td className="inv-id" style={{ color: "var(--teal)", fontWeight: 800 }}>{entry.invoiceNo || "—"}</td>
                       <td>
@@ -2028,7 +2028,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                       </td>
                       <td onClick={e => e.stopPropagation()}>
                         <div className="row-actions">
-                          <button className="row-btn" title="View" onClick={(e) => { e.stopPropagation(); setViewAsModal(true); loadEntry(entry, "preview"); window.scrollTo(0, 0); }}><i className="ti ti-eye"></i></button>
+                          <button className="row-btn" title="View" onClick={(e) => { e.stopPropagation(); setViewAsModal(false); loadEntry(entry, "preview"); window.scrollTo(0, 0); }}><i className="ti ti-eye"></i></button>
                           <button className="row-btn" title="Edit" onClick={(e) => { e.stopPropagation(); loadEntry(entry, "form"); window.scrollTo(0, 0); }}><i className="ti ti-edit"></i></button>
                           {(isPaid || isPartPaid) ? (
                             <button className="row-btn" title="Receipt" onClick={() => {
@@ -2172,9 +2172,13 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   // PREVIEW / PRINT
   // ------------------------------------------------------------
   if (step === "preview") {
+    const ModalOuter = viewAsModal ? "div" : React.Fragment;
+    const modalOuterProps = viewAsModal ? { style: { position: "fixed", inset: 0, zIndex: 9998, background: "rgba(15,28,46,0.55)", overflowY: "auto", padding: "20px 12px" }, onClick: () => setStep("list") } : {};
+    const ModalInner = viewAsModal ? "div" : React.Fragment;
+    const modalInnerProps = viewAsModal ? { onClick: (e) => e.stopPropagation(), style: { maxWidth: 830, margin: "0 auto", fontFamily: "'Plus Jakarta Sans', sans-serif" } } : {};
     return (
-      <div style={{ position: "fixed", inset: 0, zIndex: 9998, background: "rgba(15,28,46,0.55)", overflowY: "auto", padding: "20px 12px" }} onClick={() => setStep("list")}>
-        <div onClick={(e) => e.stopPropagation()} style={{ maxWidth: 830, margin: "0 auto", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <ModalOuter {...modalOuterProps}>
+        <ModalInner {...modalInnerProps}>
 
           {deleteTarget && <ConfirmModal invoiceNo={deleteTarget.invoiceNo} onConfirm={() => handleDelete(deleteTarget)} onCancel={() => setDeleteTarget(null)} />}
 
@@ -2239,8 +2243,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             selectedClient={selectedClient} currentT={currentT} subtotal={subtotal} gstAmt={gstAmt}
             balanceDue={balanceDue} amountPaid={amountPaid} qrData={qrData}
           />
-        </div>
-      </div>
+        </ModalInner>
+      </ModalOuter>
     );
   }
   // ------------------------------------------------------------

@@ -1143,10 +1143,10 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
             {description && (
               <div className="mpc-pv-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
                 <span className="mpc-pv-label">Description</span>
-                <span className="mpc-pv-val" style={{ textAlign: 'left', fontWeight: 600, lineHeight: 1.5 }}>{description}</span>
+                <span className="mpc-pv-val" style={{ textAlign: 'left', fontWeight: 600, lineHeight: 1.5, whiteSpace: 'normal', wordBreak: 'break-word', width: '100%' }}>{description}</span>
               </div>
             )}
-            <div className="mpc-pv-row"><span className="mpc-pv-label">Client Portal</span><span className="mpc-pv-val">{portalOpts.enablePortal ? 'Enabled' : 'Disabled'}</span></div>
+
 
             <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 12, marginTop: 8 }}>
               Checklist

@@ -376,7 +376,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
 
             {isFirstPage ? (
               <>
-                {/* HEADER */}<div className="inv-header" style={{ display: "flex", justifyContent: "flex-start", alignItems: "flex-start", marginBottom: "20px", borderBottom: "1.5px solid #000000", paddingBottom: "16px", gap: "16px" }}>
+                {/* HEADER */}<div className="inv-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px", paddingBottom: "16px", gap: "16px" }}>
                   <div className="inv-logo-area">
                     {effectiveLogo ? (
                       <img src={effectiveLogo} alt="logo" style={{ height: 72, width: "auto", borderRadius: 6, objectFit: "contain" }} />
@@ -386,7 +386,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                       </div>
                     )}
                   </div>
-                  <div className="inv-title-area" style={{ textAlign: "left" }}>
+                  <div className="inv-title-area" style={{ textAlign: "right" }}>
                     <div className="inv-company-name" style={{ fontSize: "18px", fontWeight: "800", color: "#0f1c2e" }}>{inv.companyName || effectiveCompanyName}</div>
                     <div className="inv-company-details" style={{ fontSize: "12px", color: "#64748b", lineHeight: "1.7", marginTop: "4px" }}>
                       {inv.companyAddress && <div>{inv.companyAddress}</div>}
@@ -394,8 +394,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                     </div>
                     <div className="inv-id" style={{ fontSize: "14px", fontWeight: "700", color: "#0f1c2e", marginTop: "5px" }}>#{inv.invoiceNo}</div>
                   </div>
-                </div>
-                <div className="inv-title-word" style={{ fontSize: "28px", fontWeight: "600", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: 4, marginBottom: 20 }}>INVOICE</div>
+                </div>     <div className="inv-title-word" style={{ fontSize: "28px", fontWeight: "600", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: 4, marginBottom: 20 }}>INVOICE</div>
 
                 {/* BILL TO + INVOICE DETAILS BOX */}
                 <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", padding: "24px 28px", border: "1.5px solid #000000", borderRadius: "8px", marginBottom: "24px", alignItems: "start" }}>
@@ -439,15 +438,14 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
             )}
 
             {/* ITEMS TABLE */}
-            <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "24px" }}>
+            <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "24px", border: "1px solid #cbd5e1" }}>
               <thead>
-                <tr style={{ background: "#f8fafc" }}>
-                  <th style={{ padding: "10px 12px", fontSize: "10px", fontWeight: "800", color: "#64748b", textAlign: "left" }}>#</th>
-                  <th style={{ padding: "10px 12px", fontSize: "10px", fontWeight: "800", color: "#64748b", textAlign: "left" }}>Description</th>
-                  <th style={{ padding: "10px 12px", fontSize: "10px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Qty</th>
-                  <th style={{ padding: "10px 12px", fontSize: "10px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Unit Price</th>
-                  <th style={{ padding: "10px 12px", fontSize: "10px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Tax %</th>
-                  <th style={{ padding: "10px 12px", fontSize: "10px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Total</th>
+                <tr style={{ background: "#0f1c2e" }}>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#ffffff", textAlign: "left", width: "5%", border: "1px solid #0f1c2e" }}>#</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#ffffff", textAlign: "left", width: "40%", border: "1px solid #0f1c2e" }}>Description</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#ffffff", textAlign: "center", width: "10%", border: "1px solid #0f1c2e" }}>Qty</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#ffffff", textAlign: "right", width: "20%", border: "1px solid #0f1c2e" }}>Rate</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#ffffff", textAlign: "right", width: "20%", border: "1px solid #0f1c2e" }}>Amount</th>
                 </tr>
               </thead>
               <tbody>
@@ -455,13 +453,15 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                   const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
                   const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
                   return (
-                    <tr key={item.id} style={{ borderBottom: "1px solid var(--app-border)" }}>
-                      <td style={{ padding: "10px 12px", fontSize: "12px", color: "#0f1c2e" }}>{startIndex + idx + 1}</td>
-                      <td style={{ padding: "10px 12px", fontSize: "12px", color: "#0f1c2e" }}>{item.description || "—"}</td>
-                      <td style={{ padding: "10px 12px", fontSize: "12px", color: "#0f1c2e", textAlign: "right" }}>{item.quantity}</td>
-                      <td style={{ padding: "10px 12px", fontSize: "12px", color: "#0f1c2e", textAlign: "right" }}>{formatCurrency(item.rate, inv.currency, false, false, inv.customCurrencySymbol)}</td>
-                      <td style={{ padding: "10px 12px", fontSize: "12px", textAlign: "right", color: "#64748b" }}>{rateGst}% {isIncl ? "Incl" : ""}</td>
-                      <td style={{ padding: "10px 12px", fontSize: "12px", color: "#0f1c2e", textAlign: "right", fontWeight: "700" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency, false, false, inv.customCurrencySymbol)}</td>
+                    <tr key={item.id} style={{ background: (startIndex + idx) % 2 === 1 ? "#f8fafc" : "#fff" }}>
+                      <td style={{ padding: "14px", fontSize: "13px", color: "#0f1c2e", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{startIndex + idx + 1}</td>
+                      <td style={{ padding: "14px", fontSize: "13px", color: "#0f1c2e", verticalAlign: "top", border: "1px solid #cbd5e1" }}>
+                        <div style={{ fontWeight: "700" }}>{item.description || "—"}</div>
+                        {rateGst ? <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>Tax {rateGst}% {isIncl ? "(Incl)" : ""}</div> : null}
+                      </td>
+                      <td style={{ padding: "14px", fontSize: "13px", color: "#0f1c2e", textAlign: "center", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{item.quantity}</td>
+                      <td style={{ padding: "14px", fontSize: "13px", color: "#0f1c2e", textAlign: "right", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{formatCurrency(item.rate, inv.currency, false, false, inv.customCurrencySymbol)}</td>
+                      <td style={{ padding: "14px", fontSize: "13px", color: "#0f1c2e", textAlign: "right", fontWeight: "700", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency, false, false, inv.customCurrencySymbol)}</td>
                     </tr>
                   );
                 })}

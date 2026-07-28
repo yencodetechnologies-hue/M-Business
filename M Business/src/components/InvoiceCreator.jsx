@@ -2129,11 +2129,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   // PREVIEW / PRINT
   // ------------------------------------------------------------
   if (step === "preview") {
-    const ModalOuter = viewAsModal ? "div" : React.Fragment;
-    const modalOuterProps = viewAsModal ? { className: "print-wrapper", onClick: () => setStep("list"), style: { position: "fixed", inset: 0, zIndex: 9998, fontFamily: "'Plus Jakarta Sans', sans-serif", background: "rgba(15,28,46,0.55)", overflowY: "auto", padding: "20px 12px" } } : {};
-    const ModalInner = viewAsModal ? "div" : React.Fragment;
-    const modalInnerProps = viewAsModal ? { onClick: (e) => e.stopPropagation(), style: { maxWidth: 480, margin: "0 auto", background: "#fff", borderRadius: 14, overflow: "hidden", boxShadow: "0 24px 60px rgba(0,0,0,0.25)" } } : {};
-    return (
+    const ModalOuter = React.Fragment;
+    const modalOuterProps = {};
+    const ModalInner = React.Fragment;
+    const modalInnerProps = {}; return (
       <ModalOuter {...modalOuterProps}>
         <ModalInner {...modalInnerProps}>
           <div className={viewAsModal ? undefined : "print-wrapper"} style={viewAsModal ? undefined : { fontFamily: "'Plus Jakarta Sans', sans-serif", background: "var(--app-bg)", minHeight: "100vh", padding: "20px 12px" }}>

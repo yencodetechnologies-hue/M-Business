@@ -2028,8 +2028,8 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
             onClearProjectFilter={() => setViewTasksProj(null)}
             onSelectProject={(p) => setViewTasksProj(p)}
           />
-        </ModalInner>
-      </ModalOuter>
+        </div>
+      </div>
     );
   }
 

@@ -400,8 +400,8 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                 {/* BILL TO + INVOICE DETAILS BOX */}
                 <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", padding: "24px 28px", border: "1.5px solid #000000", marginBottom: "24px", alignItems: "start" }}>
                   <div>
-                    <div className="inv-party-label" style={{ fontSize: "11px", fontWeight: "900", color: "#0f1c2e", textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "5px" }}>Bill To</div>
-                    <div className="inv-party-name" style={{ fontSize: "16px", fontWeight: "800", color: inv.client ? "#0f1c2e" : "#64748b" }}>{inv.client || "— Client Name —"}</div>
+                    <div className="inv-party-label" style={{ fontSize: "16px", fontWeight: "800", color: "#0f1c2e", letterSpacing: ".8px", marginBottom: "5px" }}>Bill To</div>
+                    <div className="inv-party-name" style={{ fontSize: "14px", fontWeight: "800", color: inv.client ? "#0f1c2e" : "#64748b" }}>{inv.client || "— Client Name —"}</div>
                     <div className="inv-party-detail" style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", marginTop: "3px" }}>
                       {selectedClient ? (
                         <>
@@ -486,21 +486,16 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                   </div>
 
                   <div className="inv-totals" style={{ width: "200px" }}>
-                    <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px" }}>
-                      <span className="lbl" style={{ color: "#0f1c2e" }}>Subtotal</span>
+                    <div className="inv-total-row" style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", fontSize: "10px" }}>
+                      <span className="lbl" style={{ color: "#64748b" }}>Subtotal</span>
                       <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(subtotal, inv.currency, false, false, inv.customCurrencySymbol)}</span>
                     </div>
-                    <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                      <span className="lbl" style={{ color: "#0f1c2e" }}>GST / Tax</span>
+                    <div className="inv-total-row" style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid #000000" }}>
+                      <span className="lbl" style={{ color: "#64748b" }}>GST / Tax</span>
                       <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(gstAmt, inv.currency, false, false, inv.customCurrencySymbol)}</span>
                     </div>
-                    {amountPaid > 0 && (
-                      <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                        <span className="lbl" style={{ color: "#0f1c2e" }}>Paid (Advance)</span>
-                        <span className="val" style={{ fontWeight: "700", color: "var(--green)" }}>-{formatCurrency(amountPaid, inv.currency, false, false, inv.customCurrencySymbol)}</span>
-                      </div>
-                    )}
-                    <div className="inv-grand-row" style={{ display: "flex", justify: "space-between", padding: "6px 8px", borderRadius: "6px", marginTop: "4px", color: "#0f1c2e" }}>
+
+                    <div className="inv-grand-row" style={{ display: "flex", justifyContent: "space-between", padding: "6px 8px", borderRadius: "6px", marginTop: "4px", color: "#0f1c2e" }}>
                       <span className="lbl" style={{ fontSize: "10px", fontWeight: "800" }}>Balance Due</span>
                       <span className="val" style={{ fontSize: "12px", fontWeight: "900" }}>{formatCurrency(balanceDue, inv.currency, false, false, inv.customCurrencySymbol)}</span>
                     </div>

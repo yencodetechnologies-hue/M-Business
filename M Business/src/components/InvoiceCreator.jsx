@@ -442,14 +442,13 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
             <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "24px", border: "1px solid #cbd5e1" }}>
               <thead>
                 <tr style={{ background: "#0f1c2e" }}>
-                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#ffffff", textAlign: "left", width: "5%", border: "1px solid #0f1c2e" }}>#</th>
-                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#ffffff", textAlign: "left", width: "40%", border: "1px solid #0f1c2e" }}>Description</th>
-                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#ffffff", textAlign: "center", width: "10%", border: "1px solid #0f1c2e" }}>Qty</th>
-                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#ffffff", textAlign: "right", width: "20%", border: "1px solid #0f1c2e" }}>Rate</th>
-                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#ffffff", textAlign: "right", width: "20%", border: "1px solid #0f1c2e" }}>Amount</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#ffffff", backgroundColor: "#0f1c2e", textAlign: "left", width: "5%", border: "1px solid #0f1c2e" }}>#</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#ffffff", backgroundColor: "#0f1c2e", textAlign: "left", width: "40%", border: "1px solid #0f1c2e" }}>Description</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#ffffff", backgroundColor: "#0f1c2e", textAlign: "center", width: "10%", border: "1px solid #0f1c2e" }}>Qty</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#ffffff", backgroundColor: "#0f1c2e", textAlign: "right", width: "20%", border: "1px solid #0f1c2e" }}>Rate</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#ffffff", backgroundColor: "#0f1c2e", textAlign: "right", width: "20%", border: "1px solid #0f1c2e" }}>Amount</th>
                 </tr>
-              </thead>
-              <tbody>
+              </thead>   <tbody>
                 {pageItems.map((item, idx) => {
                   const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
                   const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);

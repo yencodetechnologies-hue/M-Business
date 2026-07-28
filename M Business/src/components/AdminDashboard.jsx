@@ -575,9 +575,7 @@ export default function AdminDashboard({ user, setUser }) {
                 );
                 setActive("invoices");
               }}
-              onViewInvoice={(inv) => {
-                setProjectInvoiceView({ ...inv, project: inv?.project || jumpProject?.name || '', client: inv?.client || inv?.clientName || '' });
-              }}
+
             />
           )}
           {active === "invoices" && (

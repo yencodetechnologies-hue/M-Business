@@ -564,9 +564,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const effectiveCompanyName = companyName || "";
 
   const [step, setStep] = useState(() => {
-    if (forceListView !== undefined && forceListView !== null && forceListView !== false) return "list";
     if (jumpInvoice && (jumpInvoice._id || jumpInvoice.id)) return "preview";
     if (newInvoicePrefill) return "form";
+    if (forceListView !== undefined && forceListView !== null && forceListView !== false) return "list";
     return "list";
   });
   useEffect(() => {

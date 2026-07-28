@@ -5957,7 +5957,6 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 }
 
 
-
 function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, companyLogo, onLogoChange, enforceMySubscriptions, onLogoUploadClick, setSelectedProjectForTasks, desktopOpen, setJumpProject, setJumpInvoicePrefill, setInvoicePrefill, setSidebarNavClickId }) {
   const items = navItems || NAV;
 
@@ -6964,6 +6963,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     return null;
   });
   const [sidebarNavClickId, setSidebarNavClickId] = useState(0);
+
 
 
   useEffect(() => {
@@ -11707,7 +11707,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {validActive === "invoices" && <InvoiceCreator key={`invoices-${sidebarNavClickId}`} forceListView={!jumpProject && !invoicePrefill && !jumpInvoice} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { if (jumpProject) { setSidebarOverride(sidebarOverride || "projects"); setActive("project-details"); return; } const returnTo = sidebarOverride || prevActiveBeforeInvoice || "dashboard"; setSidebarOverride(null); setActive(returnTo); }} onSaveSuccess={() => {
+            {validActive === "invoices" && <InvoiceCreator forceListView={!jumpProject && !invoicePrefill && !jumpInvoice} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { if (jumpProject) { setSidebarOverride(sidebarOverride || "projects"); setActive("project-details"); return; } const returnTo = sidebarOverride || prevActiveBeforeInvoice || "dashboard"; setSidebarOverride(null); setActive(returnTo); }} onSaveSuccess={() => {
               if (jumpProject && (jumpProject._id || jumpProject.id)) {
                 setSidebarOverride(sidebarOverride || "projects");
                 setActive("project-details");

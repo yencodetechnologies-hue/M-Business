@@ -376,18 +376,17 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
 
             {isFirstPage ? (
               <>
-                {/* HEADER */}
-                <div className="inv-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
+                {/* HEADER */}<div className="inv-header" style={{ display: "flex", justifyContent: "flex-start", alignItems: "flex-start", marginBottom: "20px", borderBottom: "1.5px solid #000000", paddingBottom: "16px", gap: "16px" }}>
                   <div className="inv-logo-area">
                     {effectiveLogo ? (
-                      <img src={effectiveLogo} alt="logo" style={{ height: 40, width: "auto", borderRadius: 6, objectFit: "contain" }} />
+                      <img src={effectiveLogo} alt="logo" style={{ height: 72, width: "auto", borderRadius: 6, objectFit: "contain" }} />
                     ) : (
-                      <div className="inv-logo-box" style={{ width: "40px", height: "40px", borderRadius: "8px", background: currentT.logoColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px", fontWeight: "900", color: "#fff" }}>
+                      <div className="inv-logo-box" style={{ width: "72px", height: "72px", borderRadius: "8px", background: currentT.logoColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px", fontWeight: "900", color: "#fff" }}>
                         {effectiveCompanyName ? effectiveCompanyName[0].toUpperCase() : "YT"}
                       </div>
                     )}
                   </div>
-                  <div className="inv-title-area" style={{ textAlign: "right" }}>
+                  <div className="inv-title-area" style={{ textAlign: "left" }}>
                     <div className="inv-company-name" style={{ fontSize: "18px", fontWeight: "800", color: "#0f1c2e" }}>{inv.companyName || effectiveCompanyName}</div>
                     <div className="inv-company-details" style={{ fontSize: "12px", color: "#64748b", lineHeight: "1.7", marginTop: "4px" }}>
                       {inv.companyAddress && <div>{inv.companyAddress}</div>}
@@ -399,7 +398,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                 <div className="inv-title-word" style={{ fontSize: "28px", fontWeight: "600", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: 4, marginBottom: 20 }}>INVOICE</div>
 
                 {/* BILL TO + INVOICE DETAILS BOX */}
-                <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", padding: "24px 28px", border: "1.5px solid var(--app-border)", borderRadius: "8px", marginBottom: "24px", alignItems: "start" }}>
+                <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", padding: "24px 28px", border: "1.5px solid #000000", borderRadius: "8px", marginBottom: "24px", alignItems: "start" }}>
                   <div>
                     <div className="inv-party-label" style={{ fontSize: "11px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "5px" }}>Bill To</div>
                     <div className="inv-party-name" style={{ fontSize: "16px", fontWeight: "800", color: inv.client ? "#0f1c2e" : "#64748b" }}>{inv.client || "— Client Name —"}</div>

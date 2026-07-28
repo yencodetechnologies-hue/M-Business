@@ -388,9 +388,9 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                   </div>
                   <div className="inv-title-area" style={{ textAlign: "right" }}>
                     <div className="inv-company-name" style={{ fontSize: "18px", fontWeight: "800", color: "#0f1c2e" }}>{inv.companyName || effectiveCompanyName}</div>
-                    <div className="inv-company-details" style={{ fontSize: "12px", color: "#64748b", lineHeight: "1.7", marginTop: "4px" }}>
+                    <div className="inv-company-details" style={{ fontSize: "12px", fontWeight: "700", color: "#0f1c2e", lineHeight: "1.7", marginTop: "4px" }}>
                       {inv.companyAddress && <div>{inv.companyAddress}</div>}
-                      {inv.fromGST && <div style={{ fontWeight: 700 }}>GSTIN: {inv.fromGST}</div>}
+                      {inv.fromGST && <div style={{ fontWeight: 700, }}>GSTIN: {inv.fromGST}</div>}
                     </div>
                     <div className="inv-id" style={{ fontSize: "14px", fontWeight: "700", color: "#0f1c2e", marginTop: "5px" }}>#{inv.invoiceNo}</div>
                   </div>
@@ -398,7 +398,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                 <div className="inv-title-word" style={{ fontSize: "28px", fontWeight: "600", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: 4, marginBottom: 20 }}>INVOICE</div>
 
                 {/* BILL TO + INVOICE DETAILS BOX */}
-                <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", padding: "24px 28px", border: "1.5px solid #000000", borderRadius: "8px", marginBottom: "24px", alignItems: "start" }}>
+                <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", padding: "24px 28px", border: "1.5px solid #000000", marginBottom: "24px", alignItems: "start" }}>
                   <div>
                     <div className="inv-party-label" style={{ fontSize: "11px", fontWeight: "900", color: "#0f1c2e", textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "5px" }}>Bill To</div>
                     <div className="inv-party-name" style={{ fontSize: "16px", fontWeight: "800", color: inv.client ? "#0f1c2e" : "#64748b" }}>{inv.client || "— Client Name —"}</div>
@@ -442,7 +442,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
             <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "24px", border: "1px solid #cbd5e1" }}>
               <thead>
                 <tr>
-                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "left", width: "5%", background: currentT.primaryColor }}>#</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "left", width: "5%", background: currentT.primaryColor }}>S.No</th>
                   <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "left", width: "40%", background: currentT.primaryColor }}>Description</th>
                   <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "center", width: "10%", background: currentT.primaryColor }}>Qty</th>
                   <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "right", width: "20%", background: currentT.primaryColor }}>Rate</th>
@@ -479,28 +479,28 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                 {/* TOTALS WITH QR SCANNER */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "20px", marginBottom: "24px" }}>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", borderRadius: 8, padding: "8px", border: "1px solid var(--app-border)", minWidth: 95 }}>
-                    <div style={{ fontSize: "8px", color: "#64748b", fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>SCAN INVOICE</div>
+                    <div style={{ fontSize: "8px", color: "#0f1c2e", fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>SCAN INVOICE</div>
                     <div style={{ background: "#fff", padding: 5, borderRadius: 4, border: "1px solid var(--app-border)" }}>
                       <QRCodeSVG value={qrData} size={80} bgColor="#ffffff" fgColor="#0f1c2e" />
                     </div>
                   </div>
 
                   <div className="inv-totals" style={{ width: "200px" }}>
-                    <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                      <span className="lbl" style={{ color: "#64748b" }}>Subtotal</span>
+                    <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px" }}>
+                      <span className="lbl" style={{ color: "#0f1c2e" }}>Subtotal</span>
                       <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(subtotal, inv.currency, false, false, inv.customCurrencySymbol)}</span>
                     </div>
                     <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                      <span className="lbl" style={{ color: "#64748b" }}>GST / Tax</span>
+                      <span className="lbl" style={{ color: "#0f1c2e" }}>GST / Tax</span>
                       <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(gstAmt, inv.currency, false, false, inv.customCurrencySymbol)}</span>
                     </div>
                     {amountPaid > 0 && (
                       <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                        <span className="lbl" style={{ color: "#64748b" }}>Paid (Advance)</span>
+                        <span className="lbl" style={{ color: "#0f1c2e" }}>Paid (Advance)</span>
                         <span className="val" style={{ fontWeight: "700", color: "var(--green)" }}>-{formatCurrency(amountPaid, inv.currency, false, false, inv.customCurrencySymbol)}</span>
                       </div>
                     )}
-                    <div className="inv-grand-row" style={{ display: "flex", justify: "space-between", padding: "6px 8px", background: "#0f1c2e", borderRadius: "6px", marginTop: "4px", color: "#fff" }}>
+                    <div className="inv-grand-row" style={{ display: "flex", justify: "space-between", padding: "6px 8px", borderRadius: "6px", marginTop: "4px", color: "#0f1c2e" }}>
                       <span className="lbl" style={{ fontSize: "10px", fontWeight: "800" }}>Balance Due</span>
                       <span className="val" style={{ fontSize: "12px", fontWeight: "900" }}>{formatCurrency(balanceDue, inv.currency, false, false, inv.customCurrencySymbol)}</span>
                     </div>
@@ -1430,7 +1430,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
                 <thead>
                   <tr style={{ background: "#f8fafc" }}>
-                    {["#", "Description", "Qty", "Unit Rate", "Tax Rate", "Amount"].map((h, i) => (
+                    {["S.No", "Description", "Qty", "Unit Rate", "Tax Rate", "Amount"].map((h, i) => (
                       <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 800, color: "#64748b", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty", "Tax Rate"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                     ))}
                   </tr>

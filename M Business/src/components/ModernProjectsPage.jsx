@@ -416,7 +416,7 @@ export default function ModernProjectsPage({ user }) {
                   });
                 } else {
                   // New invoice
-                  setInvoicePrefill({ client: proj.client || '', project: proj.name || '', _t: Date.now() });
+                  setInvoicePrefill({ client: proj.client || '', project: proj.name || '', _t: Date.now(), projectId: proj._id });
                 }
                 setJumpInvoice(null);
                 setShowInvoiceCreator(true);

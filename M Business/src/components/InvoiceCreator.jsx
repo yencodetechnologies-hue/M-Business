@@ -549,7 +549,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                         )
                       ) : null}
                     </div>
-                    <div className="inv-sig-line" style={{ width: "100%", height: "1px", marginBottom: "3px" }}></div>
+
                     <div className="inv-sig-name" style={{ fontSize: "9px", fontWeight: "700", color: "#0f1c2e" }}></div>
                     <div className="inv-sig-role" style={{ fontSize: "8px", color: "#64748b" }}>Authorized Signatory</div>
                   </div>

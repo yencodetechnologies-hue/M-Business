@@ -509,8 +509,8 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
 
                 {/* Amount in Words */}
                 <div style={{ marginTop: "8px", padding: "7px 12px", background: "#f8fafc", border: "1px dashed #CBD5E1", borderRadius: "6px" }}>
-                  <span style={{ fontSize: "9px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.6px" }}>Amount in Words: </span>
-                  <span style={{ fontSize: "9px", fontWeight: "800", color: "#0f1c2e" }}>{inv.currency === 'INR' ? 'INR ' : (inv.currency || 'INR') + ' '}{numberToWords(Math.round(balanceDue))}</span>
+                  <span style={{ fontSize: "12px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.6px" }}>Amount in Words: </span>
+                  <span style={{ fontSize: "12px", fontWeight: "800", color: "#0f1c2e" }}>{inv.currency === 'INR' ? 'INR ' : (inv.currency || 'INR') + ' '}{numberToWords(Math.round(balanceDue))}</span>
                 </div>
 
                 {/* FOOTER */}

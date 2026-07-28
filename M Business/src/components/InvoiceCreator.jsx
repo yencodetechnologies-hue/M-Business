@@ -400,7 +400,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                 {/* BILL TO + INVOICE DETAILS BOX */}
                 <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", padding: "24px 28px", border: "1.5px solid #000000", borderRadius: "8px", marginBottom: "24px", alignItems: "start" }}>
                   <div>
-                    <div className="inv-party-label" style={{ fontSize: "11px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "5px" }}>Bill To</div>
+                    <div className="inv-party-label" style={{ fontSize: "11px", fontWeight: "900", color: "#0f1c2e", textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "5px" }}>Bill To</div>
                     <div className="inv-party-name" style={{ fontSize: "16px", fontWeight: "800", color: inv.client ? "#0f1c2e" : "#64748b" }}>{inv.client || "— Client Name —"}</div>
                     <div className="inv-party-detail" style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", marginTop: "3px" }}>
                       {selectedClient ? (
@@ -409,7 +409,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                           {selectedClient.email && <div>{selectedClient.email}</div>}
                           {selectedClient.phone && <div>{selectedClient.phone}</div>}
                           {selectedClient.address && <div>{selectedClient.address}</div>}
-                          {selectedClient.gstNumber && <div style={{ fontWeight: 700, color: currentT.primaryColor }}>GSTIN: {selectedClient.gstNumber}</div>}
+                          {selectedClient.gstNumber && <div style={{ fontWeight: 700, color: "#0f1c2e" }}>GSTIN: {selectedClient.gstNumber}</div>}
                         </>
                       ) : (
                         <span style={{ color: "#64748b" }}>Enter client details in the form</span>
@@ -417,7 +417,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                     </div>
                     {inv.project && (
                       <div style={{ marginTop: 8 }}>
-                        <div className="inv-party-label" style={{ fontSize: "11px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "3px" }}>Project</div>
+                        <div className="inv-party-label" style={{ fontSize: "11px", fontWeight: "700", color: "#0f1c2e", textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "3px" }}>Project</div>
                         <div className="inv-party-name" style={{ fontSize: "16px", fontWeight: "800", color: "#0f1c2e" }}>{inv.project}</div>
                       </div>
                     )}

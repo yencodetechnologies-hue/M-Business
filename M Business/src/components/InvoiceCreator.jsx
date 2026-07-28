@@ -514,22 +514,20 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                   <span style={{ fontSize: "9px", fontWeight: "800", color: "#0f1c2e" }}>{inv.currency === 'INR' ? 'INR ' : (inv.currency || 'INR') + ' '}{numberToWords(Math.round(balanceDue))}</span>
                 </div>
 
-                {/* BANK DETAILS */}
-                {(inv.bankName || inv.accountNumber || inv.ifscCode || inv.upiId) && (
-                  <div className="inv-bank" style={{ marginTop: "12px", padding: "8px 10px", background: currentT.primaryBg, borderRadius: "6px", borderLeft: `3px solid ${currentT.primaryColor}` }}>
-                    <div className="inv-bank-title" style={{ fontSize: "9px", fontWeight: "700", color: currentT.primaryColor, marginBottom: "3px" }}>Payment Details</div>
-                    <div className="inv-bank-detail" style={{ fontSize: "9px", color: "#0f1c2e", lineHeight: "1.5" }}>
-                      {inv.bankName && <span>Bank: {inv.bankName} &nbsp;|&nbsp; </span>}
-                      {inv.accountNumber && <span>A/C: {inv.accountNumber} &nbsp;|&nbsp; </span>}
-                      {inv.ifscCode && <span>IFSC: {inv.ifscCode}</span>}
-                      {inv.upiId && <div style={{ marginTop: "2px" }}>UPI: {inv.upiId}</div>}
-                    </div>
-                  </div>
-                )}
-
                 {/* FOOTER */}
                 <div className="inv-footer" style={{ marginTop: "auto", paddingTop: "16px", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
                   <div className="inv-notes" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
+                    {(inv.bankName || inv.accountNumber || inv.ifscCode || inv.upiId) && (
+                      <div className="inv-bank" style={{ padding: "8px 10px", background: currentT.primaryBg, borderRadius: "6px", borderLeft: `3px solid ${currentT.primaryColor}` }}>
+                        <div className="inv-bank-title" style={{ fontSize: "9px", fontWeight: "700", color: currentT.primaryColor, marginBottom: "3px" }}>Payment Details</div>
+                        <div className="inv-bank-detail" style={{ fontSize: "9px", color: "#0f1c2e", lineHeight: "1.5" }}>
+                          {inv.bankName && <span>Bank: {inv.bankName} &nbsp;|&nbsp; </span>}
+                          {inv.accountNumber && <span>A/C: {inv.accountNumber} &nbsp;|&nbsp; </span>}
+                          {inv.ifscCode && <span>IFSC: {inv.ifscCode}</span>}
+                          {inv.upiId && <div style={{ marginTop: "2px" }}>UPI: {inv.upiId}</div>}
+                        </div>
+                      </div>
+                    )}
                     {inv.notes && (
                       <div>
                         <div className="inv-notes-title" style={{ fontSize: "11px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Notes</div>
@@ -542,8 +540,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                         <div className="inv-notes-text" style={{ fontSize: "11px", color: "#64748b", lineHeight: "1.5" }}>{inv.terms}</div>
                       </div>
                     )}
-                  </div>
-                  <div className="inv-sig" style={{ textAlign: "right", minWidth: "120px" }}>
+                  </div>      <div className="inv-sig" style={{ textAlign: "right", minWidth: "120px" }}>
                     <div style={{ height: "35px", display: "flex", alignItems: "flex-end", justifyContent: "flex-end", marginBottom: "3px" }}>
                       {inv.signature ? (
                         inv.signatureType === "image" ? (

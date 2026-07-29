@@ -372,7 +372,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
         const isLastPage = pageIdx === pages.length - 1;
         const startIndex = pageIdx * INVOICE_ROWS_PER_PAGE;
         return (
-          <div key={pageIdx} className="invoice-preview invoice-paper" style={{ padding: "48px", paddingTop: "72px", fontFamily: currentT.fontFamily, fontSize: "11px", color: "#1A2E35", background: "#fff", minHeight: "1050px", display: "flex", flexDirection: "column", marginBottom: isLastPage ? 0 : 20, "--live-preview-padding": "48px" }}>
+          <div key={pageIdx} className="invoice-preview invoice-paper" style={{ padding: "48px", paddingTop: "62px", fontFamily: currentT.fontFamily, fontSize: "13px", color: "#1A2E35", background: "#fff", minHeight: "1050px", display: "flex", flexDirection: "column", marginBottom: isLastPage ? 0 : 20, "--live-preview-padding": "48px" }}>
 
             {isFirstPage ? (
               <>
@@ -387,8 +387,8 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                     )}
                   </div>
                   <div className="inv-title-area" style={{ textAlign: "right" }}>
-                    <div className="inv-company-name" style={{ fontSize: "15px", fontWeight: "800", color: "#0f172a", textTransform: "uppercase", letterSpacing: 0.5 }}>{inv.companyName || effectiveCompanyName}</div>
-                    <div className="inv-company-details" style={{ fontSize: "10px", fontWeight: "700", color: "#0f172a", lineHeight: "1.6", marginTop: "3px" }}>
+                    <div className="inv-company-name" style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", textTransform: "uppercase", letterSpacing: 0.5 }}>{inv.companyName || effectiveCompanyName}</div>
+                    <div className="inv-company-details" style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", lineHeight: "1.6", marginTop: "3px" }}>
                       {inv.companyAddress && <div>{inv.companyAddress}</div>}
                       {inv.fromGST && <div>GSTIN: {inv.fromGST}</div>}
                     </div>
@@ -398,29 +398,20 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                 {/* BILL TO + INVOICE DETAILS BOX */}
                 <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", padding: "24px 28px", border: "1.5px solid #000000", marginBottom: "24px", alignItems: "start" }}>
                   <div>
-                    <div className="inv-party-label" style={{ fontSize: "13px", fontWeight: "700", color: "#0f1c2e", letterSpacing: ".8px", marginBottom: "5px" }}>Bill To</div>
-                    <div className="inv-party-name" style={{ fontSize: "13px", fontWeight: "700", color: inv.client ? "#0f1c2e" : "#64748b", textTransform: "uppercase", }}>{inv.client || "— Client Name —"}</div>
-                    <div className="inv-party-detail" style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", marginTop: "3px" }}>
-                      {selectedClient ? (
-                        <>
-                          {selectedClient.companyName && <div style={{ color: "#0f1c2e" }}>{selectedClient.companyName}</div>}
-                          {selectedClient.email && <div style={{ color: "#0f1c2e" }}>{selectedClient.email}</div>}
-                          {selectedClient.phone && <div style={{ color: "#0f1c2e" }}>{selectedClient.phone}</div>}
-                          {selectedClient.address && <div style={{ color: "#0f1c2e" }}>{selectedClient.address}</div>}
-                          {selectedClient.gstNumber && <div style={{ color: "#0f1c2e" }}>GSTIN: {selectedClient.gstNumber}</div>}
-                        </>
-                      ) : (
-                        <span style={{ color: "#64748b" }}>Enter client details in the form</span>
-                      )}
-                    </div>
-                    {inv.project && (
+                    <div className="inv-party-label" style={{ fontSize: "12px", fontWeight: "700", color: "#0f1c2e", letterSpacing: ".8px", marginBottom: "5px" }}>Bill To</div>
+                    <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "700", color: "#0f1c2e", textTransform: "uppercase", }}>{inv.client || "— Client Name —"}</div>
+                    <div className="inv-party-detail" style={{ fontSize: "12px", color: "#0f1c2e", lineHeight: "1.5", marginTop: "3px" }}>
+
+                      {selectedClient?.address && <div style={{ color: "#0f1c2e", fontSize: "12px" }}>{selectedClient.address}</div>}
+                      {inv.fromGST && <div style={{ color: "#0f1c2e", fontSize: "12px" }}>GSTIN: {inv.fromGST}</div>}
+                    </div>           {inv.project && (
                       <div style={{ marginTop: 8 }}>
-                        <div className="inv-party-label" style={{ fontSize: "13px", fontWeight: "700", color: "#0f1c2e", letterSpacing: ".8px", marginBottom: "3px" }}>Project</div>
-                        <div className="inv-party-name" style={{ fontSize: "13px", fontWeight: "700", color: "#0f1c2e" }}>{inv.project}</div>
+                        <div className="inv-party-label" style={{ fontSize: "12px", fontWeight: "700", color: "#0f1c2e", letterSpacing: ".8px", marginBottom: "3px" }}>Project</div>
+                        <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "700", color: "#0f1c2e" }}>{inv.project}</div>
                       </div>
                     )}
                   </div>
-                  <div style={{ fontSize: "13px", color: "#64748b", display: "flex", flexDirection: "column", textAlign: "left", alignSelf: "start", marginLeft: 80, width: "fit-content" }}>
+                  <div style={{ fontSize: "13px", color: "#0f1c2e", display: "flex", flexDirection: "column", textAlign: "left", alignSelf: "start", marginLeft: 80, width: "fit-content" }}>
                     <div><strong style={{ color: "#0f1c2e" }}>Invoice No:</strong> {inv.invoiceNo}</div>
                     <div><strong style={{ color: "#0f1c2e" }}>Invoice Date:</strong> {inv.date ? new Date(inv.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</div>
                     <div><strong style={{ color: "#0f1c2e" }}>Place of Supply:</strong> {inv.placeOfSupply || "—"}</div>
@@ -474,7 +465,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
             {isLastPage && (
               <>
                 {/* TOTALS WITH QR SCANNER */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "20px", marginBottom: "24px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginTop: "auto", marginBottom: "24px" }}>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", borderRadius: 8, padding: "8px", border: "1px solid var(--app-border)", minWidth: 95 }}>
                     <div style={{ fontSize: "8px", color: "#0f1c2e", fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>SCAN INVOICE</div>
                     <div style={{ background: "#fff", padding: 5, borderRadius: 4, border: "1px solid var(--app-border)" }}>
@@ -500,7 +491,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                 </div>
 
                 {/* Amount in Words */}
-                <div style={{ marginTop: "8px", padding: "7px 12px", background: "#f8fafc", border: "1px dashed #CBD5E1", borderRadius: "6px" }}>
+                <div style={{ marginTop: 0, padding: "7px 12px", background: "#f8fafc", border: "1px dashed #CBD5E1", borderRadius: "6px" }}>
                   <span style={{ fontSize: "12px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.6px" }}>Amount in Words: </span>
                   <span style={{ fontSize: "12px", fontWeight: "800", color: "#0f1c2e" }}>{inv.currency === 'INR' ? 'INR ' : (inv.currency || 'INR') + ' '}{numberToWords(Math.round(balanceDue))}</span>
                 </div>

@@ -7,7 +7,7 @@ exports.createPaymentOrder = async (req, res) => {
     const { amount, userId, type } = req.body;
     const payment = await PaymentHistory.create({
       userId,
-      amount, sd
+      amount,
       type,
       status: 'pending',
       paymentDate: new Date()

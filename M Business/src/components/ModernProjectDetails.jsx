@@ -811,15 +811,24 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   // Auto-fetch invoices for this project to calculate Billed/Received/Pending
   const [projectInvoicesLoading, setProjectInvoicesLoading] = useState(() => {
     try {
-      return !localStorage.getItem("cached_invoices");
+      const cached = localStorage.getItem("cached_invoices");
+      if (!cached) return true;
+      const all = JSON.parse(cached);
+      const pName = currProject?.name || "";
+      const cName = currProject?.client || currProject?.clientName || "";
+      const hasMatch = (Array.isArray(all) ? all : []).some(e => {
+        const eProj = e.inv?.project || e.project;
+        const eClient = e.inv?.clientName || e.inv?.client || e.client;
+        return (eProj && eProj === pName) || (!eProj && eClient === cName);
+      });
+      return !hasMatch;
     } catch { return true; }
   });
   const fetchInvoicesReqId = useRef(0);
   const fetchProjectInvoices = useCallback(() => {
     if (!currProject || !currProject._id) { setProjectInvoicesLoading(false); return; }
     const reqId = ++fetchInvoicesReqId.current;
-    setProjectInvoicesLoading(true);
-    const pName = currProject.name || "";
+    setProjectInvoicesLoading(prev => (projectInvoices && projectInvoices.length > 0) ? false : true);  const pName = currProject.name || "";
     const cName = currProject.client || currProject.clientName || "";
     axios.get(`${BASE_URL}/api/invoices`)
       .then(res => {

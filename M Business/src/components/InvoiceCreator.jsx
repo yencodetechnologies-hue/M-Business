@@ -376,7 +376,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
 
             {isFirstPage ? (
               <>
-                {/* HEADER */}<div className="inv-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", paddingBottom: "16px", gap: "16px" }}>
+                {/* HEADER */}<div className="inv-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px", paddingBottom: "16px", gap: "16px" }}>
                   <div className="inv-logo-area" style={{ maxWidth: "180px", overflow: "hidden" }}>
                     {effectiveLogo ? (
                       <img src={effectiveLogo} alt="logo" style={{ height: 72, maxWidth: "180px", width: "auto", borderRadius: 6, objectFit: "contain", display: "block" }} />
@@ -394,8 +394,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                     </div>
                   </div>
                 </div>
-                <div className="inv-title-word" id="inv-title-anchor" style={{ fontSize: "28px", fontWeight: "600", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "left", marginLeft: "50%", marginTop: 4, marginBottom: 4, width: "fit-content" }}>INVOICE</div>
-
+                <div className="inv-title-word" id="inv-title-anchor" style={{ fontSize: "28px", fontWeight: "600", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: 8, marginBottom: 4, transform: "translateX(-30px)" }}>INVOICE</div>
                 {/* BILL TO + INVOICE DETAILS BOX */}
                 <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", padding: "24px 28px", border: "1.5px solid #000000", marginBottom: "24px", alignItems: "start" }}>
                   <div>

@@ -332,11 +332,11 @@ export default function InvoiceViewer() {
                   <tbody>
                     {pageItems.map((item, idx) => (
                       <tr key={idx} style={{ borderBottom: "1px solid var(--app-border)" }}>
-                        <td style={{ padding: "12px 11px", color: "var(--app-muted)", fontWeight: 700, fontSize: 12, opacity: 0.5 }}>{String(globalItemOffset + idx + 1).padStart(2, "0")}</td>
+                        <td style={{ padding: "12px 11px", color: "var(--app-muted)", fontWeight: 700, fontSize: 13, opacity: 0.5 }}>{String(globalItemOffset + idx + 1).padStart(2, "0")}</td>
                         <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#111827" }}>{item.description || "—"}</td>
-                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, color: "#374151" }}>{item.quantity}</td>
-                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, color: "#374151" }}>{formatCurrency(item.rate, inv.currency)}</td>
-                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#111827" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, fontWeight: 600, color: "#111827" }}>{item.quantity}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, fontWeight: 600, color: "#111827" }}>{formatCurrency(item.rate, inv.currency)}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, fontWeight: 600, color: "#111827" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -353,12 +353,12 @@ export default function InvoiceViewer() {
                         ["Amount Paid", formatCurrency(finalPaid, inv.currency)]
                       ].map(([l, v]) => (
                         <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f8fafc" }}>
-                          <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
+                          <span style={{ fontSize: 12, color: "#111827" }}>{l}</span>
                           <span style={{ fontSize: 12, fontWeight: 600, color: "#111827" }}>{v}</span>
                         </div>
                       ))}
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: currentT.primaryBg, borderRadius: 12, marginTop: 8, border: currentT.borderStyle || "1.5px solid #e2e8f0" }}>
-                        <span style={{ fontSize: 13, fontWeight: 800, color: "#64748b" }}>BALANCE DUE</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>BALANCE DUE</span>
                         <span style={{ fontSize: 19, fontWeight: 900, color: isPaid ? "#059669" : currentT.primaryColor }}>{formatCurrency(balanceDue, inv.currency)}</span>
                       </div>
                     </div>

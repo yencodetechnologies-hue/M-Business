@@ -11444,6 +11444,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   setSidebarOverride("proposals");
                   setActive("proposals");
                 }}
+                onViewInvoice={(entry) => {
+                  setJumpInvoice(entry);
+                }}
 
 
 
@@ -11726,6 +11729,24 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               setReturnToModal(modal); setModal("client");
 
             }} onAddProject={() => { setJumpProject(null); setSidebarOverride("invoices"); setActive("create-project"); }} />}
+            {validActive !== "invoices" && jumpInvoice && (
+              <InvoiceCreator
+                key={`invoice-overlay-${jumpInvoice._id || jumpInvoice.id || jumpInvoice.invoiceNo}`}
+                forceListView={false}
+                onConsumeForceListView={() => { }}
+                user={user}
+                clients={clients}
+                projects={projects}
+                companyLogo={companyLogo}
+                companyName={companyNameStr}
+                onLogoChange={onLogoChange}
+                jumpInvoice={jumpInvoice}
+                onBack={() => setJumpInvoice(null)}
+                onSaveSuccess={() => setJumpInvoice(null)}
+                onAddClient={() => { }}
+                onAddProject={() => { }}
+              />
+            )}
             {validActive !== "invoices" && jumpInvoice && (
               <InvoiceCreator
                 key={`invoice-overlay-${jumpInvoice._id || jumpInvoice.id || jumpInvoice.invoiceNo}`}

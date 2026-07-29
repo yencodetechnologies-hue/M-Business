@@ -557,8 +557,11 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     if (forceListView !== undefined && forceListView !== null && forceListView !== false) return "list";
     return "list";
   });
+  const forceListViewConsumedRef = useRef(false);
   useEffect(() => {
     if (forceListView !== undefined && forceListView !== null && forceListView !== false) {
+      if (forceListViewConsumedRef.current) return;
+      forceListViewConsumedRef.current = true;
       setStep("list");
       setEditingId(null);
       try {
@@ -568,6 +571,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         localStorage.removeItem("invoiceCreatorItems_subadmin");
       } catch (e) { }
       if (typeof onConsumeForceListView === "function") onConsumeForceListView();
+    } else {
+      forceListViewConsumedRef.current = false;
     }
   }, [forceListView]);
 
@@ -714,6 +719,12 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const [clientFilter, setClientFilter] = useState("all");
   const [sigTab, setSigTab] = useState("draw");
   const [viewAsModal, setViewAsModal] = useState(!!(jumpInvoice && (jumpInvoice._id || jumpInvoice.id)));
+  const modalScrollRef = useRef(null);
+  useEffect(() => {
+    if (viewAsModal && modalScrollRef.current) {
+      modalScrollRef.current.scrollTop = 0;
+    }
+  }, [viewAsModal, jumpInvoice]);
   const [typedSig, setTypedSig] = useState("");
 
   const handleExportCSV = (data) => {
@@ -2170,7 +2181,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   // ------------------------------------------------------------
   if (step === "preview" && !viewAsModal) {
     const ModalOuter = React.Fragment;
-    const modalOuterProps = viewAsModal ? { style: { position: "fixed", inset: 0, zIndex: 9998, background: "rgba(15,28,46,0.55)", overflowY: "auto", padding: "20px 12px" }, onClick: () => setStep("list") } : {};
+    const modalOuterProps = viewAsModal ? { ref: modalScrollRef, style: { position: "fixed", inset: 0, zIndex: 9998, background: "rgba(15,28,46,0.55)", overflowY: "auto", padding: "20px 12px" }, onClick: () => setStep("list") } : {};
     const ModalInner = viewAsModal ? "div" : React.Fragment;
     const modalInnerProps = viewAsModal ? { onClick: (e) => e.stopPropagation(), style: { maxWidth: 830, margin: "0 auto", fontFamily: "'Plus Jakarta Sans', sans-serif" } } : {};
     return (

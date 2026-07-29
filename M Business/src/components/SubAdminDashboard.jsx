@@ -7362,17 +7362,27 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     try {
       const u = JSON.parse(localStorage.getItem("user") || "{}");
       const cid = String(u?.companyId || u?._id || u?.id || u?.userId || u?.company || "").trim();
-      if (!cid) return [];
-      const c = localStorage.getItem("cached_clients_" + cid);
-      return c ? JSON.parse(c) : [];
+      if (cid) {
+        const c = localStorage.getItem("cached_clients_" + cid);
+        if (c) return JSON.parse(c);
+      }
+      // Fallback: user object wasn't ready yet on this render — grab the
+      // most recently written cached_clients_* entry instead of showing empty.
+      const keys = Object.keys(localStorage).filter(k => k.startsWith("cached_clients_"));
+      if (keys.length === 1) {
+        const c = localStorage.getItem(keys[0]);
+        return c ? JSON.parse(c) : [];
+      }
+      return [];
     } catch { return []; }
   });
-  const [clientsLoaded, setClientsLoaded] = useState(() => {
+const [clientsLoaded, setClientsLoaded] = useState(() => {
     try {
       const u = JSON.parse(localStorage.getItem("user") || "{}");
       const cid = String(u?.companyId || u?._id || u?.id || u?.userId || u?.company || "").trim();
-      if (!cid) return false;
-      return !!localStorage.getItem("cached_clients_" + cid);
+      if (cid && localStorage.getItem("cached_clients_" + cid)) return true;
+      const keys = Object.keys(localStorage).filter(k => k.startsWith("cached_clients_"));
+      return keys.length === 1;
     } catch { return false; }
   });
 

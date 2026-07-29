@@ -394,7 +394,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                     </div>
                   </div>
                 </div>
-                <div className="inv-title-word" style={{ fontSize: "22px", fontWeight: "800", color: "#0f172a", letterSpacing: 2, textAlign: "center", margin: "18px 0" }}> INVOICE</div>
+                <div className="inv-title-word" id="inv-title-anchor" style={{ fontSize: "28px", fontWeight: "600", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "left", marginLeft: "50%", marginTop: 4, marginBottom: 4, width: "fit-content" }}>INVOICE</div>
 
                 {/* BILL TO + INVOICE DETAILS BOX */}
                 <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", padding: "24px 28px", border: "1.5px solid #000000", marginBottom: "24px", alignItems: "start" }}>

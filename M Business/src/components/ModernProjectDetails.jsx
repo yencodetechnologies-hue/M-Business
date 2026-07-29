@@ -796,8 +796,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   }, [autoOpenInvoice]);
 
   // Auto-fetch invoices for this project to calculate Billed/Received/Pending
+  const [projectInvoicesLoading, setProjectInvoicesLoading] = useState(true);
   const fetchProjectInvoices = useCallback(() => {
     if (!project) return;
+    setProjectInvoicesLoading(true);
     const pName = project.name || "";
     const cName = project.client || project.clientName || "";
     axios.get(`${BASE_URL}/api/invoices`)
@@ -810,7 +812,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         });
         setProjectInvoices(matched);
       })
-      .catch(() => setProjectInvoices([]));
+      .catch(() => setProjectInvoices([]))
+      .finally(() => setProjectInvoicesLoading(false));
   }, [project?._id, project?.name, project?.client]);
 
   useEffect(() => {
@@ -3153,7 +3156,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         const liveReceived = (currProject.paymentsReceived || []).reduce((s, p) => s + parseAmt(p.amount), 0);
                         const livePending = Math.max(0, liveBilled - liveReceived);
                         return [
-                          { lbl: 'Total Invoiced', val: `${currency}${liveBilled.toLocaleString()}`, sub: `${mergedInvoices.length} invoice(s)`, color: '#3B82F6', icon: 'ti-file-invoice' },
+                          { lbl: 'Total Invoiced', val: projectInvoicesLoading ? '…' : `${currency}${liveBilled.toLocaleString()}`, sub: projectInvoicesLoading ? 'Loading…' : `${mergedInvoices.length} invoice(s)`, color: '#3B82F6', icon: 'ti-file-invoice' },
                           { lbl: 'Received', val: `${currency}${liveReceived.toLocaleString()}`, sub: `${liveBilled > 0 ? Math.round((liveReceived / liveBilled) * 100) : 0}% collected`, color: '#22C55E', icon: 'ti-circle-check' },
 
                           { lbl: 'Outstanding', val: `${currency}${livePending.toLocaleString()}`, sub: 'Balance due', color: '#EF4444', icon: 'ti-alert-circle' },

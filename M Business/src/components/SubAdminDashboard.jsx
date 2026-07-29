@@ -11755,24 +11755,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 onAddProject={() => { }}
               />
             )}
-            {validActive !== "invoices" && jumpInvoice && (
-              <InvoiceCreator
-                key={`invoice-overlay-${jumpInvoice._id || jumpInvoice.id || jumpInvoice.invoiceNo}-${jumpInvoice._t || 0}`}
-                forceListView={false}
-                onConsumeForceListView={() => { }}
-                user={user}
-                clients={clients}
-                projects={projects}
-                companyLogo={companyLogo}
-                companyName={companyNameStr}
-                onLogoChange={onLogoChange}
-                jumpInvoice={jumpInvoice}
-                onBack={() => setJumpInvoice(null)}
-                onSaveSuccess={() => setJumpInvoice(null)}
-                onAddClient={() => { }}
-                onAddProject={() => { }}
-              />
-            )}
             {validActive === "quotations" && <QuotationCreatorModern user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => {
 
               setNcError({}); setShowClientPass(false);

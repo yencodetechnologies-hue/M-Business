@@ -11711,6 +11711,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 setSidebarOverride(sidebarOverride || "projects");
                 setActive("project-details");
                 if (typeof setInvoicePrefill === "function") setInvoicePrefill(null);
+                setSidebarNavClickId(id => id + 1);
                 return;
               }
               if (!jumpInvoice && !newInvoicePrefill && !jumpInvoicePrefill) {

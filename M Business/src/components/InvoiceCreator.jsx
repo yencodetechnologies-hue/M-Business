@@ -604,7 +604,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         }
         return;
       }
-      setViewAsModal(false);
+      setViewAsModal(!!(jumpInvoice._id || jumpInvoice.id || jumpInvoice.invoiceNo));
       loadEntry(jumpInvoice);
       setStep("preview");
       setInternalNav(false);

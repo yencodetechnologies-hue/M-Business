@@ -372,7 +372,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
         const isLastPage = pageIdx === pages.length - 1;
         const startIndex = pageIdx * INVOICE_ROWS_PER_PAGE;
         return (
-          <div key={pageIdx} className="invoice-preview invoice-paper" style={{ padding: "48px", fontFamily: currentT.fontFamily, fontSize: "11px", color: "#1A2E35", background: "#fff", minHeight: "1050px", display: "flex", flexDirection: "column", marginBottom: isLastPage ? 0 : 20, "--live-preview-padding": "48px" }}>
+          <div key={pageIdx} className="invoice-preview invoice-paper" style={{ padding: isFirstPage ? "28px 48px" : "48px", fontFamily: currentT.fontFamily, fontSize: isFirstPage ? "10px" : "11px", color: "#1A2E35", background: "#fff", minHeight: "1050px", maxHeight: "1050px", overflow: "hidden", display: "flex", flexDirection: "column", marginBottom: isLastPage ? 0 : 20, "--live-preview-padding": "48px" }}>
 
             {isFirstPage ? (
               <>
@@ -454,16 +454,15 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                   const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
                   return (
                     <tr key={item.id} style={{ background: (startIndex + idx) % 2 === 1 ? "#f8fafc" : "#fff" }}>
-                      <td style={{ padding: "14px", fontSize: "13px", color: "#0f1c2e", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{startIndex + idx + 1}</td>
-                      <td style={{ padding: "14px", fontSize: "13px", color: "#0f1c2e", verticalAlign: "top", border: "1px solid #cbd5e1" }}>
+                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0f1c2e", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{startIndex + idx + 1}</td>
+                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0f1c2e", verticalAlign: "top", border: "1px solid #cbd5e1" }}>
                         <div style={{ fontWeight: "700" }}>{item.description || "—"}</div>
-                        {rateGst ? <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>Tax {rateGst}% {isIncl ? "(Incl)" : ""}</div> : null}
+                        {rateGst ? <div style={{ fontSize: "10px", color: "#64748b", marginTop: "2px" }}>Tax {rateGst}% {isIncl ? "(Incl)" : ""}</div> : null}
                       </td>
-                      <td style={{ padding: "14px", fontSize: "13px", color: "#0f1c2e", textAlign: "center", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{item.quantity}</td>
-                      <td style={{ padding: "14px", fontSize: "13px", color: "#0f1c2e", textAlign: "right", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{formatCurrency(item.rate, inv.currency, false, false, inv.customCurrencySymbol)}</td>
-                      <td style={{ padding: "14px", fontSize: "13px", color: "#0f1c2e", textAlign: "right", fontWeight: "700", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency, false, false, inv.customCurrencySymbol)}</td>
-                    </tr>
-                  );
+                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0f1c2e", textAlign: "center", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{item.quantity}</td>
+                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0f1c2e", textAlign: "right", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{formatCurrency(item.rate, inv.currency, false, false, inv.customCurrencySymbol)}</td>
+                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0f1c2e", textAlign: "right", fontWeight: "700", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency, false, false, inv.customCurrencySymbol)}</td>
+                    </tr>);
                 })}
               </tbody>
             </table>

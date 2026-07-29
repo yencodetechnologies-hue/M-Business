@@ -259,7 +259,7 @@ export default function InvoiceViewer() {
         @media (max-width:600px) { .inv-hgrid { flex-direction:column!important; } .inv-btgrid { grid-template-columns:1fr!important; } }
       `}</style>
 
-<div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 8, flexWrap: "wrap" }}>
+      <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 8, flexWrap: "wrap" }}>
         <button className="action-btn" onClick={() => window.print()}
           style={{ padding: "10px 22px", background: currentT.logoColor || currentT.primaryColor, border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>
           Print / Save PDF
@@ -334,8 +334,8 @@ export default function InvoiceViewer() {
                       <tr key={idx} style={{ borderBottom: "1px solid var(--app-border)" }}>
                         <td style={{ padding: "12px 11px", color: "var(--app-muted)", fontWeight: 700, fontSize: 12, opacity: 0.5 }}>{String(globalItemOffset + idx + 1).padStart(2, "0")}</td>
                         <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#111827" }}>{item.description || "—"}</td>
-                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
-                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, inv.currency)}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, color: "#374151" }}>{item.quantity}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, color: "#374151" }}>{formatCurrency(item.rate, inv.currency)}</td>
                         <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#111827" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
                       </tr>
                     ))}

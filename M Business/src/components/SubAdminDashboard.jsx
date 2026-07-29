@@ -11445,8 +11445,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   setActive("proposals");
                 }}
                 onNewInvoice={(proj, editInv) => {
+                  if (!proj) return;
                   setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now(), ...(editInv ? { editData: editInv, projectId: proj._id } : {}) });
                   setJumpInvoice(null);
+                  setPrevActiveBeforeInvoice(active);
+                  setActive("invoices");
                 }}
                 onViewInvoice={(entry) => {
                   setJumpInvoice(entry);

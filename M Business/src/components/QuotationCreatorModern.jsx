@@ -1052,7 +1052,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
                 <input className="mqc-tag-input" placeholder="Add a deliverable…" value={tagInput}
                   onChange={e => setTagInput(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }} />
-                <button className="mqc-tag-btn" onClick={addTag}><i className="ti ti-plus" style={{ fontSize: 13 }}></i> Add</button>
+                <button className="mqc-tag-btn" onClick={addTag}><i style={{ fontSize: 13 }}></i> Add</button>
               </div>
 
               {/* Overview */}

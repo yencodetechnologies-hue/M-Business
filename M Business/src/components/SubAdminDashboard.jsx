@@ -4597,9 +4597,6 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
         }}
         onViewInvoice={(entry) => {
           setJumpInvoice(entry);
-          setPrevActiveBeforeInvoice(active);
-          setSidebarOverride(active);
-          setActive("invoices");
         }}
       />
 
@@ -11457,9 +11454,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 }}
                 onViewInvoice={(entry) => {
                   setJumpInvoice(entry);
-                  setPrevActiveBeforeInvoice(active);
-                  setSidebarOverride(active);
-                  setActive("invoices");
                 }}
                 onLogTime={async (hours) => {
 
@@ -11770,6 +11764,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 onProfileUpdate={(updatedUser) => setUser(updatedUser)}
                 THEME={currentTheme}
               />
+
             )}
 
 

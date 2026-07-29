@@ -288,83 +288,34 @@ export default function InvoiceViewer() {
             <div key={pageIndex} className="inv-paper" style={{ width: "100%" }}>
               {/* Header */}
               {isFirstPage && (
-                <div style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0, borderBottom: currentT.borderStyle || "1px solid #e2e8f0" }}>
-                  <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: `radial-gradient(circle, ${currentT.primaryColor}0d, transparent)`, top: -80, right: -40, pointerEvents: "none" }} />
-                  <div className="inv-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 1, gap: 20 }}>
-                    <div>
-                      {inv.logoUrl && (
-                        <img src={inv.logoUrl} alt="logo" style={{ height: 85, borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />
-                      )}
-                      <div style={{ fontSize: 24, fontWeight: 900, color: "#1e1b4b", textTransform: "uppercase", letterSpacing: 1 }}>{inv.companyName}</div>
-                      {inv.companyEmail && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 3 }}>{inv.companyEmail}</div>}
-                      {inv.companyPhone && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{inv.companyPhone}</div>}
-                      {inv.companyAddress && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{inv.companyAddress}</div>}
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: 32, fontWeight: 900, color: `${currentT.primaryColor}1a`, letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>INVOICE</div>
-                      <div style={{ fontSize: 16, fontWeight: 800, color: currentT.primaryColor }}>{inv.invoiceNo}</div>
-                      <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
-                        <div style={{ textAlign: "right" }}>
-                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
-                          <div style={{ fontSize: 12, color: "#1e1b4b", fontWeight: 700 }}>{formatDate(inv.date)}</div>
-                        </div>
-                        <div style={{ textAlign: "right" }}>
-                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DUE DATE</div>
-                          <div style={{ fontSize: 12, color: "#1e1b4b", fontWeight: 700 }}>{formatDate(inv.dueDate)}</div>
-                        </div>
-                      </div>
-                      {(!isPaid && finalPaid > 0) ? (
-                        <div style={{ marginTop: 12, textAlign: "right" }}>
-                          <span style={{
-                            display: "inline-block",
-                            padding: "4px 14px",
-                            border: "1.5px solid #f59e0b",
-                            borderRadius: 20,
-                            color: "#b45309",
-                            fontSize: 11,
-                            fontWeight: 800,
-                            background: "#fef3c7",
-                            letterSpacing: 1
-                          }}>
-                            PART PAID
-                          </span>
-                        </div>
-                      ) : isPaid ? (
-                        <div style={{ marginTop: 12, textAlign: "right" }}>
-                          <span style={{
-                            display: "inline-block",
-                            padding: "4px 14px",
-                            border: "1.5px solid #10b981",
-                            borderRadius: 20,
-                            color: "#059669",
-                            fontSize: 11,
-                            fontWeight: 800,
-                            background: "#d1fae5",
-                            letterSpacing: 1
-                          }}>
-                            PAID
-                          </span>
-                        </div>
-                      ) : null}
-                      {inv.project && (
-                        <div style={{ marginTop: 24, textAlign: "right" }}>
-                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 2, marginBottom: 6 }}>PROJECT</div>
-                          <div style={{ fontSize: 14, fontWeight: 800, color: "#111827", lineHeight: 1.4 }}>{inv.project}</div>
-                        </div>
-                      )}
+                <div style={{ background: "#fff", padding: "24px 40px", flexShrink: 0 }}>
+                  <div className="inv-hgrid" style={{ display: "flex", justifyContent: "flex-start", alignItems: "center", gap: 28 }}>
+                    {inv.logoUrl && (
+                      <img src={inv.logoUrl} alt="logo" style={{ height: 80, width: 130, borderRadius: 8, objectFit: "contain" }} />
+                    )}
+                    <div style={{ textAlign: "center", flex: 1 }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: "#0f172a", textTransform: "uppercase", letterSpacing: 0.5 }}>{inv.companyName}</div>
+                      {inv.companyAddress && <div style={{ fontSize: 10, fontWeight: 700, color: "#0f172a", marginTop: 5 }}>{inv.companyAddress}</div>}
+                      {inv.companyPhone && <div style={{ fontSize: 10, fontWeight: 700, color: "#0f172a" }}>{inv.companyPhone}</div>}
+                      <div style={{ fontSize: 10, fontWeight: 700, color: "#0f172a", marginTop: 3 }}>GSTIN: {inv.gstin || "—"}</div>
                     </div>
                   </div>
+                  <div style={{ textAlign: "center", fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: 2, margin: "22px 0 0" }}>TAX INVOICE</div>
                 </div>
               )}
 
-              {/*
-              
-              */}
+              {/* Bill To + Meta Box */}
               {isFirstPage && (
-                <div className="inv-btgrid" style={{ display: "grid", gridTemplateColumns: "1fr", borderBottom: currentT.borderStyle || "2px solid #f1f5f9", flexShrink: 0 }}>
-                  <div style={{ padding: "20px 32px" }}>
-                    <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>BILL TO</div>
-                    <div style={{ fontSize: 17, fontWeight: 800, color: "#111827" }}>{inv.client || "—"}</div>
+                <div style={{ margin: "0 40px 20px", border: "1px solid #1e293b", padding: "14px 18px", display: "flex", justifyContent: "space-between", gap: 20 }}>
+                  <div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#0f172a" }}>Bill To:</div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: "#0f172a", marginTop: 2 }}>{inv.client || "—"}</div>
+                    {inv.project && <div style={{ fontSize: 11, color: "#374151", marginTop: 2 }}>{inv.project}</div>}
+                  </div>
+                  <div style={{ fontSize: 11, color: "#0f172a", textAlign: "left", minWidth: 220 }}>
+                    <div><b>Invoice No:</b> {inv.invoiceNo}</div>
+                    <div><b>Invoice Date:</b> {formatDate(inv.date)}</div>
+                    <div><b>Due Date:</b> {formatDate(inv.dueDate)}</div>
                   </div>
                 </div>
               )}
@@ -487,8 +438,8 @@ export default function InvoiceViewer() {
             </div>
           );
         })}
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }
 

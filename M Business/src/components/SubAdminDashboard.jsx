@@ -11445,9 +11445,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   setActive("proposals");
                 }}
 
-                onViewInvoice={(entry) => {
-                  setJumpInvoice(entry);
-                }}
+
 
 
                 onLogTime={async (hours) => {

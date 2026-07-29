@@ -372,7 +372,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
         const isLastPage = pageIdx === pages.length - 1;
         const startIndex = pageIdx * INVOICE_ROWS_PER_PAGE;
         return (
-          <div key={pageIdx} className="invoice-preview invoice-paper" style={{ padding: isFirstPage ? "14px 48px 28px" : "48px", fontFamily: currentT.fontFamily, fontSize: isFirstPage ? "10px" : "11px", color: "#1A2E35", background: "#fff", minHeight: "1050px", maxHeight: "1050px", overflow: "hidden", display: "flex", flexDirection: "column", marginBottom: isLastPage ? 0 : 20, "--live-preview-padding": "48px" }}>
+          <div key={pageIdx} className="invoice-preview invoice-paper" style={{ padding: "48px", paddingTop: "72px", fontFamily: currentT.fontFamily, fontSize: "11px", color: "#1A2E35", background: "#fff", minHeight: "1050px", display: "flex", flexDirection: "column", marginBottom: isLastPage ? 0 : 20, "--live-preview-padding": "48px" }}>
 
             {isFirstPage ? (
               <>

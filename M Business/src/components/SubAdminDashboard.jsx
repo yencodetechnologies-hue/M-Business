@@ -4596,7 +4596,7 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
           if (setActive) setActive("invoices");
         }}
         onViewInvoice={(entry) => {
-          setJumpInvoice(entry);
+          setJumpInvoice({ ...entry, _t: Date.now() });
         }}
       />
 
@@ -11449,10 +11449,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   setPrevActiveBeforeInvoice(active);
                   setJumpInvoice(null);
                   setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now(), ...(editInv ? { editData: editInv, projectId: proj._id } : {}) });
+                  setSidebarNavClickId(id => id + 1);
                   setActive("invoices");
                 }}
                 onViewInvoice={(entry) => {
-                  setJumpInvoice(entry);
+                  setJumpInvoice({ ...entry, _t: Date.now() });
                 }}
 
 

@@ -8874,8 +8874,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         headers: { 'x-company-id': resolveSubadminId() }
       });
 
-      setClients(prev => [res.data.client, ...prev]);
-
+      setClients(prev => {
+        const updated = [res.data.client, ...prev];
+        try {
+          const cid = resolveSubadminId();
+          if (cid) localStorage.setItem("cached_clients_" + cid, JSON.stringify(updated));
+        } catch { }
+        return updated;
+      });
       if (addClientFromInvoice) {
         setPendingInvoiceClientName(res.data.client.clientName || res.data.client.name || nc.name);
       }

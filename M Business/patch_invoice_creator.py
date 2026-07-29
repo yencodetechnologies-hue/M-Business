@@ -115,7 +115,7 @@ live_preview_content = '''
                     {inv.companyAddress && <div>{inv.companyAddress}</div>}
                   </div>
                 </div>
-                <div className="inv-title-area" style={{ textAlign: "right" }}>
+                <div className="inv-title-area" style={{ textAlign: "right", marginLeft: "auto" }}>
                   <div className="inv-title-word" style={{ fontSize: "24px", fontWeight: "900", color: currentT.primaryColor, letterSpacing: "-.5px" }}>INVOICE</div>
                   <div className="inv-id" style={{ fontSize: "11px", fontWeight: "700", color: "var(--text)", marginTop: "4px" }}>#{inv.invoiceNo}</div>
                   <div className="inv-dates" style={{ fontSize: "9px", color: "var(--app-muted)", marginTop: "2px", lineHeight: "1.6" }}>

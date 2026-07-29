@@ -376,18 +376,17 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
 
             {isFirstPage ? (
               <>
-                {/* HEADER */}
-                <div className="inv-header" style={{ display: "flex", justifyContent: "flex-start", alignItems: "center", gap: 24, marginBottom: "10px", marginTop: 0 }}>
-                  <div className="inv-logo-area">
+                {/* HEADER */}<div className="inv-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", paddingBottom: "16px", gap: "16px" }}>
+                  <div className="inv-logo-area" style={{ maxWidth: "180px", overflow: "hidden" }}>
                     {effectiveLogo ? (
-                      <img src={effectiveLogo} alt="logo" style={{ height: 56, width: 90, borderRadius: 6, objectFit: "contain" }} />
+                      <img src={effectiveLogo} alt="logo" style={{ height: 72, maxWidth: "180px", width: "auto", borderRadius: 6, objectFit: "contain", display: "block" }} />
                     ) : (
-                      <div className="inv-logo-box" style={{ width: "56px", height: "56px", borderRadius: "8px", background: currentT.logoColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "22px", fontWeight: "900", color: "#fff" }}>
+                      <div className="inv-logo-box" style={{ width: "72px", height: "72px", borderRadius: "8px", background: currentT.logoColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px", fontWeight: "900", color: "#fff" }}>
                         {effectiveCompanyName ? effectiveCompanyName[0].toUpperCase() : "YT"}
                       </div>
                     )}
                   </div>
-                  <div className="inv-title-area" style={{ textAlign: "right", flex: 1 }}>
+                  <div className="inv-title-area" style={{ textAlign: "right" }}>
                     <div className="inv-company-name" style={{ fontSize: "15px", fontWeight: "800", color: "#0f172a", textTransform: "uppercase", letterSpacing: 0.5 }}>{inv.companyName || effectiveCompanyName}</div>
                     <div className="inv-company-details" style={{ fontSize: "10px", fontWeight: "700", color: "#0f172a", lineHeight: "1.6", marginTop: "3px" }}>
                       {inv.companyAddress && <div>{inv.companyAddress}</div>}

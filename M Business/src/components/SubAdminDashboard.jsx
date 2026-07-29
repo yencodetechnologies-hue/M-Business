@@ -1038,7 +1038,10 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
   useEffect(() => {
-    setIsLoading(false);
+    setIsLoading(!!isFetching);
+  }, [isFetching]);
+
+  useEffect(() => {
     // Only auto-select a client when none is selected yet (e.g. right after
     // the client list first loads), or when the currently selected client
     // was removed entirely from `clients`. Changing the card/tab filter
@@ -1053,7 +1056,6 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       setActiveClientId(filtered.length > 0 ? filtered[0]._id : null);
     }
   }, [clients]);
-
   // Restore exact client active before navigating to create/edit project
   useEffect(() => {
     if (activeClientIdForReturn) {
@@ -8452,7 +8454,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     setProfileDropdownOpen(false);
     setShowProfile(false);
     try {
-      const cid = String(userData?._id || userData?.id || userData?.userId || userData?.companyId || userData?.company || "").trim();
+      const cid = String(userData?.companyId || userData?._id || userData?.id || userData?.userId || userData?.company || "").trim();
       if (cid) {
         const cachedClients = localStorage.getItem("cached_clients_" + cid);
         if (cachedClients) { setClients(JSON.parse(cachedClients)); setClientsLoaded(true); }
@@ -8882,6 +8884,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         } catch { }
         return updated;
       });
+
       if (addClientFromInvoice) {
         setPendingInvoiceClientName(res.data.client.clientName || res.data.client.name || nc.name);
       }
@@ -11490,14 +11493,22 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {validActive === "addClient" && <AddClientView onBack={() => { if (returnToCalendar) { setReturnToCalendar(false); setSidebarOverride(null); setActive("calendar"); } else if (returnToQuotation) { setReturnToQuotation(false); setSidebarOverride(null); setActive("quotations"); } else if (returnToProposals) { setReturnToProposals(false); setSidebarOverride(null); setActive("proposals"); } else { setActive("clients"); } }} onClientAdded={(client, replaceTempId) => {
               setClients(prev => {
+                let updated;
                 if (replaceTempId) {
                   // Server-confirmed client arrived — swap out the optimistic temp record
-                  return prev.map(c => c._id === replaceTempId ? client : c);
+                  updated = prev.map(c => c._id === replaceTempId ? client : c);
+                } else if (prev.some(c => c._id === client._id)) {
+                  updated = prev;
+                } else {
+                  // First call: either the optimistic temp client, or (in older flows)
+                  // the final client directly — append only if it isn't already present.
+                  updated = [...prev, client];
                 }
-                // First call: either the optimistic temp client, or (in older flows)
-                // the final client directly — append only if it isn't already present.
-                if (prev.some(c => c._id === client._id)) return prev;
-                return [...prev, client];
+                try {
+                  const cid = resolveSubadminId();
+                  if (cid) localStorage.setItem("cached_clients_" + cid, JSON.stringify(updated));
+                } catch { }
+                return updated;
               });
               if (returnToCalendar) {
                 setReturnToCalendar(false);
@@ -11551,7 +11562,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               </div>
             )}
 
-            {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }} onAddClient={() => {
+            {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} isFetching={!clientsLoaded} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 

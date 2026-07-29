@@ -1943,8 +1943,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const handleLogout = () => { localStorage.removeItem("user"); localStorage.setItem("loggedOut", "1"); setUser(null); };
   const onLogoChange = async (logo) => { setCompanyLogo(logo || fixedLogo); const updatedUser = { ...user, logoUrl: logo || "" }; localStorage.setItem("user", JSON.stringify(updatedUser)); setUser(updatedUser); try { await axios.post(BASE_URL + "/api/auth/save-logo", { userId: user._id || user.id, logoUrl: logo || "" }); } catch (e) { console.log(e); } };
 
-  const fetchClients = async () => { try { const res = await axios.get(BASE_URL + "/api/clients"); setClients(res.data); try { localStorage.setItem("cached_clients", JSON.stringify(res.data)); } catch { } } catch (e) { console.log(e); } };
-  const fetchEmployees = async () => { try { const res = await axios.get(BASE_URL + "/api/employees"); setEmployees(res.data); try { localStorage.setItem("cached_employees", JSON.stringify(res.data)); } catch { } } catch (e) { console.log(e); } };
+  try { const c = JSON.parse(localStorage.getItem(`cached_clients_${user?._id || user?.id}`) || "null"); if (c) setClients(c); } catch { }
+  const fetchClients = async () => { try { const res = await axios.get(BASE_URL + "/api/clients", { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }); setClients(res.data); try { localStorage.setItem(`cached_clients_${user?._id || user?.id}`, JSON.stringify(res.data)); } catch { } } catch (e) { console.log(e); } };
   const fetchProjects = async () => { try { const res = await axios.get(BASE_URL + "/api/projects"); setProjects(res.data); try { localStorage.setItem("cached_projects", JSON.stringify(res.data)); } catch { } } catch (e) { console.log(e); } };
   const fetchManagers = async () => { try { const res = await axios.get(BASE_URL + "/api/managers"); setManagers(res.data); try { localStorage.setItem("cached_managers", JSON.stringify(res.data)); } catch { } } catch (e) { console.log(e); } };
   const [selectedProjectForTasks, setSelectedProjectForTasksRaw] = useState(null);

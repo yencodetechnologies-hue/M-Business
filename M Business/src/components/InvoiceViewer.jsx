@@ -300,7 +300,7 @@ export default function InvoiceViewer() {
                       <div style={{ fontSize: 10, fontWeight: 700, color: "#0f172a", marginTop: 3 }}>GSTIN: {inv.gstin || "—"}</div>
                     </div>
                   </div>
-                  <div style={{ textAlign: "center", fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: 2, margin: "22px 0 0" }}>TAX INVOICE</div>
+                  <div style={{ textAlign: "center", fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: 2, margin: "22px 0 0" }}> INVOICE</div>
                 </div>
               )}
               {/* Bill To + Meta Box */}

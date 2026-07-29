@@ -394,7 +394,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                     </div>
                   </div>
                 </div>
-                <div className="inv-title-word" style={{ fontSize: "22px", fontWeight: "800", color: "#0f172a", letterSpacing: 2, textAlign: "center", margin: "18px 0" }}>TAX INVOICE</div>
+                <div className="inv-title-word" style={{ fontSize: "22px", fontWeight: "800", color: "#0f172a", letterSpacing: 2, textAlign: "center", margin: "18px 0" }}> INVOICE</div>
 
                 {/* BILL TO + INVOICE DETAILS BOX */}
                 <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", padding: "24px 28px", border: "1.5px solid #000000", marginBottom: "24px", alignItems: "start" }}>
@@ -2245,11 +2245,13 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           </div>
 
           {/* LIVE INVOICE PREVIEW (matches Document Live Preview exactly) */}
-          <InvoiceLivePreview
-            inv={inv} items={items} effectiveLogo={effectiveLogo} effectiveCompanyName={effectiveCompanyName}
-            selectedClient={selectedClient} currentT={currentT} subtotal={subtotal} gstAmt={gstAmt}
-            balanceDue={balanceDue} amountPaid={amountPaid} qrData={qrData}
-          />
+          <div style={{ paddingTop: "24px" }}>
+            <InvoiceLivePreview
+              inv={inv} items={items} effectiveLogo={effectiveLogo} effectiveCompanyName={effectiveCompanyName}
+              selectedClient={selectedClient} currentT={currentT} subtotal={subtotal} gstAmt={gstAmt}
+              balanceDue={balanceDue} amountPaid={amountPaid} qrData={qrData}
+            />
+          </div>
         </ModalInner>
       </ModalOuter>
     );

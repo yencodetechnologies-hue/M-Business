@@ -798,7 +798,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   // Auto-fetch invoices for this project to calculate Billed/Received/Pending
   const [projectInvoicesLoading, setProjectInvoicesLoading] = useState(true);
   const fetchProjectInvoices = useCallback(() => {
-    if (!currProject || !currProject._id) { setProjectInvoicesLoading(false); return; }
+    console.log('fetchProjectInvoices called, currProject:', currProject);
+    if (!currProject || !currProject._id) { console.log('fetchProjectInvoices: bailing, no currProject._id'); setProjectInvoicesLoading(false); return; }
     setProjectInvoicesLoading(true);
     const pName = currProject.name || "";
     const cName = currProject.client || currProject.clientName || "";

@@ -11450,6 +11450,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   setJumpInvoice(null);
                   setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now(), ...(editInv ? { editData: editInv, projectId: proj._id } : {}) });
                   setSidebarNavClickId(id => id + 1);
+                  setSidebarOverride("projects");
                   setActive("invoices");
                 }}
                 onViewInvoice={(entry) => {

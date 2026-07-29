@@ -978,7 +978,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       else localStorage.removeItem("activeClientId_subadmin");
     } catch { }
   }, [activeClientId]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!!isFetching);
   const [activeTab, setActiveTab] = useState("overview");
 
   const [editClient, setEditClient] = useState(null);
@@ -7377,7 +7377,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       return c ? JSON.parse(c) : [];
     } catch { return []; }
   });
-  const [clientsLoaded, setClientsLoaded] = useState(false);
+  const [clientsLoaded, setClientsLoaded] = useState(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem("user") || "{}");
+      const cid = String(u?.companyId || u?._id || u?.id || u?.userId || u?.company || "").trim();
+      if (!cid) return false;
+      return !!localStorage.getItem("cached_clients_" + cid);
+    } catch { return false; }
+  });
 
 
   const todayStr = new Date().toISOString().split("T")[0];

@@ -64,7 +64,7 @@ exports.addClient = async (req, res) => {
       role: "client",
       gstNumber: gstNumber || "",
       logoUrl: logoUrl || "",
-      companyId: req.companyId || "",
+ companyId: req.companyId || req.headers['x-company-id'] || "",
       clientType: clientType || "b2b",
       category: category || "",
       clientSource: clientSource || "",

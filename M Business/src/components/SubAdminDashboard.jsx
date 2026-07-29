@@ -7369,7 +7369,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [clients, setClients] = useState(() => {
     try {
       const u = JSON.parse(localStorage.getItem("user") || "{}");
-      const cid = String(u?._id || u?.id || u?.userId || u?.companyId || u?.company || "").trim();
+      const cid = String(u?.companyId || u?._id || u?.id || u?.userId || u?.company || "").trim();
       if (!cid) return [];
       const c = localStorage.getItem("cached_clients_" + cid);
       return c ? JSON.parse(c) : [];
@@ -8276,7 +8276,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
     // Aggressively find the subadmin ID from any possible property
 
-    const id = user?._id || user?.id || user?.userId || user?.companyId || user?.company || "";
+    const id = user?.companyId || user?._id || user?.id || user?.userId || user?.company || "";
 
     return String(id).trim();
 

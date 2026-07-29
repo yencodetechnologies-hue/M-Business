@@ -718,7 +718,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const [sortOrder, setSortOrder] = useState("desc");
   const [clientFilter, setClientFilter] = useState("all");
   const [sigTab, setSigTab] = useState("draw");
-  const [viewAsModal, setViewAsModal] = useState(!!(jumpInvoice && (jumpInvoice._id || jumpInvoice.id)));
+  const [viewAsModal, setViewAsModal] = useState(!!(jumpInvoice && (jumpInvoice._id || jumpInvoice.id || jumpInvoice.invoiceNo)));
   const modalScrollRef = useRef(null);
   useEffect(() => {
     if (viewAsModal && modalScrollRef.current) {

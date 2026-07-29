@@ -3516,9 +3516,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               const liveReceived = (currProject.paymentsReceived || []).reduce((s, p) => s + parseAmt(p.amount), 0);
               const livePending = Math.max(0, liveBilled - liveReceived);
               return [
-                { lbl: 'Total Invoiced', val: `${currency}${liveBilled.toLocaleString()}`, sub: `${mergedInvoices.length} invoice(s)`, color: '#3B82F6', icon: 'ti-file-invoice' },
-                { lbl: 'Received', val: `${currency}${liveReceived.toLocaleString()}`, sub: `${liveBilled > 0 ? Math.round((liveReceived / liveBilled) * 100) : 0}% collected`, color: '#22C55E', icon: 'ti-circle-check' },
-                { lbl: 'Outstanding', val: `${currency}${livePending.toLocaleString()}`, sub: 'Balance due', color: '#EF4444', icon: 'ti-alert-circle' },
+                { lbl: 'Total Invoiced', val: projectInvoicesLoading ? '…' : `${currency}${liveBilled.toLocaleString()}`, sub: projectInvoicesLoading ? 'Loading…' : `${mergedInvoices.length} invoice(s)`, color: '#3B82F6', icon: 'ti-file-invoice' },
+                { lbl: 'Received', val: projectInvoicesLoading ? '…' : `${currency}${liveReceived.toLocaleString()}`, sub: projectInvoicesLoading ? 'Loading…' : `${liveBilled > 0 ? Math.round((liveReceived / liveBilled) * 100) : 0}% collected`, color: '#22C55E', icon: 'ti-circle-check' },
+                { lbl: 'Outstanding', val: projectInvoicesLoading ? '…' : `${currency}${livePending.toLocaleString()}`, sub: 'Balance due', color: '#EF4444', icon: 'ti-alert-circle' },
               ];
             })().map(s => (
               <div key={s.lbl} style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 12, padding: '14px 16px', position: 'relative', overflow: 'hidden' }}>

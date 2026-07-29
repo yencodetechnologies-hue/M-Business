@@ -494,7 +494,20 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [showAddExpense, setShowAddExpense] = useState(false);
   const [expenseAmt, setExpenseAmt] = useState('');
   const [addingExpense, setAddingExpense] = useState(false);
-  const [projectInvoices, setProjectInvoices] = useState([]);
+  const [projectInvoices, setProjectInvoices] = useState(() => {
+    try {
+      const cached = localStorage.getItem("cached_invoices");
+      if (!cached) return [];
+      const all = JSON.parse(cached);
+      const pName = currProject?.name || "";
+      const cName = currProject?.client || currProject?.clientName || "";
+      return (Array.isArray(all) ? all : []).filter(e => {
+        const eProj = e.inv?.project || e.project;
+        const eClient = e.inv?.clientName || e.inv?.client || e.client;
+        return (eProj && eProj === pName) || (!eProj && eClient === cName);
+      });
+    } catch { return []; }
+  });
   const [showSendPopup, setShowSendPopup] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [targetPortalClient, setTargetPortalClient] = useState('');
@@ -796,7 +809,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   }, [autoOpenInvoice]);
 
   // Auto-fetch invoices for this project to calculate Billed/Received/Pending
-  const [projectInvoicesLoading, setProjectInvoicesLoading] = useState(true);
+  const [projectInvoicesLoading, setProjectInvoicesLoading] = useState(() => {
+    try {
+      return !localStorage.getItem("cached_invoices");
+    } catch { return true; }
+  });
   const fetchInvoicesReqId = useRef(0);
   const fetchProjectInvoices = useCallback(() => {
     if (!currProject || !currProject._id) { setProjectInvoicesLoading(false); return; }

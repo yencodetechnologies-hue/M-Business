@@ -66,7 +66,20 @@ export default function ProjectPaymentModals({
   // Generic form state
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
-  const [projectInvoices, setProjectInvoices] = useState([]);
+  const [projectInvoices, setProjectInvoices] = useState(() => {
+    try {
+      const cached = localStorage.getItem("cached_invoices");
+      if (!cached) return [];
+      const all = JSON.parse(cached);
+      const pName = currProject?.name || "";
+      const cName = currProject?.client || currProject?.clientName || "";
+      return (Array.isArray(all) ? all : []).filter(e => {
+        const eProj = e.inv?.project || e.project;
+        const eClient = e.inv?.clientName || e.inv?.client || e.client;
+        return (eProj && eProj === pName) || (!eProj && eClient === cName);
+      });
+    } catch { return []; }
+  });
 
   useEffect(() => {
     if (showPayment && project?.name) {
@@ -857,7 +870,7 @@ export default function ProjectPaymentModals({
             <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="checkbox" id="notify-mil" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
               <label htmlFor="notify-mil" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>
-                Send to Client Portal 
+                Send to Client Portal
               </label>
             </div>
 

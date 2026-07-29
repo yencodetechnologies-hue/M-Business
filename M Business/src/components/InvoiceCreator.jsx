@@ -376,26 +376,26 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
 
             {isFirstPage ? (
               <>
-                {/* HEADER */}<div className="inv-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px", paddingBottom: "16px", gap: "16px" }}>
+                {/* HEADER */}
+                <div className="inv-header" style={{ display: "flex", justifyContent: "flex-start", alignItems: "center", gap: 24, marginBottom: "10px" }}>
                   <div className="inv-logo-area">
                     {effectiveLogo ? (
-                      <img src={effectiveLogo} alt="logo" style={{ height: 72, width: "auto", borderRadius: 6, objectFit: "contain" }} />
+                      <img src={effectiveLogo} alt="logo" style={{ height: 56, width: 90, borderRadius: 6, objectFit: "contain" }} />
                     ) : (
-                      <div className="inv-logo-box" style={{ width: "72px", height: "72px", borderRadius: "8px", background: currentT.logoColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px", fontWeight: "900", color: "#fff" }}>
+                      <div className="inv-logo-box" style={{ width: "56px", height: "56px", borderRadius: "8px", background: currentT.logoColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "22px", fontWeight: "900", color: "#fff" }}>
                         {effectiveCompanyName ? effectiveCompanyName[0].toUpperCase() : "YT"}
                       </div>
                     )}
                   </div>
-                  <div className="inv-title-area" style={{ textAlign: "right" }}>
-                    <div className="inv-company-name" style={{ fontSize: "18px", fontWeight: "800", color: "#0f1c2e" }}>{inv.companyName || effectiveCompanyName}</div>
-                    <div className="inv-company-details" style={{ fontSize: "12px", fontWeight: "700", color: "#0f1c2e", lineHeight: "1.7", marginTop: "4px" }}>
+                  <div className="inv-title-area" style={{ textAlign: "right", flex: 1 }}>
+                    <div className="inv-company-name" style={{ fontSize: "15px", fontWeight: "800", color: "#0f172a", textTransform: "uppercase", letterSpacing: 0.5 }}>{inv.companyName || effectiveCompanyName}</div>
+                    <div className="inv-company-details" style={{ fontSize: "10px", fontWeight: "700", color: "#0f172a", lineHeight: "1.6", marginTop: "3px" }}>
                       {inv.companyAddress && <div>{inv.companyAddress}</div>}
-                      {inv.fromGST && <div style={{ fontWeight: 700, }}>GSTIN: {inv.fromGST}</div>}
+                      {inv.fromGST && <div>GSTIN: {inv.fromGST}</div>}
                     </div>
-                    <div className="inv-id" style={{ fontSize: "14px", fontWeight: "700", color: "#0f1c2e", marginTop: "5px" }}>#{inv.invoiceNo}</div>
                   </div>
                 </div>
-                <div className="inv-title-word" style={{ fontSize: "26px", fontWeight: "600", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: 4 }}>INVOICE</div>
+                <div className="inv-title-word" style={{ fontSize: "22px", fontWeight: "800", color: "#0f172a", letterSpacing: 2, textAlign: "center", margin: "18px 0" }}>TAX INVOICE</div>
 
                 {/* BILL TO + INVOICE DETAILS BOX */}
                 <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", padding: "24px 28px", border: "1.5px solid #000000", marginBottom: "24px", alignItems: "start" }}>
@@ -2158,7 +2158,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         {step === "preview" && viewAsModal && (
           <div style={{ position: "fixed", inset: 0, zIndex: 9998, background: "rgba(15,28,46,0.55)", overflowY: "auto", padding: "20px 12px" }} onClick={() => setStep("list")}>
             <div onClick={(e) => e.stopPropagation()} style={{ maxWidth: 830, margin: "0 auto", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
+              <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 6, flexWrap: "wrap" }}>
                 <button onClick={() => setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Close</button>
                 <button onClick={() => setShareModalEntry({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 22px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>Share</button>
                 <button onClick={() => triggerPDFShare({ id: editingId, invoiceNo: inv.invoiceNo, total: total }, "print")} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>Print / PDF</button>
@@ -2237,7 +2237,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           )}
 
           {/* Toolbar */}
-          <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
+          <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 6, flexWrap: "wrap" }}>
             <button onClick={() => { if ((jumpInvoice || newInvoicePrefill) && onBack) { onBack(); } else { setStep("list"); } }} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Close</button>
 
             <button onClick={() => setShareModalEntry({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 22px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>Share</button>

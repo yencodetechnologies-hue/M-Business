@@ -236,7 +236,7 @@ export default function InvoiceViewer() {
   }
 
   return (
-    <div className="print-wrapper" style={{ fontFamily: currentT.fontFamily || "'Plus Jakarta Sans', sans-serif", background: "#f1f5f9", minHeight: "100vh", padding: "20px 12px" }}>
+    <div className="print-wrapper" style={{ fontFamily: currentT.fontFamily || "'Plus Jakarta Sans', sans-serif", background: "#f1f5f9", minHeight: "100vh", padding: "8px 12px" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Dancing+Script:wght@700&display=swap');
         * { box-sizing: border-box; }
@@ -259,7 +259,7 @@ export default function InvoiceViewer() {
         @media (max-width:600px) { .inv-hgrid { flex-direction:column!important; } .inv-btgrid { grid-template-columns:1fr!important; } }
       `}</style>
 
-      <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
+      <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 8, flexWrap: "wrap" }}>
         <button className="action-btn" onClick={() => window.print()}
           style={{ padding: "10px 22px", background: currentT.logoColor || currentT.primaryColor, border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>
           Print / Save PDF
@@ -288,12 +288,12 @@ export default function InvoiceViewer() {
             <div key={pageIndex} className="inv-paper" style={{ width: "100%" }}>
               {/* Header */}
               {isFirstPage && (
-                <div style={{ background: "#fff", padding: "24px 40px", flexShrink: 0 }}>
-                  <div className="inv-hgrid" style={{ display: "flex", justifyContent: "flex-start", alignItems: "center", gap: 28 }}>
+                <div style={{ background: "#fff", padding: "10px 40px 0", flexShrink: 0 }}>
+                  <div className="inv-hgrid" style={{ display: "flex", justifyContent: "flex-start", alignItems: "center", gap: 24 }}>
                     {inv.logoUrl && (
-                      <img src={inv.logoUrl} alt="logo" style={{ height: 80, width: 130, borderRadius: 8, objectFit: "contain" }} />
+                      <img src={inv.logoUrl} alt="logo" style={{ height: 56, width: 90, borderRadius: 8, objectFit: "contain" }} />
                     )}
-                    <div style={{ textAlign: "center", flex: 1 }}>
+                    <div style={{ textAlign: "right", flex: 1 }}>
                       <div style={{ fontSize: 15, fontWeight: 800, color: "#0f172a", textTransform: "uppercase", letterSpacing: 0.5 }}>{inv.companyName}</div>
                       {inv.companyAddress && <div style={{ fontSize: 10, fontWeight: 700, color: "#0f172a", marginTop: 5 }}>{inv.companyAddress}</div>}
                       {inv.companyPhone && <div style={{ fontSize: 10, fontWeight: 700, color: "#0f172a" }}>{inv.companyPhone}</div>}
@@ -303,7 +303,6 @@ export default function InvoiceViewer() {
                   <div style={{ textAlign: "center", fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: 2, margin: "22px 0 0" }}>TAX INVOICE</div>
                 </div>
               )}
-
               {/* Bill To + Meta Box */}
               {isFirstPage && (
                 <div style={{ margin: "0 40px 20px", border: "1px solid #1e293b", padding: "14px 18px", display: "flex", justifyContent: "space-between", gap: 20 }}>

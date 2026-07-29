@@ -11445,16 +11445,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   setActive("proposals");
                 }}
 
-                onNewInvoice={(proj, editInv, editIdx) => {
-                  setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now(), ...(editInv ? { editData: editInv, editIndex: editIdx, projectId: proj._id } : {}) });
-                  setJumpInvoice(null);
-                  setPrevActiveBeforeInvoice(active);
-                  setSidebarOverride(active);
-                  setActive("invoices");
-                }}
                 onViewInvoice={(entry) => {
                   setJumpInvoice(entry);
                 }}
+
+
                 onLogTime={async (hours) => {
 
                   try {
@@ -11732,7 +11727,26 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               setAddClientFromInvoice(true);
               setReturnToModal(modal); setModal("client");
 
-            }} onAddProject={() => { setJumpProject(null); setSidebarOverride("invoices"); setActive("create-project"); }} />}  {validActive === "quotations" && <QuotationCreatorModern user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => {
+            }} onAddProject={() => { setJumpProject(null); setSidebarOverride("invoices"); setActive("create-project"); }} />}
+            {validActive !== "invoices" && jumpInvoice && (
+              <InvoiceCreator
+                key={`invoice-overlay-${jumpInvoice._id || jumpInvoice.id || jumpInvoice.invoiceNo}`}
+                forceListView={false}
+                onConsumeForceListView={() => { }}
+                user={user}
+                clients={clients}
+                projects={projects}
+                companyLogo={companyLogo}
+                companyName={companyNameStr}
+                onLogoChange={onLogoChange}
+                jumpInvoice={jumpInvoice}
+                onBack={() => setJumpInvoice(null)}
+                onSaveSuccess={() => setJumpInvoice(null)}
+                onAddClient={() => { }}
+                onAddProject={() => { }}
+              />
+            )}
+            {validActive === "quotations" && <QuotationCreatorModern user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => {
 
               setNcError({}); setShowClientPass(false);
               setReturnToQuotation(true);

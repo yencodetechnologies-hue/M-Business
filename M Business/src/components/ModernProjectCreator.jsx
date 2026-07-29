@@ -1117,49 +1117,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
           </div>
         </div>
 
-        {/* RIGHT: PREVIEW */}
-        <div>
-          <div className="mpc-preview-card">
-            <h3><i className="ti ti-eye" /> Project Preview</h3>
 
-            <div className="mpc-pv-row"><span className="mpc-pv-label">Name</span><span className="mpc-pv-val">{name || '—'}</span></div>
-            <div className="mpc-pv-row"><span className="mpc-pv-label">Client</span><span className="mpc-pv-val">{client || '—'}</span></div>
-            <div className="mpc-pv-row"><span className="mpc-pv-label">Project Category</span><span className="mpc-pv-val">{category}</span></div>
-            <div className="mpc-pv-row"><span className="mpc-pv-label">Status</span><span className="mpc-pv-val">{status}</span></div>
-            <div className="mpc-pv-row"><span className="mpc-pv-label">Priority</span><span className="mpc-pv-val">{priority.charAt(0).toUpperCase() + priority.slice(1)}</span></div>
-            <div className="mpc-pv-row"><span className="mpc-pv-label">Start</span><span className="mpc-pv-val">{start ? new Date(start).toLocaleDateString() : '—'}</span></div>
-            <div className="mpc-pv-row"><span className="mpc-pv-label">Deadline</span><span className="mpc-pv-val">{end ? new Date(end).toLocaleDateString() : '—'}</span></div>
-            <div className="mpc-pv-row"><span className="mpc-pv-label">Budget</span><span className="mpc-pv-val">{budget ? `${currency}${Number(budget).toLocaleString()}` : '—'}</span></div>
-            {budget && (
-              <>
-
-                <div className="mpc-pv-row"><span className="mpc-pv-label">Received</span><span className="mpc-pv-val">{currency}{Number(received || 0).toLocaleString()}</span></div>
-                <div className="mpc-pv-row"><span className="mpc-pv-label">Pending</span><span className="mpc-pv-val">{currency}{Number(pending || 0).toLocaleString()}</span></div>
-                <div className="mpc-pv-row"><span className="mpc-pv-label">Spent</span><span className="mpc-pv-val">{currency}{Number(spent || 0).toLocaleString()}</span></div>
-              </>
-            )}
-            <div className="mpc-pv-row"><span className="mpc-pv-label">Team</span><span className="mpc-pv-val">{assigned.length ? assigned.join(', ') : '—'}</span></div>
-            <div className="mpc-pv-row"><span className="mpc-pv-label">Milestones</span><span className="mpc-pv-val">{milestones.filter(m => m.name.trim()).length || 0}</span></div>
-            {description && (
-              <div className="mpc-pv-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
-                <span className="mpc-pv-label">Description</span>
-                <span className="mpc-pv-val" style={{ textAlign: 'left', fontWeight: 600, lineHeight: 1.5, whiteSpace: 'normal', wordBreak: 'break-word', width: '100%' }}>{description}</span>
-              </div>
-            )}
-
-
-            <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 12, marginTop: 8 }}>
-              Checklist
-            </div>
-            <div className="mpc-checklist">
-              <div className={`mpc-cl-item ${name ? 'ok' : 'pending'}`}><i className={`ti ${name ? 'ti-circle-check' : 'ti-circle'}`} /> Project name</div>
-              <div className={`mpc-cl-item ${client ? 'ok' : 'pending'}`}><i className={`ti ${client ? 'ti-circle-check' : 'ti-circle'}`} /> Client selected</div>
-              <div className={`mpc-cl-item ${(start || end) ? 'ok' : 'pending'}`}><i className={`ti ${(start || end) ? 'ti-circle-check' : 'ti-circle'}`} /> Dates set</div>
-              <div className={`mpc-cl-item ${assigned.length > 0 ? 'ok' : 'pending'}`}><i className={`ti ${assigned.length > 0 ? 'ti-circle-check' : 'ti-circle'}`} /> Team assigned ({assigned.length})</div>
-              <div className={`mpc-cl-item ${budget ? 'ok' : 'pending'}`}><i className={`ti ${budget ? 'ti-circle-check' : 'ti-circle'}`} /> Budget entered</div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* ACTION BAR */}

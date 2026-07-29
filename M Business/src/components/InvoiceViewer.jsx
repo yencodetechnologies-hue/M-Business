@@ -259,7 +259,7 @@ export default function InvoiceViewer() {
         @media (max-width:600px) { .inv-hgrid { flex-direction:column!important; } .inv-btgrid { grid-template-columns:1fr!important; } }
       `}</style>
 
-      <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 8, flexWrap: "wrap" }}>
+<div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 8, flexWrap: "wrap" }}>
         <button className="action-btn" onClick={() => window.print()}
           style={{ padding: "10px 22px", background: currentT.logoColor || currentT.primaryColor, border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>
           Print / Save PDF
@@ -288,7 +288,7 @@ export default function InvoiceViewer() {
             <div key={pageIndex} className="inv-paper" style={{ width: "100%" }}>
               {/* Header */}
               {isFirstPage && (
-                <div style={{ background: "#fff", padding: "10px 40px 0", flexShrink: 0 }}>
+                <div style={{ background: "#fff", padding: "16px 40px 0", flexShrink: 0 }}>
                   <div className="inv-hgrid" style={{ display: "flex", justifyContent: "flex-start", alignItems: "center", gap: 24 }}>
                     {inv.logoUrl && (
                       <img src={inv.logoUrl} alt="logo" style={{ height: 56, width: 90, borderRadius: 8, objectFit: "contain" }} />

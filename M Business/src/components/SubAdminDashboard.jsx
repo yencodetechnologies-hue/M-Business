@@ -11444,13 +11444,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   setSidebarOverride("proposals");
                   setActive("proposals");
                 }}
-                onNewInvoice={(proj, editInv, editIdx) => {
-                  if (!p) return;
-                  if (setInvoicePrefill) setInvoicePrefill({ client: p.client || "", project: p.name || "", _t: Date.now(), ...(editInv ? { editData: editInv, editIndex: editIdx, projectId: p._id } : {}) });
-                  if (setJumpInvoice) setJumpInvoice(true);
+                onNewInvoice={(proj, editInv) => {
+                  if (!proj) return;
                   setPrevActiveBeforeInvoice(active);
+                  setJumpInvoice(null);
+                  setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now(), ...(editInv ? { editData: editInv, projectId: proj._id } : {}) });
+                  setSidebarNavClickId(id => id + 1);
                   setSidebarOverride("projects");
-                  if (setActive) setActive("invoices");
+                  setActive("invoices");
                 }}
                 onViewInvoice={(entry) => {
                   setJumpInvoice({ ...entry, _t: Date.now() });

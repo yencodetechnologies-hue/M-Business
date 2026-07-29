@@ -66,14 +66,16 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
 
       // Clear stale cached data before setting new user session (so a
       // re-created client never sees a deleted account's data), but keep
-      // "accounts" and any pending "justRegistered:*" trial-toast flags —
-      // those must survive this login to trigger the one-time Dashboard toast.
+      // "accounts", pending "justRegistered:*" trial-toast flags, and this
+      // same account's own cached_* entries — wiping those every login is
+      // what caused the Clients page/dashboard to always show empty right
+      // after logging back in, even for the same subadmin.
+      const incomingCid = String(userWithLogo?._id || userWithLogo?.id || userWithLogo?.userId || userWithLogo?.companyId || userWithLogo?.company || "").trim();
       Object.keys(localStorage).forEach(key => {
-        if (key !== "accounts" && !key.startsWith("justRegistered:")) {
-          localStorage.removeItem(key);
-        }
-      });
-      // Also clear the accounts cache entry for this email so stale data is gone
+        if (key === "accounts" || key.startsWith("justRegistered:")) return;
+        if (incomingCid && key.endsWith("_" + incomingCid)) return;
+        localStorage.removeItem(key);
+      });    // Also clear the accounts cache entry for this email so stale data is gone
       try {
         let accs = JSON.parse(localStorage.getItem("accounts") || "[]");
         accs = accs.filter(a => a.email !== userWithLogo.email);

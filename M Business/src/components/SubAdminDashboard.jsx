@@ -2210,9 +2210,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
           {/* Client List */}
           <div style={{ flex: 1, overflowY: "auto" }}>
-            {isLoading ? (
-              <div style={{ padding: 20, textAlign: "center", color: "#A0B8BE", fontSize: 12 }}>Loading...</div>
-            ) : filtered.length === 0 ? (
+            {filtered.length === 0 ? (
               <div style={{ padding: 30, textAlign: "center" }}>
                 <div style={{ fontSize: 28, marginBottom: 8 }}>👥</div>
                 <div style={{ fontSize: 12, color: "#A0B8BE", fontWeight: 600 }}>No clients found</div>
@@ -2410,14 +2408,6 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
             </div>
 
-          </div>
-        ) : isLoading ? (
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--app-bg)", minWidth: 0 }}>
-            <div style={{ textAlign: "center", padding: 40 }}>
-              <div style={{ width: 48, height: 48, border: "4px solid #E0EEF0", borderTop: "4px solid  var(--app-accent, var(--app-accent, #00BCD4))", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
-              <div style={{ fontSize: 13, color: "#A0B8BE", fontWeight: 600 }}>Loading clients...</div>
-              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-            </div>
           </div>
         ) : (
           <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--app-bg)", minWidth: 0 }}>

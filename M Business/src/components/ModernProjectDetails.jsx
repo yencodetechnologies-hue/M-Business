@@ -797,14 +797,16 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   // Auto-fetch invoices for this project to calculate Billed/Received/Pending
   const [projectInvoicesLoading, setProjectInvoicesLoading] = useState(true);
+  const fetchInvoicesReqId = useRef(0);
   const fetchProjectInvoices = useCallback(() => {
-    console.log('fetchProjectInvoices called, currProject:', currProject);
-    if (!currProject || !currProject._id) { console.log('fetchProjectInvoices: bailing, no currProject._id'); setProjectInvoicesLoading(false); return; }
+    if (!currProject || !currProject._id) { setProjectInvoicesLoading(false); return; }
+    const reqId = ++fetchInvoicesReqId.current;
     setProjectInvoicesLoading(true);
     const pName = currProject.name || "";
     const cName = currProject.client || currProject.clientName || "";
     axios.get(`${BASE_URL}/api/invoices`)
       .then(res => {
+        if (reqId !== fetchInvoicesReqId.current) return;
         const all = res.data?.invoices || res.data || [];
         const matched = (Array.isArray(all) ? all : []).filter(e => {
           const eProj = e.inv?.project || e.project;
@@ -813,8 +815,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         });
         setProjectInvoices(matched);
       })
-      .catch(() => setProjectInvoices([]))
-      .finally(() => setProjectInvoicesLoading(false));
+      .catch(() => { if (reqId === fetchInvoicesReqId.current) setProjectInvoices([]); })
+      .finally(() => { if (reqId === fetchInvoicesReqId.current) setProjectInvoicesLoading(false); });
   }, [currProject?._id, currProject?.name, currProject?.client]);
 
   useEffect(() => {

@@ -394,9 +394,9 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                     </div>
                   </div>
                 </div>
-                <div className="inv-title-word" id="inv-title-anchor" style={{ fontSize: "28px", fontWeight: "600", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: 8, marginBottom: 4, transform: "translateX(-30px)" }}>INVOICE</div>
+                <div className="inv-title-word" id="inv-title-anchor" style={{ fontSize: "28px", fontWeight: "600", color: currentT.primaryColor, letterSpacing: "-.5px", textAlign: "center", marginTop: 2, marginBottom: 2, transform: "translateX(-30px)" }}>INVOICE</div>
                 {/* BILL TO + INVOICE DETAILS BOX */}
-                <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", padding: "24px 28px", border: "1.5px solid #000000", marginBottom: "24px", alignItems: "start" }}>
+                <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", padding: "14px 18px", border: "1.5px solid #000000", marginBottom: "24px", alignItems: "start" }}>
                   <div>
                     <div className="inv-party-label" style={{ fontSize: "12px", fontWeight: "700", color: "#0f1c2e", letterSpacing: ".8px", marginBottom: "5px" }}>Bill To</div>
                     <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "700", color: "#0f1c2e", textTransform: "uppercase", }}>{inv.client || "— Client Name —"}</div>
@@ -431,11 +431,11 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
             <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "24px", border: "1px solid #cbd5e1" }}>
               <thead>
                 <tr>
-                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "left", width: "5%", background: currentT.primaryColor, border: "1px solid rgba(255,255,255,0.3)" }}>S.No</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "center", width: "5%", background: currentT.primaryColor, border: "1px solid rgba(255,255,255,0.3)" }}>S.No</th>
                   <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "left", width: "40%", background: currentT.primaryColor, border: "1px solid rgba(255,255,255,0.3)" }}>Description</th>
                   <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "center", width: "10%", background: currentT.primaryColor, border: "1px solid rgba(255,255,255,0.3)" }}>Qty</th>
-                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "right", width: "20%", background: currentT.primaryColor, border: "1px solid rgba(255,255,255,0.3)" }}>Rate</th>
-                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "right", width: "20%", background: currentT.primaryColor, border: "1px solid rgba(255,255,255,0.3)" }}>Amount</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "center", width: "20%", background: currentT.primaryColor, border: "1px solid rgba(255,255,255,0.3)" }}>Rate</th>
+                  <th style={{ padding: "10px 14px", fontSize: "11px", fontWeight: "700", color: "#fff", textAlign: "center", width: "20%", background: currentT.primaryColor, border: "1px solid rgba(255,255,255,0.3)" }}>Amount</th>
                 </tr>
               </thead>   <tbody>
                 {pageItems.map((item, idx) => {
@@ -443,14 +443,14 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                   const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
                   return (
                     <tr key={item.id} style={{ background: (startIndex + idx) % 2 === 1 ? "#f8fafc" : "#fff" }}>
-                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0f1c2e", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{startIndex + idx + 1}</td>
+                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0f1c2e", textAlign: "center", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{startIndex + idx + 1}</td>
                       <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0f1c2e", verticalAlign: "top", border: "1px solid #cbd5e1" }}>
                         <div style={{ fontWeight: "700" }}>{item.description || "—"}</div>
                         {rateGst ? <div style={{ fontSize: "10px", color: "#64748b", marginTop: "2px" }}>Tax {rateGst}% {isIncl ? "(Incl)" : ""}</div> : null}
                       </td>
                       <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0f1c2e", textAlign: "center", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{item.quantity}</td>
-                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0f1c2e", textAlign: "right", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{formatCurrency(item.rate, inv.currency, false, false, inv.customCurrencySymbol)}</td>
-                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0f1c2e", textAlign: "right", fontWeight: "700", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency, false, false, inv.customCurrencySymbol)}</td>
+                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0f1c2e", textAlign: "center", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{formatCurrency(item.rate, inv.currency, false, false, inv.customCurrencySymbol)}</td>
+                      <td style={{ padding: isFirstPage ? "7px 14px" : "14px", fontSize: isFirstPage ? "11px" : "13px", color: "#0f1c2e", textAlign: "center", fontWeight: "700", verticalAlign: "top", border: "1px solid #cbd5e1" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency, false, false, inv.customCurrencySymbol)}</td>
                     </tr>);
                 })}
               </tbody>
@@ -465,7 +465,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
             {isLastPage && (
               <>
                 {/* TOTALS WITH QR SCANNER */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginTop: "auto", marginBottom: "24px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginTop: "20px", marginBottom: "24px" }}>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", borderRadius: 8, padding: "8px", border: "1px solid var(--app-border)", minWidth: 95 }}>
                     <div style={{ fontSize: "8px", color: "#0f1c2e", fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>SCAN INVOICE</div>
                     <div style={{ background: "#fff", padding: 5, borderRadius: 4, border: "1px solid var(--app-border)" }}>
@@ -474,24 +474,24 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                   </div>
 
                   <div className="inv-totals" style={{ width: "200px" }}>
-                    <div className="inv-total-row" style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", fontSize: "10px" }}>
-                      <span className="lbl" style={{ color: "#64748b" }}>Subtotal</span>
-                      <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(subtotal, inv.currency, false, false, inv.customCurrencySymbol)}</span>
+                    <div className="inv-total-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "4px 0", fontSize: "12px" }}>
+                      <span className="lbl" style={{ color: "#0f1c2e" }}>Subtotal</span>
+                      <span className="val" style={{ fontWeight: "700", textAlign: "right", minWidth: "90px" }}>{formatCurrency(subtotal, inv.currency, false, false, inv.customCurrencySymbol)}</span>
                     </div>
-                    <div className="inv-total-row" style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid #000000" }}>
-                      <span className="lbl" style={{ color: "#64748b" }}>GST / Tax</span>
-                      <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(gstAmt, inv.currency, false, false, inv.customCurrencySymbol)}</span>
+                    <div className="inv-total-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "4px 0", fontSize: "12px", borderBottom: "1px solid #000000" }}>
+                      <span className="lbl" style={{ color: "#0f1c2e" }}>GST / Tax ({inv.gstRate}%)</span>
+                      <span className="val" style={{ fontWeight: "700", textAlign: "right", minWidth: "90px" }}>{formatCurrency(gstAmt, inv.currency, false, false, inv.customCurrencySymbol)}</span>
                     </div>
 
-                    <div className="inv-grand-row" style={{ display: "flex", justifyContent: "space-between", padding: "6px 8px", borderRadius: "6px", marginTop: "4px", color: "#0f1c2e" }}>
-                      <span className="lbl" style={{ fontSize: "10px", fontWeight: "800" }}>Balance Due</span>
-                      <span className="val" style={{ fontSize: "12px", fontWeight: "900" }}>{formatCurrency(balanceDue, inv.currency, false, false, inv.customCurrencySymbol)}</span>
+                    <div className="inv-grand-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 0", borderRadius: "6px", marginTop: "4px", color: "#0f1c2e" }}>
+                      <span className="lbl" style={{ fontSize: "12px", fontWeight: "800" }}>Balance Due</span>
+                      <span className="val" style={{ fontSize: "12px", fontWeight: "800", textAlign: "right", minWidth: "90px" }}>{formatCurrency(balanceDue, inv.currency, false, false, inv.customCurrencySymbol)}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Amount in Words */}
-                <div style={{ marginTop: 0, padding: "7px 12px", background: "#f8fafc", border: "1px dashed #CBD5E1", borderRadius: "6px" }}>
+                <div style={{ marginTop: "12px", padding: "7px 12px", background: "#f8fafc", border: "1px dashed #CBD5E1", borderRadius: "6px" }}>
                   <span style={{ fontSize: "12px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.6px" }}>Amount in Words: </span>
                   <span style={{ fontSize: "12px", fontWeight: "800", color: "#0f1c2e" }}>{inv.currency === 'INR' ? 'INR ' : (inv.currency || 'INR') + ' '}{numberToWords(Math.round(balanceDue))}</span>
                 </div>
@@ -1426,8 +1426,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                       <tr key={item.id || idx} style={{ borderBottom: "1px solid var(--app-border)" }}>
                         <td style={{ padding: "12px 11px", color: "#64748b", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
                         <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#0f1c2e" }}>{item.description || "—"}</td>
-                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
-                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, entryInv.currency)}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#0f1c2e" }}>{item.quantity}</td>
+                        <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#0f1c2e" }}>{formatCurrency(item.rate, entryInv.currency)}</td>
                         <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#6b7280" }}>{rateGst}% {isIncl ? "(Incl)" : ""}</td>
                         <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), entryInv.currency)}</td>
                       </tr>

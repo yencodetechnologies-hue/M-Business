@@ -1120,7 +1120,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
 }
 
 // ─── MAIN APP -----------------------------------------------------------------
-export default function CanvaProposal({ clients = [], openNew = false, onOpenNewDone, companyLogo, companyName, onAddClient, newlyAddedClientName, triggerCrop, prefillProject, onPrefillConsumed, onReturnToProject }) {
+export default function CanvaProposal({ clients = [], openNew = false, onOpenNewDone, companyLogo, companyName, onAddClient, newlyAddedClientName, triggerCrop, prefillProject, onPrefillConsumed, onReturnToProject, initialViewProposal, onBackOverride }) {
   // Always start at "list" view; fetchProposals() will switch to "editor" once the
   // correct doc has been loaded from the API (fixes the blank-editor flash when
   // navigating via ?edit= or ?view= URL params before data is ready).
@@ -1243,7 +1243,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefillProject]);
-  const [viewingProposal, setViewingProposal] = useState(null);
+  const [viewingProposal, setViewingProposal] = useState(initialViewProposal || null);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [shareModalProposal, setShareModalProposal] = useState(null);
 
@@ -2210,7 +2210,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
           viewingProposal && (
             <SubadminProposalViewer
               proposal={viewingProposal}
-              onClose={() => setViewingProposal(null)}
+              onClose={() => { setViewingProposal(null); if (onBackOverride) onBackOverride(); }}
               onPrint={() => printProposal(viewingProposal)}
               onShare={() => shareProposalPDF(viewingProposal)}
               BASE_URL={BASE_URL}

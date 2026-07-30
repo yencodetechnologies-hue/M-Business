@@ -157,6 +157,25 @@ router.put("/:dbId/reject", async (req, res) => {
   }
 });
 
+// PUT /:dbId/review  (client submits review comments)
+router.put("/:dbId/review", async (req, res) => {
+  try {
+    const comment = (req.body && req.body.comment) ? String(req.body.comment).trim() : "";
+    if (!comment) return res.status(400).json({ msg: "Comment required" });
+
+    const saved = await Proposal.findByIdAndUpdate(
+      req.params.dbId,
+      { $set: { status: "pending", reviewComment: comment, reviewedAt: new Date() } },
+      { new: true, runValidators: true }
+    );
+    if (!saved) return res.status(404).json({ msg: "Proposal not found" });
+    res.json(saved);
+  } catch (err) {
+    console.error("Review error:", err.message);
+    res.status(500).json({ msg: "Error submitting review", error: err.message });
+  }
+});
+
 // PUT /:dbId/submit  (subadmin resubmits a rejected proposal → sets back to pending)
 router.put("/:dbId/submit", async (req, res) => {
   try {

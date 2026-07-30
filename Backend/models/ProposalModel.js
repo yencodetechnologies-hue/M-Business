@@ -20,6 +20,8 @@ const ProposalSchema = new mongoose.Schema(
     html: { type: String, default: "" },
     formData: { type: Object, default: {} },
     rejectNote: { type: String, default: "" },
+    reviewComment: { type: String, default: "" },
+    reviewedAt: { type: Date, default: null },
     submittedAt: { type: Date, default: null },
     companyId: { type: String, default: "" },
     assignedEmployee: { type: String, default: "" },

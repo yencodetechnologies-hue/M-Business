@@ -365,6 +365,39 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+// ── PATCH client approve ────────────────────────────────────────────────────────
+router.patch("/:id/approve", async (req, res) => {
+  try {
+    const doc = await Quotation.findByIdAndUpdate(
+      req.params.id,
+      { status: "approved" },
+      { returnDocument: "after" }
+    );
+    if (!doc) return res.status(404).json({ success: false, msg: "Quotation not found" });
+    return res.json({ success: true, quotation: doc });
+  } catch (err) {
+    return res.status(500).json({ success: false, msg: err.message });
+  }
+});
+
+// ── PATCH client review (submit comments) ───────────────────────────────────────
+router.patch("/:id/review", async (req, res) => {
+  try {
+    const { comment } = req.body;
+    if (!comment || !comment.trim()) return res.status(400).json({ success: false, msg: "Comment required" });
+
+    const doc = await Quotation.findByIdAndUpdate(
+      req.params.id,
+      { status: "pending", reviewComment: comment.trim(), reviewedAt: new Date() },
+      { returnDocument: "after" }
+    );
+    if (!doc) return res.status(404).json({ success: false, msg: "Quotation not found" });
+    return res.json({ success: true, quotation: doc });
+  } catch (err) {
+    return res.status(500).json({ success: false, msg: err.message });
+  }
+});
+
 // ── PATCH status ──────────────────────────────────────────────────────────────
 router.patch("/:id/status", async (req, res) => {
   try {

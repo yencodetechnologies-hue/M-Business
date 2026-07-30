@@ -510,6 +510,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     } catch { return []; }
   });
   const [showSendPopup, setShowSendPopup] = useState(false);
+  const [sendDocTarget, setSendDocTarget] = useState(null); // { type: 'quotation'|'proposal', doc: {...} }
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [targetPortalClient, setTargetPortalClient] = useState('');
 
@@ -723,6 +724,38 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     } catch (err) {
       console.error(err);
       alert('Failed to send items to portal.');
+    }
+  };
+
+  const handleSendDocToPortal = async (targetClient) => {
+    if (!sendDocTarget) return;
+    const { type, doc } = sendDocTarget;
+    try {
+      const clientObj = clients?.find(c => (c.clientName || c.name) === targetClient);
+      const clientId = clientObj?._id || '';
+
+      if (type === 'quotation') {
+        await axios.put(`${BASE_URL}/api/quotations/${doc.id || doc._id}`, {
+          qt: { ...doc.qt, client: targetClient, toName: targetClient },
+          items: doc.items,
+          status: 'sent',
+        });
+      } else if (type === 'proposal') {
+        await axios.put(`${BASE_URL}/api/proposals/${doc._id || doc.dbId || doc.id}`, {
+          client: targetClient,
+          clientName: targetClient,
+          clientId,
+          status: 'sent',
+        });
+      }
+      setShowSendPopup(false);
+      setSendDocTarget(null);
+      setTargetPortalClient('');
+      alert(`${type === 'quotation' ? 'Quotation' : 'Proposal'} successfully sent to ${targetClient}'s Portal.`);
+      loadLatest();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to send document to portal.');
     }
   };
 
@@ -2110,7 +2143,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           </div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-                          <button onClick={() => { onNewQuotation && onNewQuotation({ ...currProject, _editQuotation: q, _autoShare: true }); }} title="Share" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#0EA5E9' }}><i className="ti ti-send"></i></button>
+                          <button onClick={() => { setSendDocTarget({ type: 'quotation', doc: q }); setTargetPortalClient(q.client || currProject.client || ''); setShowSendPopup(true); }} title="Send to Client" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#0EA5E9' }}><i className="ti ti-send"></i></button>
                           <button onClick={() => onViewQuotation && onViewQuotation(q)} title="View" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: ' var(--app-accent, #00BCD4)' }}><i className="ti ti-eye"></i></button>
                           <button
                             onClick={async () => {
@@ -2146,7 +2179,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           </div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-                          <button onClick={() => shareProposalAsPDF(p, currProject?.companyName || user?.companyName || '')} title="Share" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#0EA5E9' }}><i className="ti ti-send"></i></button>
+                          <button onClick={() => { setSendDocTarget({ type: 'proposal', doc: p }); setTargetPortalClient(p.client || p.clientName || currProject.client || ''); setShowSendPopup(true); }} title="Send to Client" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#0EA5E9' }}><i className="ti ti-send"></i></button>
                           <button onClick={() => onViewProposal && onViewProposal(p)} title="View" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: ' var(--app-accent, #00BCD4)' }}><i className="ti ti-eye"></i></button>
 
                           <button
@@ -4707,8 +4740,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   ))}
                 </select>
                 <div style={{ marginTop: 24, display: 'flex', gap: 10 }}>
-                  <button onClick={() => setShowSendPopup(false)} style={{ flex: 1, padding: '10px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>Cancel</button>
-                  <button onClick={() => handleSendSelectedToPortal(targetPortalClient)} disabled={!targetPortalClient} style={{ flex: 1, padding: '10px', background: '#22C55E', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: !targetPortalClient ? 'not-allowed' : 'pointer', opacity: !targetPortalClient ? 0.5 : 1 }}>Send ({selectedPaymentItems.length})</button>
+                  <button onClick={() => { setShowSendPopup(false); setSendDocTarget(null); }} style={{ flex: 1, padding: '10px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>Cancel</button>
+                  <button onClick={() => sendDocTarget ? handleSendDocToPortal(targetPortalClient) : handleSendSelectedToPortal(targetPortalClient)} disabled={!targetPortalClient} style={{ flex: 1, padding: '10px', background: '#22C55E', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: !targetPortalClient ? 'not-allowed' : 'pointer', opacity: !targetPortalClient ? 0.5 : 1 }}>{sendDocTarget ? 'Send Now' : `Send (${selectedPaymentItems.length})`}</button>
                 </div>
               </div>
             </div>

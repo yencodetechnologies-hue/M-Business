@@ -468,34 +468,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const [invoices, setInvoices] = useState([]);
   const [proposals, setProposals] = useState([]);
   const [quotations, setQuotations] = useState([]);
-  {/* Approve / Review buttons */ }
-  {
-    q.status !== "approved" && q.status !== "reviewed" && (
-      <div style={{ padding: "12px 18px", borderTop: "1px solid " + C.border, display: "flex", gap: 10 }}>
-        <button
-          className="ai-btn approve"
-          onClick={() => handleQuotationApprove(q.id)}
-          style={{ flex: 1, padding: "10px 16px", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer" }}
-        >
-          <i className="ti ti-check" style={{ fontSize: 12 }}></i> Approve
-        </button>
-        <button
-          onClick={() => setReviewQuotation(q)}
-          style={{ flex: 1, padding: "10px 16px", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", background: "#fff", border: "1.5px solid " + C.border, color: C.text }}
-        >
-          <i className="ti ti-message-2" style={{ fontSize: 12 }}></i> Review
-        </button>
-      </div>
-    )
-  }
 
-  {
-    q.status === "approved" && (
-      <div style={{ padding: "10px 18px", borderTop: "1px solid " + C.border, color: C.green, fontWeight: 700, fontSize: 12 }}>
-        <i className="ti ti-circle-check"></i> Approved
-      </div>
-    )
-  }
   const [notifs, setNotifs] = useState([]);
   const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
   useEffect(() => {

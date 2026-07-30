@@ -3,6 +3,10 @@ import React, { useEffect, useRef } from 'react';
 import * as logic from './ProposalFormLogic';
 
 function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, newlyAddedClientName, onMountExposeCrop }) {
+
+
+  const onBackRef = useRef(onBack);
+  useEffect(() => { onBackRef.current = onBack; }, [onBack]);
   const containerRef = useRef(null);
   window._proposalFormContainer = null;
 
@@ -134,7 +138,7 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
         setTimeout(hookUp, 50);
         return;
       }
-      backEls.forEach(el => { el.onclick = onBack; el.style.cursor = 'pointer'; });
+      backEls.forEach(el => { el.onclick = () => onBackRef.current && onBackRef.current(); el.style.cursor = 'pointer'; });
 
       c.querySelectorAll('[onchange]').forEach(el => {
         const oc = el.getAttribute('onchange');

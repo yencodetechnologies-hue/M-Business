@@ -1383,7 +1383,11 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
   const flash = (msg, type = "ok") => { setToast({ msg, type }); setTimeout(() => setToast(null), 3200); };
   // Fix 2: persist returns the saved doc, and uses functional state update to avoid stale closure
-  const persist = useCallback(async (d) => {
+  const persist = useCallback(async (dRaw) => {
+    const d = {
+      ...dRaw,
+      projectId: dRaw.projectId || prefillProject?._id || prefillProject?.id || '',
+    };
     try {
       if (d._id) {
         // Update existing DB record

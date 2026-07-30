@@ -76,10 +76,18 @@ router.post("/", upload.single("file"), async (req, res) => {
   const isSvg = req.file.mimetype === "image/svg+xml" || /\.svg$/i.test(req.file.originalname || "");
   const resourceType = isSvg ? "raw" : "auto";
 
+  const path = require("path");
+  const ext = path.extname(req.file.originalname || "");
+  const baseName = path.basename(req.file.originalname || "file", ext).replace(/[^a-zA-Z0-9_-]/g, "_");
+  const uniqueName = `${baseName}-${Date.now()}${ext}`;
+
   const uploadStream = cloudinary.uploader.upload_stream(
     {
       folder: "mbusiness/uploads",
       resource_type: req.file.mimetype.startsWith("image/") ? "image" : "raw",
+      public_id: uniqueName,
+      use_filename: true,
+      unique_filename: false,
     },
     async (error, result) => {
       if (error) {

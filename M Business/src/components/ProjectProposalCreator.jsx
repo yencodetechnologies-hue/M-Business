@@ -1125,6 +1125,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   // correct doc has been loaded from the API (fixes the blank-editor flash when
   // navigating via ?edit= or ?view= URL params before data is ready).
   const [view, setView] = useState(() => {
+    if (prefillProject) return "form";
     try {
       const savedView = sessionStorage.getItem("proposalFormView");
       const savedDoc = sessionStorage.getItem("proposalFormDoc");
@@ -1227,8 +1228,9 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   });
 
   useEffect(() => {
-    if (prefillProject && onPrefillConsumed) {
-      onPrefillConsumed();
+    if (prefillProject) {
+      setView("form");
+      if (onPrefillConsumed) onPrefillConsumed();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefillProject]);

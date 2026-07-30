@@ -128,7 +128,13 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
     // Hook up back button
     // Hook up back button + all topbar buttons
     const hookUp = () => {
-      c.querySelectorAll('.back-btn, .topbar-title').forEach(el => { el.onclick = onBack; el.style.cursor = 'pointer'; });
+      const backEls = c.querySelectorAll('.back-btn, .topbar-title');
+      if (backEls.length === 0) {
+        console.warn('ProposalForm: .back-btn not found in DOM when hookUp() ran — retrying.');
+        setTimeout(hookUp, 50);
+        return;
+      }
+      backEls.forEach(el => { el.onclick = onBack; el.style.cursor = 'pointer'; });
 
       c.querySelectorAll('[onchange]').forEach(el => {
         const oc = el.getAttribute('onchange');

@@ -15,9 +15,10 @@ function QuoToast({ msg }) {
 }
 
 export default function QuotationCreatorModern(props) {
-  const [showModernForm, setShowModernForm] = useState(!!props.newlyAddedClientName);
+  const [showModernForm, setShowModernForm] = useState(!!props.newlyAddedClientName || !!props.prefillProject);
   const [editEntry, setEditEntry] = useState(null);
   const [listRefreshKey, setListRefreshKey] = useState(0);
+  const [pendingPrefill] = useState(props.prefillProject || null);
 
   // If a client was just added while we were mid-way through the Modern
   // Form (via "+ New Client"), the parent tears this whole tab down and
@@ -29,8 +30,9 @@ export default function QuotationCreatorModern(props) {
   }, [props.newlyAddedClientName]);
 
   useEffect(() => {
-    if (props.prefillProject && props.onPrefillConsumed) {
-      props.onPrefillConsumed();
+    if (props.prefillProject) {
+      setShowModernForm(true);
+      if (props.onPrefillConsumed) props.onPrefillConsumed();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.prefillProject]);
@@ -55,7 +57,7 @@ export default function QuotationCreatorModern(props) {
   if (!showModernForm) {
     return <QuotationCreator key={listRefreshKey} {...props} onNewQuotation={handleNew} onEditQuotation={handleEdit} />;
   }
-  return <ModernForm onBack={handleBack} editEntry={editEntry} {...props} />;
+  return <ModernForm onBack={handleBack} editEntry={editEntry} {...props} prefillProject={pendingPrefill} />;
 }
 
 const genId = () => Date.now() + Math.random();

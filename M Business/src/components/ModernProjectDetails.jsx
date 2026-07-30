@@ -4,7 +4,6 @@ import { BASE_URL } from '../config';
 import ModernEmployeeProjectDetails from './ModernEmployeeProjectDetails';
 import ProjectPaymentModals from './ProjectPaymentModals';
 import { printProposal, shareProposalAsPDF } from './proposalPrintUtils';
-import { shareQuotationAsPDF } from './QuotationCreatorModern';
 
 const MILESTONE_OPTIONS = [
   "Custom",
@@ -248,7 +247,7 @@ function DetailField({ label, value, fullWidth }) {
   );
 }
 
-export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions = false, onNext, onNewInvoice, onViewInvoice, onNewProposal, onNewQuotation, autoOpenInvoice, onAutoOpenInvoiceDone, fromClientContext = false, onAddEmployeeClick }) {
+export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions = false, onNext, onNewInvoice, onViewInvoice, onNewProposal, onNewQuotation, onViewQuotation, autoOpenInvoice, onAutoOpenInvoiceDone, fromClientContext = false, onAddEmployeeClick }) {
   const [activeTab, setActiveTab] = useState(() => {
     try {
       const saved = localStorage.getItem('project_tabs_order');
@@ -2090,19 +2089,18 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
                           <button
-                            onClick={() => shareQuotationAsPDF(q, 'share')}
+                            onClick={() => onViewQuotation && onViewQuotation(q)}
                             title="Share Quotation PDF"
                             style={{ fontSize: 11, fontWeight: 800, color: '#0EA5E9', background: 'none', border: 'none', cursor: 'pointer' }}
                           >
                             Share
                           </button>
                           <button
-                            onClick={() => shareQuotationAsPDF(q, 'view')}
+                            onClick={() => onViewQuotation && onViewQuotation(q)}
                             style={{ fontSize: 11, fontWeight: 800, color: ' var(--app-accent, #00BCD4)', background: 'none', border: 'none', cursor: 'pointer' }}
                           >
                             View
-                          </button>
-                          <button
+                          </button>  <button
                             onClick={async () => {
                               if (!confirm('Delete this quotation?')) return;
                               try {

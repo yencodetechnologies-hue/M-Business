@@ -122,10 +122,10 @@ function ProjectDropdown({ projects, value, onChange, onAddProject, disabled }) 
   );
 }
 
-export default function QuotationCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onConvertToInvoice, onAddClient, onAddProject, onNewQuotation, onEditQuotation, initialStep, onStepChange }) {
+export default function QuotationCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onConvertToInvoice, onAddClient, onAddProject, onNewQuotation, onEditQuotation, initialStep, onStepChange, initialViewEntry, onBackOverride }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || user?.companyName || "M Business";
-  const [step, setStep] = useState(initialStep || "list");
+  const [step, setStep] = useState(initialViewEntry ? "preview" : (initialStep || "list"));
   useEffect(() => {
     if (onStepChange) onStepChange(step);
   }, [step]);
@@ -178,7 +178,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
   const [convertingId, setConvertingId] = useState(null);
   const [listSearch, setListSearch] = useState("");
   const [activeTab, setActiveTab] = useState("All");
-  const [viewEntry, setViewEntry] = useState(null);
+  const [viewEntry, setViewEntry] = useState(initialViewEntry || null);
   const [toastMsg, setToastMsg] = useState(null);
   const showToast = (msg) => {
     setToastMsg(msg);
@@ -213,8 +213,8 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     ifscCode: "",
   };
 
-  const [qt, setQt] = useState(blank);
-  const [items, setItems] = useState([{ id: 1, description: "", quantity: 1, rate: "" }]);
+  const [qt, setQt] = useState(initialViewEntry?.qt || blank);
+  const [items, setItems] = useState(initialViewEntry?.items || [{ id: 1, description: "", quantity: 1, rate: "" }]);
 
   const upd = (f, v) => setQt((p) => ({ ...p, [f]: v }));
   const selectedClient = clients.find((c) => (c.clientName || c.name) === qt.client);
@@ -1221,7 +1221,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
         <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
 
-          <button onClick={() => setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Document List</button>
+          <button onClick={() => onBackOverride ? onBackOverride() : setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Document List</button>
           <button onClick={() => {
             if (onEditQuotation && viewEntry) {
               onEditQuotation(viewEntry);

@@ -6944,6 +6944,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [jumpInvoice, setJumpInvoice] = useState(null);
   const [quotationPrefillProject, setQuotationPrefillProject] = useState(null);
   const [proposalPrefillProject, setProposalPrefillProject] = useState(null);
+  const [quotationViewEntry, setQuotationViewEntry] = useState(null);
+
   const [quotationReturnProject, setQuotationReturnProject] = useState(null);
   const [proposalReturnProject, setProposalReturnProject] = useState(null);
   const [invoicePrefill, setInvoicePrefill] = useState(() => {
@@ -11466,9 +11468,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   setSidebarOverride("projects");
                   setActive("proposals");
                 }}
-                onNewQuotation={(proj) => {
+         onNewQuotation={(proj) => {
                   setQuotationPrefillProject(proj);
                   setQuotationReturnProject(proj);
+                  setSidebarOverride("projects");
+                  setActive("quotations");
+                }}
+                onViewQuotation={(entry) => {
+                  setQuotationViewEntry(entry);
+                  setSidebarOverride("projects");
+                  setActive("quotations");
+                }}
+                onViewQuotation={(entry) => {
+                  setQuotationViewEntry(entry);
                   setSidebarOverride("projects");
                   setActive("quotations");
                 }}
@@ -11793,7 +11805,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 onAddProject={() => { }}
               />
             )}
-            {validActive === "quotations" && <QuotationCreatorModern user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} prefillProject={quotationPrefillProject} onPrefillConsumed={() => setQuotationPrefillProject(null)} onReturnToProject={quotationReturnProject ? () => { const p = quotationReturnProject; setQuotationReturnProject(null); setJumpProject(p); setSidebarOverride(null); setActive("project-details"); } : null} onAddClient={() => {
+            {validActive === "quotations" && <QuotationCreatorModern user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} prefillProject={quotationPrefillProject} onPrefillConsumed={() => setQuotationPrefillProject(null)} initialViewEntry={quotationViewEntry} onBackOverride={quotationViewEntry ? () => { setQuotationViewEntry(null); setSidebarOverride(null); setActive("project-details"); } : null} onReturnToProject={quotationReturnProject ? () => { const p = quotationReturnProject; setQuotationReturnProject(null); setJumpProject(p); setSidebarOverride(null); setActive("project-details"); } : null} onAddClient={() => {
 
               setNcError({}); setShowClientPass(false);
               setReturnToQuotation(true);

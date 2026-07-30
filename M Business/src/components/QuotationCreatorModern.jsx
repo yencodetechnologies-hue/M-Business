@@ -57,7 +57,7 @@ export default function QuotationCreatorModern(props) {
     setListRefreshKey(k => k + 1);
   };
 
-  if (!showModernForm) {
+  if (!showModernForm || props.initialViewEntry) {
     return <QuotationCreator key={listRefreshKey} {...props} onNewQuotation={handleNew} onEditQuotation={handleEdit} />;
   }
   return <ModernForm onBack={pendingPrefill && props.onReturnToProject ? props.onReturnToProject : handleBack} editEntry={editEntry} {...props} prefillProject={pendingPrefill} />;

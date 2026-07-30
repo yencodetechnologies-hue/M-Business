@@ -3275,11 +3275,72 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                             <span style={{ fontWeight: 700, color: C.teal2 }}>Notes: </span>{notes}
                           </div>
                         )}
+
+                        {/* Approve / Review buttons */}
+                        {q.status !== "approved" && q.status !== "reviewed" && (
+                          <div style={{ padding: "12px 18px", borderTop: "1px solid " + C.border, display: "flex", gap: 10 }}>
+                            <button
+                              className="ai-btn approve"
+                              onClick={() => handleQuotationApprove(q.id)}
+                              style={{ flex: 1, padding: "10px 16px", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", background: C.green, color: "#fff", border: "none" }}
+                            >
+                              <i className="ti ti-check" style={{ fontSize: 12 }}></i> Approve
+                            </button>
+                            <button
+                              onClick={() => setReviewQuotation(q)}
+                              style={{ flex: 1, padding: "10px 16px", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", background: "#fff", border: "1.5px solid " + C.border, color: C.text }}
+                            >
+                              <i className="ti ti-message-2" style={{ fontSize: 12 }}></i> Review
+                            </button>
+                          </div>
+                        )}
+
+                        {q.status === "approved" && (
+                          <div style={{ padding: "10px 18px", borderTop: "1px solid " + C.border, color: C.green, fontWeight: 700, fontSize: 12 }}>
+                            <i className="ti ti-circle-check"></i> Approved
+                          </div>
+                        )}
+
+                        {q.status === "reviewed" && q.clientComment && (
+                          <div style={{ padding: "10px 18px", borderTop: "1px solid " + C.border, background: C.amberBg, color: C.text2, fontSize: 12 }}>
+                            <span style={{ fontWeight: 700, color: C.amber }}>Your Review: </span>{q.clientComment}
+                          </div>
+                        )}
                       </div>
 
                     );
                   })}
                 </div>
+
+                {reviewQuotation && (
+                <div className="modal-overlay" onClick={() => setReviewQuotation(null)}>
+                  <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+                    <div className="modal-header">
+                      <span className="modal-title">Review "{reviewQuotation.quoteNo}"</span>
+                      <button className="modal-close" onClick={() => setReviewQuotation(null)}>&times;</button>
+                    </div>
+                    <div className="modal-body">
+                      <div style={{ fontSize: 12, fontWeight: 700, color: C.text2 }}>Your comments *</div>
+                      <textarea
+                        id="quotation-review-textarea"
+                        rows={4}
+                        placeholder="Let us know what changes you'd like..."
+                        style={{ width: "100%", padding: "10px 12px", borderRadius: 9, border: "1.5px solid " + C.border, fontSize: 13, outline: "none", resize: "none", boxSizing: "border-box" }}
+                      />
+                      <button
+                        onClick={() => {
+                          const val = document.getElementById("quotation-review-textarea").value;
+                          if (!val.trim()) { alert("Please enter your comments."); return; }
+                          handleQuotationReviewSubmit(reviewQuotation.id, val.trim());
+                        }}
+                        style={{ width: "100%", padding: "11px", background: C.teal, color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+                      >
+                        Submit Review
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
 
               )}

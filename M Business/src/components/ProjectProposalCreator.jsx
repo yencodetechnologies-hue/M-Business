@@ -1120,7 +1120,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
 }
 
 // ─── MAIN APP -----------------------------------------------------------------
-export default function CanvaProposal({ clients = [], openNew = false, onOpenNewDone, companyLogo, companyName, onAddClient, newlyAddedClientName, triggerCrop }) {
+export default function CanvaProposal({ clients = [], openNew = false, onOpenNewDone, companyLogo, companyName, onAddClient, newlyAddedClientName, triggerCrop, prefillProject, onPrefillConsumed }) {
   // Always start at "list" view; fetchProposals() will switch to "editor" once the
   // correct doc has been loaded from the API (fixes the blank-editor flash when
   // navigating via ?edit= or ?view= URL params before data is ready).
@@ -1220,7 +1220,18 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   const [activeCard, setActiveCard] = useState("all");
   const [propTab, setPropTab] = useState("all");
   const [propSearch, setPropSearch] = useState("");
-  const [newForm, setNewForm] = useState({ title: "", client: "", value: "" });
+  const [newForm, setNewForm] = useState({
+    title: prefillProject?.name || "",
+    client: prefillProject?.client || prefillProject?.clientName || "",
+    value: "",
+  });
+
+  useEffect(() => {
+    if (prefillProject && onPrefillConsumed) {
+      onPrefillConsumed();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefillProject]);
   const [viewingProposal, setViewingProposal] = useState(null);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [shareModalProposal, setShareModalProposal] = useState(null);

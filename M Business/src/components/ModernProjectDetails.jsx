@@ -2005,7 +2005,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           </div>
 
           {!hideTopActions && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', background: '#F8FAFC', border: '1px solid #E8EDF2', borderRadius: 12, padding: 12, marginBottom: 20, width: '100%', boxSizing: 'border-box' }}>
 
               {onNewQuotation && (
                 <button
@@ -2023,9 +2023,22 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   <i className="ti ti-file-text" style={{ fontSize: 13 }}></i> New Project Proposal
                 </button>
               )}
+              <input
+                id="other-docs-input"
+                type="file"
+                multiple
+                onChange={handleFileUpload}
+                style={{ display: 'none' }}
+              />
+              <button
+                onClick={() => document.getElementById('other-docs-input').click()}
+                disabled={uploadingFile}
+                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#fff', color: ' var(--app-accent, #00BCD4)', border: '1px solid  var(--app-accent, #00BCD4)', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit', textDecoration: 'none' }}
+              >
+                <i className={uploadingFile ? "ti ti-loader-2" : "ti ti-folder-plus"} style={{ fontSize: 13 }}></i> {uploadingFile ? 'Uploading…' : 'Other Documents'}
+              </button>
             </div>
           )}
-
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 20, width: '100%' }}>
             {(() => {
               const liveAdvanceTotal = (currProject.advances || []).reduce((s, a) => s + parseAmt(a.amount), 0);

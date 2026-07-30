@@ -28,6 +28,13 @@ export default function QuotationCreatorModern(props) {
     }
   }, [props.newlyAddedClientName]);
 
+  useEffect(() => {
+    if (props.prefillProject && props.onPrefillConsumed) {
+      props.onPrefillConsumed();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.prefillProject]);
+
   const handleNew = () => {
     setEditEntry(null);
     setShowModernForm(true);
@@ -54,7 +61,7 @@ export default function QuotationCreatorModern(props) {
 const genId = () => Date.now() + Math.random();
 const today = new Date().toISOString().split('T')[0];
 const genQuoteNo = () => 'QUO-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 9000) + 1000);
-function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient, newlyAddedClientName }) {
+function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient, newlyAddedClientName, prefillProject, onPrefillConsumed }) {
   // ── Pre-fill from existing entry if editing ──
   // The API returns: entry.qt (saved form data), entry.items (line items),
   // entry.id (MongoDB _id), entry.client (top-level shortcut), entry.status
@@ -70,8 +77,8 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
   // qt.companyName → fromCompany
   // qt.companyEmail → fromEmail
   // qt.companyPhone → fromPhone
-  const resolvedToName = existingQt.toName || existingQt.client || editEntry?.client || '';
-  const resolvedTitle = existingQt.title || existingQt.project || '';
+  const resolvedToName = existingQt.toName || existingQt.client || editEntry?.client || (prefillProject && (prefillProject.client || prefillProject.clientName)) || '';
+  const resolvedTitle = existingQt.title || existingQt.project || (prefillProject && prefillProject.name) || '';
   const resolvedQuoteDate = existingQt.quoteDate || existingQt.date || today;
   const resolvedFromCompany = existingQt.fromCompany || existingQt.companyName || '';
   const resolvedFromName = existingQt.fromName || '';

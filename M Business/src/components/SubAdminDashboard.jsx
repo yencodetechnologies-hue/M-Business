@@ -9710,7 +9710,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 ["projects", "edit-project", "project-details"].includes(validActive) ? "projects" :
                   validActive
             }
-            setActive={(val) => { setSidebarOverride(null); setActive(val); }}
+            setActive={(val) => { setSidebarOverride(null); if (val !== "quotations") setQuotationViewEntry(null); setActive(val); }}
             onLogout={handleLogout}
             open={sidebarOpen}
             onClose={() => setSidebarOpen(false)}

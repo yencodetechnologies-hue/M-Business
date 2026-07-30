@@ -88,10 +88,7 @@ router.post("/", upload.single("file"), async (req, res) => {
       }
 
       try {
-        const isInlineViewable = /^(application\/pdf|text\/plain|image\/|application\/msword|application\/vnd\.ms-excel|application\/vnd\.ms-powerpoint|application\/vnd\.openxmlformats-officedocument)/.test(req.file.mimetype);
-        const inlineUrl = isInlineViewable
-          ? result.secure_url.replace("/upload/", "/upload/fl_attachment:false/")
-          : result.secure_url;
+        const inlineUrl = result.secure_url;
         const newMedia = new Media({
           url: inlineUrl,
           public_id: result.public_id,

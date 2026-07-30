@@ -2089,14 +2089,14 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
                           <button
-                            onClick={() => { setSidebarOverride?.('projects'); onNewQuotation && onNewQuotation({ ...currProject, _editQuotation: q, _autoShare: true }); }}
+                            onClick={() => { onNewQuotation && onNewQuotation({ ...currProject, _editQuotation: q, _autoShare: true }); }}
                             title="Share Quotation PDF"
                             style={{ fontSize: 11, fontWeight: 800, color: '#0EA5E9', background: 'none', border: 'none', cursor: 'pointer' }}
                           >
                             Share
                           </button>
                           <button
-                            onClick={() => { setSidebarOverride?.('projects'); onNewQuotation && onNewQuotation({ ...currProject, _editQuotation: q }); }}
+                            onClick={() => { onNewQuotation && onNewQuotation({ ...currProject, _editQuotation: q }); }}
                             style={{ fontSize: 11, fontWeight: 800, color: ' var(--app-accent, #00BCD4)', background: 'none', border: 'none', cursor: 'pointer' }}
                           >
                             View
@@ -2140,7 +2140,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
                           <button
-                            onClick={() => shareProposalAsPDF(p, companyName)}
+                            onClick={() => shareProposalAsPDF(p, currProject?.companyName || user?.companyName || '')}
                             title="Share Proposal PDF"
                             style={{ fontSize: 11, fontWeight: 800, color: '#0EA5E9', background: 'none', border: 'none', cursor: 'pointer' }}
                           >

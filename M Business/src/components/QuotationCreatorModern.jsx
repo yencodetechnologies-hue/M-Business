@@ -67,6 +67,7 @@ const genId = () => Date.now() + Math.random();
 const today = new Date().toISOString().split('T')[0];
 const genQuoteNo = () => 'QUO-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 9000) + 1000);
 function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient, newlyAddedClientName, prefillProject, onPrefillConsumed }) {
+  const [autoSharing, setAutoSharing] = useState(!!prefillProject?._autoShare);
   // ── Pre-fill from existing entry if editing ──
   // The API returns: entry.qt (saved form data), entry.items (line items),
   // entry.id (MongoDB _id), entry.client (top-level shortcut), entry.status
@@ -383,14 +384,6 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
     }
   };
 
-  useEffect(() => {
-    if (prefillProject?._autoShare) {
-      const t = setTimeout(() => { handleShare(); }, 800);
-      return () => clearTimeout(t);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prefillProject]);
-
   const handleShare = async () => {
     try {
       showToast('Generating PDF to share…');
@@ -421,7 +414,12 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
 
   useEffect(() => {
     if (prefillProject?._autoShare) {
-      const t = setTimeout(() => { handleShare(); }, 800);
+      setAutoSharing(true);
+      const t = setTimeout(async () => {
+        await handleShare();
+        setAutoSharing(false);
+        if (typeof onBack === 'function') onBack();
+      }, 800);
       return () => clearTimeout(t);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -702,6 +700,15 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
   `;
 
   const initials = (qt.fromCompany || 'YT').substring(0, 2).toUpperCase();
+
+  if (autoSharing) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: 12 }}>
+        <i className="ti ti-loader-2" style={{ fontSize: 32, color: 'var(--app-accent, #00BCD4)', animation: 'spin 1s linear infinite' }}></i>
+        <div style={{ fontSize: 13, fontWeight: 700, color: '#7B8FA1' }}>Preparing quotation to share…</div>
+      </div>
+    );
+  }
 
   return (
     <div className="mqc-wrap">

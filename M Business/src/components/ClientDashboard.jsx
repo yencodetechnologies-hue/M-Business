@@ -2357,6 +2357,12 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                   <div className="ai-title">{app.title}</div>
                   <div className="ai-desc">{app.desc}</div>
                   {app.senderName && <div style={{ fontSize: 10, color: C.text3, marginTop: 2 }}>From {app.senderName}</div>}
+                  {((app.attachments && app.attachments.length > 0) || app.fileUrl) && (
+                    <div style={{ fontSize: 10, color: C.teal, marginTop: 4, display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700 }}>
+                      <i className="ti ti-paperclip" style={{ fontSize: 12 }}></i>
+                      {(app.attachments && app.attachments.length > 1) ? `${app.attachments.length} files attached` : (app.fileName || app.attachments?.[0]?.name || 'File attached')}
+                    </div>
+                  )}
                 </div>
                 <div className="ai-actions" style={{ alignSelf: 'center', marginLeft: 'auto', flexShrink: 0 }}>
                   {isResponded && (

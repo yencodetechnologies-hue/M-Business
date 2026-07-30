@@ -398,9 +398,14 @@ export async function printProposal(proposal, mode = 'view', preOpenedWin = null
     :root { ${resolvedVars} }
     ${PRINT_BASE_CSS}
     ${PROPOSAL_PREVIEW_CSS}
+    .__proposal_tab_bar { position:sticky; top:0; z-index:9999; display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:12px 20px; background:#fff; border-bottom:1px solid #E8EDF2; }
+    .__proposal_tab_bar button { padding:8px 16px; border-radius:8px; border:1px solid #E8EDF2; background:#fff; font-weight:700; font-size:13px; cursor:pointer; font-family:inherit; }
   </style>
 </head>
-<body>${bodyHTML}</body>
+<body>
+  <div class="__proposal_tab_bar no-print"><button onclick="window.close()">Close Tab</button></div>
+  ${bodyHTML}
+</body>
 </html>`;
 
   const existingFrame = document.getElementById("__proposal_print_frame__");

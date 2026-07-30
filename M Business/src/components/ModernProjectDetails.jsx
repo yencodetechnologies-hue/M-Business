@@ -247,7 +247,7 @@ function DetailField({ label, value, fullWidth }) {
   );
 }
 
-export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions = false, onNext, onNewInvoice, onViewInvoice, onNewProposal, onNewQuotation, onViewQuotation, autoOpenInvoice, onAutoOpenInvoiceDone, fromClientContext = false, onAddEmployeeClick }) {
+export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions = false, onNext, onNewInvoice, onViewInvoice, onNewProposal, onNewQuotation, onViewQuotation, onViewProposal, autoOpenInvoice, onAutoOpenInvoiceDone, fromClientContext = false, onAddEmployeeClick }) {
   const [activeTab, setActiveTab] = useState(() => {
     try {
       const saved = localStorage.getItem('project_tabs_order');
@@ -2110,15 +2110,15 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           </div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-
+                          <button onClick={() => { onNewQuotation && onNewQuotation({ ...currProject, _editQuotation: q, _autoShare: true }); }} title="Share" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#0EA5E9' }}><i className="ti ti-send"></i></button>
                           <button onClick={() => onViewQuotation && onViewQuotation(q)} title="View" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: ' var(--app-accent, #00BCD4)' }}><i className="ti ti-eye"></i></button>
                           <button
                             onClick={async () => {
-                              if (!confirm('Delete this project proposal?')) return;
+                              if (!confirm('Delete this quotation?')) return;
                               try {
-                                await axios.delete(`${BASE_URL}/api/proposals/${p._id || p.id}`);
-                                setProjectProposals(prev => prev.filter(x => (x._id || x.id) !== (p._id || p.id)));
-                              } catch (err) { alert('Failed to delete proposal.'); }
+                                await axios.delete(`${BASE_URL}/api/quotations/${q._id || q.id}`);
+                                setProjectQuotations(prev => prev.filter(x => (x._id || x.id) !== (q._id || q.id)));
+                              } catch (err) { alert('Failed to delete quotation.'); }
                             }}
                             title="Delete"
                             style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}
@@ -2146,8 +2146,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           </div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                          <button onClick={() => shareProposalAsPDF(p, currProject?.companyName || user?.companyName || '')} title="Share" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#0EA5E9' }}><i className="ti ti-send"></i></button>
+                          <button onClick={() => onViewProposal && onViewProposal(p)} title="View" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: ' var(--app-accent, #00BCD4)' }}><i className="ti ti-eye"></i></button>
 
-                          <button onClick={() => { const w = window.open('', '_blank'); printProposal(p, 'view', w); }} title="View" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: ' var(--app-accent, #00BCD4)' }}><i className="ti ti-eye"></i></button>
                           <button
                             onClick={async () => {
                               if (!confirm('Delete this project proposal?')) return;

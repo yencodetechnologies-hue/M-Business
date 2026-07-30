@@ -6945,6 +6945,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [quotationPrefillProject, setQuotationPrefillProject] = useState(null);
   const [proposalPrefillProject, setProposalPrefillProject] = useState(null);
   const [quotationViewEntry, setQuotationViewEntry] = useState(null);
+  const [proposalViewEntry, setProposalViewEntry] = useState(null);
 
   const [quotationReturnProject, setQuotationReturnProject] = useState(null);
   const [proposalReturnProject, setProposalReturnProject] = useState(null);
@@ -9710,7 +9711,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 ["projects", "edit-project", "project-details"].includes(validActive) ? "projects" :
                   validActive
             }
-            setActive={(val) => { setSidebarOverride(null); if (val !== "quotations") setQuotationViewEntry(null); setActive(val); }}
+            setActive={(val) => { setSidebarOverride(null); if (val !== "quotations") setQuotationViewEntry(null); if (val !== "proposals") setProposalViewEntry(null); setActive(val); }}
             onLogout={handleLogout}
             open={sidebarOpen}
             onClose={() => setSidebarOpen(false)}
@@ -11479,6 +11480,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   setSidebarOverride("projects");
                   setActive("quotations");
                 }}
+                onViewProposal={(entry) => {
+                  setProposalViewEntry(entry);
+                  setSidebarOverride("projects");
+                  setActive("proposals");
+                }}
 
                 onNewInvoice={(proj, editInv) => {
                   if (!proj) return;
@@ -11810,7 +11816,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             }} onAddProject={() => { setPrevActiveBeforeInvoice(active); setActive("create-project"); }} newlyAddedClientName={quotationNewClientName} />}
 
-            {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} prefillProject={proposalPrefillProject} onPrefillConsumed={() => setProposalPrefillProject(null)} onReturnToProject={proposalReturnProject ? () => { const p = proposalReturnProject; setProposalReturnProject(null); setJumpProject(p); setSidebarOverride(null); setActive("project-details"); } : null} onAddClient={() => { setShowCropModal(false); setNcError({}); setShowClientPass(false); setReturnToProposals(true); setSidebarOverride("proposals"); setActive("addClient"); }} newlyAddedClientName={proposalNewClientName} triggerCrop={triggerCrop} />}
+            {validActive === "proposals" && <ProjectProposalCreator key={proposalViewEntry ? `view-${proposalViewEntry._id || proposalViewEntry.id}` : 'list'} clients={clients} companyLogo={companyLogo} companyName={companyNameStr} prefillProject={proposalPrefillProject} onPrefillConsumed={() => setProposalPrefillProject(null)} initialViewProposal={proposalViewEntry} onBackOverride={proposalViewEntry ? () => { setProposalViewEntry(null); setSidebarOverride(null); setActive("project-details"); } : null} onReturnToProject={proposalReturnProject ? () => { const p = proposalReturnProject; setProposalReturnProject(null); setJumpProject(p); setSidebarOverride(null); setActive("project-details"); } : null} onAddClient={() => { setShowCropModal(false); setNcError({}); setShowClientPass(false); setReturnToProposals(true); setSidebarOverride("proposals"); setActive("addClient"); }} newlyAddedClientName={proposalNewClientName} triggerCrop={triggerCrop} />}
 
             {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
 

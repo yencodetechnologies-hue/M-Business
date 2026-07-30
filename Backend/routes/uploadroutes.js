@@ -81,10 +81,11 @@ router.post("/", upload.single("file"), async (req, res) => {
   const baseName = path.basename(req.file.originalname || "file", ext).replace(/[^a-zA-Z0-9_-]/g, "_");
   const uniqueName = `${baseName}-${Date.now()}${ext}`;
 
+  const isPdf = req.file.mimetype === "application/pdf";
   const uploadStream = cloudinary.uploader.upload_stream(
     {
       folder: "mbusiness/uploads",
-      resource_type: req.file.mimetype.startsWith("image/") ? "image" : "raw",
+      resource_type: (req.file.mimetype.startsWith("image/") || isPdf) ? "image" : "raw",
       public_id: uniqueName,
       use_filename: true,
       unique_filename: false,

@@ -336,7 +336,7 @@ function buildSlidesHTML(proposal) {
 
   return html;
 }
-export async function printProposal(proposal) {
+export async function printProposal(proposal, mode = 'view') {
   if (!proposal) return;
   const liveDocSnapshot = document.getElementById('propDoc');
   proposal = { ...proposal, __liveHTML: liveDocSnapshot ? liveDocSnapshot.outerHTML : null };
@@ -419,23 +419,30 @@ export async function printProposal(proposal) {
       });
       const blob = await worker.output('blob');
       const fileName = `${(proposal.title || 'proposal').replace(/[^a-z0-9]/gi, '_')}.pdf`;
-      const file = new File([blob], fileName, { type: 'application/pdf' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({ files: [file] });
-        } catch (err) {
-          if (err.name !== 'AbortError') {
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = fileName;
-            a.click();
-          }
-        }
+
+      if (mode === 'view') {
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
       } else {
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = fileName;
-        a.click();
+        // mode === 'share'
+        const file = new File([blob], fileName, { type: 'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({ files: [file] });
+          } catch (err) {
+            if (err.name !== 'AbortError') {
+              const a = document.createElement('a');
+              a.href = URL.createObjectURL(blob);
+              a.download = fileName;
+              a.click();
+            }
+          }
+        } else {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = fileName;
+          a.click();
+        }
       }
     } catch (e) {
       console.error('PDF generation error:', e);
@@ -448,7 +455,7 @@ export async function printProposal(proposal) {
 
 export async function shareProposalAsPDF(proposal, companyName, onStatusUpdate) {
   if (onStatusUpdate) await onStatusUpdate(proposal);
-  printProposal(proposal);
+  printProposal(proposal, 'share');
 }
 
 export function buildProposalHTML(proposal) {

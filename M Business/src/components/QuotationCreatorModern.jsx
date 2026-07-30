@@ -416,7 +416,38 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
     if (prefillProject?._autoShare) {
       setAutoSharing(true);
       const t = setTimeout(async () => {
-        await handleShare();
+        try {
+          const pdf = await generateQuotationPdf();
+          if (pdf) {
+            const blob = pdf.output('blob');
+            const file = new File([blob], `Quotation_${qt.quoteNo}.pdf`, { type: 'application/pdf' });
+            // Fall back to direct download here (no navigator.share) since this
+            // runs on a timer, not a direct click — browsers block share() calls
+            // that aren't triggered synchronously by user interaction.
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = file.name; a.click(); URL.revokeObjectURL(url);
+          }
+        } catch (err) {
+          console.error('Auto-share PDF generation failed:', err);
+        }
+        setAutoSharing(false);
+        if (typeof onBack === 'function') onBack();
+      }, 800);
+      return () => clearTimeout(t);
+    }
+    if (prefillProject?._autoView) {
+      setAutoSharing(true); // reuse the same "hide form, show loader" flag
+      const t = setTimeout(async () => {
+        try {
+          const pdf = await generateQuotationPdf();
+          if (pdf) {
+            const blobUrl = pdf.output('bloburl');
+            window.open(blobUrl, '_blank');
+          }
+        } catch (err) {
+          console.error('Auto-view PDF generation failed:', err);
+        }
         setAutoSharing(false);
         if (typeof onBack === 'function') onBack();
       }, 800);
@@ -701,18 +732,15 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
 
   const initials = (qt.fromCompany || 'YT').substring(0, 2).toUpperCase();
 
-  if (autoSharing) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: 12 }}>
-        <i className="ti ti-loader-2" style={{ fontSize: 32, color: 'var(--app-accent, #00BCD4)', animation: 'spin 1s linear infinite' }}></i>
-        <div style={{ fontSize: 13, fontWeight: 700, color: '#7B8FA1' }}>Preparing quotation to share…</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="mqc-wrap">
+    <div className="mqc-wrap" style={autoSharing ? { position: 'relative' } : undefined}>
       <style>{CSS}</style>
+      {autoSharing && (
+        <div style={{ position: 'fixed', inset: 0, background: '#fff', zIndex: 999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+          <i className="ti ti-loader-2" style={{ fontSize: 32, color: 'var(--app-accent, #00BCD4)', animation: 'spin 1s linear infinite' }}></i>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#7B8FA1' }}>{prefillProject?._autoView ? 'Opening quotation PDF…' : 'Preparing quotation to share…'}</div>
+        </div>
+      )}
 
       {/* TOPBAR */}
       <header className="mqc-topbar">
@@ -1450,4 +1478,115 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
       <QuoToast msg={toast} />
     </div>
   );
+}
+// ── Headless quotation PDF/share generator — builds the PDF directly from
+// saved quotation data (q.qt, q.items), without mounting the editable form.
+// This lets Share/View work as a direct, synchronous click action so
+// navigator.share() still qualifies as a user-gesture-triggered call. ──
+export async function shareQuotationAsPDF(q, mode = 'share') {
+  const qt = q.qt || {};
+  const items = q.items || [];
+  const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity ?? i.qty) || 0), 0);
+  const fmt = (n) => 'INR ' + Number(n || 0).toLocaleString('en-IN');
+  const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+  const bodyHTML = `
+    <div class="quo-preview" style="padding:22px;font-family:'Nunito',sans-serif;font-size:12px;color:#1A2E35;background:#fff;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;padding-bottom:14px;border-bottom:3px solid #00BCD4;">
+        <div>
+          <div style="font-size:13px;font-weight:800;">${qt.fromCompany || '—'}</div>
+          <div style="font-size:10px;color:#A0B8BE;margin-top:2px;">${qt.fromEmail || ''}<br/>${qt.fromPhone || ''}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:22px;font-weight:900;color:#00BCD4;">QUOTATION</div>
+          <div style="font-size:11px;font-weight:700;margin-top:3px;">#${qt.quoteNo || ''}</div>
+          <div style="font-size:10px;color:#A0B8BE;margin-top:2px;">Date: ${qt.quoteDate ? new Date(qt.quoteDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : todayStr}</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+        <div>
+          <div style="font-size:9px;font-weight:700;color:#00BCD4;text-transform:uppercase;">Prepared By</div>
+          <div style="font-size:12px;font-weight:800;">${qt.fromName || '—'}</div>
+        </div>
+        <div>
+          <div style="font-size:9px;font-weight:700;color:#00BCD4;text-transform:uppercase;">Prepared For</div>
+          <div style="font-size:12px;font-weight:800;">${qt.toName || '—'}</div>
+          <div style="font-size:10px;color:#A0B8BE;">${qt.toEmail || ''} ${qt.toPhone || ''}</div>
+        </div>
+      </div>
+      <div style="padding:8px 10px;background:#F0FDFE;border-radius:8px;border-left:3px solid #00BCD4;margin-bottom:12px;">
+        <div style="font-size:9px;font-weight:700;color:#00BCD4;text-transform:uppercase;">Project</div>
+        <div style="font-size:13px;font-weight:800;">${qt.title || '—'}</div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:14px;">
+        <thead><tr style="background:linear-gradient(135deg,#00BCD4,#006E7F);">
+          <th style="padding:7px 9px;font-size:10px;color:#fff;text-align:left;">#</th>
+          <th style="padding:7px 9px;font-size:10px;color:#fff;text-align:left;">Description</th>
+          <th style="padding:7px 9px;font-size:10px;color:#fff;text-align:left;">Qty</th>
+          <th style="padding:7px 9px;font-size:10px;color:#fff;text-align:left;">Price</th>
+          <th style="padding:7px 9px;font-size:10px;color:#fff;text-align:right;">Total</th>
+        </tr></thead>
+        <tbody>
+          ${items.map((item, idx) => `
+            <tr style="border-bottom:1px solid #E0EEF0;">
+              <td style="padding:7px 9px;font-size:11px;">${idx + 1}</td>
+              <td style="padding:7px 9px;font-size:11px;">${item.description || item.desc || '—'}</td>
+              <td style="padding:7px 9px;font-size:11px;">${item.quantity ?? item.qty ?? 1}</td>
+              <td style="padding:7px 9px;font-size:11px;">${fmt(item.rate)}</td>
+              <td style="padding:7px 9px;font-size:11px;font-weight:700;text-align:right;">${fmt((parseFloat(item.rate) || 0) * (parseFloat(item.quantity ?? item.qty) || 0))}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      <div style="display:flex;justify-content:flex-end;">
+        <div style="width:200px;padding:7px 10px;background:linear-gradient(135deg,#00BCD4,#006E7F);border-radius:7px;display:flex;justify-content:space-between;">
+          <span style="font-size:11px;font-weight:800;color:#fff;">Total</span>
+          <span style="font-size:13px;font-weight:900;color:#fff;">${fmt(subtotal)}</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const container = document.createElement('div');
+  container.id = '__quotation_pdf_container__';
+  container.style.cssText = 'position:fixed;top:0;left:0;width:210mm;background:#fff;z-index:999999;opacity:0;pointer-events:none;';
+  container.innerHTML = bodyHTML;
+  document.body.appendChild(container);
+
+  try {
+    const html2canvasMod = await import('html2canvas');
+    const html2canvas = html2canvasMod.default;
+    const { jsPDF } = await import('jspdf');
+    const canvas = await html2canvas(container, { scale: 2, useCORS: true, logging: false });
+    const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    const imgData = canvas.toDataURL('image/jpeg', 0.98);
+    const pageW = 210;
+    const pageH = (canvas.height * pageW) / canvas.width;
+    pdf.addImage(imgData, 'JPEG', 0, 0, pageW, pageH);
+
+    const fileName = `Quotation_${qt.quoteNo || 'draft'}.pdf`;
+
+    if (mode === 'view') {
+      const blobUrl = pdf.output('bloburl');
+      window.open(blobUrl, '_blank');
+      return;
+    }
+
+    // mode === 'share'
+    const blob = pdf.output('blob');
+    const file = new File([blob], fileName, { type: 'application/pdf' });
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ title: `Quotation ${qt.quoteNo || ''}`, files: [file] });
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+      }
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = fileName; a.click(); URL.revokeObjectURL(url);
+  } finally {
+    container.remove();
+  }
 }

@@ -2033,12 +2033,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <i className="ti ti-arrows-exchange"></i> Accounts
           </div>
           {!hideTopActions && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', background: '#F8FAFC', border: '1px solid #E8EDF2', borderRadius: 12, padding: 12, marginBottom: 20, width: '100%', boxSizing: 'border-box' }}>
-
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, background: '#F8FAFC', border: '1px solid #E8EDF2', borderRadius: 12, padding: 12, marginBottom: 20, width: '100%', boxSizing: 'border-box' }}>
               {onNewQuotation && (
                 <button
                   onClick={() => onNewQuotation(currProject)}
-                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#fff', color: ' var(--app-accent, #00BCD4)', border: '1px solid  var(--app-accent, #00BCD4)', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none' }}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '6px 14px', background: '#fff', color: ' var(--app-accent, #00BCD4)', border: '1px solid  var(--app-accent, #00BCD4)', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none' }}
                 >
                   <i className="ti ti-file-description" style={{ fontSize: 13 }}></i> New Quotation
                 </button>
@@ -2046,25 +2045,27 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               {onNewProposal && (
                 <button
                   onClick={() => onNewProposal(currProject)}
-                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#fff', color: ' var(--app-accent, #00BCD4)', border: '1px solid  var(--app-accent, #00BCD4)', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none' }}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '6px 14px', background: '#fff', color: ' var(--app-accent, #00BCD4)', border: '1px solid  var(--app-accent, #00BCD4)', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none' }}
                 >
                   <i className="ti ti-file-text" style={{ fontSize: 13 }}></i> New Project Proposal
                 </button>
               )}
-              <input
-                id="other-docs-input"
-                type="file"
-                multiple
-                onChange={handleFileUpload}
-                style={{ display: 'none' }}
-              />
-              <button
-                onClick={() => document.getElementById('other-docs-input').click()}
-                disabled={uploadingFile}
-                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#fff', color: ' var(--app-accent, #00BCD4)', border: '1px solid  var(--app-accent, #00BCD4)', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit', textDecoration: 'none' }}
-              >
-                <i className={uploadingFile ? "ti ti-loader-2" : "ti ti-folder-plus"} style={{ fontSize: 13 }}></i> {uploadingFile ? 'Uploading…' : 'Other Documents'}
-              </button>
+              <>
+                <input
+                  id="other-docs-input"
+                  type="file"
+                  multiple
+                  onChange={handleFileUpload}
+                  style={{ display: 'none' }}
+                />
+                <button
+                  onClick={() => document.getElementById('other-docs-input').click()}
+                  disabled={uploadingFile}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '6px 14px', background: '#fff', color: ' var(--app-accent, #00BCD4)', border: '1px solid  var(--app-accent, #00BCD4)', borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit', textDecoration: 'none' }}
+                >
+                  <i className={uploadingFile ? "ti ti-loader-2" : "ti ti-folder-plus"} style={{ fontSize: 13 }}></i> {uploadingFile ? 'Uploading…' : 'Other Documents'}
+                </button>
+              </>
             </div>
           )}
 
@@ -2089,8 +2090,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             ))}
           </div>
 
-          {(projectQuotations.length > 0 || projectProposals.length > 0) && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 16, marginBottom: 20 }}>
+          {(projectQuotations.length > 0 || projectProposals.length > 0 || (currProject.files || []).length > 0) && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 20 }}>
               {projectQuotations.length > 0 && (
                 <div style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden' }}>
                   <div style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
@@ -2109,33 +2110,20 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           </div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+
+                          <button onClick={() => shareProposalAsPDF(p, currProject?.companyName || user?.companyName || '')} title="Share" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#0EA5E9' }}><i className="ti ti-send"></i></button>
+                          <button onClick={() => { const w = window.open('', '_blank'); printProposal(p, 'view', w); }} title="View" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: ' var(--app-accent, #00BCD4)' }}><i className="ti ti-eye"></i></button>
                           <button
-                            onClick={() => { onNewQuotation && onNewQuotation({ ...currProject, _editQuotation: q, _autoShare: true }); }}
-                            title="Share Quotation PDF"
-                            style={{ fontSize: 11, fontWeight: 800, color: '#0EA5E9', background: 'none', border: 'none', cursor: 'pointer' }}
-                          >
-                            Share
-                          </button>
-                          <button
-                            onClick={() => { onNewQuotation && onNewQuotation({ ...currProject, _editQuotation: q }); }}
-                            style={{ fontSize: 11, fontWeight: 800, color: ' var(--app-accent, #00BCD4)', background: 'none', border: 'none', cursor: 'pointer' }}
-                          >
-                            View
-                          </button>  <button
                             onClick={async () => {
-                              if (!confirm('Delete this quotation?')) return;
+                              if (!confirm('Delete this project proposal?')) return;
                               try {
-                                await axios.delete(`${BASE_URL}/api/quotations/${q._id || q.id}`);
-                                setProjectQuotations(prev => prev.filter(x => (x._id || x.id) !== (q._id || q.id)));
-                              } catch (err) {
-                                alert('Failed to delete quotation.');
-                              }
+                                await axios.delete(`${BASE_URL}/api/proposals/${p._id || p.id}`);
+                                setProjectProposals(prev => prev.filter(x => (x._id || x.id) !== (p._id || p.id)));
+                              } catch (err) { alert('Failed to delete proposal.'); }
                             }}
-                            style={{ fontSize: 11, fontWeight: 800, color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer' }}
-                          >
-                            Delete
-                          </button>
-                        </div>
+                            title="Delete"
+                            style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}
+                          ><i className="ti ti-trash"></i></button></div>
                       </div>
                     ))}
                   </div>
@@ -2159,38 +2147,58 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           </div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-                          <button
-                            onClick={() => shareProposalAsPDF(p, currProject?.companyName || user?.companyName || '')}
-                            title="Share Proposal PDF"
-                            style={{ fontSize: 11, fontWeight: 800, color: '#0EA5E9', background: 'none', border: 'none', cursor: 'pointer' }}
-                          >
-                            Share
-                          </button>
-                          <button
-                            onClick={() => {
-                              const w = window.open('', '_blank');
-                              printProposal(p, 'view', w);
-                            }}
-                            title="View PDF"
-                            style={{ fontSize: 11, fontWeight: 800, color: ' var(--app-accent, #00BCD4)', background: 'none', border: 'none', cursor: 'pointer' }}
-                          >
-                            View
-                          </button>
+                          <button onClick={() => shareProposalAsPDF(p, currProject?.companyName || user?.companyName || '')} title="Share" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#0EA5E9' }}><i className="ti ti-send"></i></button>
+                          <button onClick={() => { const w = window.open('', '_blank'); printProposal(p, 'view', w); }} title="View" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: ' var(--app-accent, #00BCD4)' }}><i className="ti ti-eye"></i></button>
                           <button
                             onClick={async () => {
                               if (!confirm('Delete this project proposal?')) return;
                               try {
                                 await axios.delete(`${BASE_URL}/api/proposals/${p._id || p.id}`);
                                 setProjectProposals(prev => prev.filter(x => (x._id || x.id) !== (p._id || p.id)));
-                              } catch (err) {
-                                alert('Failed to delete proposal.');
-                              }
+                              } catch (err) { alert('Failed to delete proposal.'); }
                             }}
-                            style={{ fontSize: 11, fontWeight: 800, color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer' }}
-                          >
-                            Delete
-                          </button>
+                            title="Delete"
+                            style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}
+                          ><i className="ti ti-trash"></i></button>                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {(currProject.files || []).length > 0 && (
+                <div style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
+                    <i className="ti ti-folder" style={{ color: '#6B7280', fontSize: 15, marginRight: 8 }}></i>
+                    <span style={{ fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>Other Documents</span>
+                    <span style={{ background: 'rgba(107,114,128,.1)', color: '#6B7280', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{(currProject.files || []).length}</span>
+                  </div>
+                  <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {(currProject.files || []).map((f, idx) => (
+                      <div key={f.url || idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', border: '1px solid #F1F5F9', borderRadius: 10 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                          <i className="ti ti-file-type-pdf" style={{ color: '#EF4444', fontSize: 18, flexShrink: 0 }}></i>
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontSize: 12, fontWeight: 800, color: '#0D1B2A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{f.name || 'Document'}</div>
+                            <div style={{ fontSize: 10, color: '#7B8FA1' }}>{f.uploadedAt ? new Date(f.uploadedAt).toLocaleDateString() : ''}</div>
+                          </div>
                         </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+
+                          <a href={f.url} target="_blank" rel="noopener noreferrer" title="View" style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: ' var(--app-accent, #00BCD4)', textDecoration: 'none' }}><i className="ti ti-eye"></i></a>
+                          <a href={f.url} download={f.name} title="Download" style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#0EA5E9', textDecoration: 'none' }}><i className="ti ti-download"></i></a>
+                          <button
+                            onClick={async () => {
+                              if (!confirm('Delete this document?')) return;
+                              try {
+                                const updatedFiles = (currProject.files || []).filter((_, i) => i !== idx);
+                                await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { files: updatedFiles });
+                                loadLatest();
+                                if (onUpdate) onUpdate();
+                              } catch (err) { alert('Failed to delete document.'); }
+                            }}
+                            title="Delete"
+                            style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }}
+                          ><i className="ti ti-trash"></i></button> </div>
                       </div>
                     ))}
                   </div>
@@ -2198,6 +2206,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               )}
             </div>
           )}
+
+
+
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 20, width: '100%' }}>
             {(() => {
               const liveAdvanceTotal = (currProject.advances || []).reduce((s, a) => s + parseAmt(a.amount), 0);
@@ -2516,10 +2527,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               </div>
             </div>
           )}
-        </div>
+        </div >
 
         {/* MILESTONES STANDALONE CARD */}
-        <div className="mpd-card mpd-milestones-card" style={{ marginBottom: 12 }}>
+        < div className="mpd-card mpd-milestones-card" style={{ marginBottom: 12 }
+        }>
           <div className="mpd-card-header" style={{ paddingBottom: 6, paddingLeft: 4, paddingRight: 4 }}>
             <div className="mpd-card-title"><i className="ti ti-flag"></i> Milestone Progress</div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -2544,57 +2556,121 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               )}
             </div>
           </div>
-          {(!currProject.milestones || currProject.milestones.length === 0) ? (
-            <div style={{ padding: '48px 32px', textAlign: 'center', color: P.textLight, fontSize: 13, boxSizing: 'border-box' }}>No milestones defined.</div>
-          ) : milestoneView === 'timeline' ? (
-            <div style={{ overflowX: 'auto', paddingBottom: 0 }}>
-              <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', minWidth: Math.max(300, (currProject.milestones || []).length * 100), marginBottom: 0 }}>
-                <div style={{ position: 'absolute', top: 18, left: '5%', right: '5%', height: 2, background: P.border, zIndex: 0 }} />
+          {
+            (!currProject.milestones || currProject.milestones.length === 0) ? (
+              <div style={{ padding: '48px 32px', textAlign: 'center', color: P.textLight, fontSize: 13, boxSizing: 'border-box' }}>No milestones defined.</div>
+            ) : milestoneView === 'timeline' ? (
+              <div style={{ overflowX: 'auto', paddingBottom: 0 }}>
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', minWidth: Math.max(300, (currProject.milestones || []).length * 100), marginBottom: 0 }}>
+                  <div style={{ position: 'absolute', top: 18, left: '5%', right: '5%', height: 2, background: P.border, zIndex: 0 }} />
+                  {(currProject.milestones || []).map((m, idx) => {
+                    const tasksForMilestone = projTasks.filter(t => t.milestone === m.name && !t.isDeleted);
+                    const allTasksCompleted = tasksForMilestone.length > 0 && tasksForMilestone.every(t => t.status === 'done' || t.status === 'completed');
+                    const isDone = m.done === true || allTasksCompleted;
+
+                    const firstNotDone = (currProject.milestones || []).findIndex(x => {
+                      const mTasks = projTasks.filter(t => t.milestone === x.name && !t.isDeleted);
+                      const mAllCompleted = mTasks.length > 0 && mTasks.every(t => t.status === 'done' || t.status === 'completed');
+                      // A milestone with no tasks is never "done" — it's always pending
+                      const xIsDone = mTasks.length > 0 ? (x.done === true || mAllCompleted) : false;
+                      return !xIsDone;
+                    });
+
+                    const isActive = !isDone && idx === firstNotDone;
+                    const circleColor = isDone ? P.red : isActive ? '#E0F7FA' : '#fff';
+                    const circleBorder = isDone ? P.red : isActive ? P.primary : P.border;
+                    const textColor = isDone ? P.red : isActive ? P.primary : P.textLight;
+                    const statusLabel = isDone ? 'Done' : isActive ? 'Active' : 'Pending';
+                    return (
+                      <div key={idx} draggable="true" onDragStart={(e) => { e.stopPropagation(); setDragMilestoneIdx(idx); }} onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDragOverMilestoneIdx(idx); }} onDrop={(e) => { e.preventDefault(); e.stopPropagation(); if (dragMilestoneIdx === null || dragMilestoneIdx === idx) { setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); return; } const ms = [...(currProject.milestones || [])]; const dragged = ms.splice(dragMilestoneIdx, 1)[0]; ms.splice(idx, 0, dragged); setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); setCurrProject(prev => ({ ...prev, milestones: ms })); axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms }).then(loadLatest); }} onDragEnd={(e) => { e.stopPropagation(); setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1, position: 'relative', zIndex: 1, opacity: dragMilestoneIdx === idx ? 0.4 : 1, cursor: 'grab', outline: dragOverMilestoneIdx === idx && dragMilestoneIdx !== idx ? `2.5px dashed ${P.primary}` : 'none', borderRadius: 8, transition: 'opacity .2s' }}>
+                        {tasksForMilestone.length > 0 && (
+                          <div style={{ position: 'absolute', top: 18, left: idx === 0 ? '0%' : '-50%', right: '50%', transform: 'translateY(-50%)', display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', zIndex: 0 }}>
+                            {tasksForMilestone.map((t, i) => {
+                              const taskDone = t.status === 'done' || t.status === 'completed';
+                              return (
+                                <div key={t._id} title={t.title} style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: taskDone ? P.red : P.primary, border: '2px solid #fff', zIndex: 2 }}></div>
+                                  <div style={{ position: 'absolute', top: 14, fontSize: 9, color: taskDone ? P.red : P.textDark, whiteSpace: 'nowrap', fontWeight: 700, maxWidth: 60, overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'center' }}>
+                                    {t.title}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                        <div onClick={() => handleToggleMilestone(idx)} title="Click to toggle done"
+                          style={{ width: 36, height: 36, borderRadius: '50%', background: circleColor, border: `2.5px solid ${circleBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: isDone ? '#fff' : isActive ? P.primary : P.textLight, cursor: 'pointer', boxShadow: isActive ? `0 0 0 4px ${P.primaryLight}` : 'none', transition: 'all .2s', position: 'relative', zIndex: 1 }}>
+                          {isDone ? <span style={{ color: '#fff', fontSize: 14 }}>Yes</span> : idx + 1}
+                        </div>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: P.textDark, textAlign: 'center', maxWidth: 80, minHeight: 28, lineHeight: 1.35, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', wordBreak: 'break-word', position: 'relative', zIndex: 1 }}>{m.name}</div>
+                        {m.date && <div style={{ fontSize: 10, color: P.textLight, textAlign: 'center', position: 'relative', zIndex: 1 }}>{new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</div>}
+                        <div style={{ fontSize: 10, fontWeight: 700, color: textColor, position: 'relative', zIndex: 1 }}>{statusLabel}</div>
+                        {!hideTopActions && (
+                          <div style={{ display: 'flex', gap: 8, position: 'relative', zIndex: 1 }}>
+                            <button onClick={e => { e.stopPropagation(); handleEditMilestone(idx); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.primary, fontSize: 11, padding: 0 }}>Edit</button>
+                            <button onClick={async e => {
+                              e.stopPropagation();
+                              if (!confirm('Delete milestone? This will also delete all tasks linked to this milestone.')) return;
+                              try {
+                                // Delete all tasks linked to this milestone
+                                const linkedTasks = currTasks.filter(tk => tk.milestone === m.name && !tk.isDeleted && (String(tk.projectId?._id || tk.projectId) === String(currProject._id) || tk.project === currProject.name));
+                                await Promise.all(linkedTasks.map(tk =>
+                                  axios.delete(`${BASE_URL}/api/tasks/${tk._id}`).catch(() =>
+                                    axios.put(`${BASE_URL}/api/tasks/${tk._id}`, { isDeleted: true })
+                                  )
+                                ));
+                                // Remove milestone from project
+                                const ms = (currProject.milestones || []).filter((_, i) => i !== idx);
+                                const doneM = ms.filter(x => x.done).length;
+                                const newProgress = ms.length > 0 ? Math.round((doneM / ms.length) * 100) : 0;
+                                setCurrProject(prev => ({ ...prev, milestones: ms, progress: newProgress }));
+                                await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms, progress: newProgress });
+                                if (onUpdate) onUpdate();
+                                if (fetchTasks) fetchTasks();
+                              } catch (err) { console.error('Failed to delete milestone:', err); }
+                            }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 11, padding: 0 }}>Delete</button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              /* LIST VIEW */
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '4px 0' }}>
                 {(currProject.milestones || []).map((m, idx) => {
                   const tasksForMilestone = projTasks.filter(t => t.milestone === m.name && !t.isDeleted);
                   const allTasksCompleted = tasksForMilestone.length > 0 && tasksForMilestone.every(t => t.status === 'done' || t.status === 'completed');
+                  // Only mark done if tasks exist AND all are completed, OR manually toggled with tasks present
                   const isDone = m.done === true || allTasksCompleted;
-
                   const firstNotDone = (currProject.milestones || []).findIndex(x => {
                     const mTasks = projTasks.filter(t => t.milestone === x.name && !t.isDeleted);
                     const mAllCompleted = mTasks.length > 0 && mTasks.every(t => t.status === 'done' || t.status === 'completed');
-                    // A milestone with no tasks is never "done" — it's always pending
-                    const xIsDone = mTasks.length > 0 ? (x.done === true || mAllCompleted) : false;
-                    return !xIsDone;
+                    return x.done !== true && !mAllCompleted;
                   });
-
                   const isActive = !isDone && idx === firstNotDone;
-                  const circleColor = isDone ? P.red : isActive ? '#E0F7FA' : '#fff';
-                  const circleBorder = isDone ? P.red : isActive ? P.primary : P.border;
-                  const textColor = isDone ? P.red : isActive ? P.primary : P.textLight;
                   const statusLabel = isDone ? 'Done' : isActive ? 'Active' : 'Pending';
+                  const statusColor = isDone ? P.green : isActive ? P.primary : P.textLight;
+                  const statusBg = isDone ? '#E8F5E9' : isActive ? P.primaryLight : '#f5f5f5';
+                  const doneTasks = tasksForMilestone.filter(t => t.status === 'done' || t.status === 'completed').length;
                   return (
-                    <div key={idx} draggable="true" onDragStart={(e) => { e.stopPropagation(); setDragMilestoneIdx(idx); }} onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDragOverMilestoneIdx(idx); }} onDrop={(e) => { e.preventDefault(); e.stopPropagation(); if (dragMilestoneIdx === null || dragMilestoneIdx === idx) { setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); return; } const ms = [...(currProject.milestones || [])]; const dragged = ms.splice(dragMilestoneIdx, 1)[0]; ms.splice(idx, 0, dragged); setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); setCurrProject(prev => ({ ...prev, milestones: ms })); axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms }).then(loadLatest); }} onDragEnd={(e) => { e.stopPropagation(); setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1, position: 'relative', zIndex: 1, opacity: dragMilestoneIdx === idx ? 0.4 : 1, cursor: 'grab', outline: dragOverMilestoneIdx === idx && dragMilestoneIdx !== idx ? `2.5px dashed ${P.primary}` : 'none', borderRadius: 8, transition: 'opacity .2s' }}>
-                      {tasksForMilestone.length > 0 && (
-                        <div style={{ position: 'absolute', top: 18, left: idx === 0 ? '0%' : '-50%', right: '50%', transform: 'translateY(-50%)', display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', zIndex: 0 }}>
-                          {tasksForMilestone.map((t, i) => {
-                            const taskDone = t.status === 'done' || t.status === 'completed';
-                            return (
-                              <div key={t._id} title={t.title} style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <div style={{ width: 10, height: 10, borderRadius: '50%', background: taskDone ? P.red : P.primary, border: '2px solid #fff', zIndex: 2 }}></div>
-                                <div style={{ position: 'absolute', top: 14, fontSize: 9, color: taskDone ? P.red : P.textDark, whiteSpace: 'nowrap', fontWeight: 700, maxWidth: 60, overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'center' }}>
-                                  {t.title}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
+                    <div key={idx} draggable="true" onDragStart={(e) => { e.stopPropagation(); setDragMilestoneIdx(idx); }} onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDragOverMilestoneIdx(idx); }} onDrop={(e) => { e.preventDefault(); e.stopPropagation(); if (dragMilestoneIdx === null || dragMilestoneIdx === idx) { setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); return; } const ms = [...(currProject.milestones || [])]; const dragged = ms.splice(dragMilestoneIdx, 1)[0]; ms.splice(idx, 0, dragged); setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); setCurrProject(prev => ({ ...prev, milestones: ms })); axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms }).then(loadLatest); }} onDragEnd={(e) => { e.stopPropagation(); setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); }} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 10, background: P.bg, border: `1.5px solid ${isDone ? P.green : isActive ? P.primary : P.border}`, transition: 'all .2s', cursor: 'grab', opacity: dragMilestoneIdx === idx ? 0.4 : 1, outline: dragOverMilestoneIdx === idx && dragMilestoneIdx !== idx ? `2.5px dashed ${P.primary}` : 'none' }}>
                       <div onClick={() => handleToggleMilestone(idx)} title="Click to toggle done"
-                        style={{ width: 36, height: 36, borderRadius: '50%', background: circleColor, border: `2.5px solid ${circleBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: isDone ? '#fff' : isActive ? P.primary : P.textLight, cursor: 'pointer', boxShadow: isActive ? `0 0 0 4px ${P.primaryLight}` : 'none', transition: 'all .2s', position: 'relative', zIndex: 1 }}>
-                        {isDone ? <span style={{ color: '#fff', fontSize: 14 }}>Yes</span> : idx + 1}
+                        style={{ width: 30, height: 30, borderRadius: '50%', background: isDone ? P.green : '#fff', border: `2px solid ${statusColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, transition: 'all .2s' }}>
+                        {isDone ? <span style={{ color: '#fff', fontSize: 14 }}>Yes</span> : <span style={{ fontSize: 11, color: P.textLight, fontWeight: 700 }}>{idx + 1}</span>}
                       </div>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: P.textDark, textAlign: 'center', maxWidth: 80, minHeight: 28, lineHeight: 1.35, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', wordBreak: 'break-word', position: 'relative', zIndex: 1 }}>{m.name}</div>
-                      {m.date && <div style={{ fontSize: 10, color: P.textLight, textAlign: 'center', position: 'relative', zIndex: 1 }}>{new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</div>}
-                      <div style={{ fontSize: 10, fontWeight: 700, color: textColor, position: 'relative', zIndex: 1 }}>{statusLabel}</div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>{m.name}</div>
+                        <div style={{ display: 'flex', gap: 10, marginTop: 3, flexWrap: 'wrap' }}>
+                          {m.date && <span style={{ fontSize: 11, color: P.textLight }}><i className="ti ti-calendar" style={{ marginRight: 3 }}></i>{new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>}
+                          {tasksForMilestone.length > 0 && <span style={{ fontSize: 11, color: P.textLight }}><i className="ti ti-list-check" style={{ marginRight: 3 }}></i>{doneTasks}/{tasksForMilestone.length} tasks</span>}
+                        </div>
+                      </div>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: statusColor, padding: '3px 10px', borderRadius: 6, background: statusBg, flexShrink: 0 }}>{statusLabel}</span>
                       {!hideTopActions && (
-                        <div style={{ display: 'flex', gap: 8, position: 'relative', zIndex: 1 }}>
-                          <button onClick={e => { e.stopPropagation(); handleEditMilestone(idx); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.primary, fontSize: 11, padding: 0 }}>Edit</button>
+                        <div style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
+                          <button onClick={e => { e.stopPropagation(); handleEditMilestone(idx); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.primary, fontSize: 13, padding: 0 }}>Edit</button>
                           <button onClick={async e => {
                             e.stopPropagation();
                             if (!confirm('Delete milestone? This will also delete all tasks linked to this milestone.')) return;
@@ -2611,212 +2687,154 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                               const doneM = ms.filter(x => x.done).length;
                               const newProgress = ms.length > 0 ? Math.round((doneM / ms.length) * 100) : 0;
                               setCurrProject(prev => ({ ...prev, milestones: ms, progress: newProgress }));
+                              setCurrTasks(prev => prev.filter(tk => !linkedTasks.some(lt => lt._id === tk._id)));
                               await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms, progress: newProgress });
                               if (onUpdate) onUpdate();
                               if (fetchTasks) fetchTasks();
                             } catch (err) { console.error('Failed to delete milestone:', err); }
-                          }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 11, padding: 0 }}>Delete</button>
+                          }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 13, padding: 0 }}>Delete</button>
                         </div>
                       )}
                     </div>
                   );
                 })}
               </div>
-            </div>
-          ) : (
-            /* LIST VIEW */
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '4px 0' }}>
-              {(currProject.milestones || []).map((m, idx) => {
-                const tasksForMilestone = projTasks.filter(t => t.milestone === m.name && !t.isDeleted);
-                const allTasksCompleted = tasksForMilestone.length > 0 && tasksForMilestone.every(t => t.status === 'done' || t.status === 'completed');
-                // Only mark done if tasks exist AND all are completed, OR manually toggled with tasks present
-                const isDone = m.done === true || allTasksCompleted;
-                const firstNotDone = (currProject.milestones || []).findIndex(x => {
-                  const mTasks = projTasks.filter(t => t.milestone === x.name && !t.isDeleted);
-                  const mAllCompleted = mTasks.length > 0 && mTasks.every(t => t.status === 'done' || t.status === 'completed');
-                  return x.done !== true && !mAllCompleted;
-                });
-                const isActive = !isDone && idx === firstNotDone;
-                const statusLabel = isDone ? 'Done' : isActive ? 'Active' : 'Pending';
-                const statusColor = isDone ? P.green : isActive ? P.primary : P.textLight;
-                const statusBg = isDone ? '#E8F5E9' : isActive ? P.primaryLight : '#f5f5f5';
-                const doneTasks = tasksForMilestone.filter(t => t.status === 'done' || t.status === 'completed').length;
-                return (
-                  <div key={idx} draggable="true" onDragStart={(e) => { e.stopPropagation(); setDragMilestoneIdx(idx); }} onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDragOverMilestoneIdx(idx); }} onDrop={(e) => { e.preventDefault(); e.stopPropagation(); if (dragMilestoneIdx === null || dragMilestoneIdx === idx) { setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); return; } const ms = [...(currProject.milestones || [])]; const dragged = ms.splice(dragMilestoneIdx, 1)[0]; ms.splice(idx, 0, dragged); setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); setCurrProject(prev => ({ ...prev, milestones: ms })); axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms }).then(loadLatest); }} onDragEnd={(e) => { e.stopPropagation(); setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); }} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 10, background: P.bg, border: `1.5px solid ${isDone ? P.green : isActive ? P.primary : P.border}`, transition: 'all .2s', cursor: 'grab', opacity: dragMilestoneIdx === idx ? 0.4 : 1, outline: dragOverMilestoneIdx === idx && dragMilestoneIdx !== idx ? `2.5px dashed ${P.primary}` : 'none' }}>
-                    <div onClick={() => handleToggleMilestone(idx)} title="Click to toggle done"
-                      style={{ width: 30, height: 30, borderRadius: '50%', background: isDone ? P.green : '#fff', border: `2px solid ${statusColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, transition: 'all .2s' }}>
-                      {isDone ? <span style={{ color: '#fff', fontSize: 14 }}>Yes</span> : <span style={{ fontSize: 11, color: P.textLight, fontWeight: 700 }}>{idx + 1}</span>}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>{m.name}</div>
-                      <div style={{ display: 'flex', gap: 10, marginTop: 3, flexWrap: 'wrap' }}>
-                        {m.date && <span style={{ fontSize: 11, color: P.textLight }}><i className="ti ti-calendar" style={{ marginRight: 3 }}></i>{new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>}
-                        {tasksForMilestone.length > 0 && <span style={{ fontSize: 11, color: P.textLight }}><i className="ti ti-list-check" style={{ marginRight: 3 }}></i>{doneTasks}/{tasksForMilestone.length} tasks</span>}
-                      </div>
-                    </div>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: statusColor, padding: '3px 10px', borderRadius: 6, background: statusBg, flexShrink: 0 }}>{statusLabel}</span>
-                    {!hideTopActions && (
-                      <div style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
-                        <button onClick={e => { e.stopPropagation(); handleEditMilestone(idx); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.primary, fontSize: 13, padding: 0 }}>Edit</button>
-                        <button onClick={async e => {
-                          e.stopPropagation();
-                          if (!confirm('Delete milestone? This will also delete all tasks linked to this milestone.')) return;
-                          try {
-                            // Delete all tasks linked to this milestone
-                            const linkedTasks = currTasks.filter(tk => tk.milestone === m.name && !tk.isDeleted && (String(tk.projectId?._id || tk.projectId) === String(currProject._id) || tk.project === currProject.name));
-                            await Promise.all(linkedTasks.map(tk =>
-                              axios.delete(`${BASE_URL}/api/tasks/${tk._id}`).catch(() =>
-                                axios.put(`${BASE_URL}/api/tasks/${tk._id}`, { isDeleted: true })
-                              )
-                            ));
-                            // Remove milestone from project
-                            const ms = (currProject.milestones || []).filter((_, i) => i !== idx);
-                            const doneM = ms.filter(x => x.done).length;
-                            const newProgress = ms.length > 0 ? Math.round((doneM / ms.length) * 100) : 0;
-                            setCurrProject(prev => ({ ...prev, milestones: ms, progress: newProgress }));
-                            setCurrTasks(prev => prev.filter(tk => !linkedTasks.some(lt => lt._id === tk._id)));
-                            await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms, progress: newProgress });
-                            if (onUpdate) onUpdate();
-                            if (fetchTasks) fetchTasks();
-                          } catch (err) { console.error('Failed to delete milestone:', err); }
-                        }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.red, fontSize: 13, padding: 0 }}>Delete</button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-          {editingMilestoneIdx !== null && (
-            <form onSubmit={handleUpdateMilestone} style={{ background: P.primaryLight, padding: 14, borderRadius: 10, marginTop: 12, border: `1.5px solid ${P.primary}` }}>
-              <div style={{ fontSize: 11, fontWeight: 800, color: P.primaryDark, textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 8 }}>Editing Milestone</div>
-              <div style={{ marginBottom: 8 }}>
-                {!isCustomEditMilestoneMode ? (
-                  <select
-                    value={MILESTONE_OPTIONS.filter(o => o !== "Custom").includes(editMilestoneName) ? editMilestoneName : ""}
-                    onChange={e => {
-                      const val = e.target.value;
-                      if (val === "Custom") {
-                        setEditMilestoneName('');
-                        setIsCustomEditMilestoneMode(true);
-                      } else {
-                        setEditMilestoneName(val);
-                      }
-                    }}
-                    style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none' }}
-                  >
-                    <option value="">Select milestone...</option>
-                    {MILESTONE_OPTIONS.map(opt => (
-                      <option key={opt} value={opt}>{opt}</option>
-                    ))}
-                  </select>
-                ) : (
+            )
+          }
+          {
+            editingMilestoneIdx !== null && (
+              <form onSubmit={handleUpdateMilestone} style={{ background: P.primaryLight, padding: 14, borderRadius: 10, marginTop: 12, border: `1.5px solid ${P.primary}` }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: P.primaryDark, textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 8 }}>Editing Milestone</div>
+                <div style={{ marginBottom: 8 }}>
+                  {!isCustomEditMilestoneMode ? (
+                    <select
+                      value={MILESTONE_OPTIONS.filter(o => o !== "Custom").includes(editMilestoneName) ? editMilestoneName : ""}
+                      onChange={e => {
+                        const val = e.target.value;
+                        if (val === "Custom") {
+                          setEditMilestoneName('');
+                          setIsCustomEditMilestoneMode(true);
+                        } else {
+                          setEditMilestoneName(val);
+                        }
+                      }}
+                      style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none' }}
+                    >
+                      <option value="">Select milestone...</option>
+                      {MILESTONE_OPTIONS.map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      value={editMilestoneName}
+                      autoFocus
+                      onChange={e => setEditMilestoneName(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          if (!editMilestoneName.trim()) return;
+                          setIsCustomEditMilestoneMode(false);
+                        }
+                      }}
+                      placeholder="Enter custom milestone name"
+                      required
+                      style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', boxSizing: 'border-box' }}
+                    />
+                  )}
+                </div>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <input
-                    type="text"
-                    value={editMilestoneName}
-                    autoFocus
-                    onChange={e => setEditMilestoneName(e.target.value)}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        if (!editMilestoneName.trim()) return;
-                        setIsCustomEditMilestoneMode(false);
-                      }
-                    }}
-                    placeholder="Enter custom milestone name"
-                    required
-                    style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', boxSizing: 'border-box' }}
+                    type="date"
+                    value={editMilestoneDate}
+                    onChange={e => setEditMilestoneDate(e.target.value)}
+                    style={{ padding: '6px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', flex: 1, background: '#fff', color: editMilestoneDate ? P.textDark : '#A0AEC0', fontFamily: 'Nunito, sans-serif', cursor: 'pointer', minWidth: 140 }}
                   />
-                )}
-              </div>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <input
-                  type="date"
-                  value={editMilestoneDate}
-                  onChange={e => setEditMilestoneDate(e.target.value)}
-                  style={{ padding: '6px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', flex: 1, background: '#fff', color: editMilestoneDate ? P.textDark : '#A0AEC0', fontFamily: 'Nunito, sans-serif', cursor: 'pointer', minWidth: 140 }}
-                />
-                <button type="submit" className="mpd-btn mpd-btn-primary" style={{ padding: '6px 12px', fontSize: 11 }}>Save</button>
-                <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => { setEditingMilestoneIdx(null); setIsCustomEditMilestoneMode(false); }} style={{ padding: '6px 12px', fontSize: 11 }}>✕</button>
-              </div>
-            </form>
-          )}
-          {showAddMilestone && (
-            <form onSubmit={handleAddMilestone} style={{ background: P.bg, padding: 14, borderRadius: 10, marginTop: 12 }}>
-              <div style={{ marginBottom: 8 }}>
-                {!isCustomMilestoneMode ? (
-                  <select
-                    value={MILESTONE_OPTIONS.filter(o => o !== "Custom").includes(newMilestoneName) ? newMilestoneName : ""}
-                    onChange={e => {
-                      const val = e.target.value;
-                      if (val === "Custom") {
-                        setNewMilestoneName('');
-                        setIsCustomMilestoneMode(true);
-                      } else {
-                        setNewMilestoneName(val);
-                      }
-                    }}
-                    style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none' }}
-                  >
-                    <option value="">Select milestone...</option>
-                    {MILESTONE_OPTIONS.map(opt => (
-                      <option key={opt} value={opt}>{opt}</option>
-                    ))}
-                  </select>
-                ) : (
+                  <button type="submit" className="mpd-btn mpd-btn-primary" style={{ padding: '6px 12px', fontSize: 11 }}>Save</button>
+                  <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => { setEditingMilestoneIdx(null); setIsCustomEditMilestoneMode(false); }} style={{ padding: '6px 12px', fontSize: 11 }}>✕</button>
+                </div>
+              </form>
+            )
+          }
+          {
+            showAddMilestone && (
+              <form onSubmit={handleAddMilestone} style={{ background: P.bg, padding: 14, borderRadius: 10, marginTop: 12 }}>
+                <div style={{ marginBottom: 8 }}>
+                  {!isCustomMilestoneMode ? (
+                    <select
+                      value={MILESTONE_OPTIONS.filter(o => o !== "Custom").includes(newMilestoneName) ? newMilestoneName : ""}
+                      onChange={e => {
+                        const val = e.target.value;
+                        if (val === "Custom") {
+                          setNewMilestoneName('');
+                          setIsCustomMilestoneMode(true);
+                        } else {
+                          setNewMilestoneName(val);
+                        }
+                      }}
+                      style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none' }}
+                    >
+                      <option value="">Select milestone...</option>
+                      {MILESTONE_OPTIONS.map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      value={newMilestoneName}
+                      autoFocus
+                      onChange={e => setNewMilestoneName(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          if (!newMilestoneName.trim()) return;
+                          setIsCustomMilestoneMode(false);
+                        }
+                      }}
+                      placeholder="Enter custom milestone name"
+                      required
+                      style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', boxSizing: 'border-box' }}
+                    />
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <input
-                    type="text"
-                    value={newMilestoneName}
-                    autoFocus
-                    onChange={e => setNewMilestoneName(e.target.value)}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        if (!newMilestoneName.trim()) return;
-                        setIsCustomMilestoneMode(false);
-                      }
+                    type="date"
+                    value={newMilestoneDate}
+                    onChange={e => setNewMilestoneDate(e.target.value)}
+                    style={{
+                      padding: '6px 10px',
+                      borderRadius: 6,
+                      border: `1.5px solid ${P.border}`,
+                      fontSize: 12,
+                      outline: 'none',
+                      flex: 1,
+                      background: '#fff',
+                      color: newMilestoneDate ? P.textDark : '#A0AEC0',
+                      fontFamily: 'Nunito, sans-serif',
+                      cursor: 'pointer',
+                      minWidth: 140,
                     }}
-                    placeholder="Enter custom milestone name"
-                    required
-                    style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', boxSizing: 'border-box' }}
                   />
-                )}
-              </div>
 
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <input
-                  type="date"
-                  value={newMilestoneDate}
-                  onChange={e => setNewMilestoneDate(e.target.value)}
-                  style={{
-                    padding: '6px 10px',
-                    borderRadius: 6,
-                    border: `1.5px solid ${P.border}`,
-                    fontSize: 12,
-                    outline: 'none',
-                    flex: 1,
-                    background: '#fff',
-                    color: newMilestoneDate ? P.textDark : '#A0AEC0',
-                    fontFamily: 'Nunito, sans-serif',
-                    cursor: 'pointer',
-                    minWidth: 140,
-                  }}
-                />
-
-                <button type="submit" className="mpd-btn mpd-btn-primary" style={{ padding: '6px 12px', fontSize: 11 }}>Add</button>
-                <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => { setShowAddMilestone(false); setIsCustomMilestoneMode(false); }} style={{ padding: '6px 12px', fontSize: 11 }}>✕</button>
-              </div>
-            </form>
-          )}
-        </div>
+                  <button type="submit" className="mpd-btn mpd-btn-primary" style={{ padding: '6px 12px', fontSize: 11 }}>Add</button>
+                  <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => { setShowAddMilestone(false); setIsCustomMilestoneMode(false); }} style={{ padding: '6px 12px', fontSize: 11 }}>✕</button>
+                </div>
+              </form>
+            )
+          }
+        </div >
 
 
         {/* MAIN CONTENT GRID */}
-        <div className="mpd-grid-main-side" style={{ marginTop: 24, gap: 20, marginBottom: 24 }}>
+        < div className="mpd-grid-main-side" style={{ marginTop: 24, gap: 20, marginBottom: 24 }}>
           {/* RIGHT COL — TASKS */}
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', order: 2, flex: '1 1 0%', minWidth: 0 }}>
+          < div style={{ display: 'flex', flexDirection: 'column', height: '100%', order: 2, flex: '1 1 0%', minWidth: 0 }}>
             {/* TASKS COMPONENT */}
-            <div className="mpd-card" style={{ padding: 0, overflow: 'hidden', marginBottom: 20, display: 'flex', flexDirection: 'column', height: 420, maxHeight: 420, boxSizing: 'border-box' }}>
+            < div className="mpd-card" style={{ padding: 0, overflow: 'hidden', marginBottom: 20, display: 'flex', flexDirection: 'column', height: 420, maxHeight: 420, boxSizing: 'border-box' }}>
               <div className="mpd-card-header" style={{ padding: '16px 18px 8px', marginBottom: 0 }}>
                 <div className="mpd-card-title"><i className="ti ti-list-check"></i> Tasks</div>
                 {!hideTopActions && (
@@ -2911,13 +2929,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   })
                 )}
               </div>
-            </div>
-          </div>
+            </div >
+          </div >
 
           {/* LEFT COL — TABS (Updates / Activity Logs / Accounts) */}
-          <div style={{ order: 1, flex: '1.6 1 0%', minWidth: 0 }}>
+          < div style={{ order: 1, flex: '1.6 1 0%', minWidth: 0 }}>
             {/* TABS - draggable scroll */}
-            <div className="mpd-card" style={{ padding: 22, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: 420, maxHeight: 420, boxSizing: 'border-box' }}>          <div className="mpd-tabs"
+            < div className="mpd-card" style={{ padding: 22, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: 420, maxHeight: 420, boxSizing: 'border-box' }}>          <div className="mpd-tabs"
               ref={tabsRef}
               style={{ overflowX: 'auto', scrollbarWidth: 'none', marginBottom: 4 }}
             >
@@ -4064,8 +4082,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   )}
                 </>}
               </div>
-            </div>{/* end tabContentRef wrapper */}
-          </div>
+            </div > {/* end tabContentRef wrapper */}
+          </div >
         </div > {/* end mpd-grid-main-side */}
 
 
@@ -4584,89 +4602,91 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       />
 
       {/* Invoice Payment Modal */}
-      {invoicePaymentModal && (() => {
-        const { inv: pInv, newStatus } = invoicePaymentModal;
-        const totalAmt = parseAmt(pInv.total) || parseAmt(pInv.amount) || 0;
-        const prevPaid = parseAmt(pInv.amountPaid) || 0;
-        const balanceDue = Math.max(0, totalAmt - prevPaid);
-        return (
-          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-            <div style={{ background: '#fff', borderRadius: P.radius, width: '100%', maxWidth: 400, padding: 28, boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
-                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: P.textDark }}>Payment Information</h3>
-                <button onClick={() => setInvoicePaymentModal(null)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: P.textLight }}>✕</button>
-              </div>
-              <div style={{ background: P.bg, borderRadius: 10, padding: 14, marginBottom: 18 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                  <span style={{ fontSize: 12, color: P.textLight }}>Total Amount:</span>
-                  <span style={{ fontSize: 13, fontWeight: 800 }}>{currency}{totalAmt.toLocaleString()}</span>
+      {
+        invoicePaymentModal && (() => {
+          const { inv: pInv, newStatus } = invoicePaymentModal;
+          const totalAmt = parseAmt(pInv.total) || parseAmt(pInv.amount) || 0;
+          const prevPaid = parseAmt(pInv.amountPaid) || 0;
+          const balanceDue = Math.max(0, totalAmt - prevPaid);
+          return (
+            <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+              <div style={{ background: '#fff', borderRadius: P.radius, width: '100%', maxWidth: 400, padding: 28, boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+                  <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: P.textDark }}>Payment Information</h3>
+                  <button onClick={() => setInvoicePaymentModal(null)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: P.textLight }}>✕</button>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                  <span style={{ fontSize: 12, color: P.textLight }}>Previously Paid:</span>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: P.green }}>{currency}{prevPaid.toLocaleString()}</span>
+                <div style={{ background: P.bg, borderRadius: 10, padding: 14, marginBottom: 18 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ fontSize: 12, color: P.textLight }}>Total Amount:</span>
+                    <span style={{ fontSize: 13, fontWeight: 800 }}>{currency}{totalAmt.toLocaleString()}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ fontSize: 12, color: P.textLight }}>Previously Paid:</span>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: P.green }}>{currency}{prevPaid.toLocaleString()}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 6, borderTop: `1px dashed ${P.border}` }}>
+                    <span style={{ fontSize: 12, color: '#ea580c', fontWeight: 700 }}>Balance Due:</span>
+                    <span style={{ fontSize: 14, fontWeight: 900, color: '#ea580c' }}>{currency}{balanceDue.toLocaleString()}</span>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 6, borderTop: `1px dashed ${P.border}` }}>
-                  <span style={{ fontSize: 12, color: '#ea580c', fontWeight: 700 }}>Balance Due:</span>
-                  <span style={{ fontSize: 14, fontWeight: 900, color: '#ea580c' }}>{currency}{balanceDue.toLocaleString()}</span>
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: P.textLight, marginBottom: 6, textTransform: 'uppercase' }}>
+                    {newStatus === 'paid' ? 'Final Payment Amount' : 'New Payment Amount (Advance)'}
+                  </label>
+                  <input
+                    type="number"
+                    value={invoicePaymentData.amountPaid === 0 ? '' : invoicePaymentData.amountPaid}
+                    onChange={e => setInvoicePaymentData(p => ({ ...p, amountPaid: e.target.value === '' ? 0 : Number(e.target.value) }))}
+                    placeholder="Enter amount"
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 15, fontWeight: 700, outline: 'none', boxSizing: 'border-box' }}
+                  />
                 </div>
-              </div>
-              <div style={{ marginBottom: 14 }}>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: P.textLight, marginBottom: 6, textTransform: 'uppercase' }}>
-                  {newStatus === 'paid' ? 'Final Payment Amount' : 'New Payment Amount (Advance)'}
-                </label>
-                <input
-                  type="number"
-                  value={invoicePaymentData.amountPaid === 0 ? '' : invoicePaymentData.amountPaid}
-                  onChange={e => setInvoicePaymentData(p => ({ ...p, amountPaid: e.target.value === '' ? 0 : Number(e.target.value) }))}
-                  placeholder="Enter amount"
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 15, fontWeight: 700, outline: 'none', boxSizing: 'border-box' }}
-                />
-              </div>
-              <div style={{ marginBottom: 14 }}>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: P.textLight, marginBottom: 6, textTransform: 'uppercase' }}>Payment Mode</label>
-                <select
-                  value={invoicePaymentData.paymentMode}
-                  onChange={e => setInvoicePaymentData(p => ({ ...p, paymentMode: e.target.value }))}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none' }}
-                >
-                  {['GPay', 'PhonePe', 'NEFT', 'RTGS', 'UPI', 'Net Banking', 'Cash', 'Other'].map(m => <option key={m} value={m}>{m}</option>)}
-                </select>
-              </div>
-              <div style={{ marginBottom: 14 }}>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: P.textLight, marginBottom: 6, textTransform: 'uppercase' }}>Payment Date</label>
-                <input
-                  type="date"
-                  value={invoicePaymentData.paymentDate}
-                  onChange={e => setInvoicePaymentData(p => ({ ...p, paymentDate: e.target.value }))}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
-                />
-              </div>
-              <div style={{ marginBottom: 20 }}>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: P.textLight, marginBottom: 6, textTransform: 'uppercase' }}>Transaction ID</label>
-                <input
-                  type="text"
-                  value={invoicePaymentData.transactionId}
-                  onChange={e => setInvoicePaymentData(p => ({ ...p, transactionId: e.target.value }))}
-                  placeholder="e.g. UTR123456789"
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
-                />
-              </div>
-              <div style={{ display: 'flex', gap: 10 }}>
-                <button onClick={() => setInvoicePaymentModal(null)} style={{ flex: 1, padding: 12, background: P.bg, border: `1px solid ${P.border}`, borderRadius: 10, fontSize: 13, fontWeight: 700, color: P.primary, cursor: 'pointer' }}>Cancel</button>
-                <button
-                  onClick={async () => {
-                    await applyInvoiceStatusChange(pInv, newStatus, invoicePaymentData);
-                    setInvoicePaymentModal(null);
-                  }}
-                  style={{ flex: 1, padding: 12, background: newStatus === 'paid' ? 'linear-gradient(135deg,#16a34a,#15803d)' : `linear-gradient(135deg,${P.primary},${P.primaryDark})`, border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#fff', cursor: 'pointer' }}
-                >
-                  {newStatus === 'paid' ? 'Confirm Full Payment' : 'Confirm Part Payment'}
-                </button>
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: P.textLight, marginBottom: 6, textTransform: 'uppercase' }}>Payment Mode</label>
+                  <select
+                    value={invoicePaymentData.paymentMode}
+                    onChange={e => setInvoicePaymentData(p => ({ ...p, paymentMode: e.target.value }))}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none' }}
+                  >
+                    {['GPay', 'PhonePe', 'NEFT', 'RTGS', 'UPI', 'Net Banking', 'Cash', 'Other'].map(m => <option key={m} value={m}>{m}</option>)}
+                  </select>
+                </div>
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: P.textLight, marginBottom: 6, textTransform: 'uppercase' }}>Payment Date</label>
+                  <input
+                    type="date"
+                    value={invoicePaymentData.paymentDate}
+                    onChange={e => setInvoicePaymentData(p => ({ ...p, paymentDate: e.target.value }))}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div style={{ marginBottom: 20 }}>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: P.textLight, marginBottom: 6, textTransform: 'uppercase' }}>Transaction ID</label>
+                  <input
+                    type="text"
+                    value={invoicePaymentData.transactionId}
+                    onChange={e => setInvoicePaymentData(p => ({ ...p, transactionId: e.target.value }))}
+                    placeholder="e.g. UTR123456789"
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <button onClick={() => setInvoicePaymentModal(null)} style={{ flex: 1, padding: 12, background: P.bg, border: `1px solid ${P.border}`, borderRadius: 10, fontSize: 13, fontWeight: 700, color: P.primary, cursor: 'pointer' }}>Cancel</button>
+                  <button
+                    onClick={async () => {
+                      await applyInvoiceStatusChange(pInv, newStatus, invoicePaymentData);
+                      setInvoicePaymentModal(null);
+                    }}
+                    style={{ flex: 1, padding: 12, background: newStatus === 'paid' ? 'linear-gradient(135deg,#16a34a,#15803d)' : `linear-gradient(135deg,${P.primary},${P.primaryDark})`, border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#fff', cursor: 'pointer' }}
+                  >
+                    {newStatus === 'paid' ? 'Confirm Full Payment' : 'Confirm Part Payment'}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        );
-      })()}
+          );
+        })()
+      }
 
       {/* Send to Client Popup */}
       {

@@ -2032,7 +2032,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           <div className="mpd-card-title" style={{ marginBottom: 14 }}>
             <i className="ti ti-arrows-exchange"></i> Accounts
           </div>
-
           {!hideTopActions && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', background: '#F8FAFC', border: '1px solid #E8EDF2', borderRadius: 12, padding: 12, marginBottom: 20, width: '100%', boxSizing: 'border-box' }}>
 
@@ -2068,6 +2067,28 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               </button>
             </div>
           )}
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 20, width: '100%' }}>
+            {(() => {
+              const liveQuotationsTotal = projectQuotations.reduce((s, q) => s + parseAmt(q.total ?? q.qt?.total), 0);
+              const liveProposalsTotal = projectProposals.reduce((s, p) => s + parseAmt(p.value ?? p.total), 0);
+              const liveOtherDocsCount = (currProject.files || []).length;
+              return [
+                { lbl: 'Total Quotations', val: `${currency}${liveQuotationsTotal.toLocaleString()}`, sub: `${projectQuotations.length} quotation(s)`, color: '#7C3AED', icon: 'ti-file-description' },
+                { lbl: 'Total Proposals', val: `${currency}${liveProposalsTotal.toLocaleString()}`, sub: `${projectProposals.length} proposal(s)`, color: '#0EA5E9', icon: 'ti-file-text' },
+                { lbl: 'Other Documents', val: `${currency}0`, sub: `${liveOtherDocsCount} document(s)`, color: '#6B7280', icon: 'ti-folder' },
+              ];
+            })().map(s => (
+              <div key={s.lbl} style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 12, padding: '14px 16px', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: s.color, borderRadius: '12px 12px 0 0' }}></div>
+                <i className={`ti ${s.icon}`} style={{ position: 'absolute', top: 14, right: 14, fontSize: 20, opacity: .13, color: s.color }}></i>
+                <div style={{ fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 5 }}>{s.lbl}</div>
+                <div style={{ fontSize: 20, fontWeight: 900, color: '#0D1B2A', letterSpacing: '-.5px', lineHeight: 1 }}>{s.val}</div>
+                <div style={{ fontSize: 11, color: '#7B8FA1', fontWeight: 600, marginTop: 4 }}>{s.sub}</div>
+              </div>
+            ))}
+          </div>
+
           {(projectQuotations.length > 0 || projectProposals.length > 0) && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 16, marginBottom: 20 }}>
               {projectQuotations.length > 0 && (
@@ -2089,14 +2110,14 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
                           <button
-                            onClick={() => onViewQuotation && onViewQuotation(q)}
+                            onClick={() => { onNewQuotation && onNewQuotation({ ...currProject, _editQuotation: q, _autoShare: true }); }}
                             title="Share Quotation PDF"
                             style={{ fontSize: 11, fontWeight: 800, color: '#0EA5E9', background: 'none', border: 'none', cursor: 'pointer' }}
                           >
                             Share
                           </button>
                           <button
-                            onClick={() => onViewQuotation && onViewQuotation(q)}
+                            onClick={() => { onNewQuotation && onNewQuotation({ ...currProject, _editQuotation: q }); }}
                             style={{ fontSize: 11, fontWeight: 800, color: ' var(--app-accent, #00BCD4)', background: 'none', border: 'none', cursor: 'pointer' }}
                           >
                             View

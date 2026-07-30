@@ -28,7 +28,8 @@ const ProposalSchema = new mongoose.Schema(
     value: { type: Number, default: 0 },
     clientSignature: { type: String, default: "" },
     clientSignedAt: { type: Date },
-    sigMode: { type: String, default: "draw" }
+    sigMode: { type: String, default: "draw" },
+    attachedFile: { type: Object, default: null }, // { name, url, size, type } for directly-uploaded proposal docs
   },
   { timestamps: true }
 );

@@ -1608,6 +1608,60 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     }
   };
 
+  // Uploads a raw quotation document directly into the Quotation list only.
+  const handleQuotationUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploadingFile(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("projectId", currProject._id || "");
+    formData.append("client", currProject.client || "");
+    formData.append("project", currProject.name || "");
+
+    try {
+      await axios.post(`${BASE_URL}/api/quotations/upload`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      fetchProjectQuotationsAndProposals();
+      loadLatest();
+      if (onUpdate) onUpdate();
+    } catch (err) {
+      console.error("Failed to upload quotation:", err);
+      alert("Failed to upload quotation.");
+    } finally {
+      setUploadingFile(false);
+      e.target.value = '';
+    }
+  };
+
+  // Uploads a raw proposal document directly into the Project Proposal list only.
+  const handleProposalUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploadingFile(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("projectId", currProject._id || "");
+    formData.append("client", currProject.client || "");
+    formData.append("title", file.name);
+
+    try {
+      await axios.post(`${BASE_URL}/api/proposals/upload`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      fetchProjectQuotationsAndProposals();
+      loadLatest();
+      if (onUpdate) onUpdate();
+    } catch (err) {
+      console.error("Failed to upload proposal:", err);
+      alert("Failed to upload proposal.");
+    } finally {
+      setUploadingFile(false);
+      e.target.value = '';
+    }
+  };
+
   const handleModalFileSelect = (e) => {
     const selected = Array.from(e.target.files || []);
     if (selected.length === 0) return;
@@ -2131,6 +2185,15 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     <i className="ti ti-file-description" style={{ color: '#7C3AED', fontSize: 15, marginRight: 8 }}></i>
                     <span style={{ fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>Quotations</span>
                     <span style={{ background: 'rgba(124,58,237,.1)', color: '#7C3AED', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{projectQuotations.length}</span>
+                    <input id="upload-quotation-input" type="file" onChange={handleQuotationUpload} style={{ display: 'none' }} />
+                    <button
+                      onClick={() => document.getElementById('upload-quotation-input').click()}
+                      disabled={uploadingFile}
+                      title="Upload Quotation"
+                      style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', background: '#fff', color: '#7C3AED', border: '1px solid #7C3AED', borderRadius: 6, fontSize: 11, fontWeight: 800, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}
+                    >
+                      <i className={uploadingFile ? "ti ti-loader-2" : "ti ti-upload"} style={{ fontSize: 12 }}></i> Upload Quotation
+                    </button>
                   </div>
                   <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {projectQuotations.map((q) => (
@@ -2167,6 +2230,15 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     <i className="ti ti-file-text" style={{ color: '#0EA5E9', fontSize: 15, marginRight: 8 }}></i>
                     <span style={{ fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>Project Proposals</span>
                     <span style={{ background: 'rgba(14,165,233,.1)', color: '#0EA5E9', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{projectProposals.length}</span>
+                    <input id="upload-proposal-input" type="file" onChange={handleProposalUpload} style={{ display: 'none' }} />
+                    <button
+                      onClick={() => document.getElementById('upload-proposal-input').click()}
+                      disabled={uploadingFile}
+                      title="Upload Project Proposal"
+                      style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', background: '#fff', color: '#0EA5E9', border: '1px solid #0EA5E9', borderRadius: 6, fontSize: 11, fontWeight: 800, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}
+                    >
+                      <i className={uploadingFile ? "ti ti-loader-2" : "ti ti-upload"} style={{ fontSize: 12 }}></i> Upload Proposal
+                    </button>
                   </div>
                   <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {projectProposals.map((p) => (

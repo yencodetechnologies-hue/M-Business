@@ -15,6 +15,7 @@ const QuotationSchema = new mongoose.Schema(
     projectId: { type: String, default: "", index: true },  // links this quotation to a specific project
     reviewComment: { type: String, default: "" },
     reviewedAt: { type: Date, default: null },
+    attachedFile: { type: Object, default: null }, // { name, url, size, type } for directly-uploaded quotation docs
   },
   { timestamps: true }
 );

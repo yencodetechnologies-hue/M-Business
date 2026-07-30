@@ -16,6 +16,14 @@ function QuoToast({ msg }) {
 
 export default function QuotationCreatorModern(props) {
   const [showModernForm, setShowModernForm] = useState(!!props.newlyAddedClientName || !!props.prefillProject);
+
+  // When opened with a specific quotation to view (e.g. from Project → Accounts →
+  // Quotation List "View" button), route straight to the list-based detail/PDF
+  // view (QuotationCreator already handles initialViewEntry -> "preview" step),
+  // same as clicking a quotation card from the sidebar list.
+  if (props.initialViewEntry) {
+    return <QuotationCreator {...props} onNewQuotation={() => { setShowModernForm(true); }} onEditQuotation={(entry) => { setEditEntry(entry); setShowModernForm(true); }} />;
+  }
   const [editEntry, setEditEntry] = useState(null);
   const [listRefreshKey, setListRefreshKey] = useState(0);
   const [pendingPrefill] = useState(props.prefillProject || null);

@@ -1,6 +1,63 @@
 const express = require("express");
 const router = express.Router();
 const Proposal = require("../models/ProposalModel");
+const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+const streamifier = require("streamifier");
+const uploadMem = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024 } });
+
+// ── POST upload a proposal file directly (creates a minimal Proposal entry
+// with the file attached, so it appears ONLY in the Project Proposal list) ───
+router.post("/upload", uploadMem.single("file"), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ msg: "No file uploaded" });
+    const { projectId, client, title } = req.body;
+
+    const path = require("path");
+    const ext = path.extname(req.file.originalname || "");
+    const baseName = path.basename(req.file.originalname || "file", ext).replace(/[^a-zA-Z0-9_-]/g, "_");
+    const uniqueName = `${baseName}-${Date.now()}${ext}`;
+
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: "mbusiness/proposals",
+        resource_type: req.file.mimetype.startsWith("image/") ? "image" : "raw",
+        public_id: uniqueName,
+        use_filename: true,
+        unique_filename: false,
+      },
+      async (error, result) => {
+        if (error) {
+          console.error("❌ Proposal upload error:", error);
+          return res.status(500).json({ msg: "Upload failed", error: error.message || error });
+        }
+        try {
+          const newProposal = new Proposal({
+            id: "PROP-" + Date.now(),
+            title: title || req.file.originalname,
+            client: client || "",
+            clientName: client || "",
+            projectId: projectId || "",
+            status: "draft",
+            attachedFile: {
+              name: req.file.originalname,
+              url: result.secure_url,
+              size: req.file.size,
+              type: req.file.mimetype,
+            },
+          });
+          await newProposal.save();
+          res.json(newProposal);
+        } catch (err) {
+          res.status(500).json({ msg: "Error saving proposal", error: err.message || err });
+        }
+      }
+    );
+    streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+  } catch (err) {
+    res.status(500).json({ msg: "Upload failed", error: err.message || err });
+  }
+});
 
 // ── Static / specific GET routes (must be before /:dbId) ─────────────────────
 

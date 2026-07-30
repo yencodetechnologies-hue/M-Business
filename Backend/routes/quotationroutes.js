@@ -5,6 +5,62 @@ const Quotation = require("../models/QuotationModel");
 const Invoice = require("../models/InvoiceModels");
 const Notification = require("../models/NotificationModel");
 const Client = require("../models/ClientModel");
+const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+const streamifier = require("streamifier");
+const uploadMem = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024 } });
+
+// ── POST upload a quotation file directly (creates a minimal Quotation entry
+// with the file attached, so it appears ONLY in the Quotation list) ──────────
+router.post("/upload", uploadMem.single("file"), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ msg: "No file uploaded" });
+    const { projectId, client, project } = req.body;
+
+    const path = require("path");
+    const ext = path.extname(req.file.originalname || "");
+    const baseName = path.basename(req.file.originalname || "file", ext).replace(/[^a-zA-Z0-9_-]/g, "_");
+    const uniqueName = `${baseName}-${Date.now()}${ext}`;
+
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: "mbusiness/quotations",
+        resource_type: req.file.mimetype.startsWith("image/") ? "image" : "raw",
+        public_id: uniqueName,
+        use_filename: true,
+        unique_filename: false,
+      },
+      async (error, result) => {
+        if (error) {
+          console.error("❌ Quotation upload error:", error);
+          return res.status(500).json({ msg: "Upload failed", error: error.message || error });
+        }
+        try {
+          const quoteNo = "QUO-" + new Date().getFullYear() + "-" + String(Math.floor(Math.random() * 9000) + 1000);
+          const newQuotation = new Quotation({
+            qt: { quoteNo, client: client || "", project: project || "", date: new Date().toISOString() },
+            items: [],
+            status: "draft",
+            projectId: projectId || "",
+            attachedFile: {
+              name: req.file.originalname,
+              url: result.secure_url,
+              size: req.file.size,
+              type: req.file.mimetype,
+            },
+          });
+          await newQuotation.save();
+          res.json(newQuotation);
+        } catch (err) {
+          res.status(500).json({ msg: "Error saving quotation", error: err.message || err });
+        }
+      }
+    );
+    streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+  } catch (err) {
+    res.status(500).json({ msg: "Upload failed", error: err.message || err });
+  }
+});
 
 // ── GET all ──────────────────────────────────────────────────────────────────
 router.get("/", async (req, res) => {

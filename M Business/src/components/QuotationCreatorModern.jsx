@@ -383,6 +383,14 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
     }
   };
 
+  useEffect(() => {
+    if (prefillProject?._autoShare) {
+      const t = setTimeout(() => { handleShare(); }, 800);
+      return () => clearTimeout(t);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefillProject]);
+
   const handleShare = async () => {
     try {
       showToast('Generating PDF to share…');
@@ -410,6 +418,15 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
       showToast('Failed to share quotation');
     }
   };
+
+  useEffect(() => {
+    if (prefillProject?._autoShare) {
+      const t = setTimeout(() => { handleShare(); }, 800);
+      return () => clearTimeout(t);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefillProject]);
+
 
   const handleSave = async (statusArg = 'draft') => {
     const normalStatus = statusArg.toLowerCase();

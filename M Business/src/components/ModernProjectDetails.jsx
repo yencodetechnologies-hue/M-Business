@@ -2089,14 +2089,14 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
                           <button
-                            onClick={() => shareQuotationAsPDF(q, 'share')}
+                            onClick={() => onViewQuotation && onViewQuotation(q)}
                             title="Share Quotation PDF"
                             style={{ fontSize: 11, fontWeight: 800, color: '#0EA5E9', background: 'none', border: 'none', cursor: 'pointer' }}
                           >
                             Share
                           </button>
                           <button
-                            onClick={() => shareQuotationAsPDF(q, 'view')}
+                            onClick={() => onViewQuotation && onViewQuotation(q)}
                             style={{ fontSize: 11, fontWeight: 800, color: ' var(--app-accent, #00BCD4)', background: 'none', border: 'none', cursor: 'pointer' }}
                           >
                             View

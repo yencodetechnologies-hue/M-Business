@@ -2112,7 +2112,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
 
                           <button onClick={() => shareProposalAsPDF(p, currProject?.companyName || user?.companyName || '')} title="Share" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#0EA5E9' }}><i className="ti ti-send"></i></button>
-                          <button onClick={() => { const w = window.open('', '_blank'); printProposal(p, 'view', w); }} title="View" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: ' var(--app-accent, #00BCD4)' }}><i className="ti ti-eye"></i></button>
+                          <button onClick={() => onViewQuotation && onViewQuotation(q)} title="View" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: ' var(--app-accent, #00BCD4)' }}><i className="ti ti-eye"></i></button>
                           <button
                             onClick={async () => {
                               if (!confirm('Delete this project proposal?')) return;

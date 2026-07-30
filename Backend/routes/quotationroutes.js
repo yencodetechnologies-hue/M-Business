@@ -529,6 +529,14 @@ router.delete("/:id", async (req, res) => {
     const companyId = req.companyId || "NONE";
     const doc = await Quotation.findOneAndDelete({ _id: req.params.id, companyId });
     if (!doc) return res.status(404).json({ success: false, msg: "Not found or unauthorized" });
+    if (doc.projectId) {
+      try {
+        const Project = require("../models/ProjectModel");
+        await Project.findByIdAndUpdate(doc.projectId, { $pull: { quotationIds: String(doc._id) } });
+      } catch (unlinkErr) {
+        console.warn("Failed to unlink quotation from project:", unlinkErr.message);
+      }
+    }
     return res.json({ success: true });
   } catch (err) {
     return res.status(500).json({ success: false, msg: err.message });

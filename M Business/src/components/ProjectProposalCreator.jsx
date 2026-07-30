@@ -1192,7 +1192,11 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
           type: 'proposal'
         };
         setProposals(prev => [newDoc, ...prev]);
-        setView("list");
+        if (cameFromProjectRef.current && onReturnToProject) {
+          onReturnToProject();
+        } else {
+          setView("list");
+        }
         if (typeof flash === 'function') flash(" Proposal saved successfully!");
       }
     };
@@ -1500,7 +1504,13 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
         setDoc(res.data);
         setProposals(prev => prev.map(p => p._id === savedDoc._id ? res.data : p));
         flash("Export Proposal submitted successfully!");
-        setTimeout(() => setView("list"), 1500);
+        setTimeout(() => {
+          if (cameFromProjectRef.current && onReturnToProject) {
+            onReturnToProject();
+          } else {
+            setView("list");
+          }
+        }, 1500);
       } catch (err) {
         console.error("Error submitting proposal:", err);
         flash("Error Error submitting to server", "err");
@@ -1703,8 +1713,14 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     const merged = { ...base, ...data, id: base.id || pid() };
     await persist(merged);
     flash(data.status === 'sent' ? "Export Proposal sent — it will appear on the client's dashboard now." : " Saved!");
-    setTimeout(() => setView("list"), 400);
-  }, [doc, persist, flash, companyName]);
+    setTimeout(() => {
+      if (cameFromProjectRef.current && onReturnToProject) {
+        onReturnToProject();
+      } else {
+        setView("list");
+      }
+    }, 400);
+  }, [doc, persist, flash, companyName, onReturnToProject]);
   // ══ FORM VIEW --------------------------------------------------------------
   if (view === "form") {
     // Register the back-to-list callback so ProposalFormLogic can call it after Send

@@ -246,6 +246,14 @@ router.delete("/:dbId", async (req, res) => {
     const companyId = req.companyId || "NONE";
     const doc = await Proposal.findOneAndDelete({ _id: req.params.dbId, companyId });
     if (!doc) return res.status(404).json({ msg: "Proposal not found or unauthorized" });
+    if (doc.projectId) {
+      try {
+        const Project = require("../models/ProjectModel");
+        await Project.findByIdAndUpdate(doc.projectId, { $pull: { proposalIds: String(doc._id) } });
+      } catch (unlinkErr) {
+        console.warn("Failed to unlink proposal from project:", unlinkErr.message);
+      }
+    }
     res.json({ msg: "Proposal deleted" });
   } catch (err) {
     res.status(500).json({ msg: "Error deleting proposal", error: err.message });

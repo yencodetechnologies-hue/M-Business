@@ -948,7 +948,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const [rejectReasonText, setRejectReasonText] = useState("");
   const [viewApprovalApp, setViewApprovalApp] = useState(null);
   const [lightboxImages, setLightboxImages] = useState(null);
-
+  const [viewQuotationDetail, setViewQuotationDetail] = useState(null);
   // Portal mode has no real login form — the client's "session" is just the
   // decoded token from the link. Once they sign out (or the token is
   // missing/expired), don't fall through to the normal dashboard render
@@ -3199,152 +3199,55 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-file-invoice"></i></div>
                 My Quotations
               </div>
+              <div style={{ fontSize: 12, color: C.text3, fontWeight: 600 }}>{quotations.length} quotation{quotations.length !== 1 ? "s" : ""} received</div>
             </div>
-            <div style={{ margin: "0 auto" }}>
-              {quotations.length === 0 ? (
-                <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 16, height: 233, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px", boxSizing: "border-box", textAlign: "center" }}>
-
-                  <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 4 }}>No quotations yet</div>
-
-                </div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                  {quotations.map((q) => {
-                    const qt = q.qt || {};
-                    const items = q.items || [];
-                    const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity || i.qty) || 1), 0);
-                    const total = q.total || subtotal;
-                    const quoteDate = qt.quoteDate || qt.date || q.date || "";
-                    const validity = qt.validity || "30";
-                    const overview = qt.overview || qt.description || "";
-                    const notes = qt.notes || qt.terms || "";
-                    return (
-                      <div key={q.id} style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,188,212,0.06)" }}>
-
-                        {/* Header */}
-                        <div style={{ background: C.tealLighter, padding: "14px 18px", borderBottom: "1px solid " + C.border, display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 8 }}>
-                          <div>
-                            <div style={{ fontSize: 14, fontWeight: 800, color: C.teal }}>#{q.quoteNo}</div>
-                            {(q.project || qt.title) && <div style={{ fontSize: 12, color: C.text2, marginTop: 3, fontWeight: 600 }}>{q.project || qt.title}</div>}
-                          </div>
-                          <div style={{ textAlign: "right" }}>
-                            <span style={{ background: C.teal, color: "#fff", borderRadius: 20, fontSize: 11, fontWeight: 700, padding: "3px 12px" }}>Sent</span>
-                            {quoteDate && <div style={{ fontSize: 11, color: C.text3, marginTop: 5 }}>{new Date(quoteDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</div>}
-                          </div>
-                        </div>
-
-                        {/* Overview */}
-                        {overview && (
-                          <div style={{ padding: "10px 18px", background: C.surface2, borderBottom: "1px solid " + C.border, fontSize: 12, color: C.text2, lineHeight: 1.7 }}>
-                            {overview}
-                          </div>
-                        )}
-
-                        {/* Line Items */}
-                        <div style={{ padding: "14px 18px" }}>
-                          <div style={{ fontSize: 10, fontWeight: 700, color: C.text3, textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 8 }}>Items / Services</div>
-                          {items.map((item, idx) => {
-                            const qty = parseFloat(item.quantity || item.qty) || 1;
-                            const rate = parseFloat(item.rate) || 0;
-                            return (
-                              <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 0", borderBottom: idx < items.length - 1 ? "1px solid " + C.border : "none", fontSize: 13 }}>
-                                <span style={{ color: C.text, fontWeight: 600 }}>{item.description || item.desc || "—"}</span>
-                                <span style={{ color: C.text2, fontSize: 12 }}>
-                                  {qty} × ₹{rate.toLocaleString("en-IN")}
-                                  <span style={{ fontWeight: 800, color: C.text, marginLeft: 12 }}>₹{(qty * rate).toLocaleString("en-IN")}</span>
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </div>
-
-                        {/* Total + Validity */}
-                        <div style={{ padding: "12px 18px", borderTop: "2px solid " + C.tealLight, background: C.surface2, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
-                          <div style={{ fontSize: 11, color: C.amber, fontWeight: 700, background: C.amberBg, padding: "4px 12px", borderRadius: 8, borderLeft: "3px solid " + C.amber }}>
-                            ⏰ Valid for {validity === "Custom" ? "custom period" : `${validity} days`} from issue
-                          </div>
-                          <div style={{ textAlign: "right" }}>
-                            <div style={{ fontSize: 11, color: C.text3 }}>Total Quoted</div>
-                            <div style={{ fontSize: 20, fontWeight: 900, color: C.teal }}>₹{total.toLocaleString("en-IN")}</div>
-                          </div>
-                        </div>
-
-                        {/* Notes */}
-                        {notes && (
-                          <div style={{ padding: "10px 18px", borderTop: "1px solid " + C.border, fontSize: 11, color: C.text3, lineHeight: 1.7 }}>
-                            <span style={{ fontWeight: 700, color: C.teal2 }}>Notes: </span>{notes}
-                          </div>
-                        )}
-
-                        {/* Approve / Review buttons */}
-                        {q.status !== "approved" && q.status !== "reviewed" && (
-                          <div style={{ padding: "12px 18px", borderTop: "1px solid " + C.border, display: "flex", gap: 10 }}>
-                            <button
-                              className="ai-btn approve"
-                              onClick={() => handleQuotationApprove(q.id)}
-                              style={{ flex: 1, padding: "10px 16px", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", background: C.green, color: "#fff", border: "none" }}
-                            >
-                              <i className="ti ti-check" style={{ fontSize: 12 }}></i> Approve
-                            </button>
-                            <button
-                              onClick={() => setReviewQuotation(q)}
-                              style={{ flex: 1, padding: "10px 16px", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", background: "#fff", border: "1.5px solid " + C.border, color: C.text }}
-                            >
-                              <i className="ti ti-message-2" style={{ fontSize: 12 }}></i> Review
-                            </button>
-                          </div>
-                        )}
-
-                        {q.status === "approved" && (
-                          <div style={{ padding: "10px 18px", borderTop: "1px solid " + C.border, color: C.green, fontWeight: 700, fontSize: 12 }}>
-                            <i className="ti ti-circle-check"></i> Approved
-                          </div>
-                        )}
-
-                        {q.status === "reviewed" && q.clientComment && (
-                          <div style={{ padding: "10px 18px", borderTop: "1px solid " + C.border, background: C.amberBg, color: C.text2, fontSize: 12 }}>
-                            <span style={{ fontWeight: 700, color: C.amber }}>Your Review: </span>{q.clientComment}
-                          </div>
-                        )}
+            {quotations.length === 0 ? (
+              <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 16, height: 233, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px", boxSizing: "border-box", textAlign: "center" }}>
+                <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 4 }}>No quotations yet</div>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {quotations.map((q, idx) => {
+                  const qt = q.qt || {};
+                  const items = q.items || [];
+                  const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity || i.qty) || 1), 0);
+                  const total = q.total || subtotal;
+                  const quoteDate = qt.quoteDate || qt.date || q.date || "";
+                  return (
+                    <div key={q.id || idx} style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: 14, padding: "18px 22px", display: "flex", alignItems: "center", gap: 18, boxShadow: "0 2px 10px rgba(0,0,0,.04)" }}>
+                      <div style={{ width: 44, height: 44, borderRadius: 12, background: C.tealLight, color: C.teal, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                        <i className="ti ti-file-invoice"></i>
                       </div>
-
-                    );
-                  })}
-                </div>
-
-                {reviewQuotation && (
-                <div className="modal-overlay" onClick={() => setReviewQuotation(null)}>
-                  <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-                    <div className="modal-header">
-                      <span className="modal-title">Review "{reviewQuotation.quoteNo}"</span>
-                      <button className="modal-close" onClick={() => setReviewQuotation(null)}>&times;</button>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          #{q.quoteNo} {q.project || qt.title ? `· ${q.project || qt.title}` : ""}
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: C.teal }}>
+                            <i className="ti ti-currency-rupee" style={{ fontSize: 11 }}></i> {total.toLocaleString("en-IN")}
+                          </span>
+                          {quoteDate && (
+                            <span style={{ fontSize: 11, color: C.text3, fontWeight: 600 }}>
+                              <i className="ti ti-clock" style={{ fontSize: 11 }}></i> {new Date(quoteDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+                        <span style={{ background: "#EFF4FF", color: "#2563EB", borderRadius: 20, padding: "4px 12px", fontSize: 11, fontWeight: 800 }}>Sent</span>
+                        <div style={{ display: "flex", gap: 8 }}>
+                          <button
+                            onClick={() => setViewQuotationDetail(q)}
+                            style={{ background: C.tealLight, color: C.teal, borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+                            <i className="ti ti-eye" style={{ fontSize: 13 }}></i> View
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <div className="modal-body">
-                      <div style={{ fontSize: 12, fontWeight: 700, color: C.text2 }}>Your comments *</div>
-                      <textarea
-                        id="quotation-review-textarea"
-                        rows={4}
-                        placeholder="Let us know what changes you'd like..."
-                        style={{ width: "100%", padding: "10px 12px", borderRadius: 9, border: "1.5px solid " + C.border, fontSize: 13, outline: "none", resize: "none", boxSizing: "border-box" }}
-                      />
-                      <button
-                        onClick={() => {
-                          const val = document.getElementById("quotation-review-textarea").value;
-                          if (!val.trim()) { alert("Please enter your comments."); return; }
-                          handleQuotationReviewSubmit(reviewQuotation.id, val.trim());
-                        }}
-                        style={{ width: "100%", padding: "11px", background: C.teal, color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer" }}
-                      >
-                        Submit Review
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-
-              )}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 
@@ -3588,7 +3491,24 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           </div>
         )
       }
-
+      {viewQuotationDetail && (
+        <div className="modal-overlay" onClick={() => setViewQuotationDetail(null)}>
+          <div className="modal-card" onClick={e => e.stopPropagation()} style={{ maxWidth: 520 }}>
+            <div className="modal-header">
+              <span className="modal-title">#{viewQuotationDetail.quoteNo}</span>
+              <button className="modal-close" onClick={() => setViewQuotationDetail(null)}>&times;</button>
+            </div>
+            <div className="modal-body">
+              {(viewQuotationDetail.items || []).map((item, idx) => (
+                <div key={idx} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", fontSize: 13 }}>
+                  <span>{item.description || item.desc}</span>
+                  <span>₹{((parseFloat(item.rate) || 0) * (parseFloat(item.quantity || item.qty) || 1)).toLocaleString("en-IN")}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
       {/* RECEIPT MODAL */}
       {
         receiptInvoice && (

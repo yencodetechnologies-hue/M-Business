@@ -741,7 +741,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           status: 'sent',
         });
       } else if (type === 'proposal') {
-        await axios.put(`${BASE_URL}/api/proposals/${doc._id || doc.dbId || doc.id}`, {
+        await axios.put(`${BASE_URL}/api/proposals/${doc.id || doc._id}`, {
           client: targetClient,
           clientName: targetClient,
           clientId,
@@ -2265,22 +2265,20 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             ))}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 18, width: '100%' }}>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 18, width: '100%', background: '#F8FAFC', border: '1px solid #E8EDF2', borderRadius: 12, padding: 8, boxSizing: 'border-box' }}>
             {[
-              { key: 'inv', label: 'Invoice', desc: 'Standard billing', icon: 'ti-file-invoice', color: '#3B82F6', bg: 'rgba(59,130,246,.1)' },
-              { key: 'pay', label: 'Payment', desc: 'Received amounts', icon: 'ti-credit-card', color: '#22C55E', bg: 'rgba(34,197,94,.1)' },
-              { key: 'exp', label: 'Expenses', desc: 'Project costs', icon: 'ti-receipt', color: '#6B7280', bg: 'rgba(107,114,128,.1)' },
+              { key: 'inv', label: 'Invoice', desc: 'Standard billing', icon: 'ti-file-invoice' },
+              { key: 'pay', label: 'Payment', desc: 'Received amounts', icon: 'ti-credit-card' },
+              { key: 'exp', label: 'Expenses', desc: 'Project costs', icon: 'ti-receipt' },
             ].map(t => (
-              <div key={t.key}
+              <button
+                key={t.key}
                 onClick={() => { setActivePayTab(t.key); setSelectedPaymentItems([]); }}
-                style={{ background: activePayTab === t.key ? ' var(--app-accent, var(--app-accent, #00BCD4))' : '#fff', border: `1px solid ${activePayTab === t.key ? ' var(--app-accent, var(--app-accent, #00BCD4))' : '#E8EDF2'}`, borderRadius: 12, padding: '14px 12px', textAlign: 'center', cursor: 'pointer', transition: 'all .15s', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '8px 10px', borderRadius: 8, border: `1.5px solid ${activePayTab === t.key ? 'var(--app-accent, #00BCD4)' : 'transparent'}`, background: activePayTab === t.key ? 'var(--app-accent, #00BCD4)' : '#fff', color: activePayTab === t.key ? '#fff' : '#374151', fontSize: 12, fontWeight: 800, cursor: 'pointer', transition: 'all .15s', fontFamily: 'inherit', whiteSpace: 'nowrap' }}
               >
-                <div style={{ width: 38, height: 38, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px', fontSize: 18, background: activePayTab === t.key ? 'rgba(255,255,255,.25)' : t.bg, color: activePayTab === t.key ? '#fff' : t.color }}>
-                  <i className={`ti ${t.icon}`}></i>
-                </div>
-                <div style={{ fontSize: 12, fontWeight: 800, color: activePayTab === t.key ? '#fff' : '#0D1B2A' }}>{t.label}</div>
-                <div style={{ fontSize: 10, fontWeight: 600, color: activePayTab === t.key ? 'rgba(255,255,255,.75)' : '#7B8FA1', marginTop: 2 }}>{t.desc}</div>
-              </div>
+                <i className={`ti ${t.icon}`} style={{ fontSize: 14 }}></i>
+                {t.label}
+              </button>
             ))}
           </div>
 

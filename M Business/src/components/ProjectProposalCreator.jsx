@@ -1045,73 +1045,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
             )}
 
 
-          {/* ── Client Signature Section ── */}
-          <div style={{
-            background: "#fff", borderRadius: 14,
-            border: "1.5px solid #e0eef0", padding: "24px 28px",
-            boxShadow: "0 2px 10px rgba(0,0,0,0.04)"
-          }}>
-            <div style={{ fontSize: 13, fontWeight: 800, color: "#607D86", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
-              Client Sign-off
-            </div>
-            <div style={{ fontSize: 11, color: "#96B0B8", marginBottom: 18 }}>
-              {prop.clientSignature
-                ? "The client has digitally signed and accepted this proposal."
-                : "Awaiting client's electronic signature to confirm acceptance."}
-            </div>
-
-            {prop.clientSignature ? (
-              /* ── Signed state ── */
-              <div style={{ background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: 12, padding: "20px 24px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-                  <i className="ti ti-circle-check" style={{ fontSize: 18, color: "#15803D" }}></i>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: "#15803D" }}>Proposal Accepted by Client</span>
-                  {prop.clientSignedAt && (
-                    <span style={{ marginLeft: "auto", fontSize: 11, color: "#96B0B8", fontWeight: 600 }}>
-                      {new Date(prop.clientSignedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                    </span>
-                  )}
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-                  <div style={{ background: "#fff", borderRadius: 10, border: "1px solid #86efac", padding: "16px 20px", textAlign: "center" }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: "#96B0B8", textTransform: "uppercase", letterSpacing: .6, marginBottom: 12 }}>Client Signature</div>
-                    <div style={{ height: 64, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
-                      {prop.clientSignature.startsWith("data:image") ? (
-                        <img src={prop.clientSignature} style={{ maxHeight: 60, maxWidth: "100%", objectFit: "contain" }} alt="client signature" />
-                      ) : (
-                        <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 28, color: "#0D2027" }}>
-                          {prop.clientSignature}
-                        </span>
-                      )}
-                    </div>
-                    <div style={{ height: 1, background: "#15803D", marginBottom: 8 }} />
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#0D2027" }}>{prop.clientName || prop.client || "Client"}</div>
-                    <div style={{ fontSize: 10, color: "#15803D", fontWeight: 700, marginTop: 3 }}>Digitally Signed</div>
-                  </div>
-                  <div style={{ background: "#fff", borderRadius: 10, border: "1px solid #e0eef0", padding: "16px 20px", textAlign: "center" }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: "#96B0B8", textTransform: "uppercase", letterSpacing: .6, marginBottom: 12 }}>Authorised Signatory</div>
-                    <div style={{ height: 64, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
-                      <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg,#006E7F, var(--app-accent, var(--app-accent, #00BCD4)))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, color: "#fff" }}>Yes</div>
-                    </div>
-                    <div style={{ height: 1, background: " var(--app-accent, var(--app-accent, #00BCD4))", marginBottom: 8 }} />
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#0D2027" }}>Company Representative</div>
-                    <div style={{ fontSize: 10, color: "#96B0B8", marginTop: 3 }}>Authorised Signatory</div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              /* ── Awaiting state ── */
-              <div style={{ background: "#fffbeb", border: "1.5px dashed #fcd34d", borderRadius: 12, padding: "24px", textAlign: "center" }}>
-                <i className="ti ti-writing" style={{ fontSize: 32, color: "#d97706", marginBottom: 10, display: "block" }}></i>
-                <div style={{ fontSize: 13, fontWeight: 800, color: "#92400e", marginBottom: 6 }}>
-                  {prop.client || prop.clientName || "Client"} hasn't signed yet
-                </div>
-                <div style={{ fontSize: 11, color: "#B45309" }}>
-                  The client will see a signature pad when they view this proposal in their dashboard.
-                </div>
-              </div>
-            )}
-          </div>
+      
 
         </div>
       </div>

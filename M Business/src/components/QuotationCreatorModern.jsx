@@ -1486,12 +1486,12 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
 export async function shareQuotationAsPDF(q, mode = 'share') {
   const qt = q.qt || {};
   const items = q.items || [];
-  const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity ?? i.qty) || 0), 0);
   const fmt = (n) => 'INR ' + Number(n || 0).toLocaleString('en-IN');
+  const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity ?? i.qty) || 0), 0);
   const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
   const bodyHTML = `
-    <div class="quo-preview" style="padding:22px;font-family:'Nunito',sans-serif;font-size:12px;color:#1A2E35;background:#fff;">
+    <div style="padding:22px;font-family:'Nunito',sans-serif;font-size:12px;color:#1A2E35;background:#fff;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;padding-bottom:14px;border-bottom:3px solid #00BCD4;">
         <div>
           <div style="font-size:13px;font-weight:800;">${qt.fromCompany || '—'}</div>
@@ -1547,6 +1547,10 @@ export async function shareQuotationAsPDF(q, mode = 'share') {
     </div>
   `;
 
+  // Open the target tab SYNCHRONOUSLY, before any await — otherwise most
+  // browsers treat window.open() as a popup and block it (blank page/no-op).
+  const targetWin = mode === 'view' ? window.open('', '_blank') : null;
+
   const container = document.createElement('div');
   container.id = '__quotation_pdf_container__';
   container.style.cssText = 'position:fixed;top:0;left:0;width:210mm;background:#fff;z-index:999999;opacity:0;pointer-events:none;';
@@ -1568,7 +1572,11 @@ export async function shareQuotationAsPDF(q, mode = 'share') {
 
     if (mode === 'view') {
       const blobUrl = pdf.output('bloburl');
-      window.open(blobUrl, '_blank');
+      if (targetWin) {
+        targetWin.location.href = blobUrl;
+      } else {
+        window.open(blobUrl, '_blank');
+      }
       return;
     }
 
@@ -1586,6 +1594,9 @@ export async function shareQuotationAsPDF(q, mode = 'share') {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = fileName; a.click(); URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error('Quotation PDF generation failed:', err);
+    if (targetWin) targetWin.close();
   } finally {
     container.remove();
   }

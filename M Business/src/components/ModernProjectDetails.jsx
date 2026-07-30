@@ -2148,7 +2148,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                             Share
                           </button>
                           <button
-                            onClick={() => printProposal(p, 'view')}
+                            onClick={() => {
+                              const w = window.open('', '_blank');
+                              printProposal(p, 'view', w);
+                            }}
                             title="View PDF"
                             style={{ fontSize: 11, fontWeight: 800, color: ' var(--app-accent, #00BCD4)', background: 'none', border: 'none', cursor: 'pointer' }}
                           >

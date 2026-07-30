@@ -336,7 +336,7 @@ function buildSlidesHTML(proposal) {
 
   return html;
 }
-export async function printProposal(proposal, mode = 'view') {
+export async function printProposal(proposal, mode = 'view', preOpenedWin = null) {
   if (!proposal) return;
   const liveDocSnapshot = document.getElementById('propDoc');
   proposal = { ...proposal, __liveHTML: liveDocSnapshot ? liveDocSnapshot.outerHTML : null };
@@ -422,7 +422,11 @@ export async function printProposal(proposal, mode = 'view') {
 
       if (mode === 'view') {
         const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
+        if (preOpenedWin && !preOpenedWin.closed) {
+          preOpenedWin.location.href = url;
+        } else {
+          window.open(url, '_blank');
+        }
       } else {
         // mode === 'share'
         const file = new File([blob], fileName, { type: 'application/pdf' });

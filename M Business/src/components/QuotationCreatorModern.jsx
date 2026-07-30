@@ -31,6 +31,9 @@ export default function QuotationCreatorModern(props) {
 
   useEffect(() => {
     if (props.prefillProject) {
+      if (props.prefillProject._editQuotation) {
+        setEditEntry(props.prefillProject._editQuotation);
+      }
       setShowModernForm(true);
       if (props.onPrefillConsumed) props.onPrefillConsumed();
     }
@@ -57,7 +60,7 @@ export default function QuotationCreatorModern(props) {
   if (!showModernForm) {
     return <QuotationCreator key={listRefreshKey} {...props} onNewQuotation={handleNew} onEditQuotation={handleEdit} />;
   }
-  return <ModernForm onBack={handleBack} editEntry={editEntry} {...props} prefillProject={pendingPrefill} />;
+  return <ModernForm onBack={pendingPrefill && props.onReturnToProject ? props.onReturnToProject : handleBack} editEntry={editEntry} {...props} prefillProject={pendingPrefill} />;
 }
 
 const genId = () => Date.now() + Math.random();

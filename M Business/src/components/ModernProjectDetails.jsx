@@ -824,6 +824,50 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       return !hasMatch;
     } catch { return true; }
   });
+  // ── Fetch project-linked Quotations & Proposals (matched by project name,
+  // same pattern already used for invoices) so the Accounts section can show
+  // their PDFs without duplicating data — the source of truth stays in the
+  // global Quotations/Proposals modules. ──
+  const [projectQuotations, setProjectQuotations] = useState([]);
+  const [projectProposals, setProjectProposals] = useState([]);
+  const fetchProjectDocsReqId = useRef(0);
+  const fetchProjectQuotationsAndProposals = useCallback(() => {
+    if (!currProject || !currProject._id) return;
+    const reqId = ++fetchProjectDocsReqId.current;
+    const pName = currProject.name || "";
+    const cName = currProject.client || currProject.clientName || "";
+
+    axios.get(`${BASE_URL}/api/quotations`)
+      .then(res => {
+        if (reqId !== fetchProjectDocsReqId.current) return;
+        const all = res.data?.quotations || res.data || [];
+        const matched = (Array.isArray(all) ? all : []).filter(q => {
+          const qProject = q.qt?.title || q.qt?.project || '';
+          const qClient = q.qt?.toName || q.qt?.client || '';
+          return (qProject && qProject === pName) || (!qProject && qClient === cName);
+        });
+        setProjectQuotations(matched);
+      })
+      .catch(() => { if (reqId === fetchProjectDocsReqId.current) setProjectQuotations([]); });
+
+    axios.get(`${BASE_URL}/api/proposals`)
+      .then(res => {
+        if (reqId !== fetchProjectDocsReqId.current) return;
+        const all = res.data?.proposals || res.data || [];
+        const matched = (Array.isArray(all) ? all : []).filter(p => {
+          const pProject = p.title || '';
+          const pClient = p.client || p.clientName || '';
+          return (pProject && pProject === pName) || (!pProject && pClient === cName);
+        });
+        setProjectProposals(matched);
+      })
+      .catch(() => { if (reqId === fetchProjectDocsReqId.current) setProjectProposals([]); });
+  }, [currProject?._id, currProject?.name, currProject?.client]);
+
+  useEffect(() => {
+    fetchProjectQuotationsAndProposals();
+  }, [fetchProjectQuotationsAndProposals]);
+
   const fetchInvoicesReqId = useRef(0);
   const fetchProjectInvoices = useCallback(() => {
     if (!currProject || !currProject._id) { setProjectInvoicesLoading(false); return; }
@@ -2110,6 +2154,67 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               );
             })()}
           </div>
+
+          {(projectQuotations.length > 0 || projectProposals.length > 0) && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 16, marginBottom: 20 }}>
+              {projectQuotations.length > 0 && (
+                <div style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
+                    <i className="ti ti-file-description" style={{ color: '#7C3AED', fontSize: 15, marginRight: 8 }}></i>
+                    <span style={{ fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>Quotations</span>
+                    <span style={{ background: 'rgba(124,58,237,.1)', color: '#7C3AED', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{projectQuotations.length}</span>
+                  </div>
+                  <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {projectQuotations.map((q) => (
+                      <div key={q._id || q.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', border: '1px solid #F1F5F9', borderRadius: 10 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                          <i className="ti ti-file-type-pdf" style={{ color: '#EF4444', fontSize: 18, flexShrink: 0 }}></i>
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontSize: 12, fontWeight: 800, color: '#0D1B2A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{q.qt?.quoteNo || 'Quotation'}</div>
+                            <div style={{ fontSize: 10, color: '#7B8FA1' }}>{(q.status || 'draft').toUpperCase()}</div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => { setSidebarOverride?.('projects'); onNewQuotation && onNewQuotation({ ...currProject, _editQuotation: q }); }}
+                          style={{ fontSize: 11, fontWeight: 800, color: ' var(--app-accent, #00BCD4)', background: 'none', border: 'none', cursor: 'pointer' }}
+                        >
+                          View
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {projectProposals.length > 0 && (
+                <div style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
+                    <i className="ti ti-file-text" style={{ color: '#0EA5E9', fontSize: 15, marginRight: 8 }}></i>
+                    <span style={{ fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>Project Proposals</span>
+                    <span style={{ background: 'rgba(14,165,233,.1)', color: '#0EA5E9', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{projectProposals.length}</span>
+                  </div>
+                  <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {projectProposals.map((p) => (
+                      <div key={p._id || p.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', border: '1px solid #F1F5F9', borderRadius: 10 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                          <i className="ti ti-file-type-pdf" style={{ color: '#EF4444', fontSize: 18, flexShrink: 0 }}></i>
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontSize: 12, fontWeight: 800, color: '#0D1B2A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.title || 'Proposal'}</div>
+                            <div style={{ fontSize: 10, color: '#7B8FA1' }}>{(p.status || 'draft').toUpperCase()}</div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => { setSidebarOverride?.('projects'); onNewProposal && onNewProposal({ ...currProject, _editProposal: p }); }}
+                          style={{ fontSize: 11, fontWeight: 800, color: ' var(--app-accent, #00BCD4)', background: 'none', border: 'none', cursor: 'pointer' }}
+                        >
+                          View
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {mergedInvoices.length > 0 && (
             <div data-paytab="inv" style={{ display: 'block', background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'visible', marginBottom: 20 }}>

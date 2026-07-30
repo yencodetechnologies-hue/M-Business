@@ -6944,6 +6944,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [jumpInvoice, setJumpInvoice] = useState(null);
   const [quotationPrefillProject, setQuotationPrefillProject] = useState(null);
   const [proposalPrefillProject, setProposalPrefillProject] = useState(null);
+  const [quotationReturnProject, setQuotationReturnProject] = useState(null);
+  const [proposalReturnProject, setProposalReturnProject] = useState(null);
   const [invoicePrefill, setInvoicePrefill] = useState(() => {
     try {
       const saved = localStorage.getItem("invoicePrefill_subadmin");
@@ -11460,11 +11462,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 onNewProposal={(proj) => {
                   setProposalPrefillProject(proj);
+                  setProposalReturnProject(proj);
                   setSidebarOverride("projects");
                   setActive("proposals");
                 }}
                 onNewQuotation={(proj) => {
                   setQuotationPrefillProject(proj);
+                  setQuotationReturnProject(proj);
                   setSidebarOverride("projects");
                   setActive("quotations");
                 }}
@@ -11789,7 +11793,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 onAddProject={() => { }}
               />
             )}
-            {validActive === "quotations" && <QuotationCreatorModern user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} prefillProject={quotationPrefillProject} onPrefillConsumed={() => setQuotationPrefillProject(null)} onAddClient={() => {
+            {validActive === "quotations" && <QuotationCreatorModern user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} prefillProject={quotationPrefillProject} onPrefillConsumed={() => setQuotationPrefillProject(null)} onReturnToProject={quotationReturnProject ? () => { const p = quotationReturnProject; setQuotationReturnProject(null); setJumpProject(p); setSidebarOverride(null); setActive("project-details"); } : null} onAddClient={() => {
 
               setNcError({}); setShowClientPass(false);
               setReturnToQuotation(true);
@@ -11798,7 +11802,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             }} onAddProject={() => { setPrevActiveBeforeInvoice(active); setActive("create-project"); }} newlyAddedClientName={quotationNewClientName} />}
 
-            {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} prefillProject={proposalPrefillProject} onPrefillConsumed={() => setProposalPrefillProject(null)} onAddClient={() => { setShowCropModal(false); setNcError({}); setShowClientPass(false); setReturnToProposals(true); setSidebarOverride("proposals"); setActive("addClient"); }} newlyAddedClientName={proposalNewClientName} triggerCrop={triggerCrop} />}
+            {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} prefillProject={proposalPrefillProject} onPrefillConsumed={() => setProposalPrefillProject(null)} onReturnToProject={proposalReturnProject ? () => { const p = proposalReturnProject; setProposalReturnProject(null); setJumpProject(p); setSidebarOverride(null); setActive("project-details"); } : null} onAddClient={() => { setShowCropModal(false); setNcError({}); setShowClientPass(false); setReturnToProposals(true); setSidebarOverride("proposals"); setActive("addClient"); }} newlyAddedClientName={proposalNewClientName} triggerCrop={triggerCrop} />}
 
             {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
 

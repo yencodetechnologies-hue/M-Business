@@ -1138,6 +1138,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     return "list";
   });    // list | editor
   const [proposals, setProposals] = useState(() => load());
+  const cameFromProjectRef = useRef(!!prefillProject);
   const [doc, setDoc] = useState(() => {
     try {
       const savedDoc = sessionStorage.getItem("proposalFormDoc");
@@ -1229,6 +1230,10 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
   useEffect(() => {
     if (prefillProject) {
+      if (prefillProject._editProposal) {
+        setDoc(prefillProject._editProposal);
+        setPage(0);
+      }
       setView("form");
       if (onPrefillConsumed) onPrefillConsumed();
     }
@@ -1702,7 +1707,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     window._onBackToProposals = () => { setPropTab("draft"); setActiveCard("draft"); setView("list"); };
 
     return <ProposalForm
-      onBack={() => setView("list")}
+      onBack={prefillProject === null && onReturnToProject ? onReturnToProject : (() => setView("list"))}
       initialData={doc}
       clients={clients}
       onAddClient={onAddClient}

@@ -828,7 +828,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const fetchProjectInvoices = useCallback(() => {
     if (!currProject || !currProject._id) { setProjectInvoicesLoading(false); return; }
     const reqId = ++fetchInvoicesReqId.current;
-    setProjectInvoicesLoading(prev => (projectInvoices && projectInvoices.length > 0) ? false : true);  const pName = currProject.name || "";
+    setProjectInvoicesLoading(prev => prev); const pName = currProject.name || "";
     const cName = currProject.client || currProject.clientName || "";
     axios.get(`${BASE_URL}/api/invoices`)
       .then(res => {
@@ -846,8 +846,25 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   }, [currProject?._id, currProject?.name, currProject?.client]);
 
   useEffect(() => {
+    try {
+      const cached = localStorage.getItem("cached_invoices");
+      if (cached) {
+        const all = JSON.parse(cached);
+        const pName = currProject?.name || "";
+        const cName = currProject?.client || currProject?.clientName || "";
+        const matched = (Array.isArray(all) ? all : []).filter(e => {
+          const eProj = e.inv?.project || e.project;
+          const eClient = e.inv?.clientName || e.inv?.client || e.client;
+          return (eProj && eProj === pName) || (!eProj && eClient === cName);
+        });
+        if (matched.length > 0) {
+          setProjectInvoices(matched);
+          setProjectInvoicesLoading(false);
+        }
+      }
+    } catch { }
     fetchProjectInvoices();
-  }, [fetchProjectInvoices]);
+  }, [currProject?._id, fetchProjectInvoices]);
 
   // Merge the simple project.invoices array with the rich global Invoices
   // (created via the full InvoiceCreator form) so both show up in this list.

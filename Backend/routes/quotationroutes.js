@@ -37,6 +37,39 @@ router.get("/", async (req, res) => {
   }
 });
 
+// ── GET for specific project (ID-based, exact match) ──────────────────────────
+router.get("/project/:projectId", async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const companyId = req.companyId || "NONE";
+    const docs = await Quotation.find({ companyId, projectId }).sort({ createdAt: -1 }).lean();
+    const quotations = docs.map((doc) => {
+      const qt = doc.qt || {};
+      const items = doc.items || [];
+      const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
+      const total = subtotal * (1 + (parseFloat(qt.gstRate) || 0) / 100);
+      return {
+        id: doc._id.toString(),
+        quoteNo: qt.quoteNo || doc.quoteNo || "—",
+        client: qt.client || doc.client || "—",
+        project: qt.project || "",
+        projectId: doc.projectId || "",
+        date: qt.date || null,
+        expiryDate: qt.expiryDate || null,
+        status: doc.status || "draft",
+        total,
+        savedAt: doc.createdAt || Date.now(),
+        qt,
+        items,
+      };
+    });
+    return res.json({ success: true, quotations });
+  } catch (err) {
+    console.error("GET /api/quotations/project/:projectId error:", err);
+    return res.status(500).json({ success: false, msg: err.message });
+  }
+});
+
 // ── GET for specific client ───────────────────────────────────────────────────
 router.get("/client/:clientName", async (req, res) => {
   try {
@@ -103,7 +136,7 @@ router.get("/client/:clientName", async (req, res) => {
 // ── POST create / update ──────────────────────────────────────────────────────
 router.post("/", async (req, res) => {
   try {
-    const { qt, items, status } = req.body;
+    const { qt, items, status, projectId } = req.body;
     if (!qt || !items) return res.status(400).json({ success: false, msg: "qt and items required" });
 
     const existing = await Quotation.findOne({ "qt.quoteNo": qt.quoteNo });
@@ -111,6 +144,7 @@ router.post("/", async (req, res) => {
       existing.qt = qt;
       existing.items = items;
       existing.status = status || existing.status;
+      if (projectId) existing.projectId = projectId;
       await existing.save();
 
       // Automatic Income Tracking for updates
@@ -169,8 +203,20 @@ router.post("/", async (req, res) => {
       status: normalizedStatus,
       companyId: req.companyId || "",
       clientId: resolvedClientId,
+      projectId: projectId || "",
     });
     await doc.save();
+
+    // Link this quotation back onto the project's own record, so the
+    // Accounts section can read it directly off the project too.
+    if (projectId) {
+      try {
+        const Project = require("../models/ProjectModel");
+        await Project.findByIdAndUpdate(projectId, { $addToSet: { quotationIds: String(doc._id) } });
+      } catch (linkErr) {
+        console.warn("Failed to link quotation to project:", linkErr.message);
+      }
+    }
 
     // Send notification to client when quotation is sent
     if (normalizedStatus === "sent" && resolvedClientId) {

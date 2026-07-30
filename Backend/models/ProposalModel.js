@@ -7,6 +7,7 @@ const ProposalSchema = new mongoose.Schema(
     client: { type: String, default: "" },
     clientName: { type: String, default: "" },
     clientId: { type: String, default: "", index: true },
+    projectId: { type: String, default: "", index: true },  // links this proposal to a specific project
     status: {
       type: String,
       enum: ["draft", "pending", "sent", "approved", "rejected", "negotiation", "won", "lost"],

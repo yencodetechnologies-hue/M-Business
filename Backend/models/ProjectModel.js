@@ -63,6 +63,8 @@ const projectSchema = new mongoose.Schema({
     }],
     default: []
   },
+  quotationIds: { type: [String], default: [] },
+  proposalIds: { type: [String], default: [] },
   files: {
     type: [{
       name: { type: String, required: true },

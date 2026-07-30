@@ -837,29 +837,17 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     const pName = currProject.name || "";
     const cName = currProject.client || currProject.clientName || "";
 
-    axios.get(`${BASE_URL}/api/quotations`)
+    axios.get(`${BASE_URL}/api/quotations/project/${currProject._id}`)
       .then(res => {
         if (reqId !== fetchProjectDocsReqId.current) return;
-        const all = res.data?.quotations || res.data || [];
-        const matched = (Array.isArray(all) ? all : []).filter(q => {
-          const qProject = q.qt?.title || q.qt?.project || '';
-          const qClient = q.qt?.toName || q.qt?.client || '';
-          return (qProject && qProject === pName) || (!qProject && qClient === cName);
-        });
-        setProjectQuotations(matched);
+        setProjectQuotations(res.data?.quotations || []);
       })
       .catch(() => { if (reqId === fetchProjectDocsReqId.current) setProjectQuotations([]); });
 
-    axios.get(`${BASE_URL}/api/proposals`)
+    axios.get(`${BASE_URL}/api/proposals/project/${currProject._id}`)
       .then(res => {
         if (reqId !== fetchProjectDocsReqId.current) return;
-        const all = res.data?.proposals || res.data || [];
-        const matched = (Array.isArray(all) ? all : []).filter(p => {
-          const pProject = p.title || '';
-          const pClient = p.client || p.clientName || '';
-          return (pProject && pProject === pName) || (!pProject && pClient === cName);
-        });
-        setProjectProposals(matched);
+        setProjectProposals(Array.isArray(res.data) ? res.data : []);
       })
       .catch(() => { if (reqId === fetchProjectDocsReqId.current) setProjectProposals([]); });
   }, [currProject?._id, currProject?.name, currProject?.client]);
@@ -1890,11 +1878,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
 
-                {onNewQuotation && (
-                  <button className="mpd-btn mpd-btn-outline" onClick={() => onNewQuotation(currProject)}>
-                    + New Quotation
-                  </button>
-                )}
+
 
               </div>
             </div>

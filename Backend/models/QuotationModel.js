@@ -12,6 +12,7 @@ const QuotationSchema = new mongoose.Schema(
     },
     companyId: { type: String, default: "" },
     clientId: { type: String, default: "" },  // client _id for strict portal filtering
+    projectId: { type: String, default: "", index: true },  // links this quotation to a specific project
   },
   { timestamps: true }
 );

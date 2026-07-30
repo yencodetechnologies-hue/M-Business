@@ -427,6 +427,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
     setSaving(true);
     try {
       const payload = {
+        projectId: prefillProject?._id || prefillProject?.id || undefined,
         qt: {
           ...qt,
           status: normalStatus,

@@ -15,6 +15,18 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET proposals for a specific project (ID-based, exact match)
+router.get("/project/:projectId", async (req, res) => {
+  try {
+    const companyId = req.companyId || "NONE";
+    const { projectId } = req.params;
+    const list = await Proposal.find({ companyId, projectId }).sort({ updatedAt: -1 });
+    res.json(list);
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+});
+
 // GET proposals for a specific client
 // GET proposals for a specific client
 router.get("/client/:name", async (req, res) => {
@@ -92,6 +104,18 @@ router.post("/", async (req, res) => {
     const companyId = req.companyId || "";
     const newDoc = new Proposal({ ...req.body, companyId });
     const saved = await newDoc.save();
+
+    // Link this proposal back onto the project's own record, so the
+    // Accounts section can read it directly off the project too.
+    if (saved.projectId) {
+      try {
+        const Project = require("../models/ProjectModel");
+        await Project.findByIdAndUpdate(saved.projectId, { $addToSet: { proposalIds: String(saved._id) } });
+      } catch (linkErr) {
+        console.warn("Failed to link proposal to project:", linkErr.message);
+      }
+    }
+
     res.json(saved);
   } catch (err) {
     res.status(500).json({ msg: "Error saving proposal", error: err.message });

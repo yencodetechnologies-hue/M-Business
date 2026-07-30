@@ -7376,7 +7376,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       return [];
     } catch { return []; }
   });
-const [clientsLoaded, setClientsLoaded] = useState(() => {
+  const [clientsLoaded, setClientsLoaded] = useState(() => {
     try {
       const u = JSON.parse(localStorage.getItem("user") || "{}");
       const cid = String(u?.companyId || u?._id || u?.id || u?.userId || u?.company || "").trim();
@@ -11459,6 +11459,10 @@ const [clientsLoaded, setClientsLoaded] = useState(() => {
                 onNewProposal={(proj) => {
                   setSidebarOverride("proposals");
                   setActive("proposals");
+                }}
+                onNewQuotation={(proj) => {
+                  setSidebarOverride("quotations");
+                  setActive("quotations");
                 }}
                 onNewInvoice={(proj, editInv) => {
                   if (!proj) return;

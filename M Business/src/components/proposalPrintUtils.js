@@ -338,7 +338,16 @@ function buildSlidesHTML(proposal) {
 }
 export async function printProposal(proposal, mode = 'view', preOpenedWin = null) {
   if (!proposal) return;
-  const liveDocSnapshot = document.getElementById('propDoc');
+  // Only use the live-editor DOM snapshot when we're actually inside the
+  // proposal editor AND viewing the same proposal that's currently open there.
+  // Otherwise (e.g. View from Project Details → Accounts, or Project Proposals list)
+  // always render from the persisted proposal data so the PDF is identical everywhere.
+  const currentEditorId = window._currentProposalDoc?._id || window._currentProposalDoc?.id;
+  const thisProposalId = proposal._id || proposal.id;
+  const liveDocSnapshot =
+    currentEditorId && thisProposalId && currentEditorId === thisProposalId
+      ? document.getElementById('propDoc')
+      : null;
   proposal = { ...proposal, __liveHTML: liveDocSnapshot ? liveDocSnapshot.outerHTML : null };
   if (typeof window.html2pdf === 'undefined') {
     await new Promise((resolve) => {
@@ -357,6 +366,13 @@ export async function printProposal(proposal, mode = 'view', preOpenedWin = null
   } else if (proposal.slides && proposal.slides.length > 0) {
     bodyHTML = buildSlidesHTML(proposal);
   } else {
+    console.warn('printProposal: no html/slides found on proposal', {
+      id: proposal._id || proposal.id,
+      hasHtml: !!proposal.html,
+      slidesLen: (proposal.slides || []).length,
+      hasFormData: !!(proposal.formData && Object.keys(proposal.formData).length),
+      format: proposal.format,
+    });
     bodyHTML = `<div style="padding:80px;text-align:center;color:#aaa;font-size:14px;">No proposal content to display.</div>`;
   }
   let resolvedVars = HARDCODED_VARS;
@@ -395,7 +411,7 @@ export async function printProposal(proposal, mode = 'view', preOpenedWin = null
 
   const container = document.createElement("div");
   container.id = "__proposal_pdf_container__";
-  container.style.cssText = "position:fixed;top:0;left:0;width:210mm;background:#fff;z-index:999999;opacity:0;pointer-events:none;";
+  container.style.cssText = "position:fixed;top:0;left:-9999px;width:210mm;background:#fff;z-index:999999;pointer-events:none;";
   container.innerHTML = `<style>:root{${resolvedVars}}${PRINT_BASE_CSS}${PROPOSAL_PREVIEW_CSS}</style>${bodyHTML}`;
   document.body.appendChild(container);
 

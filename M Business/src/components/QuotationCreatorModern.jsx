@@ -1553,7 +1553,7 @@ export async function shareQuotationAsPDF(q, mode = 'share') {
 
   const container = document.createElement('div');
   container.id = '__quotation_pdf_container__';
-  container.style.cssText = 'position:fixed;top:0;left:0;width:210mm;background:#fff;z-index:999999;opacity:0;pointer-events:none;';
+  container.style.cssText = 'position:fixed;top:0;left:-9999px;width:210mm;background:#fff;z-index:999999;pointer-events:none;';
   container.innerHTML = bodyHTML;
   document.body.appendChild(container);
 

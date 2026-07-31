@@ -10309,13 +10309,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     {[
                       { id: "qaInvoice", icon: "ti-file-invoice", label: "Invoices", color: "#0d9488", bg: "rgba(13,148,136,0.1)", val: invoices.length, sub: `${invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length} unpaid` },
 
-                      { id: "qaProposal", icon: "ti-clipboard-list", label: "Proposals", color: "#16a34a", bg: "rgba(22,163,74,0.1)", val: null, sub: "View list" },
-                      { id: "qaQuote", icon: "ti-receipt", label: "Quotations", color: "#2563eb", bg: "rgba(37,99,235,0.1)", val: (quotations || []).length, sub: "Total" },
+                      { id: "qaProposal", icon: "ti-clipboard-list", label: "Proposals", color: "#16a34a", bg: "rgba(22,163,74,0.1)", val: null, sub: "View list", nav: () => { setSidebarOverride("dashboard"); setActive("proposals"); } },
+                      { id: "qaQuote", icon: "ti-receipt", label: "Quotations", color: "#2563eb", bg: "rgba(37,99,235,0.1)", val: (quotations || []).length, sub: "Total", nav: () => { setSidebarOverride("dashboard"); setActive("quotations"); } },
                     ].map((a, i) => (
                       <div
                         key={i}
                         className="mob-card"
-                        onClick={() => openMobilePopup(a.id)}
+                        onClick={() => a.nav ? a.nav() : openMobilePopup(a.id)}
                         style={{ background: "#fff", borderRadius: 16, padding: 16, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", cursor: "pointer" }}
                       >
                         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
@@ -10365,21 +10365,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
                   </MobilePopup>
 
-                  <MobilePopup id="qaProposal" title="Proposals">
-                    <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "20px 0" }}>Open the Proposals page to view details.</div>
-                  </MobilePopup>
 
-                  <MobilePopup id="qaQuote" title="Quotations">
-                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{(quotations || []).length} total</div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      {(quotations || []).slice(0, 10).map((q, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
-                          <span style={{ fontWeight: 600 }}>{q.clientName || q.title || "Quotation"}</span>
-                          <span style={{ color: "rgba(15,28,46,0.5)" }}>{formatCurrency(q.grandTotal, q.currency)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </MobilePopup>
                   {/* PROJECTS — redesigned cards */}
                   <div style={{ padding: "16px 16px 100px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
@@ -10881,73 +10867,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                   </div>
                                   <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Projects</div>
                                 </div>
-                                {(() => {
-                                  const statusMeta = (raw) => {
-                                    const s = (raw || "").toLowerCase().replace(/[\s_-]/g, "");
-                                    if (["active", "inprogress", "inreview", "started"].includes(s)) return { label: "Active", color: "#16a34a" };
-                                    if (["onhold", "hold", "paused", "suspended"].includes(s)) return { label: "On Hold", color: "#7c3aed" };
-                                    if (["completed", "done", "delivered", "closed"].includes(s)) return { label: "Completed", color: "#2563eb" };
-                                    if (["overdue", "late"].includes(s)) return { label: "Overdue", color: "#dc2626" };
-                                    return { label: raw || "On Hold", color: "#7c3aed" };
-                                  };
-                                  return (
-                                    <>
-                                      <HoverPopup id="activeProjects" title="Projects">
-                                        <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{projects.length} total</div>
-                                        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                                          {projectsWithProgress.slice(0, 8).map((p, i) => {
-                                            const meta = statusMeta(p.status);
-                                            return (
-                                              <div key={p._id || p.id || i} style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
-                                                <div style={{ fontWeight: 700, fontSize: 12 }}>{p.name}</div>
-                                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>
-                                                  <span style={{ color: meta.color, fontWeight: 700 }}>{meta.label}</span> · {p.progress || 0}%
-                                                </div>
-                                              </div>
-                                            );
-                                          })}
-                                        </div>
-                                      </HoverPopup>
 
-                                      {!isDesktopWidth && expandedMobileStatCard === 'activeProjects' && (
-                                        <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 12 }}>
-                                          {projectsWithProgress.map((p, idx) => {
-                                            const meta = statusMeta(p.status);
-                                            const progress = p.progress || 0;
-                                            const clientName = clients.find(c => c._id === p.clientId)?.clientName || p.client || "Internal";
-                                            return (
-                                              <div
-                                                key={p._id || p.id || idx}
-                                                onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(true); setActive("project-details"); }}
-                                                className="mob-card"
-                                                style={{ background: "#fff", borderRadius: 20, padding: "16px 16px", boxShadow: "0 4px 16px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", cursor: "pointer" }}
-                                              >
-                                                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                                                  <div style={{ position: "relative", width: 50, height: 50, flexShrink: 0 }}>
-                                                    <svg width="50" height="50" viewBox="0 0 50 50">
-                                                      <circle cx="25" cy="25" r="21" fill="none" stroke="#f1f5f9" strokeWidth="5" />
-                                                      <circle cx="25" cy="25" r="21" fill="none" stroke={meta.color} strokeWidth="5" strokeDasharray={`${(progress / 100) * 132} 132`} strokeLinecap="round" transform="rotate(-90 25 25)" />
-                                                    </svg>
-                                                    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: meta.color }}>
-                                                      {progress}%
-                                                    </div>
-                                                  </div>
-                                                  <div style={{ flex: 1, minWidth: 0 }}>
-                                                    <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f0a29", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
-                                                    <div style={{ fontSize: 11.5, color: "#94a3b8", marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
-                                                      <i className="ti ti-building" style={{ fontSize: 12 }}></i>{clientName}
-                                                    </div>
-                                                    <div style={{ fontSize: 11, fontWeight: 700, color: meta.color, marginTop: 4 }}>{meta.label}</div>
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            );
-                                          })}
-                                        </div>
-                                      )}
-                                    </>
-                                  );
-                                })()}
                               </div>
 
 

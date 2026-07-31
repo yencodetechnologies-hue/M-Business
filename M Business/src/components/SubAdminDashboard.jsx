@@ -5782,135 +5782,15 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
 
 
-            <div style={{ fontSize: 11, fontWeight: 800, color: "var(--app-muted)", marginBottom: 12, letterSpacing: 1, marginTop: 20 }}>BUSINESS STATUS</div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
 
-              <div style={{ background: "#f0fdf4", border: "1px solid #dcfce7", borderRadius: 12, padding: 12 }}>
 
-                <div style={{ fontSize: 10, color: "#166534", fontWeight: 700 }}>PROJECTS</div>
-
-                <div style={{ fontSize: 20, fontWeight: 800, color: "#15803d" }}>{projects.length}</div>
-
-              </div>
-
-              <div style={{ background: "#eff6ff", border: "#dbeafe", borderRadius: 12, padding: 12 }}>
-
-                <div style={{ fontSize: 10, color: "#1e40af", fontWeight: 700 }}>INVOICES</div>
-
-                <div style={{ fontSize: 20, fontWeight: 800, color: "#1d4ed8" }}>{invoices.length}</div>
-
-              </div>
-
-            </div>
 
           </div>
 
 
 
-          {/* Business/Payment Info */}
 
-          <div>
-
-            <div style={{ fontSize: 11, fontWeight: 800, color: "var(--app-muted)", marginBottom: 12, letterSpacing: 1 }}>PAYMENT HISTORY</div>
-
-            <div style={{ maxHeight: 180, overflowY: "auto", border: "1px solid #f3f0ff", borderRadius: 12, padding: 4 }}>
-
-              {paymentHistory.length === 0 ? (
-
-                <div style={{ textAlign: "center", padding: 20, color: "var(--app-muted)", fontSize: 12 }}>No payments found</div>
-
-              ) : (
-
-                paymentHistory.slice(0, 5).map((payment, i) => (
-
-                  <div key={i} style={{
-
-                    display: "flex",
-
-                    justifyContent: "space-between",
-
-                    alignItems: "center",
-
-                    padding: "10px 12px",
-
-                    borderBottom: i < paymentHistory.length - 1 ? "1px solid var(--app-bg)" : "none",
-
-                    background: i % 2 === 0 ? "#fdfbff" : "transparent"
-
-                  }}>
-
-                    <div style={{ flex: 1, minWidth: 0 }}>
-
-                      <div style={{ fontSize: 11, fontWeight: 700, color: "var(--app-sidebar)", marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-
-                        {payment.description || payment.type}
-
-                      </div>
-
-                      <div style={{ fontSize: 9, color: "var(--app-muted)" }}>
-
-                        {new Date(payment.paymentDate).toLocaleDateString()}
-
-                      </div>
-
-                    </div>
-
-                    <div style={{ textAlign: "right", marginLeft: 10 }}>
-
-                      <div style={{ fontSize: 11, fontWeight: 800, color: "#22c55e" }}>Rs.{payment.amount?.toLocaleString() || "0"}</div>
-
-                      <div style={{ fontSize: 9, color: "#22c55e", fontWeight: 700, textTransform: "uppercase" }}>{payment.status || "paid"}</div>
-
-                    </div>
-
-                  </div>
-
-                ))
-
-              )}
-
-            </div>
-
-
-
-            <div style={{ fontSize: 11, fontWeight: 800, color: "var(--app-muted)", marginBottom: 12, letterSpacing: 1, marginTop: 24 }}>PROJECT PROGRESS</div>
-
-            <div style={{ maxHeight: 180, overflowY: "auto" }}>
-
-              {projects.length === 0 ? (
-
-                <div style={{ textAlign: "center", padding: 20, color: "var(--app-muted)", fontSize: 12 }}>No projects in progress</div>
-
-              ) : (
-
-                projects.slice(0, 3).map(p => (
-
-                  <div key={p._id} style={{ marginBottom: 12, padding: "8px 12px", background: "var(--app-bg)", borderRadius: 12, border: "1px solid var(--app-border)" }}>
-
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-
-                      <span style={{ fontSize: 11, fontWeight: 700, color: "var(--app-sidebar)" }}>{p.name}</span>
-
-                      <span style={{ fontSize: 10, fontWeight: 800, color: sc(p.status) }}>{p.progress || 0}%</span>
-
-                    </div>
-
-                    <div style={{ background: "var(--app-border)", borderRadius: 4, height: 5 }}>
-
-                      <div style={{ width: `${p.progress || 0}%`, background: (p.progress || 0) === 100 ? "linear-gradient(90deg,#22C55E,#4ade80)" : "linear-gradient(90deg,var(--app-accent),var(--app-accent))", borderRadius: 4, height: "100%" }} />
-
-                    </div>
-
-                  </div>
-
-                ))
-
-              )}
-
-            </div>
-
-          </div>
 
         </div>
 

@@ -2163,9 +2163,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               const liveProposalsTotal = projectProposals.reduce((s, p) => s + parseAmt(p.value ?? p.total), 0);
               const liveOtherDocsCount = (currProject.files || []).length;
               return [
-                { lbl: 'Total Quotations', val: `${currency}${liveQuotationsTotal.toLocaleString()}`, sub: `${projectQuotations.length} quotation(s)`, color: '#7C3AED', icon: 'ti-file-description' },
-                { lbl: 'Total Proposals', val: `${currency}${liveProposalsTotal.toLocaleString()}`, sub: `${projectProposals.length} proposal(s)`, color: '#0EA5E9', icon: 'ti-file-text' },
-                { lbl: 'Other Documents', val: `${currency}0`, sub: `${liveOtherDocsCount} document(s)`, color: '#6B7280', icon: 'ti-folder' },
+                { lbl: 'Total Quotations', sub: `${projectQuotations.length} quotation(s)`, color: '#7C3AED', icon: 'ti-file-description' },
+                { lbl: 'Total Proposals', sub: `${projectProposals.length} proposal(s)`, color: '#0EA5E9', icon: 'ti-file-text' },
+                { lbl: 'Other Documents', sub: `${liveOtherDocsCount} document(s)`, color: '#6B7280', icon: 'ti-folder' },
               ];
             })().map(s => (
               <div key={s.lbl} style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 12, padding: '14px 16px', position: 'relative', overflow: 'hidden' }}>

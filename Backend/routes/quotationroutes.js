@@ -142,10 +142,14 @@ router.get("/client/:clientName", async (req, res) => {
     // If no companyId, return empty — prevents deleted client's old invoices showing
     if (!companyId) return res.json([]);
 
+    const CLIENT_VISIBLE_STATUSES = ["sent", "pending", "approved", "rejected"];
+
     let docs = [];
     if (clientId) {
-      // Strict match first: quotations explicitly sent to this client account
-      docs = await Quotation.find({ companyId, clientId, status: "sent" }).sort({ createdAt: -1 }).lean();
+      // Strict match first: quotations explicitly sent to this client account.
+      // Once sent, the client keeps seeing it through pending/approved/rejected —
+      // only "draft" (never sent) stays hidden from the portal.
+      docs = await Quotation.find({ companyId, clientId, status: { $in: CLIENT_VISIBLE_STATUSES } }).sort({ createdAt: -1 }).lean();
     }
     if (docs.length === 0) {
       // Legacy fallback: name-based match, or when strict match found nothing
@@ -159,11 +163,10 @@ router.get("/client/:clientName", async (req, res) => {
         conditions.push({ client: { $regex: new RegExp(safeCompany, "i") } });
       }
       const fallbackFilter = conditions.length > 0
-        ? { companyId, $or: conditions, status: "sent" }
-        : { companyId, _id: null, status: "sent" };
+        ? { companyId, $or: conditions, status: { $in: CLIENT_VISIBLE_STATUSES } }
+        : { companyId, _id: null, status: { $in: CLIENT_VISIBLE_STATUSES } };
       docs = await Quotation.find(fallbackFilter).sort({ createdAt: -1 }).lean();
     }
-
     const quotations = docs.map((doc) => {
       const qt = doc.qt || {};
       const items = doc.items || [];
@@ -171,6 +174,7 @@ router.get("/client/:clientName", async (req, res) => {
       const total = subtotal * (1 + (parseFloat(qt.gstRate) || 0) / 100);
       return {
         id: doc._id.toString(),
+        _id: doc._id.toString(),
         quoteNo: qt.quoteNo || doc.quoteNo || "—",
         client: qt.client || doc.client || "—",
         project: qt.project || "",
@@ -181,6 +185,11 @@ router.get("/client/:clientName", async (req, res) => {
         savedAt: doc.createdAt || Date.now(),
         qt,
         items,
+        clientSignature: doc.clientSignature || "",
+        clientSignedBy: doc.clientSignedBy || "",
+        clientSignedAt: doc.clientSignedAt || null,
+        reviewComment: doc.reviewComment || "",
+        reviewedAt: doc.reviewedAt || null,
       };
     });
     res.json(quotations);

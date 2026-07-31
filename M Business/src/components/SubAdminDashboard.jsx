@@ -1660,13 +1660,12 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
           try {
 
-            await axios.put(
+            const res = await axios.put(
 
               `${BASE_URL}/api/clients/${activeClient._id}`,
               { documents: updatedDocs }
             );
             const savedClient = res.data?.client;
-            setActiveClient(prev => savedClient ? savedClient : { ...prev, documents: updatedDocs });
             setClients(prev => prev.map(c => c._id === activeClient._id ? (savedClient || { ...c, documents: updatedDocs }) : c));
 
           } catch (err) {
@@ -10228,13 +10227,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   <div style={{ padding: "22px 16px 6px" }}>
                     <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
                       {[
-                        { icon: "ti-file-invoice", label: "Invoice", color: "#0d9488", bg: "linear-gradient(135deg,#ccfbf1,#99f6e4)", action: () => { setSidebarOverride("dashboard"); setActive("invoices"); } },
-                        { icon: "ti-user-plus", label: "Client", color: "#7c3aed", bg: "linear-gradient(135deg,#ede9fe,#ddd6fe)", action: () => { setSidebarOverride("dashboard"); setActive("addClient"); } },
-                        { icon: "ti-folder-plus", label: "Project", color: "#d97706", bg: "linear-gradient(135deg,#fef3c7,#fde68a)", action: () => { setJumpProject(null); setActive("create-project"); } },
-                        { icon: "ti-clipboard-list", label: "Proposal", color: "#16a34a", bg: "linear-gradient(135deg,#dcfce7,#bbf7d0)", action: () => { setSidebarOverride("dashboard"); setActive("proposals"); } },
-                        { icon: "ti-receipt", label: "Quote", color: "#2563eb", bg: "linear-gradient(135deg,#dbeafe,#bfdbfe)", action: () => { setSidebarOverride("dashboard"); setActive("quotations"); } },
+                        { id: "qaInvoice", icon: "ti-file-invoice", label: "Invoice", color: "#0d9488", bg: "linear-gradient(135deg,#ccfbf1,#99f6e4)" },
+                        { id: "qaClient", icon: "ti-user-plus", label: "Client", color: "#7c3aed", bg: "linear-gradient(135deg,#ede9fe,#ddd6fe)" },
+                        { id: "qaProject", icon: "ti-folder-plus", label: "Project", color: "#d97706", bg: "linear-gradient(135deg,#fef3c7,#fde68a)" },
+                        { id: "qaProposal", icon: "ti-clipboard-list", label: "Proposal", color: "#16a34a", bg: "linear-gradient(135deg,#dcfce7,#bbf7d0)" },
+                        { id: "qaQuote", icon: "ti-receipt", label: "Quote", color: "#2563eb", bg: "linear-gradient(135deg,#dbeafe,#bfdbfe)" },
                       ].map((a, i) => (
-                        <div key={i} onClick={a.action} style={{ flex: "0 0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 6, cursor: "pointer", minWidth: 68 }}>
+                        <div key={i} onClick={() => openMobilePopup(a.id)} style={{ flex: "0 0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 6, cursor: "pointer", minWidth: 68 }}>
                           <div style={{ width: 52, height: 52, borderRadius: 16, background: a.bg, color: a.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 6px 16px rgba(0,0,0,0.06)" }}>
                             <i className={`ti ${a.icon}`}></i>
                           </div>
@@ -10243,7 +10242,57 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       ))}
                     </div>
                   </div>
+                  <MobilePopup id="qaInvoice" title="Invoices">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{invoices.length} total</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {invoices.slice(0, 10).map((inv, i) => (
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
+                          <span style={{ fontWeight: 600 }}>{inv.clientName || inv.client || "Client"}</span>
+                          <span style={{ color: "rgba(15,28,46,0.5)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </MobilePopup>
 
+                  <MobilePopup id="qaClient" title="Clients">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{clients.length} total</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {clients.slice(0, 10).map((c, i) => (
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
+                          <span style={{ fontWeight: 600 }}>{c.name || c.companyName || "Client"}</span>
+                          <span style={{ color: "rgba(15,28,46,0.5)" }}>{c.status || "-"}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </MobilePopup>
+
+                  <MobilePopup id="qaProject" title="Projects">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{projectsWithProgress.length} total</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {projectsWithProgress.slice(0, 10).map((p, i) => (
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
+                          <span style={{ fontWeight: 600 }}>{p.name}</span>
+                          <span style={{ color: "rgba(15,28,46,0.5)" }}>{p.progress || 0}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  </MobilePopup>
+
+                  <MobilePopup id="qaProposal" title="Proposals">
+                    <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "20px 0" }}>Open the Proposals page to view details.</div>
+                  </MobilePopup>
+
+                  <MobilePopup id="qaQuote" title="Quotations">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{(quotations || []).length} total</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {(quotations || []).slice(0, 10).map((q, i) => (
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
+                          <span style={{ fontWeight: 600 }}>{q.clientName || q.title || "Quotation"}</span>
+                          <span style={{ color: "rgba(15,28,46,0.5)" }}>{formatCurrency(q.grandTotal, q.currency)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </MobilePopup>
                   {/* PROJECTS — redesigned cards */}
                   <div style={{ padding: "16px 16px 100px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
@@ -10633,7 +10682,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                             {/* TOP CARDS ROW */}
 
-                            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 20 }}>
+                            <div style={{ display: "grid", gridTemplateColumns: isDesktopWidth ? "repeat(5, 1fr)" : "repeat(2, 1fr)", gap: isDesktopWidth ? 20 : 12 }}>
 
 
                               <div
@@ -10779,7 +10828,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                 style={{ position: "relative" }}
                               >
                                 <MobileCardArrow id="unpaidInvoices" />
-                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
+                                <div
+                                  onClick={() => !isDesktopWidth && openMobilePopup('unpaidInvoices')}
+                                  style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column", cursor: isDesktopWidth ? "default" : "pointer" }}
+                                >
                                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                                       <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>

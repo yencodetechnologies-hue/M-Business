@@ -10790,7 +10790,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               >
                                 <MobileCardArrow id="activeProjects" />
                                 <div
-                                  onClick={(e) => { e.stopPropagation(); if (!isDesktopWidth) setExpandedMobileStatCard(prev => prev === 'activeProjects' ? null : 'activeProjects'); }}
+                                  onClick={(e) => { e.stopPropagation(); if (!isDesktopWidth) openMobilePopup('activeProjects'); }}
                                   style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column", cursor: "pointer" }}
                                 >
                                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
@@ -10845,47 +10845,29 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                         </div>
                                       </HoverPopup>
 
-                                      {!isDesktopWidth && expandedMobileStatCard === 'activeProjects' && (
-                                        <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 12 }}>
+                                      <MobilePopup id="activeProjects" title="Projects">
+                                        <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{projects.length} total</div>
+                                        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                                           {projectsWithProgress.map((p, idx) => {
                                             const meta = statusMeta(p.status);
-                                            const progress = p.progress || 0;
-                                            const clientName = clients.find(c => c._id === p.clientId)?.clientName || p.client || "Internal";
-                                            const isStatusOpen = expandedMobileProjectStatusId === (p._id || p.id || idx);
+                                            const badgeBg = meta.color === "#16a34a" ? "#dcfce7" : meta.color === "#7c3aed" ? "#f3e8ff" : meta.color === "#2563eb" ? "#dbeafe" : meta.color === "#dc2626" ? "#fee2e2" : "#f3e8ff";
                                             return (
-                                              <div
-                                                key={p._id || p.id || idx}
-                                                onClick={() => setExpandedMobileProjectStatusId(prev => prev === (p._id || p.id || idx) ? null : (p._id || p.id || idx))}
-                                                className="mob-card"
-                                                style={{ background: "#fff", borderRadius: 20, padding: "16px 16px", boxShadow: "0 4px 16px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", cursor: "pointer" }}
-                                              >
-                                                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                                                  <div style={{ position: "relative", width: 50, height: 50, flexShrink: 0 }}>
-                                                    <svg width="50" height="50" viewBox="0 0 50 50">
-                                                      <circle cx="25" cy="25" r="21" fill="none" stroke="#f1f5f9" strokeWidth="5" />
-                                                      <circle cx="25" cy="25" r="21" fill="none" stroke={meta.color} strokeWidth="5" strokeDasharray={`${(progress / 100) * 132} 132`} strokeLinecap="round" transform="rotate(-90 25 25)" />
-                                                    </svg>
-                                                    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: meta.color }}>
-                                                      {progress}%
-                                                    </div>
-                                                  </div>
-                                                  <div style={{ flex: 1, minWidth: 0 }}>
-                                                    <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f0a29", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
-                                                    <div style={{ fontSize: 11.5, color: "#94a3b8", marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
-                                                      <i className="ti ti-building" style={{ fontSize: 12 }}></i>{clientName}
-                                                    </div>
-                                                  </div>
+                                              <div key={p._id || p.id || idx} style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 10 }}>
+                                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                                                  <div style={{ fontWeight: 700, fontSize: 13 }}>{p.name}</div>
+                                                  <span style={{ background: badgeBg, color: meta.color, padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{meta.label}</span>
                                                 </div>
-                                                {isStatusOpen && (
-                                                  <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid rgba(0,0,0,0.05)", fontSize: 12, fontWeight: 700, color: meta.color }}>
-                                                    Status: {meta.label}
-                                                  </div>
-                                                )}
+                                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 3 }}>
+                                                  Due {(p.end || p.deadline) ? new Date(p.end || p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}
+                                                </div>
+                                                <div style={{ height: 4, background: "#f1f5f9", borderRadius: 3, marginTop: 6, overflow: "hidden" }}>
+                                                  <div style={{ width: `${p.progress || 0}%`, height: "100%", background: meta.color, borderRadius: 3 }}></div>
+                                                </div>
                                               </div>
                                             );
                                           })}
                                         </div>
-                                      )}
+                                      </MobilePopup>
                                     </>
                                   );
                                 })()}

@@ -64,6 +64,7 @@ const CSS = `
   .mpd-ph-right { width: 100%; align-items: flex-start; }
   .mpd-prog-divider { display: none; }
   .mpd-card-header { flex-wrap: wrap; gap: 10px; }
+  .mpd-header-portal-grid { grid-template-columns: 1fr !important; }
 }
 
 /* BUTTONS */
@@ -1939,8 +1940,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
         </div>
 
-        {/* HEADER + CLIENT PORTAL — side by side, 50/50 */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch', marginBottom: 24 }}>
+        {/* HEADER + CLIENT PORTAL — side by side, 50/50 on desktop, stacked on mobile */}
+        <div className="mpd-header-portal-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'stretch', marginBottom: 24 }}>
           <div className="mpd-proj-header" style={{ flex: '1 1 50%', minWidth: 0, paddingTop: 8, paddingLeft: 6, paddingRight: 6, height: '100%', boxSizing: 'border-box', flexWrap: 'nowrap' }}>
             <div className="mpd-ph-left">
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>

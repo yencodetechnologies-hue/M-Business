@@ -6843,8 +6843,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const [dashSearch, setDashSearch] = useState("");
   const [dashTasksProj, setDashTasksProj] = useState(null);
+
   const [expandedMobileProjectIdx, setExpandedMobileProjectIdx] = useState(1);
   const [expandedMobileStatCard, setExpandedMobileStatCard] = useState(null);
+  const [expandedMobileProjectStatusId, setExpandedMobileProjectStatusId] = useState(null);
 
   const [pendingNewClientId, setPendingNewClientId] = useState(null);
   const [returnToCalendar, setReturnToCalendar] = useState(false);
@@ -10379,66 +10381,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
 
                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                      {projectsWithProgress.slice(0, 6).map((p, idx) => {
-                        const progress = p.progress || 0;
-                        const ringColor = progress >= 80 ? "#16a34a" : progress >= 40 ? "var(--app-accent)" : "#dc2626";
-                        const clientName = clients.find(c => c._id === p.clientId)?.clientName || p.client || "Internal";
-                        const isExpanded = expandedMobileProjectIdx === idx;
-                        return (
-                          <div
-                            key={p._id || idx}
-                            className="mob-card"
-                            style={{ animationDelay: `${idx * 40}ms`, background: "#fff", borderRadius: 20, padding: "16px 16px", boxShadow: isExpanded ? "0 14px 34px rgba(15,10,41,0.12)" : "0 4px 16px rgba(15,10,41,0.06)", border: `1px solid ${isExpanded ? "rgba(0,188,212,0.25)" : "rgba(0,0,0,0.04)"}`, cursor: "pointer", transition: "all .25s" }}
-                            onClick={() => setExpandedMobileProjectIdx(prev => prev === idx ? null : idx)}
-                          >
-                            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                              <div style={{ position: "relative", width: 50, height: 50, flexShrink: 0 }}>
-                                <svg width="50" height="50" viewBox="0 0 50 50">
-                                  <circle cx="25" cy="25" r="21" fill="none" stroke="#f1f5f9" strokeWidth="5" />
-                                  <circle cx="25" cy="25" r="21" fill="none" stroke={ringColor} strokeWidth="5" strokeDasharray={`${(progress / 100) * 132} 132`} strokeLinecap="round" transform="rotate(-90 25 25)" style={{ transition: "stroke-dasharray .5s ease" }} />
-                                </svg>
-                                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: ringColor }}>
-                                  {progress}%
-                                </div>
-                              </div>
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f0a29", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
-                                <div style={{ fontSize: 11.5, color: "#94a3b8", marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
-                                  <i className="ti ti-building" style={{ fontSize: 12 }}></i>{clientName}
-                                </div>
-                                <div style={{ height: 6, background: "#f1f5f9", borderRadius: 3, marginTop: 9, overflow: "hidden" }}>
-                                  <div style={{ width: `${progress}%`, height: "100%", background: `linear-gradient(90deg, ${ringColor}, ${ringColor}cc)`, borderRadius: 3, transition: "width .5s ease" }}></div>
-                                </div>
-                              </div>
-                              <i className={`ti ti-chevron-${isExpanded ? "up" : "down"}`} style={{ color: "#cbd5e1", fontSize: 18, flexShrink: 0 }}></i>
-                            </div>
 
-                            {isExpanded && (
-                              <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px dashed #e2e8f0", display: "flex", flexDirection: "column", gap: 10 }}>
-                                {p.end && (
-                                  <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "linear-gradient(135deg,#ccfbf1,#a7f3d0)", color: "#0d9488", padding: "6px 12px", borderRadius: 20, fontSize: 11.5, fontWeight: 800, width: "fit-content" }}>
-                                    <i className="ti ti-clock"></i> Due in {Math.max(0, Math.ceil((new Date(p.end) - new Date()) / 86400000))} days
-                                  </div>
-                                )}
-                                <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "#64748b" }}>
-                                  <i className="ti ti-user" style={{ fontSize: 14 }}></i>
-                                  {Array.isArray(p.assignedTo) ? (p.assignedTo[0] || "Unassigned") : (p.assignedTo || "Unassigned")}
-                                </div>
-                                <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "#64748b" }}>
-                                  <i className="ti ti-currency-rupee" style={{ fontSize: 14 }}></i>
-                                  {formatCurrency(p.budget, p.currency)} budget
-                                </div>
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); setJumpProject(p); setProjectDetailsReadOnly(true); setActive("project-details"); }}
-                                  style={{ marginTop: 4, background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 10, padding: "10px", fontSize: 12.5, fontWeight: 800, cursor: "pointer" }}
-                                >
-                                  Open Project
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
                       {projectsWithProgress.length === 0 && (
                         <div style={{ textAlign: "center", padding: "30px 0", color: "#94a3b8", fontSize: 13 }}>No projects yet</div>
                       )}
@@ -10867,7 +10810,85 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                   </div>
                                   <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Projects</div>
                                 </div>
+                                {(() => {
+                                  const statusMeta = (raw) => {
+                                    const s = (raw || "").toLowerCase().replace(/[\s_-]/g, "");
+                                    if (["active", "inprogress", "inreview", "started"].includes(s)) return { label: "Active", color: "#16a34a" };
+                                    if (["onhold", "hold", "paused", "suspended"].includes(s)) return { label: "On Hold", color: "#7c3aed" };
+                                    if (["completed", "done", "delivered", "closed"].includes(s)) return { label: "Completed", color: "#2563eb" };
+                                    if (["overdue", "late"].includes(s)) return { label: "Overdue", color: "#dc2626" };
+                                    return { label: raw || "On Hold", color: "#7c3aed" };
+                                  };
+                                  return (
+                                    <>
+                                      <HoverPopup id="activeProjects" title="Projects">
+                                        <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{projects.length} total</div>
+                                        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                          {projectsWithProgress.slice(0, 8).map((p, i) => {
+                                            const meta = statusMeta(p.status);
+                                            const badgeBg = meta.color === "#16a34a" ? "#dcfce7" : meta.color === "#7c3aed" ? "#f3e8ff" : meta.color === "#2563eb" ? "#dbeafe" : meta.color === "#dc2626" ? "#fee2e2" : "#f3e8ff";
+                                            return (
+                                              <div key={p._id || p.id || i} style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 10 }}>
+                                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                                                  <div style={{ fontWeight: 700, fontSize: 13 }}>{p.name}</div>
+                                                  <span style={{ background: badgeBg, color: meta.color, padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{meta.label}</span>
+                                                </div>
+                                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 3 }}>
+                                                  Due {(p.end || p.deadline) ? new Date(p.end || p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}
+                                                </div>
+                                                <div style={{ height: 4, background: "#f1f5f9", borderRadius: 3, marginTop: 6, overflow: "hidden" }}>
+                                                  <div style={{ width: `${p.progress || 0}%`, height: "100%", background: meta.color, borderRadius: 3 }}></div>
+                                                </div>
+                                              </div>
+                                            );
+                                          })}
+                                        </div>
+                                      </HoverPopup>
 
+                                      {!isDesktopWidth && expandedMobileStatCard === 'activeProjects' && (
+                                        <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 12 }}>
+                                          {projectsWithProgress.map((p, idx) => {
+                                            const meta = statusMeta(p.status);
+                                            const progress = p.progress || 0;
+                                            const clientName = clients.find(c => c._id === p.clientId)?.clientName || p.client || "Internal";
+                                            const isStatusOpen = expandedMobileProjectStatusId === (p._id || p.id || idx);
+                                            return (
+                                              <div
+                                                key={p._id || p.id || idx}
+                                                onClick={() => setExpandedMobileProjectStatusId(prev => prev === (p._id || p.id || idx) ? null : (p._id || p.id || idx))}
+                                                className="mob-card"
+                                                style={{ background: "#fff", borderRadius: 20, padding: "16px 16px", boxShadow: "0 4px 16px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", cursor: "pointer" }}
+                                              >
+                                                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                                                  <div style={{ position: "relative", width: 50, height: 50, flexShrink: 0 }}>
+                                                    <svg width="50" height="50" viewBox="0 0 50 50">
+                                                      <circle cx="25" cy="25" r="21" fill="none" stroke="#f1f5f9" strokeWidth="5" />
+                                                      <circle cx="25" cy="25" r="21" fill="none" stroke={meta.color} strokeWidth="5" strokeDasharray={`${(progress / 100) * 132} 132`} strokeLinecap="round" transform="rotate(-90 25 25)" />
+                                                    </svg>
+                                                    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: meta.color }}>
+                                                      {progress}%
+                                                    </div>
+                                                  </div>
+                                                  <div style={{ flex: 1, minWidth: 0 }}>
+                                                    <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f0a29", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
+                                                    <div style={{ fontSize: 11.5, color: "#94a3b8", marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
+                                                      <i className="ti ti-building" style={{ fontSize: 12 }}></i>{clientName}
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                                {isStatusOpen && (
+                                                  <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid rgba(0,0,0,0.05)", fontSize: 12, fontWeight: 700, color: meta.color }}>
+                                                    Status: {meta.label}
+                                                  </div>
+                                                )}
+                                              </div>
+                                            );
+                                          })}
+                                        </div>
+                                      )}
+                                    </>
+                                  );
+                                })()}
                               </div>
 
 

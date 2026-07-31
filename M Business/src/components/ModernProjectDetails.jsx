@@ -2212,7 +2212,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           </div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-                          <button onClick={() => { setSendDocTarget({ type: 'quotation', doc: q }); setTargetPortalClient(q.client || currProject.client || ''); setShowSendPopup(true); }} title="Send to Client" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#0EA5E9' }}><i className="ti ti-send"></i></button>
+                          <button onClick={() => { const target = q.client || currProject.client || ''; if (!target) { alert('No client assigned to this project.'); return; } setSendDocTarget({ type: 'quotation', doc: q }); handleSendDocToPortal(target); }} title="Send to Client" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#0EA5E9' }}><i className="ti ti-send"></i></button>
                           <button onClick={() => onViewQuotation && onViewQuotation(q)} title="View" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: ' var(--app-accent, #00BCD4)' }}><i className="ti ti-eye"></i></button>
                           <button
                             onClick={async () => {
@@ -2262,7 +2262,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           </div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-                          <button onClick={() => { setSendDocTarget({ type: 'proposal', doc: p }); setTargetPortalClient(p.client || p.clientName || currProject.client || ''); setShowSendPopup(true); }} title="Send to Client" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#0EA5E9' }}><i className="ti ti-send"></i></button>
+                          <button onClick={() => { const target = p.client || p.clientName || currProject.client || ''; if (!target) { alert('No client assigned to this project.'); return; } setSendDocTarget({ type: 'proposal', doc: p }); handleSendDocToPortal(target); }} title="Send to Client" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#0EA5E9' }}><i className="ti ti-send"></i></button>
                           <button onClick={() => onViewProposal && onViewProposal(p)} title="View" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: ' var(--app-accent, #00BCD4)' }}><i className="ti ti-eye"></i></button>
 
                           <button

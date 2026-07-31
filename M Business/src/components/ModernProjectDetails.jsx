@@ -2202,7 +2202,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           <i className="ti ti-file-type-pdf" style={{ color: '#EF4444', fontSize: 18, flexShrink: 0 }}></i>
                           <div style={{ minWidth: 0 }}>
                             <div style={{ fontSize: 12, fontWeight: 800, color: '#0D1B2A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{q.qt?.quoteNo || 'Quotation'}</div>
-                            <div style={{ fontSize: 10, color: '#7B8FA1' }}>{(q.status || 'draft').toUpperCase()}</div>
+                            <div style={{ fontSize: 10, color: (q.status || '').toLowerCase() === 'approved' ? '#15803D' : '#7B8FA1', fontWeight: (q.status || '').toLowerCase() === 'approved' ? 800 : 400 }}>{(q.status || 'draft').toUpperCase()}</div>
+                            {q.reviewComment && (
+                              <div style={{ fontSize: 10, color: '#0EA5E9', marginTop: 2, maxWidth: 220, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={q.reviewComment}>
+                                <i className="ti ti-message-2" style={{ fontSize: 10 }}></i> {q.reviewComment}
+                              </div>
+                            )}
                           </div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
@@ -2247,7 +2252,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           <i className="ti ti-file-type-pdf" style={{ color: '#EF4444', fontSize: 18, flexShrink: 0 }}></i>
                           <div style={{ minWidth: 0 }}>
                             <div style={{ fontSize: 12, fontWeight: 800, color: '#0D1B2A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.title || 'Proposal'}</div>
-                            <div style={{ fontSize: 10, color: '#7B8FA1' }}>{(p.status || 'draft').toUpperCase()}</div>
+                            <div style={{ fontSize: 10, color: (p.status || '').toLowerCase() === 'approved' ? '#15803D' : '#7B8FA1', fontWeight: (p.status || '').toLowerCase() === 'approved' ? 800 : 400 }}>{(p.status || 'draft').toUpperCase()}</div>
+                            {p.reviewComment && (
+                              <div style={{ fontSize: 10, color: '#0EA5E9', marginTop: 2, maxWidth: 220, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={p.reviewComment}>
+                                <i className="ti ti-message-2" style={{ fontSize: 10 }}></i> {p.reviewComment}
+                              </div>
+                            )}
                           </div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>

@@ -670,6 +670,164 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
   );
 }
 
+function QuickApprovePopup({ target, clientName, BASE_URL, onClose, onApproved }) {
+  const [sigMode, setSigMode] = React.useState("draw");
+  const [sigText, setSigText] = React.useState("");
+  const [saving, setSaving] = React.useState(false);
+  const canvasRef = React.useRef(null);
+  const drawing = React.useRef(false);
+  const points = React.useRef([]);
+
+  React.useEffect(() => {
+    if (sigMode !== "draw") return;
+    const cv = canvasRef.current;
+    if (!cv) return;
+    const rect = cv.getBoundingClientRect();
+    cv.width = rect.width || 400;
+    cv.height = 140;
+    const ctx = cv.getContext("2d");
+    ctx.strokeStyle = "#1a2e35";
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    function getPos(e) {
+      const r = cv.getBoundingClientRect();
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: (cx - r.left) * (cv.width / r.width), y: (cy - r.top) * (cv.height / r.height) };
+    }
+    cv.onmousedown = (e) => { points.current = [getPos(e)]; drawing.current = true; };
+    cv.onmousemove = (e) => {
+      if (!drawing.current) return;
+      const p = getPos(e); points.current.push(p);
+      const pts = points.current;
+      if (pts.length > 2) {
+        const a = pts[pts.length - 3], b = pts[pts.length - 2], c = pts[pts.length - 1];
+        const mx = (b.x + c.x) / 2, my = (b.y + c.y) / 2;
+        const px = (a.x + b.x) / 2, py = (a.y + b.y) / 2;
+        ctx.beginPath(); ctx.moveTo(px, py); ctx.quadraticCurveTo(b.x, b.y, mx, my); ctx.stroke();
+      }
+    };
+    cv.onmouseup = cv.onmouseleave = () => { drawing.current = false; points.current = []; };
+    cv.ontouchstart = (e) => { e.preventDefault(); points.current = [getPos(e)]; drawing.current = true; };
+    cv.ontouchmove = (e) => {
+      e.preventDefault();
+      if (!drawing.current) return;
+      const p = getPos(e); points.current.push(p);
+      const pts = points.current;
+      if (pts.length > 2) {
+        const a = pts[pts.length - 3], b = pts[pts.length - 2], c = pts[pts.length - 1];
+        const mx = (b.x + c.x) / 2, my = (b.y + c.y) / 2;
+        const px = (a.x + b.x) / 2, py = (a.y + b.y) / 2;
+        ctx.beginPath(); ctx.moveTo(px, py); ctx.quadraticCurveTo(b.x, b.y, mx, my); ctx.stroke();
+      }
+    };
+    cv.ontouchend = () => { drawing.current = false; points.current = []; };
+  }, [sigMode]);
+
+  const clearCanvas = () => {
+    const cv = canvasRef.current;
+    if (!cv) return;
+    cv.getContext("2d").clearRect(0, 0, cv.width, cv.height);
+  };
+
+  const confirmApprove = async () => {
+    let sigData = "";
+    if (sigMode === "draw") {
+      const cv = canvasRef.current;
+      if (!cv) return;
+      sigData = cv.toDataURL();
+    } else {
+      if (!sigText.trim()) return alert("Please type your name to sign.");
+      sigData = sigText.trim();
+    }
+    setSaving(true);
+    try {
+      const id = target.doc._id || target.doc.id;
+      const endpoint = target.type === "quotation" ? `${BASE_URL}/api/quotations/${id}/client-sign` : `${BASE_URL}/api/proposals/${id}/client-sign`;
+      const res = await axios.put(endpoint, { clientSignature: sigData, clientName, sigMode });
+      onApproved(target.type, res.data);
+      alert(`${target.type === "quotation" ? "Quotation" : "Proposal"} approved successfully!`);
+    } catch (err) {
+      console.error("Approve error:", err);
+      alert("Failed to approve. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,.5)", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 16, padding: 24, width: 440, maxWidth: "92vw" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+          <div style={{ fontSize: 16, fontWeight: 900, color: "#0D1B2A" }}>Sign to Approve</div>
+          <i className="ti ti-x" style={{ cursor: "pointer", fontSize: 18 }} onClick={onClose}></i>
+        </div>
+        <div style={{ display: "flex", gap: 4, background: "#f5fafa", borderRadius: 10, padding: 4, marginBottom: 14, width: "fit-content" }}>
+          {["draw", "type"].map(mode => (
+            <button key={mode} onClick={() => setSigMode(mode)} style={{ padding: "6px 16px", borderRadius: 8, border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer", background: sigMode === mode ? "#00BCD4" : "transparent", color: sigMode === mode ? "#fff" : "#607D86" }}>
+              {mode === "draw" ? "Draw" : "Type"}
+            </button>
+          ))}
+        </div>
+        {sigMode === "draw" ? (
+          <div>
+            <div style={{ background: "#f5fafa", border: "1.5px dashed #c5dde0", borderRadius: 10, overflow: "hidden", marginBottom: 10 }}>
+              <canvas ref={canvasRef} style={{ width: "100%", height: 140, cursor: "crosshair", display: "block", touchAction: "none" }} />
+            </div>
+            <button onClick={clearCanvas} style={{ background: "none", border: "1px solid #e0eef0", borderRadius: 7, padding: "5px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: "#607D86", marginBottom: 14 }}>Clear</button>
+          </div>
+        ) : (
+          <input value={sigText} onChange={e => setSigText(e.target.value)} placeholder="Type your full name to sign..." style={{ width: "100%", padding: "12px 16px", border: "1.5px solid #e0eef0", borderRadius: 10, fontSize: 20, fontFamily: "'Dancing Script', cursive", color: "#0D2027", outline: "none", boxSizing: "border-box", marginBottom: 14 }} />
+        )}
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={onClose} style={{ flex: 1, padding: "10px", background: "#F3F4F6", color: "#374151", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
+          <button onClick={confirmApprove} disabled={saving} style={{ flex: 1, padding: "10px", background: saving ? "#96B0B8" : "#22C55E", color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving..." : "Save / Confirm"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function QuickReviewPopup({ target, BASE_URL, onClose, onReviewed }) {
+  const [text, setText] = React.useState(target.doc.reviewComment || "");
+  const [saving, setSaving] = React.useState(false);
+
+  const submit = async () => {
+    if (!text.trim()) return alert("Please type your review before submitting.");
+    setSaving(true);
+    try {
+      const id = target.doc._id || target.doc.id;
+      const res = target.type === "quotation"
+        ? await axios.patch(`${BASE_URL}/api/quotations/${id}/review`, { comment: text.trim() })
+        : await axios.put(`${BASE_URL}/api/proposals/${id}/review`, { comment: text.trim() });
+      onReviewed(target.type, res.data.quotation || res.data.proposal || res.data);
+      alert("Review submitted. Thank you!");
+    } catch (err) {
+      console.error("Review error:", err);
+      alert("Failed to submit review. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,.5)", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 16, padding: 24, width: 420, maxWidth: "92vw" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+          <div style={{ fontSize: 16, fontWeight: 900, color: "#0D1B2A" }}>Write a Review</div>
+          <i className="ti ti-x" style={{ cursor: "pointer", fontSize: 18 }} onClick={onClose}></i>
+        </div>
+        <textarea value={text} onChange={e => setText(e.target.value)} rows={4} placeholder="Type your review or comments here..." style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e0eef0", borderRadius: 10, fontSize: 13, fontFamily: "inherit", resize: "vertical", outline: "none", boxSizing: "border-box", marginBottom: 14 }} />
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={onClose} style={{ flex: 1, padding: "10px", background: "#F3F4F6", color: "#374151", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
+          <button onClick={submit} disabled={saving} style={{ flex: 1, padding: "10px", background: saving ? "#96B0B8" : "#00BCD4", color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Submitting..." : "Submit Review"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ClientDashboard({ user: userProp, setUser, portalMode = false, themeColor = "#00BCD4" }) {
   useAssets();
   const [active, setActive] = useState(() =>
@@ -1270,6 +1428,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const [viewApprovalApp, setViewApprovalApp] = useState(null);
   const [lightboxImages, setLightboxImages] = useState(null);
   const [viewQuotationDetail, setViewQuotationDetail] = useState(null);
+  const [approveTarget, setApproveTarget] = useState(null); // { type: 'quotation'|'proposal', doc }
+  const [reviewTarget, setReviewTarget] = useState(null);   // { type: 'quotation'|'proposal', doc }
   // Portal mode has no real login form — the client's "session" is just the
   // decoded token from the link. Once they sign out (or the token is
   // missing/expired), don't fall through to the normal dashboard render
@@ -3484,6 +3644,18 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                             style={{ background: C.surface2, color: C.text2, borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 700, border: "1.5px solid " + C.border, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
                             <i className="ti ti-printer" style={{ fontSize: 13 }}></i> PDF
                           </button>
+                          {prop.status !== "approved" && (
+                            <button
+                              onClick={() => setApproveTarget({ type: "proposal", doc: prop })}
+                              style={{ background: "#22C55E", color: "#fff", borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+                              <i className="ti ti-writing" style={{ fontSize: 13 }}></i> Approve
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setReviewTarget({ type: "proposal", doc: prop })}
+                            style={{ background: C.surface2, color: C.text2, borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 700, border: "1.5px solid " + C.border, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+                            <i className="ti ti-message-2" style={{ fontSize: 13 }}></i> Review
+                          </button>
                           <button
                             onClick={() => shareProposalAsPDF(prop, agencyName, null)}
                             style={{ background: C.surface2, color: C.text2, borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 700, border: "1.5px solid " + C.border, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
@@ -3555,12 +3727,31 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                         </div>
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-                        <span style={{ background: "#EFF4FF", color: "#2563EB", borderRadius: 20, padding: "4px 12px", fontSize: 11, fontWeight: 800 }}>Sent</span>
+                        {(() => {
+                          const qst = (q.status || "sent").toLowerCase();
+                          const qBadge = qst === "approved" ? { bg: "#DCFCE7", color: "#15803D", label: "Approved" }
+                            : qst === "rejected" ? { bg: "#FEE2E2", color: "#DC2626", label: "Rejected" }
+                              : qst === "pending" ? { bg: "#FEF3C7", color: "#B45309", label: "Under Review" }
+                                : { bg: "#EFF4FF", color: "#2563EB", label: "Sent" };
+                          return <span style={{ background: qBadge.bg, color: qBadge.color, borderRadius: 20, padding: "4px 12px", fontSize: 11, fontWeight: 800 }}>{qBadge.label}</span>;
+                        })()}
                         <div style={{ display: "flex", gap: 8 }}>
                           <button
                             onClick={() => setViewQuotationDetail(q)}
                             style={{ background: C.tealLight, color: C.teal, borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
                             <i className="ti ti-eye" style={{ fontSize: 13 }}></i> View
+                          </button>
+                          {q.status !== "approved" && (
+                            <button
+                              onClick={() => setApproveTarget({ type: "quotation", doc: q })}
+                              style={{ background: "#22C55E", color: "#fff", borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+                              <i className="ti ti-writing" style={{ fontSize: 13 }}></i> Approve
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setReviewTarget({ type: "quotation", doc: q })}
+                            style={{ background: C.surface2, color: C.text2, borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 700, border: "1.5px solid " + C.border, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+                            <i className="ti ti-message-2" style={{ fontSize: 13 }}></i> Review
                           </button>
                         </div>
                       </div>
@@ -3764,6 +3955,58 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             onSigned={(updated) => {
               setProposals(prev => prev.map(p => (p._id === updated._id ? updated : p)));
               setViewingProposal(updated);
+            }}
+          />
+        )
+      }
+      {/* QUOTATION VIEWER MODAL */}
+      {
+        viewQuotationDetail && (
+          <QuotationViewerModal
+            quotation={viewQuotationDetail}
+            clientName={clientName}
+            BASE_URL={BASE_URL}
+            onClose={() => setViewQuotationDetail(null)}
+            onSigned={(updated) => {
+              setQuotations(prev => prev.map(q => (q._id === updated._id) ? updated : q));
+              setViewQuotationDetail(updated);
+            }}
+          />
+        )
+      }
+      {/* QUICK APPROVE POPUP (signature) */}
+      {
+        approveTarget && (
+          <QuickApprovePopup
+            target={approveTarget}
+            clientName={clientName}
+            BASE_URL={BASE_URL}
+            onClose={() => setApproveTarget(null)}
+            onApproved={(type, updated) => {
+              if (type === "quotation") {
+                setQuotations(prev => prev.map(q => (q._id === updated._id) ? updated : q));
+              } else {
+                setProposals(prev => prev.map(p => (p._id === updated._id) ? updated : p));
+              }
+              setApproveTarget(null);
+            }}
+          />
+        )
+      }
+      {/* QUICK REVIEW POPUP (comment only, no signature) */}
+      {
+        reviewTarget && (
+          <QuickReviewPopup
+            target={reviewTarget}
+            BASE_URL={BASE_URL}
+            onClose={() => setReviewTarget(null)}
+            onReviewed={(type, updated) => {
+              if (type === "quotation") {
+                setQuotations(prev => prev.map(q => (q._id === updated._id) ? updated : q));
+              } else {
+                setProposals(prev => prev.map(p => (p._id === updated._id) ? updated : p));
+              }
+              setReviewTarget(null);
             }}
           />
         )

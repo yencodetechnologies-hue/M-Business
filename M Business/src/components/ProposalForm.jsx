@@ -639,7 +639,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
         <button class="sp-toggle on" onclick="toggleSection(this,'sec-deliverables')">Deliverables</button>
         <button class="sp-toggle on" onclick="toggleSection(this,'sec-timeline')">Timeline</button>
         <button class="sp-toggle on" onclick="toggleSection(this,'sec-pricing')">Pricing</button>
-        <button class="sp-toggle on" onclick="toggleSection(this,'sec-signoff')">Sign-off</button>
+        
         <button class="sp-toggle on" onclick="toggleSection(this,'sec-team')"><i class="ti ti-users"></i> Our Team</button>
         <button class="sp-toggle on" onclick="toggleSection(this,'sec-value')"><i class="ti ti-star"></i> Value & ROI</button>
         <button class="sp-toggle" onclick="toggleSection(this,'sec-casestudies')"><i class="ti ti-trophy"></i> Case Studies</button>

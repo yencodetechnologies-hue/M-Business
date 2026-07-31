@@ -490,15 +490,7 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
             </div>
           </div>
 
-          <div class="signature-section">
-            <div style="font-weight: bold;">
-              <div>For ${formData.companyName}</div>
-              <div style="margin-top: 50px;">(Authorised Signatory)</div>
-            </div>
-            <div style="font-weight: bold; text-align: center;">
-              <div style="margin-top: 50px;">(Client Signature)</div>
-            </div>
-          </div>
+     
 
           <div class="footer">
             ${formData.companyAddress}

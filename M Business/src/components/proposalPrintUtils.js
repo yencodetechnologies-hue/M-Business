@@ -305,35 +305,6 @@ function buildSlidesHTML(proposal) {
     </div>`;
   }).join("");
 
-  html += `
-  <div style="padding:40px 56px;background:#fff;">
-    <div style="border-top:2px solid  var(--app-accent, var(--app-accent, #00BCD4));padding-top:24px;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
-        <div style="padding:20px;background:#F8FAFB;border-radius:12px;border:1px solid #E0EEF0;text-align:center;">
-          <div style="font-size:9px;font-weight:700;color:#96B0B8;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">Authorised Signatory</div>
-          <div style="height:52px;margin-bottom:12px;"></div>
-          <div style="height:1px;background:#C5DDE0;margin-bottom:8px;"></div>
-          <div style="font-size:11px;font-weight:700;color:#0D2027;">Company Representative</div>
-        </div>
-        <div style="padding:20px;background:${proposal.clientSignature ? "#F0FDF4" : "#FFFBEB"};border-radius:12px;border:${proposal.clientSignature ? "1.5px solid #86efac" : "1.5px dashed #FCD34D"};text-align:center;">
-          <div style="font-size:9px;font-weight:700;color:#96B0B8;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">Client Acceptance</div>
-          <div style="height:52px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
-            ${proposal.clientSignature
-      ? proposal.clientSignature.startsWith("data:image")
-        ? `<img src="${proposal.clientSignature}" style="max-height:48px;max-width:100%;object-fit:contain;" />`
-        : `<span style="font-size:24px;color:#0D2027;font-style:italic;">${proposal.clientSignature}</span>`
-      : `<span style="font-size:22px;color:#FCD34D;">✍</span>`}
-          </div>
-          <div style="height:1px;background:${proposal.clientSignature ? "#15803D" : "#FCD34D"};margin-bottom:8px;"></div>
-          <div style="font-size:11px;font-weight:700;color:#0D2027;">${proposal.clientName || proposal.client || "Client"}</div>
-          <div style="font-size:9px;color:${proposal.clientSignature ? "#15803D" : "#D97706"};font-weight:700;margin-top:2px;">
-            ${proposal.clientSignature ? "Digitally Signed" : "Awaiting Signature"}
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>`;
-
   return html;
 }
 export async function printProposal(proposal, mode = 'view', preOpenedWin = null) {

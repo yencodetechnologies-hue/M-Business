@@ -3634,7 +3634,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             <div className="sec-header">
               <div className="sec-title">
                 <div className="sec-title-icon" style={{ background: "#EDE9FE", color: "#7C3AED" }}><i className="ti ti-presentation"></i></div>
-                Project Proposals ({proposals.length})
+                Project Proposals
               </div>
               <div style={{ fontSize: 12, color: C.text3, fontWeight: 600 }}>{proposals.length} proposal{proposals.length !== 1 ? "s" : ""} received</div>
             </div>
@@ -3743,7 +3743,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             <div className="sec-header">
               <div className="sec-title">
                 <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-file-invoice"></i></div>
-                My Quotations ({quotations.length})
+                My Quotations
               </div>
               <div style={{ fontSize: 12, color: C.text3, fontWeight: 600 }}>{quotations.length} quotation{quotations.length !== 1 ? "s" : ""} received</div>
             </div>

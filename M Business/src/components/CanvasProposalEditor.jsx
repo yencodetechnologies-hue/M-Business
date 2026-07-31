@@ -1053,66 +1053,6 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose, isPr
               )
             ))}
 
-            {/* Signature section in preview mode */}
-            {isPreview && (
-              <div style={{
-                position: 'absolute',
-                bottom: 60,
-                left: 60,
-                right: 60,
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: 40,
-              }}>
-                {/* Subadmin signature */}
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
-                    <span style={{ fontSize: 22, fontWeight: 900, color: ' var(--app-accent, var(--app-accent, #00BCD4))' }}>YT</span>
-                  </div>
-                  <div style={{ height: 1, background: ' var(--app-accent, var(--app-accent, #00BCD4))', marginBottom: 6 }}></div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: '#0D2027' }}>Your Company</div>
-                  <div style={{ fontSize: 10, color: '#96B0B8' }}>Authorised Signatory</div>
-                </div>
-
-                {/* Client signature */}
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{
-                    height: 50,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    marginBottom: 8,
-                    border: (proposalData?.clientSignature || propDataProp?.clientSignature) ? 'none' : '1.5px dashed #fcd34d',
-                    borderRadius: 8,
-                  }}>
-                    {(proposalData?.clientSignature || propDataProp?.clientSignature) ? (
-                      (proposalData?.clientSignature || propDataProp?.clientSignature).startsWith('data:image') ? (
-                        <img
-                          src={proposalData?.clientSignature || propDataProp?.clientSignature}
-                          style={{ maxHeight: 46, maxWidth: '100%', objectFit: 'contain' }}
-                          alt="client sig"
-                        />
-                      ) : (
-                        <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 24, color: '#0D2027' }}>
-                          {proposalData?.clientSignature || propDataProp?.clientSignature}
-                        </span>
-                      )
-                    ) : (
-                      <span style={{ fontSize: 11, color: '#d97706', fontWeight: 600 }}>Awaiting Signature</span>
-                    )}
-                  </div>
-                  <div style={{
-                    height: 1,
-                    background: (proposalData?.clientSignature || propDataProp?.clientSignature) ? '#15803D' : '#fcd34d',
-                    marginBottom: 6
-                  }}></div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: '#0D2027' }}>
-                    {proposalData?.clientName || propDataProp?.clientName || proposalData?.client || propDataProp?.client || 'Client'}
-                  </div>
-                  <div style={{ fontSize: 10, color: (proposalData?.clientSignature || propDataProp?.clientSignature) ? '#15803D' : '#d97706', fontWeight: 700 }}>
-                    {(proposalData?.clientSignature || propDataProp?.clientSignature) ? 'Yes Signed Digitally' : 'Awaiting Client Signature'}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
 
           <div style={{ textAlign: 'center', marginTop: 10, fontSize: 12, color: P.muted }}>

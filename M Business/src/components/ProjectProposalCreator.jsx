@@ -694,15 +694,7 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
           </div>
         </div>
 
-        <div style={{ marginTop: "60px", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-          <div style={{ fontWeight: "bold" }}>
-            <div>For <Txt val={slide.companyName} onCh={v => upd({ companyName: v })} /></div>
-            <div style={{ marginTop: "40px" }}>(Authorised Signatory)</div>
-          </div>
-          <div style={{ fontWeight: "bold", textAlign: "center" }}>
-            <div style={{ marginTop: "40px" }}>(Company Signature)</div>
-          </div>
-        </div>
+
 
         {/* Footer */}
         <div style={{ position: "absolute", bottom: "40px", left: "60px", right: "60px", textAlign: "center", fontSize: "10px", color: "#666", borderTop: "2px solid #ff0000", paddingTop: "10px" }}>

@@ -7,11 +7,14 @@ const cloudinary = require("cloudinary").v2;
 const streamifier = require("streamifier");
 const Media = require("../models/MediaModel");
 
+const cloudinary = require("cloudinary").v2;
+const streamifier = require("streamifier");
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+const uploadMem = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024 } });
 
 const storage = multer.memoryStorage();
 const upload = multer({

@@ -292,7 +292,13 @@ router.put("/:dbId", async (req, res) => {
   try {
     const companyId = req.companyId || "NONE";
 
-    const existing = await Proposal.findOne({ _id: req.params.dbId, companyId });
+    const mongoose = require("mongoose");
+    const isObjectId = mongoose.Types.ObjectId.isValid(req.params.dbId);
+    const lookup = isObjectId
+      ? { _id: req.params.dbId, companyId }
+      : { id: req.params.dbId, companyId };
+
+    const existing = await Proposal.findOne(lookup);
     if (!existing) return res.status(404).json({ msg: "Proposal not found or unauthorized" });
 
     const updateData = { ...req.body };
@@ -306,7 +312,7 @@ router.put("/:dbId", async (req, res) => {
     }
 
     const saved = await Proposal.findOneAndUpdate(
-      { _id: req.params.dbId, companyId },
+      lookup,
       { $set: updateData },
       { new: true }
     );

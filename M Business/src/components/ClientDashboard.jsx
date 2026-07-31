@@ -7,6 +7,19 @@ import { PROPOSAL_PREVIEW_CSS } from "./ProposalPreviewStyles";
 import CanvasProposalEditor from "./CanvasProposalEditor";
 import { printProposal, shareProposalAsPDF } from "./proposalPrintUtils";
 import html2pdf from "html2pdf.js";
+import { QRCodeSVG } from "qrcode.react";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
+
+function formatCurrency(val, symbol = "INR") {
+  const num = parseFloat(val) || 0;
+  const isINR = symbol === "INR";
+  return symbol + " " + num.toLocaleString(isINR ? "en-IN" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function formatQtDate(d) {
+  if (!d) return "—";
+  return new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+}
 
 // Renders the receipt for a paid invoice into a PDF and triggers a download.
 async function downloadReceiptPdf(invoice, clientName, agencyName) {
@@ -547,40 +560,173 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
         <span style={{ background: st === "approved" ? "#DCFCE7" : st === "rejected" ? "#FEE2E2" : "#EFF4FF", color: st === "approved" ? "#15803D" : st === "rejected" ? "#DC2626" : "#2563EB", borderRadius: 20, padding: "4px 14px", fontSize: 11, fontWeight: 800 }}>
           {st.charAt(0).toUpperCase() + st.slice(1)}
         </span>
+        <button onClick={() => window.print()} className="no-print" style={{ padding: "8px 16px", background: "#00BCD4", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: "pointer", color: "#fff", marginLeft: 12 }}>
+          Print / PDF
+        </button>
       </div>
+      <style>{`
+        @media print {
+          @page { size: A4 portrait; margin: 0; }
+          html, body { margin: 0 !important; padding: 0 !important; background: white !important; }
+          .no-print, .no-print * { display: none !important; }
+          #qt-portal-scroll { padding: 0 !important; background: #fff !important; overflow: visible !important; }
+          #qt-portal-paper { box-shadow: none !important; border: none !important; border-radius: 0 !important; max-width: 100% !important; margin: 0 !important; }
+        }
+      `}</style>
 
-      <div style={{ flex: 1, overflowY: "auto", background: "#f5fafa", padding: "24px" }}>
+      <div id="qt-portal-scroll" style={{ flex: 1, overflowY: "auto", background: "#f5fafa", padding: "24px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
 
-          <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", padding: "32px 40px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
-            <div style={{ textAlign: "center", marginBottom: 28 }}>
-              <div style={{ fontSize: 24, fontWeight: 900, color: "#0D2027", marginBottom: 6 }}>{qt.companyName || qt.fromCompany || ""}</div>
-              <div style={{ fontSize: 13, color: "#607D86" }}>Quotation for {qt.client || qt.toName}</div>
-              {qt.project && <div style={{ fontSize: 12, color: "#96B0B8", marginTop: 2 }}>Project: {qt.project}</div>}
+          <div id="qt-portal-paper" style={{ position: "relative", maxWidth: 794, margin: "0 auto", background: "#fff", borderRadius: 18, boxShadow: "0 24px 80px rgba(5,150,105,0.15)", display: "flex", flexDirection: "column" }}>
+            <div style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", borderBottom: "1px solid #e2e8f0" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 20 }}>
+                <div>
+                  {qt.companyLogo ? (
+                    <img src={qt.companyLogo} alt="logo" style={{ height: 85, borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />
+                  ) : (
+                    <div style={{ height: 60, width: 60, background: "#00BCD4", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
+                      {(qt.companyName || "?")[0]}
+                    </div>
+                  )}
+                  <div style={{ fontSize: 24, fontWeight: 900, color: "#064e3b", textTransform: "uppercase", letterSpacing: 1 }}>{qt.companyName || qt.fromCompany || ""}</div>
+                  {qt.companyEmail && <div style={{ fontSize: 11, color: "#065f46", marginTop: 3 }}>{qt.companyEmail}</div>}
+                  {qt.companyPhone && <div style={{ fontSize: 11, color: "#065f46", marginTop: 2 }}>{qt.companyPhone}</div>}
+                  {qt.companyAddress && <div style={{ fontSize: 11, color: "#065f46", marginTop: 2 }}>{qt.companyAddress}</div>}
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 32, fontWeight: 900, color: "rgba(5,150,105,0.1)", letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>QUOTATION</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: "#00BCD4" }}>{qt.quoteNo || q.quoteNo}</div>
+                  {qt.refNo && <div style={{ fontSize: 11, color: "#065f46", marginTop: 3 }}>Ref # {qt.refNo}</div>}
+                  <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: 9, color: "#00BCD4", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
+                      <div style={{ fontSize: 12, color: "#064e3b", fontWeight: 700 }}>{formatQtDate(qt.date)}</div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: 9, color: "#00BCD4", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>VALID UNTIL</div>
+                      <div style={{ fontSize: 12, color: "#ea580c", fontWeight: 700 }}>{formatQtDate(qt.expiryDate)}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div style={{ borderTop: "2px solid #00BCD4", marginBottom: 20 }}></div>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ background: "#00BCD4" }}>
-                  <th style={{ padding: "10px 14px", color: "#fff", fontSize: 12, textAlign: "left" }}>Description</th>
-                  <th style={{ padding: "10px 14px", color: "#fff", fontSize: 12, textAlign: "right" }}>Qty</th>
-                  <th style={{ padding: "10px 14px", color: "#fff", fontSize: 12, textAlign: "right" }}>Rate</th>
-                  <th style={{ padding: "10px 14px", color: "#fff", fontSize: 12, textAlign: "right" }}>Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((it, i) => (
-                  <tr key={i} style={{ borderBottom: "1px solid #e0eef0" }}>
-                    <td style={{ padding: "10px 14px", fontSize: 13 }}>{it.description || it.desc}</td>
-                    <td style={{ padding: "10px 14px", fontSize: 13, textAlign: "right" }}>{it.quantity || it.qty}</td>
-                    <td style={{ padding: "10px 14px", fontSize: 13, textAlign: "right" }}>₹{parseFloat(it.rate || 0).toLocaleString("en-IN")}</td>
-                    <td style={{ padding: "10px 14px", fontSize: 13, textAlign: "right", fontWeight: 700 }}>₹{((parseFloat(it.rate) || 0) * (parseFloat(it.quantity || it.qty) || 0)).toLocaleString("en-IN")}</td>
+
+            <div style={{ display: "grid", gridTemplateColumns: qt.project ? "1fr 1fr" : "1fr", borderBottom: "2px solid #f0fdf4" }}>
+              <div style={{ padding: "20px 32px", borderRight: qt.project ? "1px solid #f0fdf4" : "none" }}>
+                <div style={{ fontSize: 9, color: "#00BCD4", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PREPARED FOR</div>
+                <div style={{ fontSize: 17, fontWeight: 800, color: "#111827" }}>{qt.client || qt.toName || clientName || "—"}</div>
+              </div>
+              {qt.project && (
+                <div style={{ padding: "20px 32px" }}>
+                  <div style={{ fontSize: 9, color: "#00BCD4", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PROJECT</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: "#111827" }}>{qt.project}</div>
+                </div>
+              )}
+            </div>
+
+            <div style={{ padding: "22px 32px", overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
+                <thead>
+                  <tr style={{ background: "linear-gradient(90deg,#f0fdf4,#f7fffe)" }}>
+                    {["#", "Description", "Qty", "Unit Rate", "Amount"].map((h, i) => (
+                      <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#00BCD4", letterSpacing: 1.5, borderBottom: "2px solid #d1fae5", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16, fontSize: 16, fontWeight: 900, color: "#00BCD4" }}>
-              Total: ₹{subtotal.toLocaleString("en-IN")}
+                </thead>
+                <tbody>
+                  {items.map((item, idx) => (
+                    <tr key={idx} style={{ borderBottom: "1px solid #f0fdf4" }}>
+                      <td style={{ padding: "12px 11px", color: "#6ee7b7", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
+                      <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#111827" }}>{item.description || item.desc || "—"}</td>
+                      <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity || item.qty}</td>
+                      <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, qt.currency)}</td>
+                      <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#111827" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity || item.qty) || 0), qt.currency)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
+                <div style={{ width: "min(280px,100%)" }}>
+                  {[
+                    ["Subtotal", formatCurrency(subtotal, qt.currency)],
+                    [`GST (${qt.gstRate}%)${qt.isGstIncluded ? " (Incl.)" : ""}`, formatCurrency(gstAmt, qt.currency)],
+                    ["Total Amount", formatCurrency(total, qt.currency)],
+                    ["Amount Paid", formatCurrency(amountPaid, qt.currency)]
+                  ].map(([l, v]) => (
+                    <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f0fdf4" }}>
+                      <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: "#111827" }}>{v}</span>
+                    </div>
+                  ))}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "#f8fafc", borderRadius: 12, marginTop: 8, border: "1.5px solid #e2e8f0" }}>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: "#64748b" }}>BALANCE DUE</span>
+                    <span style={{ fontSize: 19, fontWeight: 900, color: "#064e3b" }}>{formatCurrency(balanceDue, qt.currency)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ padding: "0 32px 24px", display: "grid", gridTemplateColumns: "1fr auto", gap: 16, alignItems: "flex-start" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {qt.notes && (
+                  <div style={{ background: "#f0fdf4", borderRadius: 11, padding: "14px 16px", border: "1px solid #d1fae5" }}>
+                    <div style={{ fontSize: 9, color: "#00BCD4", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>NOTES</div>
+                    <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{qt.notes}</div>
+                  </div>
+                )}
+                {qt.terms && (
+                  <div style={{ background: "#f0fdf4", borderRadius: 11, padding: "14px 16px", border: "1px solid #d1fae5" }}>
+                    <div style={{ fontSize: 9, color: "#00BCD4", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>TERMS & CONDITIONS</div>
+                    <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{qt.terms}</div>
+                  </div>
+                )}
+                {(qt.upiId || qt.bankName) && (
+                  <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
+                    <div style={{ fontSize: 9, color: "#00BCD4", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>PAYMENT INSTRUCTIONS</div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 20px" }}>
+                      {qt.upiId && (
+                        <div>
+                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>UPI ID</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{qt.upiId}</div>
+                        </div>
+                      )}
+                      {qt.bankName && (
+                        <>
+                          <div>
+                            <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>BANK NAME</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{qt.bankName}</div>
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>ACCOUNT NAME</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{qt.accountName}</div>
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>ACCOUNT NUMBER</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "#111827", fontFamily: "monospace" }}>{qt.accountNumber}</div>
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>IFSC CODE</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "#111827", fontFamily: "monospace" }}>{qt.ifscCode}</div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#f0fdf4", borderRadius: 12, padding: "14px 16px", border: "1px solid #d1fae5", minWidth: 110 }}>
+                <div style={{ fontSize: 8, color: "#00BCD4", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textAlign: "center" }}>SCAN QUOTE</div>
+                <div style={{ background: "#fff", padding: 6, borderRadius: 8, border: "1px solid #d1fae5" }}>
+                  <QRCodeSVG value={`${FRONTEND_URL}/quotation-view?no=${qt.quoteNo || q.quoteNo || ""}`} size={88} bgColor="#ffffff" fgColor="#064e3b" />
+                </div>
+                <div style={{ fontSize: 8, color: "#9ca3af", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{qt.quoteNo || q.quoteNo}</div>
+              </div>
+            </div>
+
+            <div style={{ background: "#ffffff", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "2px solid #f1f5f9" }}>
+              <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{qt.companyName || qt.fromCompany || ""}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#7c3aed" }}>{qt.footerMessage}</div>
+              <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{qt.quoteNo || q.quoteNo}</div>
             </div>
           </div>
 

@@ -1081,7 +1081,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         const myClientIdStr = String(user._id || user.id || "");
         const cn = (clientName || "").toLowerCase().trim();
         const filteredQuots = allQuots.filter(q => {
-          if (q.status !== "sent") return false;
+          if (!["sent", "pending", "approved", "rejected"].includes(q.status)) return false;
           const qClient = (q.client || q.qt?.client || q.qt?.toName || "").toLowerCase().trim();
           return qClient === cn;
         });
@@ -1184,7 +1184,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         const myClientIdStr = String(user._id || user.id || "");
         const cn = (clientName || "").toLowerCase().trim();
         const filteredQuots = allQuots.filter(q => {
-          if (q.status !== "sent") return false;
+          if (!["sent", "pending", "approved", "rejected"].includes(q.status)) return false;
           const qClient = (q.client || q.qt?.client || q.qt?.toName || "").toLowerCase().trim();
           return qClient === cn;
         });

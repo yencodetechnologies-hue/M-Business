@@ -85,7 +85,7 @@ const CSS = `
 .mpd-card { background:#fff; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,.07), 0 0 0 1px rgba(0,0,0,.04); padding:32px 36px !important; margin-bottom:20px; transition:box-shadow .2s; box-sizing: border-box !important; }
 .mpd-card:hover { box-shadow:0 6px 24px rgba(0,0,0,.1), 0 0 0 1px rgba(0,188,212,.08); }
 .mpd-milestones-card { padding:48px 36px !important; margin-bottom:24px; box-sizing: border-box !important; }
-.mpd-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+.mpd-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; padding-bottom:10px; border-bottom:2px solid ${P.border}; }
 .mpd-card-title { font-size:15px; font-weight:800; color:${P.textDark}; display:flex; align-items:center; gap:8px; }
 .mpd-card-title i { color:${P.primary}; font-size:18px; }
 
@@ -188,7 +188,7 @@ const CSS = `
 .mpd-task-due.mpd-late { color:${P.red}; }
 
 /* TABS */
-.mpd-tabs { display:flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; border-bottom:2px solid ${P.border}; margin-bottom:20px; }
+.mpd-tabs { display:flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; border-bottom:2px solid ${P.border}; margin-bottom:20px; padding-bottom:0; }
 .mpd-tab-btn { flex-shrink:0; white-space:nowrap; padding:10px 18px; margin-right: 6px; font-size:13px; font-weight:700; color:${P.textMid}; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .2s; background:transparent; border-top:none; border-left:none; border-right:none; font-family:'Nunito',sans-serif; }
 .mpd-tab-btn:hover { color:${P.primary}; background:${P.primaryLight}; border-radius:8px 8px 0 0; }
 .mpd-tab-btn.mpd-active { color:${P.primary}; border-bottom-color:${P.primary}; }
@@ -2948,7 +2948,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           < div style={{ display: 'flex', flexDirection: 'column', height: '100%', order: 2, flex: '1 1 0%', minWidth: 0 }}>
             {/* TASKS COMPONENT */}
             < div className="mpd-card" style={{ padding: 0, overflow: 'hidden', marginBottom: 20, display: 'flex', flexDirection: 'column', height: 420, maxHeight: 420, boxSizing: 'border-box' }}>
-              <div className="mpd-card-header" style={{ padding: '16px 18px 8px', marginBottom: 0 }}>
+              <div className="mpd-card-header" style={{ padding: '22px 18px 12px', marginBottom: 0, borderBottom: `2px solid ${P.border}` }}>
                 <div className="mpd-card-title"><i className="ti ti-list-check"></i> Tasks</div>
                 {!hideTopActions && (
                   <button className="mpd-btn mpd-btn-outline" onClick={() => { setEditingTask(null); setNewTaskTitle(''); setNewTaskDesc(''); setNewTaskPriority('medium'); setNewTaskAssignTo([]); setNewTaskDue(''); setNewTaskMilestone(''); setShowAddTaskModal(true); }} style={{ padding: '6px 12px', fontSize: 12 }}><i className="ti ti-plus"></i> Add Task</button>
@@ -3048,9 +3048,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           {/* LEFT COL — TABS (Updates / Activity Logs / Accounts) */}
           < div style={{ order: 1, flex: '1.6 1 0%', minWidth: 0 }}>
             {/* TABS - draggable scroll */}
-            < div className="mpd-card" style={{ padding: 22, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: 420, maxHeight: 420, boxSizing: 'border-box' }}>          <div className="mpd-tabs"
+            < div className="mpd-card" style={{ padding: '22px 18px 22px', overflow: 'hidden', display: 'flex', flexDirection: 'column', height: 420, maxHeight: 420, boxSizing: 'border-box' }}>          <div className="mpd-tabs"
               ref={tabsRef}
-              style={{ overflowX: 'auto', scrollbarWidth: 'none', marginBottom: 4 }}
+              style={{ overflowX: 'auto', scrollbarWidth: 'none', marginBottom: 0, paddingBottom: 12, borderBottom: `2px solid ${P.border}` }}
             >
               {tabOrder.filter(tab => tab !== 'activity' && tab !== 'payments').map(tab => {
                 let lbl = '', icon = null;
@@ -3082,13 +3082,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 );
               })}
 
-              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, paddingRight: 12, fontSize: 13, color: '#9CA3AF', userSelect: 'none', whiteSpace: 'nowrap' }}>
+              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, paddingRight: 0, fontSize: 13, color: '#9CA3AF', userSelect: 'none', whiteSpace: 'nowrap' }}>
                 {!hideTopActions && activeTab === 'updates' && (
                   <button
                     type="button"
                     onClick={() => { setActiveTab('updates'); setShowUpdateModal(true); }}
                     className="mpd-btn mpd-btn-primary"
-                    style={{ padding: '5px 12px', fontSize: 12, whiteSpace: 'nowrap' }}
+                    style={{ padding: '6px 12px', fontSize: 12, whiteSpace: 'nowrap' }}
                   >
                     <i className="ti ti-plus" style={{ marginRight: 4 }}></i>Add Update
                   </button>
@@ -3096,34 +3096,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
               </div>
             </div>
-              <div ref={tabContentRef} style={{ userSelect: 'none', overflowY: 'auto', flex: 1, minHeight: 0, padding: '0 4px', boxSizing: 'border-box' }}>
-                <div className={`mpd-tab-pane ${activeTab === 'activity' ? 'mpd-active' : ''}`}>
-                  <div style={{ padding: '12px 16px', color: P.textLight, fontSize: 13 }}>
-                    {(currProject.updates && currProject.updates.length > 0) ? (() => {
-                      const perPage = 10;
-                      const totalPages = Math.ceil(currProject.updates.length / perPage);
-                      const pageItems = currProject.updates.slice(activityPage * perPage, activityPage * perPage + perPage);
-                      return (
-                        <div>
-                          <div style={{ textAlign: 'left' }}>
-                            {currProject.updates.slice(activityPage * 10, activityPage * 10 + 10).map((upd, idx) => (
-                              <div key={idx} style={{ padding: '8px 0', borderBottom: `1px solid ${P.bg}`, fontSize: 12.5, color: P.textMid }}>
-                                Update posted: <strong>{upd.text}</strong> by {upd.author} on {new Date(upd.date).toLocaleDateString()}
-                              </div>
-                            ))}
-                          </div>
-                          {Math.ceil(currProject.updates.length / 10) > 1 && (
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 10, borderTop: `1px solid ${P.border}` }}>
-                              <button onClick={() => setActivityPage(p => Math.max(0, p - 1))} disabled={activityPage === 0} style={{ padding: '5px 14px', borderRadius: 6, border: `1px solid ${P.border}`, background: activityPage === 0 ? P.bg : '#fff', color: activityPage === 0 ? P.textLight : P.textDark, cursor: activityPage === 0 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700 }}> Prev</button>
-                              <span style={{ fontSize: 12, color: P.textLight }}>{activityPage + 1} / {Math.ceil(currProject.updates.length / 10)}</span>
-                              <button onClick={() => setActivityPage(p => Math.min(Math.ceil(currProject.updates.length / 10) - 1, p + 1))} disabled={activityPage === Math.ceil(currProject.updates.length / 10) - 1} style={{ padding: '5px 14px', borderRadius: 6, border: `1px solid ${P.border}`, background: activityPage === Math.ceil(currProject.updates.length / 10) - 1 ? P.bg : '#fff', color: activityPage === Math.ceil(currProject.updates.length / 10) - 1 ? P.textLight : P.textDark, cursor: activityPage === Math.ceil(currProject.updates.length / 10) - 1 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700 }}>Next </button>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })() : <div style={{ textAlign: 'center', padding: '20px 24px', minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', color: P.textLight, fontSize: 13, boxSizing: 'border-box' }}>Activity logs will appear here.</div>}
-                  </div>
-                </div>
+              <div ref={tabContentRef} style={{ userSelect: 'none', overflowY: 'auto', flex: 1, minHeight: 0, padding: '10px 4px 0', boxSizing: 'border-box' }}>
+
                 <div className={`mpd-tab-pane ${activeTab === 'updates' ? 'mpd-active' : ''}`}>
 
                   {!hideTopActions && showUpdateModal && (

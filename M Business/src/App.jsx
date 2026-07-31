@@ -138,7 +138,7 @@ export default function App() {
           <Route path="/process" element={user ? <Dashboard key={user.email || user.id} user={user} setUser={handleSetUser} /> : <Navigate to="/" replace />} />
           <Route path="/canvas" element={user ? <CanvasPage /> : <Navigate to="/" replace />} />
           <Route path="/invoice-view" element={user ? <InvoiceViewer /> : <Navigate to="/" replace />} />
-          <Route path="/quotation-view" element={user ? <QuotationViewer /> : <Navigate to="/" replace />} />
+          <Route path="/quotation-view" element={<QuotationViewer />} />
           <Route path="/receipt-view" element={user ? <ReceiptViewer /> : <Navigate to="/" replace />} />
           <Route path="/calendar" element={user ? <CalendarPage /> : <Navigate to="/" replace />} />
           <Route path="/expenses" element={user ? <ExpensesPage /> : <Navigate to="/" replace />} />

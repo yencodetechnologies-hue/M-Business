@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { BASE_URL } from "../config";
+import { BASE_URL, FRONTEND_URL } from "../config";
 import SettingsPage from "./SettingsPage";
 import ModernProjectDetails from "./ModernProjectDetails";
 import { PROPOSAL_PREVIEW_CSS } from "./ProposalPreviewStyles";
+import CanvasProposalEditor from "./CanvasProposalEditor";
 import { printProposal, shareProposalAsPDF } from "./proposalPrintUtils";
 import html2pdf from "html2pdf.js";
 
@@ -72,6 +73,28 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
   const [sigText, setSigText] = React.useState("");
   const [saving, setSaving] = React.useState(false);
   const [saved, setSaved] = React.useState(!!proposal.clientSignature);
+  const [reviewOpen, setReviewOpen] = React.useState(false);
+  const [reviewText, setReviewText] = React.useState("");
+  const [reviewSaving, setReviewSaving] = React.useState(false);
+  const [reviewSavedComment, setReviewSavedComment] = React.useState(proposal.reviewComment || "");
+
+  const submitReview = async () => {
+    if (!reviewText.trim()) return alert("Please type your review before submitting.");
+    setReviewSaving(true);
+    try {
+      const dbId = proposal._id || proposal.id;
+      const res = await axios.put(`${BASE_URL}/api/proposals/${dbId}/review`, { comment: reviewText.trim() });
+      setReviewSavedComment(reviewText.trim());
+      setReviewOpen(false);
+      if (onSigned) onSigned(res.data.proposal || res.data);
+      alert("Review submitted. Thank you!");
+    } catch (err) {
+      console.error("Review submit error:", err);
+      alert("Failed to submit review. Please try again.");
+    } finally {
+      setReviewSaving(false);
+    }
+  };
   const canvasRef = React.useRef(null);
   const drawing = React.useRef(false);
   const points = React.useRef([]);
@@ -188,8 +211,15 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
       <div style={{ flex: 1, overflowY: "auto", background: "#f5fafa", padding: "24px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
 
-          {/* Proposal HTML content */}
-          {prop.html ? (
+          {/* Canvas-based proposal — show read-only canvas, same as admin side */}
+          {prop.format === "canvas" && prop.canvasElements && prop.canvasElements.length > 0 ? (
+            <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #e0eef0', overflow: 'hidden' }}>
+              <CanvasProposalEditor
+                isPreviewMode={true}
+                proposalData={prop}
+              />
+            </div>
+          ) : prop.html ? (
             <>
               <style>{PROPOSAL_PREVIEW_CSS}</style>
               <div className="prop-doc" style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", maxHeight: "none", overflow: "visible" }}
@@ -344,11 +374,302 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
               <div style={{ fontSize: 12, color: "#607D86", marginTop: 4 }}>Your signature has been saved and the subadmin has been notified.</div>
             </div>
           )}
+
+          {/* ── Review section ── */}
+          <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", padding: "24px 28px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: reviewSavedComment || reviewOpen ? 14 : 0 }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "#607D86", textTransform: "uppercase", letterSpacing: 0.5 }}>Your Review</div>
+              {!reviewOpen && (
+                <button onClick={() => { setReviewOpen(true); setReviewText(reviewSavedComment || ""); }} style={{ background: "#f0fdfe", border: "1.5px solid #e0eef0", borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #00BCD4))" }}>
+                  <i className="ti ti-message-2" style={{ marginRight: 5 }}></i>{reviewSavedComment ? "Edit Review" : "Review"}
+                </button>
+              )}
+            </div>
+            {reviewSavedComment && !reviewOpen && (
+              <div style={{ fontSize: 13, color: "#374151", background: "#f5fafa", borderRadius: 10, padding: "12px 16px", lineHeight: 1.6 }}>{reviewSavedComment}</div>
+            )}
+            {reviewOpen && (
+              <div>
+                <textarea value={reviewText} onChange={e => setReviewText(e.target.value)} rows={3} placeholder="Type your review or comments here..." style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e0eef0", borderRadius: 10, fontSize: 13, fontFamily: "inherit", resize: "vertical", outline: "none", boxSizing: "border-box", marginBottom: 10 }} />
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button onClick={submitReview} disabled={reviewSaving} style={{ padding: "9px 18px", background: " var(--app-accent, var(--app-accent, #00BCD4))", color: "#fff", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: reviewSaving ? "not-allowed" : "pointer" }}>{reviewSaving ? "Submitting..." : "Submit Review"}</button>
+                  <button onClick={() => setReviewOpen(false)} style={{ padding: "9px 18px", background: "#fff", color: "#607D86", border: "1.5px solid #e0eef0", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Cancel</button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
 }
+function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSigned }) {
+  const [sigMode, setSigMode] = React.useState("draw");
+  const [sigText, setSigText] = React.useState("");
+  const [saving, setSaving] = React.useState(false);
+  const [saved, setSaved] = React.useState(!!quotation.clientSignature);
+  const [reviewOpen, setReviewOpen] = React.useState(false);
+  const [reviewText, setReviewText] = React.useState("");
+  const [reviewSaving, setReviewSaving] = React.useState(false);
+  const [reviewSavedComment, setReviewSavedComment] = React.useState(quotation.reviewComment || "");
+  const canvasRef = React.useRef(null);
+  const drawing = React.useRef(false);
+  const points = React.useRef([]);
+
+  React.useEffect(() => {
+    if (sigMode !== "draw") return;
+    const cv = canvasRef.current;
+    if (!cv) return;
+    const rect = cv.getBoundingClientRect();
+    cv.width = rect.width || 500;
+    cv.height = 150;
+    const ctx = cv.getContext("2d");
+    ctx.strokeStyle = "#1a2e35";
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    function getPos(e) {
+      const r = cv.getBoundingClientRect();
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: (cx - r.left) * (cv.width / r.width), y: (cy - r.top) * (cv.height / r.height) };
+    }
+    cv.onmousedown = (e) => { points.current = [getPos(e)]; drawing.current = true; };
+    cv.onmousemove = (e) => {
+      if (!drawing.current) return;
+      const p = getPos(e); points.current.push(p);
+      const pts = points.current;
+      if (pts.length > 2) {
+        const a = pts[pts.length - 3], b = pts[pts.length - 2], c = pts[pts.length - 1];
+        const mx = (b.x + c.x) / 2, my = (b.y + c.y) / 2;
+        const px = (a.x + b.x) / 2, py = (a.y + b.y) / 2;
+        ctx.beginPath(); ctx.moveTo(px, py); ctx.quadraticCurveTo(b.x, b.y, mx, my); ctx.stroke();
+      }
+    };
+    cv.onmouseup = cv.onmouseleave = () => { drawing.current = false; points.current = []; };
+    cv.ontouchstart = (e) => { e.preventDefault(); points.current = [getPos(e)]; drawing.current = true; };
+    cv.ontouchmove = (e) => {
+      e.preventDefault();
+      if (!drawing.current) return;
+      const p = getPos(e); points.current.push(p);
+      const pts = points.current;
+      if (pts.length > 2) {
+        const a = pts[pts.length - 3], b = pts[pts.length - 2], c = pts[pts.length - 1];
+        const mx = (b.x + c.x) / 2, my = (b.y + c.y) / 2;
+        const px = (a.x + b.x) / 2, py = (a.y + b.y) / 2;
+        ctx.beginPath(); ctx.moveTo(px, py); ctx.quadraticCurveTo(b.x, b.y, mx, my); ctx.stroke();
+      }
+    };
+    cv.ontouchend = () => { drawing.current = false; points.current = []; };
+  }, [sigMode]);
+
+  const clearCanvas = () => {
+    const cv = canvasRef.current;
+    if (!cv) return;
+    cv.getContext("2d").clearRect(0, 0, cv.width, cv.height);
+  };
+
+  const saveSignature = async () => {
+    let sigData = "";
+    if (sigMode === "draw") {
+      const cv = canvasRef.current;
+      if (!cv) return;
+      sigData = cv.toDataURL();
+    } else {
+      if (!sigText.trim()) return alert("Please type your name to sign.");
+      sigData = sigText.trim();
+    }
+    setSaving(true);
+    try {
+      const res = await axios.put(`${BASE_URL}/api/quotations/${quotation._id}/client-sign`, {
+        clientSignature: sigData,
+        clientName: clientName,
+        sigMode: sigMode,
+      });
+      setSaved(true);
+      if (onSigned) onSigned(res.data);
+      alert("Success! Signature saved and quotation approved.");
+    } catch (err) {
+      console.error("Signature save error:", err);
+      alert("Failed to save signature. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const submitReview = async () => {
+    if (!reviewText.trim()) return alert("Please type your review before submitting.");
+    setReviewSaving(true);
+    try {
+      const res = await axios.patch(`${BASE_URL}/api/quotations/${quotation._id}/review`, { comment: reviewText.trim() });
+      setReviewSavedComment(reviewText.trim());
+      setReviewOpen(false);
+      if (onSigned) onSigned(res.data.quotation || res.data);
+      alert("Review submitted. Thank you!");
+    } catch (err) {
+      console.error("Review submit error:", err);
+      alert("Failed to submit review. Please try again.");
+    } finally {
+      setReviewSaving(false);
+    }
+  };
+
+  const q = quotation;
+  const qt = q.qt || {};
+  const items = q.items || [];
+  const st = (q.status || "sent").toLowerCase();
+  const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity || i.qty) || 0), 0);
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.6)", display: "flex", flexDirection: "column" }}>
+      <div style={{ background: "#fff", borderBottom: "1px solid #e0eef0", padding: "12px 24px", display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
+        <button onClick={onClose} style={{ background: "#f0fdfe", border: "1.5px solid #e0eef0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#00BCD4", display: "flex", alignItems: "center", gap: 6 }}>
+          <i className="ti ti-arrow-left"></i> Back
+        </button>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: "#0D2027" }}>#{qt.quoteNo || q.quoteNo}</div>
+          <div style={{ fontSize: 11, color: "#96B0B8" }}>{qt.client || clientName}</div>
+        </div>
+        <span style={{ background: st === "approved" ? "#DCFCE7" : st === "rejected" ? "#FEE2E2" : "#EFF4FF", color: st === "approved" ? "#15803D" : st === "rejected" ? "#DC2626" : "#2563EB", borderRadius: 20, padding: "4px 14px", fontSize: 11, fontWeight: 800 }}>
+          {st.charAt(0).toUpperCase() + st.slice(1)}
+        </span>
+      </div>
+
+      <div style={{ flex: 1, overflowY: "auto", background: "#f5fafa", padding: "24px" }}>
+        <div style={{ maxWidth: 900, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
+
+          <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", padding: "32px 40px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+            <div style={{ textAlign: "center", marginBottom: 28 }}>
+              <div style={{ fontSize: 24, fontWeight: 900, color: "#0D2027", marginBottom: 6 }}>{qt.companyName || qt.fromCompany || ""}</div>
+              <div style={{ fontSize: 13, color: "#607D86" }}>Quotation for {qt.client || qt.toName}</div>
+              {qt.project && <div style={{ fontSize: 12, color: "#96B0B8", marginTop: 2 }}>Project: {qt.project}</div>}
+            </div>
+            <div style={{ borderTop: "2px solid #00BCD4", marginBottom: 20 }}></div>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ background: "#00BCD4" }}>
+                  <th style={{ padding: "10px 14px", color: "#fff", fontSize: 12, textAlign: "left" }}>Description</th>
+                  <th style={{ padding: "10px 14px", color: "#fff", fontSize: 12, textAlign: "right" }}>Qty</th>
+                  <th style={{ padding: "10px 14px", color: "#fff", fontSize: 12, textAlign: "right" }}>Rate</th>
+                  <th style={{ padding: "10px 14px", color: "#fff", fontSize: 12, textAlign: "right" }}>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((it, i) => (
+                  <tr key={i} style={{ borderBottom: "1px solid #e0eef0" }}>
+                    <td style={{ padding: "10px 14px", fontSize: 13 }}>{it.description || it.desc}</td>
+                    <td style={{ padding: "10px 14px", fontSize: 13, textAlign: "right" }}>{it.quantity || it.qty}</td>
+                    <td style={{ padding: "10px 14px", fontSize: 13, textAlign: "right" }}>₹{parseFloat(it.rate || 0).toLocaleString("en-IN")}</td>
+                    <td style={{ padding: "10px 14px", fontSize: 13, textAlign: "right", fontWeight: 700 }}>₹{((parseFloat(it.rate) || 0) * (parseFloat(it.quantity || it.qty) || 0)).toLocaleString("en-IN")}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16, fontSize: 16, fontWeight: 900, color: "#00BCD4" }}>
+              Total: ₹{subtotal.toLocaleString("en-IN")}
+            </div>
+          </div>
+
+          {/* ── Client Signature display ── */}
+          <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", padding: "24px 28px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)" }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: "#607D86", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>Client Sign-off</div>
+            {q.clientSignature ? (
+              <div style={{ background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: 12, padding: "20px 24px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+                  <i className="ti ti-circle-check" style={{ fontSize: 18, color: "#15803D" }}></i>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: "#15803D" }}>You have approved this quotation</span>
+                  {q.clientSignedAt && (
+                    <span style={{ marginLeft: "auto", fontSize: 11, color: "#96B0B8", fontWeight: 600 }}>
+                      {new Date(q.clientSignedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                    </span>
+                  )}
+                </div>
+                <div style={{ background: "#fff", borderRadius: 10, border: "1px solid #86efac", padding: "16px 20px", textAlign: "center", maxWidth: 320, margin: "0 auto" }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "#96B0B8", textTransform: "uppercase", letterSpacing: .6, marginBottom: 12 }}>Your Signature</div>
+                  <div style={{ height: 64, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
+                    {q.clientSignature.startsWith("data:image") ? (
+                      <img src={q.clientSignature} style={{ maxHeight: 60, maxWidth: "100%", objectFit: "contain" }} alt="your signature" />
+                    ) : (
+                      <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 28, color: "#0D2027" }}>{q.clientSignature}</span>
+                    )}
+                  </div>
+                  <div style={{ height: 1, background: "#15803D", marginBottom: 8 }} />
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#0D2027" }}>{q.clientSignedBy || clientName}</div>
+                  <div style={{ fontSize: 10, color: "#15803D", fontWeight: 700, marginTop: 3 }}>Digitally Signed & Approved</div>
+                </div>
+              </div>
+            ) : (
+              <div style={{ fontSize: 12, color: "#96B0B8", marginBottom: 16 }}>Please sign below to formally approve this quotation.</div>
+            )}
+          </div>
+
+          {!q.clientSignature && !saved && (
+            <div style={{ background: "#fff", borderRadius: 14, border: "2px solid #00BCD4", padding: "24px 28px", boxShadow: "0 4px 20px rgba(0,188,212,0.1)" }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: "#0D2027", marginBottom: 4 }}>
+                <i className="ti ti-writing" style={{ color: "#00BCD4", marginRight: 8 }}></i>Awaiting Client Signature
+              </div>
+              <div style={{ fontSize: 12, color: "#96B0B8", marginBottom: 18 }}>Sign below to approve this quotation.</div>
+              <div style={{ display: "flex", gap: 4, background: "#f5fafa", borderRadius: 10, padding: 4, marginBottom: 16, width: "fit-content" }}>
+                {["draw", "type"].map(mode => (
+                  <button key={mode} onClick={() => setSigMode(mode)} style={{ padding: "6px 16px", borderRadius: 8, border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer", background: sigMode === mode ? "#00BCD4" : "transparent", color: sigMode === mode ? "#fff" : "#607D86" }}>
+                    {mode === "draw" ? "Draw" : "Type"}
+                  </button>
+                ))}
+              </div>
+              {sigMode === "draw" ? (
+                <div>
+                  <div style={{ background: "#f5fafa", border: "1.5px dashed #c5dde0", borderRadius: 10, overflow: "hidden", marginBottom: 12 }}>
+                    <canvas ref={canvasRef} style={{ width: "100%", height: 150, cursor: "crosshair", display: "block", touchAction: "none" }} />
+                  </div>
+                  <button onClick={clearCanvas} style={{ background: "none", border: "1px solid #e0eef0", borderRadius: 7, padding: "5px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: "#607D86", marginBottom: 12 }}>Clear</button>
+                </div>
+              ) : (
+                <div style={{ marginBottom: 16 }}>
+                  <input value={sigText} onChange={e => setSigText(e.target.value)} placeholder="Type your full name to sign..." style={{ width: "100%", padding: "12px 16px", border: "1.5px solid #e0eef0", borderRadius: 10, fontSize: 22, fontFamily: "'Dancing Script', cursive", color: "#0D2027", outline: "none", boxSizing: "border-box" }} />
+                </div>
+              )}
+              <button onClick={saveSignature} disabled={saving} style={{ width: "100%", padding: "13px", background: saving ? "#96B0B8" : "#00BCD4", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 800, cursor: saving ? "not-allowed" : "pointer" }}>
+                {saving ? "Saving Signature..." : "Sign & Approve Quotation"}
+              </button>
+            </div>
+          )}
+
+          {!q.clientSignature && saved && (
+            <div style={{ background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: 14, padding: "20px 28px", textAlign: "center" }}>
+              <i className="ti ti-circle-check" style={{ fontSize: 36, color: "#15803D" }}></i>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "#15803D", marginTop: 8 }}>Quotation Approved!</div>
+            </div>
+          )}
+
+          {/* ── Review section ── */}
+          <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", padding: "24px 28px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: reviewSavedComment || reviewOpen ? 14 : 0 }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "#607D86", textTransform: "uppercase", letterSpacing: 0.5 }}>Your Review</div>
+              {!reviewOpen && (
+                <button onClick={() => { setReviewOpen(true); setReviewText(reviewSavedComment || ""); }} style={{ background: "#f0fdfe", border: "1.5px solid #e0eef0", borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#00BCD4" }}>
+                  <i className="ti ti-message-2" style={{ marginRight: 5 }}></i>{reviewSavedComment ? "Edit Review" : "Review"}
+                </button>
+              )}
+            </div>
+            {reviewSavedComment && !reviewOpen && (
+              <div style={{ fontSize: 13, color: "#374151", background: "#f5fafa", borderRadius: 10, padding: "12px 16px", lineHeight: 1.6 }}>{reviewSavedComment}</div>
+            )}
+            {reviewOpen && (
+              <div>
+                <textarea value={reviewText} onChange={e => setReviewText(e.target.value)} rows={3} placeholder="Type your review or comments here..." style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e0eef0", borderRadius: 10, fontSize: 13, fontFamily: "inherit", resize: "vertical", outline: "none", boxSizing: "border-box", marginBottom: 10 }} />
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button onClick={submitReview} disabled={reviewSaving} style={{ padding: "9px 18px", background: "#00BCD4", color: "#fff", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: reviewSaving ? "not-allowed" : "pointer" }}>{reviewSaving ? "Submitting..." : "Submit Review"}</button>
+                  <button onClick={() => setReviewOpen(false)} style={{ padding: "9px 18px", background: "#fff", color: "#607D86", border: "1.5px solid #e0eef0", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Cancel</button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ClientDashboard({ user: userProp, setUser, portalMode = false, themeColor = "#00BCD4" }) {
   useAssets();
   const [active, setActive] = useState(() =>
@@ -3491,24 +3812,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
           </div>
         )
       }
-      {viewQuotationDetail && (
-        <div className="modal-overlay" onClick={() => setViewQuotationDetail(null)}>
-          <div className="modal-card" onClick={e => e.stopPropagation()} style={{ maxWidth: 520 }}>
-            <div className="modal-header">
-              <span className="modal-title">#{viewQuotationDetail.quoteNo}</span>
-              <button className="modal-close" onClick={() => setViewQuotationDetail(null)}>&times;</button>
-            </div>
-            <div className="modal-body">
-              {(viewQuotationDetail.items || []).map((item, idx) => (
-                <div key={idx} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", fontSize: 13 }}>
-                  <span>{item.description || item.desc}</span>
-                  <span>₹{((parseFloat(item.rate) || 0) * (parseFloat(item.quantity || item.qty) || 1)).toLocaleString("en-IN")}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+
       {/* RECEIPT MODAL */}
       {
         receiptInvoice && (

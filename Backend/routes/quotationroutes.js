@@ -436,6 +436,28 @@ router.patch("/:id/approve", async (req, res) => {
   }
 });
 
+// ── PUT client signature + approve (mirrors proposal's client-sign route) ────
+router.put("/:id/client-sign", async (req, res) => {
+  try {
+    const { clientSignature, clientName, sigMode } = req.body;
+    const doc = await Quotation.findByIdAndUpdate(
+      req.params.id,
+      {
+        clientSignature,
+        clientSignedBy: clientName,
+        clientSignedAt: new Date(),
+        sigMode: sigMode || "draw",
+        status: "approved",
+      },
+      { new: true }
+    );
+    if (!doc) return res.status(404).json({ success: false, msg: "Quotation not found" });
+    return res.json(doc);
+  } catch (err) {
+    return res.status(500).json({ success: false, msg: err.message });
+  }
+});
+
 // ── PATCH client review (submit comments) ───────────────────────────────────────
 router.patch("/:id/review", async (req, res) => {
   try {

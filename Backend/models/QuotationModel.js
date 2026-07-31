@@ -16,6 +16,9 @@ const QuotationSchema = new mongoose.Schema(
     reviewComment: { type: String, default: "" },
     reviewedAt: { type: Date, default: null },
     attachedFile: { type: Object, default: null }, // { name, url, size, type } for directly-uploaded quotation docs
+    clientSignature: { type: String, default: "" },
+    clientSignedAt: { type: Date, default: null },
+    sigMode: { type: String, default: "draw" },
   },
   { timestamps: true }
 );

@@ -180,6 +180,28 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
   const [activeTab, setActiveTab] = useState("All");
   const [viewEntry, setViewEntry] = useState(initialViewEntry || null);
   const [toastMsg, setToastMsg] = useState(null);
+  const [showSendPopup, setShowSendPopup] = useState(false);
+  const [sendPopupEntry, setSendPopupEntry] = useState(null);
+  const [targetPortalClient, setTargetPortalClient] = useState("");
+
+  const handleSendQuotationToPortal = async (targetClient) => {
+    if (!sendPopupEntry) return;
+    try {
+      await axios.put(`${BASE_URL}/api/quotations/${sendPopupEntry.id || sendPopupEntry._id}`, {
+        qt: { ...sendPopupEntry.qt, client: targetClient, toName: targetClient },
+        items: sendPopupEntry.items,
+        status: 'sent',
+      });
+      setShowSendPopup(false);
+      setSendPopupEntry(null);
+      setTargetPortalClient('');
+      showToast(`Quotation sent to ${targetClient}'s Portal.`);
+      fetchList();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to send quotation to portal.');
+    }
+  };
   const showToast = (msg) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(null), 3000);
@@ -1077,7 +1099,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                         {entry.status === "converted" ? <><i className="ti ti-circle-check" style={{ fontSize: 13 }}></i> Done</> : <><i className="ti ti-receipt" style={{ fontSize: 13 }}></i> Invoice</>}
                       </button>
                     ) : (
-                      <button className="qa-btn primary" onClick={() => shareQuotation(entry)}><i className="ti ti-send" style={{ fontSize: 13 }}></i> Send</button>
+                      <button className="qa-btn primary" onClick={() => { setSendPopupEntry(entry); setTargetPortalClient(entry.qt?.client || entry.client || ''); setShowSendPopup(true); }}><i className="ti ti-send" style={{ fontSize: 13 }}></i> Send</button>
                     )}
                     <button
                       className="qa-btn"
@@ -1166,6 +1188,28 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           </div>
         </div>
 
+        {/* Send to Client Portal Popup */}
+        {showSendPopup && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowSendPopup(false)}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 16, padding: 24, width: 420, maxWidth: '92vw' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+                <div style={{ fontSize: 16, fontWeight: 900, color: '#0D1B2A' }}>Send to Client Portal</div>
+                <i className="ti ti-x" style={{ cursor: 'pointer', fontSize: 18 }} onClick={() => setShowSendPopup(false)}></i>
+              </div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 8 }}>Select Client</div>
+              <select value={targetPortalClient} onChange={e => setTargetPortalClient(e.target.value)} style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8, fontSize: 13, marginBottom: 20 }}>
+                <option value="">-- Select Client --</option>
+                {(clients || []).map(c => (
+                  <option key={c._id || c.clientName || c.name} value={c.clientName || c.name}>{c.clientName || c.name}</option>
+                ))}
+              </select>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button onClick={() => setShowSendPopup(false)} style={{ flex: 1, padding: '10px', background: '#F3F4F6', color: '#374151', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>Cancel</button>
+                <button onClick={() => handleSendQuotationToPortal(targetPortalClient)} disabled={!targetPortalClient} style={{ flex: 1, padding: '10px', background: '#22C55E', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: !targetPortalClient ? 'not-allowed' : 'pointer', opacity: !targetPortalClient ? 0.5 : 1 }}>Send Now</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

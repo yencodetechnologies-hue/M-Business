@@ -1045,7 +1045,7 @@ function SubadminProposalViewer({ proposal, onClose, onPrint, onShare, BASE_URL,
             )}
 
 
-      
+
 
         </div>
       </div>
@@ -1178,6 +1178,29 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefillProject]);
   const [viewingProposal, setViewingProposal] = useState(initialViewProposal || null);
+  const [showSendPopup, setShowSendPopup] = useState(false);
+  const [sendPopupProposal, setSendPopupProposal] = useState(null);
+  const [targetPortalClient, setTargetPortalClient] = useState("");
+
+  const handleSendProposalToPortal = async (targetClient) => {
+    if (!sendPopupProposal) return;
+    try {
+      const clientObj = (clients || []).find(c => (c.clientName || c.name) === targetClient);
+      await axios.put(`${BASE_URL}/api/proposals/${sendPopupProposal._id || sendPopupProposal.id}`, {
+        client: targetClient,
+        clientName: targetClient,
+        clientId: clientObj?._id || '',
+        status: 'sent',
+      });
+      setShowSendPopup(false);
+      setSendPopupProposal(null);
+      setTargetPortalClient('');
+      alert(`Proposal sent to ${targetClient}'s Portal.`);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to send proposal to portal.');
+    }
+  };
   const [openMenuId, setOpenMenuId] = useState(null);
   const [shareModalProposal, setShareModalProposal] = useState(null);
 
@@ -2040,10 +2063,11 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                             <i className="ti ti-calendar" style={{ fontSize: 11 }}></i> Valid until {fmtDate(new Date(Date.now() + 30 * 86400000))}
                           </div>
                           <div style={{ fontSize: 15, fontWeight: 800, color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))" }}>₹{value.toLocaleString("en-IN")}</div>
-                          <div style={{ display: "flex", gap: 6 }} onClick={e => e.stopPropagation()}>
+                          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }} onClick={e => e.stopPropagation()}>
                             <button className="pf-btn" onClick={e => { e.stopPropagation(); setViewingProposal(p); }}><i className="ti ti-eye" style={{ fontSize: 12 }}></i> View</button>
+                            <button className="pf-btn" style={{ background: '#22C55E', color: '#fff', borderColor: '#22C55E' }} onClick={e => { e.stopPropagation(); setSendPopupProposal(p); setTargetPortalClient(p.client || p.clientName || ''); setShowSendPopup(true); }}><i className="ti ti-send" style={{ fontSize: 12 }}></i> Send</button>
                             <button className="pf-btn" onClick={e => { e.stopPropagation(); shareProposalPDF(p); }}><i className="ti ti-share" style={{ fontSize: 12 }}></i> Share</button>
-                            <button className="pf-btn" onClick={e => { e.stopPropagation(); printProposal(p); }}><i className="ti ti-download" style={{ fontSize: 12 }}></i> PDF</button>
+
                           </div>
                         </div>
                       </div>
@@ -2157,6 +2181,28 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
             />
           )
         }
+        {/* Send to Client Portal Popup */}
+        {showSendPopup && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowSendPopup(false)}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 16, padding: 24, width: 420, maxWidth: '92vw' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+                <div style={{ fontSize: 16, fontWeight: 900, color: '#0D1B2A' }}>Send to Client Portal</div>
+                <i className="ti ti-x" style={{ cursor: 'pointer', fontSize: 18 }} onClick={() => setShowSendPopup(false)}></i>
+              </div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 8 }}>Select Client</div>
+              <select value={targetPortalClient} onChange={e => setTargetPortalClient(e.target.value)} style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8, fontSize: 13, marginBottom: 20 }}>
+                <option value="">-- Select Client --</option>
+                {(clients || []).map(c => (
+                  <option key={c._id || c.clientName || c.name} value={c.clientName || c.name}>{c.clientName || c.name}</option>
+                ))}
+              </select>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button onClick={() => setShowSendPopup(false)} style={{ flex: 1, padding: '10px', background: '#F3F4F6', color: '#374151', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>Cancel</button>
+                <button onClick={() => handleSendProposalToPortal(targetPortalClient)} disabled={!targetPortalClient} style={{ flex: 1, padding: '10px', background: '#22C55E', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: !targetPortalClient ? 'not-allowed' : 'pointer', opacity: !targetPortalClient ? 0.5 : 1 }}>Send Now</button>
+              </div>
+            </div>
+          </div>
+        )}
         {
           shareModalProposal && (
             <div style={{ position: "fixed", inset: 0, zIndex: 100000, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => setShareModalProposal(null)}>

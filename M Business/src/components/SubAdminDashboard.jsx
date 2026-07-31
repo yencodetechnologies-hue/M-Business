@@ -7048,8 +7048,70 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     accounts: false,
     whatsapp: false,
   });
-  const toggleMobileSection = (key) => {
-    setMobileOpenSections(prev => ({ ...prev, [key]: !prev[key] }));
+  const [mobilePopupSection, setMobilePopupSection] = useState(null); // holds the id of open popup, or null
+  const openMobilePopup = (key) => setMobilePopupSection(key);
+  const closeMobilePopup = () => setMobilePopupSection(null);
+
+  // Reusable popup overlay for mobile card details
+  const MobilePopup = ({ id, title, children }) => {
+    if (mobilePopupSection !== id) return null;
+    return (
+      <div
+        onClick={closeMobilePopup}
+        style={{
+          position: "fixed", inset: 0, background: "rgba(15,28,46,0.55)",
+          zIndex: 9999, display: "flex", alignItems: "flex-end", justifyContent: "center",
+        }}
+      >
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            background: "#fff", borderRadius: "20px 20px 0 0", width: "100%", maxWidth: 480,
+            maxHeight: "75vh", overflowY: "auto", padding: 20, boxShadow: "0 -4px 24px rgba(0,0,0,0.2)",
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <div style={{ fontSize: 17, fontWeight: 800, color: "#0f1c2e" }}>{title}</div>
+            <span onClick={closeMobilePopup} style={{ fontSize: 20, cursor: "pointer", color: "rgba(15,28,46,0.5)" }}>✕</span>
+          </div>
+          {children}
+        </div>
+      </div>
+    );
+  };
+
+  // Small arrow button placed above a card, mobile-only
+  const MobileCardArrow = ({ id }) => {
+    if (isDesktopWidth) return null;
+    return (
+      <div
+        onClick={(e) => { e.stopPropagation(); openMobilePopup(id); }}
+        style={{
+          display: "flex", justifyContent: "center", cursor: "pointer",
+          padding: "2px 0 6px 0", color: "var(--app-accent)", fontSize: 14, fontWeight: 900,
+        }}
+      >
+        ▲
+      </div>
+    );
+  };
+  // ── Desktop hover popup ──────────────────────────────────────────────
+  const [hoverPopupSection, setHoverPopupSection] = useState(null);
+  const HoverPopup = ({ id, title, children }) => {
+    if (!isDesktopWidth || hoverPopupSection !== id) return null;
+    return (
+      <div
+        style={{
+          position: "absolute", top: "100%", left: 0, right: 0, marginTop: 8,
+          background: "#fff", borderRadius: 14, border: "1px solid rgba(0,0,0,0.08)",
+          boxShadow: "0 8px 28px rgba(0,0,0,0.15)", padding: 18, zIndex: 50,
+          maxHeight: 320, overflowY: "auto",
+        }}
+      >
+        <div style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e", marginBottom: 10 }}>{title}</div>
+        {children}
+      </div>
+    );
   };
   // Wraps a section's heading + content. Desktop renders normally (no collapse).
   // Mobile renders a clickable heading row with a ▼/▶ arrow that toggles content.
@@ -10574,7 +10636,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 20 }}>
 
 
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
+                              <div
+                                onMouseEnter={() => isDesktopWidth && setHoverPopupSection('revenue')}
+                                onMouseLeave={() => isDesktopWidth && setHoverPopupSection(null)}
+                                style={{ position: "relative", background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}
+                              >
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
                                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                                     <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "#0097A7", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
@@ -10591,97 +10657,218 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                   )}
                                 </div>
                                 <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Revenue This Month</div>
+                                <HoverPopup id="revenue" title="Revenue This Month">
+                                  <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>{formatShortCurrency(totalIncome)}</div>
+                                  <div style={{ fontSize: 12, color: "rgba(15,28,46,0.5)" }}>Total income this year: {formatShortCurrency(totalIncome)}</div>
+                                </HoverPopup>
                               </div>
 
 
                               {/* Clients Card */}
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-                                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
-                                      <i className="ti ti-users"></i>
+                              <div
+                                onMouseEnter={() => isDesktopWidth && setHoverPopupSection('clients')}
+                                onMouseLeave={() => isDesktopWidth && setHoverPopupSection(null)}
+                                style={{ position: "relative" }}
+                              >
+                                <MobileCardArrow id="clients" />
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                      <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                        <i className="ti ti-users"></i>
+                                      </div>
+                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
+                                        {clients.length}
+                                      </div>
                                     </div>
-                                    <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
-                                      {clients.length}
-                                    </div>
+                                    {clients.length > 0 && (
+                                      <div style={{ background: "#dcfce7", color: "#166534", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                        <i className="ti ti-trending-up"></i> {clients.filter(c => (c.status || "").toLowerCase() === "active").length} active
+                                      </div>
+                                    )}
                                   </div>
-                                  {clients.length > 0 && (
-                                    <div style={{ background: "#dcfce7", color: "#166534", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-                                      <i className="ti ti-trending-up"></i> {clients.filter(c => (c.status || "").toLowerCase() === "active").length} active
-                                    </div>
-                                  )}
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Total Clients</div>
                                 </div>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Total Clients</div>
+                                <HoverPopup id="clients" title="Total Clients">
+                                  <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>{clients.length} total</div>
+                                  <div style={{ fontSize: 12, color: "rgba(15,28,46,0.5)", marginBottom: 12 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} Active Clients</div>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                                    {clients.slice(0, 8).map((c, i) => (
+                                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 6 }}>
+                                        <span style={{ fontWeight: 600 }}>{c.name || c.companyName || "Client"}</span>
+                                        <span style={{ color: "rgba(15,28,46,0.5)" }}>{c.status || "-"}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </HoverPopup>
+                                <MobilePopup id="clients" title="Total Clients">
+                                  <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>{clients.length} total</div>
+                                  <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", marginBottom: 16 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} Active Clients</div>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                                    {clients.map((c, i) => (
+                                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
+                                        <span style={{ fontWeight: 600 }}>{c.name || c.companyName || "Client"}</span>
+                                        <span style={{ color: "rgba(15,28,46,0.5)" }}>{c.status || "-"}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </MobilePopup>
                               </div>
 
 
 
                               {/* Projects Card */}
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-                                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37,99,235,0.1)", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
-                                      <i className="ti ti-folder"></i>
+                              <div
+                                onMouseEnter={() => isDesktopWidth && setHoverPopupSection('activeProjects')}
+                                onMouseLeave={() => isDesktopWidth && setHoverPopupSection(null)}
+                                style={{ position: "relative" }}
+                              >
+                                <MobileCardArrow id="activeProjects" />
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                      <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37,99,235,0.1)", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                        <i className="ti ti-folder"></i>
+                                      </div>
+                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
+                                        {activeProjCount}
+                                      </div>
                                     </div>
-                                    <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
-                                      {activeProjCount}
-                                    </div>
+                                    {activeProjCount > 0 && (
+                                      <div style={{ background: "#f1f5f9", color: "#64748b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                        Active
+                                      </div>
+                                    )}
                                   </div>
-                                  {activeProjCount > 0 && (
-                                    <div style={{ background: "#f1f5f9", color: "#64748b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-                                      Active
-                                    </div>
-                                  )}
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Active Projects</div>
                                 </div>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Active Projects</div>
+                                <HoverPopup id="activeProjects" title="Active Projects">
+                                  <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{activeProjCount} active</div>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                                    {projects.filter(p => p.status === "Active" || p.status === "Pending").slice(0, 8).map((p, i) => (
+                                      <div key={i} style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
+                                        <div style={{ fontWeight: 700, fontSize: 12 }}>{p.name}</div>
+                                        <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>
+                                          Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"} · {p.progress || 0}%
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </HoverPopup>
+                                <MobilePopup id="activeProjects" title="Active Projects">
+                                  <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{activeProjCount} active</div>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                    {projects.filter(p => p.status === "Active" || p.status === "Pending").map((p, i) => (
+                                      <div key={i} style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 10 }}>
+                                        <div style={{ fontWeight: 700, fontSize: 13 }}>{p.name}</div>
+                                        <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>
+                                          Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"} · {p.progress || 0}%
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </MobilePopup>
                               </div>
 
 
 
                               {/* Invoices Card */}
-
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-                                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
-                                      <i className="ti ti-file-invoice"></i>
+                              <div
+                                onMouseEnter={() => isDesktopWidth && setHoverPopupSection('unpaidInvoices')}
+                                onMouseLeave={() => isDesktopWidth && setHoverPopupSection(null)}
+                                style={{ position: "relative" }}
+                              >
+                                <MobileCardArrow id="unpaidInvoices" />
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                      <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                        <i className="ti ti-file-invoice"></i>
+                                      </div>
+                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
+                                        {pendingInvCount}
+                                      </div>
                                     </div>
-                                    <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
-                                      {pendingInvCount}
-                                    </div>
+                                    {pendingInvCount > 0 && (
+                                      <div style={{ background: "#fef2f2", color: "#991b1b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                        <i className="ti ti-trending-down"></i> {invoices.filter(i => (i.status || "").toLowerCase() === "overdue").length > 0 ? "overdue" : "pending"}
+                                      </div>
+                                    )}
                                   </div>
-                                  {pendingInvCount > 0 && (
-                                    <div style={{ background: "#fef2f2", color: "#991b1b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-                                      <i className="ti ti-trending-down"></i> {invoices.filter(i => (i.status || "").toLowerCase() === "overdue").length > 0 ? "overdue" : "pending"}
-                                    </div>
-                                  )}
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Unpaid Invoices</div>
                                 </div>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Unpaid Invoices</div>
+                                <HoverPopup id="unpaidInvoices" title="Unpaid Invoices">
+                                  <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{pendingInvCount} pending</div>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                                    {invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").slice(0, 8).map((inv, i) => (
+                                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 6 }}>
+                                        <span style={{ fontWeight: 600 }}>{inv.clientName || inv.client || "Client"}</span>
+                                        <span style={{ color: "rgba(15,28,46,0.5)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </HoverPopup>
+                                <MobilePopup id="unpaidInvoices" title="Unpaid Invoices">
+                                  <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{pendingInvCount} pending</div>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                                    {invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").map((inv, i) => (
+                                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
+                                        <span style={{ fontWeight: 600 }}>{inv.clientName || inv.client || "Client"}</span>
+                                        <span style={{ color: "rgba(15,28,46,0.5)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </MobilePopup>
                               </div>
 
 
                               {/* Employees Card */}
-
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-                                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(124,58,237,0.1)", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
-                                      <i className="ti ti-user-circle"></i>
+                              <div
+                                onMouseEnter={() => isDesktopWidth && setHoverPopupSection('employees')}
+                                onMouseLeave={() => isDesktopWidth && setHoverPopupSection(null)}
+                                style={{ position: "relative" }}
+                              >
+                                <MobileCardArrow id="employees" />
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                      <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(124,58,237,0.1)", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                        <i className="ti ti-user-circle"></i>
+                                      </div>
+                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
+                                        {employees.length}
+                                      </div>
                                     </div>
-                                    <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
-                                      {employees.length}
-                                    </div>
+                                    {employees.length > 0 && (
+                                      <div style={{ background: "#f3e8ff", color: "#6b21a8", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                        <i className="ti ti-trending-up"></i> {employees.length}
+                                      </div>
+                                    )}
                                   </div>
-                                  {employees.length > 0 && (
-                                    <div style={{ background: "#f3e8ff", color: "#6b21a8", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-                                      <i className="ti ti-trending-up"></i> {employees.length}
-                                    </div>
-                                  )}
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Employees</div>
                                 </div>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Employees</div>
-
-
-
+                                <HoverPopup id="employees" title="Employees">
+                                  <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{employees.length} staff</div>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                                    {employees.slice(0, 8).map((e, i) => (
+                                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 6 }}>
+                                        <span style={{ fontWeight: 600 }}>{e.name}</span>
+                                        <span style={{ color: "rgba(15,28,46,0.5)" }}>{e.role || "Employee"}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </HoverPopup>
+                                <MobilePopup id="employees" title="Employees">
+                                  <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>{employees.length} staff</div>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 16 }}>
+                                    {employees.map((e, i) => (
+                                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
+                                        <span style={{ fontWeight: 600 }}>{e.name}</span>
+                                        <span style={{ color: "rgba(15,28,46,0.5)" }}>{e.role || "Employee"}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </MobilePopup>
                               </div>
 
 
@@ -11296,7 +11483,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       })()}
 
 
-                    </>)}
+                    </>)
+                  }
                 </div>
               </>
             )}

@@ -846,10 +846,7 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 3. Additional work beyond agreed scope will be quoted separately.
 4. Confidentiality of all shared information will be maintained.
 5. This proposal is valid for 30 days from the date of issue.</textarea></div>
-        <div class="form-row">
-          <div class="fg"><label class="fl">Our Signature</label><div class="sig-box" id="ourSigBox" style="height:70px;cursor:pointer"><i class="ti ti-signature" style="font-size:22px;color:var(--text3)"></i><div style="font-size:11px;color:var(--text3);font-weight:600">Click to sign</div></div></div>
-          <div class="fg"><label class="fl">Client Signature</label><div class="sig-box" style="border-color:var(--amber);background:var(--amber-bg);height:70px"><i class="ti ti-user-check" style="font-size:22px;color:var(--amber)"></i><div style="font-size:11px;color:var(--amber);font-weight:600">Awaiting client</div></div></div>
-        </div>
+    
         <div id="sigModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
           <div style="background:#fff;border-radius:16px;padding:24px;width:480px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,0.18);">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:13px;font-weight:800;color:#0f1c2e">AUTHORISED SIGNATURE</div><button id="sigModalClose" style="background:none;border:none;font-size:20px;cursor:pointer;color:#607D86;">✕</button></div>
@@ -898,7 +895,6 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
       <div class="ps" id="pv-sec-risks"><div class="ps-lbl"><i class="ti ti-shield-exclamation"></i>Risks & Mitigation</div><div class="risk-p" id="pv-risks"></div></div>
       <div class="ps" id="pv-sec-pricing"><div class="ps-lbl"><i class="ti ti-currency-rupee"></i>Investment</div><table class="pricing-tbl"><thead><tr><th>Service</th><th>Amount</th></tr></thead><tbody id="pv-pricing"></tbody></table><div class="pricing-grand" style="margin-top:7px"><span>Total Investment</span><span id="pv-grand">₹1,12,100</span></div><div style="margin-top:6px;font-size:10px;color:var(--text2);font-weight:600" id="pv-pay">Payment: 50% advance, 50% on delivery</div></div>
       <div class="ps"><div class="ps-lbl"><i class="ti ti-writing"></i>Closing</div><div id="pv-closing" style="font-size:10px;color:var(--text2);line-height:1.7">We are excited about the opportunity to work with you…</div></div>
-      <div class="ps"><div class="ps-lbl"><i class="ti ti-signature"></i>Sign-off</div><div class="sop"><div class="sob"><div class="sob-line"></div><div class="sob-name" id="pv-sig1">Your Name</div><div class="sob-role">Your Company Name</div></div><div class="sob"><div class="sob-line" style="background:var(--amber)"></div><div class="sob-name" id="pv-sig2" style="color:var(--text3)">— Client —</div><div class="sob-role" id="pv-sig2-role">Awaiting</div></div></div></div>
     </div>
   </div><!-- /preview-panel -->
 

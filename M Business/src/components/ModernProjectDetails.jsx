@@ -889,6 +889,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   useEffect(() => {
     fetchProjectQuotationsAndProposals();
+    const qpInterval = setInterval(fetchProjectQuotationsAndProposals, 5000);
+    return () => clearInterval(qpInterval);
   }, [fetchProjectQuotationsAndProposals]);
 
   const fetchInvoicesReqId = useRef(0);

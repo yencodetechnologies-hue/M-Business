@@ -209,9 +209,11 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
             {prop.client || prop.clientName} · {prop.sentAt ? new Date(prop.sentAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : ""}
           </div>
         </div>
-        <span style={{ background: st === "approved" ? "#DCFCE7" : st === "rejected" ? "#FEE2E2" : "#EFF4FF", color: st === "approved" ? "#15803D" : st === "rejected" ? "#DC2626" : "#2563EB", borderRadius: 20, padding: "4px 14px", fontSize: 11, fontWeight: 800 }}>
-          {st.charAt(0).toUpperCase() + st.slice(1)}
-        </span>
+        {(st === "approved" || st === "rejected") && (
+          <span style={{ background: st === "approved" ? "#DCFCE7" : "#FEE2E2", color: st === "approved" ? "#15803D" : "#DC2626", borderRadius: 20, padding: "4px 14px", fontSize: 11, fontWeight: 800 }}>
+            {st.charAt(0).toUpperCase() + st.slice(1)}
+          </span>
+        )}
         <button onClick={() => printProposal(proposal)} style={{ background: "#f0fdfe", border: "1.5px solid #e0eef0", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #00BCD4))", display: "flex", alignItems: "center", gap: 6 }}>
           <i className="ti ti-printer"></i> Print / PDF
         </button>
@@ -557,9 +559,11 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
           <div style={{ fontSize: 15, fontWeight: 800, color: "#0D2027" }}>#{qt.quoteNo || q.quoteNo}</div>
           <div style={{ fontSize: 11, color: "#96B0B8" }}>{qt.client || clientName}</div>
         </div>
-        <span style={{ background: st === "approved" ? "#DCFCE7" : st === "rejected" ? "#FEE2E2" : "#EFF4FF", color: st === "approved" ? "#15803D" : st === "rejected" ? "#DC2626" : "#2563EB", borderRadius: 20, padding: "4px 14px", fontSize: 11, fontWeight: 800 }}>
-          {st.charAt(0).toUpperCase() + st.slice(1)}
-        </span>
+        {(st === "approved" || st === "rejected") && (
+          <span style={{ background: st === "approved" ? "#DCFCE7" : "#FEE2E2", color: st === "approved" ? "#15803D" : "#DC2626", borderRadius: 20, padding: "4px 14px", fontSize: 11, fontWeight: 800 }}>
+            {st.charAt(0).toUpperCase() + st.slice(1)}
+          </span>
+        )}
         <button onClick={() => window.print()} className="no-print" style={{ padding: "8px 16px", background: "#00BCD4", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: "pointer", color: "#fff", marginLeft: 12 }}>
           Print / PDF
         </button>
@@ -730,100 +734,9 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
             </div>
           </div>
 
-          {/* ── Client Signature display ── */}
-          <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", padding: "24px 28px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)" }}>
-            <div style={{ fontSize: 13, fontWeight: 800, color: "#607D86", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>Client Sign-off</div>
-            {q.clientSignature ? (
-              <div style={{ background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: 12, padding: "20px 24px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-                  <i className="ti ti-circle-check" style={{ fontSize: 18, color: "#15803D" }}></i>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: "#15803D" }}>You have approved this quotation</span>
-                  {q.clientSignedAt && (
-                    <span style={{ marginLeft: "auto", fontSize: 11, color: "#96B0B8", fontWeight: 600 }}>
-                      {new Date(q.clientSignedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                    </span>
-                  )}
-                </div>
-                <div style={{ background: "#fff", borderRadius: 10, border: "1px solid #86efac", padding: "16px 20px", textAlign: "center", maxWidth: 320, margin: "0 auto" }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: "#96B0B8", textTransform: "uppercase", letterSpacing: .6, marginBottom: 12 }}>Your Signature</div>
-                  <div style={{ height: 64, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
-                    {q.clientSignature.startsWith("data:image") ? (
-                      <img src={q.clientSignature} style={{ maxHeight: 60, maxWidth: "100%", objectFit: "contain" }} alt="your signature" />
-                    ) : (
-                      <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 28, color: "#0D2027" }}>{q.clientSignature}</span>
-                    )}
-                  </div>
-                  <div style={{ height: 1, background: "#15803D", marginBottom: 8 }} />
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "#0D2027" }}>{q.clientSignedBy || clientName}</div>
-                  <div style={{ fontSize: 10, color: "#15803D", fontWeight: 700, marginTop: 3 }}>Digitally Signed & Approved</div>
-                </div>
-              </div>
-            ) : (
-              <div style={{ fontSize: 12, color: "#96B0B8", marginBottom: 16 }}>Please sign below to formally approve this quotation.</div>
-            )}
-          </div>
 
-          {!q.clientSignature && !saved && (
-            <div style={{ background: "#fff", borderRadius: 14, border: "2px solid #00BCD4", padding: "24px 28px", boxShadow: "0 4px 20px rgba(0,188,212,0.1)" }}>
-              <div style={{ fontSize: 15, fontWeight: 800, color: "#0D2027", marginBottom: 4 }}>
-                <i className="ti ti-writing" style={{ color: "#00BCD4", marginRight: 8 }}></i>Awaiting Client Signature
-              </div>
-              <div style={{ fontSize: 12, color: "#96B0B8", marginBottom: 18 }}>Sign below to approve this quotation.</div>
-              <div style={{ display: "flex", gap: 4, background: "#f5fafa", borderRadius: 10, padding: 4, marginBottom: 16, width: "fit-content" }}>
-                {["draw", "type"].map(mode => (
-                  <button key={mode} onClick={() => setSigMode(mode)} style={{ padding: "6px 16px", borderRadius: 8, border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer", background: sigMode === mode ? "#00BCD4" : "transparent", color: sigMode === mode ? "#fff" : "#607D86" }}>
-                    {mode === "draw" ? "Draw" : "Type"}
-                  </button>
-                ))}
-              </div>
-              {sigMode === "draw" ? (
-                <div>
-                  <div style={{ background: "#f5fafa", border: "1.5px dashed #c5dde0", borderRadius: 10, overflow: "hidden", marginBottom: 12 }}>
-                    <canvas ref={canvasRef} style={{ width: "100%", height: 150, cursor: "crosshair", display: "block", touchAction: "none" }} />
-                  </div>
-                  <button onClick={clearCanvas} style={{ background: "none", border: "1px solid #e0eef0", borderRadius: 7, padding: "5px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: "#607D86", marginBottom: 12 }}>Clear</button>
-                </div>
-              ) : (
-                <div style={{ marginBottom: 16 }}>
-                  <input value={sigText} onChange={e => setSigText(e.target.value)} placeholder="Type your full name to sign..." style={{ width: "100%", padding: "12px 16px", border: "1.5px solid #e0eef0", borderRadius: 10, fontSize: 22, fontFamily: "'Dancing Script', cursive", color: "#0D2027", outline: "none", boxSizing: "border-box" }} />
-                </div>
-              )}
-              <button onClick={saveSignature} disabled={saving} style={{ width: "100%", padding: "13px", background: saving ? "#96B0B8" : "#00BCD4", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 800, cursor: saving ? "not-allowed" : "pointer" }}>
-                {saving ? "Saving Signature..." : "Sign & Approve Quotation"}
-              </button>
-            </div>
-          )}
 
-          {!q.clientSignature && saved && (
-            <div style={{ background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: 14, padding: "20px 28px", textAlign: "center" }}>
-              <i className="ti ti-circle-check" style={{ fontSize: 36, color: "#15803D" }}></i>
-              <div style={{ fontSize: 16, fontWeight: 800, color: "#15803D", marginTop: 8 }}>Quotation Approved!</div>
-            </div>
-          )}
 
-          {/* ── Review section ── */}
-          <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", padding: "24px 28px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: reviewSavedComment || reviewOpen ? 14 : 0 }}>
-              <div style={{ fontSize: 13, fontWeight: 800, color: "#607D86", textTransform: "uppercase", letterSpacing: 0.5 }}>Your Review</div>
-              {!reviewOpen && (
-                <button onClick={() => { setReviewOpen(true); setReviewText(reviewSavedComment || ""); }} style={{ background: "#f0fdfe", border: "1.5px solid #e0eef0", borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#00BCD4" }}>
-                  <i className="ti ti-message-2" style={{ marginRight: 5 }}></i>{reviewSavedComment ? "Edit Review" : "Review"}
-                </button>
-              )}
-            </div>
-            {reviewSavedComment && !reviewOpen && (
-              <div style={{ fontSize: 13, color: "#374151", background: "#f5fafa", borderRadius: 10, padding: "12px 16px", lineHeight: 1.6 }}>{reviewSavedComment}</div>
-            )}
-            {reviewOpen && (
-              <div>
-                <textarea value={reviewText} onChange={e => setReviewText(e.target.value)} rows={3} placeholder="Type your review or comments here..." style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e0eef0", borderRadius: 10, fontSize: 13, fontFamily: "inherit", resize: "vertical", outline: "none", boxSizing: "border-box", marginBottom: 10 }} />
-                <div style={{ display: "flex", gap: 8 }}>
-                  <button onClick={submitReview} disabled={reviewSaving} style={{ padding: "9px 18px", background: "#00BCD4", color: "#fff", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: reviewSaving ? "not-allowed" : "pointer" }}>{reviewSaving ? "Submitting..." : "Submit Review"}</button>
-                  <button onClick={() => setReviewOpen(false)} style={{ padding: "9px 18px", background: "#fff", color: "#607D86", border: "1.5px solid #e0eef0", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Cancel</button>
-                </div>
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </div>
@@ -907,6 +820,18 @@ function QuickApprovePopup({ target, clientName, BASE_URL, onClose, onApproved }
       const endpoint = target.type === "quotation" ? `${BASE_URL}/api/quotations/${id}/client-sign` : `${BASE_URL}/api/proposals/${id}/client-sign`;
       const res = await axios.put(endpoint, { clientSignature: sigData, clientName, sigMode });
       onApproved(target.type, res.data);
+      const docLabel = target.type === "quotation" ? (target.doc.quoteNo || "Quotation") : (target.doc.title || "Proposal");
+      const notifCompanyId = target.doc.companyId || "";
+      if (notifCompanyId) {
+        axios.post(`${BASE_URL}/api/notifications`, {
+          userId: notifCompanyId,
+          companyId: notifCompanyId,
+          type: "success",
+          icon: "✅",
+          text: `${clientName || "Client"} approved & signed ${target.type === "quotation" ? "quotation" : "proposal"} "${docLabel}"`,
+          link: target.type === "quotation" ? "quotations" : "projectProposals"
+        }).catch(() => { });
+      }
       alert(`${target.type === "quotation" ? "Quotation" : "Proposal"} approved successfully!`);
     } catch (err) {
       console.error("Approve error:", err);
@@ -962,6 +887,18 @@ function QuickReviewPopup({ target, BASE_URL, onClose, onReviewed }) {
         ? await axios.patch(`${BASE_URL}/api/quotations/${id}/review`, { comment: text.trim() })
         : await axios.put(`${BASE_URL}/api/proposals/${id}/review`, { comment: text.trim() });
       onReviewed(target.type, res.data.quotation || res.data.proposal || res.data);
+      const docLabel = target.type === "quotation" ? (target.doc.quoteNo || "Quotation") : (target.doc.title || "Proposal");
+      const notifCompanyId = target.doc.companyId || "";
+      if (notifCompanyId) {
+        axios.post(`${BASE_URL}/api/notifications`, {
+          userId: notifCompanyId,
+          companyId: notifCompanyId,
+          type: "warning",
+          icon: "💬",
+          text: `Client left a review on ${target.type === "quotation" ? "quotation" : "proposal"} "${docLabel}": "${text.trim().slice(0, 60)}${text.trim().length > 60 ? "…" : ""}"`,
+          link: target.type === "quotation" ? "quotations" : "projectProposals"
+        }).catch(() => { });
+      }
       alert("Review submitted. Thank you!");
     } catch (err) {
       console.error("Review error:", err);
@@ -3748,7 +3685,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             <div className="sec-header">
               <div className="sec-title">
                 <div className="sec-title-icon" style={{ background: "#EDE9FE", color: "#7C3AED" }}><i className="ti ti-presentation"></i></div>
-                Project Proposals
+                Project Proposals ({proposals.length})
               </div>
               <div style={{ fontSize: 12, color: C.text3, fontWeight: 600 }}>{proposals.length} proposal{proposals.length !== 1 ? "s" : ""} received</div>
             </div>
@@ -3791,7 +3728,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                           {prop.rejectNote && st === "rejected" && (
                             <span style={{ fontSize: 11, color: "#DC2626", fontWeight: 600 }}>Note: {prop.rejectNote}</span>
                           )}
-                          {prop.clientSignature && (
+                          {prop.clientSignature && (prop.status || "").toLowerCase() === "approved" && (
                             <span style={{ fontSize: 11, color: C.green, fontWeight: 700 }}>
                               <i className="ti ti-writing" style={{ fontSize: 11 }}></i> Signed by client
                             </span>
@@ -3857,7 +3794,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             <div className="sec-header">
               <div className="sec-title">
                 <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-file-invoice"></i></div>
-                My Quotations
+                My Quotations ({quotations.length})
               </div>
               <div style={{ fontSize: 12, color: C.text3, fontWeight: 600 }}>{quotations.length} quotation{quotations.length !== 1 ? "s" : ""} received</div>
             </div>
@@ -3904,8 +3841,8 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                           const qBadge = qst === "approved" ? { bg: "#DCFCE7", color: "#15803D", label: "Approved" }
                             : qst === "rejected" ? { bg: "#FEE2E2", color: "#DC2626", label: "Rejected" }
                               : qst === "pending" ? { bg: "#FEF3C7", color: "#B45309", label: "Under Review" }
-                                : { bg: "#EFF4FF", color: "#2563EB", label: "Sent" };
-                          return <span style={{ background: qBadge.bg, color: qBadge.color, borderRadius: 20, padding: "4px 12px", fontSize: 11, fontWeight: 800 }}>{qBadge.label}</span>;
+                                : null;
+                          return qBadge ? <span style={{ background: qBadge.bg, color: qBadge.color, borderRadius: 20, padding: "4px 12px", fontSize: 11, fontWeight: 800 }}>{qBadge.label}</span> : null;
                         })()}
                         <div style={{ display: "flex", gap: 8 }}>
                           <button

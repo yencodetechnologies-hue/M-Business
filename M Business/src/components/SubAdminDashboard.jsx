@@ -10209,11 +10209,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   {/* FLOATING STAT STRIP */}
                   <div style={{ margin: "-72px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
                     {[
-                      { icon: "ti-users", label: "Clients", val: clients.length, grad: "linear-gradient(135deg,#7c3aed,#a78bfa)" },
-                      { icon: "ti-folder", label: "Projects", val: projects.length, grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
-                      { icon: "ti-user-circle", label: "Team", val: employees.length, grad: "linear-gradient(135deg,#f59e0b,#fbbf24)" },
+                      { id: "mobClients", icon: "ti-users", label: "Clients", val: clients.length, grad: "linear-gradient(135deg,#7c3aed,#a78bfa)" },
+                      { id: "mobProjects", icon: "ti-folder", label: "Projects", val: projects.length, grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+                      { id: "mobTeam", icon: "ti-user-circle", label: "Team", val: employees.length, grad: "linear-gradient(135deg,#f59e0b,#fbbf24)" },
                     ].map((s, i) => (
-                      <div key={i} className="mob-card" style={{ animationDelay: `${i * 60}ms`, background: "#fff", borderRadius: 18, padding: "14px 10px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)" }}>
+                      <div key={i} className="mob-card" onClick={() => openMobilePopup(s.id)} style={{ animationDelay: `${i * 60}ms`, background: "#fff", borderRadius: 18, padding: "14px 10px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)", cursor: "pointer" }}>
                         <div style={{ width: 34, height: 34, borderRadius: 11, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", color: "#fff", fontSize: 15, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
                           <i className={`ti ${s.icon}`}></i>
                         </div>
@@ -10222,6 +10222,86 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       </div>
                     ))}
                   </div>
+
+                  <MobilePopup id="mobClients" title="Clients">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>{clients.length} total</div>
+                    <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", marginBottom: 16 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} Active Clients</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {clients.map((c, i) => (
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
+                          <span style={{ fontWeight: 600 }}>{c.name || c.clientName || c.companyName || "Client"}</span>
+                          <span style={{ color: "rgba(15,28,46,0.5)" }}>{c.status || "-"}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </MobilePopup>
+
+                  <MobilePopup id="mobProjects" title="Projects">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{projects.length} total</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {projectsWithProgress.map((p, i) => (
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
+                          <span style={{ fontWeight: 600 }}>{p.name}</span>
+                          <span style={{ color: "rgba(15,28,46,0.5)" }}>{p.progress || 0}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  </MobilePopup>
+
+                  <MobilePopup id="mobTeam" title="Team">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{employees.length} staff</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {employees.map((e, i) => (
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
+                          <span style={{ fontWeight: 600 }}>{e.name}</span>
+                          <span style={{ color: "rgba(15,28,46,0.5)" }}>{e.role || "Employee"}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </MobilePopup>
+
+                  {/* REVENUE / UNPAID INVOICES CARDS */}
+                  <div style={{ margin: "10px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}>
+                    <div
+                      className="mob-card"
+                      onClick={() => openMobilePopup('mobRevenue')}
+                      style={{ background: "#fff", borderRadius: 18, padding: "14px 12px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", border: "1px solid rgba(0,0,0,0.03)", cursor: "pointer" }}
+                    >
+                      <div style={{ width: 34, height: 34, borderRadius: 11, background: "rgba(0,188,212,0.1)", color: "#0097A7", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8, fontSize: 16 }}>
+                        <i className="ti ti-currency-rupee"></i>
+                      </div>
+                      <div style={{ fontSize: 17, fontWeight: 900, color: "#0f0a29" }}>{formatShortCurrency(income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0))}</div>
+                      <div style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 700, marginTop: 1 }}>Revenue This Month</div>
+                    </div>
+                    <div
+                      className="mob-card"
+                      onClick={() => openMobilePopup('mobUnpaidInvoices')}
+                      style={{ background: "#fff", borderRadius: 18, padding: "14px 12px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", border: "1px solid rgba(0,0,0,0.03)", cursor: "pointer" }}
+                    >
+                      <div style={{ width: 34, height: 34, borderRadius: 11, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8, fontSize: 16 }}>
+                        <i className="ti ti-file-invoice"></i>
+                      </div>
+                      <div style={{ fontSize: 17, fontWeight: 900, color: "#0f0a29" }}>{invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length}</div>
+                      <div style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 700, marginTop: 1 }}>Unpaid Invoices</div>
+                    </div>
+                  </div>
+
+                  <MobilePopup id="mobRevenue" title="Revenue This Month">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>{formatShortCurrency(income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0))}</div>
+                    <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)" }}>Total income this year: {formatShortCurrency(income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0))}</div>
+                  </MobilePopup>
+
+                  <MobilePopup id="mobUnpaidInvoices" title="Unpaid Invoices">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length} pending</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").map((inv, i) => (
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
+                          <span style={{ fontWeight: 600 }}>{inv.clientName || inv.client || "Client"}</span>
+                          <span style={{ color: "rgba(15,28,46,0.5)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </MobilePopup>
 
                   {/* QUICK ACTIONS — pill scroller */}
                   <div style={{ padding: "22px 16px 6px" }}>

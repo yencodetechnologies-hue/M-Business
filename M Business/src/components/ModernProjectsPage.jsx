@@ -876,11 +876,9 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit, empl
             <div>
               <label style={LBL}>Status</label>
               <select style={INP} value={form.status} onChange={e => f('status', e.target.value)}>
-                <option value="In Progress">In Progress</option>
                 <option value="Active">Active</option>
                 <option value="On Hold">On Hold</option>
                 <option value="Completed">Completed</option>
-                <option value="Pending">Pending</option>
                 <option value="Overdue">Overdue</option>
               </select>
             </div>

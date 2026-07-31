@@ -18,7 +18,7 @@ const projectSchema = new mongoose.Schema({
   pending: { type: Number, default: 0 },
   spent: { type: Number, default: 0 },
   team: { type: String, default: "" },
-  status: { type: String, default: "Pending" },
+  status: { type: String, enum: ["Active", "On Hold", "Completed", "Overdue"], default: "Active" },
   progress: { type: Number, default: 0 },
   tasks: { type: Number, default: 0 },
   completedTasks: { type: Number, default: 0 },
@@ -138,7 +138,7 @@ const projectSchema = new mongoose.Schema({
       amount: { type: Number, default: 0 },
       approvedBy: { type: String, default: "" },
       date: { type: String, default: "" },
-      status: { type: String, default: "Pending" },
+      status: { type: String, enum: ["Active", "On Hold", "Completed", "Overdue"], default: "Active" },
       notes: { type: String, default: "" },
       notifyClient: { type: Boolean, default: false },
       createdAt: { type: Date, default: Date.now }

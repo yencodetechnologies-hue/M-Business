@@ -7701,6 +7701,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
   const [quotations, setQuotations] = useState([]);
+  const [proposalsList, setProposalsList] = useState([]);
 
   const [vendors, setVendors] = useState([]);
 
@@ -7953,7 +7954,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     fetchProfile();
     Promise.all([
       fetchManagers(), fetchSubadmins(), fetchPackages(),
-      fetchSubscription(), fetchQuotations(), fetchPaymentHistory(), fetchVendors(),
+      fetchSubscription(), fetchQuotations(), fetchProposalsList(), fetchPaymentHistory(), fetchVendors(),
       fetchInvoices(), fetchIncome(), fetchExpenses(), fetchTasks(), fetchConfig()
     ]).catch(e => console.log("Background fetch error:", e));
     fetchPendingLeaves(); fetchEmployeeDocs(); fetchNotifications();
@@ -8790,6 +8791,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   };
 
 
+
+  const fetchProposalsList = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/api/proposals");
+      const apiDocs = Array.isArray(res.data?.proposals) ? res.data.proposals : (Array.isArray(res.data) ? res.data : []);
+      setProposalsList(apiDocs);
+    } catch (e) {
+      console.log(e);
+      setProposalsList([]);
+    }
+  };
 
   const fetchQuotations = async () => {
 
@@ -10311,13 +10323,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     {[
                       { id: "qaInvoice", icon: "ti-file-invoice", label: "Invoices", color: "#0d9488", bg: "rgba(13,148,136,0.1)", val: invoices.length, sub: `${invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length} unpaid` },
 
-                      { id: "qaProposal", icon: "ti-clipboard-list", label: "Proposals", color: "#16a34a", bg: "rgba(22,163,74,0.1)", val: null, sub: "View list", nav: () => { setSidebarOverride("dashboard"); setActive("proposals"); } },
-                      { id: "qaQuote", icon: "ti-receipt", label: "Quotations", color: "#2563eb", bg: "rgba(37,99,235,0.1)", val: (quotations || []).length, sub: "Total", nav: () => { setSidebarOverride("dashboard"); setActive("quotations"); } },
+                      { id: "qaProposal", icon: "ti-clipboard-list", label: "Proposals", color: "#16a34a", bg: "rgba(22,163,74,0.1)", val: (proposalsList || []).length, sub: "Total" },
+                      { id: "qaQuote", icon: "ti-receipt", label: "Quotations", color: "#2563eb", bg: "rgba(37,99,235,0.1)", val: (quotations || []).length, sub: "Total" },
                     ].map((a, i) => (
                       <div
                         key={i}
                         className="mob-card"
-                        onClick={() => a.nav ? a.nav() : openMobilePopup(a.id)}
+                        onClick={() => openMobilePopup(a.id)}
                         style={{ background: "#fff", borderRadius: 16, padding: 16, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", cursor: "pointer" }}
                       >
                         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
@@ -10331,6 +10343,44 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       </div>
                     ))}
                   </div>
+                  <MobilePopup id="qaQuote" title="Quotations">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{(quotations || []).length} total</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                      {(quotations || []).map((q, i) => (
+                        <div key={q._id || q.id || i} style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 10 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                            <span style={{ fontWeight: 700, fontSize: 13 }}>{q.qt?.quoteNo || q.quoteNo || q.clientName || "Quotation"}</span>
+                            <span style={{ color: (q.status || "").toLowerCase() === "approved" ? "#15803D" : "#7B8FA1", fontWeight: (q.status || "").toLowerCase() === "approved" ? 800 : 600, fontSize: 11 }}>{(q.status || "draft").toUpperCase()}</span>
+                          </div>
+                          {q.reviewComment && (
+                            <div style={{ fontSize: 11, color: "#0EA5E9", marginTop: 3 }}>
+                              <i className="ti ti-message-2" style={{ fontSize: 11 }}></i> {q.reviewComment}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </MobilePopup>
+
+                  <MobilePopup id="qaProposal" title="Proposals">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{(proposalsList || []).length} total</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                      {(proposalsList || []).map((p, i) => (
+                        <div key={p._id || p.id || i} style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 10 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                            <span style={{ fontWeight: 700, fontSize: 13 }}>{p.title || "Proposal"}</span>
+                            <span style={{ color: (p.status || "").toLowerCase() === "approved" ? "#15803D" : "#7B8FA1", fontWeight: (p.status || "").toLowerCase() === "approved" ? 800 : 600, fontSize: 11 }}>{(p.status || "draft").toUpperCase()}</span>
+                          </div>
+                          {p.reviewComment && (
+                            <div style={{ fontSize: 11, color: "#0EA5E9", marginTop: 3 }}>
+                              <i className="ti ti-message-2" style={{ fontSize: 11 }}></i> {p.reviewComment}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </MobilePopup>
+
                   <MobilePopup id="qaInvoice" title="Invoices">
                     <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{invoices.length} total</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

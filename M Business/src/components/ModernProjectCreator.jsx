@@ -750,7 +750,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
               <div className="mpc-form-group">
                 <label>Status</label>
                 <select value={status} onChange={e => setStatus(e.target.value)}>
-                  <option>Active</option><option>Planning</option><option>On Hold</option>
+                  <option>Active</option><option>On Hold</option><option>Completed</option><option>Overdue</option>
                 </select>
               </div>
               <div className="mpc-form-group">

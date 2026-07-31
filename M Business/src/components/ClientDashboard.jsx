@@ -1184,9 +1184,16 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
         const myClientIdStr = String(user._id || user.id || "");
         const cn = (clientName || "").toLowerCase().trim();
         const filteredQuots = allQuots.filter(q => {
-          if (!["sent", "pending", "approved", "rejected"].includes(q.status)) return false;
+          if (!["sent", "pending", "approved", "rejected"].includes(q.status)) {
+            console.log("[QUOTE DROPPED - status]", q.qt?.quoteNo || q.quoteNo, "status:", q.status);
+            return false;
+          }
           const qClient = (q.client || q.qt?.client || q.qt?.toName || "").toLowerCase().trim();
-          return qClient === cn;
+          const matches = qClient === cn;
+          if (!matches) {
+            console.log("[QUOTE DROPPED - client mismatch]", q.qt?.quoteNo || q.quoteNo, "qClient:", JSON.stringify(qClient), "expected cn:", JSON.stringify(cn));
+          }
+          return matches;
         });
         setQuotations(filteredQuots);
         setApprovals(Array.isArray(approvalRes.data) ? approvalRes.data.map(a => ({
@@ -3722,6 +3729,11 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                           {quoteDate && (
                             <span style={{ fontSize: 11, color: C.text3, fontWeight: 600 }}>
                               <i className="ti ti-clock" style={{ fontSize: 11 }}></i> {new Date(quoteDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                            </span>
+                          )}
+                          {q.clientSignature && (
+                            <span style={{ fontSize: 11, color: C.green, fontWeight: 700 }}>
+                              <i className="ti ti-writing" style={{ fontSize: 11 }}></i> Signed by client
                             </span>
                           )}
                         </div>

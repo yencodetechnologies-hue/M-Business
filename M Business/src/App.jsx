@@ -135,7 +135,7 @@ export default function App() {
             }
           />
 
-          <Route path="/tasks" element={user ? <TasksPage /> : <Navigate to="/" replace />} />
+          <Route path="/process" element={user ? <Dashboard key={user.email || user.id} user={user} setUser={handleSetUser} /> : <Navigate to="/" replace />} />
           <Route path="/canvas" element={user ? <CanvasPage /> : <Navigate to="/" replace />} />
           <Route path="/invoice-view" element={user ? <InvoiceViewer /> : <Navigate to="/" replace />} />
           <Route path="/quotation-view" element={user ? <QuotationViewer /> : <Navigate to="/" replace />} />

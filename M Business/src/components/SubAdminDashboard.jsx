@@ -7027,6 +7027,61 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
+  // ── Mobile collapsible dashboard sections ──────────────────────────────
+  const [mobileOpenSections, setMobileOpenSections] = useState({
+    revenue: true,
+    clients: false,
+    activeProjects: false,
+    unpaidInvoices: false,
+    employees: false,
+    projectsList: false,
+    quickAccess: false,
+    team: false,
+    leaveRequests: false,
+    overdueTasks: false,
+    documentRequests: false,
+    quotations: false,
+    proposals: false,
+    templates: false,
+    messages: false,
+    clientPortal: false,
+    accounts: false,
+    whatsapp: false,
+  });
+  const toggleMobileSection = (key) => {
+    setMobileOpenSections(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+  // Wraps a section's heading + content. Desktop renders normally (no collapse).
+  // Mobile renders a clickable heading row with a ▼/▶ arrow that toggles content.
+  const MobileSection = ({ id, title, icon, children, defaultOpenDesktop = true }) => {
+    const isOpen = isDesktopWidth ? defaultOpenDesktop : !!mobileOpenSections[id];
+    return (
+      <div style={{ background: "#ffffff", borderRadius: 16, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", overflow: "hidden" }}>
+        <div
+          onClick={() => !isDesktopWidth && toggleMobileSection(id)}
+          style={{
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+            padding: "16px 20px", cursor: isDesktopWidth ? "default" : "pointer", userSelect: "none",
+          }}
+        >
+          <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+            {icon} {title}
+          </div>
+          {!isDesktopWidth && (
+            <span style={{ fontSize: 14, color: "var(--app-accent)", fontWeight: 900 }}>
+              {isOpen ? "▼" : "▶"}
+            </span>
+          )}
+        </div>
+        {isOpen && (
+          <div style={{ padding: "0 20px 20px 20px" }}>
+            {children}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const [companyLogo, setCompanyLogo] = useState(user?.logoUrl ? user.logoUrl : (fixedLogo || null));
 
   const [cropImage, setCropImage] = useState(null);

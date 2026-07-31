@@ -10303,24 +10303,30 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
                   </MobilePopup>
 
-                  {/* QUICK ACTIONS — pill scroller */}
-                  <div style={{ padding: "22px 16px 6px" }}>
-                    <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
-                      {[
-                        { id: "qaInvoice", icon: "ti-file-invoice", label: "Invoice", color: "#0d9488", bg: "linear-gradient(135deg,#ccfbf1,#99f6e4)" },
-                        { id: "qaClient", icon: "ti-user-plus", label: "Client", color: "#7c3aed", bg: "linear-gradient(135deg,#ede9fe,#ddd6fe)" },
-                        { id: "qaProject", icon: "ti-folder-plus", label: "Project", color: "#d97706", bg: "linear-gradient(135deg,#fef3c7,#fde68a)" },
-                        { id: "qaProposal", icon: "ti-clipboard-list", label: "Proposal", color: "#16a34a", bg: "linear-gradient(135deg,#dcfce7,#bbf7d0)" },
-                        { id: "qaQuote", icon: "ti-receipt", label: "Quote", color: "#2563eb", bg: "linear-gradient(135deg,#dbeafe,#bfdbfe)" },
-                      ].map((a, i) => (
-                        <div key={i} onClick={() => openMobilePopup(a.id)} style={{ flex: "0 0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 6, cursor: "pointer", minWidth: 68 }}>
-                          <div style={{ width: 52, height: 52, borderRadius: 16, background: a.bg, color: a.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 6px 16px rgba(0,0,0,0.06)" }}>
+                  {/* QUICK ACTION CARDS — proper dashboard-card style, tap opens popup */}
+                  <div style={{ padding: "22px 16px 6px", display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}>
+                    {[
+                      { id: "qaInvoice", icon: "ti-file-invoice", label: "Invoices", color: "#0d9488", bg: "rgba(13,148,136,0.1)", val: invoices.length, sub: `${invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length} unpaid` },
+
+                      { id: "qaProposal", icon: "ti-clipboard-list", label: "Proposals", color: "#16a34a", bg: "rgba(22,163,74,0.1)", val: null, sub: "View list" },
+                      { id: "qaQuote", icon: "ti-receipt", label: "Quotations", color: "#2563eb", bg: "rgba(37,99,235,0.1)", val: (quotations || []).length, sub: "Total" },
+                    ].map((a, i) => (
+                      <div
+                        key={i}
+                        className="mob-card"
+                        onClick={() => openMobilePopup(a.id)}
+                        style={{ background: "#fff", borderRadius: 16, padding: 16, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", cursor: "pointer" }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                          <div style={{ width: 34, height: 34, borderRadius: 10, background: a.bg, color: a.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>
                             <i className={`ti ${a.icon}`}></i>
                           </div>
-                          <div style={{ fontSize: 10.5, fontWeight: 700, color: "#334155" }}>{a.label}</div>
+                          {a.val !== null && <div style={{ fontSize: 20, fontWeight: 800, color: "#0f1c2e" }}>{a.val}</div>}
                         </div>
-                      ))}
-                    </div>
+                        <div style={{ fontSize: 12.5, fontWeight: 700, color: "#0f1c2e" }}>{a.label}</div>
+                        <div style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 600, marginTop: 2 }}>{a.sub}</div>
+                      </div>
+                    ))}
                   </div>
                   <MobilePopup id="qaInvoice" title="Invoices">
                     <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{invoices.length} total</div>
@@ -10853,50 +10859,74 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                 style={{ position: "relative" }}
                               >
                                 <MobileCardArrow id="activeProjects" />
-                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
+                                <div
+                                  onClick={() => !isDesktopWidth && openMobilePopup('activeProjects')}
+                                  style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column", cursor: isDesktopWidth ? "default" : "pointer" }}
+                                >
                                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                                       <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37,99,235,0.1)", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
                                         <i className="ti ti-folder"></i>
                                       </div>
                                       <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
-                                        {activeProjCount}
+                                        {projects.length}
                                       </div>
                                     </div>
-                                    {activeProjCount > 0 && (
+                                    {projects.length > 0 && (
                                       <div style={{ background: "#f1f5f9", color: "#64748b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-                                        Active
+                                        {activeProjCount} Active
                                       </div>
                                     )}
                                   </div>
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Active Projects</div>
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Projects</div>
                                 </div>
-                                <HoverPopup id="activeProjects" title="Active Projects">
-                                  <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{activeProjCount} active</div>
-                                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                                    {projects.filter(p => p.status === "Active" || p.status === "Pending").slice(0, 8).map((p, i) => (
-                                      <div key={i} style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
-                                        <div style={{ fontWeight: 700, fontSize: 12 }}>{p.name}</div>
-                                        <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>
-                                          Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"} · {p.progress || 0}%
+                                {(() => {
+                                  const statusMeta = (raw) => {
+                                    const s = (raw || "").toLowerCase().replace(/[\s_-]/g, "");
+                                    if (["active", "inprogress", "inreview", "started"].includes(s)) return { label: "Active", bg: "#dcfce7", color: "#16a34a" };
+                                    if (["onhold", "hold", "paused", "suspended"].includes(s)) return { label: "On Hold", bg: "#f3e8ff", color: "#7c3aed" };
+                                    if (["completed", "done", "delivered", "closed"].includes(s)) return { label: "Completed", bg: "#dbeafe", color: "#2563eb" };
+                                    if (["overdue", "late"].includes(s)) return { label: "Overdue", bg: "#fee2e2", color: "#dc2626" };
+                                    return { label: raw || "On Hold", bg: "#f3e8ff", color: "#7c3aed" };
+                                  };
+                                  const renderProjectRow = (p, i) => {
+                                    const meta = statusMeta(p.status);
+                                    return (
+                                      <div
+                                        key={p._id || p.id || i}
+                                        onClick={() => { closeMobilePopup(); setHoverPopupSection(null); setJumpProject(p); setProjectDetailsReadOnly(true); setActive("project-details"); }}
+                                        style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 10, marginBottom: 2, cursor: "pointer" }}
+                                      >
+                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                                          <div style={{ fontWeight: 700, fontSize: 13, flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
+                                          <span style={{ background: meta.bg, color: meta.color, padding: "2px 8px", borderRadius: 20, fontSize: 10, fontWeight: 800, flexShrink: 0 }}>{meta.label}</span>
+                                        </div>
+                                        <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 3 }}>
+                                          Due {(p.end || p.deadline) ? new Date(p.end || p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}
+                                        </div>
+                                        <div style={{ height: 5, background: "#f1f5f9", borderRadius: 3, marginTop: 6, overflow: "hidden" }}>
+                                          <div style={{ width: `${p.progress || 0}%`, height: "100%", background: meta.color, borderRadius: 3 }}></div>
                                         </div>
                                       </div>
-                                    ))}
-                                  </div>
-                                </HoverPopup>
-                                <MobilePopup id="activeProjects" title="Active Projects">
-                                  <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{activeProjCount} active</div>
-                                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                                    {projects.filter(p => p.status === "Active" || p.status === "Pending").map((p, i) => (
-                                      <div key={i} style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 10 }}>
-                                        <div style={{ fontWeight: 700, fontSize: 13 }}>{p.name}</div>
-                                        <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>
-                                          Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"} · {p.progress || 0}%
+                                    );
+                                  };
+                                  return (
+                                    <>
+                                      <HoverPopup id="activeProjects" title="Projects">
+                                        <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{projects.length} total</div>
+                                        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                                          {projectsWithProgress.slice(0, 8).map(renderProjectRow)}
                                         </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </MobilePopup>
+                                      </HoverPopup>
+                                      <MobilePopup id="activeProjects" title="Projects">
+                                        <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{projects.length} total</div>
+                                        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                          {projectsWithProgress.map(renderProjectRow)}
+                                        </div>
+                                      </MobilePopup>
+                                    </>
+                                  );
+                                })()}
                               </div>
 
 

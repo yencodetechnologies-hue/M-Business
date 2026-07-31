@@ -518,7 +518,21 @@ function QuotationViewerModal({ quotation, clientName, BASE_URL, onClose, onSign
   const qt = q.qt || {};
   const items = q.items || [];
   const st = (q.status || "sent").toLowerCase();
-  const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity || i.qty) || 0), 0);
+
+  const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity || i.qty) || 0), 0);
+  const gstRate = parseFloat(qt.gstRate) || 0;
+  let subtotal, gstAmt, total;
+  if (qt.isGstIncluded) {
+    total = subtotalRaw;
+    subtotal = total / (1 + gstRate / 100);
+    gstAmt = total - subtotal;
+  } else {
+    subtotal = subtotalRaw;
+    gstAmt = subtotal * (gstRate / 100);
+    total = subtotal + gstAmt;
+  }
+  const amountPaid = parseFloat(qt.amountPaid) || 0;
+  const balanceDue = total - amountPaid;
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.6)", display: "flex", flexDirection: "column" }}>

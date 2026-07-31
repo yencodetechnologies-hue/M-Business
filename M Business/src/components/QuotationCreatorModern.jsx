@@ -1463,20 +1463,6 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
                   <div className="quo-notes-lbl">Notes</div>
                   <div className="quo-notes-text">{qt.notes || 'Payment terms and conditions apply.'}</div>
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div className="quo-sig-line"></div>
-                  <div className="quo-sig-name">{qt.fromName || 'Authorised Signatory'}</div>
-                  <div className="quo-sig-role">{qt.fromCompany}</div>
-                </div>
-              </div>
-
-              {/* CTA */}
-              <div className="quo-cta">
-                <div className="quo-cta-text">Client action on this quotation:</div>
-                <div className="quo-cta-btns">
-                  <button className="quo-cta-btn accept">Success Accept Quote</button>
-                  <button className="quo-cta-btn negotiate">Partnership Negotiate</button>
-                </div>
               </div>
             </div>
           </div>

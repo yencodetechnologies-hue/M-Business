@@ -238,88 +238,60 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
             <>
               <style>{PROPOSAL_PREVIEW_CSS}</style>
               <div className="prop-doc" style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", maxHeight: "none", overflow: "visible" }}
-                dangerouslySetInnerHTML={{ __html: prop.html }} />
-            </>
-          ) : prop.slides && prop.slides.length > 0 ? (
-            <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", padding: "32px 40px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
-              {/* Slide-based proposal summary */}
-              <div style={{ textAlign: "center", marginBottom: 28 }}>
-                <div style={{ fontSize: 28, fontWeight: 900, color: "#0D2027", marginBottom: 6 }}>{prop.title}</div>
-                <div style={{ fontSize: 14, color: "#607D86" }}>Prepared for {prop.client || prop.clientName}</div>
-                <div style={{ fontSize: 13, color: "#96B0B8", marginTop: 4 }}>
-                  {prop.sentAt ? new Date(prop.sentAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) : ""}
+                dangerouslySetInnerHTML={{
+                  __html: (() => {
+                    const div = document.createElement("div");
+                    div.innerHTML = prop.html || "";
+                    div.querySelectorAll(".sop").forEach(el => {
+                      const wrapper = el.closest(".ps") || el.parentElement;
+                      if (wrapper) wrapper.remove();
+                    });
+                    return div.innerHTML;
+                  })()
+                }} />
+            </>) : prop.slides && prop.slides.length > 0 ? (
+              <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", padding: "32px 40px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+                {/* Slide-based proposal summary */}
+                <div style={{ textAlign: "center", marginBottom: 28 }}>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: "#0D2027", marginBottom: 6 }}>{prop.title}</div>
+                  <div style={{ fontSize: 14, color: "#607D86" }}>Prepared for {prop.client || prop.clientName}</div>
+                  <div style={{ fontSize: 13, color: "#96B0B8", marginTop: 4 }}>
+                    {prop.sentAt ? new Date(prop.sentAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) : ""}
+                  </div>
                 </div>
+                <div style={{ borderTop: "2px solid  var(--app-accent, var(--app-accent, #00BCD4))", marginBottom: 24 }}></div>
+                {prop.slides.map((slide, si) => (
+                  <div key={si} style={{ marginBottom: 20, padding: "16px 20px", background: "#f5fafa", borderRadius: 10, border: "1px solid #e0eef0" }}>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: " var(--app-accent, var(--app-accent, #00BCD4))", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>{slide.type}</div>
+                    {slide.heading && <div style={{ fontSize: 16, fontWeight: 700, color: "#0D2027", marginBottom: 4 }}>{slide.heading}</div>}
+                    {slide.title && <div style={{ fontSize: 16, fontWeight: 700, color: "#0D2027", marginBottom: 4 }}>{slide.title}</div>}
+                    {slide.body && <div style={{ fontSize: 13, color: "#4E6B75", lineHeight: 1.7 }}>{slide.body}</div>}
+                    {slide.subtitle && <div style={{ fontSize: 13, color: "#4E6B75" }}>{slide.subtitle}</div>}
+                    {slide.items && slide.items.map((item, ii) => (
+                      <div key={ii} style={{ fontSize: 13, color: "#4E6B75", padding: "4px 0", borderBottom: "1px solid #e0eef0" }}>Yes {item}</div>
+                    ))}
+                    {slide.rows && slide.rows.map((row, ri) => (
+                      <div key={ri} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "4px 0", borderBottom: "1px solid #e0eef0" }}>
+                        <span>{row.item}</span><span style={{ fontWeight: 700 }}>{row.cost}</span>
+                      </div>
+                    ))}
+                    {slide.total && <div style={{ fontSize: 14, fontWeight: 800, color: " var(--app-accent, var(--app-accent, #00BCD4))", marginTop: 8 }}>Total: {slide.total}</div>}
+                    {slide.phases && slide.phases.map((ph, pi) => (
+                      <div key={pi} style={{ fontSize: 13, color: "#4E6B75", padding: "3px 0" }}>Phase {pi + 1}: {ph.label} — {ph.dur}</div>
+                    ))}
+                    {slide.members && slide.members.map((m, mi) => (
+                      <div key={mi} style={{ fontSize: 13, color: "#4E6B75", padding: "3px 0" }}>{m.name} — {m.role}</div>
+                    ))}
+                  </div>
+                ))}
               </div>
-              <div style={{ borderTop: "2px solid  var(--app-accent, var(--app-accent, #00BCD4))", marginBottom: 24 }}></div>
-              {prop.slides.map((slide, si) => (
-                <div key={si} style={{ marginBottom: 20, padding: "16px 20px", background: "#f5fafa", borderRadius: 10, border: "1px solid #e0eef0" }}>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: " var(--app-accent, var(--app-accent, #00BCD4))", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>{slide.type}</div>
-                  {slide.heading && <div style={{ fontSize: 16, fontWeight: 700, color: "#0D2027", marginBottom: 4 }}>{slide.heading}</div>}
-                  {slide.title && <div style={{ fontSize: 16, fontWeight: 700, color: "#0D2027", marginBottom: 4 }}>{slide.title}</div>}
-                  {slide.body && <div style={{ fontSize: 13, color: "#4E6B75", lineHeight: 1.7 }}>{slide.body}</div>}
-                  {slide.subtitle && <div style={{ fontSize: 13, color: "#4E6B75" }}>{slide.subtitle}</div>}
-                  {slide.items && slide.items.map((item, ii) => (
-                    <div key={ii} style={{ fontSize: 13, color: "#4E6B75", padding: "4px 0", borderBottom: "1px solid #e0eef0" }}>Yes {item}</div>
-                  ))}
-                  {slide.rows && slide.rows.map((row, ri) => (
-                    <div key={ri} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "4px 0", borderBottom: "1px solid #e0eef0" }}>
-                      <span>{row.item}</span><span style={{ fontWeight: 700 }}>{row.cost}</span>
-                    </div>
-                  ))}
-                  {slide.total && <div style={{ fontSize: 14, fontWeight: 800, color: " var(--app-accent, var(--app-accent, #00BCD4))", marginTop: 8 }}>Total: {slide.total}</div>}
-                  {slide.phases && slide.phases.map((ph, pi) => (
-                    <div key={pi} style={{ fontSize: 13, color: "#4E6B75", padding: "3px 0" }}>Phase {pi + 1}: {ph.label} — {ph.dur}</div>
-                  ))}
-                  {slide.members && slide.members.map((m, mi) => (
-                    <div key={mi} style={{ fontSize: 13, color: "#4E6B75", padding: "3px 0" }}>{m.name} — {m.role}</div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          ) : (
+            ) : (
             <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", padding: 40, textAlign: "center", color: "#96B0B8" }}>
               No proposal content available.
             </div>
           )}
 
-          {/* ── Client Signature display (always shown at bottom) ── */}
-          <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", padding: "24px 28px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)" }}>
-            <div style={{ fontSize: 13, fontWeight: 800, color: "#607D86", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
-              Client Sign-off
-            </div>
-            {prop.clientSignature ? (
-              <div style={{ background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: 12, padding: "20px 24px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-                  <i className="ti ti-circle-check" style={{ fontSize: 18, color: "#15803D" }}></i>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: "#15803D" }}>You have accepted this proposal</span>
-                  {prop.clientSignedAt && (
-                    <span style={{ marginLeft: "auto", fontSize: 11, color: "#96B0B8", fontWeight: 600 }}>
-                      {new Date(prop.clientSignedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                    </span>
-                  )}
-                </div>
-                <div style={{ background: "#fff", borderRadius: 10, border: "1px solid #86efac", padding: "16px 20px", textAlign: "center", maxWidth: 320, margin: "0 auto" }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: "#96B0B8", textTransform: "uppercase", letterSpacing: .6, marginBottom: 12 }}>Your Signature</div>
-                  <div style={{ height: 64, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
-                    {prop.clientSignature.startsWith("data:image") ? (
-                      <img src={prop.clientSignature} style={{ maxHeight: 60, maxWidth: "100%", objectFit: "contain" }} alt="your signature" />
-                    ) : (
-                      <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 28, color: "#0D2027" }}>
-                        {prop.clientSignature}
-                      </span>
-                    )}
-                  </div>
-                  <div style={{ height: 1, background: "#15803D", marginBottom: 8 }} />
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "#0D2027" }}>{prop.clientName || clientName}</div>
-                  <div style={{ fontSize: 10, color: "#15803D", fontWeight: 700, marginTop: 3 }}>Digitally Signed & Accepted</div>
-                </div>
-              </div>
-            ) : (
-              <div style={{ fontSize: 12, color: "#96B0B8", marginBottom: 16 }}>
-                Please sign below to formally accept this proposal.
-              </div>
-            )}
-          </div>
+
 
           {/* Signature box — show only if not yet signed */}
           {!prop.clientSignature && !saved && (
@@ -390,29 +362,6 @@ function ProposalViewerModal({ proposal, clientName, BASE_URL, onClose, onSigned
             </div>
           )}
 
-          {/* ── Review section ── */}
-          <div style={{ background: "#fff", borderRadius: 14, border: "1.5px solid #e0eef0", padding: "24px 28px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: reviewSavedComment || reviewOpen ? 14 : 0 }}>
-              <div style={{ fontSize: 13, fontWeight: 800, color: "#607D86", textTransform: "uppercase", letterSpacing: 0.5 }}>Your Review</div>
-              {!reviewOpen && (
-                <button onClick={() => { setReviewOpen(true); setReviewText(reviewSavedComment || ""); }} style={{ background: "#f0fdfe", border: "1.5px solid #e0eef0", borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: " var(--app-accent, var(--app-accent, #00BCD4))" }}>
-                  <i className="ti ti-message-2" style={{ marginRight: 5 }}></i>{reviewSavedComment ? "Edit Review" : "Review"}
-                </button>
-              )}
-            </div>
-            {reviewSavedComment && !reviewOpen && (
-              <div style={{ fontSize: 13, color: "#374151", background: "#f5fafa", borderRadius: 10, padding: "12px 16px", lineHeight: 1.6 }}>{reviewSavedComment}</div>
-            )}
-            {reviewOpen && (
-              <div>
-                <textarea value={reviewText} onChange={e => setReviewText(e.target.value)} rows={3} placeholder="Type your review or comments here..." style={{ width: "100%", padding: "12px 14px", border: "1.5px solid #e0eef0", borderRadius: 10, fontSize: 13, fontFamily: "inherit", resize: "vertical", outline: "none", boxSizing: "border-box", marginBottom: 10 }} />
-                <div style={{ display: "flex", gap: 8 }}>
-                  <button onClick={submitReview} disabled={reviewSaving} style={{ padding: "9px 18px", background: " var(--app-accent, var(--app-accent, #00BCD4))", color: "#fff", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 800, cursor: reviewSaving ? "not-allowed" : "pointer" }}>{reviewSaving ? "Submitting..." : "Submit Review"}</button>
-                  <button onClick={() => setReviewOpen(false)} style={{ padding: "9px 18px", background: "#fff", color: "#607D86", border: "1.5px solid #e0eef0", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Cancel</button>
-                </div>
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </div>

@@ -2180,9 +2180,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             ))}
           </div>
 
-          {(projectQuotations.length > 0 || projectProposals.length > 0 || (currProject.files || []).length > 0) && (
+          {true && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 20 }}>
-              {projectQuotations.length > 0 && (
+              {true && (
                 <div style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden' }}>
                   <div style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
                     <i className="ti ti-file-description" style={{ color: '#7C3AED', fontSize: 15, marginRight: 8 }}></i>
@@ -2199,6 +2199,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     </button>
                   </div>
                   <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {projectQuotations.length === 0 && (
+                      <div style={{ padding: '24px 12px', textAlign: 'center', color: '#96A6AE', fontSize: 12 }}>No quotations yet.</div>
+                    )}
                     {projectQuotations.map((q) => (
                       <div key={q._id || q.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', border: '1px solid #F1F5F9', borderRadius: 10 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
@@ -2232,7 +2235,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   </div>
                 </div>
               )}
-              {projectProposals.length > 0 && (
+              {true && (
                 <div style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden' }}>
                   <div style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
                     <i className="ti ti-file-text" style={{ color: '#0EA5E9', fontSize: 15, marginRight: 8 }}></i>
@@ -2249,6 +2252,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     </button>
                   </div>
                   <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {projectProposals.length === 0 && (
+                      <div style={{ padding: '24px 12px', textAlign: 'center', color: '#96A6AE', fontSize: 12 }}>No proposals yet.</div>
+                    )}
                     {projectProposals.map((p) => (
                       <div key={p._id || p.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', border: '1px solid #F1F5F9', borderRadius: 10 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
@@ -2283,7 +2289,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   </div>
                 </div>
               )}
-              {(currProject.files || []).length > 0 && (
+              {true && (
                 <div style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden' }}>
                   <div style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
                     <i className="ti ti-folder" style={{ color: '#6B7280', fontSize: 15, marginRight: 8 }}></i>
@@ -2291,6 +2297,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     <span style={{ background: 'rgba(107,114,128,.1)', color: '#6B7280', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{(currProject.files || []).length}</span>
                   </div>
                   <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {(currProject.files || []).length === 0 && (
+                      <div style={{ padding: '24px 12px', textAlign: 'center', color: '#96A6AE', fontSize: 12 }}>No documents yet.</div>
+                    )}
                     {(currProject.files || []).map((f, idx) => (
                       <div key={f.url || idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', border: '1px solid #F1F5F9', borderRadius: 10 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>

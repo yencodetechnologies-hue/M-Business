@@ -10860,8 +10860,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               >
                                 <MobileCardArrow id="activeProjects" />
                                 <div
-                                  onClick={() => !isDesktopWidth && openMobilePopup('activeProjects')}
-                                  style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column", cursor: isDesktopWidth ? "default" : "pointer" }}
+                                  onClick={(e) => { e.stopPropagation(); openMobilePopup('activeProjects'); }}
+                                  style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column", cursor: "pointer" }}
                                 >
                                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>

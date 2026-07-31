@@ -10912,18 +10912,53 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                   };
                                   return (
                                     <>
-                                      <HoverPopup id="activeProjects" title="Projects">
-                                        <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{projects.length} total</div>
-                                        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                                          {projectsWithProgress.slice(0, 8).map(renderProjectRow)}
-                                        </div>
-                                      </HoverPopup>
-                                      <MobilePopup id="activeProjects" title="Projects">
-                                        <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{projects.length} total</div>
-                                        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                                          {projectsWithProgress.map(renderProjectRow)}
-                                        </div>
-                                      </MobilePopup>
+                                      {(() => {
+                                        const statusMeta = (raw) => {
+                                          const s = (raw || "").toLowerCase().replace(/[\s_-]/g, "");
+                                          if (["active", "inprogress", "inreview", "started"].includes(s)) return { label: "Active", bg: "#dcfce7", color: "#16a34a" };
+                                          if (["onhold", "hold", "paused", "suspended"].includes(s)) return { label: "On Hold", bg: "#f3e8ff", color: "#7c3aed" };
+                                          if (["completed", "done", "delivered", "closed"].includes(s)) return { label: "Completed", bg: "#dbeafe", color: "#2563eb" };
+                                          if (["overdue", "late"].includes(s)) return { label: "Overdue", bg: "#fee2e2", color: "#dc2626" };
+                                          return { label: raw || "On Hold", bg: "#f3e8ff", color: "#7c3aed" };
+                                        };
+                                        const renderProjectRow = (p, i) => {
+                                          const meta = statusMeta(p.status);
+                                          return (
+                                            <div
+                                              key={p._id || p.id || i}
+                                              onClick={() => { closeMobilePopup(); setHoverPopupSection(null); setJumpProject(p); setProjectDetailsReadOnly(true); setActive("project-details"); }}
+                                              style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 10, marginBottom: 2, cursor: "pointer" }}
+                                            >
+                                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                                                <div style={{ fontWeight: 700, fontSize: 13, flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
+                                                <span style={{ background: meta.bg, color: meta.color, padding: "2px 8px", borderRadius: 20, fontSize: 10, fontWeight: 800, flexShrink: 0 }}>{meta.label}</span>
+                                              </div>
+                                              <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 3 }}>
+                                                Due {(p.end || p.deadline) ? new Date(p.end || p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}
+                                              </div>
+                                              <div style={{ height: 5, background: "#f1f5f9", borderRadius: 3, marginTop: 6, overflow: "hidden" }}>
+                                                <div style={{ width: `${p.progress || 0}%`, height: "100%", background: meta.color, borderRadius: 3 }}></div>
+                                              </div>
+                                            </div>
+                                          );
+                                        };
+                                        return (
+                                          <>
+                                            <HoverPopup id="activeProjects" title="Projects">
+                                              <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{projects.length} total</div>
+                                              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                                                {projectsWithProgress.slice(0, 8).map(renderProjectRow)}
+                                              </div>
+                                            </HoverPopup>
+                                            <MobilePopup id="activeProjects" title="Projects">
+                                              <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{projects.length} total</div>
+                                              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                                {projectsWithProgress.map(renderProjectRow)}
+                                              </div>
+                                            </MobilePopup>
+                                          </>
+                                        );
+                                      })()}
                                     </>
                                   );
                                 })()}

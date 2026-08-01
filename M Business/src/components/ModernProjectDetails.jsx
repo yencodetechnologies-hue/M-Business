@@ -142,7 +142,9 @@ const CSS = `
 .mpd-prog-item { background:#fff; border-radius:16px; padding:32px 30px; box-shadow:0 2px 12px rgba(0,0,0,.07); border:1px solid rgba(0,0,0,.05); min-width:0; min-height:130px; box-sizing: border-box; }
 .mpd-prog-item .mpd-progress-bg { width:100%; }
 @media (max-width: 900px) { .mpd-prog-card { grid-template-columns:repeat(2,1fr); } }
-@media (max-width: 480px) { .mpd-prog-card { grid-template-columns:1fr; } }
+@media (max-width: 480px) { .mpd-prog-card { grid-template-columns:repeat(2,1fr); } }
+.mpd-acc-actions, .mpd-acc-stats, .mpd-acc-boxes { display:flex; gap:10px; width:100%; box-sizing:border-box; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.mpd-acc-actions > *, .mpd-acc-stats > *, .mpd-acc-boxes > * { flex:1 1 220px; min-width:220px; }
 .mpd-prog-num { font-size:22px; font-weight:900; color:${P.textDark}; letter-spacing:-.3px; }
 .mpd-prog-lbl { font-size:11px; color:${P.textLight}; font-weight:700; text-transform:uppercase; letter-spacing:.6px; margin-bottom:8px; }
 .mpd-progress-bg { background:${P.bg}; border-radius:20px; height:8px; overflow:hidden; margin-right:6px; }
@@ -2123,7 +2125,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <i className="ti ti-arrows-exchange"></i> Accounts
           </div>
           {!hideTopActions && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, background: '#F8FAFC', border: '1px solid #E8EDF2', borderRadius: 12, padding: 12, marginBottom: 20, width: '100%', boxSizing: 'border-box' }}>
+            <div className="mpd-acc-actions" style={{ background: '#F8FAFC', border: '1px solid #E8EDF2', borderRadius: 12, padding: 12, marginBottom: 20 }}>
               {onNewQuotation && (
                 <button
                   onClick={() => onNewQuotation(currProject)}
@@ -2159,7 +2161,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             </div>
           )}
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 20, width: '100%' }}>
+          <div className="mpd-acc-stats" style={{ marginBottom: 20 }}>
             {(() => {
               const liveQuotationsTotal = projectQuotations.reduce((s, q) => s + parseAmt(q.total ?? q.qt?.total), 0);
               const liveProposalsTotal = projectProposals.reduce((s, p) => s + parseAmt(p.value ?? p.total), 0);
@@ -2181,7 +2183,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           </div>
 
           {true && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 20 }}>
+            <div className="mpd-acc-boxes" style={{ marginBottom: 20 }}>
               {true && (
                 <div style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden' }}>
                   <div style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
@@ -2336,7 +2338,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
 
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 20, width: '100%' }}>
+          <div className="mpd-acc-stats" style={{ marginBottom: 20 }}>
             {(() => {
               const liveAdvanceTotal = (currProject.advances || []).reduce((s, a) => s + parseAmt(a.amount), 0);
               const liveAdditionalTotal = (currProject.additionalCharges || []).reduce((s, a) => s + parseAmt(a.amount), 0);
@@ -2344,8 +2346,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               const liveReceived = (currProject.paymentsReceived || []).reduce((s, p) => s + parseAmt(p.amount), 0);
               const livePending = Math.max(0, liveBilled - liveReceived);
               return [
-                { lbl: 'Total Invoiced', val: projectInvoicesLoading ? '' : `${mergedInvoices.length} invoice(s)`, sub: projectInvoicesLoading ? '' : `${currency}${liveBilled.toLocaleString()}`, color: '#3B82F6', icon: 'ti-file-invoice' },
-                { lbl: 'Received', val: projectInvoicesLoading ? '' : `${liveBilled > 0 ? Math.round((liveReceived / liveBilled) * 100) : 0}% collected`, sub: projectInvoicesLoading ? '' : `${currency}${liveReceived.toLocaleString()}`, color: '#22C55E', icon: 'ti-circle-check' },
+                { lbl: 'Total Invoiced', val: projectInvoicesLoading ? 'Loading…' : `${mergedInvoices.length} invoice(s)`, sub: '', color: '#3B82F6', icon: 'ti-file-invoice' },
+                { lbl: 'Received', val: projectInvoicesLoading ? 'Loading…' : `${liveBilled > 0 ? Math.round((liveReceived / liveBilled) * 100) : 0}% collected`, sub: '', color: '#22C55E', icon: 'ti-circle-check' },
                 { lbl: 'Outstanding', val: 'Balance due', sub: '', color: '#EF4444', icon: 'ti-alert-circle' },
               ];
             })().map(s => (
@@ -2359,7 +2361,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             ))}
           </div>
 
-          <div style={{ display: 'flex', gap: 8, marginBottom: 18, width: '100%', background: '#F8FAFC', border: '1px solid #E8EDF2', borderRadius: 12, padding: 8, boxSizing: 'border-box' }}>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 18, width: '100%', maxWidth: '100%', background: '#F8FAFC', border: '1px solid #E8EDF2', borderRadius: 12, padding: 8, boxSizing: 'border-box', overflow: 'hidden' }}>
             {[
               { key: 'inv', label: 'Invoice', desc: 'Standard billing', icon: 'ti-file-invoice' },
               { key: 'pay', label: 'Payment', desc: 'Received amounts', icon: 'ti-credit-card' },
@@ -2368,9 +2370,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               <button
                 key={t.key}
                 onClick={() => { setActivePayTab(t.key); setSelectedPaymentItems([]); }}
-                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '8px 10px', borderRadius: 8, border: `1.5px solid ${activePayTab === t.key ? 'var(--app-accent, #00BCD4)' : 'transparent'}`, background: activePayTab === t.key ? 'var(--app-accent, #00BCD4)' : '#fff', color: activePayTab === t.key ? '#fff' : '#374151', fontSize: 12, fontWeight: 800, cursor: 'pointer', transition: 'all .15s', fontFamily: 'inherit', whiteSpace: 'nowrap' }}
+                style={{ flex: '1 1 0', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 6px', borderRadius: 8, border: `1.5px solid ${activePayTab === t.key ? 'var(--app-accent, #00BCD4)' : 'transparent'}`, background: activePayTab === t.key ? 'var(--app-accent, #00BCD4)' : '#fff', color: activePayTab === t.key ? '#fff' : '#374151', fontSize: 12, fontWeight: 800, cursor: 'pointer', transition: 'all .15s', fontFamily: 'inherit', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
               >
-                <i className={`ti ${t.icon}`} style={{ fontSize: 14 }}></i>
+                <i className={`ti ${t.icon}`} style={{ fontSize: 14, flexShrink: 0 }}></i>
                 {t.label}
               </button>
             ))}
@@ -3829,7 +3831,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   <div style={{ padding: '18px 16px', overflow: 'visible', boxSizing: 'border-box' }}>
 
                     {/* STATS ROW */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 20, width: '100%' }}>
+                    <div className="mpd-acc-stats" style={{ marginBottom: 20 }}>
                       {(() => {
                         const liveAdvanceTotal = (currProject.advances || []).reduce((s, a) => s + parseAmt(a.amount), 0);
                         const liveAdditionalTotal = (currProject.additionalCharges || []).reduce((s, a) => s + parseAmt(a.amount), 0);
@@ -3837,7 +3839,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         const liveReceived = (currProject.paymentsReceived || []).reduce((s, p) => s + parseAmt(p.amount), 0);
                         const livePending = Math.max(0, liveBilled - liveReceived);
                         return [
-{ lbl: 'Total Invoiced', val: projectInvoicesLoading ? '' : `${currency}${liveBilled.toLocaleString()}`, sub: projectInvoicesLoading ? '' : `${mergedInvoices.length} invoice(s)`, color: '#3B82F6', icon: 'ti-file-invoice' },
+                          { lbl: 'Total Invoiced', val: projectInvoicesLoading ? '' : `${currency}${liveBilled.toLocaleString()}`, sub: projectInvoicesLoading ? '' : `${mergedInvoices.length} invoice(s)`, color: '#3B82F6', icon: 'ti-file-invoice' },
                           { lbl: 'Received', val: `${currency}${liveReceived.toLocaleString()}`, sub: `${liveBilled > 0 ? Math.round((liveReceived / liveBilled) * 100) : 0}% collected`, color: '#22C55E', icon: 'ti-circle-check' },
 
                           { lbl: 'Outstanding', val: `${currency}${livePending.toLocaleString()}`, sub: 'Balance due', color: '#EF4444', icon: 'ti-alert-circle' },

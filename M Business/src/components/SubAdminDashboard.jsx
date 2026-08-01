@@ -2154,7 +2154,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       </div>
 
       {/* STAT PILLS — matches Projects page style */}
-   <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 20 }}>
         <div onClick={() => setFilterMode("all")} style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-users" /></div>
           <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{totalClients}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>All Clients</div></div>
@@ -4514,7 +4514,7 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
   return (
 
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 14, width: "100%", maxWidth: "100%", overflowX: "hidden", boxSizing: "border-box" }}>
 
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
@@ -4540,12 +4540,12 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
         </div>
 
         <button
-          className="create-btn"
+          className="create-btn compact-action-btn"
           onClick={() => {
             setJumpProject(null);
             if (setActive) setActive("create-project");
           }}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}
         >
           <i className="ti ti-plus"></i> New Project
         </button>
@@ -6508,18 +6508,18 @@ function VendorsPage({ vendors, setVendors, onAddVendorClick }) {
 
   return (
 
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 14, width: "100%", maxWidth: "100%", overflowX: "hidden", boxSizing: "border-box" }}>
 
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
         <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1A2332", margin: 0 }}>Vendors</h1>
-        <button className="create-btn" onClick={onAddVendorClick} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-          <i className="ti ti-plus"></i>  New Vendor
+        <button className="create-btn compact-action-btn" onClick={onAddVendorClick} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+          <i className="ti ti-plus"></i> New Vendor
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
         {(() => {
           const totalVendors = vendors.length;
           const totalPaid = vendors.reduce((sum, v) => sum + (Number(v.paidAmount) || 0), 0);
@@ -6530,17 +6530,17 @@ function VendorsPage({ vendors, setVendors, onAddVendorClick }) {
           }, 0);
           return (
             <>
-              <div style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-                <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-truck-delivery" /></div>
-                <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{totalVendors}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Total Vendors</div></div>
+              <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+                <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "rgba(var(--app-accent-rgb,0,188,212),0.08)", color: "var(--app-accent)" }}><i className="ti ti-truck-delivery"></i></div>
+                <div><div style={{ fontSize: 24, fontWeight: 900, color: "var(--text)", lineHeight: 1 }}>{totalVendors}</div><div style={{ fontSize: 11, color: "var(--text-soft)", marginTop: 3, fontWeight: 600 }}>Total Vendors</div></div>
               </div>
-              <div style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-                <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-cash" /></div>
-                <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{formatCurrency(totalPaid)}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Total Paid</div></div>
+              <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+                <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#dcfce7", color: "#16a34a" }}><i className="ti ti-cash"></i></div>
+                <div><div style={{ fontSize: 24, fontWeight: 900, color: "var(--text)", lineHeight: 1 }}>{formatCurrency(totalPaid)}</div><div style={{ fontSize: 11, color: "var(--text-soft)", marginTop: 3, fontWeight: 600 }}>Total Paid</div></div>
               </div>
-              <div style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-                <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-alert-circle" /></div>
-                <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{formatCurrency(totalOutstanding)}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Outstanding Balance</div></div>
+              <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+                <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#fee2e2", color: "#dc2626" }}><i className="ti ti-alert-circle"></i></div>
+                <div><div style={{ fontSize: 24, fontWeight: 900, color: "var(--text)", lineHeight: 1 }}>{formatCurrency(totalOutstanding)}</div><div style={{ fontSize: 11, color: "var(--text-soft)", marginTop: 3, fontWeight: 600 }}>Outstanding Balance</div></div>
               </div>
             </>
           );

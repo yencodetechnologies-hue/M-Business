@@ -2154,19 +2154,11 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             <button className={`tn-item ${active === "timeline" ? "active" : ""}`} onClick={() => setActive("timeline")}>Timeline</button>
             <button className={`tn-item ${active === "files" ? "active" : ""}`} onClick={() => setActive("files")}>Files</button>
             <button className={`tn-item ${active === "proposals" ? "active" : ""}`} onClick={() => setActive("proposals")}>
-              Proposals {proposals.filter(p => p.status === "sent" || p.status === "pending").length > 0 && (
-                <span style={{ background: " var(--app-accent, var(--app-accent, #00BCD4))", color: "#fff", borderRadius: 20, fontSize: 10, fontWeight: 800, padding: "1px 6px", marginLeft: 4 }}>
-                  {proposals.filter(p => p.status === "sent" || p.status === "pending").length}
-                </span>
-              )}
+              Proposals
             </button>
             <button className={`tn-item ${active === "payments" ? "active" : ""}`} onClick={() => setActive("payments")}>Invoices</button>
             <button className={`tn-item ${active === "quotations" ? "active" : ""}`} onClick={() => setActive("quotations")}>
-              Quotations {quotations.length > 0 && (
-                <span style={{ background: " var(--app-accent, var(--app-accent, #00BCD4))", color: "#fff", borderRadius: 20, fontSize: 10, fontWeight: 800, padding: "1px 6px", marginLeft: 4 }}>
-                  {quotations.length}
-                </span>
-              )}
+              Quotations
             </button>
 
 
@@ -3777,7 +3769,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                               <i className="ti ti-clock" style={{ fontSize: 11 }}></i> {new Date(quoteDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                             </span>
                           )}
-                          {q.clientSignature && (
+                          {q.clientSignature && (q.status || "").toLowerCase() === "approved" && (
                             <span style={{ fontSize: 11, color: C.green, fontWeight: 700 }}>
                               <i className="ti ti-writing" style={{ fontSize: 11 }}></i> Signed by client
                             </span>

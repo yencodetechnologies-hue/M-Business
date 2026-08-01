@@ -2186,16 +2186,16 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             <div className="mpd-acc-boxes" style={{ marginBottom: 20 }}>
               {true && (
                 <div style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
-                    <i className="ti ti-file-description" style={{ color: '#7C3AED', fontSize: 15, marginRight: 8 }}></i>
+                  <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 8, padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
+                    <i className="ti ti-file-description" style={{ color: '#7C3AED', fontSize: 15 }}></i>
                     <span style={{ fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>Quotations</span>
-                    <span style={{ background: 'rgba(124,58,237,.1)', color: '#7C3AED', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{projectQuotations.length}</span>
+                    <span style={{ background: 'rgba(124,58,237,.1)', color: '#7C3AED', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{projectQuotations.length}</span>
                     <input id="upload-quotation-input" type="file" onChange={handleQuotationUpload} style={{ display: 'none' }} />
                     <button
                       onClick={() => document.getElementById('upload-quotation-input').click()}
                       disabled={uploadingFile}
                       title="Upload Quotation"
-                      style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', background: '#fff', color: '#7C3AED', border: '1px solid #7C3AED', borderRadius: 6, fontSize: 11, fontWeight: 800, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}
+                      style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', background: '#fff', color: '#7C3AED', border: '1px solid #7C3AED', borderRadius: 6, fontSize: 11, fontWeight: 800, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0 }}
                     >
                       <i className={uploadingFile ? "ti ti-loader-2" : "ti ti-upload"} style={{ fontSize: 12 }}></i> Upload Quotation
                     </button>
@@ -2239,16 +2239,16 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               )}
               {true && (
                 <div style={{ background: '#fff', border: '1px solid #E8EDF2', borderRadius: 14, overflow: 'hidden' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
-                    <i className="ti ti-file-text" style={{ color: '#0EA5E9', fontSize: 15, marginRight: 8 }}></i>
+                  <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 8, padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
+                    <i className="ti ti-file-text" style={{ color: '#0EA5E9', fontSize: 15 }}></i>
                     <span style={{ fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>Project Proposals</span>
-                    <span style={{ background: 'rgba(14,165,233,.1)', color: '#0EA5E9', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20, marginLeft: 8 }}>{projectProposals.length}</span>
+                    <span style={{ background: 'rgba(14,165,233,.1)', color: '#0EA5E9', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{projectProposals.length}</span>
                     <input id="upload-proposal-input" type="file" onChange={handleProposalUpload} style={{ display: 'none' }} />
                     <button
                       onClick={() => document.getElementById('upload-proposal-input').click()}
                       disabled={uploadingFile}
                       title="Upload Project Proposal"
-                      style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', background: '#fff', color: '#0EA5E9', border: '1px solid #0EA5E9', borderRadius: 6, fontSize: 11, fontWeight: 800, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}
+                      style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', background: '#fff', color: '#0EA5E9', border: '1px solid #0EA5E9', borderRadius: 6, fontSize: 11, fontWeight: 800, cursor: uploadingFile ? 'not-allowed' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0 }}
                     >
                       <i className={uploadingFile ? "ti ti-loader-2" : "ti ti-upload"} style={{ fontSize: 12 }}></i> Upload Proposal
                     </button>

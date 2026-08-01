@@ -968,7 +968,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     };
 
     return (
-      <div style={{ fontFamily: "var(--font, 'Nunito', sans-serif)", minHeight: "100%", background: "var(--bg, #F5FAFA)" }}>
+      <div style={{ fontFamily: "var(--font, 'Nunito', sans-serif)", minHeight: "100%", width: "100%", maxWidth: "100%", overflowX: "hidden", boxSizing: "border-box", background: "var(--bg, #F5FAFA)" }}>
         {toastMsg && (
           <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 99999, background: '#1A2E35', color: '#fff', borderRadius: 12, padding: '12px 20px', fontSize: 13, fontWeight: 700, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8 }}>
             <i className="ti ti-check" style={{ fontSize: 15, color: '#26C281' }}></i> {toastMsg}
@@ -980,8 +980,8 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               <div className="page-title">Quotations</div>
               <div className="page-sub">Create, send and track client quotations</div>
             </div>
-            <div className="header-actions">
-              <div className="search-wrap" style={{ width: 250 }}>
+            <div className="header-actions" style={{ display: "flex", gap: 10, width: "100%" }}>
+              <div className="search-wrap" style={{ flex: "1 1 0", minWidth: 0, width: "auto" }}>
                 <i className="ti ti-search" style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)", color: "var(--text3)", fontSize: 16 }}></i>
 
                 <input
@@ -989,10 +989,10 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                   placeholder="Search quotations…"
                   value={listSearch}
                   onChange={e => setListSearch(e.target.value)}
-                  style={{ width: "100%", padding: "11px 14px 11px 40px", background: "var(--surface)", border: "1.5px solid var(--border)", borderRadius: 12, fontSize: 13, color: "var(--text)", fontFamily: "var(--font)", outline: "none", transition: "all .15s" }}
+                  style={{ width: "100%", padding: "11px 14px 11px 40px", background: "var(--surface)", border: "1.5px solid var(--border)", borderRadius: 12, fontSize: 13, color: "var(--text)", fontFamily: "var(--font)", outline: "none", transition: "all .15s", boxSizing: "border-box" }}
                 />
               </div>
-              <button className="create-btn" onClick={() => { clearForm(); if (onNewQuotation) { onNewQuotation(); } else { setStep("form"); } }}>
+              <button className="create-btn" onClick={() => { clearForm(); if (onNewQuotation) { onNewQuotation(); } else { setStep("form"); } }} style={{ flex: "1 1 0", minWidth: 0, justifyContent: "center", whiteSpace: "nowrap" }}>
                 <i className="ti ti-plus" style={{ fontSize: 15 }}></i> New Quotation
               </button>
             </div>
@@ -1260,7 +1260,8 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             body > div { height: auto !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; }
           }
           .avoid-break { page-break-inside: avoid; break-inside: avoid; }
-          @media (max-width:600px) { .qt-hgrid { flex-direction:column!important; } .qt-btgrid { grid-template-columns:1fr!important; } }
+@media (max-width:600px) { .qt-hgrid { flex-direction:column!important; } .qt-btgrid { grid-template-columns:1fr!important; } }
+          @media (max-width:600px) { .stats-row { grid-template-columns:repeat(2,1fr)!important; } }
         `}</style>
 
         <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>

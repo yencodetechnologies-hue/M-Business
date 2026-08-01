@@ -86,11 +86,9 @@ router.post("/", upload.single("file"), async (req, res) => {
   const isPdf = req.file.mimetype === "application/pdf";
   const uploadStream = cloudinary.uploader.upload_stream(
     {
-      folder: "mbusiness/uploads",
       resource_type: req.file.mimetype.startsWith("image/") ? "image" : "raw",
-      public_id: uniqueName,
-      use_filename: true,
-      unique_filename: false,
+      type: "upload",
+      access_mode: "public",
     },
     async (error, result) => {
       if (error) {

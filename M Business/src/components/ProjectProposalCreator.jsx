@@ -1676,7 +1676,14 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     window._onBackToProposals = () => { setPropTab("draft"); setActiveCard("draft"); setView("list"); };
 
     return <ProposalForm
-      onBack={cameFromProjectRef.current && onReturnToProject ? onReturnToProject : (() => setView("list"))}
+      onBack={() => {
+        if (cameFromProjectRef.current && onReturnToProject) {
+          cameFromProjectRef.current = false;
+          onReturnToProject();
+        } else {
+          setView("list");
+        }
+      }}
       initialData={doc}
       clients={clients}
       onAddClient={onAddClient}

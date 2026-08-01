@@ -138,7 +138,17 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
         setTimeout(hookUp, 50);
         return;
       }
-      backEls.forEach(el => { el.onclick = () => onBackRef.current && onBackRef.current(); el.style.cursor = 'pointer'; });
+      backEls.forEach(el => { el.style.cursor = 'pointer'; });
+      if (!c._backBtnHandler) {
+        c._backBtnHandler = (e) => {
+          const target = e.target.closest('.back-btn, .topbar-title');
+          if (!target) return;
+          e.preventDefault();
+          e.stopPropagation();
+          if (onBackRef.current) onBackRef.current();
+        };
+        c.addEventListener('click', c._backBtnHandler, true);
+      }
 
       c.querySelectorAll('[onchange]').forEach(el => {
         const oc = el.getAttribute('onchange');
@@ -345,7 +355,7 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
 
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "var(--bg)", display: "flex", flexDirection: "column", overflow: "hidden" }}
+    <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "var(--bg)", display: "flex", flexDirection: "column", overflow: "auto" }}
       onClickCapture={(e) => console.log('CLICK HIT:', e.target)}>
       <style>{`
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -365,7 +375,31 @@ function ProposalFormInner({ onBack, onSave, initialData, clients, onAddClient, 
 html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(--text)}
 
 /* ── TOPBAR ── */
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:50;box-shadow:0 1px 8px rgba(0,188,212,.06);gap:10px}
+@media(max-width:900px){
+  .two-panel{
+    grid-template-columns:1fr;
+    height:auto;
+    overflow:visible;
+  }
+  .form-panel{
+    max-height:none;
+    overflow:visible;
+    padding:16px 16px 40px;
+  }
+  .preview-panel{
+    border-left:none;
+    border-top:2px solid var(--border);
+    max-height:none;
+    overflow:visible;
+  }
+  .form-row,.form-row-3{grid-template-columns:1fr}
+  .topbar-actions .btn-o{display:flex}
+  .topbar{padding:0 12px}
+  .topbar-title{font-size:14px}
+  .topbar-actions{gap:6px}
+  .btn-o,.btn-t{padding:6px 10px;font-size:11px}
+  .btn-o span,.btn-t span{display:none}
+}
 .topbar-left{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .back-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s;white-space:nowrap}
 .back-btn:hover{border-color:var(--teal);color:var(--teal)}
@@ -600,11 +634,26 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 .sob-name{font-size:10px;font-weight:700;color:var(--text)}
 .sob-role{font-size:9px;color:var(--text3)}
 @media(max-width:900px){
-  .two-panel{grid-template-columns:1fr;height:auto;min-height:0;overflow:visible}
-  .form-panel{max-height:none;overflow:visible}
-  .preview-panel{border-left:none;border-top:2px solid var(--border);overflow:visible}
+  .two-panel{
+    grid-template-columns:1fr;
+    height:auto;
+    overflow:visible;
+  }
+  .form-panel{
+    max-height:none;
+    overflow:visible;
+    padding:16px 16px 40px;
+  }
+  .preview-panel{
+    border-left:none;
+    border-top:2px solid var(--border);
+    max-height:none;
+    overflow:visible;
+  }
   .form-row,.form-row-3{grid-template-columns:1fr}
-  .topbar-actions .btn-o{display:none}
+  .topbar-actions .btn-o{display:flex}
+  .topbar{padding:0 12px}
+  .topbar-title{font-size:14px}
 }
 `}</style>
 

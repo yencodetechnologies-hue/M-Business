@@ -599,11 +599,10 @@ html,body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(
 .sob-line{width:70px;height:1px;background:var(--text3);margin:0 auto 4px}
 .sob-name{font-size:10px;font-weight:700;color:var(--text)}
 .sob-role{font-size:9px;color:var(--text3)}
-
 @media(max-width:900px){
-  .two-panel{grid-template-columns:1fr;height:auto}
-  .form-panel{max-height:none}
-  .preview-panel{border-left:none;border-top:2px solid var(--border)}
+  .two-panel{grid-template-columns:1fr;height:auto;min-height:0;overflow:visible}
+  .form-panel{max-height:none;overflow:visible}
+  .preview-panel{border-left:none;border-top:2px solid var(--border);overflow:visible}
   .form-row,.form-row-3{grid-template-columns:1fr}
   .topbar-actions .btn-o{display:none}
 }

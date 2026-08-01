@@ -108,6 +108,8 @@ const docStorage = new CloudinaryStorage({
   params: {
     folder: "M-Business/Documents",
     resource_type: "auto", // supports pdf, images, etc.
+    type: "upload",
+    access_mode: "public",
     public_id: (req, file) => `${Date.now()}-${file.originalname.replace(/\s+/g, '_')}`,
   },
 });

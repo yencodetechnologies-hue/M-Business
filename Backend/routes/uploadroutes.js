@@ -129,6 +129,10 @@ router.post("/logo", upload.single("file"), (req, res) => {
     {
       folder: "mbusiness/logos",
       resource_type: "auto",
+      type: "upload",
+      access_mode: "public",
+      disposition: "inline",
+      flags: "attachment:false",
       format: "png",
     },
     (error, result) => {

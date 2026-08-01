@@ -3001,12 +3001,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                               <span style={{ fontSize: 10, fontWeight: 600, color: C.text2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                 <i className="ti ti-paperclip" style={{ marginRight: 3 }}></i>{file.name || "Attached file"}
                               </span>
-                              <a href={isOffice ? `https://docs.google.com/gview?url=${encodeURIComponent(file.url)}&embedded=true` : file.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style={{ fontSize: 10, fontWeight: 700, color: C.teal, textDecoration: "none" }}
-                              >
-                                Open <i className="ti ti-external-link" style={{ marginLeft: 2 }}></i>                            </a>
+
                             </div>
                           </div>
                         );

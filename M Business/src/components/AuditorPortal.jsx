@@ -251,7 +251,7 @@ tr:hover td{background:#FAFCFE;}
                 <table>
                   <thead><tr><th>Date</th><th>Ref</th><th>Description</th><th>Type</th><th>Amount</th><th>Status</th><th>Audit Actions</th></tr></thead>
                   <tbody>
-                    {loading ? <tr><td colSpan="7">Loading...</td></tr> : transactions.length === 0 ? <tr><td colSpan="7">No transactions found.</td></tr> : transactions.map((txn, i) => {
+                    {loading ? null : transactions.length === 0 ? <tr><td colSpan="7">No transactions found.</td></tr> : transactions.map((txn, i) => {
                       const id = txn.invoiceNumber || txn.expenseId || txn._id;
                       const hasNote = notes.find(n => n.transactionId === id);
                       const isFlagged = hasNote?.flagged;

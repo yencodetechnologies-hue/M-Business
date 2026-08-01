@@ -2051,7 +2051,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
           </div>
           <div style={{ fontSize: 11, color: "#607D86", lineHeight: 1.6 }}>
             <div>📧 Login Email: <strong>{c.email || "Not set"}</strong></div>
-            <div>🔐 Password: Set during client registration</div>
+
             <div>🌐 Portal URL: <span style={{ fontFamily: "monospace", fontSize: 10 }}>{portalUrl}</span></div>
           </div>
         </div>
@@ -2084,7 +2084,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   useEffect(() => {
     if (activeTab === "feedback" && activeClientId) {
       const activeC = clients.find(c => c._id === activeClientId);
-      if (!activeC) return;
+      if (!activeC) { setFeedbackLoading(false); return; }
       setFeedbackLoading(true);
       const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
       axios.get(`${BASE_URL}/api/clients/feedback`, {
@@ -2093,17 +2093,19 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
         const clientName = activeC.clientName || activeC.name;
         const filtered = (res.data || []).filter(f => f.clientName === clientName);
         setClientFeedback(filtered);
-      }).catch(err => console.error(err))
-        .finally(() => setFeedbackLoading(false));
+      }).catch(err => {
+        console.error(err);
+        setClientFeedback([]);
+      }).finally(() => setFeedbackLoading(false));
     }
-  }, [activeTab, activeClientId]);
+  }, [activeTab, activeClientId, clients]);
 
   const renderFeedback = () => {
     return (
       <div style={{ padding: 2 }}>
 
         {feedbackLoading ? (
-          <div style={{ color: "#A0B8BE", textAlign: "center", padding: 30 }}>Loading...</div>
+          null
         ) : clientFeedback.length === 0 ? (
           <div style={{ color: "#A0B8BE", textAlign: "center", padding: 30, fontSize: 12 }}>No feedback submitted yet.</div>
         ) : (
@@ -2152,21 +2154,20 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       </div>
 
       {/* STAT PILLS — matches Projects page style */}
-      <div style={{ display: "flex", gap: 16, marginBottom: 20, flexWrap: "wrap" }}>
-        <div onClick={() => setFilterMode("all")} style={{ cursor: "pointer", flex: "1 1 200px", minWidth: 200, background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+   <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 20 }}>
+        <div onClick={() => setFilterMode("all")} style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-users" /></div>
           <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{totalClients}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>All Clients</div></div>
         </div>
-        <div onClick={() => setFilterMode("active")} style={{ cursor: "pointer", flex: "1 1 200px", minWidth: 200, background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+        <div onClick={() => setFilterMode("active")} style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-user-check" /></div>
           <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{activeClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Active</div></div>
         </div>
-        <div onClick={() => setFilterMode("inactive")} style={{ cursor: "pointer", flex: "1 1 200px", minWidth: 200, background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+        <div onClick={() => setFilterMode("inactive")} style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-user-off" /></div>
           <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{inactiveClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Inactive</div></div>
         </div>
       </div>
-
 
 
 
@@ -3157,7 +3158,7 @@ ${onboardingLink}`;
 
       <div className="employees-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
         <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1A2332", margin: 0 }}>Employees</h1>
-        <button className="create-btn" onClick={onAddEmployeeClick} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <button className="create-btn compact-action-btn" onClick={onAddEmployeeClick} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
           <i className="ti ti-plus"></i> New Employee
         </button>
       </div>

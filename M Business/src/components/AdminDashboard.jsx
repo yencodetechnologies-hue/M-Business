@@ -1228,7 +1228,7 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
               <h3 style={{ margin: 0, fontWeight: 900 }}>{selectedCompany} Details</h3>
               <button onClick={() => setCompanyModalOpen(false)} style={{ background: THEME.surface, border: "none", width: 32, height: 32, borderRadius: 8, cursor: "pointer", color: THEME.text }}>Close</button>
             </div>
-            {companyLoading ? <div>Loading...</div> : (
+            {companyLoading ? null : (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
                 <div style={{ background: THEME.surface, padding: 20, borderRadius: 16 }}>
                   <div style={{ fontSize: 12, color: THEME.muted, fontWeight: 700 }}>Employees</div>

@@ -809,7 +809,7 @@ function EmployeesPage({ employees, setEmployees }) {
           <div style={{ marginTop: 14 }}>
             <div style={{ fontSize: 12, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
               Folder Documents
-              {empDocsLoading && <span style={{ fontSize: 10, color: "var(--app-muted)" }}>Loading...</span>}
+              {null}
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {DOC_TYPES.map(dt => {

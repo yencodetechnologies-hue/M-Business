@@ -379,7 +379,7 @@ export function SubAdminDocumentsPage({ employees = [] }) {
             <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", fontSize: 16, cursor: "pointer", color: "var(--app-muted)" }}>Close</button>
           </div>
           {loadingDocs ? (
-            <div style={{ textAlign: "center", padding: "2rem", color: "var(--app-muted)" }}>Loading...</div>
+            null
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {DOC_TYPES.map(dt => {

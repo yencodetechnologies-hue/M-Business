@@ -2344,8 +2344,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               const liveReceived = (currProject.paymentsReceived || []).reduce((s, p) => s + parseAmt(p.amount), 0);
               const livePending = Math.max(0, liveBilled - liveReceived);
               return [
-                { lbl: 'Total Invoiced', val: projectInvoicesLoading ? 'Loading…' : `${mergedInvoices.length} invoice(s)`, sub: '', color: '#3B82F6', icon: 'ti-file-invoice' },
-                { lbl: 'Received', val: projectInvoicesLoading ? 'Loading…' : `${liveBilled > 0 ? Math.round((liveReceived / liveBilled) * 100) : 0}% collected`, sub: '', color: '#22C55E', icon: 'ti-circle-check' },
+                { lbl: 'Total Invoiced', val: projectInvoicesLoading ? '' : `${mergedInvoices.length} invoice(s)`, sub: projectInvoicesLoading ? '' : `${currency}${liveBilled.toLocaleString()}`, color: '#3B82F6', icon: 'ti-file-invoice' },
+                { lbl: 'Received', val: projectInvoicesLoading ? '' : `${liveBilled > 0 ? Math.round((liveReceived / liveBilled) * 100) : 0}% collected`, sub: projectInvoicesLoading ? '' : `${currency}${liveReceived.toLocaleString()}`, color: '#22C55E', icon: 'ti-circle-check' },
                 { lbl: 'Outstanding', val: 'Balance due', sub: '', color: '#EF4444', icon: 'ti-alert-circle' },
               ];
             })().map(s => (
@@ -3837,7 +3837,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         const liveReceived = (currProject.paymentsReceived || []).reduce((s, p) => s + parseAmt(p.amount), 0);
                         const livePending = Math.max(0, liveBilled - liveReceived);
                         return [
-                          { lbl: 'Total Invoiced', val: projectInvoicesLoading ? '…' : `${currency}${liveBilled.toLocaleString()}`, sub: projectInvoicesLoading ? 'Loading…' : `${mergedInvoices.length} invoice(s)`, color: '#3B82F6', icon: 'ti-file-invoice' },
+{ lbl: 'Total Invoiced', val: projectInvoicesLoading ? '' : `${currency}${liveBilled.toLocaleString()}`, sub: projectInvoicesLoading ? '' : `${mergedInvoices.length} invoice(s)`, color: '#3B82F6', icon: 'ti-file-invoice' },
                           { lbl: 'Received', val: `${currency}${liveReceived.toLocaleString()}`, sub: `${liveBilled > 0 ? Math.round((liveReceived / liveBilled) * 100) : 0}% collected`, color: '#22C55E', icon: 'ti-circle-check' },
 
                           { lbl: 'Outstanding', val: `${currency}${livePending.toLocaleString()}`, sub: 'Balance due', color: '#EF4444', icon: 'ti-alert-circle' },

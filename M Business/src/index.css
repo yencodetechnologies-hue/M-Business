@@ -4251,6 +4251,18 @@ tbody tr:last-child td {
   gap: 16px
 }
 
+@media (max-width: 700px) {
+  .quotes-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .quote-card {
+    padding: 12px !important;
+    font-size: 12px !important;
+  }
+}
+
 .quote-card {
   background: var(--surface);
   border: 1.5px solid var(--border);

@@ -1855,17 +1855,26 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
           .prop-list-wrap .search-wrap{position:relative;flex:1;max-width:320px;}
           .prop-list-wrap .search-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3,#A0B8BE);font-size:15px;}
           .prop-list-wrap .search-wrap input{width:100%;padding:10px 14px 10px 36px;background:var(--surface,#fff);border:1.5px solid var(--border,#E0EEF0);border-radius:12px;font-size:13px;color:var(--text,#1A2E35);font-family:inherit;outline:none;transition:all .15s;}
-          .prop-list-wrap .search-wrap input:focus{border-color:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));box-shadow:0 0 0 3px rgba(0,188,212,.08);}
+      .prop-list-wrap .search-wrap input:focus{border-color:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));box-shadow:0 0 0 3px rgba(0,188,212,.08);}
+          @media (max-width: 700px) {
+            .prop-stats-row { grid-template-columns: repeat(2,1fr) !important; }
+            .prop-header-row { flex-wrap: wrap !important; gap: 10px !important; }
+            .prop-header-actions { width: 100% !important; }
+            .prop-header-actions input[type="month"] { flex: 1 1 0; min-width: 0; }
+            .prop-header-actions .new-prop-btn { flex: 1 1 0; min-width: 0; justify-content: center; }
+            .prop-tabs-search-row { flex-wrap: wrap !important; gap: 10px !important; }
+            .prop-list-wrap .search-wrap { max-width: 100% !important; width: 100%; }
+          }
         `}</style>
 
         <div className="prop-list-wrap">
           {/* PAGE HEADER */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 22 }}>
+          <div className="prop-header-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 22 }}>
             <div>
               <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", margin: 0 }}>Project Proposals</h1>
               <p style={{ fontSize: 12, color: "var(--text3,#A0B8BE)", marginTop: 3 }}>Manage and track your client project proposals</p>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div className="prop-header-actions" style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <input
                 type="month"
                 value={selectedMonth}
@@ -1888,7 +1897,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
           </div>
 
           {/* STATS ROW */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 22 }}>
+          <div className="prop-stats-row" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 22 }}>
             <div className="stat-card" style={{ display: "flex", alignItems: "center", gap: 12, border: "1.5px solid var(--border,#E0EEF0)", cursor: "default" }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: "var(--teal-light,var(--teal-light, var(--teal-light, #E0F7FA)))", color: "var(--teal, var(--app-accent, var(--app-accent, #00BCD4)))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8, flexShrink: 0 }}><i className="ti ti-presentation"></i></div>
               <div>
@@ -1924,15 +1933,15 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
           </div>
 
           {/* TABS + SEARCH */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
-            <div style={{ display: "flex", gap: 4, background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 12, padding: 4 }}>
+          <div className="prop-tabs-search-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
+            <div style={{ display: "flex", gap: 4, flexWrap: "wrap", background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 12, padding: 4 }}>
               {["all", "draft", "sent", "negotiation", "won", "lost"].map(t => (
-                <button key={t} className={`prop-tab${propTab === t ? " active" : ""}`} onClick={() => { setPropTab(t); setActiveCard(t === "all" ? "all" : t === "won" ? "won" : t === "negotiation" ? "inprogress" : ""); }}>
+                <button key={t} className={`prop-tab${propTab === t ? " active" : ""}`} onClick={() => { setPropTab(t); setActiveCard(t === "all" ? "all" : t === "won" ? "won" : t === "negotiation" ? "inprogress" : ""); }} style={{ whiteSpace: "nowrap" }}>
                   {t.charAt(0).toUpperCase() + t.slice(1)}
                 </button>
               ))}
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
               <div className="search-wrap">
                 <i className="ti ti-search"></i>
                 <input placeholder="Search proposals…" value={propSearch} onChange={e => setPropSearch(e.target.value)} />

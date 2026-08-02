@@ -90,8 +90,8 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
   // qt.companyName → fromCompany
   // qt.companyEmail → fromEmail
   // qt.companyPhone → fromPhone
-  const resolvedToName = existingQt.toName || existingQt.client || editEntry?.client || (prefillProject && (prefillProject.client || prefillProject.clientName)) || '';
-  const resolvedTitle = existingQt.title || existingQt.project || (prefillProject && prefillProject.name) || '';
+  const resolvedToName = existingQt.toName || existingQt.client || editEntry?.client || '';
+  const resolvedTitle = existingQt.title || existingQt.project || '';
   const resolvedQuoteDate = existingQt.quoteDate || existingQt.date || today;
   const resolvedFromCompany = existingQt.fromCompany || existingQt.companyName || '';
   const resolvedFromName = existingQt.fromName || '';

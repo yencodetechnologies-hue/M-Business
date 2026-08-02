@@ -1356,11 +1356,11 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     if (!file?.url) return;
     try {
       if (/\.pdf$/i.test(file.name || file.url || "")) {
-        window.open(file.url.replace('/upload/', '/upload/fl_attachment:false/'), "_blank", "noopener");
+        window.open(`https://docs.google.com/viewer?url=${encodeURIComponent(file.url)}`, "_blank", "noopener");
         return;
       }
       if (/\.pdf$/i.test(file.name || file.url || "")) {
-        window.open(file.url.replace('/upload/', '/upload/fl_attachment:false/'), "_blank", "noopener");
+        window.open(`https://docs.google.com/viewer?url=${encodeURIComponent(file.url)}`, "_blank", "noopener");
         return;
       }
       const res = await fetch(file.url);
@@ -1369,7 +1369,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
       const a = document.createElement("a");
       a.href = blobUrl;
       if (/\.pdf$/i.test(file.name || file.url || "")) {
-        window.open(file.url.replace('/upload/', '/upload/fl_attachment:false/'), "_blank", "noopener");
+        window.open(`https://docs.google.com/viewer?url=${encodeURIComponent(file.url)}`, "_blank", "noopener");
         return;
       }
       a.download = file.name || "file";
@@ -2563,7 +2563,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             <div key={idx} className="file-card" onClick={() => {
               if (file.isLetterhead && file.raw?.htmlContent) { setSelectedDoc(file.raw); }
               else if (isPreviewableFile(file)) { setPreviewFile(file); }
-              else if (file.url) { window.open(/\.pdf$/i.test(file.url) ? file.url.replace('/upload/', '/upload/fl_attachment:false/') : file.url, "_blank", "noopener"); }
+              else if (file.url) { window.open((/\.pdf$/i.test(file.name || file.url || "") || (file.type || "").includes("pdf")) ? `https://docs.google.com/viewer?url=${encodeURIComponent(file.url)}` : file.url, "_blank", "noopener"); }
             }}>
               {file.isNew && <span className="fc-new-badge">New</span>}
               <div className="fc-download" title="Download" onClick={(e) => {
@@ -2641,7 +2641,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
             <div key={idx} className="file-card" onClick={() => {
               if (file.isLetterhead && file.raw?.htmlContent) { setSelectedDoc(file.raw); }
               else if (isPreviewableFile(file)) { setPreviewFile(file); }
-              else if (file.url) { window.open(/\.pdf$/i.test(file.url) ? file.url.replace('/upload/', '/upload/fl_attachment:false/') : file.url, "_blank", "noopener"); }
+              else if (file.url) { window.open((/\.pdf$/i.test(file.name || file.url || "") || (file.type || "").includes("pdf")) ? `https://docs.google.com/viewer?url=${encodeURIComponent(file.url)}` : file.url, "_blank", "noopener"); }
             }}>
               {file.isNew && <span className="fc-new-badge">New</span>}
               <div className="fc-download" title="Download" onClick={(e) => {
@@ -2962,7 +2962,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                 <div style={{ fontSize: 13, color: C.text2, lineHeight: 1.6 }}>{viewApprovalApp.desc || "No additional details provided."}</div>
                 {viewApprovalApp.senderName && <div style={{ fontSize: 12, color: C.text3 }}>Requested by {viewApprovalApp.senderName}</div>}
 
-                {(viewApprovalApp.attachments && viewApprovalApp.attachments.length > 0 ? viewApprovalApp.attachments : (viewApprovalApp.fileUrl ? [{ name: viewApprovalApp.fileName, url: viewApprovalApp.fileUrl, type: "" }] : [])).length > 0 && (() => {
+                {(viewApprovalApp.fileUrl ? [{ name: viewApprovalApp.fileName, url: viewApprovalApp.fileUrl, type: "" }] : (viewApprovalApp.attachments && viewApprovalApp.attachments.length > 0 ? viewApprovalApp.attachments : [])).length > 0 && (() => {
                   const files = viewApprovalApp.attachments && viewApprovalApp.attachments.length > 0
                     ? viewApprovalApp.attachments
                     : [{ name: viewApprovalApp.fileName, url: viewApprovalApp.fileUrl, type: "" }];
@@ -2985,7 +2985,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                                 style={{ width: "100%", height: 100, objectFit: "cover", display: "block", background: "#f5f5f5", cursor: "pointer" }}
                               />
                             ) : isPdf ? (
-                              <a href={(file.url || "").replace('/upload/', '/upload/fl_attachment:false/')} target="_blank" rel="noopener noreferrer" onClick={(e) => { if (!file.url) e.preventDefault(); }} style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "16px 8px", gap: 6, background: C.surface2, textDecoration: "none", cursor: "pointer" }}>
+                              <a href={`https://docs.google.com/viewer?url=${encodeURIComponent(file.url || "")}`} target="_blank" rel="noopener noreferrer" onClick={(e) => { if (!file.url) e.preventDefault(); }} style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "16px 8px", gap: 6, background: C.surface2, textDecoration: "none", cursor: "pointer" }}>
                                 <i className="ti ti-file-type-pdf" style={{ fontSize: 36, color: "#EF4444" }}></i>
                                 <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{file.name || "Attached PDF"}</div>
                                 <div style={{ fontSize: 11, color: C.teal, fontWeight: 700 }}>Open <i className="ti ti-external-link" style={{ marginLeft: 2 }}></i></div>

@@ -1589,7 +1589,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      const uploadedUrl = res.data.url.startsWith('http') ? res.data.url : `${BASE_URL}${res.data.url}`;
+      const uploadedUrl = (res.data.url || '').startsWith('http') ? res.data.url : `${BASE_URL}${res.data.url || ''}`;
       const newFileObj = {
         name: file.name,
         url: uploadedUrl,
@@ -1763,8 +1763,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               rejectLabel: 'Review',
               sourceType: 'project',
               projectId: currProject._id || '',
-fileUrl: newUploadedUrl || (primaryAttachment ? primaryAttachment.url : ''),
-fileName: uploadFileObj ? uploadFileObj.name : (primaryAttachment ? primaryAttachment.name : ''),
+              fileUrl: newUploadedUrl || (primaryAttachment ? primaryAttachment.url : ''),
+              fileName: uploadFileObj ? uploadFileObj.name : (primaryAttachment ? primaryAttachment.name : ''),
             }));
           }
           if (uploadSendToEmployee && assigned.length > 0) {
@@ -1782,8 +1782,8 @@ fileName: uploadFileObj ? uploadFileObj.name : (primaryAttachment ? primaryAttac
                 rejectLabel: 'Review',
                 sourceType: 'project',
                 projectId: currProject._id || '',
-                fileUrl: newUploadedUrl,
-                fileName: uploadFileObj ? uploadFileObj.name : '',
+                fileUrl: newUploadedUrl || (primaryAttachment ? primaryAttachment.url : ''),
+                fileName: uploadFileObj ? uploadFileObj.name : (primaryAttachment ? primaryAttachment.name : ''),
               }));
             }
           }

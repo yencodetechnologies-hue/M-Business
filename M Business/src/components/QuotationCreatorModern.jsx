@@ -315,55 +315,25 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
       }
     });
 
-    const A4_W = 210;
+   const A4_W = 210;
     const A4_H = 297;
     const imgAspect = canvas.width / canvas.height;
-    const finalW = A4_W;
-    const finalH = A4_W / imgAspect;
-    const imgData = canvas.toDataURL('image/jpeg', 0.98);
 
-    const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
-
-    // px -> mm conversion factor based on the canvas scale used above
-    const pxToMm = finalW / canvas.width;
-    const pageHeightPx = A4_H / pxToMm;
-
-    // Collect the bottom edge (in px, relative to element) of every direct
-    // "block" node inside the preview so we can break between them, not through them.
-    const blocks = Array.from(element.querySelectorAll('.quo-preview *'))
-      .filter(n => n.offsetHeight > 0)
-      .map(n => {
-        const r = n.getBoundingClientRect();
-        const baseR = element.getBoundingClientRect();
-        return (r.bottom - baseR.top) * 2; // *2 to match html2canvas scale:2
-      });
-
-    let renderedPx = 0;
-    let pageNum = 0;
-    while (renderedPx < canvas.height) {
-      let sliceEnd = Math.min(renderedPx + pageHeightPx, canvas.height);
-
-      if (sliceEnd < canvas.height) {
-        const candidates = blocks.filter(b => b > renderedPx && b <= sliceEnd);
-        if (candidates.length) sliceEnd = Math.max(...candidates);
-      }
-
-      const sliceHeightPx = sliceEnd - renderedPx;
-      const pageCanvas = document.createElement('canvas');
-      pageCanvas.width = canvas.width;
-      pageCanvas.height = sliceHeightPx;
-      const ctx = pageCanvas.getContext('2d');
-      ctx.drawImage(canvas, 0, renderedPx, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx);
-      const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.98);
-
-      if (pageNum > 0) pdf.addPage();
-      pdf.addImage(pageImgData, 'JPEG', 0, 0, finalW, sliceHeightPx * pxToMm);
-
-      renderedPx = sliceEnd;
-      pageNum++;
+    // Force everything onto a single page: scale the whole image to fit
+    // within A4 height (and width) regardless of actual content height.
+    let finalW = A4_W;
+    let finalH = A4_W / imgAspect;
+    if (finalH > A4_H) {
+      finalH = A4_H;
+      finalW = A4_H * imgAspect;
     }
-    return pdf;
-  };
+    const offsetX = (A4_W - finalW) / 2;
+    const offsetY = 0;
+
+    const imgData = canvas.toDataURL('image/jpeg', 0.98);
+    const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
+    pdf.addImage(imgData, 'JPEG', offsetX, offsetY, finalW, finalH);
+    return pdf; };
   const handleDownloadPdf = async () => {
     try {
       showToast('Generating PDF…');

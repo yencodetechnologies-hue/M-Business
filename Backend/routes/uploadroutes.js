@@ -97,7 +97,11 @@ router.post("/", upload.single("file"), async (req, res) => {
       }
 
       try {
-        const inlineUrl = result.secure_url;
+      
+        const isPdfFile = req.file.mimetype === "application/pdf";
+        const inlineUrl = isPdfFile
+          ? result.secure_url.replace('/upload/', '/upload/fl_attachment:false/')
+          : result.secure_url;
         const newMedia = new Media({
           url: inlineUrl,
           public_id: result.public_id,

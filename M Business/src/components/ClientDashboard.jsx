@@ -1355,11 +1355,23 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
   const downloadSingleFile = async (file) => {
     if (!file?.url) return;
     try {
+      if (/\.pdf$/i.test(file.name || file.url || "")) {
+        window.open(file.url.replace('/upload/', '/upload/fl_attachment:false/'), "_blank", "noopener");
+        return;
+      }
+      if (/\.pdf$/i.test(file.name || file.url || "")) {
+        window.open(file.url.replace('/upload/', '/upload/fl_attachment:false/'), "_blank", "noopener");
+        return;
+      }
       const res = await fetch(file.url);
       const blob = await res.blob();
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = blobUrl;
+      if (/\.pdf$/i.test(file.name || file.url || "")) {
+        window.open(file.url.replace('/upload/', '/upload/fl_attachment:false/'), "_blank", "noopener");
+        return;
+      }
       a.download = file.name || "file";
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
@@ -2973,11 +2985,11 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
                                 style={{ width: "100%", height: 100, objectFit: "cover", display: "block", background: "#f5f5f5", cursor: "pointer" }}
                               />
                             ) : isPdf ? (
-                           <a href={file.url.replace('/upload/', '/upload/fl_attachment:false/')} target="_blank" rel="noopener noreferrer" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "16px 8px", gap: 6, background: C.surface2, textDecoration: "none", cursor: "pointer" }}>
-  <i className="ti ti-file-type-pdf" style={{ fontSize: 36, color: "#EF4444" }}></i>
-  <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{file.name || "Attached PDF"}</div>
-  <div style={{ fontSize: 11, color: C.teal, fontWeight: 700 }}>Open <i className="ti ti-external-link" style={{ marginLeft: 2 }}></i></div>
-</a>
+                              <a href={(file.url || "").replace('/upload/', '/upload/fl_attachment:false/')} target="_blank" rel="noopener noreferrer" onClick={(e) => { if (!file.url) e.preventDefault(); }} style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "16px 8px", gap: 6, background: C.surface2, textDecoration: "none", cursor: "pointer" }}>
+                                <i className="ti ti-file-type-pdf" style={{ fontSize: 36, color: "#EF4444" }}></i>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{file.name || "Attached PDF"}</div>
+                                <div style={{ fontSize: 11, color: C.teal, fontWeight: 700 }}>Open <i className="ti ti-external-link" style={{ marginLeft: 2 }}></i></div>
+                              </a>
                             ) : isOffice ? (
                               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "16px 8px", gap: 6 }}>
                                 <i className={`ti ${officeIcon}`} style={{ fontSize: 36, color: C.teal }}></i>

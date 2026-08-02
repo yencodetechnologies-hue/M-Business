@@ -1697,7 +1697,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           const res = await axios.post(`${BASE_URL}/api/upload`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
           });
-          const uploadedUrl = res.data.url.startsWith('http') ? res.data.url : `${BASE_URL}${res.data.url}`;
+          const uploadedUrl = (res.data.url || res.data.secure_url || '').startsWith('http') ? (res.data.url || res.data.secure_url) : `${BASE_URL}${res.data.url || res.data.secure_url || ''}`;
           // If multiple files share one heading, number them so titles stay unique
           const heading = uploadHeading
             ? (uploadFiles.length > 1 ? `${uploadHeading} (${i + 1})` : uploadHeading)
@@ -1763,8 +1763,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               rejectLabel: 'Review',
               sourceType: 'project',
               projectId: currProject._id || '',
-              fileUrl: newUploadedUrl,
-              fileName: uploadFileObj ? uploadFileObj.name : '',
+fileUrl: newUploadedUrl || (primaryAttachment ? primaryAttachment.url : ''),
+fileName: uploadFileObj ? uploadFileObj.name : (primaryAttachment ? primaryAttachment.name : ''),
             }));
           }
           if (uploadSendToEmployee && assigned.length > 0) {

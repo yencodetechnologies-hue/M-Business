@@ -1,12 +1,9 @@
-
-
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const streamifier = require("streamifier");
 const Media = require("../models/MediaModel");
-
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -101,7 +98,7 @@ router.post("/", upload.single("file"), async (req, res) => {
       }
 
       try {
-      
+
         const isPdfFile = req.file.mimetype === "application/pdf";
         const inlineUrl = result.secure_url;
         const newMedia = new Media({

@@ -1610,18 +1610,15 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     const imgData = canvas.toDataURL('image/jpeg', 0.6);
     const pdfDoc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
     const pageWidth = 210, pageHeight = 297;
-    const imgWidth = pageWidth;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    let heightLeft = imgHeight, position = 0;
-    pdfDoc.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight;
-      pdfDoc.addPage();
-      pdfDoc.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+    const imgAspect = canvas.width / canvas.height;
+    let imgWidth = pageWidth;
+    let imgHeight = pageWidth / imgAspect;
+    if (imgHeight > pageHeight) {
+      imgHeight = pageHeight;
+      imgWidth = pageHeight * imgAspect;
     }
-    const blob = pdfDoc.output('blob');
+    const offsetX = (pageWidth - imgWidth) / 2;
+    pdfDoc.addImage(imgData, 'JPEG', offsetX, 0, imgWidth, imgHeight); const blob = pdfDoc.output('blob');
     const fileName = `${(p.title || 'Proposal').replace(/[^a-z0-9]/gi, '_')}.pdf`;
     const file = new File([blob], fileName, { type: 'application/pdf' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -1732,19 +1729,15 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
               const pdfDoc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
               const pageWidth = 210;
               const pageHeight = 297;
-              const imgWidth = pageWidth;
-              const imgHeight = (canvas.height * imgWidth) / canvas.width;
-              let heightLeft = imgHeight;
-              let position = 0;
-              pdfDoc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-              heightLeft -= pageHeight;
-              while (heightLeft > 0) {
-                position = heightLeft - imgHeight;
-                pdfDoc.addPage();
-                pdfDoc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
+              const imgAspect = canvas.width / canvas.height;
+              let imgWidth = pageWidth;
+              let imgHeight = pageWidth / imgAspect;
+              if (imgHeight > pageHeight) {
+                imgHeight = pageHeight;
+                imgWidth = pageHeight * imgAspect;
               }
-              const blob = pdfDoc.output('blob');
+              const offsetX = (pageWidth - imgWidth) / 2;
+              pdfDoc.addImage(imgData, 'PNG', offsetX, 0, imgWidth, imgHeight); const blob = pdfDoc.output('blob');
               const fileName = `${(current.title || 'Proposal').replace(/[^a-z0-9]/gi, '_')}.pdf`;
               const file = new File([blob], fileName, { type: 'application/pdf' });
               if (navigator.canShare && navigator.canShare({ files: [file] })) {

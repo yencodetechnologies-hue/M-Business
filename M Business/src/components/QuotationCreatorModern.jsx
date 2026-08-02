@@ -315,7 +315,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
       }
     });
 
-   const A4_W = 210;
+    const A4_W = 210;
     const A4_H = 297;
     const imgAspect = canvas.width / canvas.height;
 
@@ -325,15 +325,16 @@ function ModernForm({ onBack, user, clients = [], editEntry = null, onAddClient,
     let finalH = A4_W / imgAspect;
     if (finalH > A4_H) {
       finalH = A4_H;
-      finalW = A4_H * imgAspect;
+      finalW = A4_W;
     }
-    const offsetX = (A4_W - finalW) / 2;
+    const offsetX = 0;
     const offsetY = 0;
 
     const imgData = canvas.toDataURL('image/jpeg', 0.98);
     const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
     pdf.addImage(imgData, 'JPEG', offsetX, offsetY, finalW, finalH);
-    return pdf; };
+    return pdf;
+  };
   const handleDownloadPdf = async () => {
     try {
       showToast('Generating PDF…');

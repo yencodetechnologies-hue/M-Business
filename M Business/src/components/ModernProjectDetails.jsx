@@ -371,62 +371,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   const [draggingTab, setDraggingTab] = useState(null);
 
-  // Swipe-to-switch-tab on content area
-  useEffect(() => {
-    const el = tabContentRef.current;
-    if (!el) return;
-    let startX = null;
-    let startY = null;
-    let dragging = false;
-
-    const onMouseDown = e => { startX = e.clientX; startY = e.clientY; dragging = true; };
-    const onMouseUp = e => {
-      if (!dragging || startX === null) return;
-      dragging = false;
-      const dx = e.clientX - startX;
-      const dy = Math.abs(e.clientY - startY);
-      if (Math.abs(dx) > 60 && dy < 80) {
-        setActiveTab(prev => {
-          const idx = tabOrder.indexOf(prev);
-          if (dx < 0 && idx < tabOrder.length - 1) return tabOrder[idx + 1];
-          if (dx > 0 && idx > 0) return tabOrder[idx - 1];
-          return prev;
-        });
-      }
-      startX = null;
-    };
-    const onMouseLeave = () => { dragging = false; startX = null; };
-
-    const onTouchStart = e => { startX = e.touches[0].clientX; startY = e.touches[0].clientY; };
-    const onTouchEnd = e => {
-      if (startX === null) return;
-      const dx = e.changedTouches[0].clientX - startX;
-      const dy = Math.abs(e.changedTouches[0].clientY - startY);
-      if (Math.abs(dx) > 60 && dy < 80) {
-        setActiveTab(prev => {
-          const idx = tabOrder.indexOf(prev);
-          if (dx < 0 && idx < tabOrder.length - 1) return tabOrder[idx + 1];
-          if (dx > 0 && idx > 0) return tabOrder[idx - 1];
-          return prev;
-        });
-      }
-      startX = null;
-    };
-
-    el.addEventListener('mousedown', onMouseDown);
-    el.addEventListener('mouseup', onMouseUp);
-    el.addEventListener('mouseleave', onMouseLeave);
-    el.addEventListener('touchstart', onTouchStart, { passive: true });
-    el.addEventListener('touchend', onTouchEnd, { passive: true });
-
-    return () => {
-      el.removeEventListener('mousedown', onMouseDown);
-      el.removeEventListener('mouseup', onMouseUp);
-      el.removeEventListener('mouseleave', onMouseLeave);
-      el.removeEventListener('touchstart', onTouchStart);
-      el.removeEventListener('touchend', onTouchEnd);
-    };
-  }, [tabOrder]);
+  // Swipe-to-switch-tab removed — Updates is the only tab and should never change on swipe.
 
   // Modal / Input states
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -2034,7 +1979,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
         {/* PROGRESS + SUMMARY — single row, 4 equal-width cards */}
         <div className="mpd-prog-card" style={{ marginBottom: 24 }}>
-          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 10, paddingTop: 0, paddingLeft: 0, minWidth: 0 }}>
+          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 14, paddingTop: 26, paddingLeft: 26, minWidth: 0 }}>
             <div className="mpd-kpi-icon" style={{ background: P.primaryLight || '#E0F2FE', flexShrink: 0, marginTop: 6, marginLeft: 4 }}><i className="ti ti-chart-donut" style={{ color: P.primary }}></i></div>
             <div style={{ flex: 1 }}>
               <div className="mpd-prog-num">{progressPct}%</div>
@@ -3084,24 +3029,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 return (
                   <button
                     key={tab}
-                    draggable
-                    onDragStart={(e) => { setDraggingTab(tab); e.dataTransfer.effectAllowed = "move"; }}
-                    onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; }}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      if (!draggingTab || draggingTab === tab) return;
-                      const oldIdx = tabOrder.indexOf(draggingTab);
-                      const newIdx = tabOrder.indexOf(tab);
-                      const newOrder = [...tabOrder];
-                      newOrder.splice(oldIdx, 1);
-                      newOrder.splice(newIdx, 0, draggingTab);
-                      setTabOrder(newOrder);
-                      setDraggingTab(null);
-                    }}
-                    onDragEnd={() => setDraggingTab(null)}
                     className={`mpd-tab-btn ${activeTab === tab ? 'mpd-active' : ''}`}
                     onClick={() => setActiveTab(tab)}
-                    style={{ opacity: draggingTab === tab ? 0.4 : 1, cursor: 'grab', transition: 'all 0.2s' }}
+                    style={{ transition: 'all 0.2s' }}
                   >
                     {icon && <i className={`ti ${icon}`} style={{ marginRight: 5 }}></i>}{lbl}
                   </button>

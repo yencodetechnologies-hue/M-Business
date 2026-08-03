@@ -6932,6 +6932,23 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     whatsapp: false,
   });
   const [mobilePopupSection, setMobilePopupSection] = useState(null); // holds the id of open popup, or null
+  const [showMobileAddMenu, setShowMobileAddMenu] = useState(false);
+
+  const [draggingStatCard, setDraggingStatCard] = useState(null);
+  const [mobStatCardOrder, setMobStatCardOrder] = useState([
+    { id: "mobClients", icon: "ti-users", label: "Clients", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "mobProjects", icon: "ti-folder", label: "Projects", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "mobTeam", icon: "ti-user-circle", label: "Team", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "mobRevenue", icon: "ti-currency-rupee", label: "Revenue", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+
+  ]);
+  const [draggingSecondRow, setDraggingSecondRow] = useState(null);
+  const [mobSecondRowOrder, setMobSecondRowOrder] = useState([
+    { id: "unpaidInv", popupId: "mobUnpaidInvoices", icon: "ti-file-invoice", label: "Unpaid Invoices", color: "var(--app-accent)", bg: "rgba(var(--app-accent-rgb,0,188,212),0.1)" },
+    { id: "totalInv", popupId: "qaInvoice", icon: "ti-file-invoice", label: "Invoices", color: "var(--app-accent)", bg: "rgba(var(--app-accent-rgb,0,188,212),0.1)" },
+    { id: "totalProp", popupId: "qaProposal", icon: "ti-clipboard-list", label: "Proposals", color: "var(--app-accent)", bg: "rgba(var(--app-accent-rgb,0,188,212),0.1)" },
+    { id: "totalQuote", popupId: "qaQuote", icon: "ti-receipt", label: "Quotations", color: "var(--app-accent)", bg: "rgba(var(--app-accent-rgb,0,188,212),0.1)" },
+  ]);
   const openMobilePopup = (key) => setMobilePopupSection(key);
   const closeMobilePopup = () => setMobilePopupSection(null);
 
@@ -10040,8 +10057,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   <div style={{
                     position: "relative",
                     background: "radial-gradient(120% 120% at 15% 0%, #1e1b4b 0%, #0f0a29 45%, #05030f 100%)",
-                    borderRadius: "0 0 32px 32px",
-                    padding: "18px 18px 100px",
+                    borderRadius: "32px",
+                    margin: "12px",
+                    padding: "18px 18px 50px",
                     color: "#fff",
                     overflow: "hidden"
                   }}>
@@ -10069,9 +10087,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         </div>
                       </div>
 
-                      <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-                        <i className="ti ti-sparkles" style={{ color: "var(--app-accent)" }}></i> Revenue this month
-                      </div>
+
                       <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 6 }}>
                         <span style={{ fontSize: 42, fontWeight: 900, letterSpacing: -1, background: "linear-gradient(90deg,#fff,#c7d2fe)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                           Rs.{(totalRevenue || 0).toLocaleString()}
@@ -10096,19 +10112,36 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
                   </div>
 
-                  {/* FLOATING STAT STRIP */}
-                  <div style={{ margin: "-72px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
-                    {[
-                      { id: "mobClients", icon: "ti-users", label: "Clients", val: clients.length, grad: "linear-gradient(135deg,#7c3aed,#a78bfa)" },
-                      { id: "mobProjects", icon: "ti-folder", label: "Projects", val: projects.length, grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
-                      { id: "mobTeam", icon: "ti-user-circle", label: "Team", val: employees.length, grad: "linear-gradient(135deg,#f59e0b,#fbbf24)" },
-                    ].map((s, i) => (
-                      <div key={i} className="mob-card" onClick={() => openMobilePopup(s.id)} style={{ animationDelay: `${i * 60}ms`, background: "#fff", borderRadius: 18, padding: "14px 10px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)", cursor: "pointer" }}>
-                        <div style={{ width: 34, height: 34, borderRadius: 11, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", color: "#fff", fontSize: 15, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
+                  {/* FLOATING STAT STRIP — draggable reorder, sits below hero (no overlap) */}
+                  <div style={{ margin: "16px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
+                    {mobStatCardOrder.map((s, i) => (
+                      <div
+                        key={s.id}
+                        className="mob-card"
+                        draggable
+                        onDragStart={() => setDraggingStatCard(s.id)}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={() => {
+                          if (!draggingStatCard || draggingStatCard === s.id) { setDraggingStatCard(null); return; }
+                          setMobStatCardOrder(prev => {
+                            const arr = [...prev];
+                            const fromIdx = arr.findIndex(c => c.id === draggingStatCard);
+                            const toIdx = arr.findIndex(c => c.id === s.id);
+                            const [moved] = arr.splice(fromIdx, 1);
+                            arr.splice(toIdx, 0, moved);
+                            return arr;
+                          });
+                          setDraggingStatCard(null);
+                        }}
+                        onDragEnd={() => setDraggingStatCard(null)}
+                        onClick={() => openMobilePopup(s.id)}
+                        style={{ animationDelay: `${i * 60}ms`, background: "#fff", borderRadius: 18, aspectRatio: "1 / 1", padding: "10px 6px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)", cursor: "grab", opacity: draggingStatCard === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
+                      >
+                        <div style={{ width: 30, height: 30, borderRadius: 10, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 6px", color: "#fff", fontSize: 13, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
                           <i className={`ti ${s.icon}`}></i>
                         </div>
-                        <div style={{ fontSize: 19, fontWeight: 900, color: "#0f0a29" }}>{s.val}</div>
-                        <div style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 700, marginTop: 1 }}>{s.label}</div>
+                        <div style={{ fontSize: 16, fontWeight: 900, color: "#0f0a29" }}>{s.val}</div>
+                        <div style={{ fontSize: 9.5, color: "#94a3b8", fontWeight: 700, marginTop: 1 }}>{s.label}</div>
                       </div>
                     ))}
                   </div>
@@ -10150,31 +10183,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
                   </MobilePopup>
 
-                  {/* REVENUE / UNPAID INVOICES CARDS */}
-                  <div style={{ margin: "10px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}>
-                    <div
-                      className="mob-card"
-                      onClick={() => openMobilePopup('mobRevenue')}
-                      style={{ background: "#fff", borderRadius: 18, padding: "14px 12px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", border: "1px solid rgba(0,0,0,0.03)", cursor: "pointer" }}
-                    >
-                      <div style={{ width: 34, height: 34, borderRadius: 11, background: "rgba(0,188,212,0.1)", color: "#0097A7", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8, fontSize: 16 }}>
-                        <i className="ti ti-currency-rupee"></i>
-                      </div>
-                      <div style={{ fontSize: 17, fontWeight: 900, color: "#0f0a29" }}>{formatShortCurrency(income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0))}</div>
-                      <div style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 700, marginTop: 1 }}>Revenue This Month</div>
-                    </div>
-                    <div
-                      className="mob-card"
-                      onClick={() => openMobilePopup('mobUnpaidInvoices')}
-                      style={{ background: "#fff", borderRadius: 18, padding: "14px 12px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", border: "1px solid rgba(0,0,0,0.03)", cursor: "pointer" }}
-                    >
-                      <div style={{ width: 34, height: 34, borderRadius: 11, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8, fontSize: 16 }}>
-                        <i className="ti ti-file-invoice"></i>
-                      </div>
-                      <div style={{ fontSize: 17, fontWeight: 900, color: "#0f0a29" }}>{invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length}</div>
-                      <div style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 700, marginTop: 1 }}>Unpaid Invoices</div>
-                    </div>
-                  </div>
+
 
                   <MobilePopup id="mobRevenue" title="Revenue This Month">
                     <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>{formatShortCurrency(income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0))}</div>
@@ -10193,31 +10202,42 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
                   </MobilePopup>
 
-                  {/* QUICK ACTION CARDS — proper dashboard-card style, tap opens popup */}
-                  <div style={{ padding: "22px 16px 6px", display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}>
-                    {[
-                      { id: "qaInvoice", icon: "ti-file-invoice", label: "Invoices", color: "#0d9488", bg: "rgba(13,148,136,0.1)", val: invoices.length, sub: `${invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length} unpaid` },
-
-                      { id: "qaProposal", icon: "ti-clipboard-list", label: "Proposals", color: "#16a34a", bg: "rgba(22,163,74,0.1)", val: (proposalsList || []).length, sub: "Total" },
-                      { id: "qaQuote", icon: "ti-receipt", label: "Quotations", color: "#2563eb", bg: "rgba(37,99,235,0.1)", val: (quotations || []).length, sub: "Total" },
-                    ].map((a, i) => (
+                  {/* NEW DRAGGABLE ROW — Unpaid Invoices, Invoices, Proposals, Quotations */}
+                  <div style={{ margin: "10px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
+                    {mobSecondRowOrder.map((s, i) => (
                       <div
-                        key={i}
+                        key={s.id}
                         className="mob-card"
-                        onClick={() => openMobilePopup(a.id)}
-                        style={{ background: "#fff", borderRadius: 16, padding: 16, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", cursor: "pointer" }}
+                        draggable
+                        onDragStart={() => setDraggingSecondRow(s.id)}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={() => {
+                          if (!draggingSecondRow || draggingSecondRow === s.id) { setDraggingSecondRow(null); return; }
+                          setMobSecondRowOrder(prev => {
+                            const arr = [...prev];
+                            const fromIdx = arr.findIndex(c => c.id === draggingSecondRow);
+                            const toIdx = arr.findIndex(c => c.id === s.id);
+                            const [moved] = arr.splice(fromIdx, 1);
+                            arr.splice(toIdx, 0, moved);
+                            return arr;
+                          });
+                          setDraggingSecondRow(null);
+                        }}
+                        onDragEnd={() => setDraggingSecondRow(null)}
+                        onClick={() => openMobilePopup(s.popupId)}
+                        style={{ animationDelay: `${i * 60}ms`, background: "#fff", borderRadius: 18, aspectRatio: "1 / 1", padding: "10px 6px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)", cursor: "grab", opacity: draggingSecondRow === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                       >
-                        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                          <div style={{ width: 34, height: 34, borderRadius: 10, background: a.bg, color: a.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>
-                            <i className={`ti ${a.icon}`}></i>
-                          </div>
-                          {a.val !== null && <div style={{ fontSize: 20, fontWeight: 800, color: "#0f1c2e" }}>{a.val}</div>}
+                        <div style={{ width: 30, height: 30, borderRadius: 10, background: s.bg, color: s.color, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 6px", fontSize: 15 }}>
+                          <i className={`ti ${s.icon}`}></i>
                         </div>
-                        <div style={{ fontSize: 12.5, fontWeight: 700, color: "#0f1c2e" }}>{a.label}</div>
-                        <div style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 600, marginTop: 2 }}>{a.sub}</div>
+                        <div style={{ fontSize: 16, fontWeight: 900, color: "#0f0a29" }}>{s.val}</div>
+                        <div style={{ fontSize: 9.5, color: "#94a3b8", fontWeight: 700, marginTop: 1 }}>{s.label}</div>
                       </div>
                     ))}
                   </div>
+
+                  {/* QUICK ACTION CARDS — proper dashboard-card style, tap opens popup */}
+
                   <MobilePopup id="qaQuote" title="Quotations">
                     <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{(quotations || []).length} total</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -10293,43 +10313,64 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   </MobilePopup>
 
 
-                  {/* PROJECTS — redesigned cards */}
-                  <div style={{ padding: "16px 16px 100px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                      <div style={{ fontSize: 16, fontWeight: 900, color: "#0f0a29", display: "flex", alignItems: "center", gap: 8 }}>
-                        <span style={{ width: 6, height: 18, borderRadius: 4, background: "var(--app-accent)", display: "inline-block" }}></span>
-                        Active Projects
-                      </div>
-                      <div onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ fontSize: 12.5, fontWeight: 800, color: "var(--app-accent)", display: "flex", alignItems: "center", gap: 3 }}>
-                        View All <i className="ti ti-chevron-right" style={{ fontSize: 13 }}></i>
-                      </div>
-                    </div>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-
-                      {projectsWithProgress.length === 0 && (
-                        <div style={{ textAlign: "center", padding: "30px 0", color: "#94a3b8", fontSize: 13 }}>No projects yet</div>
-                      )}
-                    </div>
-                  </div>
 
                   {/* FLOATING BOTTOM NAV — glass pill */}
                   <div style={{ position: "fixed", bottom: 14, left: 14, right: 14, background: "rgba(15,10,41,0.92)", backdropFilter: "blur(16px)", borderRadius: 24, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "10px 6px", zIndex: 4000, boxShadow: "0 12px 32px rgba(15,10,41,0.35)" }}>
                     {[
-                      { icon: "ti-home", label: "Home", key: "dashboard" },
+                      { icon: "ti-file-invoice", label: "Invoice", key: "invoices" },
                       { icon: "ti-folder", label: "Projects", key: "projects" },
                       { icon: null, label: "", key: "add" },
                       { icon: "ti-users", label: "Clients", key: "clients" },
                       { icon: "ti-dots", label: "More", key: "settings" },
                     ].map((n, i) => n.key === "add" ? (
-                      <div key={i} onClick={() => { setJumpProject(null); setActive("create-project"); }} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#26d0ce)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", border: "3px solid #0f0a29" }}>+</div>
+                      <div key={i} onClick={() => setShowMobileAddMenu(true)} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#26d0ce)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", border: "3px solid #0f0a29" }}>+</div>
                     ) : (
-                      <div key={i} onClick={() => setActive(n.key)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: active === n.key ? "var(--app-accent)" : "rgba(255,255,255,0.5)", padding: "4px 10px" }}>
+                      <div key={i} onClick={() => {
+                        if (n.key === "invoices") {
+                          setJumpProject(null);
+                          setJumpInvoice(null);
+                          setInvoicePrefill(null);
+                          setSidebarNavClickId(id => id + 1);
+                        }
+                        setActive(n.key);
+                      }} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: (active === n.key || (n.key === "invoices" && active === "invoices")) ? "var(--app-accent)" : "rgba(255,255,255,0.5)", padding: "4px 10px" }}>
                         <i className={`ti ${n.icon}`} style={{ fontSize: 19 }}></i>
                         <span style={{ fontSize: 9.5, fontWeight: 700 }}>{n.label}</span>
                       </div>
                     ))}
                   </div>
+
+                  {showMobileAddMenu && (
+                    <div
+                      onClick={() => setShowMobileAddMenu(false)}
+                      style={{ position: "fixed", inset: 0, background: "rgba(15,10,41,0.55)", zIndex: 4500, display: "flex", alignItems: "flex-end", justifyContent: "center" }}
+                    >
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ background: "#fff", borderRadius: "20px 20px 0 0", width: "100%", maxWidth: 480, padding: "20px 16px 28px", boxShadow: "0 -4px 24px rgba(0,0,0,0.2)" }}
+                      >
+                        <div style={{ width: 40, height: 4, borderRadius: 2, background: "#e2e8f0", margin: "0 auto 18px" }} />
+                        {[
+                          { icon: "ti-building", label: "Add Client", action: () => { setNcError({}); setShowClientPass(false); setActive("addClient"); } },
+                          { icon: "ti-file-invoice", label: "Add Invoice", action: () => { setJumpProject(null); setJumpInvoice(null); setInvoicePrefill(null); setSidebarNavClickId(id => id + 1); setActive("invoices"); } },
+                          { icon: "ti-briefcase", label: "Add Project", action: () => { setJumpProject(null); setActive("create-project"); } },
+                        ].map((opt, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => { setShowMobileAddMenu(false); opt.action(); }}
+                            style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 12px", borderRadius: 14, cursor: "pointer", marginBottom: idx < 2 ? 8 : 0 }}
+                            onTouchStart={e => e.currentTarget.style.background = "#f8fafc"}
+                          >
+                            <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--app-accent)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                              <i className={`ti ${opt.icon}`}></i>
+                            </div>
+                            <div style={{ fontSize: 15, fontWeight: 700, color: "#0f1c2e" }}>+ {opt.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="desktop-dashboard-view">

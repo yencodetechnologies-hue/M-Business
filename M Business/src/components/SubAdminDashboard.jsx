@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useTransition } from "react";
+import { useState, useEffect, useRef, useTransition, useCallback } from "react";
 
 import React from "react";
 
@@ -6939,8 +6939,22 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [mobilePopupSection, setMobilePopupSection] = useState(null); // holds the id of open popup, or null
   const [showMobileAddMenu, setShowMobileAddMenu] = useState(false);
   const [mobNotifExpanded, setMobNotifExpanded] = useState(false);
-  const [mobMessagesExpanded, setMobMessagesExpanded] = useState(true);
+
   const [openedFromMobileAddMenu, setOpenedFromMobileAddMenu] = useState(false);
+  const [clientResponsesExpanded, setClientResponsesExpanded] = useState(true);
+  const [allApprovals, setAllApprovals] = useState([]);
+  const fetchAllApprovals = useCallback(async () => {
+    try {
+      const companyId = user?.companyId || user?._id || user?.id || "";
+      const res = await axios.get(`${BASE_URL}/api/approvals`, { headers: { 'x-company-id': companyId } });
+      setAllApprovals(Array.isArray(res.data) ? res.data : []);
+    } catch (e) { /* silent */ }
+  }, [user]);
+  useEffect(() => {
+    fetchAllApprovals();
+    const iv = setInterval(fetchAllApprovals, 15000);
+    return () => clearInterval(iv);
+  }, [fetchAllApprovals]);
 
   const [draggingStatCard, setDraggingStatCard] = useState(null);
   const [mobStatCardOrder, setMobStatCardOrder] = useState([
@@ -10085,10 +10099,49 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           <div style={{ fontSize: 14, fontWeight: 800 }}>{(user?.companyName || user?.name || "Business")}</div>
                         </div>
                         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                          <div onClick={() => { setMobNotifExpanded(v => !v); fetchPendingLeaves(); }} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.08)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-                            <i className="ti ti-bell" style={{ fontSize: 17 }}></i>
-                            {pendingLeaves.length > 0 && (
-                              <span style={{ position: "absolute", top: 5, right: 6, width: 8, height: 8, borderRadius: "50%", background: "#ff4d6d", boxShadow: "0 0 0 2px #0f0a29" }}></span>
+                          <div style={{ position: "relative" }}>
+                            <div onClick={() => { setMobNotifExpanded(v => !v); fetchPendingLeaves(); }} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.08)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                              <i className="ti ti-bell" style={{ fontSize: 17 }}></i>
+                              {pendingLeaves.length > 0 && (
+                                <span style={{ position: "absolute", top: 5, right: 6, width: 8, height: 8, borderRadius: "50%", background: "#ff4d6d", boxShadow: "0 0 0 2px #0f0a29" }}></span>
+                              )}
+                            </div>
+                            {mobNotifExpanded && (
+                              <>
+                                <div onClick={() => setMobNotifExpanded(false)} style={{ position: "fixed", inset: 0, zIndex: 4998 }} />
+                                <div style={{ position: "absolute", top: 50, right: 0, width: 300, maxHeight: 380, overflowY: "auto", background: "#fff", borderRadius: 16, boxShadow: "0 12px 32px rgba(15,10,41,0.25)", border: "1px solid rgba(0,0,0,0.05)", zIndex: 4999 }}>
+                                  <div style={{ padding: "12px 16px", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", gap: 6 }}>
+                                    <i className="ti ti-bell" style={{ color: "var(--app-accent)" }}></i>
+                                    <span style={{ fontSize: 13, fontWeight: 800, color: "#0f1c2e" }}>Notifications</span>
+                                    {pendingLeaves.length > 0 && <span style={{ background: "#EF4444", color: "#fff", borderRadius: 20, padding: "2px 7px", fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length}</span>}
+                                  </div>
+                                  <div style={{ padding: "6px 14px 12px" }}>
+                                    {pendingLeaves.length === 0 ? (
+                                      <div style={{ textAlign: "center", padding: "14px 0", color: "#A0AEC0", fontSize: 12.5 }}>No pending notifications</div>
+                                    ) : (
+                                      pendingLeaves.map((l, i) => {
+                                        const initials = l.employeeName ? l.employeeName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'EE';
+                                        const colors = ['#f59e0b', '#a855f7', '#0ea5e9', '#ec4899', '#22c55e'];
+                                        const bg = colors[i % colors.length];
+                                        const detail = `${l.type || 'Leave'} · ${l.from || ''} ${l.to ? '- ' + l.to : ''}`;
+                                        return (
+                                          <div key={l._id || i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", borderBottom: i === pendingLeaves.length - 1 ? "none" : "1px solid #F0F4F8" }}>
+                                            <div style={{ width: 30, height: 30, borderRadius: "50%", background: bg, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{initials}</div>
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                              <div style={{ fontSize: 12, fontWeight: 700, color: "#1A2332" }}>{l.employeeName}</div>
+                                              <div style={{ fontSize: 10, color: "#718096", marginTop: 1 }}>{detail}</div>
+                                            </div>
+                                            <div style={{ display: "flex", flexDirection: "column", gap: 3, flexShrink: 0 }}>
+                                              <button onClick={() => handleApproveLeave(l._id)} style={{ background: "#DCFCE7", color: "#166534", border: "none", padding: "3px 7px", borderRadius: 6, fontSize: 9.5, fontWeight: 700, cursor: "pointer" }}>Approve</button>
+                                              <button onClick={() => handleRejectLeave(l._id)} style={{ background: "#FEF2F2", color: "#DC2626", border: "none", padding: "3px 7px", borderRadius: 6, fontSize: 9.5, fontWeight: 700, cursor: "pointer" }}>Reject</button>
+                                            </div>
+                                          </div>
+                                        );
+                                      })
+                                    )}
+                                  </div>
+                                </div>
+                              </>
                             )}
                           </div>
 
@@ -10244,44 +10297,109 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   </div>
 
                   {/* QUICK ACTION CARDS — proper dashboard-card style, tap opens popup */}
-                  {mobNotifExpanded && (
-                    <div style={{ margin: "10px 16px 0" }}>
-                      <div style={{ background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.12)", border: "1px solid rgba(0,0,0,0.03)", overflow: "hidden" }}>
-                        <div style={{ padding: "14px 16px", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                          <div style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 6 }}>
-                            <i className="ti ti-bell" style={{ color: "var(--app-accent)" }}></i> Notifications
-                            {pendingLeaves.length > 0 && <span style={{ background: "#EF4444", color: "#fff", borderRadius: 20, padding: "2px 8px", fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length}</span>}
-                          </div>
-                          <span onClick={() => setMobNotifExpanded(false)} style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 800, cursor: "pointer" }}>▲</span>
+                  <div style={{ margin: "10px 16px 0" }}>
+                    <div style={{ background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.12)", border: "1px solid rgba(0,0,0,0.03)", overflow: "hidden" }}>
+                      <div style={{ padding: "14px 16px", borderBottom: clientResponsesExpanded ? "1px solid #f1f5f9" : "none", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          <i className="ti ti-clipboard-check" style={{ color: "var(--app-accent)" }}></i>
+                          <span style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e" }}>Client Responses</span>
                         </div>
-                        <div style={{ padding: "10px 16px 16px" }}>
-                          {pendingLeaves.length === 0 ? (
-                            <div style={{ textAlign: "center", padding: "16px 0", color: "#A0AEC0", fontSize: 13 }}>No pending notifications</div>
-                          ) : (
-                            pendingLeaves.map((l, i) => {
-                              const initials = l.employeeName ? l.employeeName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'EE';
-                              const colors = ['#f59e0b', '#a855f7', '#0ea5e9', '#ec4899', '#22c55e'];
-                              const bg = colors[i % colors.length];
-                              const detail = `${l.type || 'Leave'} · ${l.from || ''} ${l.to ? '- ' + l.to : ''}`;
-                              return (
-                                <div key={l._id || i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: i === pendingLeaves.length - 1 ? "none" : "1px solid #F0F4F8" }}>
-                                  <div style={{ width: 34, height: 34, borderRadius: "50%", background: bg, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, flexShrink: 0 }}>{initials}</div>
-                                  <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "#1A2332" }}>{l.employeeName}</div>
-                                    <div style={{ fontSize: 10.5, color: "#718096", marginTop: 2 }}>{detail}</div>
+                        <span onClick={() => setClientResponsesExpanded(v => !v)} style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 800, cursor: "pointer" }}>
+                          {clientResponsesExpanded ? "▼" : "▲"}
+                        </span>
+                      </div>
+                      {clientResponsesExpanded && (
+                        <div style={{ padding: "6px 16px 14px" }}>
+                          {(() => {
+                            const approvalItems = allApprovals
+                              .filter(a => a.status === "approved" || a.status === "rejected")
+                              .map(a => ({
+                                kind: "approval",
+                                key: a._id,
+                                sortDate: a.respondedAt ? new Date(a.respondedAt) : new Date(0),
+                                data: a,
+                              }));
+
+                            const invoiceItems = invoices
+                              .filter(inv => {
+                                const s = (inv.status || "").toLowerCase();
+                                return s === "paid" || s === "overdue" || s === "pending" || s === "sent";
+                              })
+                              .map(inv => ({
+                                kind: "invoice",
+                                key: inv._id || inv.invoiceNo,
+                                sortDate: inv.updatedAt ? new Date(inv.updatedAt) : (inv.date ? new Date(inv.date) : new Date(0)),
+                                data: inv,
+                              }));
+
+                            const combined = [...approvalItems, ...invoiceItems]
+                              .sort((x, y) => y.sortDate - x.sortDate)
+                              .slice(0, 20);
+
+                            if (combined.length === 0) {
+                              return <div style={{ textAlign: "center", padding: "16px 0", color: "#A0AEC0", fontSize: 13 }}>No client responses yet</div>;
+                            }
+
+                            return combined.map((item, i) => {
+                              if (item.kind === "approval") {
+                                const a = item.data;
+                                const isApproved = a.status === "approved";
+                                return (
+                                  <div key={item.key || i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 0", borderBottom: i === combined.length - 1 ? "none" : "1px solid #F0F4F8" }}>
+                                    <div style={{ width: 30, height: 30, borderRadius: "50%", background: isApproved ? "#DCFCE7" : "#FEE2E2", color: isApproved ? "#16a34a" : "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 14 }}>
+                                      <i className={`ti ${isApproved ? "ti-check" : "ti-x"}`}></i>
+                                    </div>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                      <div style={{ fontSize: 12.5, fontWeight: 700, color: "#1A2332" }}>
+                                        {a.title || "Update"} — <span style={{ color: isApproved ? "#16a34a" : "#dc2626" }}>{isApproved ? "Approved" : "Rejected"}</span>
+                                      </div>
+                                      {a.desc && <div style={{ fontSize: 11, color: "#718096", marginTop: 2 }}>{a.desc}</div>}
+                                      {!isApproved && a.rejectReason && (
+                                        <div style={{ fontSize: 11, color: "#dc2626", marginTop: 3, background: "#FEF2F2", padding: "4px 8px", borderRadius: 6 }}>
+                                          Reason: {a.rejectReason}
+                                        </div>
+                                      )}
+                                      <div style={{ fontSize: 10, color: "#A0AEC0", marginTop: 3 }}>
+                                        {a.respondedAt ? new Date(a.respondedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}
+                                      </div>
+                                    </div>
                                   </div>
-                                  <div style={{ display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }}>
-                                    <button onClick={() => handleApproveLeave(l._id)} style={{ background: "#DCFCE7", color: "#166534", border: "none", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Approve</button>
-                                    <button onClick={() => handleRejectLeave(l._id)} style={{ background: "#FEF2F2", color: "#DC2626", border: "none", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Reject</button>
+                                );
+                              }
+
+                              const inv = item.data;
+                              const s = (inv.status || "").toLowerCase();
+                              const cfg = s === "paid"
+                                ? { icon: "ti-cash", bg: "#DCFCE7", color: "#16a34a", label: "Paid" }
+                                : s === "overdue"
+                                  ? { icon: "ti-alert-circle", bg: "#FEE2E2", color: "#dc2626", label: "Overdue" }
+                                  : s === "sent"
+                                    ? { icon: "ti-send", bg: "#DBEAFE", color: "#1d4ed8", label: "Sent" }
+                                    : { icon: "ti-clock", bg: "#FEF3C7", color: "#b45309", label: "Pending" };
+                              return (
+                                <div key={item.key || i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 0", borderBottom: i === combined.length - 1 ? "none" : "1px solid #F0F4F8" }}>
+                                  <div style={{ width: 30, height: 30, borderRadius: "50%", background: cfg.bg, color: cfg.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 14 }}>
+                                    <i className={`ti ${cfg.icon}`}></i>
+                                  </div>
+                                  <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "#1A2332" }}>
+                                      Invoice {inv.invoiceNo || ""} — <span style={{ color: cfg.color }}>{cfg.label}</span>
+                                    </div>
+                                    <div style={{ fontSize: 11, color: "#718096", marginTop: 2 }}>
+                                      {inv.clientName || inv.client || "Client"} · {formatCurrency ? formatCurrency(inv.grandTotal, inv.currency) : `₹${inv.grandTotal || 0}`}
+                                    </div>
+                                    <div style={{ fontSize: 10, color: "#A0AEC0", marginTop: 3 }}>
+                                      {inv.date ? new Date(inv.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}
+                                    </div>
                                   </div>
                                 </div>
                               );
-                            })
-                          )}
+                            });
+                          })()}
                         </div>
-                      </div>
+                      )}
                     </div>
-                  )}
+                  </div>
 
                   {/* QUICK ACTION CARDS — proper dashboard-card style, tap opens popup */}
                   <div style={{ padding: "22px 16px 6px", display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}></div>

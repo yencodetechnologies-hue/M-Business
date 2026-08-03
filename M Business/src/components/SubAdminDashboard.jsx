@@ -9696,7 +9696,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 @media(max-width:768px){.desktop-topbar{display:none!important;}}
 
         @media(max-width:768px){.sidebar-spacer{display:none!important;}.mob-topbar-hide{display:none!important;}.main-content{padding:12px!important;}.dash-stats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}.dash-2col{grid-template-columns:1fr!important;}.modal-2col{grid-template-columns:1fr!important;}.page-header{flex-wrap:wrap;gap:8px;}.header-actions{flex-wrap:wrap;gap:8px;}}
-@media(max-width:768px){.mob-topbar-hamburger{display:none!important;}}
+@media(max-width:768px){.mob-topbar-hamburger{visibility:hidden!important;}}
         @media print {
 
           .no-print { display: none !important; }
@@ -9777,7 +9777,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
         {/* Mobile Topbar */}
 
-        <div className="mob-topbar no-print" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#fff", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)" }}>
+        <div className="mob-topbar no-print" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#fff", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", position: "sticky" }}>
 
           {!enforceMySubscriptions ? (
 

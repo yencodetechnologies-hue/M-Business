@@ -2373,7 +2373,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             ))}
           </div>
 
-          <div style={{ display: 'flex', gap: 8, marginBottom: 18, width: '100%', maxWidth: '100%', background: '#F8FAFC', border: '1px solid #E8EDF2', borderRadius: 12, padding: 8, boxSizing: 'border-box', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', gap: 6, marginBottom: 18, width: '100%', maxWidth: '100%', background: '#F8FAFC', border: '1px solid #E8EDF2', borderRadius: 12, padding: 6, boxSizing: 'border-box', overflow: 'visible' }}>
             {[
               { key: 'inv', label: 'Invoice', desc: 'Standard billing', icon: 'ti-file-invoice' },
               { key: 'pay', label: 'Payment', desc: 'Received amounts', icon: 'ti-credit-card' },
@@ -2382,7 +2382,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
               <button
                 key={t.key}
                 onClick={() => { setActivePayTab(t.key); setSelectedPaymentItems([]); }}
-                style={{ flex: '1 1 0', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 6px', borderRadius: 8, border: `1.5px solid ${activePayTab === t.key ? 'var(--app-accent, #00BCD4)' : 'transparent'}`, background: activePayTab === t.key ? 'var(--app-accent, #00BCD4)' : '#fff', color: activePayTab === t.key ? '#fff' : '#374151', fontSize: 12, fontWeight: 800, cursor: 'pointer', transition: 'all .15s', fontFamily: 'inherit', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                style={{ flex: '1 1 0', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, padding: '8px 4px', borderRadius: 8, border: `1.5px solid ${activePayTab === t.key ? 'var(--app-accent, #00BCD4)' : 'transparent'}`, background: activePayTab === t.key ? 'var(--app-accent, #00BCD4)' : '#fff', color: activePayTab === t.key ? '#fff' : '#374151', fontSize: 11, fontWeight: 800, cursor: 'pointer', transition: 'all .15s', fontFamily: 'inherit', whiteSpace: 'nowrap', overflow: 'visible', textOverflow: 'clip' }}
               >
                 <i className={`ti ${t.icon}`} style={{ fontSize: 14, flexShrink: 0 }}></i>
                 {t.label}
@@ -2671,7 +2671,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         {/* MILESTONES STANDALONE CARD */}
         < div className="mpd-card mpd-milestones-card" style={{ marginBottom: 12 }
         }>
-          <div className="mpd-card-header" style={{ paddingBottom: 6, paddingLeft: 4, paddingRight: 4 }}>
+          <div className="mpd-card-header" style={{ paddingBottom: 16, paddingLeft: 4, paddingRight: 4, marginBottom: 8 }}>
             <div className="mpd-card-title"><i className="ti ti-flag"></i> Milestone Progress</div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               <div style={{ display: 'flex', background: P.bg, borderRadius: 8, border: `1px solid ${P.border}`, overflow: 'hidden' }}>
@@ -3208,10 +3208,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   </select>
                                 )}
                               </div>
-                              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: P.textMid, cursor: 'pointer', paddingTop: 22, whiteSpace: 'nowrap' }}>
-                                <input type="checkbox" checked={isApprovalRequest} onChange={e => setIsApprovalRequest(e.target.checked)} style={{ accentColor: P.primary, width: 15, height: 15, cursor: 'pointer' }} />
-                                <i className="ti ti-clipboard-check" style={{ fontSize: 14 }} /> Approval Request
-                              </label>
                             </div>
 
                             <div style={{ marginBottom: 14 }}>

@@ -10283,30 +10283,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
                   )}
 
-                  <div style={{ margin: "10px 16px 0" }}>
-                    <div style={{ background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.12)", border: "1px solid rgba(0,0,0,0.03)", overflow: "hidden" }}>
-                      <div style={{ padding: "14px 16px", borderBottom: mobMessagesExpanded ? "1px solid #f1f5f9" : "none", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                        <div style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 6 }}>
-                          <i className="ti ti-messages" style={{ color: "var(--app-accent)" }}></i> Messages
-                        </div>
-                        <span onClick={() => setMobMessagesExpanded(v => !v)} style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 800, cursor: "pointer" }}>
-                          {mobMessagesExpanded ? "▼" : "▲"}
-                        </span>
-                      </div>
-                      {mobMessagesExpanded && (
-                        <div style={{ padding: "16px" }}>
-                          <div
-                            onClick={() => setActive("messaging")}
-                            style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", borderRadius: 12, background: "rgba(0,188,212,0.08)", cursor: "pointer" }}
-                          >
-                            <span style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>Open Messages</span>
-                            <i className="ti ti-arrow-right" style={{ color: "var(--app-accent)" }}></i>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
                   {/* QUICK ACTION CARDS — proper dashboard-card style, tap opens popup */}
                   <div style={{ padding: "22px 16px 6px", display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}></div>
                   <MobilePopup id="qaQuote" title="Quotations">
@@ -12055,7 +12031,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {validActive === "projects" && <ProjectsPage
 
-              onBack={sidebarOverride === "dashboard" ? () => { setSidebarOverride(null); setActive("dashboard"); } : null}
+              onBack={(sidebarOverride === "dashboard" || openedFromMobileAddMenu) ? () => { setSidebarOverride(null); setOpenedFromMobileAddMenu(false); setActive("dashboard"); } : null}
 
               projects={projects}
 

@@ -6933,6 +6933,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   });
   const [mobilePopupSection, setMobilePopupSection] = useState(null); // holds the id of open popup, or null
   const [showMobileAddMenu, setShowMobileAddMenu] = useState(false);
+  const [mobNotifExpanded, setMobNotifExpanded] = useState(false);
 
   const [draggingStatCard, setDraggingStatCard] = useState(null);
   const [mobStatCardOrder, setMobStatCardOrder] = useState([
@@ -6944,10 +6945,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   ]);
   const [draggingSecondRow, setDraggingSecondRow] = useState(null);
   const [mobSecondRowOrder, setMobSecondRowOrder] = useState([
-    { id: "unpaidInv", popupId: "mobUnpaidInvoices", icon: "ti-file-invoice", label: "Unpaid Invoices", color: "var(--app-accent)", bg: "rgba(var(--app-accent-rgb,0,188,212),0.1)" },
-    { id: "totalInv", popupId: "qaInvoice", icon: "ti-file-invoice", label: "Invoices", color: "var(--app-accent)", bg: "rgba(var(--app-accent-rgb,0,188,212),0.1)" },
-    { id: "totalProp", popupId: "qaProposal", icon: "ti-clipboard-list", label: "Proposals", color: "var(--app-accent)", bg: "rgba(var(--app-accent-rgb,0,188,212),0.1)" },
-    { id: "totalQuote", popupId: "qaQuote", icon: "ti-receipt", label: "Quotations", color: "var(--app-accent)", bg: "rgba(var(--app-accent-rgb,0,188,212),0.1)" },
+    { id: "unpaidInv", popupId: "mobUnpaidInvoices", icon: "ti-file-invoice", label: "Unpaid Invoices", val: 0, grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "totalInv", popupId: "qaInvoice", icon: "ti-file-invoice", label: "Invoices", val: 0, grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "totalProp", popupId: "qaProposal", icon: "ti-clipboard-list", label: "Proposals", val: 0, grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "totalQuote", popupId: "qaQuote", icon: "ti-receipt", label: "Quotations", val: 0, grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
   ]);
   const openMobilePopup = (key) => setMobilePopupSection(key);
   const closeMobilePopup = () => setMobilePopupSection(null);
@@ -6966,13 +6967,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         <div
           onClick={(e) => e.stopPropagation()}
           style={{
-            background: "#fff", borderRadius: "20px 20px 0 0", width: "100%", maxWidth: 480,
+            background: "var(--app-accent, #00BCD4)", borderRadius: "20px 20px 0 0", width: "100%", maxWidth: 480,
             maxHeight: "75vh", overflowY: "auto", padding: 20, boxShadow: "0 -4px 24px rgba(0,0,0,0.2)",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <div style={{ fontSize: 17, fontWeight: 800, color: "#0f1c2e" }}>{title}</div>
-            <span onClick={closeMobilePopup} style={{ fontSize: 20, cursor: "pointer", color: "rgba(15,28,46,0.5)" }}>✕</span>
+            <div style={{ fontSize: 17, fontWeight: 800, color: "#fff" }}>{title}</div>
+            <span onClick={closeMobilePopup} style={{ fontSize: 20, cursor: "pointer", color: "rgba(255,255,255,0.8)" }}>✕</span>
           </div>
           {children}
         </div>
@@ -10077,7 +10078,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           <div style={{ fontSize: 14, fontWeight: 800 }}>{(user?.companyName || user?.name || "Business")}</div>
                         </div>
                         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                          <div onClick={() => { setShowNotifPanel(v => !v); fetchPendingLeaves(); }} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.08)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                          <div onClick={() => { setMobNotifExpanded(v => !v); fetchPendingLeaves(); }} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.08)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
                             <i className="ti ti-bell" style={{ fontSize: 17 }}></i>
                             {pendingLeaves.length > 0 && (
                               <span style={{ position: "absolute", top: 5, right: 6, width: 8, height: 8, borderRadius: "50%", background: "#ff4d6d", boxShadow: "0 0 0 2px #0f0a29" }}></span>
@@ -10147,37 +10148,36 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   </div>
 
                   <MobilePopup id="mobClients" title="Clients">
-                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>{clients.length} total</div>
-                    <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", marginBottom: 16 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} Active Clients</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4, color: "#fff" }}>{clients.length} total</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.75)", marginBottom: 16 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} Active Clients</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {clients.map((c, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
-                          <span style={{ fontWeight: 600 }}>{c.name || c.clientName || c.companyName || "Client"}</span>
-                          <span style={{ color: "rgba(15,28,46,0.5)" }}>{c.status || "-"}</span>
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8 }}>
+                          <span style={{ fontWeight: 600, color: "#fff" }}>{c.name || c.clientName || c.companyName || "Client"}</span>
+                          <span style={{ color: "rgba(255,255,255,0.75)" }}>{c.status || "-"}</span>
                         </div>
                       ))}
                     </div>
                   </MobilePopup>
-
                   <MobilePopup id="mobProjects" title="Projects">
-                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{projects.length} total</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{projects.length} total</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {projectsWithProgress.map((p, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
-                          <span style={{ fontWeight: 600 }}>{p.name}</span>
-                          <span style={{ color: "rgba(15,28,46,0.5)" }}>{p.progress || 0}%</span>
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8 }}>
+                          <span style={{ fontWeight: 600, color: "#fff" }}>{p.name}</span>
+                          <span style={{ color: "rgba(255,255,255,0.75)" }}>{p.progress || 0}%</span>
                         </div>
                       ))}
                     </div>
                   </MobilePopup>
 
                   <MobilePopup id="mobTeam" title="Team">
-                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{employees.length} staff</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{employees.length} staff</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {employees.map((e, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
-                          <span style={{ fontWeight: 600 }}>{e.name}</span>
-                          <span style={{ color: "rgba(15,28,46,0.5)" }}>{e.role || "Employee"}</span>
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8 }}>
+                          <span style={{ fontWeight: 600, color: "#fff" }}>{e.name}</span>
+                          <span style={{ color: "rgba(255,255,255,0.75)" }}>{e.role || "Employee"}</span>
                         </div>
                       ))}
                     </div>
@@ -10186,17 +10186,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
                   <MobilePopup id="mobRevenue" title="Revenue This Month">
-                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>{formatShortCurrency(income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0))}</div>
-                    <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)" }}>Total income this year: {formatShortCurrency(income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0))}</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4, color: "#fff" }}>{formatShortCurrency(income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0))}</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.75)" }}>Total income this year: {formatShortCurrency(income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0))}</div>
                   </MobilePopup>
 
                   <MobilePopup id="mobUnpaidInvoices" title="Unpaid Invoices">
-                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length} pending</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length} pending</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").map((inv, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
-                          <span style={{ fontWeight: 600 }}>{inv.clientName || inv.client || "Client"}</span>
-                          <span style={{ color: "rgba(15,28,46,0.5)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8 }}>
+                          <span style={{ fontWeight: 600, color: "#fff" }}>{inv.clientName || inv.client || "Client"}</span>
+                          <span style={{ color: "rgba(255,255,255,0.75)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
                         </div>
                       ))}
                     </div>
@@ -10227,7 +10227,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         onClick={() => openMobilePopup(s.popupId)}
                         style={{ animationDelay: `${i * 60}ms`, background: "#fff", borderRadius: 18, aspectRatio: "1 / 1", padding: "10px 6px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)", cursor: "grab", opacity: draggingSecondRow === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                       >
-                        <div style={{ width: 30, height: 30, borderRadius: 10, background: s.bg, color: s.color, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 6px", fontSize: 15 }}>
+                        <div style={{ width: 30, height: 30, borderRadius: 10, background: s.grad, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 6px", fontSize: 15, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
                           <i className={`ti ${s.icon}`}></i>
                         </div>
                         <div style={{ fontSize: 16, fontWeight: 900, color: "#0f0a29" }}>{s.val}</div>
@@ -10239,16 +10239,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   {/* QUICK ACTION CARDS — proper dashboard-card style, tap opens popup */}
 
                   <MobilePopup id="qaQuote" title="Quotations">
-                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{(quotations || []).length} total</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{(quotations || []).length} total</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                       {(quotations || []).map((q, i) => (
-                        <div key={q._id || q.id || i} style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 10 }}>
+                        <div key={q._id || q.id || i} style={{ borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 10 }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                            <span style={{ fontWeight: 700, fontSize: 13 }}>{q.qt?.quoteNo || q.quoteNo || q.clientName || "Quotation"}</span>
-                            <span style={{ color: (q.status || "").toLowerCase() === "approved" ? "#15803D" : "#7B8FA1", fontWeight: (q.status || "").toLowerCase() === "approved" ? 800 : 600, fontSize: 11 }}>{(q.status || "draft").toUpperCase()}</span>
+                            <span style={{ fontWeight: 700, fontSize: 13, color: "#fff" }}>{q.qt?.quoteNo || q.quoteNo || q.clientName || "Quotation"}</span>
+                            <span style={{ color: (q.status || "").toLowerCase() === "approved" ? "#bbf7d0" : "rgba(255,255,255,0.75)", fontWeight: (q.status || "").toLowerCase() === "approved" ? 800 : 600, fontSize: 11 }}>{(q.status || "draft").toUpperCase()}</span>
                           </div>
                           {q.reviewComment && (
-                            <div style={{ fontSize: 11, color: "#0EA5E9", marginTop: 3 }}>
+                            <div style={{ fontSize: 11, color: "#fff", marginTop: 3 }}>
                               <i className="ti ti-message-2" style={{ fontSize: 11 }}></i> {q.reviewComment}
                             </div>
                           )}
@@ -10258,16 +10258,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   </MobilePopup>
 
                   <MobilePopup id="qaProposal" title="Proposals">
-                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{(proposalsList || []).length} total</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{(proposalsList || []).length} total</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                       {(proposalsList || []).map((p, i) => (
-                        <div key={p._id || p.id || i} style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 10 }}>
+                        <div key={p._id || p.id || i} style={{ borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 10 }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                            <span style={{ fontWeight: 700, fontSize: 13 }}>{p.title || "Proposal"}</span>
-                            <span style={{ color: (p.status || "").toLowerCase() === "approved" ? "#15803D" : "#7B8FA1", fontWeight: (p.status || "").toLowerCase() === "approved" ? 800 : 600, fontSize: 11 }}>{(p.status || "draft").toUpperCase()}</span>
+                            <span style={{ fontWeight: 700, fontSize: 13, color: "#fff" }}>{p.title || "Proposal"}</span>
+                            <span style={{ color: (p.status || "").toLowerCase() === "approved" ? "#bbf7d0" : "rgba(255,255,255,0.75)", fontWeight: (p.status || "").toLowerCase() === "approved" ? 800 : 600, fontSize: 11 }}>{(p.status || "draft").toUpperCase()}</span>
                           </div>
                           {p.reviewComment && (
-                            <div style={{ fontSize: 11, color: "#0EA5E9", marginTop: 3 }}>
+                            <div style={{ fontSize: 11, color: "#fff", marginTop: 3 }}>
                               <i className="ti ti-message-2" style={{ fontSize: 11 }}></i> {p.reviewComment}
                             </div>
                           )}
@@ -10277,12 +10277,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   </MobilePopup>
 
                   <MobilePopup id="qaInvoice" title="Invoices">
-                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{invoices.length} total</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{invoices.length} total</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {invoices.slice(0, 10).map((inv, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
-                          <span style={{ fontWeight: 600 }}>{inv.clientName || inv.client || "Client"}</span>
-                          <span style={{ color: "rgba(15,28,46,0.5)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8 }}>
+                          <span style={{ fontWeight: 600, color: "#fff" }}>{inv.clientName || inv.client || "Client"}</span>
+                          <span style={{ color: "rgba(255,255,255,0.75)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
                         </div>
                       ))}
                     </div>

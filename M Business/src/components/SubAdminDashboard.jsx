@@ -9696,7 +9696,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 @media(max-width:768px){.desktop-topbar{display:none!important;}}
 
         @media(max-width:768px){.sidebar-spacer{display:none!important;}.mob-topbar-hide{display:none!important;}.main-content{padding:12px!important;}.dash-stats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}.dash-2col{grid-template-columns:1fr!important;}.modal-2col{grid-template-columns:1fr!important;}.page-header{flex-wrap:wrap;gap:8px;}.header-actions{flex-wrap:wrap;gap:8px;}}
-
+@media(max-width:768px){.mob-topbar-hamburger{display:none!important;}}
         @media print {
 
           .no-print { display: none !important; }
@@ -9781,7 +9781,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           {!enforceMySubscriptions ? (
 
-            <button onClick={() => { isDesktopWidth ? setDesktopSidebarOpen(v => !v) : setSidebarOpen(true); }} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)", padding: "2px 6px", lineHeight: 1 }}>☰</button>
+            <button onClick={() => { isDesktopWidth ? setDesktopSidebarOpen(v => !v) : setSidebarOpen(true); }} className="mob-topbar-hamburger" style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)", padding: "2px 6px", lineHeight: 1 }}>☰</button>
 
           ) : (
 
@@ -10050,9 +10050,23 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <div style={{ position: "absolute", bottom: -80, left: -30, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, #7c3aed 0%, transparent 70%)", opacity: 0.25, filter: "blur(14px)" }} />
 
                     <div style={{ position: "relative", zIndex: 2 }}>
-                      <div style={{ textAlign: "center", marginBottom: 20 }}>
-                        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", fontWeight: 700, letterSpacing: 1 }}>WELCOME BACK</div>
-                        <div style={{ fontSize: 14, fontWeight: 800 }}>{(user?.companyName || user?.name || "Business")}</div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                        <div onClick={() => setSidebarOpen(true)} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.08)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <i className="ti ti-menu-2" style={{ fontSize: 18 }}></i>
+                        </div>
+                        <div style={{ textAlign: "center" }}>
+                          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", fontWeight: 700, letterSpacing: 1 }}>WELCOME BACK</div>
+                          <div style={{ fontSize: 14, fontWeight: 800 }}>{(user?.companyName || user?.name || "Business")}</div>
+                        </div>
+                        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                          <div onClick={() => { setShowNotifPanel(v => !v); fetchPendingLeaves(); }} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.08)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                            <i className="ti ti-bell" style={{ fontSize: 17 }}></i>
+                            {pendingLeaves.length > 0 && (
+                              <span style={{ position: "absolute", top: 5, right: 6, width: 8, height: 8, borderRadius: "50%", background: "#ff4d6d", boxShadow: "0 0 0 2px #0f0a29" }}></span>
+                            )}
+                          </div>
+
+                        </div>
                       </div>
 
                       <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>

@@ -3076,7 +3076,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             {/* TABS - draggable scroll */}
             < div className="mpd-card" style={{ padding: '22px 18px 22px', overflow: 'hidden', display: 'flex', flexDirection: 'column', height: 420, maxHeight: 420, boxSizing: 'border-box' }}>          <div className="mpd-tabs"
               ref={tabsRef}
-              style={{ overflowX: 'auto', scrollbarWidth: 'none', marginBottom: 0, paddingBottom: 12, borderBottom: `2px solid ${P.border}` }}
+              style={{ overflowX: 'auto', scrollbarWidth: 'none', marginBottom: 0, paddingBottom: 12 }}
             >
               {tabOrder.filter(tab => tab !== 'activity' && tab !== 'payments').map(tab => {
                 let lbl = '', icon = null;
@@ -3108,7 +3108,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 );
               })}
 
-              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, paddingRight: 0, fontSize: 13, color: '#9CA3AF', userSelect: 'none', whiteSpace: 'nowrap' }}>
+              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, paddingRight: 0, fontSize: 13, color: '#9CA3AF', whiteSpace: 'nowrap' }}>
                 {!hideTopActions && activeTab === 'updates' && (
                   <button
                     type="button"
@@ -3122,7 +3122,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
               </div>
             </div>
-              <div ref={tabContentRef} style={{ userSelect: 'none', overflowY: 'auto', flex: 1, minHeight: 0, padding: '10px 4px 0', boxSizing: 'border-box' }}>
+              <div ref={tabContentRef} style={{ userSelect: 'none', overflowY: (activeTab === 'updates' && (!currProject.updates || currProject.updates.length === 0)) ? 'hidden' : 'auto', flex: 1, minHeight: 0, padding: '10px 4px 0', boxSizing: 'border-box' }}>
 
                 <div className={`mpd-tab-pane ${activeTab === 'updates' ? 'mpd-active' : ''}`}>
 
@@ -3228,7 +3228,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                 onChange={e => setUpdateText(e.target.value)}
                                 placeholder="What's done, what's next, any blockers or decisions needed..."
                                 rows={3}
-                                style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', boxSizing: 'border-box', resize: 'vertical' }}
+                                style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', boxSizing: 'border-box', resize: 'none' }}
                               />
                             </div>
                             <div style={{ marginBottom: 14 }}>
@@ -3410,7 +3410,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     </div>
                   )}
                   {(!currProject.updates || currProject.updates.length === 0) ? (
-                    <div style={{ padding: '20px 24px', minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', color: P.textLight, fontSize: 13, boxSizing: 'border-box' }}>No updates posted yet.</div>
+                    <div style={{ padding: '20px 24px', height: '100%', minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', color: P.textLight, fontSize: 13, boxSizing: 'border-box' }}>No updates posted yet.</div>
                   ) : (() => {
                     const perPage = 10;
                     const totalPages = Math.ceil(currProject.updates.length / perPage);

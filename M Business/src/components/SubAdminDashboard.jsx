@@ -953,7 +953,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 
 
 
-function ClientsPage({ clients, setClients, projects = [], setProjects, onAddClient, onViewProject, triggerCrop, onCreateProject, user, activeClientIdForReturn, onActiveClientIdRestored, newClientId, onNewClientShown, isFetching, invoices = [], tasks = [] }) {
+function ClientsPage({ clients, setClients, projects = [], setProjects, onAddClient, onViewProject, triggerCrop, onCreateProject, user, activeClientIdForReturn, onActiveClientIdRestored, newClientId, onNewClientShown, isFetching, invoices = [], tasks = [], onBack }) {
 
   const mainScrollRef = useRef(null);
 
@@ -2146,6 +2146,11 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
     <div className="clients-page-root" style={{ display: "flex", flexDirection: "column", minHeight: "100%", height: "auto", overflowY: "auto", overflowX: "hidden", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 100%)", padding: "24px 28px" }}>
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
+      {onBack && (
+        <div onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--app-accent)", fontWeight: 800, fontSize: 14, cursor: "pointer", marginBottom: 14 }}>
+          <i className="ti ti-chevron-left"></i> Back
+        </div>
+      )}
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
         <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1A2332", margin: 0 }}>Clients</h1>
         <button className="create-btn compact-action-btn" onClick={onAddClient} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
@@ -6934,6 +6939,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [mobilePopupSection, setMobilePopupSection] = useState(null); // holds the id of open popup, or null
   const [showMobileAddMenu, setShowMobileAddMenu] = useState(false);
   const [mobNotifExpanded, setMobNotifExpanded] = useState(false);
+  const [openedFromMobileAddMenu, setOpenedFromMobileAddMenu] = useState(false);
 
   const [draggingStatCard, setDraggingStatCard] = useState(null);
   const [mobStatCardOrder, setMobStatCardOrder] = useState([
@@ -10237,7 +10243,47 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   </div>
 
                   {/* QUICK ACTION CARDS — proper dashboard-card style, tap opens popup */}
+                  {mobNotifExpanded && (
+                    <div style={{ margin: "10px 16px 0" }}>
+                      <div style={{ background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.12)", border: "1px solid rgba(0,0,0,0.03)", overflow: "hidden" }}>
+                        <div style={{ padding: "14px 16px", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                          <div style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 6 }}>
+                            <i className="ti ti-bell" style={{ color: "var(--app-accent)" }}></i> Notifications
+                            {pendingLeaves.length > 0 && <span style={{ background: "#EF4444", color: "#fff", borderRadius: 20, padding: "2px 8px", fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length}</span>}
+                          </div>
+                          <span onClick={() => setMobNotifExpanded(false)} style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 800, cursor: "pointer" }}>▲</span>
+                        </div>
+                        <div style={{ padding: "10px 16px 16px" }}>
+                          {pendingLeaves.length === 0 ? (
+                            <div style={{ textAlign: "center", padding: "16px 0", color: "#A0AEC0", fontSize: 13 }}>No pending notifications</div>
+                          ) : (
+                            pendingLeaves.map((l, i) => {
+                              const initials = l.employeeName ? l.employeeName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'EE';
+                              const colors = ['#f59e0b', '#a855f7', '#0ea5e9', '#ec4899', '#22c55e'];
+                              const bg = colors[i % colors.length];
+                              const detail = `${l.type || 'Leave'} · ${l.from || ''} ${l.to ? '- ' + l.to : ''}`;
+                              return (
+                                <div key={l._id || i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: i === pendingLeaves.length - 1 ? "none" : "1px solid #F0F4F8" }}>
+                                  <div style={{ width: 34, height: 34, borderRadius: "50%", background: bg, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, flexShrink: 0 }}>{initials}</div>
+                                  <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "#1A2332" }}>{l.employeeName}</div>
+                                    <div style={{ fontSize: 10.5, color: "#718096", marginTop: 2 }}>{detail}</div>
+                                  </div>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }}>
+                                    <button onClick={() => handleApproveLeave(l._id)} style={{ background: "#DCFCE7", color: "#166534", border: "none", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Approve</button>
+                                    <button onClick={() => handleRejectLeave(l._id)} style={{ background: "#FEF2F2", color: "#DC2626", border: "none", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Reject</button>
+                                  </div>
+                                </div>
+                              );
+                            })
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
+                  {/* QUICK ACTION CARDS — proper dashboard-card style, tap opens popup */}
+                  <div style={{ padding: "22px 16px 6px", display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}></div>
                   <MobilePopup id="qaQuote" title="Quotations">
                     <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{(quotations || []).length} total</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -10352,9 +10398,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       >
                         <div style={{ width: 40, height: 4, borderRadius: 2, background: "#e2e8f0", margin: "0 auto 18px" }} />
                         {[
-                          { icon: "ti-building", label: "Add Client", action: () => { setNcError({}); setShowClientPass(false); setActive("addClient"); } },
-                          { icon: "ti-file-invoice", label: "Add Invoice", action: () => { setJumpProject(null); setJumpInvoice(null); setInvoicePrefill(null); setSidebarNavClickId(id => id + 1); setActive("invoices"); } },
-                          { icon: "ti-briefcase", label: "Add Project", action: () => { setJumpProject(null); setActive("create-project"); } },
+                          { icon: "ti-building", label: "Add Client", action: () => { setNcError({}); setShowClientPass(false); setOpenedFromMobileAddMenu(true); setActive("addClient"); } },
+                          { icon: "ti-file-invoice", label: "Add Invoice", action: () => { setJumpProject(null); setJumpInvoice(null); setInvoicePrefill(null); setSidebarNavClickId(id => id + 1); setOpenedFromMobileAddMenu(true); setActive("invoices"); } },
+                          { icon: "ti-briefcase", label: "Add Project", action: () => { setJumpProject(null); setOpenedFromMobileAddMenu(true); setActive("create-project"); } },
                         ].map((opt, idx) => (
                           <div
                             key={idx}
@@ -11580,6 +11626,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 prefillClient={jumpProject?._prefillClient ? clients.find(c => (c.clientName || c.name) === jumpProject._prefillClient) : null}
 
                 onBack={() => {
+                  if (openedFromMobileAddMenu) {
+                    setOpenedFromMobileAddMenu(false);
+                    setSidebarOverride(null);
+                    setJumpProject(null);
+                    setActive("dashboard");
+                    return;
+                  }
                   const returnTo = sidebarOverride || "projects";
                   setSidebarOverride(null);
                   setJumpProject(null);
@@ -11839,7 +11892,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             )}
 
-            {validActive === "addClient" && <AddClientView onBack={() => { if (returnToCalendar) { setReturnToCalendar(false); setSidebarOverride(null); setActive("calendar"); } else if (returnToQuotation) { setReturnToQuotation(false); setSidebarOverride(null); setActive("quotations"); } else if (returnToProposals) { setReturnToProposals(false); setSidebarOverride(null); setActive("proposals"); } else { setActive("clients"); } }} onClientAdded={(client, replaceTempId) => {
+            {validActive === "addClient" && <AddClientView onBack={() => { if (openedFromMobileAddMenu) { setOpenedFromMobileAddMenu(false); setActive("dashboard"); } else if (returnToCalendar) { setReturnToCalendar(false); setSidebarOverride(null); setActive("calendar"); } else if (returnToQuotation) { setReturnToQuotation(false); setSidebarOverride(null); setActive("quotations"); } else if (returnToProposals) { setReturnToProposals(false); setSidebarOverride(null); setActive("proposals"); } else { setActive("clients"); } }} onClientAdded={(client, replaceTempId) => {
               setClients(prev => {
                 let updated;
                 if (replaceTempId) {
@@ -11910,7 +11963,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               </div>
             )}
 
-            {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} isFetching={!clientsLoaded} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }} onAddClient={() => {
+            {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} isFetching={!clientsLoaded} onBack={openedFromMobileAddMenu ? () => { setOpenedFromMobileAddMenu(false); setActive("dashboard"); } : null} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 
@@ -12072,7 +12125,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {validActive === "invoices" && <InvoiceCreator key={`invoices-${sidebarNavClickId}`} forceListView={false} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { if (jumpProject) { setSidebarOverride(sidebarOverride || "projects"); setActive("project-details"); return; } const returnTo = sidebarOverride || prevActiveBeforeInvoice || "dashboard"; setSidebarOverride(null); setActive(returnTo); }} onSaveSuccess={() => {
+            {validActive === "invoices" && <InvoiceCreator key={`invoices-${sidebarNavClickId}`} forceListView={false} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { if (openedFromMobileAddMenu) { setOpenedFromMobileAddMenu(false); setActive("dashboard"); return; } if (jumpProject) { setSidebarOverride(sidebarOverride || "projects"); setActive("project-details"); return; } const returnTo = sidebarOverride || prevActiveBeforeInvoice || "dashboard"; setSidebarOverride(null); setActive(returnTo); }} onSaveSuccess={() => {
               if (jumpProject && (jumpProject._id || jumpProject.id)) {
                 setSidebarOverride(sidebarOverride || "projects");
                 setActive("project-details");

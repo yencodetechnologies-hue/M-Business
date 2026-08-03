@@ -372,7 +372,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
         const isLastPage = pageIdx === pages.length - 1;
         const startIndex = pageIdx * INVOICE_ROWS_PER_PAGE;
         return (
-          <div key={pageIdx} className="invoice-preview invoice-paper" style={{ padding: "48px", paddingTop: "62px", fontFamily: currentT.fontFamily, fontSize: "13px", color: "#1A2E35", background: "#fff", minHeight: "1050px", display: "flex", flexDirection: "column", marginBottom: isLastPage ? 0 : 20, "--live-preview-padding": "48px" }}>
+          <div key={pageIdx} className="invoice-preview invoice-paper" style={{ padding: "48px", fontFamily: currentT.fontFamily, fontSize: "13px", color: "#1A2E35", background: "#fff", display: "flex", flexDirection: "column", marginBottom: isLastPage ? 0 : 20, "--live-preview-padding": "48px" }}>
 
             {isFirstPage ? (
               <>
@@ -464,15 +464,8 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
 
             {isLastPage && (
               <>
-                {/* TOTALS WITH QR SCANNER */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginTop: "20px", marginBottom: "24px" }}>
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", borderRadius: 8, padding: "8px", border: "1px solid var(--app-border)", minWidth: 95 }}>
-                    <div style={{ fontSize: "8px", color: "#0f1c2e", fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>SCAN INVOICE</div>
-                    <div style={{ background: "#fff", padding: 5, borderRadius: 4, border: "1px solid var(--app-border)" }}>
-                      <QRCodeSVG value={qrData} size={80} bgColor="#ffffff" fgColor="#0f1c2e" />
-                    </div>
-                  </div>
-
+                {/* TOTALS */}
+                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", marginBottom: "16px" }}>
                   <div className="inv-totals" style={{ width: "200px" }}>
                     <div className="inv-total-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "4px 0", fontSize: "12px" }}>
                       <span className="lbl" style={{ color: "#0f1c2e" }}>Subtotal</span>
@@ -490,26 +483,36 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
                   </div>
                 </div>
 
-                {/* Amount in Words */}
-                <div style={{ marginTop: "12px", padding: "7px 12px", background: "#f8fafc", border: "1px dashed #CBD5E1", borderRadius: "6px" }}>
-                  <span style={{ fontSize: "12px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.6px" }}>Amount in Words: </span>
-                  <span style={{ fontSize: "12px", fontWeight: "800", color: "#0f1c2e" }}>{inv.currency === 'INR' ? 'INR ' : (inv.currency || 'INR') + ' '}{numberToWords(Math.round(balanceDue))}</span>
+                {/* STACKED SECTIONS: Scan Invoice → Amount in Words → Payment Details */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", borderRadius: 8, padding: "8px", border: "1px solid var(--app-border)", width: "fit-content" }}>
+                    <div style={{ fontSize: "8px", color: "#0f1c2e", fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>SCAN INVOICE</div>
+                    <div style={{ background: "#fff", padding: 5, borderRadius: 4, border: "1px solid var(--app-border)" }}>
+                      <QRCodeSVG value={qrData} size={80} bgColor="#ffffff" fgColor="#0f1c2e" />
+                    </div>
+                  </div>
+
+                  <div style={{ padding: "7px 12px", background: "#f8fafc", border: "1px dashed #CBD5E1", borderRadius: "6px" }}>
+                    <span style={{ fontSize: "12px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.6px" }}>Amount in Words: </span>
+                    <span style={{ fontSize: "12px", fontWeight: "800", color: "#0f1c2e" }}>{inv.currency === 'INR' ? 'INR ' : (inv.currency || 'INR') + ' '}{numberToWords(Math.round(balanceDue))}</span>
+                  </div>
+
+                  {(inv.bankName || inv.accountNumber || inv.ifscCode || inv.upiId) && (
+                    <div className="inv-bank" style={{ padding: "8px 10px", background: currentT.primaryBg, borderRadius: "6px", borderLeft: `3px solid ${currentT.primaryColor}`, width: "100%" }}>
+                      <div className="inv-bank-title" style={{ fontSize: "9px", fontWeight: "700", color: currentT.primaryColor, marginBottom: "3px" }}>Payment Details</div>
+                      <div className="inv-bank-detail" style={{ fontSize: "9px", color: "#0f1c2e", lineHeight: "1.5" }}>
+                        {inv.bankName && <span>Bank: {inv.bankName} &nbsp;|&nbsp; </span>}
+                        {inv.accountNumber && <span>A/C: {inv.accountNumber} &nbsp;|&nbsp; </span>}
+                        {inv.ifscCode && <span>IFSC: {inv.ifscCode}</span>}
+                        {inv.upiId && <div style={{ marginTop: "2px" }}>UPI: {inv.upiId}</div>}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* FOOTER */}
-                <div className="inv-footer" style={{ marginTop: "auto", paddingTop: "16px", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+                <div className="inv-footer" style={{ marginTop: "8px", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
                   <div className="inv-notes" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
-                    {(inv.bankName || inv.accountNumber || inv.ifscCode || inv.upiId) && (
-                      <div className="inv-bank" style={{ padding: "8px 10px", background: currentT.primaryBg, borderRadius: "6px", borderLeft: `3px solid ${currentT.primaryColor}`, width: "100%" }}>
-                        <div className="inv-bank-title" style={{ fontSize: "9px", fontWeight: "700", color: currentT.primaryColor, marginBottom: "3px" }}>Payment Details</div>
-                        <div className="inv-bank-detail" style={{ fontSize: "9px", color: "#0f1c2e", lineHeight: "1.5" }}>
-                          {inv.bankName && <span>Bank: {inv.bankName} &nbsp;|&nbsp; </span>}
-                          {inv.accountNumber && <span>A/C: {inv.accountNumber} &nbsp;|&nbsp; </span>}
-                          {inv.ifscCode && <span>IFSC: {inv.ifscCode}</span>}
-                          {inv.upiId && <div style={{ marginTop: "2px" }}>UPI: {inv.upiId}</div>}
-                        </div>
-                      </div>
-                    )}
                     {inv.notes && (
                       <div>
                         <div className="inv-notes-title" style={{ fontSize: "11px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Notes</div>

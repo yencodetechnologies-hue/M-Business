@@ -2312,7 +2312,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: s.color, borderRadius: '12px 12px 0 0' }}></div>
                 <i className={`ti ${s.icon}`} style={{ position: 'absolute', top: 14, right: 14, fontSize: 20, opacity: .13, color: s.color }}></i>
                 <div style={{ fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 5 }}>{s.lbl}</div>
-                <div style={{ fontSize: 20, fontWeight: 900, color: '#0D1B2A', letterSpacing: '-.5px', lineHeight: 1 }}>{s.val}</div>
+                <div style={{ fontSize: 20, fontWeight: 900, color: '#6B7280', letterSpacing: '-.5px', lineHeight: 1 }}>{s.val}</div>
                 <div style={{ fontSize: 11, color: '#7B8FA1', fontWeight: 600, marginTop: 4 }}>{s.sub}</div>
               </div>
             ))}

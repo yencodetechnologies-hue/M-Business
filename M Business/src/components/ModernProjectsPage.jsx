@@ -624,11 +624,11 @@ export default function ModernProjectsPage({ user }) {
                       {p.category && <span style={{ padding: '3px 9px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: 'var(--teal-light, var(--teal-light, #E0F7FA))', color: '#0097A7' }}>{p.category}</span>}
                     </div>
 
-                    <div className="m-pc-top" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                    <div className="m-pc-top" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexWrap: 'nowrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', minWidth: 0, flex: '1 1 auto', overflow: 'hidden' }}>
                         <div className="m-pc-icon" style={{ background: avColor(p.name, idx), flexShrink: 0 }}>{initials(p.name)}</div>
-                        <div style={{ minWidth: 0 }}>
-                          <div className="m-pc-name">{p.name}</div>
+                        <div style={{ minWidth: 0, overflow: 'hidden' }}>
+                          <div className="m-pc-name" style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}>{p.name}</div>
                           <div className="m-pc-company"><i className="ti ti-building" style={{ fontSize: '11px' }}></i> {p.client || 'Internal'}</div>
                         </div>
                       </div>

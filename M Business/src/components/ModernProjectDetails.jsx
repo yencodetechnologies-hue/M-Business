@@ -1887,11 +1887,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         {/* CSS injected once via useEffect above */}
 
         {/* TOPBAR */}
-        <div className="mpd-topbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
-          <div className="mpd-breadcrumb">
-            <a onClick={onBack}>Projects</a>
-            <i className="ti ti-chevron-right" style={{ fontSize: 14 }}></i>
-            <span style={{ color: P.textDark }}>{projName}</span>
+        <div className="mpd-topbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, flexWrap: 'wrap', gap: 10 }}>
+          <div className="mpd-breadcrumb" style={{ minWidth: 0, overflow: "hidden" }}>
+            <a onClick={onBack} style={{ flexShrink: 0 }}>Projects</a>
+            <i className="ti ti-chevron-right" style={{ fontSize: 14, flexShrink: 0 }}></i>
+            <span style={{ color: P.textDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>{projName}</span>
           </div>
           {onEdit && (
             <button className="mpd-btn mpd-btn-primary" onClick={() => onEdit(currProject)}>
@@ -1906,7 +1906,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           <div className="mpd-proj-header" style={{ flex: '1 1 50%', minWidth: 0, paddingTop: 8, paddingLeft: 6, paddingRight: 6, height: '100%', boxSizing: 'border-box', flexWrap: 'nowrap' }}>
             <div className="mpd-ph-left">
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-                <div className="mpd-proj-name">{projName}</div>
+                <div className="mpd-proj-name" style={{ overflowWrap: "break-word", wordBreak: "break-word", minWidth: 0 }}>{projName}</div>
                 <span className={`mpd-status-badge ${badgeClass}`}>{currProject.status || 'Active'}</span>
                 <span className={`mpd-prio ${prioClass}`}>{priority.charAt(0).toUpperCase() + priority.slice(1)}</span>
               </div>

@@ -109,7 +109,7 @@ function Toggle({ on, onChange }) {
   );
 }
 
-export default function SettingsPage({ user, appTheme, setAppTheme, themes, customColor, setCustomColor, onLogoChange, triggerCrop, onProfileUpdate, THEME }) {
+export default function SettingsPage({ user, appTheme, setAppTheme, themes, customColor, setCustomColor, onLogoChange, triggerCrop, onProfileUpdate, THEME, onBack }) {
   const [activeSection, setActiveSection] = useState('profile');
   const [toast, setToast] = useState(null);
   const fileInputRef = useRef(null);
@@ -264,9 +264,13 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
           {toast.type === 'error' ? '⚠ ' : '✓ '}{toast.msg}
         </div>
       )}
-
       {/* Page Header */}
       <div style={{ marginBottom: 22 }}>
+        {onBack && (
+          <div onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--app-accent)", fontWeight: 800, fontSize: 14, cursor: "pointer", marginBottom: 10 }}>
+            <i className="ti ti-chevron-left"></i> Back
+          </div>
+        )}
         <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--app-text, #1A2E35)' }}>Settings</div>
         <div style={{ fontSize: 12, color: 'var(--app-muted, #607D86)', marginTop: 3 }}>Manage your account, company and preferences</div>
       </div>

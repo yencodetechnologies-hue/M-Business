@@ -10246,7 +10246,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
                   <MobilePopup id="mobRevenue" title="Revenue This Month">
-                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4, color: "#fff" }}>{formatShortCurrency(income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0))}</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4, color: "#fff" }}></div>
                     <div style={{ fontSize: 13, color: "rgba(255,255,255,0.75)" }}>Total income this year: {formatShortCurrency(income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0))}</div>
                   </MobilePopup>
 
@@ -10302,7 +10302,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       <div style={{ padding: "14px 16px", borderBottom: clientResponsesExpanded ? "1px solid #f1f5f9" : "none", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                           <i className="ti ti-clipboard-check" style={{ color: "var(--app-accent)" }}></i>
-                          <span style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e" }}>Client Responses</span>
+                          <span style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e" }}>Recent Activity</span>
                         </div>
                         <span onClick={() => setClientResponsesExpanded(v => !v)} style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 800, cursor: "pointer" }}>
                           {clientResponsesExpanded ? "▼" : "▲"}
@@ -10386,7 +10386,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                       Invoice {inv.invoiceNo || ""} — <span style={{ color: cfg.color }}>{cfg.label}</span>
                                     </div>
                                     <div style={{ fontSize: 11, color: "#718096", marginTop: 2 }}>
-                                      {inv.clientName || inv.client || "Client"} · {formatCurrency ? formatCurrency(inv.grandTotal, inv.currency) : `₹${inv.grandTotal || 0}`}
+                                      {inv.clientName || inv.client || "Client"}
                                     </div>
                                     <div style={{ fontSize: 10, color: "#A0AEC0", marginTop: 3 }}>
                                       {inv.date ? new Date(inv.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}
@@ -12328,6 +12328,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 triggerCrop={triggerCrop}
                 onProfileUpdate={(updatedUser) => setUser(updatedUser)}
                 THEME={currentTheme}
+                onBack={() => setActive("dashboard")}
               />
 
             )}

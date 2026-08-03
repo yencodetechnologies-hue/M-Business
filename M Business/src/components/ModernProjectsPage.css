@@ -672,6 +672,9 @@
   font-weight: 800;
   color: var(--text);
   margin-bottom: 3px;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  min-width: 0;
 }
 
 .modern-app .m-pc-company {

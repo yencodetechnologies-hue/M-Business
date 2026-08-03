@@ -1818,6 +1818,11 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
 
             <div>
+              {onBack && (
+                <div onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--app-accent)", fontWeight: 800, fontSize: 14, cursor: "pointer", marginBottom: 10 }}>
+                  <i className="ti ti-chevron-left"></i> Back
+                </div>
+              )}
               <div className="page-title">Invoices</div>
               <div className="page-sub">Track, manage and send invoices to your clients</div>
             </div>

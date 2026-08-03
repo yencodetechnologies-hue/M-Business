@@ -139,10 +139,14 @@ const CSS = `
 /* PROGRESS — 4 separate equal-width summary cards */
 .mpd-prog-card { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:0; margin-bottom:0; }
 .mpd-prog-item > div:last-child { padding-right: 14px; box-sizing: border-box; }
-.mpd-prog-item { background:#fff; border-radius:16px; padding:32px 30px; box-shadow:0 2px 12px rgba(0,0,0,.07); border:1px solid rgba(0,0,0,.05); min-width:0; min-height:130px; box-sizing: border-box; }
+.mpd-prog-item { background:#fff; border-radius:16px; padding:32px 30px; box-shadow:0 2px 12px rgba(0,0,0,.07); border:1px solid rgba(0,0,0,.05); min-width:0; min-height:130px; box-sizing: border-box; overflow:hidden; }
 .mpd-prog-item .mpd-progress-bg { width:100%; }
+.mpd-prog-num { word-break: break-word; }
 @media (max-width: 900px) { .mpd-prog-card { grid-template-columns:repeat(2,1fr); } }
-@media (max-width: 480px) { .mpd-prog-card { grid-template-columns:repeat(2,1fr); } }
+@media (max-width: 480px) {
+  .mpd-prog-card { grid-template-columns:repeat(2,1fr); gap:10px; }
+  .mpd-prog-item { padding:16px 12px !important; min-height:auto; }
+}
 .mpd-acc-actions, .mpd-acc-stats, .mpd-acc-boxes { display:flex; gap:10px; width:100%; box-sizing:border-box; overflow-x:auto; -webkit-overflow-scrolling:touch; }
 .mpd-acc-actions > *, .mpd-acc-stats > *, .mpd-acc-boxes > * { flex:1 1 220px; min-width:220px; }
 .mpd-prog-num { font-size:22px; font-weight:900; color:${P.textDark}; letter-spacing:-.3px; }
@@ -171,8 +175,16 @@ const CSS = `
 @media (max-width: 900px) { .mpd-grid-main-side { grid-template-columns:1fr; } }
 
 /* TASKS LIST */
-.mpd-task-filters { display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap; }
-.mpd-tf { padding:5px 14px; margin-right: 8px; border-radius:20px; font-size:12px; font-weight:700; border:1.5px solid ${P.border}; background:transparent; color:${P.textMid}; cursor:pointer; font-family:'Nunito',sans-serif; transition:all .2s; }
+.mpd-task-filters { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; margin-top:12px; width:100%; box-sizing:border-box; }
+@media (max-width: 768px) {
+  .mpd-task-filters .mpd-tf:first-child { flex-basis: 100%; }
+}
+.mpd-tf { padding:6px 14px; margin-right: 0; margin-bottom:6px; border-radius:20px; font-size:12px; font-weight:700; border:1.5px solid ${P.border}; background:transparent; color:${P.textMid}; cursor:pointer; font-family:'Nunito',sans-serif; transition:all .2s; white-space:nowrap; flex:0 0 auto; }
+@media (max-width: 480px) {
+  .mpd-task-filters { gap:6px; }
+  .mpd-tf { padding:4px 10px; font-size:11px; margin-right:6px; }
+}
+
 .mpd-tf.mpd-on, .mpd-tf:hover { background:linear-gradient(135deg,${P.primary},${P.primaryDark}); border-color:${P.primary}; color:#fff; box-shadow:0 3px 10px rgba(0,188,212,.3); }
 .mpd-task-row { display:flex; align-items:center; gap:10px; padding:11px 0; border-bottom:1px solid ${P.bg}; cursor:pointer; transition:all .15s; border-radius:8px; }
 .mpd-task-row:last-child { border-bottom:none; }
@@ -2022,7 +2034,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
         {/* PROGRESS + SUMMARY — single row, 4 equal-width cards */}
         <div className="mpd-prog-card" style={{ marginBottom: 24 }}>
-          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 16, paddingTop: 26, paddingLeft: 26 }}>
+          <div className="mpd-prog-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 10, paddingTop: 0, paddingLeft: 0, minWidth: 0 }}>
             <div className="mpd-kpi-icon" style={{ background: P.primaryLight || '#E0F2FE', flexShrink: 0, marginTop: 6, marginLeft: 4 }}><i className="ti ti-chart-donut" style={{ color: P.primary }}></i></div>
             <div style={{ flex: 1 }}>
               <div className="mpd-prog-num">{progressPct}%</div>
@@ -2961,15 +2973,15 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           {/* RIGHT COL — TASKS */}
           < div style={{ display: 'flex', flexDirection: 'column', height: '100%', order: 2, flex: '1 1 0%', minWidth: 0 }}>
             {/* TASKS COMPONENT */}
-            < div className="mpd-card" style={{ padding: 0, overflow: 'hidden', marginBottom: 20, display: 'flex', flexDirection: 'column', height: 420, maxHeight: 420, boxSizing: 'border-box' }}>
-              <div className="mpd-card-header" style={{ padding: '22px 18px 12px', marginBottom: 0, borderBottom: `2px solid ${P.border}` }}>
+            < div className="mpd-card" style={{ padding: "11px 23px", overflow: 'hidden', marginBottom: 20, display: 'flex', flexDirection: 'column', height: 420, maxHeight: 420, boxSizing: 'border-box' }}>
+              <div className="mpd-card-header" style={{ padding: '0 0 12px', marginBottom: 0, borderBottom: `2px solid ${P.border}` }}>
                 <div className="mpd-card-title"><i className="ti ti-list-check"></i> Tasks</div>
                 {!hideTopActions && (
                   <button className="mpd-btn mpd-btn-outline" onClick={() => { setEditingTask(null); setNewTaskTitle(''); setNewTaskDesc(''); setNewTaskPriority('medium'); setNewTaskAssignTo([]); setNewTaskDue(''); setNewTaskMilestone(''); setShowAddTaskModal(true); }} style={{ padding: '6px 12px', fontSize: 12 }}><i className="ti ti-plus"></i> Add Task</button>
                 )}
 
               </div>
-              <div style={{ padding: '0 18px 14px' }}>
+              <div style={{ padding: '0 18px 14px', overflow: 'visible', width: '100%', boxSizing: 'border-box' }}>
                 <div className="mpd-task-filters">
                   <button className={`mpd-tf ${taskFilter === 'all' ? 'mpd-on' : ''}`} onClick={() => setTaskFilter('all')}>All ({totalTasks})</button>
                   <button className={`mpd-tf ${taskFilter === 'inprog' ? 'mpd-on' : ''}`} onClick={() => setTaskFilter('inprog')}>In Progress ({inprogTasks})</button>

@@ -6940,7 +6940,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [showMobileAddMenu, setShowMobileAddMenu] = useState(false);
   const [mobNotifExpanded, setMobNotifExpanded] = useState(false);
 
-  const [openedFromMobileAddMenu, setOpenedFromMobileAddMenu] = useState(false);
+  const [openedFromMobileAddMenu, setOpenedFromMobileAddMenuState] = useState(() => {
+    try { return sessionStorage.getItem('mb_openedFromMobileAddMenu') === '1'; } catch { return false; }
+  });
+  const setOpenedFromMobileAddMenu = (val) => {
+    try {
+      if (val) sessionStorage.setItem('mb_openedFromMobileAddMenu', '1');
+      else sessionStorage.removeItem('mb_openedFromMobileAddMenu');
+    } catch { }
+    setOpenedFromMobileAddMenuState(val);
+  };
   const [clientResponsesExpanded, setClientResponsesExpanded] = useState(true);
   const [allApprovals, setAllApprovals] = useState([]);
   const fetchAllApprovals = useCallback(async () => {
@@ -6966,10 +6975,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   ]);
   const [draggingSecondRow, setDraggingSecondRow] = useState(null);
   const [mobSecondRowOrder, setMobSecondRowOrder] = useState([
-    { id: "unpaidInv", popupId: "mobUnpaidInvoices", icon: "ti-file-invoice", label: "Unpaid Invoices",  grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
-    { id: "totalInv", popupId: "qaInvoice", icon: "ti-file-invoice", label: "Invoices",  grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "unpaidInv", popupId: "mobUnpaidInvoices", icon: "ti-file-invoice", label: "Unpaid Invoices", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "totalInv", popupId: "qaInvoice", icon: "ti-file-invoice", label: "Invoices", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
     { id: "totalProp", popupId: "qaProposal", icon: "ti-clipboard-list", label: "Proposals", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
-    { id: "totalQuote", popupId: "qaQuote", icon: "ti-receipt", label: "Quotations",grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "totalQuote", popupId: "qaQuote", icon: "ti-receipt", label: "Quotations", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
   ]);
   const openMobilePopup = (key) => setMobilePopupSection(key);
   const closeMobilePopup = () => setMobilePopupSection(null);
@@ -10196,9 +10205,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         }}
                         onDragEnd={() => setDraggingStatCard(null)}
                         onClick={() => openMobilePopup(s.id)}
-                        style={{ animationDelay: `${i * 60}ms`, background: "#fff", borderRadius: 18, aspectRatio: "1 / 1", padding: "10px 6px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)", cursor: "grab", opacity: draggingStatCard === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
+                        style={{ animationDelay: `${i * 60}ms`, background: "#fff", borderRadius: 18, aspectRatio: "1 / 1", padding: "6px 6px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)", cursor: "grab", opacity: draggingStatCard === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                       >
-                        <div style={{ width: 30, height: 30, borderRadius: 10, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 6px", color: "#fff", fontSize: 13, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
+                        <div style={{ width: 40, height: 40, borderRadius: 12, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 2px", color: "#fff", fontSize: 19, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
                           <i className={`ti ${s.icon}`}></i>
                         </div>
                         <div style={{ fontSize: 16, fontWeight: 900, color: "#0f0a29" }}>{s.val}</div>
@@ -10287,7 +10296,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         onClick={() => openMobilePopup(s.popupId)}
                         style={{ animationDelay: `${i * 60}ms`, background: "#fff", borderRadius: 18, aspectRatio: "1 / 1", padding: "10px 6px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)", cursor: "grab", opacity: draggingSecondRow === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                       >
-                        <div style={{ width: 30, height: 30, borderRadius: 10, background: s.grad, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 6px", fontSize: 15, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
+                        <div style={{ width: 38, height: 38, borderRadius: 12, background: s.grad, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 2px", fontSize: 18, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
                           <i className={`ti ${s.icon}`}></i>
                         </div>
                         <div style={{ fontSize: 16, fontWeight: 900, color: "#0f0a29" }}>{s.val}</div>

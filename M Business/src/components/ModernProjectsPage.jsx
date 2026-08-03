@@ -618,35 +618,38 @@ export default function ModernProjectsPage({ user }) {
                       ><i className="ti ti-trash" style={{ fontSize: 13 }}></i></button>
                     </div>
 
-                    <div className="m-pc-top">
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div className="m-pc-icon" style={{ background: avColor(p.name, idx) }}>{initials(p.name)}</div>
-                        <div>
-                          <div className="m-pc-name">{p.name}</div>
-                          <div className="m-pc-company"><i className="ti ti-building" style={{ fontSize: '11px' }}></i> {p.client || 'Internal'}</div>
-                        </div>
-                      </div>
-                    </div>
-
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
                       <span className={`m-status-badge ${statusLabel.toLowerCase().replace(' ', '')}`}>{statusLabel}</span>
                       {p.priority && <span style={{ padding: '3px 9px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: p.priority === 'high' ? '#FEE2E2' : p.priority === 'low' ? '#D1FAE5' : '#FEF3C7', color: p.priority === 'high' ? '#DC2626' : p.priority === 'low' ? '#059669' : '#D97706' }}>{p.priority.charAt(0).toUpperCase() + p.priority.slice(1)}</span>}
                       {p.category && <span style={{ padding: '3px 9px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: 'var(--teal-light, var(--teal-light, #E0F7FA))', color: '#0097A7' }}>{p.category}</span>}
                     </div>
 
+                    <div className="m-pc-top" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                        <div className="m-pc-icon" style={{ background: avColor(p.name, idx), flexShrink: 0 }}>{initials(p.name)}</div>
+                        <div style={{ minWidth: 0 }}>
+                          <div className="m-pc-name">{p.name}</div>
+                          <div className="m-pc-company"><i className="ti ti-building" style={{ fontSize: '11px' }}></i> {p.client || 'Internal'}</div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div style={{ width: 40, height: 5, borderRadius: 3, background: '#E2E8F0', overflow: 'hidden' }}>
+                            <div style={{ width: `${pct}%`, height: '100%', background: progGradient(cls) }}></div>
+                          </div>
+                          <span style={{ fontSize: 10.5, fontWeight: 700, color: '#4A5568' }}>{pct}%</span>
+                        </div>
+                        {p.start && (
+                          <span style={{ fontSize: 10.5, color: '#718096', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                            {new Date(p.start).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                     <div className="m-pc-desc">{p.description || p.purpose || 'No description.'}</div>
 
                     <div style={{ display: 'flex', gap: 16, marginBottom: 8, flexWrap: 'wrap' }}>
-                      {p.start && <span style={{ fontSize: 11, color: '#718096', display: 'flex', alignItems: 'center', gap: 4 }}><i className="ti ti-calendar-event" style={{ fontSize: 12 }}></i> Start: <strong style={{ color: '#4A5568' }}>{new Date(p.start).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</strong></span>}
                       {p.budget && <span style={{ fontSize: 11, color: '#718096', display: 'flex', alignItems: 'center', gap: 4 }}><i className="ti ti-wallet" style={{ fontSize: 12 }}></i> Budget: <strong style={{ color: '#4A5568' }}>{p.currency || '₹'}{Number(p.budget).toLocaleString()}</strong></span>}
-                    </div>
-
-                    <div className="m-pc-progress-label">
-                      <span className="m-pc-progress-text">Progress</span>
-                      <span className="m-pc-progress-pct">{pct}%</span>
-                    </div>
-                    <div className="m-pc-bar">
-                      <div className="m-pc-fill" style={{ width: `${pct}%`, background: progGradient(cls) }}></div>
                     </div>
 
                     <div className="m-pc-footer">

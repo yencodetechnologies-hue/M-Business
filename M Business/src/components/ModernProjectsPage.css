@@ -574,6 +574,12 @@
   gap: 14px !important;
 }
 
+@media (max-width: 768px) {
+  .m-projects-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 .m-project-card {
   background: #fff;
   border-radius: 10px;

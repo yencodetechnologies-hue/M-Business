@@ -205,8 +205,8 @@ const CSS = `
 /* TABS */
 .mpd-tabs { display:flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; border-bottom:2px solid ${P.border}; margin-bottom:20px; padding-bottom:0; }
 .mpd-tab-btn { flex-shrink:0; white-space:nowrap; padding:10px 18px; margin-right: 6px; font-size:13px; font-weight:700; color:${P.textMid}; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .2s; background:transparent; border-top:none; border-left:none; border-right:none; font-family:'Nunito',sans-serif; }
-.mpd-tab-btn:hover { color:${P.primary}; background:${P.primaryLight}; border-radius:8px 8px 0 0; }
-.mpd-tab-btn.mpd-active { color:${P.primary}; border-bottom-color:${P.primary}; }
+.mpd-tab-btn:hover {  border-radius:8px 8px 0 0; }
+.mpd-tab-btn.mpd-active { color:${P.textMid}; border-bottom-color:transparent; }
 .mpd-tab-pane { display:none; overflow:visible; }
 .mpd-tab-pane.mpd-active { display:block; animation:fadeUp .18s ease; overflow:visible; }
 

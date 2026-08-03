@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const streamifier = require("streamifier");
+const axios = require("axios");
 const Media = require("../models/MediaModel");
 
 cloudinary.config({
@@ -147,6 +148,20 @@ router.post("/logo", upload.single("file"), (req, res) => {
     }
   );
   streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+});
+
+router.get("/proxy-pdf", async (req, res) => {
+  try {
+    const { url } = req.query;
+    if (!url) return res.status(400).send("No URL provided");
+    const response = await axios.get(url, { responseType: 'stream' });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline');
+    response.data.pipe(res);
+  } catch (error) {
+    console.error("PDF Proxy Error:", error);
+    res.status(500).send("Failed to load PDF");
+  }
 });
 
 module.exports = router;

@@ -981,7 +981,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               <div className="page-sub">Create, send and track client quotations</div>
             </div>
             <div className="header-actions" style={{ display: "flex", gap: 10, width: "100%" }}>
-              <div className="search-wrap" style={{ flex: "1 1 0", minWidth: 0, width: "auto" }}>
+              <div className="search-wrap" style={{ flex: "0 1 320px", minWidth: 0, width: "auto" }}>
                 <i className="ti ti-search" style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)", color: "var(--text3)", fontSize: 16 }}></i>
 
                 <input
@@ -992,7 +992,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                   style={{ width: "100%", padding: "11px 14px 11px 40px", background: "var(--surface)", border: "1.5px solid var(--border)", borderRadius: 12, fontSize: 13, color: "var(--text)", fontFamily: "var(--font)", outline: "none", transition: "all .15s", boxSizing: "border-box" }}
                 />
               </div>
-              <button className="create-btn" onClick={() => { clearForm(); if (onNewQuotation) { onNewQuotation(); } else { setStep("form"); } }} style={{ flex: "1 1 0", minWidth: 0, justifyContent: "center", whiteSpace: "nowrap" }}>
+              <button className="create-btn" onClick={() => { clearForm(); if (onNewQuotation) { onNewQuotation(); } else { setStep("form"); } }} style={{ flex: "0 0 auto", minWidth: 0, justifyContent: "center", whiteSpace: "nowrap", padding: "11px 24px", marginLeft: "auto" }}>
                 <i className="ti ti-plus" style={{ fontSize: 15 }}></i> New Quotation
               </button>
             </div>

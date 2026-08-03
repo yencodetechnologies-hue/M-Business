@@ -9723,7 +9723,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 ["projects", "edit-project", "project-details"].includes(validActive) ? "projects" :
                   validActive
             }
-            setActive={(val) => { setSidebarOverride(null); if (val !== "quotations") { setQuotationViewEntry(null); setQuotationPrefillProject(null); setQuotationReturnProject(null); } if (val !== "proposals") setProposalViewEntry(null); setActive(val); }}
+            setActive={(val) => { setSidebarOverride(null); if (val === "quotations" || val !== "quotations") { setQuotationViewEntry(null); setQuotationPrefillProject(null); setQuotationReturnProject(null); } if (val !== "proposals") setProposalViewEntry(null); setActive(val); }}
             onLogout={handleLogout}
             open={sidebarOpen}
             onClose={() => setSidebarOpen(false)}
@@ -12087,7 +12087,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 onAddProject={() => { }}
               />
             )}
-            {validActive === "quotations" && <QuotationCreatorModern key={quotationViewEntry ? `view-${quotationViewEntry._id || quotationViewEntry.id}` : (quotationPrefillProject ? `new-${quotationPrefillProject._id}` : 'list')} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} prefillProject={quotationPrefillProject} onPrefillConsumed={() => setQuotationPrefillProject(null)} initialViewEntry={quotationViewEntry} onBackOverride={quotationViewEntry ? () => { setQuotationViewEntry(null); setSidebarOverride(null); setActive("project-details"); } : null} onReturnToProject={quotationReturnProject ? () => { const p = quotationReturnProject; setQuotationReturnProject(null); setJumpProject(p); setSidebarOverride(null); setActive("project-details"); } : null} onAddClient={() => {
+            {validActive === "quotations" && <QuotationCreatorModern key={quotationViewEntry ? `view-${quotationViewEntry._id || quotationViewEntry.id}` : (quotationReturnProject ? `new-${quotationReturnProject._id}` : 'list')} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} prefillProject={quotationPrefillProject} onPrefillConsumed={() => setQuotationPrefillProject(null)} initialViewEntry={quotationViewEntry} onBackOverride={quotationViewEntry ? () => { setQuotationViewEntry(null); setSidebarOverride(null); setActive("project-details"); } : null} onReturnToProject={quotationReturnProject ? () => { const p = quotationReturnProject; setQuotationReturnProject(null); setJumpProject(p); setSidebarOverride(null); setActive("project-details"); } : null} onAddClient={() => {
 
               setNcError({}); setShowClientPass(false);
               setReturnToQuotation(true);

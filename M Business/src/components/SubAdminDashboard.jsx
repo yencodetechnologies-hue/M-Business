@@ -6966,10 +6966,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   ]);
   const [draggingSecondRow, setDraggingSecondRow] = useState(null);
   const [mobSecondRowOrder, setMobSecondRowOrder] = useState([
-    { id: "unpaidInv", popupId: "mobUnpaidInvoices", icon: "ti-file-invoice", label: "Unpaid Invoices", val: 0, grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
-    { id: "totalInv", popupId: "qaInvoice", icon: "ti-file-invoice", label: "Invoices", val: 0, grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
-    { id: "totalProp", popupId: "qaProposal", icon: "ti-clipboard-list", label: "Proposals", val: 0, grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
-    { id: "totalQuote", popupId: "qaQuote", icon: "ti-receipt", label: "Quotations", val: 0, grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "unpaidInv", popupId: "mobUnpaidInvoices", icon: "ti-file-invoice", label: "Unpaid Invoices",  grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "totalInv", popupId: "qaInvoice", icon: "ti-file-invoice", label: "Invoices",  grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "totalProp", popupId: "qaProposal", icon: "ti-clipboard-list", label: "Proposals", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "totalQuote", popupId: "qaQuote", icon: "ti-receipt", label: "Quotations",grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
   ]);
   const openMobilePopup = (key) => setMobilePopupSection(key);
   const closeMobilePopup = () => setMobilePopupSection(null);

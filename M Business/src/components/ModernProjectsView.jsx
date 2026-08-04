@@ -88,7 +88,7 @@ const CSS = `
 .mpv-kpi { background:#fff; border-radius:14px; padding:16px 18px; box-shadow:0 2px 12px rgba(0,188,212,.08);
   display:flex; align-items:center; gap:12px; cursor:pointer; transition:all .18s;
   border:2px solid transparent; }
-.mpv-kpi:hover,.mpv-kpi.active { border-color:${P.primary}; transform:translateY(-2px); box-shadow:0 8px 32px rgba(0,188,212,.14); }
+.mpv-kpi { border-color:transparent; }
 .mpv-kpi-icon { width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .mpv-kpi-icon i { font-size:20px; }
 .mpv-kpi-num { font-size:22px; font-weight:900; color:${P.textDark}; line-height:1; }
@@ -257,6 +257,7 @@ export default function ModernProjectsView({
 }) {
   const [search, setSearch] = useState(searchQuery);
   const [statusFilter, setStatus] = useState('all');
+  const [dropdownStatus, setDropdownStatus] = useState('all');
   const [sortBy, setSort] = useState('newest');
   const [view, setView] = useState('grid');
   const [openMenu, setOpenMenu] = useState(null);
@@ -309,8 +310,9 @@ export default function ModernProjectsView({
       const nameMatch = (p.name || '').toLowerCase().includes(q);
       const clientMatch = (p.client || '').toLowerCase().includes(q);
       if (!nameMatch && !clientMatch) return false;
-      if (statusFilter === 'all') return true;
-      return normaliseStatus(p.status).cls === statusFilter;
+      if (statusFilter !== 'all' && normaliseStatus(p.status).cls !== statusFilter) return false;
+      if (dropdownStatus !== 'all' && normaliseStatus(p.status).cls !== dropdownStatus) return false;
+      return true;
     });
 
     if (sortBy === 'newest') {
@@ -325,10 +327,10 @@ export default function ModernProjectsView({
       list = [...list].sort((a, b) => (b.progress || 0) - (a.progress || 0));
     }
     return list;
-  }, [projects, search, statusFilter, sortBy]);
+  }, [projects, search, statusFilter, dropdownStatus, sortBy]);
 
   // Reset page on filter/search change
-  React.useEffect(() => { setPage(1); }, [search, statusFilter, sortBy]);
+  React.useEffect(() => { setPage(1); }, [search, statusFilter, dropdownStatus, sortBy]);
 
   const totalPages = Math.ceil(displayed.length / perPage);
   const paginated = displayed.slice((page - 1) * perPage, page * perPage);
@@ -353,9 +355,8 @@ export default function ModernProjectsView({
           {KPI_ITEMS.map(k => (
             <div
               key={k.key}
-              className={`mpv-kpi${statusFilter === k.key ? ' active' : ''}`}
-              onClick={() => k.key !== 'budget' && setStatus(k.key)}
-              style={{ cursor: k.key === 'budget' ? 'default' : 'pointer' }}
+              className="mpv-kpi"
+
             >
               <div className="mpv-kpi-icon" style={{ background: k.iconBg }}>
                 <i className={`ti ${k.icon}`} style={{ color: k.iconColor }} />
@@ -395,7 +396,7 @@ export default function ModernProjectsView({
           />
         </div>
 
-        <select className="mpv-sel" value={statusFilter} onChange={e => setStatus(e.target.value)}>
+        <select className="mpv-sel" key="status-filter-select" value={dropdownStatus} onChange={e => setDropdownStatus(e.target.value)}>
           <option value="all">All Status</option>
           <option value="active">Active</option>
           <option value="hold">On Hold</option>
@@ -408,7 +409,6 @@ export default function ModernProjectsView({
           <option value="deadline">By Deadline</option>
           <option value="progress">By Progress</option>
         </select>
-
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 12, color: P.textLight, fontWeight: 600 }}>
             {paginated.length} of {displayed.length} projects

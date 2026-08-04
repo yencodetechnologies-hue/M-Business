@@ -9786,7 +9786,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-        *{box-sizing:border-box}
+*{box-sizing:border-box}
+        html, body, #root { margin: 0 !important; padding: 0 !important; overflow-x: hidden; }
 
         ::-webkit-scrollbar{width:5px}
 
@@ -9797,7 +9798,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 @media(min-width:769px){.sidebar{position:sticky!important;top:0!important;}.sidebar-close{display:none!important;}.mob-overlay{display:none!important;}.mob-topbar{display:none!important;}.sidebar-spacer{display:none!important;}.desktop-topbar{display:flex!important;}}
 @media(max-width:768px){.desktop-topbar{display:none!important;}}
 
-        @media(max-width:768px){.sidebar-spacer{display:none!important;}.mob-topbar-hide{display:none!important;}.main-content{padding:12px!important;}.dash-stats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}.dash-2col{grid-template-columns:1fr!important;}.modal-2col{grid-template-columns:1fr!important;}.page-header{flex-wrap:wrap;gap:8px;}.header-actions{flex-wrap:wrap;gap:8px;}}
+@media(max-width:768px){.sidebar-spacer{display:none!important;}.mob-topbar-hide{display:none!important;}.main-content{padding:12px!important;}.dash-stats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}.dash-2col{grid-template-columns:1fr!important;}.modal-2col{grid-template-columns:1fr!important;}.page-header{flex-wrap:wrap;gap:8px;}.header-actions{flex-wrap:wrap;gap:8px;}}
 @media(max-width:768px){.mob-topbar-hamburger{visibility:hidden!important;}}
 @media(max-width:768px){.mob-topbar-dashboard-hidden{display:none!important;}}
         @media print {
@@ -10101,7 +10102,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-          <div className="content">
+          <div className="content" style={validActive === "dashboard" && !isDesktopWidth ? { padding: 0 } : undefined}>
 
             {trialToast && (
               <div style={{ position: "fixed", top: 24, left: "50%", width: "max-content", marginLeft: "auto", marginRight: "auto", right: 0, zIndex: 9999, background: "#fff", border: "1.5px solid #00BCD4", borderRadius: 14, padding: "14px 26px", fontSize: 14, fontWeight: 800, color: "#0097A7", boxShadow: "0 10px 32px rgba(0,188,212,0.25), 0 4px 12px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", gap: 10 }}>
@@ -10123,7 +10124,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             {/* ── Dashboard ── */}{validActive === "dashboard" && (
               <>
                 {/* MOBILE DASHBOARD (visible only under 768px) */}
-                <div className="mobile-dashboard-view" style={{ display: "none", width: "100vw", marginLeft: "calc(50% - 50vw)", marginRight: "calc(50% - 50vw)", marginTop: "-24px" }}>
+                <div className="mobile-dashboard-view" style={{ display: "none", width: "100vw", marginLeft: "calc(50% - 50vw)", marginRight: "calc(50% - 50vw)", marginTop: 0 }}>
                   <style>{`
     @media (max-width: 768px) {
       .mobile-dashboard-view { display: block !important; }

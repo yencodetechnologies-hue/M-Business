@@ -239,9 +239,21 @@ const CSS = `
   .mpv-kpi-grid { grid-template-columns:repeat(3,1fr); }
   .mpv-grid { grid-template-columns:repeat(2,1fr); }
 }
-@media(max-width:600px){
+@media (max-width: 640px) {
   .mpv-kpi-grid { grid-template-columns:repeat(2,1fr); }
-  .mpv-grid { grid-template-columns:1fr; }
+  .mpv-grid {
+    display: flex;
+    grid-template-columns: unset;
+    overflow-x: auto;
+    gap: 14px;
+    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mpv-grid .mpv-card {
+    flex: 0 0 85%;
+    scroll-snap-align: center;
+  }
 }
 `;
 export default function ModernProjectsView({

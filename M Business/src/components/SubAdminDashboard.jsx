@@ -10230,7 +10230,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <div style={{ position: "relative", margin: "-30px 0 0", zIndex: 20 }}>
                       <div
                         id="mobProjectsScroller"
-                        style={{ position: "relative", zIndex: 21, display: "flex", gap: 12, overflowX: "auto", justifyContent: projectsWithProgress.length > 2 ? "flex-start" : "center", padding: "0 calc(50% - 140px) 10px", WebkitOverflowScrolling: "touch" }}
+                        style={{ position: "relative", zIndex: 21, display: "flex", gap: 12, overflowX: "auto", justifyContent: projectsWithProgress.length > 2 ? "flex-start" : "center", padding: "0 calc(50% - 150px) 10px", WebkitOverflowScrolling: "touch" }}
                       >
                         {projectsWithProgress.map((p, i) => {
                           const pct = p.progress || 0;
@@ -10238,36 +10238,40 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           const offset = circumference - (pct / 100) * circumference;
                           const budget = formatCurrency(p.budget, p.currency);
                           return (
-                            <div
+                         <div
                               key={p._id || p.id || i}
                               onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
-                              style={{ flex: "0 0 auto", width: 340, height: 74, boxSizing: "border-box", background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.1)", border: "1px solid rgba(0,0,0,0.03)", padding: 14, display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}
+                              style={{ flex: "0 0 auto", width: 260, boxSizing: "border-box", background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.1)", border: "1px solid rgba(0,0,0,0.03)", padding: "14px 16px", display: "flex", flexDirection: "column", gap: 8, cursor: "pointer" }}
                             >
-                              <div style={{ position: "relative", width: 44, height: 44, flexShrink: 0 }}>
-                                <svg width="44" height="44" viewBox="0 0 44 44">
-                                  <circle cx="22" cy="22" r="18" fill="none" stroke="#f1f5f9" strokeWidth="4" />
-                                  <circle
-                                    cx="22" cy="22" r="18" fill="none"
-                                    stroke="var(--app-accent)" strokeWidth="4"
-                                    strokeDasharray={circumference}
-                                    strokeDashoffset={offset}
-                                    strokeLinecap="round"
-                                    transform="rotate(-90 22 22)"
-                                  />
-                                </svg>
-                                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10.5, fontWeight: 800, color: "#0f1c2e" }}>
-                                  {pct}%
+                              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                                <div style={{ position: "relative", width: 36, height: 36, flexShrink: 0 }}>
+                                  <svg width="36" height="36" viewBox="0 0 44 44">
+                                    <circle cx="22" cy="22" r="18" fill="none" stroke="#f1f5f9" strokeWidth="4" />
+                                    <circle
+                                      cx="22" cy="22" r="18" fill="none"
+                                      stroke="var(--app-accent)" strokeWidth="4"
+                                      strokeDasharray={circumference}
+                                      strokeDashoffset={offset}
+                                      strokeLinecap="round"
+                                      transform="rotate(-90 22 22)"
+                                    />
+                                  </svg>
+                                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8.5, fontWeight: 800, color: "#0f1c2e" }}>
+                                    {pct}%
+                                  </div>
                                 </div>
-                              </div>
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontSize: 12.5, fontWeight: 700, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e", textAlign: "right", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                                   {p.name}
                                 </div>
-                                <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>
-                                  {p.client || "—"}
+                              </div>
+                              <div>
+                                <div style={{ height: 6, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
+                                  <div style={{ width: `${pct}%`, height: "100%", background: "var(--app-accent)", borderRadius: 4 }} />
                                 </div>
-                                <div style={{ fontSize: 13, fontWeight: 800, color: "var(--app-accent)", marginTop: 4 }}>
-                                  {budget}
+                              </div>
+                              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                                <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>
+                                  {(p.end || p.deadline) ? new Date(p.end || p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : "No deadline"}
                                 </div>
                               </div>
                             </div>

@@ -86,7 +86,7 @@ const CSS = `
 .mpd-card { background:#fff; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,.07), 0 0 0 1px rgba(0,0,0,.04); padding:32px 36px !important; margin-bottom:20px; transition:box-shadow .2s; box-sizing: border-box !important; }
 .mpd-card:hover { box-shadow:0 6px 24px rgba(0,0,0,.1), 0 0 0 1px rgba(0,188,212,.08); }
 .mpd-milestones-card { padding:48px 36px !important; margin-bottom:24px; box-sizing: border-box !important; }
-.mpd-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; padding-bottom:10px; border-bottom:2px solid ${P.border}; }
+.mpd-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; padding-bottom:10px; border-bottom:none; }
 .mpd-card-title { font-size:15px; font-weight:800; color:${P.textDark}; display:flex; align-items:center; gap:8px; }
 .mpd-card-title i { color:${P.primary}; font-size:18px; }
 
@@ -493,21 +493,28 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
     if (!confirm('Are you sure you want to delete this record?')) return;
     try {
       const currentList = currProject[arrayName] || [];
+      const deletedRecord = currentList[index];
       const updatedList = currentList.filter((_, i) => i !== index);
       const updatePayload = { [arrayName]: updatedList };
       if (arrayName === 'expenses') {
         updatePayload.spent = updatedList.reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
       }
-      // Update local state immediately so the row disappears right away,
-      // instead of waiting for loadLatest()'s server round-trip.
       setCurrProject(prev => ({ ...prev, ...updatePayload }));
       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, updatePayload);
+
+      if (arrayName === 'paymentsReceived' && deletedRecord?.invoiceId) {
+        try {
+          await axios.patch(`${BASE_URL}/api/invoices/${deletedRecord.invoiceId}/status`, { status: "draft" });
+        } catch (invErr) {
+          console.error("Failed to revert invoice status after payment deletion:", invErr);
+        }
+      }
+
       loadLatest();
     } catch (err) {
       alert('Failed to delete record.');
     }
   };
-
   // 👇 ADD THE NEW FUNCTION HERE 👇
   const handleDeleteInvoice = async (inv) => {
     if (!confirm('Delete this invoice?')) return;

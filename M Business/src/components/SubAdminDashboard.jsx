@@ -7562,9 +7562,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     if (s === 'completed' || s === 'done') {
       return { ...p, progress: 100 };
     }
-    if (Number(p.progress) > 0) {
-      return { ...p, progress: Number(p.progress) };
-    }
     const projTasks = (tasks || []).filter(t => {
       const tid = t.projectId?._id || t.projectId || t.project;
       return tid === (p._id || p.id);
@@ -10261,12 +10258,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                   />
                                 </svg>
                                 <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10.5, fontWeight: 800, color: "#0f1c2e" }}>
-                                  {(() => {
-                                    const budgetNum = Number(p.budget) || 0;
-                                    const spentNum = Number(p.spentAmount || p.amountSpent || 0);
-                                    const budgetPct = budgetNum > 0 ? Math.round((spentNum / budgetNum) * 100) : 0;
-                                    return `${budgetPct}%`;
-                                  })()}
+                                  {pct}%
                                 </div>
                               </div>
                               <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 6 }}>

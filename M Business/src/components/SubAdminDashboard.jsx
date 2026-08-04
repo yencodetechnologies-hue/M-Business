@@ -9803,7 +9803,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             user={user}
             active={
               sidebarOverride ? sidebarOverride :
-                ["projects", "edit-project", "project-details"].includes(validActive) ? "projects" :
+                ["projects", "edit-project"].includes(validActive) ? "projects" :
                   validActive
             }
             setActive={(val) => { setSidebarOverride(null); if (val === "quotations" || val !== "quotations") { setQuotationViewEntry(null); setQuotationPrefillProject(null); setQuotationReturnProject(null); } if (val !== "proposals") setProposalViewEntry(null); setActive(val); }}
@@ -11360,7 +11360,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                       return (
 
-                                        <div key={p._id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 16, borderBottom: idx === 4 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
+                                        <div key={p._id} onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 16, borderBottom: idx === 4 ? "none" : "1px solid rgba(0,0,0,0.04)", cursor: "pointer" }}>
 
                                           <div style={{ display: "flex", gap: 12 }}>
 
@@ -11994,6 +11994,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 clients={clients}
 
                 fromClientContext={sidebarOverride === "clients"}
+
+                showBackLabel={sidebarOverride === "dashboard"}
 
                 scrollContainerRef={mainScrollRef}
 

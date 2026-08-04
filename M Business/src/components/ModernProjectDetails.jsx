@@ -262,7 +262,7 @@ function DetailField({ label, value, fullWidth }) {
   );
 }
 
-export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions = false, onNext, onNewInvoice, onViewInvoice, onNewProposal, onNewQuotation, onViewQuotation, onViewProposal, autoOpenInvoice, onAutoOpenInvoiceDone, fromClientContext = false, onAddEmployeeClick }) {
+export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions = false, onNext, onNewInvoice, onViewInvoice, onNewProposal, onNewQuotation, onViewQuotation, onViewProposal, autoOpenInvoice, onAutoOpenInvoiceDone, fromClientContext = false, onAddEmployeeClick, showBackLabel = false }) {
   const [activeTab, setActiveTab] = useState(() => {
     try {
       const saved = localStorage.getItem('project_tabs_order');
@@ -1889,7 +1889,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         {/* TOPBAR */}
         <div className="mpd-topbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, flexWrap: 'wrap', gap: 10 }}>
           <div className="mpd-breadcrumb" style={{ minWidth: 0, overflow: "hidden" }}>
-            <a onClick={onBack} style={{ flexShrink: 0 }}>Projects</a>
+            <a onClick={onBack} style={{ flexShrink: 0 }}>{showBackLabel ? "Back" : "Projects"}</a>
             <i className="ti ti-chevron-right" style={{ fontSize: 14, flexShrink: 0 }}></i>
             <span style={{ color: P.textDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>{projName}</span>
           </div>

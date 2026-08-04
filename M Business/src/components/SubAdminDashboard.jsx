@@ -2129,10 +2129,9 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const st = getStatusCfg(activeClient?.status);
 
   const acColor = getAvatarColor(activeClient || {});
-
-  const cRevenue = (invoices || [])
-    .filter(inv => inv.client === activeClient?.clientName)
-    .reduce((sum, inv) => sum + (Number(inv.amountPaid) || 0), 0);
+const cRevenue = (invoices || [])
+    .filter(inv => inv.client === activeClient?.clientName && (inv.status || "").toLowerCase() === "paid")
+    .reduce((sum, inv) => sum + (Number(inv.grandTotal || inv.amountPaid || inv.total) || 0), 0);
 
 
 
@@ -7704,7 +7703,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const [expenses, setExpenses] = useState([]);
 
-  const totalRevenue = income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
+  const totalRevenue = invoices
+    .filter(inv => (inv.status || "").toLowerCase() === "paid")
+    .reduce((sum, inv) => sum + (Number(inv.grandTotal || inv.amountPaid || inv.total) || 0), 0);
 
   const [pendingLeaves, setPendingLeaves] = useState([]);
   const [showNotifPanel, setShowNotifPanel] = useState(false);
@@ -10941,7 +10942,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                         const pendingInvCount = invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length;
 
-                        const totalIncome = income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
+                        const totalIncome = totalRevenue;
 
                         const totalInvAmt = invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").reduce((sum, i) => sum + (Number(i.grandTotal) || 0), 0);
 
@@ -11276,7 +11277,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                       <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(15,28,46,0.8)" }}>
 
-                                        <div style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(var(--app-accent-rgb,0,188,212),0.2)" }}></div> Expenses
+
 
                                       </div>
 

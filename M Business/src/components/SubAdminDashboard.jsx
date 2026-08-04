@@ -7586,11 +7586,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   });
 
   useEffect(() => {
-    const container = document.getElementById("mobProjectsScroller");
-    if (!container) return;
-    const cards = container.children;
-    if (!cards || cards.length <= 1) return;
+    if (!projectsWithProgress.length) return;
     const interval = setInterval(() => {
+      const container = document.getElementById("mobProjectsScroller");
+      if (!container) return;
+      const cards = container.children;
+      if (!cards || cards.length <= 1) return;
       const next = (projectCarouselIndexRef.current + 1) % cards.length;
       projectCarouselIndexRef.current = next;
       const card = cards[next];

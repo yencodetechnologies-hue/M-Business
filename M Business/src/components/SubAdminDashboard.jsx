@@ -10100,9 +10100,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   {/* HERO HEADER — glass + gradient mesh */}
                   <div style={{
                     position: "relative",
-                    background: "radial-gradient(120% 120% at 15% 0%, #1e1b4b 0%, #0f0a29 45%, #05030f 100%)",
-                    borderRadius: "32px",
-                    margin: "12px",
+                    background: "linear-gradient(160deg, var(--app-accent) 0%, #0f7a8a 60%, #0a5a68 100%)",
+                    borderRadius: "0 0 32px 32px",
+                    margin: "0",
                     padding: "18px 18px 50px",
                     color: "#fff",
                     overflow: "hidden"
@@ -10113,12 +10113,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     <div style={{ position: "relative", zIndex: 2 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                        <div onClick={() => setSidebarOpen(true)} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.08)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <i className="ti ti-menu-2" style={{ fontSize: 18 }}></i>
-                        </div>
-                        <div style={{ textAlign: "center" }}>
-                          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", fontWeight: 700, letterSpacing: 1 }}>WELCOME BACK</div>
-                          <div style={{ fontSize: 14, fontWeight: 800 }}>{(user?.companyName || user?.name || "Business")}</div>
+                        <div onClick={() => setSidebarOpen(true)} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+                          <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.12)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+                            {companyLogo ? (
+                              <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                            ) : (
+                              <i className="ti ti-building" style={{ fontSize: 18, color: "#fff" }}></i>
+                            )}
+                          </div>
+                          <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{(user?.companyName || user?.name || "Business")}</div>
                         </div>
                         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                           <div style={{ position: "relative" }}>
@@ -10184,12 +10187,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         <svg viewBox="0 0 300 60" width="100%" height="100%" preserveAspectRatio="none">
                           <defs>
                             <linearGradient id="mobAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor="var(--app-accent)" stopOpacity="0.4" />
-                              <stop offset="100%" stopColor="var(--app-accent)" stopOpacity="0" />
+                              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.35" />
+                              <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
                             </linearGradient>
                           </defs>
                           <path d="M0,45 L50,40 L100,48 L150,18 L200,26 L250,12 L300,20 L300,60 L0,60 Z" fill="url(#mobAreaGrad)" />
-                          <polyline fill="none" stroke="var(--app-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points="0,45 50,40 100,48 150,18 200,26 250,12 300,20" />
+                          <polyline fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points="0,45 50,40 100,48 150,18 200,26 250,12 300,20" />
                         </svg>
                       </div>
                     </div>
@@ -10317,6 +10320,58 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       </div>
                     ))}
                   </div>
+
+                  {/* HORIZONTAL SCROLLING PROJECT CARDS */}
+                  {projectsWithProgress.length > 0 && (
+                    <div style={{ margin: "10px 0 0" }}>
+                      <div style={{ padding: "0 16px", marginBottom: 8, fontSize: 14, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 6 }}>
+                        <i className="ti ti-folder" style={{ color: "var(--app-accent)" }}></i> Projects
+                      </div>
+                      <div style={{ display: "flex", gap: 12, overflowX: "auto", padding: "2px calc(50% - 105px) 10px", scrollSnapType: "x mandatory", scrollBehavior: "smooth", WebkitOverflowScrolling: "touch" }}>
+                        {projectsWithProgress.map((p, i) => {
+                          const pct = p.progress || 0;
+                          const circumference = 2 * Math.PI * 18;
+                          const offset = circumference - (pct / 100) * circumference;
+                          const budget = formatCurrency(p.budget, p.currency);
+                          return (
+                            <div
+                              key={p._id || p.id || i}
+                              onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
+                              style={{ flex: "0 0 auto", scrollSnapAlign: "center", scrollSnapStop: "always", width: 210, background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.1)", border: "1px solid rgba(0,0,0,0.03)", padding: 14, display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}
+                            >
+                              <div style={{ position: "relative", width: 44, height: 44, flexShrink: 0 }}>
+                                <svg width="44" height="44" viewBox="0 0 44 44">
+                                  <circle cx="22" cy="22" r="18" fill="none" stroke="#f1f5f9" strokeWidth="4" />
+                                  <circle
+                                    cx="22" cy="22" r="18" fill="none"
+                                    stroke="var(--app-accent)" strokeWidth="4"
+                                    strokeDasharray={circumference}
+                                    strokeDashoffset={offset}
+                                    strokeLinecap="round"
+                                    transform="rotate(-90 22 22)"
+                                  />
+                                </svg>
+                                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10.5, fontWeight: 800, color: "#0f1c2e" }}>
+                                  {pct}%
+                                </div>
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontSize: 12.5, fontWeight: 700, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  {p.name}
+                                </div>
+                                <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>
+                                  {p.client || "—"}
+                                </div>
+                                <div style={{ fontSize: 13, fontWeight: 800, color: "var(--app-accent)", marginTop: 4 }}>
+                                  {budget}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
 
                   {/* QUICK ACTION CARDS — proper dashboard-card style, tap opens popup */}
                   <div style={{ margin: "10px 16px 0" }}>

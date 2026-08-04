@@ -6951,6 +6951,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     setOpenedFromMobileAddMenuState(val);
   };
   const [clientResponsesExpanded, setClientResponsesExpanded] = useState(true);
+  const [dismissedActivityKeys, setDismissedActivityKeys] = useState(() => {
+    try {
+      const cid = user?.companyId || user?._id || user?.id || "";
+      const saved = localStorage.getItem("dismissedActivityKeys_" + cid);
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) { return []; }
+  });
+  useEffect(() => {
+    try {
+      const cid = user?.companyId || user?._id || user?.id || "";
+      localStorage.setItem("dismissedActivityKeys_" + cid, JSON.stringify(dismissedActivityKeys));
+    } catch (e) { }
+  }, [dismissedActivityKeys, user]);
   const [allApprovals, setAllApprovals] = useState([]);
   const fetchAllApprovals = useCallback(async () => {
     try {
@@ -10342,6 +10355,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               }));
 
                             const combined = [...approvalItems, ...invoiceItems]
+                              .filter(item => !dismissedActivityKeys.includes(String(item.key)))
                               .sort((x, y) => y.sortDate - x.sortDate)
                               .slice(0, 20);
 
@@ -10372,6 +10386,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                         {a.respondedAt ? new Date(a.respondedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}
                                       </div>
                                     </div>
+                                    <span
+                                      onClick={() => setDismissedActivityKeys(prev => [...prev, String(item.key)])}
+                                      style={{ fontSize: 14, color: "var(--app-muted)", fontWeight: 700, cursor: "pointer", flexShrink: 0, padding: "4px 8px", lineHeight: 1 }}
+                                    >
+                                      ✕
+                                    </span>
                                   </div>
                                 );
                               }
@@ -10401,6 +10421,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                       {inv.date ? new Date(inv.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}
                                     </div>
                                   </div>
+                                  <span
+                                    onClick={() => setDismissedActivityKeys(prev => [...prev, String(item.key)])}
+                                    style={{ fontSize: 14, color: "var(--app-muted)", fontWeight: 700, cursor: "pointer", flexShrink: 0, padding: "4px 8px", lineHeight: 1 }}
+                                  >
+                                    ✕
+                                  </span>
                                 </div>
                               );
                             });

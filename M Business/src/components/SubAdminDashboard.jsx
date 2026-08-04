@@ -9924,7 +9924,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           {/* Topbar */}
 
-          <div className="topbar no-print">
+          <div className="topbar no-print" style={validActive === "dashboard" && !isDesktopWidth ? { display: "none", padding: 0, minHeight: 0 } : undefined}>
 
             <div className="search-wrap">
 
@@ -10238,7 +10238,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           const offset = circumference - (pct / 100) * circumference;
                           const budget = formatCurrency(p.budget, p.currency);
                           return (
-                         <div
+                            <div
                               key={p._id || p.id || i}
                               onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
                               style={{ flex: "0 0 auto", width: 260, boxSizing: "border-box", background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.1)", border: "1px solid rgba(0,0,0,0.03)", padding: "14px 16px", display: "flex", flexDirection: "column", gap: 8, cursor: "pointer" }}

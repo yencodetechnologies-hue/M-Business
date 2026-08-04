@@ -2160,15 +2160,15 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
       {/* STAT PILLS — matches Projects page style */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 20 }}>
-        <div onClick={() => setFilterMode("all")} style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+        <div  style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-users" /></div>
           <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{totalClients}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>All Clients</div></div>
         </div>
-        <div onClick={() => setFilterMode("active")} style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+        <div  style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-user-check" /></div>
           <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{activeClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Active</div></div>
         </div>
-        <div onClick={() => setFilterMode("inactive")} style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+        <div style={{ cursor: "pointer", background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}><i className="ti ti-user-off" /></div>
           <div><div style={{ fontSize: 24, fontWeight: 800, color: "#1A2332" }}>{inactiveClientsCount}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#607D86" }}>Inactive</div></div>
         </div>
@@ -5708,7 +5708,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 
 
 
-        <div style={{ padding: "20px 24px", overflowY: "auto", flex: 1, display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 24 }}>
+        <div style={{ padding: "20px 24px", overflowY: "auto", flex: 1, display: "grid", gridTemplateColumns: "1fr", gap: 24 }}>
 
           {/* Personal Info */}
 

@@ -1913,7 +1913,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
           )}
         </div>
         
-        <div style={{ padding: "20px 24px", overflowY: "auto", flex: 1, display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 24 }}>
+        <div style={{ padding: "20px 24px", overflowY: "auto", flex: 1, display: "grid", gridTemplateColumns: "1fr", gap: 24 }}>
           {/* Personal Info */}
           <div>
             <div style={{ fontSize: 11, fontWeight: 800, color: "#7c3aed", marginBottom: 12, letterSpacing: 1 }}>PERSONAL DETAILS</div>

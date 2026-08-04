@@ -161,7 +161,7 @@
     .content,
     .main-content,
     .main-pad {
-        padding: 12px !important;
+    
         width: 100% !important;
         min-width: 0 !important;
     }

@@ -1619,9 +1619,6 @@ td.exp-name {
     display: none !important;
   }
 
-  .main-content {
-    padding: 12px !important;
-  }
 
   .dash-stats {
     grid-template-columns: repeat(2, 1fr) !important;

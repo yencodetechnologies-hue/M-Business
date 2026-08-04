@@ -6987,6 +6987,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   ]);
   const [draggingSecondRow, setDraggingSecondRow] = useState(null);
+  const projectCarouselIndexRef = useRef(0);
   const [mobSecondRowOrder, setMobSecondRowOrder] = useState([
     { id: "unpaidInv", popupId: "mobUnpaidInvoices", icon: "ti-file-invoice", label: "Unpaid Invoices", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
     { id: "totalInv", popupId: "qaInvoice", icon: "ti-file-invoice", label: "Invoices", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
@@ -7583,6 +7584,24 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     }
     return { ...p, progress: p.progress || 0 };
   });
+
+  useEffect(() => {
+    const container = document.getElementById("mobProjectsScroller");
+    if (!container) return;
+    const cards = container.children;
+    if (!cards || cards.length <= 1) return;
+    const interval = setInterval(() => {
+      const next = (projectCarouselIndexRef.current + 1) % cards.length;
+      projectCarouselIndexRef.current = next;
+      const card = cards[next];
+      if (card) {
+        const containerCenter = container.offsetWidth / 2;
+        const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+        container.scrollTo({ left: cardCenter - containerCenter, behavior: "smooth" });
+      }
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [projectsWithProgress.length]);
 
   const fetchPackages = async () => {
 
@@ -9758,6 +9777,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
         @media(max-width:768px){.sidebar-spacer{display:none!important;}.mob-topbar-hide{display:none!important;}.main-content{padding:12px!important;}.dash-stats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}.dash-2col{grid-template-columns:1fr!important;}.modal-2col{grid-template-columns:1fr!important;}.page-header{flex-wrap:wrap;gap:8px;}.header-actions{flex-wrap:wrap;gap:8px;}}
 @media(max-width:768px){.mob-topbar-hamburger{visibility:hidden!important;}}
+@media(max-width:768px){.mob-topbar-dashboard-hidden{display:none!important;}}
         @media print {
 
           .no-print { display: none !important; }
@@ -9838,7 +9858,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
         {/* Mobile Topbar */}
 
-        <div className="mob-topbar no-print" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#fff", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", position: "sticky" }}>
+        <div className="mob-topbar no-print" style={{ display: validActive === "dashboard" ? "none" : "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#fff", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)" }}>
 
           {!enforceMySubscriptions ? (
 
@@ -10328,6 +10348,65 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         <i className="ti ti-folder" style={{ color: "var(--app-accent)" }}></i> Projects
                       </div>
                       <div style={{ display: "flex", gap: 12, overflowX: "auto", padding: "2px calc(50% - 105px) 10px", scrollSnapType: "x mandatory", scrollBehavior: "smooth", WebkitOverflowScrolling: "touch" }}>
+                        {projectsWithProgress.map((p, i) => {
+                          const pct = p.progress || 0;
+                          const circumference = 2 * Math.PI * 18;
+                          const offset = circumference - (pct / 100) * circumference;
+                          const budget = formatCurrency(p.budget, p.currency);
+                          return (
+                            <div
+                              key={p._id || p.id || i}
+                              onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
+                              style={{ flex: "0 0 auto", scrollSnapAlign: "center", scrollSnapStop: "always", width: 210, background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.1)", border: "1px solid rgba(0,0,0,0.03)", padding: 14, display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}
+                            >
+                              <div style={{ position: "relative", width: 44, height: 44, flexShrink: 0 }}>
+                                <svg width="44" height="44" viewBox="0 0 44 44">
+                                  <circle cx="22" cy="22" r="18" fill="none" stroke="#f1f5f9" strokeWidth="4" />
+                                  <circle
+                                    cx="22" cy="22" r="18" fill="none"
+                                    stroke="var(--app-accent)" strokeWidth="4"
+                                    strokeDasharray={circumference}
+                                    strokeDashoffset={offset}
+                                    strokeLinecap="round"
+                                    transform="rotate(-90 22 22)"
+                                  />
+                                </svg>
+                                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10.5, fontWeight: 800, color: "#0f1c2e" }}>
+                                  {pct}%
+                                </div>
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontSize: 12.5, fontWeight: 700, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  {p.name}
+                                </div>
+                                <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>
+                                  {p.client || "—"}
+                                </div>
+                                <div style={{ fontSize: 13, fontWeight: 800, color: "var(--app-accent)", marginTop: 4 }}>
+                                  {budget}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* HORIZONTAL SCROLLING PROJECT CARDS */}
+                  {projectsWithProgress.length > 0 && (
+                    <div style={{ position: "relative", margin: "10px 0 0" }}>
+                      <div style={{ padding: "0 16px", marginBottom: 8, fontSize: 14, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 6 }}>
+                        <i className="ti ti-folder" style={{ color: "var(--app-accent)" }}></i> Projects
+                      </div>
+                      {/* Center indicator line — passes through the vertical middle of the cards */}
+                      <div style={{ position: "absolute", left: 0, right: 0, top: 32, height: 68, transform: "translateY(-50%)", pointerEvents: "none", zIndex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ width: 40, height: 3, borderRadius: 2, background: "var(--app-accent)", opacity: 0.5 }} />
+                      </div>
+                      <div
+                        id="mobProjectsScroller"
+                        style={{ position: "relative", zIndex: 2, display: "flex", gap: 12, overflowX: "auto", padding: "0 calc(50% - 105px) 10px", scrollSnapType: "x mandatory", scrollBehavior: "smooth", WebkitOverflowScrolling: "touch" }}
+                      >
                         {projectsWithProgress.map((p, i) => {
                           const pct = p.progress || 0;
                           const circumference = 2 * Math.PI * 18;

@@ -7587,42 +7587,21 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   useEffect(() => {
     if (!projectsWithProgress.length) return;
-    let rafId;
-    let paused = false;
-    const speed = 1.6; // px per frame
-    let started = false;
-    const onPointerDown = () => { paused = true; };
-    const onPointerUp = () => { paused = false; };
-    const tick = () => {
+    const interval = setInterval(() => {
       const container = document.getElementById("mobProjectsScroller");
-      if (container && !paused) {
-        if (!started) { container.style.scrollBehavior = "auto"; started = true; }
-        const maxScroll = container.scrollWidth - container.clientWidth;
-        if (maxScroll > 0) {
-          let next = container.scrollLeft + speed;
-          if (next >= maxScroll) next = 0;
-          container.scrollLeft = next;
-        }
+      if (!container) return;
+      const cards = container.children;
+      if (!cards || cards.length <= 1) return;
+      const next = (projectCarouselIndexRef.current + 1) % cards.length;
+      projectCarouselIndexRef.current = next;
+      const card = cards[next];
+      if (card) {
+        const containerCenter = container.offsetWidth / 2;
+        const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+        container.scrollTo({ left: cardCenter - containerCenter, behavior: "smooth" });
       }
-      rafId = requestAnimationFrame(tick);
-    };
-    const container = document.getElementById("mobProjectsScroller");
-    if (container) {
-      container.addEventListener("touchstart", onPointerDown, { passive: true });
-      container.addEventListener("touchend", onPointerUp, { passive: true });
-      container.addEventListener("mousedown", onPointerDown);
-      container.addEventListener("mouseup", onPointerUp);
-    }
-    rafId = requestAnimationFrame(tick);
-    return () => {
-      cancelAnimationFrame(rafId);
-      if (container) {
-        container.removeEventListener("touchstart", onPointerDown);
-        container.removeEventListener("touchend", onPointerUp);
-        container.removeEventListener("mousedown", onPointerDown);
-        container.removeEventListener("mouseup", onPointerUp);
-      }
-    };
+    }, 3000);
+    return () => clearInterval(interval);
   }, [projectsWithProgress.length]);
 
   const fetchPackages = async () => {
@@ -10251,7 +10230,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <div style={{ position: "relative", margin: "-30px 0 0", zIndex: 20 }}>
                       <div
                         id="mobProjectsScroller"
-                        style={{ position: "relative", zIndex: 21, display: "flex", gap: 12, overflowX: "auto", justifyContent: projectsWithProgress.length > 2 ? "flex-start" : "center", padding: "0 calc(50% - 105px) 10px", WebkitOverflowScrolling: "touch" }}
+                        style={{ position: "relative", zIndex: 21, display: "flex", gap: 12, overflowX: "auto", justifyContent: projectsWithProgress.length > 2 ? "flex-start" : "center", padding: "0 calc(50% - 140px) 10px", WebkitOverflowScrolling: "touch" }}
                       >
                         {projectsWithProgress.map((p, i) => {
                           const pct = p.progress || 0;
@@ -10262,7 +10241,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             <div
                               key={p._id || p.id || i}
                               onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
-                              style={{ flex: "0 0 auto", width: 210, background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.1)", border: "1px solid rgba(0,0,0,0.03)", padding: 14, display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}
+                              style={{ flex: "0 0 auto", width: 340, height: 74, boxSizing: "border-box", background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.1)", border: "1px solid rgba(0,0,0,0.03)", padding: 14, display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}
                             >
                               <div style={{ position: "relative", width: 44, height: 44, flexShrink: 0 }}>
                                 <svg width="44" height="44" viewBox="0 0 44 44">

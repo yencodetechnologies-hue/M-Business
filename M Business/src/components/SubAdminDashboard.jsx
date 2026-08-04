@@ -2129,7 +2129,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const st = getStatusCfg(activeClient?.status);
 
   const acColor = getAvatarColor(activeClient || {});
-const cRevenue = (invoices || [])
+  const cRevenue = (invoices || [])
     .filter(inv => inv.client === activeClient?.clientName && (inv.status || "").toLowerCase() === "paid")
     .reduce((sum, inv) => sum + (Number(inv.grandTotal || inv.amountPaid || inv.total) || 0), 0);
 
@@ -7562,6 +7562,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     if (s === 'completed' || s === 'done') {
       return { ...p, progress: 100 };
     }
+    if (Number(p.progress) > 0) {
+      return { ...p, progress: Number(p.progress) };
+    }
     const projTasks = (tasks || []).filter(t => {
       const tid = t.projectId?._id || t.projectId || t.project;
       return tid === (p._id || p.id);
@@ -10235,7 +10238,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         style={{ position: "relative", zIndex: 21, display: "flex", gap: 12, overflowX: "auto", justifyContent: projectsWithProgress.length > 2 ? "flex-start" : "center", padding: "0 calc(50% - 150px) 10px", WebkitOverflowScrolling: "touch" }}
                       >
                         {projectsWithProgress.map((p, i) => {
-                          const pct = p.progress || 0;
+                          const pct = Number(p.progress) || 0;
                           const circumference = 2 * Math.PI * 18;
                           const offset = circumference - (pct / 100) * circumference;
                           const budget = formatCurrency(p.budget, p.currency);
@@ -10258,7 +10261,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                   />
                                 </svg>
                                 <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10.5, fontWeight: 800, color: "#0f1c2e" }}>
-                                  {pct}%
+                                  {(() => {
+                                    const budgetNum = Number(p.budget) || 0;
+                                    const spentNum = Number(p.spentAmount || p.amountSpent || 0);
+                                    const budgetPct = budgetNum > 0 ? Math.round((spentNum / budgetNum) * 100) : 0;
+                                    return `${budgetPct}%`;
+                                  })()}
                                 </div>
                               </div>
                               <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 6 }}>
@@ -10270,6 +10278,22 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                     {p.status || "Active"}
                                   </span>
                                 </div>
+                                {(() => {
+                                  const budgetNum = Number(p.budget) || 0;
+                                  const spentNum = Number(p.spentAmount || p.amountSpent || 0);
+                                  const budgetPct = budgetNum > 0 ? Math.min(100, Math.round((spentNum / budgetNum) * 100)) : 0;
+                                  return (
+                                    <div>
+                                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginBottom: 2 }}>
+                                        <span>Budget Used</span>
+                                        <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
+                                      </div>
+                                      <div style={{ height: 5, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
+                                        <div style={{ width: `${budgetPct}%`, height: "100%", background: "#7c3aed", borderRadius: 4 }} />
+                                      </div>
+                                    </div>
+                                  );
+                                })()}
                                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#94a3b8" }}>
                                   <span>Start: {p.start ? new Date(p.start).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "—"}</span>
                                   <span style={{ color: "#dc2626", fontWeight: 600 }}>End: {(p.end || p.deadline) ? new Date(p.end || p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "—"}</span>

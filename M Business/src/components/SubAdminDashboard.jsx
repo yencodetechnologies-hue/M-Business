@@ -10123,7 +10123,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             {/* ── Dashboard ── */}{validActive === "dashboard" && (
               <>
                 {/* MOBILE DASHBOARD (visible only under 768px) */}
-                <div className="mobile-dashboard-view" style={{ display: "none" }}>
+                <div className="mobile-dashboard-view" style={{ display: "none", width: "100vw", marginLeft: "calc(50% - 50vw)", marginRight: "calc(50% - 50vw)", marginTop: "-24px" }}>
                   <style>{`
     @media (max-width: 768px) {
       .mobile-dashboard-view { display: block !important; }
@@ -10138,8 +10138,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       animation: shimmerMove 2.5s ease infinite;
     }
     @media (max-width: 768px) {
-      .mobile-dashboard-view, .mobile-dashboard-view * { -ms-overflow-style: none; scrollbar-width: none; }
-      .mobile-dashboard-view::-webkit-scrollbar, .mobile-dashboard-view *::-webkit-scrollbar { display: none; width: 0; height: 0; }
+      html, body, .content, .main, .mobile-dashboard-view, .mobile-dashboard-view * { -ms-overflow-style: none; scrollbar-width: none; }
+      ::-webkit-scrollbar { display: none; width: 0; height: 0; }
     }
   `}</style>
 

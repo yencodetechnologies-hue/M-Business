@@ -167,15 +167,15 @@
     }
 }
 
-@media (max-width: 480px) {
+/* @media (max-width: 480px) {
 
-    .main,
+ 
     .content,
     .main-content,
     .main-pad {
         padding: 10px !important;
     }
-}
+} */
 
 /* ---------- Grids: stat cards / two-col / three-col / forms ---------- */
 @media (max-width: 900px) {

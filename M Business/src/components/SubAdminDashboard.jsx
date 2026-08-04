@@ -10128,7 +10128,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     position: "relative",
                     zIndex: 1,
                     background: "linear-gradient(160deg, var(--app-accent) 0%, #0f7a8a 60%, #0a5a68 100%)",
-                    borderRadius: "0 0 32px 32px",
+                    borderRadius: "0",
                     margin: "0",
                     padding: "18px 18px 90px",
 

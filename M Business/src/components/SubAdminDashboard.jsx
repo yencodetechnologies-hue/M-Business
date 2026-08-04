@@ -10241,7 +10241,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             <div
                               key={p._id || p.id || i}
                               onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
-                              style={{ flex: "0 0 auto", width: 260, boxSizing: "border-box", background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.1)", border: "1px solid rgba(0,0,0,0.03)", padding: "14px 16px", display: "flex", gap: 12, cursor: "pointer" }}
+                              style={{ flex: "0 0 auto", width: 380, boxSizing: "border-box", background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.1)", border: "1px solid rgba(0,0,0,0.03)", padding: "14px 16px", display: "flex", gap: 12, cursor: "pointer" }}
                             >
                               <div style={{ position: "relative", width: 44, height: 44, flexShrink: 0 }}>
                                 <svg width="44" height="44" viewBox="0 0 44 44">

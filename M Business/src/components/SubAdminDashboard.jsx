@@ -10130,7 +10130,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     background: "linear-gradient(160deg, var(--app-accent) 0%, #0f7a8a 60%, #0a5a68 100%)",
                     borderRadius: "0 0 32px 32px",
                     margin: "0",
-                    padding: "18px 18px 50px",
+                    padding: "18px 18px 90px",
+
                     color: "#fff",
                     overflow: "hidden"
                   }}>
@@ -10227,7 +10228,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   {/* HORIZONTAL SCROLLING PROJECT CARDS — overlaps the bottom of the hero card */}
                   {projectsWithProgress.length > 0 && (
-                    <div style={{ position: "relative", margin: "-30px 0 0", zIndex: 20 }}>
+                    <div style={{ position: "relative", margin: "-40px 0 0", zIndex: 20 }}>
                       <div
                         id="mobProjectsScroller"
                         style={{ position: "relative", zIndex: 21, display: "flex", gap: 12, overflowX: "auto", justifyContent: projectsWithProgress.length > 2 ? "flex-start" : "center", padding: "0 calc(50% - 150px) 10px", WebkitOverflowScrolling: "touch" }}

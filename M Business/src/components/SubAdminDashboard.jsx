@@ -7045,6 +7045,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [mobShowAllProjects, setMobShowAllProjects] = useState(false);
   const [mobShowInvoiceList, setMobShowInvoiceList] = useState(false);
   const mobIdleTimerRef = useRef(null);
+
+  const MobIdleInvoiceArmer = ({ projectsWithProgress, mobShowInvoiceList, setMobShowInvoiceList }) => {
+    useEffect(() => {
+      if (mobShowInvoiceList) return;
+      if (!projectsWithProgress || projectsWithProgress.length === 0) return;
+      const timer = setTimeout(() => setMobShowInvoiceList(true), 4000);
+      return () => clearTimeout(timer);
+    }, [projectsWithProgress, mobShowInvoiceList, setMobShowInvoiceList]);
+    return null;
+  };
   const [showMobileInvoiceModal, setShowMobileInvoiceModal] = useState(false);
   const [showMobileTaskModal, setShowMobileTaskModal] = useState(false);
 
@@ -10456,7 +10466,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           Create Invoice
                         </button>
                         <button
-                          onClick={() => { if (!projectsWithProgress[0]) { setActive("projects"); return; } setJumpProject(projectsWithProgress[0]); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setAutoOpenTaskModal(true); setActive("project-details"); }}
+                          onClick={() => { if (!projectsWithProgress[0]) { setActive("projects"); return; } setAutoOpenTaskModal(true); }}
                           style={{ flex: 1, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(0,188,212,0.3)" }}
                         >
                           Add Task
@@ -10470,17 +10480,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
 
                     <div style={{ marginTop: 10, background: "#fff", borderRadius: 16, boxShadow: "0 10px 30px rgba(15,10,41,0.08)", border: "1px solid rgba(0,0,0,0.03)", overflow: "hidden" }}>
-                      {(() => {
-                        const clearIdleTimer = () => { if (mobIdleTimerRef.current) { clearTimeout(mobIdleTimerRef.current); mobIdleTimerRef.current = null; } };
-                        const armIdleTimer = (proj) => {
-                          clearIdleTimer();
-                          const nameMatch = (proj?.name || "").toLowerCase().includes("safety training academy");
-                          if (!nameMatch) return;
-                          mobIdleTimerRef.current = setTimeout(() => setMobShowInvoiceList(true), 4000);
-                        };
-                        if (!window.__mobIdleArmed) { window.__mobIdleArmed = true; armIdleTimer(projectsWithProgress[0]); }
-                        return null;
-                      })()}
+                      <MobIdleInvoiceArmer projectsWithProgress={projectsWithProgress} mobShowInvoiceList={mobShowInvoiceList} setMobShowInvoiceList={setMobShowInvoiceList} />
                       {(mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).map((p, idx, arr) => {
                         const progress = p.progress || 0;
                         const priority = p.priority || "medium";

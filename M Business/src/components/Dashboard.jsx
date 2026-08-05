@@ -9,7 +9,7 @@ import QuotationCreator from "./QuotationCreator";
 import ProjectProposalCreator from "./ProjectProposalCreator";
 import AccountsPage, { ExpensesPage, IncomePage } from "./AccountsPage";
 import ModernProjectDetails from "./ModernProjectDetails";
-import ModernProjectDetails from "./ModernProjectDetails";
+
 import AdminProposalManagement from "./AdminProposalManagement";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -1810,7 +1810,21 @@ function Sidebar({ active, setActive, onLogout, open, onClose, navItems, initial
           </div>
         </div>
         <nav style={{ flex: 1, minHeight: 0, padding: "10px 8px", overflowY: "auto", position: "relative", zIndex: 1 }}>
-          onClick={() => { setActive(n.key); if (n.key === "invoices" && typeof setSidebarInvoiceClick === "function") setSidebarInvoiceClick(true); onClose(); }}
+          {items.map(n => (
+            <div
+              key={n.key}
+              onClick={() => { setActive(n.key); if (n.key === "invoices" && typeof setSidebarInvoiceClick === "function") setSidebarInvoiceClick(true); onClose(); }}
+              style={{
+                display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 10,
+                marginBottom: 3, cursor: "pointer", fontSize: 13, fontWeight: active === n.key ? 700 : 500,
+                background: active === n.key ? "rgba(255,255,255,0.12)" : "transparent",
+                color: active === n.key ? "#fff" : "rgba(255,255,255,0.65)"
+              }}
+            >
+              <span style={{ width: 18, textAlign: "center" }}>{n.icon}</span>
+              <span>{n.label}</span>
+            </div>
+          ))}
         </nav>
         <div style={{ padding: "10px 8px 14px", borderTop: "1px solid rgba(255,255,255,0.07)", position: "relative", zIndex: 1, flexShrink: 0 }}>
           <button onClick={onLogout} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 9, padding: "10px 12px", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.35)", borderRadius: 11, color: "#fca5a5", fontSize: 12.5, cursor: "pointer", fontWeight: 700, fontFamily: "inherit" }}> Logout</button>
@@ -1851,7 +1865,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     }
   }, [prefillClientName, modal]); const [showProfile, setShowProfile] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  { validActive === "invoices" && <InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setActive("projects")} key="global-invoice-creator" /> }
   const [companyLogo, setCompanyLogo] = useState(user?.logoUrl ? user.logoUrl : (fixedLogo || null));
   useEffect(() => { setCompanyLogo(user?.logoUrl ? user.logoUrl : (fixedLogo || null)); }, [user, fixedLogo]);
 
@@ -2203,19 +2216,27 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 <div className="md-glow" style={{ position: "absolute", bottom: -90, left: -40, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, #8b5cf6 0%, transparent 70%)", filter: "blur(10px)", animationDelay: "1.5s" }} />
 
                 <div style={{ position: "relative", zIndex: 2 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
-                    <div className="md-tap" onClick={() => setSidebarOpen(true)} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                      <i className="ti ti-menu-2" style={{ fontSize: 18 }}></i>
+                  {/* ROW 1 — Company Name (left) + Notification (right) */}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                    <div style={{ fontSize: 16, fontWeight: 800, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {user?.companyName || "Ylines Ecommerce"}
                     </div>
-                    <div style={{ textAlign: "center", flex: 1, padding: "0 10px" }}>
-                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", fontWeight: 800, letterSpacing: 1.5 }}>WELCOME BACK</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{displayName}</div>
-                    </div>
-                    <div className="md-tap" style={{ width: 42, height: 42, borderRadius: 14, background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 13, boxShadow: "0 8px 20px rgba(0,188,212,0.4)", cursor: "pointer", flexShrink: 0 }}>
-                      {(user?.name || "PR").substring(0, 2).toUpperCase()}
+                    <div className="md-tap" style={{ width: 38, height: 38, borderRadius: 12, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+                      <i className="ti ti-bell" style={{ fontSize: 17 }}></i>
                     </div>
                   </div>
 
+                  {/* ROW 2 — Logo (left) + Hamburger menu (right) */}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
+                    <div style={{ width: 38, height: 38, borderRadius: 10, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+                      {companyLogo
+                        ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                        : <span style={{ color: T.accent, fontWeight: 800, fontSize: 12 }}>{initials}</span>}
+                    </div>
+                    <div className="md-tap" onClick={() => setSidebarOpen(true)} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                      <i className="ti ti-menu-2" style={{ fontSize: 18 }}></i>
+                    </div>
+                  </div>
                   <div style={{ fontSize: 12.5, color: "rgba(255,255,255,0.5)", display: "flex", alignItems: "center", gap: 6, marginBottom: 8, fontWeight: 600 }}>
                     <i className="ti ti-sparkles" style={{ color: "var(--app-accent)" }}></i> Revenue this month
                   </div>

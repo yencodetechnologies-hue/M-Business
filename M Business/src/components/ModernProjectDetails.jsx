@@ -262,7 +262,7 @@ function DetailField({ label, value, fullWidth }) {
   );
 }
 
-export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions = false, onNext, onNewInvoice, onViewInvoice, onNewProposal, onNewQuotation, onViewQuotation, onViewProposal, autoOpenInvoice, onAutoOpenInvoiceDone, fromClientContext = false, onAddEmployeeClick, showBackLabel = false }) {
+export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions = false, onNext, onNewInvoice, onViewInvoice, onNewProposal, onNewQuotation, onViewQuotation, onViewProposal, autoOpenInvoice, onAutoOpenInvoiceDone, fromClientContext = false, onAddEmployeeClick, showBackLabel = false, autoOpenAddTask, onAutoOpenAddTaskDone }) {
   const [activeTab, setActiveTab] = useState(() => {
     try {
       const saved = localStorage.getItem('project_tabs_order');
@@ -375,6 +375,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   // Modal / Input states
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
+
   const [editingTask, setEditingTask] = useState(null);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskPriority, setNewTaskPriority] = useState('medium');
@@ -401,7 +402,18 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [updateSelectedMembers, setUpdateSelectedMembers] = useState([]);
   const [showUpdateMembersDropdown, setShowUpdateMembersDropdown] = useState(false);
   const updateMembersDropdownRef = useRef(null);
-
+  useEffect(() => {
+    if (autoOpenAddTask) {
+      setEditingTask(null);
+      setNewTaskTitle('');
+      setNewTaskDesc('');
+      setNewTaskPriority('medium');
+      setNewTaskAssignTo([]);
+      setNewTaskDue('');
+      setNewTaskMilestone('');
+      setShowAddTaskModal(true);
+    }
+  }, [autoOpenAddTask]);
   useEffect(() => {
     if (!showUpdateMembersDropdown) return;
     const handleClickOutside = (e) => {

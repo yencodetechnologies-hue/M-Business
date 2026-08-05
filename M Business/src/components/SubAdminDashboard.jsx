@@ -7106,7 +7106,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <i className="ti ti-file-invoice"></i> Create Invoice
             </button>
             <button
-              onClick={() => { setActive("tasks"); }}
+              onClick={() => { setJumpProject(projectsWithProgress[0] || null); setActive("project-details"); setOpenAddTaskOnLoad(true); }}
               style={{ flex: 1, background: "rgba(255,255,255,0.18)", color: "#fff", border: "1.5px solid rgba(255,255,255,0.5)", borderRadius: 12, padding: "12px 0", fontSize: 14, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
             >
               <i className="ti ti-plus"></i> Add Task
@@ -10298,15 +10298,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <div style={{ position: "absolute", bottom: -80, left: -30, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, #7c3aed 0%, transparent 70%)", opacity: 0.25, filter: "blur(14px)" }} />
 
                     <div style={{ position: "relative", zIndex: 2 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                        <div onClick={() => setSidebarOpen(true)} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
-                          <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.12)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
-                            {companyLogo ? (
-                              <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                            ) : (
-                              <i className="ti ti-building" style={{ fontSize: 18, color: "#fff" }}></i>
-                            )}
-                          </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 20 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                           <div
                             data-profile-anchor="true"
                             onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }}
@@ -10314,8 +10307,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           >
                             {(user?.companyName || user?.name || "Business")}
                           </div>
-                        </div>
-                        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                           <div style={{ position: "relative" }}>
                             <div onClick={() => { setMobNotifExpanded(v => !v); fetchPendingLeaves(); }} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.08)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
                               <i className="ti ti-bell" style={{ fontSize: 17 }}></i>
@@ -10323,46 +10314,22 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                 <span style={{ position: "absolute", top: 5, right: 6, width: 8, height: 8, borderRadius: "50%", background: "#ff4d6d", boxShadow: "0 0 0 2px #0f0a29" }}></span>
                               )}
                             </div>
-                            {mobNotifExpanded && (
-                              <>
-                                <div onClick={() => setMobNotifExpanded(false)} style={{ position: "fixed", inset: 0, zIndex: 4998 }} />
-                                <div style={{ position: "absolute", top: 50, right: 0, width: 300, maxHeight: 380, overflowY: "auto", background: "#fff", borderRadius: 16, boxShadow: "0 12px 32px rgba(15,10,41,0.25)", border: "1px solid rgba(0,0,0,0.05)", zIndex: 4999 }}>
-                                  <div style={{ padding: "12px 16px", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", gap: 6 }}>
-                                    <i className="ti ti-bell" style={{ color: "var(--app-accent)" }}></i>
-                                    <span style={{ fontSize: 13, fontWeight: 800, color: "#0f1c2e" }}>Notifications</span>
-                                    {pendingLeaves.length > 0 && <span style={{ background: "#EF4444", color: "#fff", borderRadius: 20, padding: "2px 7px", fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length}</span>}
-                                  </div>
-                                  <div style={{ padding: "6px 14px 12px" }}>
-                                    {pendingLeaves.length === 0 ? (
-                                      <div style={{ textAlign: "center", padding: "14px 0", color: "#A0AEC0", fontSize: 12.5 }}>No pending notifications</div>
-                                    ) : (
-                                      pendingLeaves.map((l, i) => {
-                                        const initials = l.employeeName ? l.employeeName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'EE';
-                                        const colors = ['#f59e0b', '#a855f7', '#0ea5e9', '#ec4899', '#22c55e'];
-                                        const bg = colors[i % colors.length];
-                                        const detail = `${l.type || 'Leave'} · ${l.from || ''} ${l.to ? '- ' + l.to : ''}`;
-                                        return (
-                                          <div key={l._id || i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", borderBottom: i === pendingLeaves.length - 1 ? "none" : "1px solid #F0F4F8" }}>
-                                            <div style={{ width: 30, height: 30, borderRadius: "50%", background: bg, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{initials}</div>
-                                            <div style={{ flex: 1, minWidth: 0 }}>
-                                              <div style={{ fontSize: 12, fontWeight: 700, color: "#1A2332" }}>{l.employeeName}</div>
-                                              <div style={{ fontSize: 10, color: "#718096", marginTop: 1 }}>{detail}</div>
-                                            </div>
-                                            <div style={{ display: "flex", flexDirection: "column", gap: 3, flexShrink: 0 }}>
-                                              <button onClick={() => handleApproveLeave(l._id)} style={{ background: "#DCFCE7", color: "#166534", border: "none", padding: "3px 7px", borderRadius: 6, fontSize: 9.5, fontWeight: 700, cursor: "pointer" }}>Approve</button>
-                                              <button onClick={() => handleRejectLeave(l._id)} style={{ background: "#FEF2F2", color: "#DC2626", border: "none", padding: "3px 7px", borderRadius: 6, fontSize: 9.5, fontWeight: 700, cursor: "pointer" }}>Reject</button>
-                                            </div>
-                                          </div>
-                                        );
-                                      })
-                                    )}
-                                  </div>
-                                </div>
-                              </>
+                          </div>
+                        </div>
+
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.12)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+                            {companyLogo ? (
+                              <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                            ) : (
+                              <i className="ti ti-building" style={{ fontSize: 18, color: "#fff" }}></i>
                             )}
                           </div>
-
+                          <div onClick={() => setSidebarOpen(true)} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.08)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                            <i className="ti ti-menu-2" style={{ fontSize: 20, color: "#fff" }}></i>
+                          </div>
                         </div>
+
                       </div>
 
 
@@ -10472,7 +10439,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           Create Invoice
                         </button>
                         <button
-                          onClick={() => { setActive("tasks"); }}
+                          onClick={() => { setJumpProject(projectsWithProgress[0] || null); setActive("project-details"); setOpenAddTaskOnLoad(true); }}
                           style={{ flex: 1, background: "rgba(255,255,255,0.18)", color: "#fff", border: "1.5px solid rgba(255,255,255,0.5)", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer" }}
                         >
                           Add Task

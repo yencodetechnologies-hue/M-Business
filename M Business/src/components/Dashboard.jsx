@@ -1869,6 +1869,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   useEffect(() => { setCompanyLogo(user?.logoUrl ? user.logoUrl : (fixedLogo || null)); }, [user, fixedLogo]);
 
   const [clients, setClients] = useState([]);
+  
   const [nc, setNc] = useState({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", contactPersonName: "", contactPersonNo: "", gstNumber: "", logoUrl: "", clientType: "b2b", category: "", source: "", onboardedOn: new Date().toISOString().split('T')[0], city: "", state: "", pincode: "", country: "India", website: "", linkedin: "", billingCurrency: "INR — Indian Rupee", paymentTerms: "", creditLimit: "", preferredPaymentMode: "", notes: "" });
   const [ncError, setNcError] = useState({});
   const [saveLoading, setSaveLoading] = useState(false);

@@ -10511,33 +10511,33 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           <div
                             key={p._id || idx}
                             onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
-                            style={{ padding: "14px", borderBottom: idx === arr.length - 1 ? "none" : "1px solid #f1f5f9", cursor: "pointer" }}
+                            style={{ padding: "10px 12px", borderBottom: idx === arr.length - 1 ? "none" : "1px solid #f1f5f9", cursor: "pointer" }}
                           >
-                            <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
-                              <span style={{ display: "flex", alignItems: "center", gap: 4, padding: "3px 9px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: "#D1FAE5", color: "#059669" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginBottom: 5 }}>
+                              <span style={{ display: "flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#D1FAE5", color: "#059669" }}>
                                 <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#059669" }} />
                                 {p.status || "Active"}
                               </span>
-                              {p.category && <span style={{ padding: "3px 9px", borderRadius: 20, fontSize: 11, fontWeight: 600, background: "#E0F7FA", color: "#0097A7" }}>{p.category}</span>}
-                              <span style={{ marginLeft: "auto", padding: "3px 9px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: priorityColors.bg, color: priorityColors.fg }}>
+                              {p.category && <span style={{ padding: "2px 8px", borderRadius: 20, fontSize: 10, fontWeight: 600, background: "#E0F7FA", color: "#0097A7" }}>{p.category}</span>}
+                              <span style={{ marginLeft: "auto", padding: "2px 8px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: priorityColors.bg, color: priorityColors.fg }}>
                                 {priority.charAt(0).toUpperCase() + priority.slice(1)}
                               </span>
                             </div>
-                            <div style={{ fontSize: 15, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>{p.name}</div>
+                            <div style={{ fontSize: 13.5, fontWeight: 800, color: "#0f1c2e", marginBottom: 2 }}>{p.name}</div>
                             {clientLabel && (
-                              <div style={{ fontSize: 12, color: "#64748b", display: "flex", alignItems: "center", gap: 4, marginBottom: 10 }}>
-                                <i className="ti ti-building" style={{ fontSize: 13 }}></i> {clientLabel}
+                              <div style={{ fontSize: 11, color: "#64748b", display: "flex", alignItems: "center", gap: 4, marginBottom: 6 }}>
+                                <i className="ti ti-building" style={{ fontSize: 12 }}></i> {clientLabel}
                               </div>
                             )}
-                            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: "#64748b", marginBottom: 4 }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10.5, color: "#64748b", marginBottom: 3 }}>
                               <span>Progress</span>
                               <span style={{ fontWeight: 800, color: "#0f1c2e" }}>{progress}%</span>
                             </div>
-                            <div style={{ height: 6, background: "#f1f5f9", borderRadius: 4, marginBottom: 10 }}>
+                            <div style={{ height: 5, background: "#f1f5f9", borderRadius: 4, marginBottom: 6 }}>
                               <div style={{ width: `${progress}%`, height: "100%", background: "var(--app-accent, #00BCD4)", borderRadius: 4 }} />
                             </div>
-                            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#94a3b8" }}>
-                              {p.start && <span><i className="ti ti-calendar" style={{ fontSize: 12, marginRight: 3 }}></i>Start: {new Date(p.start).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>}
+                            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#94a3b8" }}>
+                              {p.start && <span><i className="ti ti-calendar" style={{ fontSize: 11, marginRight: 3 }}></i>Start: {new Date(p.start).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>}
                               {deadline && <span style={{ color: "#dc2626", fontWeight: 700 }}>Deadline: {new Date(deadline).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>}
                             </div>
                           </div>
@@ -10588,7 +10588,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   </div>
 
                   {/* FLOATING STAT STRIP — draggable reorder, sits below hero (no overlap) */}
-                  <div style={{ margin: "8px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
+                  <div style={{ margin: "8px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
                     {mobStatCardOrder.map((s, i) => (
                       <div
                         key={s.id}
@@ -10610,15 +10610,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         }}
                         onDragEnd={() => setDraggingStatCard(null)}
                         onClick={() => openMobilePopup(s.id)}
-                        style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, aspectRatio: "1 / 1", padding: "6px 6px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingStatCard === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
+                        style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, padding: "4px 4px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingStatCard === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                       >
-                        <div style={{ width: 40, height: 40, borderRadius: 12, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 2px", color: "#fff", fontSize: 19, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
+                        <div style={{ width: 72, height: 72, borderRadius: 18, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", color: "#fff", fontSize: 30, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
                           <i className={`ti ${s.icon}`}></i>
                         </div>
-                        <div style={{ fontSize: 16, fontWeight: 900, color: "#0f0a29" }}>{s.val}</div>
-                        <div style={{ fontSize: 9.5, color: "#94a3b8", fontWeight: 700, marginTop: 1 }}>{s.label}</div>
-                      </div>
-                    ))}
+                        <div style={{ fontSize: 13, fontWeight: 800, color: "#0f0a29" }}>{s.label}</div>
+                        <div style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 600, marginTop: 1 }}>{s.val}</div>
+                      </div>))}
                   </div>
 
                   <MobilePopup id="mobClients" title="Clients">
@@ -10677,7 +10676,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   </MobilePopup>
 
                   {/* NEW DRAGGABLE ROW — Unpaid Invoices, Invoices, Proposals, Quotations */}
-                  <div style={{ margin: "10px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
+                  <div style={{ margin: "14px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
                     {mobSecondRowOrder.map((s, i) => (
                       <div
                         key={s.id}
@@ -10699,13 +10698,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         }}
                         onDragEnd={() => setDraggingSecondRow(null)}
                         onClick={() => openMobilePopup(s.popupId)}
-                        style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, aspectRatio: "1 / 1", padding: "10px 6px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingSecondRow === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
+                        style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, padding: "4px 4px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingSecondRow === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                       >
-                        <div style={{ width: 38, height: 38, borderRadius: 12, background: s.grad, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 2px", fontSize: 18, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
+                        <div style={{ width: 72, height: 72, borderRadius: 18, background: s.grad, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", fontSize: 30, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
                           <i className={`ti ${s.icon}`}></i>
                         </div>
-                        <div style={{ fontSize: 16, fontWeight: 900, color: "#0f0a29" }}>{s.val}</div>
-                        <div style={{ fontSize: 9.5, color: "#94a3b8", fontWeight: 700, marginTop: 1 }}>{s.label}</div>
+                        <div style={{ fontSize: 13, fontWeight: 800, color: "#0f0a29" }}>{s.label}</div>
+                        <div style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 600, marginTop: 1 }}>{s.val}</div>
                       </div>
                     ))}
                   </div>

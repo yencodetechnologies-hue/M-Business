@@ -499,13 +499,25 @@ export default function ModernProjectsPage({ user }) {
         <div className="m-content">
           {/* Header */}
           <div className="m-page-header">
-            <div>
-              <div className="m-page-title">Projects</div>
-              <div className="m-page-sub">Manage and track all your projects</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <button
+                onClick={() => navigate(-1)}
+                style={{
+                  width: 36, height: 36, borderRadius: '50%', border: 'none',
+                  background: '#fff', boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', flexShrink: 0
+                }}
+              >
+                <i className="ti ti-arrow-left" style={{ fontSize: '18px', color: '#111' }}></i>
+              </button>
+              <div>
+                <div className="m-page-title">Projects</div>
+                <div className="m-page-sub">Manage and track all your projects</div>
+              </div>
             </div>
             <div className="m-header-actions">
               <button className="m-filter-btn" onClick={fetchAll}><i className="ti ti-refresh" style={{ fontSize: '14px' }}></i> Refresh</button>
-
             </div>
           </div>
 

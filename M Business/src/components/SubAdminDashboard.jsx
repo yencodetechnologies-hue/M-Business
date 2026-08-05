@@ -10150,7 +10150,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               <i className="ti ti-building" style={{ fontSize: 18, color: "#fff" }}></i>
                             )}
                           </div>
-                          <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{(user?.companyName || user?.name || "Business")}</div>
+                          <div
+                            data-profile-anchor="true"
+                            onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }}
+                            style={{ fontSize: 15, fontWeight: 800, color: "#fff", cursor: "pointer" }}
+                          >
+                            {(user?.companyName || user?.name || "Business")}
+                          </div>
                         </div>
                         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                           <div style={{ position: "relative" }}>
@@ -12291,7 +12297,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             {validActive === "projects" && <ProjectsPage
 
-              onBack={(sidebarOverride === "dashboard" || openedFromMobileAddMenu) ? () => { setSidebarOverride(null); setOpenedFromMobileAddMenu(false); setActive("dashboard"); } : null}
+              onBack={() => { setSidebarOverride(null); setOpenedFromMobileAddMenu(false); setActive("dashboard"); }}
 
               projects={projects}
 

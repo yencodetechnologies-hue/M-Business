@@ -7043,12 +7043,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   // ── Mobile: Teal actions + project carousel + auto-swap invoice list ──
   const [mobShowAllProjects, setMobShowAllProjects] = useState(false);
+  const [mobShowInvoiceList, setMobShowInvoiceList] = useState(false);
+  const mobIdleTimerRef = useRef(null);
   const [showMobileInvoiceModal, setShowMobileInvoiceModal] = useState(false);
   const [showMobileTaskModal, setShowMobileTaskModal] = useState(false);
 
-  const [mobCarouselIdx, setMobCarouselIdx] = useState(0);
-  const [mobShowInvoiceList, setMobShowInvoiceList] = useState(false);
-  const mobIdleTimerRef = useRef(null);
+
 
   const MobileTealActionsSection = () => {
     const allProjects = projects || [];
@@ -10470,6 +10470,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
 
                     <div style={{ marginTop: 10, background: "#fff", borderRadius: 16, boxShadow: "0 10px 30px rgba(15,10,41,0.08)", border: "1px solid rgba(0,0,0,0.03)", overflow: "hidden" }}>
+                      {(() => {
+                        const clearIdleTimer = () => { if (mobIdleTimerRef.current) { clearTimeout(mobIdleTimerRef.current); mobIdleTimerRef.current = null; } };
+                        const armIdleTimer = (proj) => {
+                          clearIdleTimer();
+                          const nameMatch = (proj?.name || "").toLowerCase().includes("safety training academy");
+                          if (!nameMatch) return;
+                          mobIdleTimerRef.current = setTimeout(() => setMobShowInvoiceList(true), 4000);
+                        };
+                        if (!window.__mobIdleArmed) { window.__mobIdleArmed = true; armIdleTimer(projectsWithProgress[0]); }
+                        return null;
+                      })()}
                       {(mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).map((p, idx, arr) => {
                         const progress = p.progress || 0;
                         const priority = p.priority || "medium";
@@ -10517,7 +10528,43 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       )}
                     </div>
 
-                    {projectsWithProgress.length > 3 && (
+                    {mobShowInvoiceList && (
+                      <div style={{ marginTop: 4 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                          <span style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e" }}>Invoice List</span>
+                          <span onClick={() => setMobShowInvoiceList(false)} style={{ fontSize: 11.5, fontWeight: 700, color: "var(--app-accent, #00BCD4)", cursor: "pointer" }}>Back to Projects</span>
+                        </div>
+                        {[
+                          { key: "unpaid", label: "Unpaid", color: "#d97706", bg: "#fff7ed" },
+                          { key: "overdue", label: "Overdue", color: "#dc2626", bg: "#fef2f2" },
+                          { key: "partpaid", label: "Part Paid", color: "#7c3aed", bg: "#f3e8ff" },
+                        ].map(g => {
+                          const list = (invoices || []).filter(i => {
+                            const s = (i.status || "").toLowerCase();
+                            if (g.key === "unpaid") return s === "pending" || s === "unpaid";
+                            if (g.key === "overdue") return s === "overdue";
+                            if (g.key === "partpaid") return s === "part paid" || s === "partpaid" || s === "part-paid";
+                            return false;
+                          });
+                          return (
+                            <div key={g.key} style={{ background: "#fff", borderRadius: 14, padding: 14, border: "1px solid rgba(0,0,0,0.06)", marginBottom: 10 }}>
+                              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: list.length ? 8 : 0 }}>
+                                <span style={{ background: g.bg, color: g.color, padding: "4px 10px", borderRadius: 8, fontSize: 11, fontWeight: 800 }}>{g.label}</span>
+                                <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>{list.length}</span>
+                              </div>
+                              {list.slice(0, 5).map((inv, i) => (
+                                <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, padding: "5px 0", borderTop: i === 0 ? "1px solid #f1f5f9" : "none" }}>
+                                  <span style={{ fontWeight: 600 }}>{inv.clientName || inv.client || "Client"}</span>
+                                  <span style={{ color: "#94a3b8" }}>{inv.grandTotal ? `₹${inv.grandTotal}` : ""}</span>
+                                </div>
+                              ))}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {!mobShowInvoiceList && projectsWithProgress.length > 3 && (
                       <button
                         onClick={() => setMobShowAllProjects(v => !v)}
                         style={{ width: "100%", marginTop: 8, marginBottom: -4, background: "#fff", border: "1.5px solid var(--app-accent, #00BCD4)", color: "var(--app-accent, #00BCD4)", borderRadius: 10, padding: "8px 0", fontSize: 12.5, fontWeight: 800, cursor: "pointer" }}
@@ -11487,7 +11534,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                             </div>
 
-                            {!isDesktopWidth && <MobileTealActionsSection />}
+
 
                             {isDesktopWidth && (<>
                               {/* MAIN CONTENT AREA */}

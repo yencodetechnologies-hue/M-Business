@@ -21,7 +21,7 @@ const T = {
   // ── BACKGROUNDS ------------------------------------------
   bg: "var(--app-bg, #f8fafc)",
   surface: "#ffffff",
-  sidebar: "linear-gradient(180deg, var(--app-accent, #00BCD4) 0%, var(--app-accent2, #00ACC1) 100%)",
+  sidebar: "linear-gradient(180deg, var(--app-accent, #00BCD4) 0%, var(--app-accent2, #00BCD4) 100%)",
   sidebarActive: "rgba(255,255,255,0.22)",
   sidebarText: "rgba(255,255,255,0.65)",
   sidebarTextActive: "#ffffff",

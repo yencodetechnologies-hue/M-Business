@@ -7376,7 +7376,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
     candy: { label: "Candy", sidebar: "#c026d3", accent: "#c026d3", bg: "#fdf4ff", muted: "#a21caf", border: "#f5d0fe", dot: "#c026d3" },
 
-    teal: { label: "Teal", sidebar: "#00BCD4", accent: "#00BCD4", bg: "#F5FAFA", muted: "#607D86", border: "#E0EEF0", dot: "#00ACC1" },
+    teal: { label: "Teal", sidebar: "#00BCD4", accent: "#00BCD4", bg: "#F5FAFA", muted: "#607D86", border: "#E0EEF0", dot: "#00BCD4" },
 
   };
 
@@ -10452,14 +10452,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           Create Invoice
                         </button>
                         <button
-                          onClick={() => { setActive("tasks"); }}
+                          onClick={() => { setSelectedProjectForTasks(null); setAutoOpenTaskModal(true); setActive("tasks"); }}
                           style={{ flex: 1, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(0,188,212,0.3)" }}
                         >
                           Add Task
                         </button>
                       </div>
                     </div>
-                    <div style={{ marginTop: 14, height: 8, background: "rgba(0,188,212,0.12)" }} />
+                    <div style={{ marginTop: 14, height: 8, background: "rgba(0,188,212,0.12)", marginLeft: -16, marginRight: -16 }} />
 
                     <div style={{ marginTop: 14, display: "flex" }}>
                       <span style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e" }}>Projects</span>

@@ -5,7 +5,7 @@ const THEMES = {
   teal: {
     name: 'Teal',
     primary: ' var(--app-accent, var(--app-accent, #00BCD4))',
-    primary2: 'var(--app-accent2, #00ACC1)',
+    primary2: 'var(--app-accent2, #00BCD4)',
     light: 'var(--teal-light, #E0F7FA)',
     lighter: 'var(--teal-lighter, #F0FDFE)',
     bg: '#F5FAFA',

@@ -50,7 +50,7 @@ const C = {
   text2: "#4E6B75",
   text3: "#96B0B8",
   teal: " var(--app-accent, var(--app-accent, #00BCD4))",
-  teal2: "var(--app-accent2, #00ACC1)",
+  teal2: "var(--app-accent2, #00BCD4)",
   teal3: "#006E7F",
   tealLight: "var(--teal-light, var(--teal-light, #E0F7FA))",
   tealLighter: "var(--teal-lighter, #F0FDFE)",

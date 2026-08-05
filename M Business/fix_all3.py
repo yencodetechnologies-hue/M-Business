@@ -52,7 +52,7 @@ send_modal_html = """
     
     <div style="display:flex;gap:10px;">
       <button onclick="closeSendModal()" style="flex:1;padding:10px;border:1.5px solid #E0EEF0;border-radius:8px;background:#fff;font-size:13px;font-weight:600;color:#607D86;cursor:pointer;font-family:inherit;">Cancel</button>
-      <button onclick="sendDoc()" style="flex:2;padding:10px;border:none;border-radius:8px;background:linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),var(--app-accent2, #00ACC1));font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;">
+      <button onclick="sendDoc()" style="flex:2;padding:10px;border:none;border-radius:8px;background:linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),var(--app-accent2, #00BCD4));font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;">
         <i class="ti ti-send" style="margin-right:6px;"></i>Send Now
       </button>
     </div>

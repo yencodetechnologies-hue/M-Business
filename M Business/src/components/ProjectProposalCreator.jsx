@@ -1829,7 +1829,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
           .prop-list-wrap .pf-btn{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:1.5px solid var(--border,#E0EEF0);background:none;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--text2,#607D86);transition:all .15s;}
           .prop-list-wrap .pf-btn:hover{border-color:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));color:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));background:var(--teal-light,var(--teal-light, var(--teal-light, #E0F7FA)));}
           .prop-list-wrap .pf-btn.primary{background:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));color:#fff;border-color:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));}
-          .prop-list-wrap .pf-btn.primary:hover{background:var(--teal2,var(--app-accent2, #00ACC1));}
+          .prop-list-wrap .pf-btn.primary:hover{background:var(--teal2,var(--app-accent2, #00BCD4));}
           .prop-list-wrap .pf-btn.danger{color:var(--red,#F05C5C);border-color:var(--red-bg,#FEF2F2);}
           .prop-list-wrap .badge-pill{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;}
           .prop-list-wrap .badge-pill::before{content:'';width:5px;height:5px;border-radius:50%;}
@@ -1849,7 +1849,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
           .prop-list-wrap .filter-btn{display:flex;align-items:center;gap:6px;padding:9px 16px;background:var(--surface,#fff);border:1.5px solid var(--border,#E0EEF0);border-radius:10px;font-size:12px;font-weight:700;color:var(--text2,#607D86);cursor:pointer;font-family:inherit;transition:all .15s;}
           .prop-list-wrap .filter-btn:hover{border-color:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));color:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));}
           .prop-list-wrap .new-prop-btn{display:flex;align-items:center;gap:7px;padding:11px 20px;background:var(--teal, var(--app-accent, var(--app-accent, #00BCD4)));color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:background .15s;box-shadow:0 4px 14px rgba(0,188,212,.25);}
-          .prop-list-wrap .new-prop-btn:hover{background:var(--teal2,var(--app-accent2, #00ACC1));}
+          .prop-list-wrap .new-prop-btn:hover{background:var(--teal2,var(--app-accent2, #00BCD4));}
           .prop-list-wrap .prog-bar{height:5px;background:var(--border,#E0EEF0);border-radius:3px;overflow:hidden;margin-top:8px;}
           .prop-list-wrap .prog-fill{height:100%;border-radius:3px;}
           .prop-list-wrap .search-wrap{position:relative;flex:1;max-width:320px;}

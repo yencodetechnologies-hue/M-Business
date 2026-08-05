@@ -262,7 +262,7 @@ function DetailField({ label, value, fullWidth }) {
   );
 }
 
-export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions = false, onNext, onNewInvoice, onViewInvoice, onNewProposal, onNewQuotation, onViewQuotation, onViewProposal, autoOpenInvoice, onAutoOpenInvoiceDone, fromClientContext = false, onAddEmployeeClick, showBackLabel = false, autoOpenAddTask, onAutoOpenAddTaskDone }) {
+export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions = false, onNext, onNewInvoice, onViewInvoice, onNewProposal, onNewQuotation, onViewProposal, onViewQuotation, autoOpenInvoice, onAutoOpenInvoiceDone, fromClientContext = false, onAddEmployeeClick, showBackLabel = false, autoOpenAddTask, onAutoOpenAddTaskDone, onCancelReturnToDashboard }) {
   const [activeTab, setActiveTab] = useState(() => {
     try {
       const saved = localStorage.getItem('project_tabs_order');
@@ -818,6 +818,20 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       if (onAutoOpenInvoiceDone) onAutoOpenInvoiceDone();
     }
   }, [autoOpenInvoice]);
+
+  useEffect(() => {
+    if (autoOpenAddTask) {
+      setEditingTask(null);
+      setNewTaskTitle('');
+      setNewTaskDesc('');
+      setNewTaskPriority('medium');
+      setNewTaskAssignTo([]);
+      setNewTaskDue('');
+      setNewTaskMilestone('');
+      setShowAddTaskModal(true);
+      if (onAutoOpenAddTaskDone) onAutoOpenAddTaskDone();
+    }
+  }, [autoOpenAddTask]);
 
   // Auto-fetch invoices for this project to calculate Billed/Received/Pending
   const [projectInvoicesLoading, setProjectInvoicesLoading] = useState(() => {
@@ -4337,18 +4351,18 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       {/* Add Task Modal */} {
         showAddTaskModal && (
           <div style={{ position: 'fixed', inset: 0, zIndex: 99995, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ background: '#fff', borderRadius: P.radius, width: 440, padding: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.15)', boxSizing: 'border-box', maxHeight: '90vh', overflowY: 'auto' }}>
-              <h3 style={{ margin: '0 0 16px', fontSize: 18, color: P.textDark }}>{editingTask ? 'Edit Task' : 'Add New Task'}</h3>
+            <div style={{ background: '#fff', borderRadius: P.radius, width: 'min(360px, 92vw)', padding: 14, boxShadow: '0 8px 32px rgba(0,0,0,0.15)', boxSizing: 'border-box', maxHeight: '80vh', overflowY: 'auto' }}>
+              <h3 style={{ margin: '0 0 10px', fontSize: 16, color: P.textDark }}>{editingTask ? 'Edit Task' : 'Add New Task'}</h3>
               <form onSubmit={handleCreateTask}>
-                <div style={{ marginBottom: 12 }}>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Task Name *</label>
-                  <input type="text" value={newTaskTitle} onChange={e => setNewTaskTitle(e.target.value)} placeholder="Enter task title" required style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }} />
+                <div style={{ marginBottom: 8 }}>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 3 }}>Task Name *</label>
+                  <input type="text" value={newTaskTitle} onChange={e => setNewTaskTitle(e.target.value)} placeholder="Enter task title" required style={{ width: '100%', padding: '8px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }} />
                 </div>
-                <div style={{ marginBottom: 12 }}>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Description</label>
-                  <textarea value={newTaskDesc} onChange={e => setNewTaskDesc(e.target.value)} placeholder="Enter details..." style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', resize: 'vertical', minHeight: 60, boxSizing: 'border-box' }} />
+                <div style={{ marginBottom: 8 }}>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 3 }}>Description</label>
+                  <textarea value={newTaskDesc} onChange={e => setNewTaskDesc(e.target.value)} placeholder="Enter details..." style={{ width: '100%', padding: '8px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', resize: 'vertical', minHeight: 40, boxSizing: 'border-box' }} />
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 8 }}>
                   <div>
                     <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Priority</label>
                     <select value={newTaskPriority} onChange={e => setNewTaskPriority(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
@@ -4362,9 +4376,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     <input type="date" value={newTaskDue} onChange={e => setNewTaskDue(e.target.value)} style={{ width: '100%', padding: '9px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box', background: '#fff', color: newTaskDue ? P.textDark : '#A0AEC0', fontFamily: 'Nunito, sans-serif', cursor: 'pointer' }} />
                   </div>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 8 }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Status</label>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 3 }}>Status</label>
                     <select value={newTaskStatus} onChange={e => setNewTaskStatus(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
                       <option value="Not Started">Not Started</option>
                       <option value="In Progress">In Progress</option>
@@ -4380,9 +4394,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     </select>
                   </div>
                 </div>
-                <div style={{ marginBottom: 16 }}>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Select Team Members</label>
-                  <div style={{ width: '100%', maxHeight: 160, overflowY: 'auto', padding: '8px', borderRadius: 8, border: `1.5px solid ${P.border}`, boxSizing: 'border-box', background: '#fff' }}>
+                <div style={{ marginBottom: 10 }}>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 3 }}>Select Team Members</label>
+                  <div style={{ width: '100%', maxHeight: 100, overflowY: 'auto', padding: '6px', borderRadius: 8, border: `1.5px solid ${P.border}`, boxSizing: 'border-box', background: '#fff' }}>
                     {(employees || [])
                       .filter(emp => assigned.includes(emp.name || emp.employeeName))
                       .map(emp => {
@@ -4412,7 +4426,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   <div style={{ fontSize: 11, color: P.textLight, marginTop: 4 }}>Select one or more team members.</div>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-                  <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddTaskModal(false)}>Cancel</button>
+                  <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => { setShowAddTaskModal(false); if (onCancelReturnToDashboard) onCancelReturnToDashboard(); }}>Cancel</button>
                   <button type="submit" className="mpd-btn mpd-btn-primary" disabled={addingTask}>{addingTask ? 'Adding...' : editingTask ? 'Update Task' : 'Add Task'}</button>
                 </div>
               </form>

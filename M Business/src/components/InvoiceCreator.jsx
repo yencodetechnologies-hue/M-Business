@@ -550,7 +550,7 @@ function InvoiceLivePreview({ inv, items, effectiveLogo, effectiveCompanyName, s
   );
 }
 // ------------------------------------------------------------
-export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack, jumpInvoice, newInvoicePrefill, onSaveLocalInvoice, onSaveSuccess, forceListView, onConsumeForceListView }) {
+export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack, jumpInvoice, newInvoicePrefill, onSaveLocalInvoice, onSaveSuccess, forceListView, onConsumeForceListView, hideLivePreview = false }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || "";
 
@@ -2309,7 +2309,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
 
       {/* Split Layout Container */}
-      <div className="invoice-creator-split-container" style={{ display: "grid", gridTemplateColumns: "1fr 450px", gap: "24px", alignItems: "start", marginTop: 16 }}>
+      <div className="invoice-creator-split-container" style={{ display: "grid", gridTemplateColumns: hideLivePreview ? "1fr" : "1fr 450px", gap: "24px", alignItems: "start", marginTop: 16 }}>
 
         {/* Left Panel: Scrollable form cards */}
         <div className="inv-creator-form-side">
@@ -2897,28 +2897,30 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           </div>
 
         </div>{/* Right Side: Sticky Live Preview */}
-        <div style={{ position: "sticky", top: "0px", display: "flex", flexDirection: "column", gap: 12 }}>
-          <div className="preview-card" style={{ background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: "14px", overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.06)" }}>
-            <div className="preview-toolbar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1.5px solid var(--app-border)", background: "var(--app-surface-variant)" }}>
-              <div style={{ fontSize: "12px", fontWeight: "800", color: "#0f1c2e" }}>Document Live Preview</div>
-              <div style={{ display: "flex", gap: "6px" }}>
-                <button onClick={handleSavePreview} style={{ display: "flex", alignItems: "center", gap: "4px", padding: "6px 10px", background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: "8px", fontSize: "10px", fontWeight: "700", color: "#0f1c2e", cursor: "pointer", fontFamily: "inherit" }}>
-                  Print / PDF
-                </button>
+        {!hideLivePreview && (
+          <div style={{ position: "sticky", top: "0px", display: "flex", flexDirection: "column", gap: 12 }}>
+            <div className="preview-card" style={{ background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: "14px", overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.06)" }}>
+              <div className="preview-toolbar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1.5px solid var(--app-border)", background: "var(--app-surface-variant)" }}>
+                <div style={{ fontSize: "12px", fontWeight: "800", color: "#0f1c2e" }}>Document Live Preview</div>
+                <div style={{ display: "flex", gap: "6px" }}>
+                  <button onClick={handleSavePreview} style={{ display: "flex", alignItems: "center", gap: "4px", padding: "6px 10px", background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: "8px", fontSize: "10px", fontWeight: "700", color: "#0f1c2e", cursor: "pointer", fontFamily: "inherit" }}>
+                    Print / PDF
+                  </button>
+                </div>
               </div>
+              {/* LIVE INVOICE PREVIEW (uses shared component) */}
+              <InvoiceLivePreview
+                inv={inv} items={items} effectiveLogo={effectiveLogo} effectiveCompanyName={effectiveCompanyName}
+                selectedClient={selectedClient} currentT={currentT} subtotal={subtotal} gstAmt={gstAmt}
+                balanceDue={balanceDue} amountPaid={amountPaid} qrData={qrData}
+              />
             </div>
-            {/* LIVE INVOICE PREVIEW (uses shared component) */}
-            <InvoiceLivePreview
-              inv={inv} items={items} effectiveLogo={effectiveLogo} effectiveCompanyName={effectiveCompanyName}
-              selectedClient={selectedClient} currentT={currentT} subtotal={subtotal} gstAmt={gstAmt}
-              balanceDue={balanceDue} amountPaid={amountPaid} qrData={qrData}
-            />
           </div>
-        </div>
+        )}
 
       </div>
       {/* Bottom save buttons */}
-      <div style={{ display: "flex", gap: 10, marginBottom: 32 }}>
+         <div style={{ display: "flex", gap: 10, marginBottom: 32 }}>
         <button onClick={handleSaveDraft} disabled={!!saving}
           style={{ padding: "13px", background: draftSaved ? "#22c55e" : "#fff", border: `1.5px solid ${draftSaved ? "#22c55e" : "#e5e7eb"}`, borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: saving ? "not-allowed" : "pointer", color: draftSaved ? "#fff" : "#374151", fontFamily: "inherit", transition: "all 0.3s" }}>
           {saving === "draft" ? "Saving…" : draftSaved ? "Success Saved as Draft!" : " Save Draft"}

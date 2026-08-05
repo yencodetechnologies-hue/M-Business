@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useTransition, useCallback } from "react";
 
 import React from "react";
+import { createPortal } from "react-dom";
 
 import "./DashboardModern.css";
 
@@ -7042,6 +7043,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   // ── Mobile: Teal actions + project carousel + auto-swap invoice list ──
   const [mobShowAllProjects, setMobShowAllProjects] = useState(false);
+  const [showMobileInvoiceModal, setShowMobileInvoiceModal] = useState(false);
+  const [showMobileTaskModal, setShowMobileTaskModal] = useState(false);
   const [mobCarouselIdx, setMobCarouselIdx] = useState(0);
   const [mobShowInvoiceList, setMobShowInvoiceList] = useState(false);
   const mobIdleTimerRef = useRef(null);
@@ -10446,13 +10449,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <div style={{ background: "transparent", padding: 0 }}>
                       <div style={{ display: "flex", gap: 12 }}>
                         <button
-                          onClick={() => { setJumpProject(null); setJumpInvoice(null); setInvoicePrefill(null); setSidebarNavClickId(id => id + 1); setActive("invoices"); }}
+                          onClick={() => { setJumpProject(null); setJumpInvoice(null); setInvoicePrefill(null); setShowMobileInvoiceModal(true); }}
                           style={{ flex: 1, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(0,188,212,0.3)" }}
                         >
                           Create Invoice
                         </button>
                         <button
-                          onClick={() => { setSelectedProjectForTasks(null); setAutoOpenTaskModal(true); setActive("tasks"); }}
+                          onClick={() => { if (!projectsWithProgress[0]) { setActive("projects"); return; } setAutoOpenTaskModal(true); }}
                           style={{ flex: 1, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(0,188,212,0.3)" }}
                         >
                           Add Task
@@ -10487,9 +10490,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     {projectsWithProgress.length > 3 && (
                       <button
                         onClick={() => setMobShowAllProjects(v => !v)}
-                        style={{ width: "100%", marginTop: 10, background: "#fff", border: "1.5px solid var(--app-accent, #00BCD4)", color: "var(--app-accent, #00BCD4)", borderRadius: 12, padding: "10px 0", fontSize: 13, fontWeight: 800, cursor: "pointer" }}
+                        style={{ width: "100%", marginTop: 8, marginBottom: 0, background: "#fff", border: "1.5px solid var(--app-accent, #00BCD4)", color: "var(--app-accent, #00BCD4)", borderRadius: 10, padding: "8px 0", fontSize: 12.5, fontWeight: 800, cursor: "pointer" }}
                       >
-                        {mobShowAllProjects ? "▲ See Less" : "▼ See All"}
+                        {mobShowAllProjects ? "▲ See Less" : `▼ See All ${projectsWithProgress.length} projects`}
                       </button>
                     )}
                   </div>
@@ -10816,34 +10819,37 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-                  {/* FLOATING BOTTOM NAV — glass pill */}
-                  <div style={{ position: "fixed", bottom: 14, left: 14, right: 14, background: "rgba(15,10,41,0.92)", backdropFilter: "blur(16px)", borderRadius: 24, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "10px 6px", zIndex: 4000, boxShadow: "0 12px 32px rgba(15,10,41,0.35)" }}>
-                    {[
-                      { icon: "ti-file-invoice", label: "Invoice", key: "invoices" },
-                      { icon: "ti-folder", label: "Projects", key: "projects" },
-                      { icon: null, label: "", key: "add" },
-                      { icon: "ti-users", label: "Clients", key: "clients" },
-                      { icon: "ti-dots", label: "More", key: "settings" },
-                    ].map((n, i) => n.key === "add" ? (
-                      <div key={i} onClick={() => setShowMobileAddMenu(true)} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#26d0ce)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", border: "3px solid #0f0a29" }}>+</div>
-                    ) : (
-                      <div key={i} onClick={() => {
-                        if (n.key === "invoices") {
-                          setJumpProject(null);
-                          setJumpInvoice(null);
-                          setInvoicePrefill(null);
-                          setSidebarNavClickId(id => id + 1);
-                        }
-                        if (n.key === "invoices" || n.key === "projects" || n.key === "clients") {
-                          setOpenedFromMobileAddMenu(true);
-                        }
-                        setActive(n.key);
-                      }} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: (active === n.key || (n.key === "invoices" && active === "invoices")) ? "var(--app-accent)" : "rgba(255,255,255,0.5)", padding: "4px 10px" }}>
-                        <i className={`ti ${n.icon}`} style={{ fontSize: 19 }}></i>
-                        <span style={{ fontSize: 9.5, fontWeight: 700 }}>{n.label}</span>
-                      </div>
-                    ))}
-                  </div>
+                  {/* FLOATING BOTTOM NAV — glass pill (portaled to body so it always stays fixed to the viewport) */}
+                  {createPortal(
+                    <div style={{ position: "fixed", bottom: 14, left: 14, right: 14, background: "rgba(15,10,41,0.92)", backdropFilter: "blur(16px)", borderRadius: 24, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "10px 6px", zIndex: 4000, boxShadow: "0 12px 32px rgba(15,10,41,0.35)" }}>
+                      {[
+                        { icon: "ti-file-invoice", label: "Invoice", key: "invoices" },
+                        { icon: "ti-folder", label: "Projects", key: "projects" },
+                        { icon: null, label: "", key: "add" },
+                        { icon: "ti-users", label: "Clients", key: "clients" },
+                        { icon: "ti-dots", label: "More", key: "settings" },
+                      ].map((n, i) => n.key === "add" ? (
+                        <div key={i} onClick={() => setShowMobileAddMenu(true)} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#26d0ce)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", border: "3px solid #0f0a29" }}>+</div>
+                      ) : (
+                        <div key={i} onClick={() => {
+                          if (n.key === "invoices") {
+                            setJumpProject(null);
+                            setJumpInvoice(null);
+                            setInvoicePrefill(null);
+                            setSidebarNavClickId(id => id + 1);
+                          }
+                          if (n.key === "invoices" || n.key === "projects" || n.key === "clients") {
+                            setOpenedFromMobileAddMenu(true);
+                          }
+                          setActive(n.key);
+                        }} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: (active === n.key || (n.key === "invoices" && active === "invoices")) ? "var(--app-accent)" : "rgba(255,255,255,0.5)", padding: "4px 10px" }}>
+                          <i className={`ti ${n.icon}`} style={{ fontSize: 19 }}></i>
+                          <span style={{ fontSize: 9.5, fontWeight: 700 }}>{n.label}</span>
+                        </div>
+                      ))}
+                    </div>,
+                    document.body
+                  )}
 
                   {showMobileAddMenu && (
                     <div
@@ -12223,6 +12229,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 autoOpenInvoice={autoOpenInvoice}
 
+                autoOpenAddTask={autoOpenTaskModal}
+
+                onAutoOpenAddTaskDone={() => setAutoOpenTaskModal(false)}
+
+                onCancelReturnToDashboard={() => { if (!isDesktopWidth) { setActive("dashboard"); } }}
+
                 onAutoOpenInvoiceDone={() => setAutoOpenInvoice(false)}
                 onAddClient={() => {
                   setNcError({});
@@ -12617,6 +12629,56 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               setReturnToModal(modal); setModal("client");
 
             }} onAddProject={() => { setJumpProject(null); setSidebarOverride("invoices"); setActive("create-project"); }} />}
+
+            {showMobileInvoiceModal && (
+              <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(15,23,42,0.5)", display: "flex", alignItems: "flex-end" }}>
+                <div style={{ background: "var(--app-bg, #f5f7fb)", width: "100%", maxHeight: "92vh", overflowY: "auto", borderRadius: "18px 18px 0 0", padding: "16px" }}>
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
+                    <button onClick={() => setShowMobileInvoiceModal(false)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)" }}>✕</button>
+                  </div>
+                  <InvoiceCreator
+                    key={`mobile-invoice-${sidebarNavClickId}`}
+                    hideLivePreview={true}
+                    forceListView={false}
+                    onConsumeForceListView={() => { }}
+                    user={user}
+                    clients={clients}
+                    projects={projects}
+                    companyLogo={companyLogo}
+                    companyName={companyNameStr}
+                    onLogoChange={onLogoChange}
+                    onBack={() => setShowMobileInvoiceModal(false)}
+                    onSaveSuccess={() => setShowMobileInvoiceModal(false)}
+                    jumpInvoice={null}
+                    newInvoicePrefill={invoicePrefill}
+                    newClientName={pendingInvoiceClientName}
+                    onNewClientConsumed={() => setPendingInvoiceClientName(null)}
+                    onAddClient={() => { const limit = getSubscriptionLimit("client"); if (subscription && clients.length >= limit) { setLimitModal({ type: "client", limit }); return; } setAddClientFromInvoice(true); setReturnToModal(modal); setModal("client"); }}
+                    onAddProject={() => { setShowMobileInvoiceModal(false); setJumpProject(null); setActive("create-project"); }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {!isDesktopWidth && (projectsWithProgress[0]) && (
+              <div style={{ position: "fixed", left: 0, top: 0, width: 1, height: 1, opacity: 0, pointerEvents: "none", overflow: "visible", zIndex: -1 }}>
+                <ModernProjectDetails
+                  key={`mobile-task-${(jumpProject || projectsWithProgress[0])._id || (jumpProject || projectsWithProgress[0]).id}`}
+                  project={jumpProject || projectsWithProgress[0]}
+                  tasks={tasks}
+                  employees={employees}
+                  user={user}
+                  clients={clients}
+                  autoOpenAddTask={autoOpenTaskModal}
+                  onAutoOpenAddTaskDone={() => setAutoOpenTaskModal(false)}
+                  onCancelReturnToDashboard={() => setAutoOpenTaskModal(false)}
+                  onUpdate={() => { fetchTasks && fetchTasks(); setAutoOpenTaskModal(false); }}
+                  fetchProjects={fetchProjects}
+                  fetchTasks={fetchTasks}
+                />
+              </div>
+            )}
+
             {validActive !== "invoices" && jumpInvoice && (
               <InvoiceCreator
                 key={`invoice-overlay-${jumpInvoice._id || jumpInvoice.id || jumpInvoice.invoiceNo}-${jumpInvoice._t || 0}`}

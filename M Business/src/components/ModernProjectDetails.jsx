@@ -403,18 +403,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [showUpdateMembersDropdown, setShowUpdateMembersDropdown] = useState(false);
   const updateMembersDropdownRef = useRef(null);
   useEffect(() => {
-    if (autoOpenAddTask) {
-      setEditingTask(null);
-      setNewTaskTitle('');
-      setNewTaskDesc('');
-      setNewTaskPriority('medium');
-      setNewTaskAssignTo([]);
-      setNewTaskDue('');
-      setNewTaskMilestone('');
-      setShowAddTaskModal(true);
-    }
-  }, [autoOpenAddTask]);
-  useEffect(() => {
     if (!showUpdateMembersDropdown) return;
     const handleClickOutside = (e) => {
       if (updateMembersDropdownRef.current && !updateMembersDropdownRef.current.contains(e.target)) {

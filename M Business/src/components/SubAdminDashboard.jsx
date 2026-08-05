@@ -10821,7 +10821,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   {/* FLOATING BOTTOM NAV — glass pill (portaled to body so it always stays fixed to the viewport) */}
                   {createPortal(
-                    <div style={{ position: "fixed", bottom: 14, left: 14, right: 14, background: "rgba(15,10,41,0.92)", backdropFilter: "blur(16px)", borderRadius: 24, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "10px 6px", zIndex: 4000, boxShadow: "0 12px 32px rgba(15,10,41,0.35)" }}>
+                    <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#0f0a29", borderRadius: 0, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "12px 6px", zIndex: 4000, boxShadow: "0 -2px 12px rgba(0,0,0,0.15)" }}>
                       {[
                         { icon: "ti-file-invoice", label: "Invoice", key: "invoices" },
                         { icon: "ti-folder", label: "Projects", key: "projects" },

@@ -1969,6 +1969,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     } catch { }
   };
   const [mobileExpandedProjectIdx, setMobileExpandedProjectIdx] = useState(null);
+  const [mobileShowAllProjects, setMobileShowAllProjects] = useState(false);
+
+  const [mobileShowInvoices, setMobileShowInvoices] = useState(false);
+  useEffect(() => {
+    if (validActive !== "dashboard") return;
+    const timer = setTimeout(() => setMobileShowInvoices(true), 6000);
+    return () => clearTimeout(timer);
+  }, [validActive, mobileShowAllProjects]);
   const [autoOpenTaskModal, setAutoOpenTaskModal] = useState(false);
 
   const fetchTasks = async () => { try { const res = await axios.get(BASE_URL + "/api/tasks"); setTasks(res.data); try { localStorage.setItem("cached_tasks", JSON.stringify(res.data)); } catch { } } catch (e) { console.log(e); } };
@@ -2134,29 +2142,33 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       <Sidebar active={validActive} setActive={setActive} onLogout={handleLogout} open={sidebarOpen} onClose={() => setSidebarOpen(false)} navItems={navItems} initials={initials} companyName={companyNameStr} companyLogo={companyLogo} setSidebarInvoiceClick={setSidebarInvoiceClick} />
 
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
-        <div className="mob-topbar" style={{ display: validActive === "dashboard" ? "none" : "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#fff", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)" }}>
-          <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-accent)", padding: "2px 6px", lineHeight: 1 }}></button>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ width: 30, height: 30, background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 14, color: "#fff" }}>
-              {companyNameStr[0] || "W"}
+        <div className="mob-topbar" style={{ display: validActive === "dashboard" ? "none" : "flex", flexDirection: "column", background: "#fff", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#0d0b26", padding: "10px 16px" }}>
+            <span style={{ fontWeight: 700, fontSize: 14, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{companyNameStr}</span>
+            <div style={{ width: 32, height: 32, borderRadius: 9, background: "rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+              <i className="ti ti-bell" style={{ fontSize: 15, color: "#fff" }}></i>
             </div>
-            <span style={{ fontWeight: 800, fontSize: 14, color: T.text }}>{companyNameStr}</span>
           </div>
-          <div onClick={() => setShowProfile(true)} style={{
-            height: 34,
-            width: companyLogo ? "auto" : 34,
-            minWidth: 34,
-            background: "#fff",
-            border: "1px solid #e2e8f0",
-            borderRadius: 8,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            overflow: "hidden",
-            padding: companyLogo ? "0 6px" : 0
-          }}>
-            {companyLogo ? <img src={companyLogo} alt="logo" style={{ height: "80%", width: "auto", objectFit: "contain" }} /> : <span style={{ color: T.accent, fontWeight: 800 }}>{initials}</span>}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 16px" }}>
+            <div onClick={() => setShowProfile(true)} style={{
+              height: 34,
+              width: companyLogo ? "auto" : 34,
+              minWidth: 34,
+              background: "#fff",
+              border: "1px solid #e2e8f0",
+              borderRadius: 8,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              overflow: "hidden",
+              padding: companyLogo ? "0 6px" : 0
+            }}>
+              {companyLogo ? <img src={companyLogo} alt="logo" style={{ height: "80%", width: "auto", objectFit: "contain" }} /> : <span style={{ color: T.accent, fontWeight: 800 }}>{initials}</span>}
+            </div>
+            <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "#0d0b26", padding: "2px 6px", lineHeight: 1 }}>
+              <i className="ti ti-menu-2"></i>
+            </button>
           </div>
         </div>
 
@@ -2281,103 +2293,121 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 ))}
               </div>
 
-              {/* QUICK ACTIONS */}
-              <div style={{ padding: "22px 16px 4px" }}>
-                <div style={{ fontSize: 12, fontWeight: 800, color: "#0f0a29", marginBottom: 12, letterSpacing: 0.4 }}>QUICK ACTIONS</div>
-                <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4, WebkitOverflowScrolling: "touch" }}>
-                  {[
-                    { icon: "ti-user-plus", label: "Client", color: "#7c3aed", bg: "linear-gradient(135deg,#ede9fe,#ddd6fe)", action: () => setActive("addClient") },
-                    { icon: "ti-folder-plus", label: "Project", color: "#d97706", bg: "linear-gradient(135deg,#fef3c7,#fde68a)", action: () => setActive("projects") },
-                    { icon: "ti-user-plus", label: "Employee", color: "#0d9488", bg: "linear-gradient(135deg,#ccfbf1,#99f6e4)", action: () => setActive("employees") },
-                    { icon: "ti-checklist", label: "Tasks", color: "#16a34a", bg: "linear-gradient(135deg,#dcfce7,#bbf7d0)", action: () => setActive("tasks") },
-                    { icon: "ti-wallet", label: "Accounts", color: "#2563eb", bg: "linear-gradient(135deg,#dbeafe,#bfdbfe)", action: () => setActive("accounts") },
-                  ].map((a, i) => (
-                    <div key={i} className="md-tap" onClick={a.action} style={{ flex: "0 0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 6, cursor: "pointer", minWidth: 66 }}>
-                      <div style={{ width: 52, height: 52, borderRadius: 16, background: a.bg, color: a.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 6px 16px rgba(0,0,0,0.06)" }}>
-                        <i className={`ti ${a.icon}`}></i>
-                      </div>
-                      <div style={{ fontSize: 10.5, fontWeight: 700, color: "#334155" }}>{a.label}</div>
-                    </div>
-                  ))}
+              {/* TEAL ACTION SECTION */}
+              <div style={{ margin: "18px 16px 0", background: "linear-gradient(135deg,#0f766e,#14b8a6)", borderRadius: 22, padding: "18px 16px 16px", boxShadow: "0 10px 30px rgba(15,118,110,0.25)" }}>
+                <div style={{ fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,0.85)", marginBottom: 12, letterSpacing: 0.4 }}>QUICK ACTIONS</div>
+                <div style={{ display: "flex", gap: 10 }}>
+                  <button
+                    onClick={() => setActive("invoices")}
+                    style={{ flex: 1, background: "#fff", color: "#0f766e", border: "none", borderRadius: 12, padding: "12px", fontSize: 13, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+                  >
+                    <i className="ti ti-file-invoice"></i> Create Invoice
+                  </button>
+                  <button
+                    onClick={() => setActive("tasks")}
+                    style={{ flex: 1, background: "rgba(255,255,255,0.15)", color: "#fff", border: "1.5px solid rgba(255,255,255,0.4)", borderRadius: 12, padding: "12px", fontSize: 13, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+                  >
+                    <i className="ti ti-checklist"></i> Add Task
+                  </button>
                 </div>
               </div>
 
-              {/* PROJECTS */}
+              {/* PROJECTS / INVOICE LIST SWITCHER */}
               <div style={{ padding: "18px 16px 110px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                   <div style={{ fontSize: 16, fontWeight: 900, color: "#0f0a29", display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ width: 6, height: 18, borderRadius: 4, background: "var(--app-accent)", display: "inline-block" }}></span>
-                    Active Projects
+                    <span style={{ width: 6, height: 18, borderRadius: 4, background: "#0f766e", display: "inline-block" }}></span>
+                    {mobileShowInvoices ? "Invoice List" : "Active Projects"}
                   </div>
-                  <div className="md-tap" onClick={() => setActive("projects")} style={{ fontSize: 12.5, fontWeight: 800, color: "var(--app-accent)", display: "flex", alignItems: "center", gap: 3, cursor: "pointer" }}>
-                    View All <i className="ti ti-chevron-right" style={{ fontSize: 13 }}></i>
-                  </div>
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  {projects.slice(0, 6).map((p, idx) => {
-                    const pTasks = (tasks || []).filter(t => (t.project === p.name || t.projectId === p._id || t.projectId === p.id));
-                    const doneTasks = pTasks.length > 0 ? pTasks.filter(t => t.status === "Done").length : 0;
-                    const progress = pTasks.length > 0 ? Math.round((doneTasks / pTasks.length) * 100) : (p.progress || 0);
-                    const ringColor = progress >= 80 ? "#16a34a" : progress >= 40 ? "var(--app-accent)" : "#dc2626";
-                    const isExpanded = mobileExpandedProjectIdx === idx;
-                    return (
-                      <div
-                        key={p._id || p.id || idx}
-                        className="md-card"
-                        style={{ animationDelay: `${idx * 40}ms`, background: "#fff", borderRadius: 20, padding: "16px", boxShadow: isExpanded ? "0 14px 34px rgba(15,10,41,0.14)" : "0 4px 16px rgba(15,10,41,0.06)", border: `1px solid ${isExpanded ? "rgba(0,188,212,0.3)" : "rgba(0,0,0,0.04)"}`, cursor: "pointer", transition: "all .25s" }}
-                        onClick={() => setMobileExpandedProjectIdx(prev => prev === idx ? null : idx)}
-                      >
-                        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                          <div style={{ position: "relative", width: 50, height: 50, flexShrink: 0 }}>
-                            <svg width="50" height="50" viewBox="0 0 50 50">
-                              <circle cx="25" cy="25" r="21" fill="none" stroke="#f1f5f9" strokeWidth="5" />
-                              <circle cx="25" cy="25" r="21" fill="none" stroke={ringColor} strokeWidth="5" strokeDasharray={`${(progress / 100) * 132} 132`} strokeLinecap="round" transform="rotate(-90 25 25)" style={{ transition: "stroke-dasharray .5s ease" }} />
-                            </svg>
-                            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: ringColor }}>{progress}%</div>
-                          </div>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f0a29", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
-                            <div style={{ fontSize: 11.5, color: "#94a3b8", marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
-                              <i className="ti ti-building" style={{ fontSize: 12 }}></i>{p.client || "Internal"}
-                            </div>
-                            <div style={{ height: 6, background: "#f1f5f9", borderRadius: 3, marginTop: 9, overflow: "hidden" }}>
-                              <div style={{ width: `${progress}%`, height: "100%", background: `linear-gradient(90deg, ${ringColor}, ${ringColor}cc)`, borderRadius: 3, transition: "width .5s ease" }}></div>
-                            </div>
-                          </div>
-                          <i className={`ti ti-chevron-${isExpanded ? "up" : "down"}`} style={{ color: "#cbd5e1", fontSize: 18, flexShrink: 0 }}></i>
-                        </div>
-
-                        {isExpanded && (
-                          <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px dashed #e2e8f0", display: "flex", flexDirection: "column", gap: 10 }}>
-                            {p.end && (
-                              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "linear-gradient(135deg,#ccfbf1,#a7f3d0)", color: "#0d9488", padding: "6px 12px", borderRadius: 20, fontSize: 11.5, fontWeight: 800, width: "fit-content" }}>
-                                <i className="ti ti-clock"></i> Due {new Date(p.end).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                              </div>
-                            )}
-                            <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "#64748b" }}>
-                              <i className="ti ti-currency-rupee" style={{ fontSize: 14 }}></i>
-                              {p.currency || "₹"} {p.budget || "0"} budget
-                            </div>
-                            <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "#64748b" }}>
-                              <i className="ti ti-checklist" style={{ fontSize: 14 }}></i>
-                              {pTasks.length > 0 ? `${doneTasks}/${pTasks.length} tasks done` : "No tasks yet"}
-                            </div>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); setViewProject(null); setTimeout(() => setViewProject(p), 0); }}
-                              style={{ marginTop: 4, background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 10, padding: "10px", fontSize: 12.5, fontWeight: 800, cursor: "pointer" }}
-                            >
-                              Open Project
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                  {projects.length === 0 && (
-                    <div style={{ textAlign: "center", padding: "30px 0", color: "#94a3b8", fontSize: 13 }}>No projects yet</div>
+                  {!mobileShowInvoices && (
+                    <div className="md-tap" onClick={() => setActive("projects")} style={{ fontSize: 12.5, fontWeight: 800, color: "#0f766e", display: "flex", alignItems: "center", gap: 3, cursor: "pointer" }}>
+                      View All <i className="ti ti-chevron-right" style={{ fontSize: 13 }}></i>
+                    </div>
                   )}
                 </div>
+
+                {!mobileShowInvoices ? (
+                  <>
+                    <div style={{ display: "flex", gap: 12, overflowX: "auto", paddingBottom: 6, WebkitOverflowScrolling: "touch", scrollSnapType: "x mandatory" }}>
+                      {(mobileShowAllProjects ? projects : projects.slice(0, 3)).map((p, idx) => {
+                        const pTasks = (tasks || []).filter(t => (t.project === p.name || t.projectId === p._id || t.projectId === p.id));
+                        const doneTasks = pTasks.length > 0 ? pTasks.filter(t => t.status === "Done").length : 0;
+                        const progress = pTasks.length > 0 ? Math.round((doneTasks / pTasks.length) * 100) : (p.progress || 0);
+                        const ringColor = progress >= 80 ? "#16a34a" : progress >= 40 ? "#0f766e" : "#dc2626";
+                        return (
+                          <div
+                            key={p._id || p.id || idx}
+                            className="md-card"
+                            style={{ flex: "0 0 82%", scrollSnapAlign: "start", background: "#fff", borderRadius: 20, padding: "16px", boxShadow: "0 4px 16px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", cursor: "pointer" }}
+                            onClick={() => { setViewProject(null); setTimeout(() => setViewProject(p), 0); }}
+                          >
+                            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                              <div style={{ position: "relative", width: 50, height: 50, flexShrink: 0 }}>
+                                <svg width="50" height="50" viewBox="0 0 50 50">
+                                  <circle cx="25" cy="25" r="21" fill="none" stroke="#f1f5f9" strokeWidth="5" />
+                                  <circle cx="25" cy="25" r="21" fill="none" stroke={ringColor} strokeWidth="5" strokeDasharray={`${(progress / 100) * 132} 132`} strokeLinecap="round" transform="rotate(-90 25 25)" />
+                                </svg>
+                                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: ringColor }}>{progress}%</div>
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f0a29", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
+                                <div style={{ fontSize: 11.5, color: "#94a3b8", marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
+                                  <i className="ti ti-building" style={{ fontSize: 12 }}></i>{p.client || "Internal"}
+                                </div>
+                                <div style={{ height: 6, background: "#f1f5f9", borderRadius: 3, marginTop: 9, overflow: "hidden" }}>
+                                  <div style={{ width: `${progress}%`, height: "100%", background: `linear-gradient(90deg, ${ringColor}, ${ringColor}cc)`, borderRadius: 3 }}></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                      {projects.length === 0 && (
+                        <div style={{ textAlign: "center", padding: "30px 0", color: "#94a3b8", fontSize: 13, width: "100%" }}>No projects yet</div>
+                      )}
+                    </div>
+
+                    {projects.length > 3 && (
+                      <button
+                        onClick={() => setMobileShowAllProjects(v => !v)}
+                        style={{ width: "100%", marginTop: 12, background: "#f0fdfa", border: "1px solid #99f6e4", color: "#0f766e", borderRadius: 12, padding: "10px", fontSize: 12.5, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+                      >
+                        <i className={`ti ti-chevron-${mobileShowAllProjects ? "up" : "down"}`}></i>
+                        {mobileShowAllProjects ? "See Less" : `See All (${projects.length})`}
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {["Unpaid", "Overdue", "Part Paid", "Paid"].map((status, i) => {
+                      const statusColor = { Unpaid: "#f59e0b", Overdue: "#dc2626", "Part Paid": "#0284c7", Paid: "#16a34a" }[status];
+                      const list = INVOICES.filter(inv => (inv.status || "").toLowerCase() === status.toLowerCase() || (status === "Unpaid" && inv.status === "Pending"));
+                      return (
+                        <div key={status} className="md-card" style={{ animationDelay: `${i * 60}ms`, background: "#fff", borderRadius: 16, padding: "14px 16px", boxShadow: "0 4px 16px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)" }}>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: list.length ? 8 : 0 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                              <span style={{ width: 8, height: 8, borderRadius: "50%", background: statusColor, display: "inline-block" }}></span>
+                              <span style={{ fontSize: 13, fontWeight: 800, color: "#0f0a29" }}>{status}</span>
+                            </div>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: statusColor, background: `${statusColor}15`, padding: "3px 10px", borderRadius: 20 }}>{list.length}</span>
+                          </div>
+                          {list.map((inv, idx) => (
+                            <div key={idx} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderTop: idx > 0 ? "1px solid #f1f5f9" : "none" }}>
+                              <span style={{ fontSize: 12, color: "#475569" }}>{inv.client}</span>
+                              <span style={{ fontSize: 12, fontWeight: 700, color: "#0f0a29" }}>{inv.total}</span>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    })}
+                    <button
+                      onClick={() => setMobileShowInvoices(false)}
+                      style={{ marginTop: 4, background: "none", border: "none", color: "#0f766e", fontSize: 12.5, fontWeight: 800, cursor: "pointer", padding: "8px" }}
+                    >
+                      ← Back to Projects
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* FLOATING BOTTOM NAV */}

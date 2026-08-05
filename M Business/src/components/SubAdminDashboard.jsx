@@ -10461,6 +10461,58 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
                   )}
 
+                  {/* TEAL ACTION BAR + PROJECT LIST (image-2 style) */}
+                  <div style={{ margin: "16px 16px 0" }}>
+                    <div style={{ background: "var(--app-accent, #00BCD4)", borderRadius: 18, padding: 16, boxShadow: "0 10px 30px rgba(0,188,212,0.25)" }}>
+                      <div style={{ display: "flex", gap: 10 }}>
+                        <button
+                          onClick={() => { setJumpProject(null); setJumpInvoice(null); setInvoicePrefill(null); setSidebarNavClickId(id => id + 1); setActive("invoices"); }}
+                          style={{ flex: 1, background: "#fff", color: "var(--app-accent, #00BCD4)", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer" }}
+                        >
+                          Create Invoice
+                        </button>
+                        <button
+                          onClick={() => { setActive("tasks"); }}
+                          style={{ flex: 1, background: "rgba(255,255,255,0.18)", color: "#fff", border: "1.5px solid rgba(255,255,255,0.5)", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer" }}
+                        >
+                          Add Task
+                        </button>
+                      </div>
+                    </div>
+
+                    <div style={{ marginTop: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e" }}>Projects</span>
+                    </div>
+
+                    <div style={{ marginTop: 10, background: "#fff", borderRadius: 16, boxShadow: "0 10px 30px rgba(15,10,41,0.08)", border: "1px solid rgba(0,0,0,0.03)", overflow: "hidden" }}>
+                      {(mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).map((p, idx, arr) => (
+                        <div
+                          key={p._id || idx}
+                          onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
+                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", borderBottom: idx === arr.length - 1 ? "none" : "1px solid #f1f5f9", cursor: "pointer" }}
+                        >
+                          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--app-accent, #00BCD4)", flexShrink: 0 }} />
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
+                            <div style={{ fontSize: 11, color: "#94a3b8" }}>{p.status || "Active"} · {p.progress || 0}%</div>
+                          </div>
+                        </div>
+                      ))}
+                      {projectsWithProgress.length === 0 && (
+                        <div style={{ padding: "16px 0", textAlign: "center", color: "#94a3b8", fontSize: 13 }}>No projects yet</div>
+                      )}
+                    </div>
+
+                    {projectsWithProgress.length > 3 && (
+                      <button
+                        onClick={() => setMobShowAllProjects(v => !v)}
+                        style={{ width: "100%", marginTop: 10, background: "#fff", border: "1.5px solid var(--app-accent, #00BCD4)", color: "var(--app-accent, #00BCD4)", borderRadius: 12, padding: "10px 0", fontSize: 13, fontWeight: 800, cursor: "pointer" }}
+                      >
+                        {mobShowAllProjects ? "▲ See Less" : "▼ See All"}
+                      </button>
+                    )}
+                  </div>
+
                   {/* FLOATING STAT STRIP — draggable reorder, sits below hero (no overlap) */}
                   <div style={{ margin: "16px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
                     {mobStatCardOrder.map((s, i) => (

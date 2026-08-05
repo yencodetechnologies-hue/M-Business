@@ -10459,7 +10459,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         </button>
                       </div>
                     </div>
-                    <div style={{ marginTop: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ marginTop: 14, height: 8, background: "rgba(0,188,212,0.12)" }} />
+
+                    <div style={{ marginTop: 14, display: "flex" }}>
                       <span style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e" }}>Projects</span>
                     </div>
 

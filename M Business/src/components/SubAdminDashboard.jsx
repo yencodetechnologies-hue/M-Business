@@ -10443,23 +10443,22 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   {/* TEAL ACTION BAR + PROJECT LIST (image-2 style) */}
                   <div style={{ margin: "16px 16px 0" }}>
-                    <div style={{ background: "var(--app-accent, #00BCD4)", borderRadius: 18, padding: 16, boxShadow: "0 10px 30px rgba(0,188,212,0.25)" }}>
-                      <div style={{ display: "flex", gap: 10 }}>
+                    <div style={{ background: "transparent", padding: 0 }}>
+                      <div style={{ display: "flex", gap: 12 }}>
                         <button
                           onClick={() => { setJumpProject(null); setJumpInvoice(null); setInvoicePrefill(null); setSidebarNavClickId(id => id + 1); setActive("invoices"); }}
-                          style={{ flex: 1, background: "#fff", color: "var(--app-accent, #00BCD4)", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer" }}
+                          style={{ flex: 1, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(0,188,212,0.3)" }}
                         >
                           Create Invoice
                         </button>
                         <button
-                          onClick={() => { setJumpProject(projectsWithProgress[0] || null); setActive("project-details"); setOpenAddTaskOnLoad(true); }}
-                          style={{ flex: 1, background: "rgba(255,255,255,0.18)", color: "#fff", border: "1.5px solid rgba(255,255,255,0.5)", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer" }}
+                          onClick={() => { setActive("tasks"); }}
+                          style={{ flex: 1, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(0,188,212,0.3)" }}
                         >
                           Add Task
                         </button>
                       </div>
                     </div>
-
                     <div style={{ marginTop: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <span style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e" }}>Projects</span>
                     </div>

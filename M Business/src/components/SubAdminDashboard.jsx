@@ -7039,6 +7039,158 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       </div>
     );
   };
+
+  // ── Mobile: Teal actions + project carousel + auto-swap invoice list ──
+  const [mobShowAllProjects, setMobShowAllProjects] = useState(false);
+  const [mobCarouselIdx, setMobCarouselIdx] = useState(0);
+  const [mobShowInvoiceList, setMobShowInvoiceList] = useState(false);
+  const mobIdleTimerRef = useRef(null);
+
+  const MobileTealActionsSection = () => {
+    const allProjects = projects || [];
+    const visibleProjects = mobShowAllProjects ? allProjects : allProjects.slice(0, 3);
+
+    const clearIdleTimer = () => {
+      if (mobIdleTimerRef.current) {
+        clearTimeout(mobIdleTimerRef.current);
+        mobIdleTimerRef.current = null;
+      }
+    };
+
+    const armIdleTimer = (proj) => {
+      clearIdleTimer();
+      const nameMatch = (proj?.name || "").toLowerCase().includes("safety training academy");
+      if (!nameMatch) return;
+      mobIdleTimerRef.current = setTimeout(() => {
+        setMobShowInvoiceList(true);
+      }, 4000);
+    };
+
+    const handleCarouselScroll = (e) => {
+      const el = e.currentTarget;
+      const cardWidth = el.firstChild ? el.firstChild.offsetWidth + 12 : 1;
+      const idx = Math.round(el.scrollLeft / cardWidth);
+      setMobCarouselIdx(idx);
+      clearIdleTimer();
+      const proj = visibleProjects[idx];
+      armIdleTimer(proj);
+    };
+
+    const invoicesByStatus = (statusKey) => {
+      return (invoices || []).filter(i => {
+        const s = (i.status || "").toLowerCase();
+        if (statusKey === "unpaid") return s === "pending" || s === "unpaid";
+        if (statusKey === "overdue") return s === "overdue";
+        if (statusKey === "partpaid") return s === "part paid" || s === "partpaid" || s === "part-paid";
+        if (statusKey === "paid") return s === "paid";
+        return false;
+      });
+    };
+
+    const statusGroups = [
+      { key: "unpaid", label: "Unpaid", color: "#d97706", bg: "#fff7ed" },
+      { key: "overdue", label: "Overdue", color: "#dc2626", bg: "#fef2f2" },
+      { key: "partpaid", label: "Part Paid", color: "#7c3aed", bg: "#f3e8ff" },
+      { key: "paid", label: "Paid", color: "#16a34a", bg: "#f0fdf4" },
+    ];
+
+    return (
+      <div style={{ padding: "0 16px", marginTop: 16 }}>
+        {/* Teal action section */}
+        <div style={{ background: "var(--app-accent, #00BCD4)", borderRadius: 18, padding: 20, boxShadow: "0 8px 24px rgba(0,188,212,0.25)" }}>
+          <div style={{ display: "flex", gap: 12 }}>
+            <button
+              onClick={() => { setJumpProject(null); setJumpInvoice(null); setInvoicePrefill(null); setSidebarNavClickId(id => id + 1); setActive("invoices"); }}
+              style={{ flex: 1, background: "#fff", color: "var(--app-accent, #00BCD4)", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 14, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+            >
+              <i className="ti ti-file-invoice"></i> Create Invoice
+            </button>
+            <button
+              onClick={() => { setActive("tasks"); }}
+              style={{ flex: 1, background: "rgba(255,255,255,0.18)", color: "#fff", border: "1.5px solid rgba(255,255,255,0.5)", borderRadius: 12, padding: "12px 0", fontSize: 14, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+            >
+              <i className="ti ti-plus"></i> Add Task
+            </button>
+          </div>
+        </div>
+
+        {/* Project cards / Invoice list */}
+        <div style={{ marginTop: 16 }}>
+          {!mobShowInvoiceList ? (
+            <>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "#0f1c2e" }}>Projects</div>
+              </div>
+
+              <div
+                onScroll={handleCarouselScroll}
+                style={{ display: "flex", gap: 12, overflowX: "auto", scrollSnapType: "x mandatory", paddingBottom: 6, WebkitOverflowScrolling: "touch" }}
+              >
+                {visibleProjects.map((p, idx) => {
+                  const progress = p.progress || 25;
+                  const barColor = progress > 70 ? "#16a34a" : progress > 40 ? "#f59e0b" : "#dc2626";
+                  return (
+                    <div
+                      key={p._id || idx}
+                      onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }}
+                      style={{ minWidth: "85%", scrollSnapAlign: "start", background: "#fff", borderRadius: 16, padding: 18, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.04)", cursor: "pointer" }}
+                    >
+                      <div style={{ fontSize: 15, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>{p.name || p.title}</div>
+                      <div style={{ fontSize: 12, color: "rgba(15,28,46,0.5)", marginBottom: 12 }}>
+                        {clients.find(c => c._id === p.clientId)?.clientName || "Internal"} · Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <div style={{ flex: 1, height: 5, background: "rgba(0,0,0,0.06)", borderRadius: 3 }}>
+                          <div style={{ width: `${progress}%`, height: "100%", background: barColor, borderRadius: 3 }}></div>
+                        </div>
+                        <div style={{ fontSize: 11, fontWeight: 800, color: barColor }}>{progress}%</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {allProjects.length > 3 && (
+                <button
+                  onClick={() => setMobShowAllProjects(v => !v)}
+                  style={{ width: "100%", marginTop: 14, background: "#fff", border: "1.5px solid var(--app-accent, #00BCD4)", color: "var(--app-accent, #00BCD4)", borderRadius: 12, padding: "10px 0", fontSize: 13, fontWeight: 800, cursor: "pointer" }}
+                >
+                  {mobShowAllProjects ? "▲ See Less" : `▼ See All ${allProjects.length} Projects`}
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "#0f1c2e" }}>Invoice List</div>
+                <div onClick={() => setMobShowInvoiceList(false)} style={{ fontSize: 12, fontWeight: 700, color: "var(--app-accent, #00BCD4)", cursor: "pointer" }}>Back to Projects</div>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {statusGroups.map(g => {
+                  const list = invoicesByStatus(g.key);
+                  return (
+                    <div key={g.key} style={{ background: "#fff", borderRadius: 14, padding: 16, border: "1px solid rgba(0,0,0,0.08)" }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: list.length ? 10 : 0 }}>
+                        <span style={{ background: g.bg, color: g.color, padding: "4px 10px", borderRadius: 8, fontSize: 11, fontWeight: 800 }}>{g.label}</span>
+                        <span style={{ fontSize: 12, color: "rgba(15,28,46,0.5)", fontWeight: 700 }}>{list.length}</span>
+                      </div>
+                      {list.slice(0, 5).map((inv, i) => (
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, padding: "6px 0", borderTop: i === 0 ? "1px solid rgba(0,0,0,0.05)" : "none" }}>
+                          <span style={{ fontWeight: 600 }}>{inv.clientName || inv.client || "Client"}</span>
+                          <span style={{ color: "rgba(15,28,46,0.5)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   // ── Desktop hover popup ──────────────────────────────────────────────
   const [hoverPopupSection, setHoverPopupSection] = useState(null);
   const HoverPopup = ({ id, title, children }) => {
@@ -7538,654 +7690,666 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     }
   }, [projects]);
 
-// projectsWithProgress is computed below after tasks state is declared
+  // projectsWithProgress is computed below after tasks state is declared
 
-const [projLoading, setProjLoading] = useState(false);
+  const [projLoading, setProjLoading] = useState(false);
 
-const [np, setNp] = useState({ name: "", client: "", companyName: "", phone: "", address: "", contactPersonName: "", contactPersonNo: "", contactEmail: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "Rs.", team: "", status: "Pending", progress: 0, assignedTo: [] });
+  const [np, setNp] = useState({ name: "", client: "", companyName: "", phone: "", address: "", contactPersonName: "", contactPersonNo: "", contactEmail: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "Rs.", team: "", status: "Pending", progress: 0, assignedTo: [] });
 
-const [npError, setNpError] = useState({});
+  const [npError, setNpError] = useState({});
 
-const [projSaveLoading, setProjSaveLoading] = useState(false);
+  const [projSaveLoading, setProjSaveLoading] = useState(false);
 
 
 
-const [managers, setManagers] = useState([]);
+  const [managers, setManagers] = useState([]);
 
-const [nm, setNm] = useState({ managerName: "", email: "", phone: "", department: "", role: "Manager", address: "", password: "", status: "Active" });
+  const [nm, setNm] = useState({ managerName: "", email: "", phone: "", department: "", role: "Manager", address: "", password: "", status: "Active" });
 
-const [nmError, setNmError] = useState({});
+  const [nmError, setNmError] = useState({});
 
-const [mgrSaveLoading, setMgrSaveLoading] = useState(false);
+  const [mgrSaveLoading, setMgrSaveLoading] = useState(false);
 
-const [showMgrPass, setShowMgrPass] = useState(false);
+  const [showMgrPass, setShowMgrPass] = useState(false);
 
-const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState([]);
 
-const projectsWithProgress = (projects || []).map(p => {
-  const s = (p.status || '').toLowerCase();
-  if (s === 'completed' || s === 'done') {
-    return { ...p, progress: 100 };
-  }
-  const projTasks = (tasks || []).filter(t => {
-    const tid = t.projectId?._id || t.projectId || t.project;
-    return tid === (p._id || p.id);
+  const projectsWithProgress = (projects || []).map(p => {
+    const s = (p.status || '').toLowerCase();
+    if (s === 'completed' || s === 'done') {
+      return { ...p, progress: 100 };
+    }
+    const projTasks = (tasks || []).filter(t => {
+      const tid = t.projectId?._id || t.projectId || t.project;
+      return tid === (p._id || p.id);
+    });
+
+    const milestonesArr = p.milestones || [];
+    if (milestonesArr.length > 0) {
+      const doneMilestones = milestonesArr.filter(m => {
+        const mTasks = projTasks.filter(t => t.milestone === m.name && !t.isDeleted);
+        const allTasksCompleted = mTasks.length > 0 && mTasks.every(t => (t.status || '').toLowerCase() === 'done' || (t.status || '').toLowerCase() === 'completed');
+        return m.done === true || allTasksCompleted;
+      }).length;
+      return { ...p, progress: Math.round((doneMilestones / milestonesArr.length) * 100) };
+    }
+
+    if (projTasks.length > 0) {
+      const completed = projTasks.filter(t => (t.status || '').toLowerCase() === 'completed' || (t.status || '').toLowerCase() === 'done').length;
+      return { ...p, progress: Math.round((completed / projTasks.length) * 100) };
+    }
+    return { ...p, progress: p.progress || 0 };
   });
 
-  const milestonesArr = p.milestones || [];
-  if (milestonesArr.length > 0) {
-    const doneMilestones = milestonesArr.filter(m => {
-      const mTasks = projTasks.filter(t => t.milestone === m.name && !t.isDeleted);
-      const allTasksCompleted = mTasks.length > 0 && mTasks.every(t => (t.status || '').toLowerCase() === 'done' || (t.status || '').toLowerCase() === 'completed');
-      return m.done === true || allTasksCompleted;
-    }).length;
-    return { ...p, progress: Math.round((doneMilestones / milestonesArr.length) * 100) };
-  }
+  useEffect(() => {
+    if (!projectsWithProgress.length) return;
+    const interval = setInterval(() => {
+      const container = document.getElementById("mobProjectsScroller");
+      if (!container) return;
+      const cards = container.children;
+      if (!cards || cards.length <= 1) return;
+      const next = (projectCarouselIndexRef.current + 1) % cards.length;
+      projectCarouselIndexRef.current = next;
+      const card = cards[next];
+      if (card) {
+        const containerCenter = container.offsetWidth / 2;
+        const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+        container.scrollTo({ left: cardCenter - containerCenter, behavior: "smooth" });
+      }
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [projectsWithProgress.length]);
 
-  if (projTasks.length > 0) {
-    const completed = projTasks.filter(t => (t.status || '').toLowerCase() === 'completed' || (t.status || '').toLowerCase() === 'done').length;
-    return { ...p, progress: Math.round((completed / projTasks.length) * 100) };
-  }
-  return { ...p, progress: p.progress || 0 };
-});
+  const fetchPackages = async () => {
 
-useEffect(() => {
-  if (!projectsWithProgress.length) return;
-  const interval = setInterval(() => {
-    const container = document.getElementById("mobProjectsScroller");
-    if (!container) return;
-    const cards = container.children;
-    if (!cards || cards.length <= 1) return;
-    const next = (projectCarouselIndexRef.current + 1) % cards.length;
-    projectCarouselIndexRef.current = next;
-    const card = cards[next];
-    if (card) {
-      const containerCenter = container.offsetWidth / 2;
-      const cardCenter = card.offsetLeft + card.offsetWidth / 2;
-      container.scrollTo({ left: cardCenter - containerCenter, behavior: "smooth" });
-    }
-  }, 3000);
-  return () => clearInterval(interval);
-}, [projectsWithProgress.length]);
+    try {
 
-const fetchPackages = async () => {
+      const id = resolveSubadminId();
 
-  try {
+      const isSub = user?.role === "subadmin";
 
-    const id = resolveSubadminId();
+      const endpoint = isSub ? `${BASE_URL}/api/packages/subadmin/${id}` : `${BASE_URL}/api/packages`;
 
-    const isSub = user?.role === "subadmin";
+      const res = await axios.get(endpoint);
 
-    const endpoint = isSub ? `${BASE_URL}/api/packages/subadmin/${id}` : `${BASE_URL}/api/packages`;
+      setPackages(res.data || []);
 
-    const res = await axios.get(endpoint);
+    } catch (e) { console.log(e); }
 
-    setPackages(res.data || []);
+  };
 
-  } catch (e) { console.log(e); }
+  const [config, setConfig] = useState(null);
 
-};
+  const [viewProject, setViewProject] = useState(null);
 
-const [config, setConfig] = useState(null);
 
-const [viewProject, setViewProject] = useState(null);
 
+  const [subadmins, setSubadmins] = useState([]);
 
+  const [ns, setNs] = useState({ name: "", email: "", phone: "", password: "", status: "Active", companyName: "", companyType: "IT", employeeCount: "0-10", clientLimit: "3", employeeLimit: "6" });
 
-const [subadmins, setSubadmins] = useState([]);
+  const [nsError, setNsError] = useState({});
 
-const [ns, setNs] = useState({ name: "", email: "", phone: "", password: "", status: "Active", companyName: "", companyType: "IT", employeeCount: "0-10", clientLimit: "3", employeeLimit: "6" });
+  const [subSaveLoading, setSubSaveLoading] = useState(false);
 
-const [nsError, setNsError] = useState({});
+  const [showSubPass, setShowSubPass] = useState(false);
 
-const [subSaveLoading, setSubSaveLoading] = useState(false);
 
-const [showSubPass, setShowSubPass] = useState(false);
 
+  const [packages, setPackages] = useState([]);
 
+  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "", assignedSubadmins: [] });
 
-const [packages, setPackages] = useState([]);
+  const [editPkgForm, setEditPkgForm] = useState({ title: "", description: "", icon: "📦", type: "paid", price: "", noOfDays: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", status: "Active", assignedSubadmins: [] });
 
-const [npkg, setNpkg] = useState({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "", assignedSubadmins: [] });
+  const [pkgError, setPkgError] = useState({});
 
-const [editPkgForm, setEditPkgForm] = useState({ title: "", description: "", icon: "📦", type: "paid", price: "", noOfDays: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", status: "Active", assignedSubadmins: [] });
+  const [pkgSaveLoading, setPkgSaveLoading] = useState(false);
 
-const [pkgError, setPkgError] = useState({});
 
-const [pkgSaveLoading, setPkgSaveLoading] = useState(false);
 
+  // Package view/edit state
 
+  const [viewPackage, setViewPackage] = useState(null);
 
-// Package view/edit state
+  const [editPackage, setEditPackage] = useState(null);
 
-const [viewPackage, setViewPackage] = useState(null);
 
-const [editPackage, setEditPackage] = useState(null);
 
 
 
+  const [quotations, setQuotations] = useState([]);
+  const [proposalsList, setProposalsList] = useState([]);
 
+  const [vendors, setVendors] = useState([]);
 
-const [quotations, setQuotations] = useState([]);
-const [proposalsList, setProposalsList] = useState([]);
+  const [paymentHistory, setPaymentHistory] = useState([]);
 
-const [vendors, setVendors] = useState([]);
+  const [subLoading, setSubLoading] = useState(true);
 
-const [paymentHistory, setPaymentHistory] = useState([]);
+  const [alertDismissedToday, setAlertDismissedToday] = useState(() => {
+    try {
+      const stored = localStorage.getItem("subAlertDismissedDate");
+      return stored === new Date().toDateString();
+    } catch { return false; }
+  });
 
-const [subLoading, setSubLoading] = useState(true);
 
-const [alertDismissedToday, setAlertDismissedToday] = useState(() => {
-  try {
-    const stored = localStorage.getItem("subAlertDismissedDate");
-    return stored === new Date().toDateString();
-  } catch { return false; }
-});
 
+  const [nv, setNv] = useState({ vendorName: "", vendorProduct: "", amountTaxGst: "", date: "", paidAmount: "", productDescription: "", dateOfPurchase: "", modeOfPayment: "Cash" });
 
+  const [nvError, setNvError] = useState({});
 
-const [nv, setNv] = useState({ vendorName: "", vendorProduct: "", amountTaxGst: "", date: "", paidAmount: "", productDescription: "", dateOfPurchase: "", modeOfPayment: "Cash" });
+  const [vendorSaveLoading, setVendorSaveLoading] = useState(false);
 
-const [nvError, setNvError] = useState({});
 
-const [vendorSaveLoading, setVendorSaveLoading] = useState(false);
 
-
-
-const [invoices, setInvoices] = useState(() => {
-  try {
-    const c = localStorage.getItem("cached_invoices");
-    return c ? JSON.parse(c) : [];
-  } catch { return []; }
-});
-
-const [income, setIncome] = useState(() => {
-  try {
-    const c = localStorage.getItem("cached_income");
-    return c ? JSON.parse(c) : [];
-  } catch { return []; }
-});
-
-const [expenses, setExpenses] = useState([]);
-
-const totalRevenue = invoices
-  .filter(inv => (inv.status || "").toLowerCase() === "paid")
-  .reduce((sum, inv) => sum + (Number(inv.grandTotal || inv.amountPaid || inv.total) || 0), 0);
-
-const [pendingLeaves, setPendingLeaves] = useState([]);
-const [showNotifPanel, setShowNotifPanel] = useState(false);
-const [employeeDocs, setEmployeeDocs] = useState([]);
-const [notifications, setNotifications] = useState([]);
-const unreadNotifCount = notifications.filter(n => !n.isRead).length + pendingLeaves.length;
-
-const fetchNotifications = async () => {
-  try {
-    const uid = resolveSubadminId();
-    if (!uid) return;
-    const res = await axios.get(`${BASE_URL}/api/notifications/${uid}`);
-    setNotifications(Array.isArray(res.data) ? res.data : []);
-  } catch (err) {
-    console.error('Failed to fetch notifications:', err);
-  }
-};
-
-const markAllNotificationsRead = async () => {
-  try {
-    const uid = resolveSubadminId();
-    if (!uid) return;
-    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
-    await axios.patch(`${BASE_URL}/api/notifications/read-all/${uid}`);
-  } catch (err) {
-    console.error('Failed to mark notifications read:', err);
-  }
-};
-
-
-
-const fetchPendingLeaves = async () => {
-
-  try {
-
-    const companyId = resolveSubadminId();
-
-    const res = await axios.get(`${BASE_URL}/api/employee-dashboard/leave/all/pending`, {
-
-      headers: { "x-company-id": companyId }
-
-    });
-
-    setPendingLeaves(res.data || []);
-
-  } catch (e) { console.log(e); }
-
-};
-
-
-
-const fetchEmployeeDocs = async () => {
-
-  try {
-
-    const companyId = resolveSubadminId();
-
-    const res = await axios.get(`${BASE_URL}/api/employee-dashboard/documents/company/all`, {
-
-      headers: { "x-company-id": companyId }
-
-    });
-
-    setEmployeeDocs(res.data || []);
-
-  } catch (e) { console.log(e); }
-
-};
-
-
-
-const handleApproveLeave = async (leaveId) => {
-
-  try {
-
-    const name = user?.name || "Admin";
-
-    await axios.patch(`${BASE_URL}/api/employee-dashboard/leave/${leaveId}/approve`, {
-
-      reviewedBy: name,
-
-      managerNote: "Approved by Sub-Admin"
-
-    });
-
-    toast.success("Leave request approved successfully!");
-
-    fetchPendingLeaves();
-
-  } catch (e) {
-
-    toast.error("Failed to approve leave request");
-
-    console.log(e);
-
-  }
-
-};
-
-
-
-const handleRejectLeave = async (leaveId) => {
-
-  try {
-
-    const name = user?.name || "Admin";
-
-    await axios.patch(`${BASE_URL}/api/employee-dashboard/leave/${leaveId}/reject`, {
-
-      reviewedBy: name,
-
-      managerNote: "Rejected by Sub-Admin"
-
-    });
-
-    toast.success("Leave request rejected successfully!");
-
-    fetchPendingLeaves();
-
-  } catch (e) {
-
-    toast.error("Failed to reject leave request");
-
-    console.log(e);
-
-  }
-
-};
-
-
-
-const handleApproveDoc = async (docId) => {
-
-  try {
-
-    await axios.patch(`${BASE_URL}/api/employee-dashboard/documents/${docId}/approve`);
-
-    toast.success("Document approved successfully!");
-
-    fetchEmployeeDocs();
-
-  } catch (e) {
-
-    toast.error("Failed to approve document");
-
-    console.log(e);
-
-  }
-
-};
-
-
-
-const handleRejectDoc = async (docId) => {
-
-  try {
-
-    await axios.patch(`${BASE_URL}/api/employee-dashboard/documents/${docId}/reject`);
-
-    toast.success("Document rejected successfully!");
-
-    fetchEmployeeDocs();
-
-  } catch (e) {
-
-    toast.error("Failed to reject document");
-
-    console.log(e);
-
-  }
-
-};
-
-
-
-const fetchProfile = async () => {
-
-  try {
-
-    const id = resolveSubadminId();
-
-    if (!id) return;
-
-    const res = await axios.get(`${BASE_URL}/api/auth/profile/${id}`);
-
-    if (res.data.user) {
-
-      const updated = { ...user, ...res.data.user };
-
-      localStorage.setItem("user", JSON.stringify(updated));
-
-      setUser(updated);
-
-    }
-
-  } catch (e) { console.log("Profile sync failed", e); }
-
-};
-
-const mainScrollRef = useRef(null);
-const lastFetchedUserId = useRef(null);
-useEffect(() => {
-  const cid = resolveSubadminId();
-  if (!cid || lastFetchedUserId.current === cid) return;
-  lastFetchedUserId.current = cid;
-  fetchEmployees();
-  fetchClients();
-  fetchProjects();
-  fetchProfile();
-  Promise.all([
-    fetchManagers(), fetchSubadmins(), fetchPackages(),
-    fetchSubscription(), fetchQuotations(), fetchProposalsList(), fetchPaymentHistory(), fetchVendors(),
-    fetchInvoices(), fetchIncome(), fetchExpenses(), fetchTasks(), fetchConfig()
-  ]).catch(e => console.log("Background fetch error:", e));
-  fetchPendingLeaves(); fetchEmployeeDocs(); fetchNotifications();
-  const notifPollInterval = setInterval(fetchNotifications, 30000);
-  return () => clearInterval(notifPollInterval);
-}, [user]);
-
-useEffect(() => {
-  if (active === "invoices") {
-    fetchInvoices();
-  }
-}, [active]);
-// Close notification panel when clicking outside
-useEffect(() => {
-  const handleClickOutside = (e) => {
-    if (showNotifPanel && !e.target.closest('.topbar-icon')) {
-      setShowNotifPanel(false);
+  const [invoices, setInvoices] = useState(() => {
+    try {
+      const c = localStorage.getItem("cached_invoices");
+      return c ? JSON.parse(c) : [];
+    } catch { return []; }
+  });
+
+  const [income, setIncome] = useState(() => {
+    try {
+      const c = localStorage.getItem("cached_income");
+      return c ? JSON.parse(c) : [];
+    } catch { return []; }
+  });
+
+  const [expenses, setExpenses] = useState([]);
+
+  const totalRevenue = invoices
+    .filter(inv => (inv.status || "").toLowerCase() === "paid")
+    .reduce((sum, inv) => sum + (Number(inv.grandTotal || inv.amountPaid || inv.total) || 0), 0);
+
+  const [pendingLeaves, setPendingLeaves] = useState([]);
+  const [showNotifPanel, setShowNotifPanel] = useState(false);
+  const [employeeDocs, setEmployeeDocs] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const unreadNotifCount = notifications.filter(n => !n.isRead).length + pendingLeaves.length;
+
+  const fetchNotifications = async () => {
+    try {
+      const uid = resolveSubadminId();
+      if (!uid) return;
+      const res = await axios.get(`${BASE_URL}/api/notifications/${uid}`);
+      setNotifications(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error('Failed to fetch notifications:', err);
     }
   };
-  document.addEventListener('mousedown', handleClickOutside);
-  return () => document.removeEventListener('mousedown', handleClickOutside);
-}, [showNotifPanel]);
+
+  const markAllNotificationsRead = async () => {
+    try {
+      const uid = resolveSubadminId();
+      if (!uid) return;
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      await axios.patch(`${BASE_URL}/api/notifications/read-all/${uid}`);
+    } catch (err) {
+      console.error('Failed to mark notifications read:', err);
+    }
+  };
 
 
-// ── Listen for SEND_DOCUMENT from template designer iframe ──
 
-useEffect(() => {
+  const fetchPendingLeaves = async () => {
 
-  const handleMessage = async (e) => {
-
-    if (e.data && e.data.type === "SEND_DOCUMENT") {
-      const payload = e.data.payload;
-      if (!payload) return;
+    try {
 
       const companyId = resolveSubadminId();
-      const sendTo = payload.sendTo || "client";
 
-      let resolvedClientId = payload.clientId || "";
-      if (!resolvedClientId && sendTo === "client") {
-        const match = clients.find(c => (c.clientName || c.name) === payload.client);
-        resolvedClientId = match?._id || match?.id || "";
+      const res = await axios.get(`${BASE_URL}/api/employee-dashboard/leave/all/pending`, {
+
+        headers: { "x-company-id": companyId }
+
+      });
+
+      setPendingLeaves(res.data || []);
+
+    } catch (e) { console.log(e); }
+
+  };
+
+
+
+  const fetchEmployeeDocs = async () => {
+
+    try {
+
+      const companyId = resolveSubadminId();
+
+      const res = await axios.get(`${BASE_URL}/api/employee-dashboard/documents/company/all`, {
+
+        headers: { "x-company-id": companyId }
+
+      });
+
+      setEmployeeDocs(res.data || []);
+
+    } catch (e) { console.log(e); }
+
+  };
+
+
+
+  const handleApproveLeave = async (leaveId) => {
+
+    try {
+
+      const name = user?.name || "Admin";
+
+      await axios.patch(`${BASE_URL}/api/employee-dashboard/leave/${leaveId}/approve`, {
+
+        reviewedBy: name,
+
+        managerNote: "Approved by Sub-Admin"
+
+      });
+
+      toast.success("Leave request approved successfully!");
+
+      fetchPendingLeaves();
+
+    } catch (e) {
+
+      toast.error("Failed to approve leave request");
+
+      console.log(e);
+
+    }
+
+  };
+
+
+
+  const handleRejectLeave = async (leaveId) => {
+
+    try {
+
+      const name = user?.name || "Admin";
+
+      await axios.patch(`${BASE_URL}/api/employee-dashboard/leave/${leaveId}/reject`, {
+
+        reviewedBy: name,
+
+        managerNote: "Rejected by Sub-Admin"
+
+      });
+
+      toast.success("Leave request rejected successfully!");
+
+      fetchPendingLeaves();
+
+    } catch (e) {
+
+      toast.error("Failed to reject leave request");
+
+      console.log(e);
+
+    }
+
+  };
+
+
+
+  const handleApproveDoc = async (docId) => {
+
+    try {
+
+      await axios.patch(`${BASE_URL}/api/employee-dashboard/documents/${docId}/approve`);
+
+      toast.success("Document approved successfully!");
+
+      fetchEmployeeDocs();
+
+    } catch (e) {
+
+      toast.error("Failed to approve document");
+
+      console.log(e);
+
+    }
+
+  };
+
+
+
+  const handleRejectDoc = async (docId) => {
+
+    try {
+
+      await axios.patch(`${BASE_URL}/api/employee-dashboard/documents/${docId}/reject`);
+
+      toast.success("Document rejected successfully!");
+
+      fetchEmployeeDocs();
+
+    } catch (e) {
+
+      toast.error("Failed to reject document");
+
+      console.log(e);
+
+    }
+
+  };
+
+
+
+  const fetchProfile = async () => {
+
+    try {
+
+      const id = resolveSubadminId();
+
+      if (!id) return;
+
+      const res = await axios.get(`${BASE_URL}/api/auth/profile/${id}`);
+
+      if (res.data.user) {
+
+        const updated = { ...user, ...res.data.user };
+
+        localStorage.setItem("user", JSON.stringify(updated));
+
+        setUser(updated);
+
       }
-      let resolvedEmployeeId = payload.employeeId || "";
-      if (!resolvedEmployeeId && sendTo === "employee") {
-        const match = employees.find(emp => (emp.name || emp.employeeName) === payload.client);
-        resolvedEmployeeId = match?._id || match?.id || "";
+
+    } catch (e) { console.log("Profile sync failed", e); }
+
+  };
+
+  const mainScrollRef = useRef(null);
+  const lastFetchedUserId = useRef(null);
+  useEffect(() => {
+    const cid = resolveSubadminId();
+    if (!cid || lastFetchedUserId.current === cid) return;
+    lastFetchedUserId.current = cid;
+    fetchEmployees();
+    fetchClients();
+    fetchProjects();
+    fetchProfile();
+    Promise.all([
+      fetchManagers(), fetchSubadmins(), fetchPackages(),
+      fetchSubscription(), fetchQuotations(), fetchProposalsList(), fetchPaymentHistory(), fetchVendors(),
+      fetchInvoices(), fetchIncome(), fetchExpenses(), fetchTasks(), fetchConfig()
+    ]).catch(e => console.log("Background fetch error:", e));
+    fetchPendingLeaves(); fetchEmployeeDocs(); fetchNotifications();
+    const notifPollInterval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(notifPollInterval);
+  }, [user]);
+
+  useEffect(() => {
+    if (active === "invoices") {
+      fetchInvoices();
+    }
+  }, [active]);
+  // Close notification panel when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showNotifPanel && !e.target.closest('.topbar-icon')) {
+        setShowNotifPanel(false);
       }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showNotifPanel]);
 
-      try {
-        await axios.post(`${BASE_URL}/api/documents`, {
-          docType: payload.docType || "lh",
-          sendTo,
-          client: payload.client || (sendTo === "employee" ? "Employee" : "Client"),
-          clientId: sendTo === "client" ? resolvedClientId : "",
-          employeeId: sendTo === "employee" ? resolvedEmployeeId : "",
-          recipientEmail: payload.recipientEmail || "",
-          htmlContent: payload.htmlContent || "",
-          senderCompany: companyNameStr,
-          companyId
-        });
 
-        if (sendTo === "employee" && resolvedEmployeeId) {
-          try {
-            await axios.post(`${BASE_URL}/api/notifications`, {
-              userId: resolvedEmployeeId,
-              type: "document",
-              icon: "ti-files",
-              text: `A new document has been shared with you`,
-            });
-          } catch (notifErr) {
-            console.error("Failed to notify employee:", notifErr);
-          }
+  // ── Listen for SEND_DOCUMENT from template designer iframe ──
+
+  useEffect(() => {
+
+    const handleMessage = async (e) => {
+
+      if (e.data && e.data.type === "SEND_DOCUMENT") {
+        const payload = e.data.payload;
+        if (!payload) return;
+
+        const companyId = resolveSubadminId();
+        const sendTo = payload.sendTo || "client";
+
+        let resolvedClientId = payload.clientId || "";
+        if (!resolvedClientId && sendTo === "client") {
+          const match = clients.find(c => (c.clientName || c.name) === payload.client);
+          resolvedClientId = match?._id || match?.id || "";
+        }
+        let resolvedEmployeeId = payload.employeeId || "";
+        if (!resolvedEmployeeId && sendTo === "employee") {
+          const match = employees.find(emp => (emp.name || emp.employeeName) === payload.client);
+          resolvedEmployeeId = match?._id || match?.id || "";
         }
 
-        toast.success(`Document sent to ${payload.client || "Client"} successfully!`);
-      } catch (err) {
-        console.error("Failed to send document:", err);
-        toast.error("Failed to send document. Check connection.");
+        try {
+          await axios.post(`${BASE_URL}/api/documents`, {
+            docType: payload.docType || "lh",
+            sendTo,
+            client: payload.client || (sendTo === "employee" ? "Employee" : "Client"),
+            clientId: sendTo === "client" ? resolvedClientId : "",
+            employeeId: sendTo === "employee" ? resolvedEmployeeId : "",
+            recipientEmail: payload.recipientEmail || "",
+            htmlContent: payload.htmlContent || "",
+            senderCompany: companyNameStr,
+            companyId
+          });
+
+          if (sendTo === "employee" && resolvedEmployeeId) {
+            try {
+              await axios.post(`${BASE_URL}/api/notifications`, {
+                userId: resolvedEmployeeId,
+                type: "document",
+                icon: "ti-files",
+                text: `A new document has been shared with you`,
+              });
+            } catch (notifErr) {
+              console.error("Failed to notify employee:", notifErr);
+            }
+          }
+
+          toast.success(`Document sent to ${payload.client || "Client"} successfully!`);
+        } catch (err) {
+          console.error("Failed to send document:", err);
+          toast.error("Failed to send document. Check connection.");
+        }
       }
+
+      if (e.data && e.data.type === "SAVE_QUOTATION") {
+
+        const { qt, items } = e.data.payload;
+
+        if (!qt || !qt.quoteNo) return;
+
+
+
+        // 1. Save to backend API
+
+        try {
+
+          await axios.post(`${BASE_URL}/api/quotations`, { qt, items, status: "draft" });
+
+        } catch (err) {
+
+          console.error("API Save Error", err);
+
+        }
+
+
+
+        // 2. Save to local drafts to update the UI
+
+        try {
+
+          const LOCAL_KEY = "quotation_drafts";
+
+          const all = localStorage.getItem(LOCAL_KEY) ? JSON.parse(localStorage.getItem(LOCAL_KEY)) : [];
+
+          const id = qt.quoteNo;
+
+          const idx = all.findIndex((d) => d.id === id || (d.qt && d.qt.quoteNo === id));
+
+          const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
+
+          const total = subtotal * (1 + (qt.gstRate || 0) / 100);
+
+          const entry = { id, quoteNo: qt.quoteNo, client: qt.client || "—", total, savedAt: Date.now(), qt, items, status: "draft" };
+
+
+
+          if (idx >= 0) all[idx] = entry;
+
+          else all.unshift(entry);
+
+
+
+          localStorage.setItem(LOCAL_KEY, JSON.stringify(all.slice(0, 30)));
+
+          toast.success("Quotation saved successfully!");
+
+          fetchQuotations(); // Refresh list to update the Template Designer dropdown
+
+        } catch (err) {
+
+          toast.error("Failed to save quotation locally.");
+
+        }
+
+      }
+
+    };
+
+    window.addEventListener("message", handleMessage);
+
+    return () => window.removeEventListener("message", handleMessage);
+
+  }, [companyNameStr, user]);
+
+
+
+  // Redirect to mysubscriptions only when the trial has actually expired
+  // (i.e. no subscription AND no free trial days left). While the user is
+  // still within their free trial, subscription is legitimately null and
+  // they should stay on the Dashboard — not be bounced to "Choose your Plan".
+  const hasRedirected = useRef(false);
+  const [subscriptionChecked, setSubscriptionChecked] = useState(false);
+
+  useEffect(() => {
+    if (!subscriptionChecked || trialToastShown.current) return;
+    const flagKey = user?.email ? `justRegistered:${user.email}` : null;
+    const isFirstTimeAfterSignup = flagKey && localStorage.getItem(flagKey) === "1";
+    const trialIsActive = isInFreeTrial() || subscription?.isTrial || subscription?.status === "trial";
+    if (isFirstTimeAfterSignup && trialIsActive) {
+      trialToastShown.current = true;
+      localStorage.removeItem(flagKey);
+      setTrialToast(true);
+      const hideTimer = setTimeout(() => setTrialToast(false), 4000);
+      return () => clearTimeout(hideTimer);
     }
+  }, [subscriptionChecked, subscription]);
 
-    if (e.data && e.data.type === "SAVE_QUOTATION") {
-
-      const { qt, items } = e.data.payload;
-
-      if (!qt || !qt.quoteNo) return;
-
-
-
-      // 1. Save to backend API
-
-      try {
-
-        await axios.post(`${BASE_URL}/api/quotations`, { qt, items, status: "draft" });
-
-      } catch (err) {
-
-        console.error("API Save Error", err);
-
-      }
-
-
-
-      // 2. Save to local drafts to update the UI
-
-      try {
-
-        const LOCAL_KEY = "quotation_drafts";
-
-        const all = localStorage.getItem(LOCAL_KEY) ? JSON.parse(localStorage.getItem(LOCAL_KEY)) : [];
-
-        const id = qt.quoteNo;
-
-        const idx = all.findIndex((d) => d.id === id || (d.qt && d.qt.quoteNo === id));
-
-        const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
-
-        const total = subtotal * (1 + (qt.gstRate || 0) / 100);
-
-        const entry = { id, quoteNo: qt.quoteNo, client: qt.client || "—", total, savedAt: Date.now(), qt, items, status: "draft" };
-
-
-
-        if (idx >= 0) all[idx] = entry;
-
-        else all.unshift(entry);
-
-
-
-        localStorage.setItem(LOCAL_KEY, JSON.stringify(all.slice(0, 30)));
-
-        toast.success("Quotation saved successfully!");
-
-        fetchQuotations(); // Refresh list to update the Template Designer dropdown
-
-      } catch (err) {
-
-        toast.error("Failed to save quotation locally.");
-
-      }
-
+  useEffect(() => {
+    if (
+      subscriptionChecked &&
+      subscription === null &&
+      !isInFreeTrial() &&
+      !hasRedirected.current
+    ) {
+      hasRedirected.current = true;
+      setForceUpgradeTab(false);
+      setActive("mysubscriptions");
     }
+  }, [subscription, subscriptionChecked]);
 
-  };
+  // Process PayU payment silently on dashboard load — no need to show subscriptions page
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("payment") !== "success") return;
+    const subId = params.get("subId");
+    const txnid = params.get("txnid");
+    window.history.replaceState({}, document.title, window.location.pathname);
+    const activateAndRefresh = async () => {
+      try {
+        if (subId) {
+          await axios.post(`${BASE_URL}/api/subscriptions/activate-pending`, {
+            subscriptionId: subId, txnid
+          });
+        }
+      } catch (e) { console.log("PayU activation:", e.message); }
+      await fetchSubscription();
+    };
+    activateAndRefresh();
+  }, []);
 
-  window.addEventListener("message", handleMessage);
 
-  return () => window.removeEventListener("message", handleMessage);
+  const fetchTasks = async () => {
 
-}, [companyNameStr, user]);
-
-
-
-// Redirect to mysubscriptions only when the trial has actually expired
-// (i.e. no subscription AND no free trial days left). While the user is
-// still within their free trial, subscription is legitimately null and
-// they should stay on the Dashboard — not be bounced to "Choose your Plan".
-const hasRedirected = useRef(false);
-const [subscriptionChecked, setSubscriptionChecked] = useState(false);
-
-useEffect(() => {
-  if (!subscriptionChecked || trialToastShown.current) return;
-  const flagKey = user?.email ? `justRegistered:${user.email}` : null;
-  const isFirstTimeAfterSignup = flagKey && localStorage.getItem(flagKey) === "1";
-  const trialIsActive = isInFreeTrial() || subscription?.isTrial || subscription?.status === "trial";
-  if (isFirstTimeAfterSignup && trialIsActive) {
-    trialToastShown.current = true;
-    localStorage.removeItem(flagKey);
-    setTrialToast(true);
-    const hideTimer = setTimeout(() => setTrialToast(false), 4000);
-    return () => clearTimeout(hideTimer);
-  }
-}, [subscriptionChecked, subscription]);
-
-useEffect(() => {
-  if (
-    subscriptionChecked &&
-    subscription === null &&
-    !isInFreeTrial() &&
-    !hasRedirected.current
-  ) {
-    hasRedirected.current = true;
-    setForceUpgradeTab(false);
-    setActive("mysubscriptions");
-  }
-}, [subscription, subscriptionChecked]);
-
-// Process PayU payment silently on dashboard load — no need to show subscriptions page
-useEffect(() => {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get("payment") !== "success") return;
-  const subId = params.get("subId");
-  const txnid = params.get("txnid");
-  window.history.replaceState({}, document.title, window.location.pathname);
-  const activateAndRefresh = async () => {
     try {
-      if (subId) {
-        await axios.post(`${BASE_URL}/api/subscriptions/activate-pending`, {
-          subscriptionId: subId, txnid
-        });
-      }
-    } catch (e) { console.log("PayU activation:", e.message); }
-    await fetchSubscription();
+
+      const res = await axios.get(BASE_URL + "/api/tasks");
+
+      setTasks(res.data || []);
+
+    } catch (e) { console.log(e); }
+
   };
-  activateAndRefresh();
-}, []);
-
-
-const fetchTasks = async () => {
-
-  try {
-
-    const res = await axios.get(BASE_URL + "/api/tasks");
-
-    setTasks(res.data || []);
-
-  } catch (e) { console.log(e); }
-
-};
 
 
 
-const fetchConfig = async () => {
+  const fetchConfig = async () => {
 
-  try {
+    try {
 
-    const cid = resolveSubadminId();
+      const cid = resolveSubadminId();
 
-    if (!cid) return;
+      if (!cid) return;
 
-    const res = await axios.get(`${BASE_URL}/api/config/${cid}`);
+      const res = await axios.get(`${BASE_URL}/api/config/${cid}`);
 
-    setConfig(res.data);
+      setConfig(res.data);
 
-  } catch (e) { console.log(e); }
+    } catch (e) { console.log(e); }
 
-};
-
-
-
-const fetchSubscription = async () => {
-
-  try {
-
-    if (!subscription) setSubLoading(true);
-
-    const id = resolveSubadminId();
-
-    if (!id) return null;
+  };
 
 
 
-    const res = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
+  const fetchSubscription = async () => {
 
-    if (res.data.hasSubscription) {
+    try {
 
-      setSubscription(res.data.subscription);
-      setSubLoading(false);
-      setSubscriptionChecked(true);
+      if (!subscription) setSubLoading(true);
 
-      return res.data.subscription; // return fresh data for immediate use
+      const id = resolveSubadminId();
 
-    } else {
+      if (!id) return null;
+
+
+
+      const res = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
+
+      if (res.data.hasSubscription) {
+
+        setSubscription(res.data.subscription);
+        setSubLoading(false);
+        setSubscriptionChecked(true);
+
+        return res.data.subscription; // return fresh data for immediate use
+
+      } else {
+
+        setSubscription(null);
+        setSubLoading(false);
+        setSubscriptionChecked(true);
+
+        return null;
+
+      }
+
+    } catch (err) {
+
+      console.error("Subscription fetch error:", err);
 
       setSubscription(null);
       setSubLoading(false);
@@ -8193,1581 +8357,1569 @@ const fetchSubscription = async () => {
 
       return null;
 
-    }
-
-  } catch (err) {
-
-    console.error("Subscription fetch error:", err);
-
-    setSubscription(null);
-    setSubLoading(false);
-    setSubscriptionChecked(true);
-
-    return null;
-
-  } finally {
-    // Fetch updated user limits in the background — don't block callers on this,
-    // and delay it slightly so it never competes with the initial dashboard
-    // render/data calls right after login.
-    setTimeout(() => {
-      (async () => {
-        try {
-          const id = resolveSubadminId();
-          if (id) {
-            const userRes = await axios.get(`${BASE_URL}/api/users/${id}`);
-            if (userRes.data) {
-              localStorage.setItem("user", JSON.stringify(userRes.data));
+    } finally {
+      // Fetch updated user limits in the background — don't block callers on this,
+      // and delay it slightly so it never competes with the initial dashboard
+      // render/data calls right after login.
+      setTimeout(() => {
+        (async () => {
+          try {
+            const id = resolveSubadminId();
+            if (id) {
+              const userRes = await axios.get(`${BASE_URL}/api/users/${id}`);
+              if (userRes.data) {
+                localStorage.setItem("user", JSON.stringify(userRes.data));
+              }
             }
+          } catch (e) {
+            console.error("Failed to update local user limits:", e);
           }
-        } catch (e) {
-          console.error("Failed to update local user limits:", e);
-        }
-      })();
-    }, 1500);
-  }
-};
+        })();
+      }, 1500);
+    }
+  };
 
-const fetchInvoices = async () => {
+  const fetchInvoices = async () => {
 
-  try {
+    try {
 
-    const res = await axios.get(BASE_URL + "/api/invoices");
+      const res = await axios.get(BASE_URL + "/api/invoices");
 
-    const list = res.data.invoices || [];
+      const list = res.data.invoices || [];
 
-    setInvoices(list);
+      setInvoices(list);
 
-    try { localStorage.setItem("cached_invoices", JSON.stringify(list)); } catch { }
+      try { localStorage.setItem("cached_invoices", JSON.stringify(list)); } catch { }
 
-  } catch (e) {
+    } catch (e) {
 
-    console.log("Fetch invoices error:", e);
+      console.log("Fetch invoices error:", e);
 
-  }
+    }
 
-};
+  };
 
 
 
-const fetchPaymentHistory = async () => {
+  const fetchPaymentHistory = async () => {
 
-  try {
+    try {
 
-    const id = resolveSubadminId();
+      const id = resolveSubadminId();
 
-    if (!id) return;
+      if (!id) return;
 
-    const res = await axios.get(`${BASE_URL}/api/subscriptions/payments/${id}`);
+      const res = await axios.get(`${BASE_URL}/api/subscriptions/payments/${id}`);
 
-    setPaymentHistory(res.data || []);
+      setPaymentHistory(res.data || []);
 
-  } catch (err) {
+    } catch (err) {
 
-    console.error("Payment history fetch failed", err);
+      console.error("Payment history fetch failed", err);
 
-  }
+    }
 
-};
+  };
 
 
 
-const fetchIncome = async () => {
+  const fetchIncome = async () => {
 
-  try {
+    try {
 
-    const res = await axios.get(BASE_URL + "/api/income");
+      const res = await axios.get(BASE_URL + "/api/income");
 
-    setIncome(res.data || []);
+      setIncome(res.data || []);
 
-  } catch (e) {
+    } catch (e) {
 
-    console.log("Fetch income error:", e);
+      console.log("Fetch income error:", e);
 
-    setIncome([]);
+      setIncome([]);
 
-  }
+    }
 
-};
+  };
 
 
 
-const fetchExpenses = async () => {
+  const fetchExpenses = async () => {
 
-  try {
+    try {
 
-    const res = await axios.get(BASE_URL + "/api/expenses");
+      const res = await axios.get(BASE_URL + "/api/expenses");
 
-    setExpenses(res.data || []);
+      setExpenses(res.data || []);
 
-  } catch (e) {
+    } catch (e) {
 
-    console.log("Fetch expenses error:", e);
+      console.log("Fetch expenses error:", e);
 
-    setExpenses([]);
+      setExpenses([]);
 
-  }
+    }
 
-};
+  };
 
 
 
-// ── FREE TRIAL ──────────────────────────────────────────────────────────────
-const FREE_TRIAL_DAYS = 30;
-const FREE_TRIAL_LIMITS = { client: 5, employee: 10, manager: 2 };
+  // ── FREE TRIAL ──────────────────────────────────────────────────────────────
+  const FREE_TRIAL_DAYS = 30;
+  const FREE_TRIAL_LIMITS = { client: 5, employee: 10, manager: 2 };
 
-const getTrialDaysRemaining = () => {
-  const created = user?.createdAt;
-  if (!created) return 0;
-  const diffMs = new Date(created).getTime() + FREE_TRIAL_DAYS * 86400000 - Date.now();
-  return Math.max(0, Math.ceil(diffMs / 86400000));
-};
+  const getTrialDaysRemaining = () => {
+    const created = user?.createdAt;
+    if (!created) return 0;
+    const diffMs = new Date(created).getTime() + FREE_TRIAL_DAYS * 86400000 - Date.now();
+    return Math.max(0, Math.ceil(diffMs / 86400000));
+  };
 
-const isInFreeTrial = () => getTrialDaysRemaining() > 0;
-// ────────────────────────────────────────────────────────────────────────────
+  const isInFreeTrial = () => getTrialDaysRemaining() > 0;
+  // ────────────────────────────────────────────────────────────────────────────
 
-const getSubStatus = () => {
+  const getSubStatus = () => {
 
-  // While subscription data is still loading, never block
+    // While subscription data is still loading, never block
 
-  if (!subscription) {
-    // Free trial — never block
-    if (isInFreeTrial()) return { blocked: false, alert: false, status: "trial", trialDays: getTrialDaysRemaining() };
-    // No subscription and trial expired
-    return { blocked: true, alert: false, status: "no_subscription" };
-  }
+    if (!subscription) {
+      // Free trial — never block
+      if (isInFreeTrial()) return { blocked: false, alert: false, status: "trial", trialDays: getTrialDaysRemaining() };
+      // No subscription and trial expired
+      return { blocked: true, alert: false, status: "no_subscription" };
+    }
 
 
 
-  const end = new Date(subscription.endDate);
+    const end = new Date(subscription.endDate);
 
-  const now = new Date();
+    const now = new Date();
 
-  const diffDays = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+    const diffDays = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
 
-  const isExpired = subscription.status === "expired" || diffDays <= 0;
+    const isExpired = subscription.status === "expired" || diffDays <= 0;
 
 
 
-  // If status is hidden or explicitly expired, or it's past the end date
+    // If status is hidden or explicitly expired, or it's past the end date
 
-  if (subscription.status === "hidden" || isExpired) {
+    if (subscription.status === "hidden" || isExpired) {
 
-    return { blocked: true, alert: false, status: subscription.status, days: diffDays };
+      return { blocked: true, alert: false, status: subscription.status, days: diffDays };
 
-  }
+    }
 
 
 
-  // 10 days before renewal -> plz renew your...
+    // 10 days before renewal -> plz renew your...
 
-  if (diffDays <= 10 && diffDays > 0) {
+    if (diffDays <= 10 && diffDays > 0) {
 
-    return { blocked: false, alert: true, days: diffDays, status: "active" };
+      return { blocked: false, alert: true, days: diffDays, status: "active" };
 
-  }
+    }
 
 
 
-  return { blocked: false, alert: false, status: "active" };
+    return { blocked: false, alert: false, status: "active" };
 
-};
+  };
 
 
 
-const subStatus = getSubStatus();
+  const subStatus = getSubStatus();
 
-const resolveSubadminId = () => {
+  const resolveSubadminId = () => {
 
-  // Aggressively find the subadmin ID from any possible property
+    // Aggressively find the subadmin ID from any possible property
 
-  const id = user?.companyId || user?._id || user?.id || user?.userId || user?.company || "";
+    const id = user?.companyId || user?._id || user?.id || user?.userId || user?.company || "";
 
-  return String(id).trim();
+    return String(id).trim();
 
-};
+  };
 
-// Persist any custom "Category / Industry" values the user types into the
-// Add Client form, scoped per company, so they survive a page refresh and
-// show up in the dropdown for future clients too.
-const CATEGORY_STORAGE_KEY = `customCategories_${resolveSubadminId() || "default"}`;
-const [customCategories, setCustomCategories] = useState(() => {
-  try {
-    return JSON.parse(localStorage.getItem(CATEGORY_STORAGE_KEY) || "[]");
-  } catch (e) {
-    return [];
-  }
-});
-const CURRENCY_STORAGE_KEY = `customCurrencies_${resolveSubadminId() || "default"}`;
-const [customCurrencies, setCustomCurrencies] = useState(() => {
-  try {
-    return JSON.parse(localStorage.getItem(CURRENCY_STORAGE_KEY) || "[]");
-  } catch (e) {
-    return [];
-  }
-});
-const saveCustomCurrency = (value) => {
-  const v = (value || "").trim();
-  if (!v) return;
-  setCustomCurrencies(prev => {
-    if (prev.some(c => c.toLowerCase() === v.toLowerCase())) return prev;
-    const next = [...prev, v];
-    try { localStorage.setItem(CURRENCY_STORAGE_KEY, JSON.stringify(next)); } catch (e) { }
-    return next;
+  // Persist any custom "Category / Industry" values the user types into the
+  // Add Client form, scoped per company, so they survive a page refresh and
+  // show up in the dropdown for future clients too.
+  const CATEGORY_STORAGE_KEY = `customCategories_${resolveSubadminId() || "default"}`;
+  const [customCategories, setCustomCategories] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(CATEGORY_STORAGE_KEY) || "[]");
+    } catch (e) {
+      return [];
+    }
   });
-};
-const saveCustomCategory = (value) => {
-  const v = (value || "").trim();
-  if (!v) return;
-  setCustomCategories(prev => {
-    if (prev.some(c => c.toLowerCase() === v.toLowerCase())) return prev;
-    const next = [...prev, v];
-    try { localStorage.setItem(CATEGORY_STORAGE_KEY, JSON.stringify(next)); } catch (e) { }
-    return next;
+  const CURRENCY_STORAGE_KEY = `customCurrencies_${resolveSubadminId() || "default"}`;
+  const [customCurrencies, setCustomCurrencies] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(CURRENCY_STORAGE_KEY) || "[]");
+    } catch (e) {
+      return [];
+    }
   });
-};
-
-
-
-// Dashboard.jsx-à®²à¯ à®‡à®°à¯à®•à¯à®•à¯à®®à¯ parseLimit function-à® à®‡à®¤à®¾à®• à®®à®¾à®¤à¯à®¤à¯à®™à¯à®•:
-
-
-
-const parseLimit = (limitStr) => {
-
-  if (limitStr === undefined || limitStr === null || limitStr === "") return 10;
-
-  const s = String(limitStr).toLowerCase().trim();
-
-  if (s.includes("unlimited") || s.includes("infinity")) return Infinity;
-
-  const m = s.match(/\d+/);
-
-  if (m) return parseInt(m[0]);
-
-  return 10;
-
-};
-
-const getSubscriptionLimit = (type, sub = subscription) => {
-
-  // 1. Try to get limit from the active subscription directly
-
-  let val = null;
-
-  if (sub) {
-
-    val = type === "client" ? sub.clientLimit : type === "employee" ? sub.employeeLimit : sub.managerLimit;
-
-
-
-    // If direct field is empty, search in features array
-
-    if ((!val || val === "") && sub.features && Array.isArray(sub.features)) {
-
-      const label = type === "client" ? "client" : type === "employee" ? "employee" : "manager";
-
-      const feat = sub.features.find(f => f.toLowerCase().includes(label));
-
-      if (feat) {
-
-        const match = feat.match(/\d+/);
-
-        if (match) val = match[0];
-
-        if (feat.toLowerCase().includes("unlimited")) val = "Infinity";
-
-      }
-
-    }
-
-  }
-
-
-
-  // 2. If subscription has a limit, parse and return it — but a real
-  // trial period always overrides any numeric limit set on the plan.
-
-  if (isInFreeTrial()) {
-
-    return Infinity;
-
-  }
-
-  if (val && String(val).trim() !== "" && String(val) !== "0") {
-
-    return parseLimit(val);
-
-  }
-
-
-
-  // 3. Fallback: Direct limit set by Admin on the user profile
-
-  const uLimit = type === "client" ? user?.clientLimit : type === "employee" ? user?.employeeLimit : user?.managerLimit;
-
-  if (uLimit && String(uLimit).trim() !== "" && String(uLimit) !== "0") {
-
-    return parseLimit(uLimit);
-
-  }
-
-
-
-  // 4. Free trial — unlimited, no restrictions during trial
-  if (isInFreeTrial()) {
-    return Infinity;
-  }
-
-  // 5. Default fallback
-  return 10;
-
-};
-
-
-
-const isUsageAtLimit = (type, currentCount, sub = subscription) => {
-
-  if (isInFreeTrial()) return false;
-
-  const limit = getSubscriptionLimit(type, sub);
-
-  if (limit === Infinity) return false;
-
-  return currentCount >= limit;
-
-};
-
-
-
-
-
-const handleLogout = () => {
-  localStorage.removeItem("user");
-  localStorage.removeItem("accounts");
-  localStorage.removeItem("activeClientId_subadmin");
-  localStorage.setItem("loggedOut", "1");
-  setUser(null);
-  setAccounts([]);
-  setActive("dashboard");
-};
-
-const handleAuthSetUser = (userData) => {
-  setAccountAuthOpen(false);
-  setProfileDropdownOpen(false);
-  setShowProfile(false);
-  try {
-    const cid = String(userData?.companyId || userData?._id || userData?.id || userData?.userId || userData?.company || "").trim();
-    if (cid) {
-      const cachedClients = localStorage.getItem("cached_clients_" + cid);
-      if (cachedClients) { setClients(JSON.parse(cachedClients)); setClientsLoaded(true); }
-      const cachedEmployees = localStorage.getItem("cached_employees_" + cid);
-      if (cachedEmployees) setEmployees(JSON.parse(cachedEmployees));
-    }
-  } catch { }
-  setUser(userData);
-};
-const onLogoChange = (logo) => {
-  setCompanyLogo(logo || fixedLogo);
-  const updatedUser = { ...user, logoUrl: logo || "" };
-  localStorage.setItem("user", JSON.stringify(updatedUser));
-  setUser(updatedUser);
-  axios.post(BASE_URL + "/api/auth/save-logo", { userId: user._id || user.id, logoUrl: logo || "" }).catch(e => console.log(e));
-};
-
-const fetchClients = async () => {
-  const cid = resolveSubadminId();
-  if (!cid) return;
-  try {
-    const cached = localStorage.getItem("cached_clients_" + cid);
-    if (cached) { try { setClients(JSON.parse(cached)); setClientsLoaded(true); } catch { } }
-  } catch { }
-  try {
-    const res = await axios.get(BASE_URL + "/api/clients", {
-      headers: { 'x-company-id': cid },
-      timeout: 8000
+  const saveCustomCurrency = (value) => {
+    const v = (value || "").trim();
+    if (!v) return;
+    setCustomCurrencies(prev => {
+      if (prev.some(c => c.toLowerCase() === v.toLowerCase())) return prev;
+      const next = [...prev, v];
+      try { localStorage.setItem(CURRENCY_STORAGE_KEY, JSON.stringify(next)); } catch (e) { }
+      return next;
     });
-    setClients(res.data);
-    setClientsLoaded(true);
-    try { localStorage.setItem("cached_clients_" + cid, JSON.stringify(res.data)); } catch { }
-  } catch (e) { console.log(e); setClientsLoaded(true); }
-};
-
-const fetchEmployees = async () => {
-  const cid = resolveSubadminId();
-  try {
-    const cached = localStorage.getItem("cached_employees_" + cid);
-    if (cached) { try { setEmployees(JSON.parse(cached)); } catch { } }
-  } catch { }
-  try {
-    const res = await axios.get(BASE_URL + "/api/employees", {
-      headers: { 'x-company-id': cid }
+  };
+  const saveCustomCategory = (value) => {
+    const v = (value || "").trim();
+    if (!v) return;
+    setCustomCategories(prev => {
+      if (prev.some(c => c.toLowerCase() === v.toLowerCase())) return prev;
+      const next = [...prev, v];
+      try { localStorage.setItem(CATEGORY_STORAGE_KEY, JSON.stringify(next)); } catch (e) { }
+      return next;
     });
-    setEmployees(res.data);
-    try { localStorage.setItem("cached_employees_" + cid, JSON.stringify(res.data)); } catch { }
-  } catch (e) { console.log(e); }
-};
+  };
 
-const fetchProjects = async () => {
-  const cid = user?.companyId || user?.company || user?._id || user?.id || "";
-  try {
-    const cached = localStorage.getItem("cached_projects_" + cid);
-    if (cached) { try { setProjects(JSON.parse(cached)); } catch { } }
-  } catch { }
-  try {
-    const res = await axios.get(BASE_URL + "/api/projects", {
-      headers: { 'x-company-id': cid }
-    });
-    setProjects(res.data);
-    try { localStorage.setItem("cached_projects_" + cid, JSON.stringify(res.data)); } catch { }
-  } catch (e) { console.log(e); }
-};
 
-const fetchManagers = async () => { try { const res = await axios.get(BASE_URL + "/api/managers"); setManagers(res.data); } catch (e) { console.log(e); } };
 
-const fetchSubadmins = async () => { try { const res = await axios.get(BASE_URL + "/api/subadmins"); setSubadmins(res.data); } catch (e) { console.log(e); } };
+  // Dashboard.jsx-à®²à¯ à®‡à®°à¯à®•à¯à®•à¯à®®à¯ parseLimit function-à® à®‡à®¤à®¾à®• à®®à®¾à®¤à¯à®¤à¯à®™à¯à®•:
 
 
 
+  const parseLimit = (limitStr) => {
 
+    if (limitStr === undefined || limitStr === null || limitStr === "") return 10;
 
-// Re-fetch packages when navigating to Packages tab to show admin-added packages
+    const s = String(limitStr).toLowerCase().trim();
 
-// Also refresh subscription when visiting resource tabs to ensure latest limits
+    if (s.includes("unlimited") || s.includes("infinity")) return Infinity;
 
-useEffect(() => {
+    const m = s.match(/\d+/);
 
-  if (active === "packages") {
+    if (m) return parseInt(m[0]);
 
-    fetchPackages();
+    return 10;
 
-  }
+  };
 
-}, [active]);
+  const getSubscriptionLimit = (type, sub = subscription) => {
 
-// Package view/edit handlers
+    // 1. Try to get limit from the active subscription directly
 
-const handleViewPackage = (pkg) => {
+    let val = null;
 
-  setViewPackage(pkg);
+    if (sub) {
 
-};
+      val = type === "client" ? sub.clientLimit : type === "employee" ? sub.employeeLimit : sub.managerLimit;
 
 
 
-const handleEditPackage = (pkg) => {
+      // If direct field is empty, search in features array
 
-  setEditPackage(pkg);
+      if ((!val || val === "") && sub.features && Array.isArray(sub.features)) {
 
-  setEditPkgForm({
+        const label = type === "client" ? "client" : type === "employee" ? "employee" : "manager";
 
-    title: pkg.title || "",
+        const feat = sub.features.find(f => f.toLowerCase().includes(label));
 
-    description: pkg.description || "",
+        if (feat) {
 
-    icon: pkg.icon || "📦",
+          const match = feat.match(/\d+/);
 
-    type: pkg.type || "paid",
+          if (match) val = match[0];
 
-    price: pkg.price || "",
+          if (feat.toLowerCase().includes("unlimited")) val = "Infinity";
 
-    noOfDays: pkg.no_of_days || pkg.noOfDays || "",
-
-    planDuration: pkg.planDuration || "Monthly",
-
-    businessLimit: pkg.businessLimit || "",
-
-    managerLimit: pkg.managerLimit || "",
-
-    clientLimit: pkg.clientLimit || "3 Client manage",
-
-    status: pkg.status || "Active",
-
-    assignedSubadmins: pkg.assignedSubadmins || []
-
-  });
-
-};
-
-const savePackageEdit = async () => {
-
-  if (!editPackage) return;
-
-  try {
-
-    setPkgSaveLoading(true);
-
-    const packageData = {
-
-      title: editPkgForm.title,
-
-      description: editPkgForm.description,
-
-      icon: editPkgForm.icon,
-
-      type: editPkgForm.type,
-
-      price: parseFloat(editPkgForm.price) || 0,
-
-      no_of_days: parseInt(editPkgForm.noOfDays) || 30,
-
-      planDuration: editPkgForm.planDuration,
-
-      businessLimit: editPkgForm.businessLimit,
-
-      managerLimit: editPkgForm.managerLimit,
-
-      clientLimit: editPkgForm.clientLimit,
-
-      employeeLimit: editPkgForm.employeeLimit,
-
-      status: editPkgForm.status,
-
-      assignedSubadmins: editPkgForm.assignedSubadmins,
-
-      monthlyPrice: editPkgForm.type === "free" ? "Free" : editPkgForm.price,
-
-      quarterlyPrice: editPkgForm.type === "free" ? "Free" : Math.round((parseFloat(editPkgForm.price) || 0) * 3 * 0.9).toString(),
-
-      halfYearlyPrice: editPkgForm.type === "free" ? "Free" : Math.round((parseFloat(editPkgForm.price) || 0) * 6 * 0.85).toString(),
-
-      annualPrice: editPkgForm.type === "free" ? "Free" : Math.round((parseFloat(editPkgForm.price) || 0) * 12 * 0.8).toString(),
-
-      features: `${editPkgForm.planDuration} Plan\n${editPkgForm.businessLimit}\n${editPkgForm.managerLimit}\n${editPkgForm.clientLimit}\n${editPkgForm.employeeLimit}`
-
-    };
-
-    const res = await axios.put(`${BASE_URL}/api/packages/${editPackage._id}`, packageData);
-
-    setPackages(prev => prev.map(p => p._id === editPackage._id ? res.data : p));
-
-    setEditPackage(null);
-
-    toast.success("Package updated successfully!");
-
-  } catch (err) {
-
-    console.error(err);
-
-    toast.error("Failed to update package");
-
-  } finally {
-
-    setPkgSaveLoading(false);
-
-  }
-
-};
-
-
-
-const fetchProposalsList = async () => {
-  try {
-    const res = await axios.get(BASE_URL + "/api/proposals");
-    const apiDocs = Array.isArray(res.data?.proposals) ? res.data.proposals : (Array.isArray(res.data) ? res.data : []);
-    setProposalsList(apiDocs);
-  } catch (e) {
-    console.log(e);
-    setProposalsList([]);
-  }
-};
-
-const fetchQuotations = async () => {
-
-  try {
-
-    const res = await axios.get(BASE_URL + "/api/quotations");
-
-    let apiDocs = res.data?.quotations || res.data || [];
-
-    if (!Array.isArray(apiDocs)) apiDocs = [];
-
-    let localDocs = [];
-
-    try { const d = localStorage.getItem("quotation_drafts"); localDocs = d ? JSON.parse(d) : []; } catch (e) { }
-
-    // Combine avoiding duplicates by quoteNo
-
-    const combined = [...apiDocs];
-
-    localDocs.forEach(ld => {
-
-      if (!combined.some(c => (c.quoteNo || c.qt?.quoteNo) === (ld.quoteNo || ld.qt?.quoteNo))) combined.push(ld);
-
-    });
-
-    setQuotations(combined);
-
-  } catch (e) {
-
-    console.log(e);
-
-    try { const d = localStorage.getItem("quotation_drafts"); setQuotations(d ? JSON.parse(d) : []); } catch (e) { }
-
-  }
-
-};
-
-const fetchVendors = async () => {
-
-  try {
-
-    console.log('Fetching vendors from:', BASE_URL + "/api/vendors");
-
-    const res = await axios.get(BASE_URL + "/api/vendors");
-
-    console.log('Vendors response:', res.data);
-
-    setVendors(res.data || []);
-
-  } catch (e) {
-
-    console.error('Fetch vendors error:', e);
-
-    console.error('Error status:', e.response?.status);
-
-    console.error('Error data:', e.response?.data);
-
-    setVendors([]); // Set empty array on error to prevent crashes
-
-  }
-
-};
-
-
-
-const createNew = () => {
-
-  window.location.href = "/project-proposal?new=true";
-
-};
-
-
-
-const addClient = async () => {
-
-  const errors = {};
-
-  if (!nc.name || !nc.name.trim()) errors.name = "Name is required";
-
-  if (!nc.email || !nc.email.trim()) errors.email = "Email is required";
-
-
-
-  // Subscription Limit Check - Fetch latest before check to catch admin updates
-
-  try {
-
-    const id = resolveSubadminId();
-
-    if (id) {
-
-      const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
-      if (subRes.data.hasSubscription) {
-
-        const latestSub = subRes.data.subscription;
-
-        setSubscription(latestSub);
-
-        if (!isInFreeTrial() && isUsageAtLimit("client", clients.length)) {
-
-          setLimitModal({ type: "client", limit: getSubscriptionLimit("client") });
-
-          return;
-
-        }
-
-      } else {
-
-        // No subscription — allow if still in free trial
-        if (!isInFreeTrial()) {
-          setForceUpgradeTab(true);
-          setActive("mysubscriptions");
-          return;
         }
 
       }
 
     }
 
-  } catch (err) {
 
-    console.error("Failed to fetch latest subscription for limit check", err);
 
-    if (isUsageAtLimit("client", clients.length)) {
+    // 2. If subscription has a limit, parse and return it — but a real
+    // trial period always overrides any numeric limit set on the plan.
 
-      setLimitModal({ type: "client", limit: getSubscriptionLimit("client") });
+    if (isInFreeTrial()) {
 
-      return;
+      return Infinity;
 
     }
 
-  }
+    if (val && String(val).trim() !== "" && String(val) !== "0") {
+
+      return parseLimit(val);
+
+    }
 
 
 
-  if (Object.keys(errors).length > 0) {
-    setNcError(errors);
-    requestAnimationFrame(() => {
-      const el = document.querySelector('.modal-2col input[type="email"]') || document.querySelector('input[placeholder="contact@company.com"]');
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
-        el.focus();
+    // 3. Fallback: Direct limit set by Admin on the user profile
+
+    const uLimit = type === "client" ? user?.clientLimit : type === "employee" ? user?.employeeLimit : user?.managerLimit;
+
+    if (uLimit && String(uLimit).trim() !== "" && String(uLimit) !== "0") {
+
+      return parseLimit(uLimit);
+
+    }
+
+
+
+    // 4. Free trial — unlimited, no restrictions during trial
+    if (isInFreeTrial()) {
+      return Infinity;
+    }
+
+    // 5. Default fallback
+    return 10;
+
+  };
+
+
+
+  const isUsageAtLimit = (type, currentCount, sub = subscription) => {
+
+    if (isInFreeTrial()) return false;
+
+    const limit = getSubscriptionLimit(type, sub);
+
+    if (limit === Infinity) return false;
+
+    return currentCount >= limit;
+
+  };
+
+
+
+
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("accounts");
+    localStorage.removeItem("activeClientId_subadmin");
+    localStorage.setItem("loggedOut", "1");
+    setUser(null);
+    setAccounts([]);
+    setActive("dashboard");
+  };
+
+  const handleAuthSetUser = (userData) => {
+    setAccountAuthOpen(false);
+    setProfileDropdownOpen(false);
+    setShowProfile(false);
+    try {
+      const cid = String(userData?.companyId || userData?._id || userData?.id || userData?.userId || userData?.company || "").trim();
+      if (cid) {
+        const cachedClients = localStorage.getItem("cached_clients_" + cid);
+        if (cachedClients) { setClients(JSON.parse(cachedClients)); setClientsLoaded(true); }
+        const cachedEmployees = localStorage.getItem("cached_employees_" + cid);
+        if (cachedEmployees) setEmployees(JSON.parse(cachedEmployees));
       }
-    });
-    return;
-  }
+    } catch { }
+    setUser(userData);
+  };
+  const onLogoChange = (logo) => {
+    setCompanyLogo(logo || fixedLogo);
+    const updatedUser = { ...user, logoUrl: logo || "" };
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    setUser(updatedUser);
+    axios.post(BASE_URL + "/api/auth/save-logo", { userId: user._id || user.id, logoUrl: logo || "" }).catch(e => console.log(e));
+  };
 
-  try {
+  const fetchClients = async () => {
+    const cid = resolveSubadminId();
+    if (!cid) return;
+    try {
+      const cached = localStorage.getItem("cached_clients_" + cid);
+      if (cached) { try { setClients(JSON.parse(cached)); setClientsLoaded(true); } catch { } }
+    } catch { }
+    try {
+      const res = await axios.get(BASE_URL + "/api/clients", {
+        headers: { 'x-company-id': cid },
+        timeout: 8000
+      });
+      setClients(res.data);
+      setClientsLoaded(true);
+      try { localStorage.setItem("cached_clients_" + cid, JSON.stringify(res.data)); } catch { }
+    } catch (e) { console.log(e); setClientsLoaded(true); }
+  };
 
-    setSaveLoading(true);
+  const fetchEmployees = async () => {
+    const cid = resolveSubadminId();
+    try {
+      const cached = localStorage.getItem("cached_employees_" + cid);
+      if (cached) { try { setEmployees(JSON.parse(cached)); } catch { } }
+    } catch { }
+    try {
+      const res = await axios.get(BASE_URL + "/api/employees", {
+        headers: { 'x-company-id': cid }
+      });
+      setEmployees(res.data);
+      try { localStorage.setItem("cached_employees_" + cid, JSON.stringify(res.data)); } catch { }
+    } catch (e) { console.log(e); }
+  };
 
-    const payload = {
+  const fetchProjects = async () => {
+    const cid = user?.companyId || user?.company || user?._id || user?.id || "";
+    try {
+      const cached = localStorage.getItem("cached_projects_" + cid);
+      if (cached) { try { setProjects(JSON.parse(cached)); } catch { } }
+    } catch { }
+    try {
+      const res = await axios.get(BASE_URL + "/api/projects", {
+        headers: { 'x-company-id': cid }
+      });
+      setProjects(res.data);
+      try { localStorage.setItem("cached_projects_" + cid, JSON.stringify(res.data)); } catch { }
+    } catch (e) { console.log(e); }
+  };
 
-      clientName: nc.name,
+  const fetchManagers = async () => { try { const res = await axios.get(BASE_URL + "/api/managers"); setManagers(res.data); } catch (e) { console.log(e); } };
 
-      companyName: nc.company,
+  const fetchSubadmins = async () => { try { const res = await axios.get(BASE_URL + "/api/subadmins"); setSubadmins(res.data); } catch (e) { console.log(e); } };
 
-      email: nc.email,
 
-      phone: nc.phone,
 
-      address: nc.address,
 
-      password: nc.password,
 
-      status: nc.status,
+  // Re-fetch packages when navigating to Packages tab to show admin-added packages
 
-      role: nc.role || "client",
+  // Also refresh subscription when visiting resource tabs to ensure latest limits
 
-      contactPersonName: nc.contactPersonName,
+  useEffect(() => {
 
-      contactPersonNo: nc.contactPersonNo,
+    if (active === "packages") {
 
-      gstNumber: nc.gstNumber,
-
-      logoUrl: nc.logoUrl,
-
-      clientType: nc.clientType,
-
-      category: nc.category || "",
-
-      source: nc.source,
-
-      onboardedOn: nc.onboardedOn,
-
-      city: nc.city,
-
-      state: nc.state,
-
-      pincode: nc.pincode,
-
-      country: nc.country,
-
-      website: nc.website,
-
-      linkedin: nc.linkedin,
-
-      billingCurrency: nc.billingCurrency,
-
-      paymentTerms: nc.paymentTerms,
-
-      creditLimit: nc.creditLimit,
-
-      preferredPaymentMode: nc.preferredPaymentMode,
-
-      notes: nc.notes,
-
-      designation: nc.designation,
-
-      altEmail: nc.altEmail,
-
-      companyId: resolveSubadminId()
-
-    };
-
-    const res = await axios.post(BASE_URL + "/api/clients/add", payload, {
-      headers: { 'x-company-id': resolveSubadminId() }
-    });
-
-    setClients(prev => {
-      const updated = [res.data.client, ...prev];
-      try {
-        const cid = resolveSubadminId();
-        if (cid) localStorage.setItem("cached_clients_" + cid, JSON.stringify(updated));
-      } catch { }
-      return updated;
-    });
-
-    if (addClientFromInvoice) {
-      setPendingInvoiceClientName(res.data.client.clientName || res.data.client.name || nc.name);
-    }
-
-    // Store credentials for the success screen
-
-    setClientSuccessData({ email: nc.email, password: nc.password, name: nc.name }); const todayStr = new Date().toISOString().split("T")[0];
-
-    setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", logoUrl: "", gstNumber: "", contactPersonName: "", contactPersonNo: "", category: "", clientType: "b2b", source: "", onboardedOn: todayStr, city: "", state: "", pincode: "", country: "India", website: "", linkedin: "", billingCurrency: "INR — Indian Rupee", paymentTerms: "", creditLimit: "", preferredPaymentMode: "", notes: "", designation: "", altEmail: "" });
-
-    setNcError({});
-
-    if (returnToModal) { setModal(returnToModal); setReturnToModal(null); }
-
-    // Don't Closemodal yet if no return - show success screen (this depends on existing logic)
-
-  } catch (err) {
-
-    if (err.response?.status === 403 && err.response?.data?.limitReached) {
-
-      setLimitModal({ type: "client", limit: err.response.data.limit });
-
-    } else {
-
-      setNcError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" });
+      fetchPackages();
 
     }
 
-  } finally {
+  }, [active]);
 
-    setSaveLoading(false);
+  // Package view/edit handlers
 
-  }
+  const handleViewPackage = (pkg) => {
 
-};
+    setViewPackage(pkg);
 
-
-
-const addEmployee = async () => {
-
-  const errors = {};
-
-  if (!ne.name.trim()) errors.name = "Name is required";
-
-  if (!ne.email.trim()) errors.email = "Email required";
-  if (!ne.status || !ne.status.trim()) errors.status = "Status is required";
-  if (ne.role === "Custom") errors.role = "Please enter a custom role name";
-
-  if (!ne.password.trim()) errors.password = "Password is required";
-
-  if (ne.password && ne.password.length < 4) errors.password = "Min 4 characters";
-
-  if (ne.password !== ne.confirmPassword) errors.confirmPassword = "Passwords do not match";
-
-  if (ne.password && ne.password.length < 4) errors.password = "Min 4 characters";
-
-  if (ne.password !== ne.confirmPassword) errors.confirmPassword = "Passwords do not match";
+  };
 
 
 
-  // Subscription Limit Check - Fetch latest before check to catch admin updates
+  const handleEditPackage = (pkg) => {
 
-  try {
+    setEditPackage(pkg);
 
-    const id = resolveSubadminId();
+    setEditPkgForm({
 
-    if (id) {
+      title: pkg.title || "",
 
-      const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
+      description: pkg.description || "",
 
-      if (subRes.data.hasSubscription) {
+      icon: pkg.icon || "📦",
 
-        const latestSub = subRes.data.subscription;
+      type: pkg.type || "paid",
 
-        setSubscription(latestSub);
+      price: pkg.price || "",
 
-        if (!isInFreeTrial() && isUsageAtLimit("client", clients.length)) {
+      noOfDays: pkg.no_of_days || pkg.noOfDays || "",
 
-          setLimitModal({ type: "client", limit: getSubscriptionLimit("client") });
+      planDuration: pkg.planDuration || "Monthly",
 
-          return;
+      businessLimit: pkg.businessLimit || "",
+
+      managerLimit: pkg.managerLimit || "",
+
+      clientLimit: pkg.clientLimit || "3 Client manage",
+
+      status: pkg.status || "Active",
+
+      assignedSubadmins: pkg.assignedSubadmins || []
+
+    });
+
+  };
+
+  const savePackageEdit = async () => {
+
+    if (!editPackage) return;
+
+    try {
+
+      setPkgSaveLoading(true);
+
+      const packageData = {
+
+        title: editPkgForm.title,
+
+        description: editPkgForm.description,
+
+        icon: editPkgForm.icon,
+
+        type: editPkgForm.type,
+
+        price: parseFloat(editPkgForm.price) || 0,
+
+        no_of_days: parseInt(editPkgForm.noOfDays) || 30,
+
+        planDuration: editPkgForm.planDuration,
+
+        businessLimit: editPkgForm.businessLimit,
+
+        managerLimit: editPkgForm.managerLimit,
+
+        clientLimit: editPkgForm.clientLimit,
+
+        employeeLimit: editPkgForm.employeeLimit,
+
+        status: editPkgForm.status,
+
+        assignedSubadmins: editPkgForm.assignedSubadmins,
+
+        monthlyPrice: editPkgForm.type === "free" ? "Free" : editPkgForm.price,
+
+        quarterlyPrice: editPkgForm.type === "free" ? "Free" : Math.round((parseFloat(editPkgForm.price) || 0) * 3 * 0.9).toString(),
+
+        halfYearlyPrice: editPkgForm.type === "free" ? "Free" : Math.round((parseFloat(editPkgForm.price) || 0) * 6 * 0.85).toString(),
+
+        annualPrice: editPkgForm.type === "free" ? "Free" : Math.round((parseFloat(editPkgForm.price) || 0) * 12 * 0.8).toString(),
+
+        features: `${editPkgForm.planDuration} Plan\n${editPkgForm.businessLimit}\n${editPkgForm.managerLimit}\n${editPkgForm.clientLimit}\n${editPkgForm.employeeLimit}`
+
+      };
+
+      const res = await axios.put(`${BASE_URL}/api/packages/${editPackage._id}`, packageData);
+
+      setPackages(prev => prev.map(p => p._id === editPackage._id ? res.data : p));
+
+      setEditPackage(null);
+
+      toast.success("Package updated successfully!");
+
+    } catch (err) {
+
+      console.error(err);
+
+      toast.error("Failed to update package");
+
+    } finally {
+
+      setPkgSaveLoading(false);
+
+    }
+
+  };
+
+
+
+  const fetchProposalsList = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/api/proposals");
+      const apiDocs = Array.isArray(res.data?.proposals) ? res.data.proposals : (Array.isArray(res.data) ? res.data : []);
+      setProposalsList(apiDocs);
+    } catch (e) {
+      console.log(e);
+      setProposalsList([]);
+    }
+  };
+
+  const fetchQuotations = async () => {
+
+    try {
+
+      const res = await axios.get(BASE_URL + "/api/quotations");
+
+      let apiDocs = res.data?.quotations || res.data || [];
+
+      if (!Array.isArray(apiDocs)) apiDocs = [];
+
+      let localDocs = [];
+
+      try { const d = localStorage.getItem("quotation_drafts"); localDocs = d ? JSON.parse(d) : []; } catch (e) { }
+
+      // Combine avoiding duplicates by quoteNo
+
+      const combined = [...apiDocs];
+
+      localDocs.forEach(ld => {
+
+        if (!combined.some(c => (c.quoteNo || c.qt?.quoteNo) === (ld.quoteNo || ld.qt?.quoteNo))) combined.push(ld);
+
+      });
+
+      setQuotations(combined);
+
+    } catch (e) {
+
+      console.log(e);
+
+      try { const d = localStorage.getItem("quotation_drafts"); setQuotations(d ? JSON.parse(d) : []); } catch (e) { }
+
+    }
+
+  };
+
+  const fetchVendors = async () => {
+
+    try {
+
+      console.log('Fetching vendors from:', BASE_URL + "/api/vendors");
+
+      const res = await axios.get(BASE_URL + "/api/vendors");
+
+      console.log('Vendors response:', res.data);
+
+      setVendors(res.data || []);
+
+    } catch (e) {
+
+      console.error('Fetch vendors error:', e);
+
+      console.error('Error status:', e.response?.status);
+
+      console.error('Error data:', e.response?.data);
+
+      setVendors([]); // Set empty array on error to prevent crashes
+
+    }
+
+  };
+
+
+
+  const createNew = () => {
+
+    window.location.href = "/project-proposal?new=true";
+
+  };
+
+
+
+  const addClient = async () => {
+
+    const errors = {};
+
+    if (!nc.name || !nc.name.trim()) errors.name = "Name is required";
+
+    if (!nc.email || !nc.email.trim()) errors.email = "Email is required";
+
+
+
+    // Subscription Limit Check - Fetch latest before check to catch admin updates
+
+    try {
+
+      const id = resolveSubadminId();
+
+      if (id) {
+
+        const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
+        if (subRes.data.hasSubscription) {
+
+          const latestSub = subRes.data.subscription;
+
+          setSubscription(latestSub);
+
+          if (!isInFreeTrial() && isUsageAtLimit("client", clients.length)) {
+
+            setLimitModal({ type: "client", limit: getSubscriptionLimit("client") });
+
+            return;
+
+          }
+
+        } else {
+
+          // No subscription — allow if still in free trial
+          if (!isInFreeTrial()) {
+            setForceUpgradeTab(true);
+            setActive("mysubscriptions");
+            return;
+          }
 
         }
 
-      } else {
-        // No subscription — allow if still in free trial
-        if (!isInFreeTrial()) {
-          setForceUpgradeTab(true);
-          setActive("mysubscriptions");
-          return;
-        }
+      }
+
+    } catch (err) {
+
+      console.error("Failed to fetch latest subscription for limit check", err);
+
+      if (isUsageAtLimit("client", clients.length)) {
+
+        setLimitModal({ type: "client", limit: getSubscriptionLimit("client") });
+
+        return;
 
       }
 
     }
 
-  } catch (err) {
-
-    console.error("Failed to fetch latest subscription for employee limit check", err);
-
-    if (isUsageAtLimit("employee", employees.length)) {
-
-      setLimitModal({ type: "employee", limit: getSubscriptionLimit("employee") });
-
-      return;
-
-    }
-
-  }
 
 
-
-  if (Object.keys(errors).length > 0) {
-    setNeError(errors);
-    const fieldOrder = ["name", "email", "phone", "password", "confirmPassword"];
-    const firstErrorField = fieldOrder.find(f => errors[f]) || Object.keys(errors)[0];
-    requestAnimationFrame(() => {
-      const el = document.querySelector(`[data-field="${firstErrorField}"]`);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
-        const input = el.querySelector("input, select, textarea") || el;
-        input.focus();
-      }
-    });
-    return;
-  }
-
-  try {
-
-    setEmpSaveLoading(true);
-
-    const { confirmPassword, ...neWithoutConfirm } = ne;
-
-    const payload = {
-      ...neWithoutConfirm,
-      role: (ne.role && ne.role !== "Custom" ? ne.role.trim() : "") || "employee",
-      companyId: resolveSubadminId(),
-
-      bankDetails: {
-
-        bankName: ne.bankName,
-
-        ifscCode: ne.ifscCode,
-
-        accountNumber: ne.accountNumber,
-
-        branchName: ne.branchName
-
-      }
-
-    };
-
-    const res = await axios.post(BASE_URL + "/api/employees/add", payload, {
-      headers: { 'x-company-id': resolveSubadminId() }
-    });
-
-    setEmployees(prev => [res.data.employee, ...prev]);
-
-    setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "", password: "", confirmPassword: "", dateOfBirth: "", maritalStatus: "", address: "", bankName: "", ifscCode: "", accountNumber: "" });
-
-    setShowEmpPass(false);
-
-    setNeError({});
-
-    if (returnToModal) { setModal(returnToModal); setReturnToModal(null); } else { setModal(null); }
-
-  } catch (err) {
-
-    if (err.response?.status === 403 && err.response?.data?.limitReached) {
-
-      setLimitModal({ type: "employee", limit: err.response.data.limit });
-
-    } else {
-
-      const errMsg = err.response?.data?.message || err.response?.data?.msg || "Failed to save";
-
-      const isPasswordError = errMsg.toLowerCase().includes("password");
-
-      const failedField = isPasswordError ? "password" : "email";
-
-      setNeError({ [failedField]: errMsg });
-
+    if (Object.keys(errors).length > 0) {
+      setNcError(errors);
       requestAnimationFrame(() => {
-        const el = document.querySelector(`[data-field="${failedField}"]`) || document.getElementById(`emp-fld-${failedField}`);
+        const el = document.querySelector('.modal-2col input[type="email"]') || document.querySelector('input[placeholder="contact@company.com"]');
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          el.focus();
+        }
+      });
+      return;
+    }
+
+    try {
+
+      setSaveLoading(true);
+
+      const payload = {
+
+        clientName: nc.name,
+
+        companyName: nc.company,
+
+        email: nc.email,
+
+        phone: nc.phone,
+
+        address: nc.address,
+
+        password: nc.password,
+
+        status: nc.status,
+
+        role: nc.role || "client",
+
+        contactPersonName: nc.contactPersonName,
+
+        contactPersonNo: nc.contactPersonNo,
+
+        gstNumber: nc.gstNumber,
+
+        logoUrl: nc.logoUrl,
+
+        clientType: nc.clientType,
+
+        category: nc.category || "",
+
+        source: nc.source,
+
+        onboardedOn: nc.onboardedOn,
+
+        city: nc.city,
+
+        state: nc.state,
+
+        pincode: nc.pincode,
+
+        country: nc.country,
+
+        website: nc.website,
+
+        linkedin: nc.linkedin,
+
+        billingCurrency: nc.billingCurrency,
+
+        paymentTerms: nc.paymentTerms,
+
+        creditLimit: nc.creditLimit,
+
+        preferredPaymentMode: nc.preferredPaymentMode,
+
+        notes: nc.notes,
+
+        designation: nc.designation,
+
+        altEmail: nc.altEmail,
+
+        companyId: resolveSubadminId()
+
+      };
+
+      const res = await axios.post(BASE_URL + "/api/clients/add", payload, {
+        headers: { 'x-company-id': resolveSubadminId() }
+      });
+
+      setClients(prev => {
+        const updated = [res.data.client, ...prev];
+        try {
+          const cid = resolveSubadminId();
+          if (cid) localStorage.setItem("cached_clients_" + cid, JSON.stringify(updated));
+        } catch { }
+        return updated;
+      });
+
+      if (addClientFromInvoice) {
+        setPendingInvoiceClientName(res.data.client.clientName || res.data.client.name || nc.name);
+      }
+
+      // Store credentials for the success screen
+
+      setClientSuccessData({ email: nc.email, password: nc.password, name: nc.name }); const todayStr = new Date().toISOString().split("T")[0];
+
+      setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", logoUrl: "", gstNumber: "", contactPersonName: "", contactPersonNo: "", category: "", clientType: "b2b", source: "", onboardedOn: todayStr, city: "", state: "", pincode: "", country: "India", website: "", linkedin: "", billingCurrency: "INR — Indian Rupee", paymentTerms: "", creditLimit: "", preferredPaymentMode: "", notes: "", designation: "", altEmail: "" });
+
+      setNcError({});
+
+      if (returnToModal) { setModal(returnToModal); setReturnToModal(null); }
+
+      // Don't Closemodal yet if no return - show success screen (this depends on existing logic)
+
+    } catch (err) {
+
+      if (err.response?.status === 403 && err.response?.data?.limitReached) {
+
+        setLimitModal({ type: "client", limit: err.response.data.limit });
+
+      } else {
+
+        setNcError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" });
+
+      }
+
+    } finally {
+
+      setSaveLoading(false);
+
+    }
+
+  };
+
+
+
+  const addEmployee = async () => {
+
+    const errors = {};
+
+    if (!ne.name.trim()) errors.name = "Name is required";
+
+    if (!ne.email.trim()) errors.email = "Email required";
+    if (!ne.status || !ne.status.trim()) errors.status = "Status is required";
+    if (ne.role === "Custom") errors.role = "Please enter a custom role name";
+
+    if (!ne.password.trim()) errors.password = "Password is required";
+
+    if (ne.password && ne.password.length < 4) errors.password = "Min 4 characters";
+
+    if (ne.password !== ne.confirmPassword) errors.confirmPassword = "Passwords do not match";
+
+    if (ne.password && ne.password.length < 4) errors.password = "Min 4 characters";
+
+    if (ne.password !== ne.confirmPassword) errors.confirmPassword = "Passwords do not match";
+
+
+
+    // Subscription Limit Check - Fetch latest before check to catch admin updates
+
+    try {
+
+      const id = resolveSubadminId();
+
+      if (id) {
+
+        const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
+
+        if (subRes.data.hasSubscription) {
+
+          const latestSub = subRes.data.subscription;
+
+          setSubscription(latestSub);
+
+          if (!isInFreeTrial() && isUsageAtLimit("client", clients.length)) {
+
+            setLimitModal({ type: "client", limit: getSubscriptionLimit("client") });
+
+            return;
+
+          }
+
+        } else {
+          // No subscription — allow if still in free trial
+          if (!isInFreeTrial()) {
+            setForceUpgradeTab(true);
+            setActive("mysubscriptions");
+            return;
+          }
+
+        }
+
+      }
+
+    } catch (err) {
+
+      console.error("Failed to fetch latest subscription for employee limit check", err);
+
+      if (isUsageAtLimit("employee", employees.length)) {
+
+        setLimitModal({ type: "employee", limit: getSubscriptionLimit("employee") });
+
+        return;
+
+      }
+
+    }
+
+
+
+    if (Object.keys(errors).length > 0) {
+      setNeError(errors);
+      const fieldOrder = ["name", "email", "phone", "password", "confirmPassword"];
+      const firstErrorField = fieldOrder.find(f => errors[f]) || Object.keys(errors)[0];
+      requestAnimationFrame(() => {
+        const el = document.querySelector(`[data-field="${firstErrorField}"]`);
         if (el) {
           el.scrollIntoView({ behavior: "smooth", block: "center" });
           const input = el.querySelector("input, select, textarea") || el;
           input.focus();
         }
       });
-
+      return;
     }
-
-  } finally { setEmpSaveLoading(false); }
-
-};
-
-
-
-const addProject = async () => {
-
-  const errors = {};
-
-  if (!np.name.trim()) errors.name = "Project name is required";
-
-  if (!np.client.trim()) errors.client = "Client is required";
-
-  if (Object.keys(errors).length > 0) {
-
-    setNpError(errors);
-
-    return;
-
-  }
-
-
-
-  const notifyAssigned = async (projectId, projectName, assignees) => {
 
     try {
 
-      for (const name of assignees) {
+      setEmpSaveLoading(true);
 
-        const emp = employees.find(e => (e.name || e.employeeName || "").toLowerCase() === name.toLowerCase());
+      const { confirmPassword, ...neWithoutConfirm } = ne;
 
-        if (emp && (emp._id || emp.id)) {
+      const payload = {
+        ...neWithoutConfirm,
+        role: (ne.role && ne.role !== "Custom" ? ne.role.trim() : "") || "employee",
+        companyId: resolveSubadminId(),
 
-          await axios.post(`${BASE_URL}/api/notifications`, {
+        bankDetails: {
 
-            userId: emp._id || emp.id,
+          bankName: ne.bankName,
 
-            type: 'project',
+          ifscCode: ne.ifscCode,
 
-            icon: '—ˆ',
+          accountNumber: ne.accountNumber,
 
-            text: `You have been assigned to a new project: "${projectName}"`,
-
-            link: 'projects'
-
-          });
+          branchName: ne.branchName
 
         }
 
+      };
+
+      const res = await axios.post(BASE_URL + "/api/employees/add", payload, {
+        headers: { 'x-company-id': resolveSubadminId() }
+      });
+
+      setEmployees(prev => [res.data.employee, ...prev]);
+
+      setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "", password: "", confirmPassword: "", dateOfBirth: "", maritalStatus: "", address: "", bankName: "", ifscCode: "", accountNumber: "" });
+
+      setShowEmpPass(false);
+
+      setNeError({});
+
+      if (returnToModal) { setModal(returnToModal); setReturnToModal(null); } else { setModal(null); }
+
+    } catch (err) {
+
+      if (err.response?.status === 403 && err.response?.data?.limitReached) {
+
+        setLimitModal({ type: "employee", limit: err.response.data.limit });
+
+      } else {
+
+        const errMsg = err.response?.data?.message || err.response?.data?.msg || "Failed to save";
+
+        const isPasswordError = errMsg.toLowerCase().includes("password");
+
+        const failedField = isPasswordError ? "password" : "email";
+
+        setNeError({ [failedField]: errMsg });
+
+        requestAnimationFrame(() => {
+          const el = document.querySelector(`[data-field="${failedField}"]`) || document.getElementById(`emp-fld-${failedField}`);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "center" });
+            const input = el.querySelector("input, select, textarea") || el;
+            input.focus();
+          }
+        });
+
       }
 
-    } catch (err) { console.error("Notification failed", err); }
+    } finally { setEmpSaveLoading(false); }
 
   };
 
 
 
-  try {
+  const addProject = async () => {
 
-    setProjSaveLoading(true);
+    const errors = {};
 
-    const res = await axios.post(BASE_URL + "/api/projects/add", np);
+    if (!np.name.trim()) errors.name = "Project name is required";
 
-    await fetchProjects();
+    if (!np.client.trim()) errors.client = "Client is required";
 
+    if (Object.keys(errors).length > 0) {
 
-
-    // Notify assigned employees
-
-    if (np.assignedTo && np.assignedTo.length > 0) {
-
-      notifyAssigned(res.data._id, np.name, np.assignedTo);
-
-    }
-
-
-
-    setNp({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "Rs.", team: "", status: "Active", progress: 0, assignedTo: [] });
-
-    setNpError({});
-
-    setModal(null);
-
-    toast.success("Yes Project created successfully!");
-
-  } catch (err) {
-
-    setNpError({ name: err.response?.data?.msg || "Failed to save project" });
-
-  } finally {
-
-    setProjSaveLoading(false);
-
-  }
-
-};
-
-
-
-const addManager = async () => {
-
-  const errors = {};
-
-  if (!nm.managerName.trim()) errors.managerName = "Name is required";
-
-  if (!nm.email.trim()) errors.email = "Email is required";
-
-  if (!nm.password.trim()) errors.password = "Password is required";
-
-
-
-  // Subscription Limit Check - Fetch latest before check to catch admin updates
-
-  try {
-
-    const id = resolveSubadminId();
-
-    if (id) {
-
-      const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
-
-      if (subRes.data.hasSubscription) {
-
-        const latestSub = subRes.data.subscription;
-
-        setSubscription(latestSub);
-
-        if (!isInFreeTrial() && isUsageAtLimit("client", clients.length)) {
-
-          setLimitModal({ type: "client", limit: getSubscriptionLimit("client") });
-
-          return;
-
-        }
-
-      } else {      // No subscription — allow if still in free trial
-        if (!isInFreeTrial()) {
-          setForceUpgradeTab(true);
-          setActive("mysubscriptions");
-          return;
-        }
-
-      }
-
-    }
-
-  } catch (err) {
-
-    console.error("Failed to fetch latest subscription for manager limit check", err);
-
-    if (isUsageAtLimit("manager", managers.length)) {
-
-      setLimitModal({ type: "manager", limit: getSubscriptionLimit("manager") });
+      setNpError(errors);
 
       return;
 
     }
 
-  }
 
 
+    const notifyAssigned = async (projectId, projectName, assignees) => {
 
-  if (Object.keys(errors).length > 0) { setNmError(errors); return; }
+      try {
 
-  try {
+        for (const name of assignees) {
 
-    setMgrSaveLoading(true);
+          const emp = employees.find(e => (e.name || e.employeeName || "").toLowerCase() === name.toLowerCase());
 
-    const managerPayload = { ...nm, companyId: resolveSubadminId() };
+          if (emp && (emp._id || emp.id)) {
 
-    const res = await axios.post(BASE_URL + "/api/managers/add", managerPayload);
+            await axios.post(`${BASE_URL}/api/notifications`, {
 
-    setManagers(prev => [res.data.manager, ...prev]);
+              userId: emp._id || emp.id,
 
-    setNm({ managerName: "", email: "", phone: "", department: "", role: "Manager", address: "", password: "", status: "Active" });
+              type: 'project',
 
-    setNmError({});
+              icon: '—ˆ',
 
-    setModal(null);
+              text: `You have been assigned to a new project: "${projectName}"`,
 
-  } catch (err) {
+              link: 'projects'
 
-    if (err.response?.status === 403 && err.response?.data?.limitReached) {
+            });
 
-      setLimitModal({ type: "manager", limit: err.response.data.limit });
-
-    } else {
-
-      setNmError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" });
-
-    }
-
-  } finally {
-
-    setMgrSaveLoading(false);
-
-  }
-
-};
-
-
-
-const addSubadmin = async () => {
-
-  const errors = {};
-
-  if (!ns.name.trim()) errors.name = "Name is required";
-
-  if (!ns.email.trim()) errors.email = "Email is required";
-
-  if (!ns.password.trim()) errors.password = "Password is required";
-
-  if (Object.keys(errors).length > 0) { setNsError(errors); return; }
-
-  try {
-
-    setSubSaveLoading(true);
-
-    const res = await axios.post(BASE_URL + "/api/subadmins", ns);
-
-    setSubadmins(prev => [res.data.subadmin, ...prev]);
-
-    setNs({ name: "", email: "", phone: "", password: "", status: "Active", companyName: "", companyType: "IT", employeeCount: "0-10", clientLimit: "3", employeeLimit: "6" });
-
-    setNsError({});
-
-    setModal(null);
-
-  } catch (err) {
-
-    setNsError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" });
-
-  } finally {
-
-    setSubSaveLoading(false);
-
-  }
-
-};
-
-
-
-const addPackage = async () => {
-
-  const errors = {};
-
-  if (!npkg.title.trim()) errors.title = "Title is required";
-
-  if (!npkg.description.trim()) errors.description = "Description is required";
-
-  if (Object.keys(errors).length > 0) { setPkgError(errors); return; }
-
-  try {
-
-    setPkgSaveLoading(true);
-
-
-
-    // Format data for backend API
-
-    const packageData = {
-
-      title: npkg.title,
-
-      description: npkg.description,
-
-      icon: npkg.icon || "📦",
-
-      type: npkg.type || "paid",
-
-      no_of_days: parseInt(npkg.noOfDays) || 30,
-
-      price: parseFloat(npkg.price) || 0,
-
-      monthlyPrice: npkg.monthlyPrice || "0",
-
-      quarterlyPrice: npkg.quarterlyPrice || "0",
-
-      halfYearlyPrice: npkg.halfYearlyPrice || "0",
-
-      annualPrice: npkg.annualPrice || "0",
-
-
-
-      features: npkg.features ? npkg.features.split(',').map(f => f.trim()).filter(f => f) : [],
-
-      planDuration: npkg.planDuration || "Monthly",
-
-      businessLimit: npkg.businessLimit || "",
-
-      managerLimit: npkg.managerLimit || "",
-
-      clientLimit: npkg.clientLimit || "3 Client manage",
-
-      employeeLimit: npkg.employeeLimit || "",
-
-      status: "Active",
-
-      targetRole: "subadmin",
-
-      assignedSubadmins: npkg.assignedSubadmins || []
-
-    };
-
-
-
-    const res = await axios.post(BASE_URL + "/api/packages", packageData);
-
-    setPackages(prev => [...prev, res.data]);
-
-    setNpkg({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", employeeLimit: "", type: "paid", price: "", noOfDays: "", assignedSubadmins: [] });
-
-    setPkgError({});
-
-    setModal(null);
-
-    toast.success("Yes Package added!");
-
-  } catch (err) {
-
-    console.error("Add package error:", err);
-
-    toast.error("❌ Failed to add package: " + (err.response?.data?.msg || err.message));
-
-  } finally { setPkgSaveLoading(false); }
-
-};
-
-
-
-const addVendor = async () => {
-
-  const errors = {};
-
-  if (!nv.vendorName?.trim?.()) errors.vendorName = "Vendor Name is required";
-
-  if (!nv.vendorProduct?.trim?.()) errors.vendorProduct = "Product Name is required";
-
-  if (!nv.amountTaxGst || nv.amountTaxGst <= 0) errors.amountTaxGst = "Required";
-
-  if (!nv.paidAmount || nv.paidAmount <= 0) errors.paidAmount = "Required";
-
-  if (Object.keys(errors).length > 0) { setNvError(errors); return; }
-
-  try {
-
-    setVendorSaveLoading(true);
-
-    const resolvedCompanyId = user?.companyId || user?.company || user?._id || user?.id || "default";
-
-    const amt = parseFloat(nv.amountTaxGst) || 0;
-
-    const payload = {
-
-      vendorName: nv.vendorName,
-
-      vendorProduct: nv.vendorProduct,
-
-      amount: amt,
-
-      tax: amt,
-
-      gst: amt,
-
-      paidAmount: parseFloat(nv.paidAmount) || 0,
-
-      productDescription: nv.productDescription,
-
-      modeOfPayment: nv.modeOfPayment,
-
-      companyId: resolvedCompanyId
-
-    };
-
-    if (nv.date) payload.date = nv.date;
-
-    if (nv.dateOfPurchase) payload.dateOfPurchase = nv.dateOfPurchase;
-
-    const res = await axios.post(BASE_URL + "/api/vendors", payload);
-
-    setVendors(prev => [res.data, ...prev]);
-
-    setNv({ vendorName: "", vendorProduct: "", amountTaxGst: "", date: "", paidAmount: "", productDescription: "", dateOfPurchase: "", modeOfPayment: "Cash" });
-
-    setNvError({});
-
-    setModal(null);
-
-    toast.success("Yes Vendor Added Successfully!");
-
-  } catch (err) {
-
-    console.error('Add vendor error:', err);
-
-    toast.error("❌ Failed to add vendor: " + (err.response?.data?.message || err.message));
-
-  } finally { setVendorSaveLoading(false); }
-
-};
-
-
-
-
-
-// ── Subscription gate: subadmins must subscribe before accessing dashboard ──
-
-const roleLower = (user?.role || "").toLowerCase().trim();
-
-const isSubAdmin = roleLower === "subadmin" || roleLower === "sub_admin" || roleLower === "sub-admin";
-
-const isAdmin = user?.email === "admin@gmail.com";
-
-
-
-// Enforce subscription page when:
-
-// (a) subadmin and still loading subscription data (prevent flash)
-
-// (b) subadmin and no active subscription (blocked)
-
-// Block sidebar until user selects a plan (free trial OR paid)
-// New users: no subscription AND not in free trial = must pick a plan first
-// hasSelectedPlan = they have either activated free trial OR have a paid subscription
-const hasSelectedPlan = subscription !== null || isInFreeTrial();
-// Never force the upgrade/packages screen while subscription data is still
-// loading — that's exactly what caused the "Choose your Plan" page to flash
-// briefly right after login, before fetchSubscription() had resolved.
-let enforceMySubscriptions = !subLoading && !hasSelectedPlan;
-
-const rawNavItems = getNavForRole(user?.role);
-
-// When restricted, ONLY show My Subscriptions (no dashboard — must subscribe first)
-
-const navItems = enforceMySubscriptions
-
-  ? rawNavItems.filter(n => ["mysubscriptions"].includes(n.key))
-
-  : rawNavItems;
-
-
-
-// Helper to find item in flat or nested structure
-
-const findNavItem = (key) => {
-
-  for (const item of navItems) {
-
-    if (item.key === key) return item;
-
-    if (item.type === "group" && item.items) {
-
-      const sub = item.items.find(i => i.key === key);
-
-      if (sub) return sub;
-
-    }
-
-  }
-
-  return null;
-
-};
-
-
-
-// Always land on mysubscriptions when enforced — never show dashboard
-
-const validActive = enforceMySubscriptions
-
-  ? "mysubscriptions"
-
-  : ((findNavItem(active) || active === "addClient" || active === "tasks" || active === "create-project" || active === "edit-project" || active === "project-details" || active === "projects" || active === "invoices") ? active : navItems[0]?.key || "dashboard");
-
-
-
-const page = findNavItem(validActive) || navItems[0];
-
-
-
-// Note: removed setActive(validActive) here to prevent re-render loop
-
-
-
-useEffect(() => {
-
-  if (validActive === "templates") {
-
-    const frame = document.getElementById('template-designer-frame');
-
-    if (frame && frame.contentWindow) {
-
-      // Send data if the frame is already loaded, otherwise onLoad will catch it later
-
-      frame.contentWindow.postMessage({
-
-        type: 'SET_DATA',
-
-        clients: clients.map(c => c.clientName || c.name),
-
-        employees: employees.map(emp => ({ name: emp.name, id: emp._id || emp.id })),
-
-        quotations: quotations,
-
-        company: {
-
-          name: user?.companyName || "",
-
-          logoUrl: user?.logoUrl || "",
-
-          email: user?.email || "",
-
-          phone: user?.phone || "",
+          }
 
         }
 
-      }, '*');
+      } catch (err) { console.error("Notification failed", err); }
+
+    };
+
+
+
+    try {
+
+      setProjSaveLoading(true);
+
+      const res = await axios.post(BASE_URL + "/api/projects/add", np);
+
+      await fetchProjects();
+
+
+
+      // Notify assigned employees
+
+      if (np.assignedTo && np.assignedTo.length > 0) {
+
+        notifyAssigned(res.data._id, np.name, np.assignedTo);
+
+      }
+
+
+
+      setNp({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "Rs.", team: "", status: "Active", progress: 0, assignedTo: [] });
+
+      setNpError({});
+
+      setModal(null);
+
+      toast.success("Yes Project created successfully!");
+
+    } catch (err) {
+
+      setNpError({ name: err.response?.data?.msg || "Failed to save project" });
+
+    } finally {
+
+      setProjSaveLoading(false);
 
     }
 
-  }
-
-}, [quotations, clients, employees, user, validActive]);
+  };
 
 
 
-const displayName = companyNameStr;
+  const addManager = async () => {
 
-const initials = (displayName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+    const errors = {};
 
-const B = (color) => {
+    if (!nm.managerName.trim()) errors.managerName = "Name is required";
 
-  const isVar = color && color.startsWith("var");
+    if (!nm.email.trim()) errors.email = "Email is required";
 
-  return {
+    if (!nm.password.trim()) errors.password = "Password is required";
 
-    background: isVar ? `var(--app-accent-gradient, linear-gradient(135deg, ${color}, ${color}))` : `linear-gradient(135deg, ${color}, ${color}ee)`,
 
-    color: "#fff",
 
-    border: "none",
+    // Subscription Limit Check - Fetch latest before check to catch admin updates
 
-    borderRadius: 12,
+    try {
 
-    padding: "9px 18px",
+      const id = resolveSubadminId();
 
-    fontWeight: 800,
+      if (id) {
 
-    fontSize: 13,
+        const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
 
-    cursor: "pointer",
+        if (subRes.data.hasSubscription) {
 
-    fontFamily: "inherit",
+          const latestSub = subRes.data.subscription;
 
-    boxShadow: isVar ? `0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)` : `0 4px 12px ${color}40`,
+          setSubscription(latestSub);
 
-    textShadow: "0 1px 2px rgba(0,0,0,0.2)"
+          if (!isInFreeTrial() && isUsageAtLimit("client", clients.length)) {
+
+            setLimitModal({ type: "client", limit: getSubscriptionLimit("client") });
+
+            return;
+
+          }
+
+        } else {      // No subscription — allow if still in free trial
+          if (!isInFreeTrial()) {
+            setForceUpgradeTab(true);
+            setActive("mysubscriptions");
+            return;
+          }
+
+        }
+
+      }
+
+    } catch (err) {
+
+      console.error("Failed to fetch latest subscription for manager limit check", err);
+
+      if (isUsageAtLimit("manager", managers.length)) {
+
+        setLimitModal({ type: "manager", limit: getSubscriptionLimit("manager") });
+
+        return;
+
+      }
+
+    }
+
+
+
+    if (Object.keys(errors).length > 0) { setNmError(errors); return; }
+
+    try {
+
+      setMgrSaveLoading(true);
+
+      const managerPayload = { ...nm, companyId: resolveSubadminId() };
+
+      const res = await axios.post(BASE_URL + "/api/managers/add", managerPayload);
+
+      setManagers(prev => [res.data.manager, ...prev]);
+
+      setNm({ managerName: "", email: "", phone: "", department: "", role: "Manager", address: "", password: "", status: "Active" });
+
+      setNmError({});
+
+      setModal(null);
+
+    } catch (err) {
+
+      if (err.response?.status === 403 && err.response?.data?.limitReached) {
+
+        setLimitModal({ type: "manager", limit: err.response.data.limit });
+
+      } else {
+
+        setNmError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" });
+
+      }
+
+    } finally {
+
+      setMgrSaveLoading(false);
+
+    }
 
   };
 
-};
+
+
+  const addSubadmin = async () => {
+
+    const errors = {};
+
+    if (!ns.name.trim()) errors.name = "Name is required";
+
+    if (!ns.email.trim()) errors.email = "Email is required";
+
+    if (!ns.password.trim()) errors.password = "Password is required";
+
+    if (Object.keys(errors).length > 0) { setNsError(errors); return; }
+
+    try {
+
+      setSubSaveLoading(true);
+
+      const res = await axios.post(BASE_URL + "/api/subadmins", ns);
+
+      setSubadmins(prev => [res.data.subadmin, ...prev]);
+
+      setNs({ name: "", email: "", phone: "", password: "", status: "Active", companyName: "", companyType: "IT", employeeCount: "0-10", clientLimit: "3", employeeLimit: "6" });
+
+      setNsError({});
+
+      setModal(null);
+
+    } catch (err) {
+
+      setNsError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" });
+
+    } finally {
+
+      setSubSaveLoading(false);
+
+    }
+
+  };
 
 
 
-const companyId = user?.companyId || user?.company || user?._id || user?.id || "default";
+  const addPackage = async () => {
+
+    const errors = {};
+
+    if (!npkg.title.trim()) errors.title = "Title is required";
+
+    if (!npkg.description.trim()) errors.description = "Description is required";
+
+    if (Object.keys(errors).length > 0) { setPkgError(errors); return; }
+
+    try {
+
+      setPkgSaveLoading(true);
 
 
 
-const roleDisplay = user?.role || "Admin";
+      // Format data for backend API
+
+      const packageData = {
+
+        title: npkg.title,
+
+        description: npkg.description,
+
+        icon: npkg.icon || "📦",
+
+        type: npkg.type || "paid",
+
+        no_of_days: parseInt(npkg.noOfDays) || 30,
+
+        price: parseFloat(npkg.price) || 0,
+
+        monthlyPrice: npkg.monthlyPrice || "0",
+
+        quarterlyPrice: npkg.quarterlyPrice || "0",
+
+        halfYearlyPrice: npkg.halfYearlyPrice || "0",
+
+        annualPrice: npkg.annualPrice || "0",
 
 
 
-return (
+        features: npkg.features ? npkg.features.split(',').map(f => f.trim()).filter(f => f) : [],
 
-  <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 50%,var(--app-border) 100%)", fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+        planDuration: npkg.planDuration || "Monthly",
 
-    <style>{`
+        businessLimit: npkg.businessLimit || "",
+
+        managerLimit: npkg.managerLimit || "",
+
+        clientLimit: npkg.clientLimit || "3 Client manage",
+
+        employeeLimit: npkg.employeeLimit || "",
+
+        status: "Active",
+
+        targetRole: "subadmin",
+
+        assignedSubadmins: npkg.assignedSubadmins || []
+
+      };
+
+
+
+      const res = await axios.post(BASE_URL + "/api/packages", packageData);
+
+      setPackages(prev => [...prev, res.data]);
+
+      setNpkg({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", employeeLimit: "", type: "paid", price: "", noOfDays: "", assignedSubadmins: [] });
+
+      setPkgError({});
+
+      setModal(null);
+
+      toast.success("Yes Package added!");
+
+    } catch (err) {
+
+      console.error("Add package error:", err);
+
+      toast.error("❌ Failed to add package: " + (err.response?.data?.msg || err.message));
+
+    } finally { setPkgSaveLoading(false); }
+
+  };
+
+
+
+  const addVendor = async () => {
+
+    const errors = {};
+
+    if (!nv.vendorName?.trim?.()) errors.vendorName = "Vendor Name is required";
+
+    if (!nv.vendorProduct?.trim?.()) errors.vendorProduct = "Product Name is required";
+
+    if (!nv.amountTaxGst || nv.amountTaxGst <= 0) errors.amountTaxGst = "Required";
+
+    if (!nv.paidAmount || nv.paidAmount <= 0) errors.paidAmount = "Required";
+
+    if (Object.keys(errors).length > 0) { setNvError(errors); return; }
+
+    try {
+
+      setVendorSaveLoading(true);
+
+      const resolvedCompanyId = user?.companyId || user?.company || user?._id || user?.id || "default";
+
+      const amt = parseFloat(nv.amountTaxGst) || 0;
+
+      const payload = {
+
+        vendorName: nv.vendorName,
+
+        vendorProduct: nv.vendorProduct,
+
+        amount: amt,
+
+        tax: amt,
+
+        gst: amt,
+
+        paidAmount: parseFloat(nv.paidAmount) || 0,
+
+        productDescription: nv.productDescription,
+
+        modeOfPayment: nv.modeOfPayment,
+
+        companyId: resolvedCompanyId
+
+      };
+
+      if (nv.date) payload.date = nv.date;
+
+      if (nv.dateOfPurchase) payload.dateOfPurchase = nv.dateOfPurchase;
+
+      const res = await axios.post(BASE_URL + "/api/vendors", payload);
+
+      setVendors(prev => [res.data, ...prev]);
+
+      setNv({ vendorName: "", vendorProduct: "", amountTaxGst: "", date: "", paidAmount: "", productDescription: "", dateOfPurchase: "", modeOfPayment: "Cash" });
+
+      setNvError({});
+
+      setModal(null);
+
+      toast.success("Yes Vendor Added Successfully!");
+
+    } catch (err) {
+
+      console.error('Add vendor error:', err);
+
+      toast.error("❌ Failed to add vendor: " + (err.response?.data?.message || err.message));
+
+    } finally { setVendorSaveLoading(false); }
+
+  };
+
+
+
+
+
+  // ── Subscription gate: subadmins must subscribe before accessing dashboard ──
+
+  const roleLower = (user?.role || "").toLowerCase().trim();
+
+  const isSubAdmin = roleLower === "subadmin" || roleLower === "sub_admin" || roleLower === "sub-admin";
+
+  const isAdmin = user?.email === "admin@gmail.com";
+
+
+
+  // Enforce subscription page when:
+
+  // (a) subadmin and still loading subscription data (prevent flash)
+
+  // (b) subadmin and no active subscription (blocked)
+
+  // Block sidebar until user selects a plan (free trial OR paid)
+  // New users: no subscription AND not in free trial = must pick a plan first
+  // hasSelectedPlan = they have either activated free trial OR have a paid subscription
+  const hasSelectedPlan = subscription !== null || isInFreeTrial();
+  // Never force the upgrade/packages screen while subscription data is still
+  // loading — that's exactly what caused the "Choose your Plan" page to flash
+  // briefly right after login, before fetchSubscription() had resolved.
+  let enforceMySubscriptions = !subLoading && !hasSelectedPlan;
+
+  const rawNavItems = getNavForRole(user?.role);
+
+  // When restricted, ONLY show My Subscriptions (no dashboard — must subscribe first)
+
+  const navItems = enforceMySubscriptions
+
+    ? rawNavItems.filter(n => ["mysubscriptions"].includes(n.key))
+
+    : rawNavItems;
+
+
+
+  // Helper to find item in flat or nested structure
+
+  const findNavItem = (key) => {
+
+    for (const item of navItems) {
+
+      if (item.key === key) return item;
+
+      if (item.type === "group" && item.items) {
+
+        const sub = item.items.find(i => i.key === key);
+
+        if (sub) return sub;
+
+      }
+
+    }
+
+    return null;
+
+  };
+
+
+
+  // Always land on mysubscriptions when enforced — never show dashboard
+
+  const validActive = enforceMySubscriptions
+
+    ? "mysubscriptions"
+
+    : ((findNavItem(active) || active === "addClient" || active === "tasks" || active === "create-project" || active === "edit-project" || active === "project-details" || active === "projects" || active === "invoices") ? active : navItems[0]?.key || "dashboard");
+
+
+
+  const page = findNavItem(validActive) || navItems[0];
+
+
+
+  // Note: removed setActive(validActive) here to prevent re-render loop
+
+
+
+  useEffect(() => {
+
+    if (validActive === "templates") {
+
+      const frame = document.getElementById('template-designer-frame');
+
+      if (frame && frame.contentWindow) {
+
+        // Send data if the frame is already loaded, otherwise onLoad will catch it later
+
+        frame.contentWindow.postMessage({
+
+          type: 'SET_DATA',
+
+          clients: clients.map(c => c.clientName || c.name),
+
+          employees: employees.map(emp => ({ name: emp.name, id: emp._id || emp.id })),
+
+          quotations: quotations,
+
+          company: {
+
+            name: user?.companyName || "",
+
+            logoUrl: user?.logoUrl || "",
+
+            email: user?.email || "",
+
+            phone: user?.phone || "",
+
+          }
+
+        }, '*');
+
+      }
+
+    }
+
+  }, [quotations, clients, employees, user, validActive]);
+
+
+
+  const displayName = companyNameStr;
+
+  const initials = (displayName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+
+  const B = (color) => {
+
+    const isVar = color && color.startsWith("var");
+
+    return {
+
+      background: isVar ? `var(--app-accent-gradient, linear-gradient(135deg, ${color}, ${color}))` : `linear-gradient(135deg, ${color}, ${color}ee)`,
+
+      color: "#fff",
+
+      border: "none",
+
+      borderRadius: 12,
+
+      padding: "9px 18px",
+
+      fontWeight: 800,
+
+      fontSize: 13,
+
+      cursor: "pointer",
+
+      fontFamily: "inherit",
+
+      boxShadow: isVar ? `0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)` : `0 4px 12px ${color}40`,
+
+      textShadow: "0 1px 2px rgba(0,0,0,0.2)"
+
+    };
+
+  };
+
+
+
+  const companyId = user?.companyId || user?.company || user?._id || user?.id || "default";
+
+
+
+  const roleDisplay = user?.role || "Admin";
+
+
+
+  return (
+
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 50%,var(--app-border) 100%)", fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+
+      <style>{`
 
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
@@ -9802,315 +9954,315 @@ return (
 
 
 
-    {!enforceMySubscriptions && (
-
-      <div className="no-print" style={{ display: "contents" }}>
-        <Sidebar
-          user={user}
-          active={
-            sidebarOverride ? sidebarOverride :
-              ["projects", "edit-project"].includes(validActive) ? "projects" :
-                validActive
-          }
-          setActive={(val) => { setSidebarOverride(null); if (val === "quotations" || val !== "quotations") { setQuotationViewEntry(null); setQuotationPrefillProject(null); setQuotationReturnProject(null); } if (val !== "proposals") setProposalViewEntry(null); setActive(val); }}
-          onLogout={handleLogout}
-          open={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          navItems={navItems}
-          companyLogo={companyLogo}
-          onLogoChange={onLogoChange}
-          enforceMySubscriptions={enforceMySubscriptions}
-          onLogoUploadClick={() => headerLogoRef.current?.click()}
-          setSelectedProjectForTasks={setSelectedProjectForTasks}
-          desktopOpen={desktopSidebarOpen}
-          setJumpProject={setJumpProject}
-          setJumpInvoicePrefill={setJumpInvoicePrefill}
-          setInvoicePrefill={setInvoicePrefill}
-          setSidebarNavClickId={setSidebarNavClickId}
-          setJumpInvoice={setJumpInvoice}
-        />
-
-      </div>
-
-    )}
-
-
-    {showCropModal && (
-
-      <ImageCropModal
-
-        image={cropImage}
-
-        onCropComplete={handleCropComplete}
-
-        onCancel={() => setShowCropModal(false)}
-
-        aspect={cropAspect}
-
-      />
-
-    )}
-
-
-
-
-
-    <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
-
-      {/* Desktop Topbar (hamburger toggle) */}
       {!enforceMySubscriptions && (
-        <div className="desktop-topbar no-print" style={{ display: "none", alignItems: "center", height: 36, padding: "0 24px", background: "var(--app-bg)", position: "sticky", top: 0, zIndex: 90, marginTop: 0 }}>
-          <button onClick={() => setDesktopSidebarOpen(v => !v)} style={{ background: "none", border: "none", width: 38, height: 38, fontSize: 22, cursor: "pointer", color: "var(--app-muted)", display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1, marginTop: "70px", alignSelf: "center" }}>☰</button>
+
+        <div className="no-print" style={{ display: "contents" }}>
+          <Sidebar
+            user={user}
+            active={
+              sidebarOverride ? sidebarOverride :
+                ["projects", "edit-project"].includes(validActive) ? "projects" :
+                  validActive
+            }
+            setActive={(val) => { setSidebarOverride(null); if (val === "quotations" || val !== "quotations") { setQuotationViewEntry(null); setQuotationPrefillProject(null); setQuotationReturnProject(null); } if (val !== "proposals") setProposalViewEntry(null); setActive(val); }}
+            onLogout={handleLogout}
+            open={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+            navItems={navItems}
+            companyLogo={companyLogo}
+            onLogoChange={onLogoChange}
+            enforceMySubscriptions={enforceMySubscriptions}
+            onLogoUploadClick={() => headerLogoRef.current?.click()}
+            setSelectedProjectForTasks={setSelectedProjectForTasks}
+            desktopOpen={desktopSidebarOpen}
+            setJumpProject={setJumpProject}
+            setJumpInvoicePrefill={setJumpInvoicePrefill}
+            setInvoicePrefill={setInvoicePrefill}
+            setSidebarNavClickId={setSidebarNavClickId}
+            setJumpInvoice={setJumpInvoice}
+          />
+
         </div>
+
       )}
 
-      {/* Mobile Topbar */}
 
-      <div className="mob-topbar no-print mob-topbar-dashboard-hidden" style={{ display: (validActive === "dashboard" && !isDesktopWidth) ? "none" : "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#fff", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)" }}>
+      {showCropModal && (
 
-        {!enforceMySubscriptions ? (
+        <ImageCropModal
 
-          <button onClick={() => { isDesktopWidth ? setDesktopSidebarOpen(v => !v) : setSidebarOpen(true); }} className="mob-topbar-hamburger" style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)", padding: "2px 6px", lineHeight: 1 }}>☰</button>
+          image={cropImage}
 
-        ) : (
+          onCropComplete={handleCropComplete}
 
-          <div style={{ width: 40 }} />
+          onCancel={() => setShowCropModal(false)}
 
+          aspect={cropAspect}
+
+        />
+
+      )}
+
+
+
+
+
+      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
+
+        {/* Desktop Topbar (hamburger toggle) */}
+        {!enforceMySubscriptions && (
+          <div className="desktop-topbar no-print" style={{ display: "none", alignItems: "center", height: 36, padding: "0 24px", background: "var(--app-bg)", position: "sticky", top: 0, zIndex: 90, marginTop: 0 }}>
+            <button onClick={() => setDesktopSidebarOpen(v => !v)} style={{ background: "none", border: "none", width: 38, height: 38, fontSize: 22, cursor: "pointer", color: "var(--app-muted)", display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1, marginTop: "70px", alignSelf: "center" }}>☰</button>
+          </div>
         )}
 
-        <div style={{ fontWeight: 800, fontSize: 15, color: T.text }}>
+        {/* Mobile Topbar */}
 
-          {page?.label}
+        <div className="mob-topbar no-print mob-topbar-dashboard-hidden" style={{ display: (validActive === "dashboard" && !isDesktopWidth) ? "none" : "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#fff", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)" }}>
+
+          {!enforceMySubscriptions ? (
+
+            <button onClick={() => { isDesktopWidth ? setDesktopSidebarOpen(v => !v) : setSidebarOpen(true); }} className="mob-topbar-hamburger" style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)", padding: "2px 6px", lineHeight: 1 }}>☰</button>
+
+          ) : (
+
+            <div style={{ width: 40 }} />
+
+          )}
+
+          <div style={{ fontWeight: 800, fontSize: 15, color: T.text }}>
+
+            {page?.label}
+
+          </div>
+
+          {user?.email !== "admin@gmail.com" && (
+
+            <>
+
+              <input type="file" ref={headerLogoRef} onChange={handleHeaderLogoUpload} accept="image/*" style={{ display: "none" }} />
+
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+
+                {enforceMySubscriptions && (
+
+                  <button onClick={handleLogout} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "6px 12px", color: "#ef4444", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Logout</button>
+
+                )}
+
+                <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} style={{ cursor: "pointer", position: "relative" }}>
+
+                  <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} title="Click to upload logo">
+
+                    {companyLogo ? (
+
+                      <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "100px", objectFit: "contain", flexShrink: 0, display: "block", borderRadius: 10, background: "#fff", border: "1.5px solid var(--app-border)" }} />
+
+                    ) : (
+
+                      <div style={{ width: 38, height: 38, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", fontWeight: 800, fontSize: 13 }}>{initials}</div>
+
+                    )}
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </>
+
+          )}
 
         </div>
 
-        {user?.email !== "admin@gmail.com" && (
 
-          <>
 
-            <input type="file" ref={headerLogoRef} onChange={handleHeaderLogoUpload} accept="image/*" style={{ display: "none" }} />
+        <div className="main">
 
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {/* Topbar */}
 
-              {enforceMySubscriptions && (
+          <div className="topbar no-print" style={validActive === "dashboard" && !isDesktopWidth ? { display: "none", padding: 0, minHeight: 0 } : undefined}>
 
-                <button onClick={handleLogout} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "6px 12px", color: "#ef4444", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Logout</button>
+            <div className="search-wrap">
+
+
+
+
+
+            </div>
+            <div className="topbar-right">
+
+              <div className="topbar-icon" onClick={() => { const next = !showNotifPanel; setShowNotifPanel(next); fetchPendingLeaves(); fetchNotifications(); if (next) markAllNotificationsRead(); }} style={{ position: 'relative', cursor: 'pointer' }}>
+                <i className="ti ti-bell"></i>
+                {unreadNotifCount > 0 && (
+                  <span style={{ position: 'absolute', top: -6, right: -6, minWidth: 16, height: 16, padding: '0 3px', background: '#EF4444', borderRadius: 10, border: '1.5px solid #fff', zIndex: 2, boxSizing: 'border-box', color: '#fff', fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>{unreadNotifCount > 99 ? '99+' : unreadNotifCount}</span>
+                )}
+                {showNotifPanel && (
+                  <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: 44, right: 0, width: 380, background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', border: '1px solid #E2E8F0', zIndex: 99999, overflow: 'hidden' }}>
+                    <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--app-accent, var(--app-accent, #00BCD4))' }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <i className="ti ti-bell"></i> Notifications
+                        {pendingLeaves.length > 0 && <span style={{ background: '#EF4444', color: '#fff', borderRadius: 20, padding: '2px 8px', fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length}</span>}
+                      </div>
+                      <button onClick={() => setShowNotifPanel(false)} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 26, height: 26, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                    </div>
+                    <div style={{ maxHeight: 420, overflowY: 'auto', padding: '12px 16px' }}>
+                      <div style={{ fontSize: 11, fontWeight: 800, color: '#718096', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 10 }}>
+                        <i className="ti ti-user-x" style={{ marginRight: 5, color: 'var(--app-accent)' }}></i> Leave Requests
+                      </div>
+                      {pendingLeaves.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '20px 0', color: '#A0AEC0', fontSize: 13 }}>
+                          <i className="ti ti-bell-off" style={{ fontSize: 28, display: 'block', marginBottom: 8, opacity: 0.4 }}></i>
+                          No pending notifications
+                        </div>
+                      ) : (
+                        pendingLeaves.map((l, i) => {
+                          const initials = l.employeeName ? l.employeeName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'EE';
+                          const colors = ['#f59e0b', '#a855f7', '#0ea5e9', '#ec4899', '#22c55e'];
+                          const bg = colors[i % colors.length];
+                          const detail = `${l.type || 'Leave'} · ${l.from || ''} ${l.to ? '- ' + l.to : ''}`;
+                          return (
+                            <div key={l._id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: i === pendingLeaves.length - 1 ? 'none' : '1px solid #F0F4F8' }}>
+                              <div style={{ width: 38, height: 38, borderRadius: '50%', background: bg, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, flexShrink: 0 }}>{initials}</div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: '#1A2332' }}>{l.employeeName}</div>
+                                <div style={{ fontSize: 11, color: '#718096', marginTop: 2 }}>{detail}</div>
+                                <span style={{ display: 'inline-block', marginTop: 4, background: '#FEF3C7', color: '#D97706', borderRadius: 20, padding: '2px 8px', fontSize: 10, fontWeight: 800 }}>Pending</span>
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
+                                <button onClick={() => handleApproveLeave(l._id)} style={{ background: '#DCFCE7', color: '#166534', border: 'none', padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                  <i className="ti ti-check"></i> Approve
+                                </button>
+                                <button onClick={() => handleRejectLeave(l._id)} style={{ background: '#FEF2F2', color: '#DC2626', border: 'none', padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                  <i className="ti ti-x"></i> Reject
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                    <div style={{ padding: '12px 16px', borderTop: '1px solid #E2E8F0', textAlign: 'center' }}>
+                      <button onClick={() => setShowNotifPanel(false)} style={{ background: 'none', border: 'none', color: ' var(--app-accent, var(--app-accent, #00BCD4))', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="topbar-icon" onClick={() => setActive("settings")}><i className="ti ti-settings"></i></div>
+
+              {/* Dynamic Action Buttons based on validActive */}
+              {validActive === "clients" && (
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+
+
+                </div>
 
               )}
 
-              <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} style={{ cursor: "pointer", position: "relative" }}>
+              {validActive === "employees" && (
 
-                <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} title="Click to upload logo">
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+
+                </div>
+
+              )}
+
+              {/* New Project button moved above Overall Value card */}
+
+              {validActive === "managers" && (
+
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+
+
+
+                  <button
+
+                    className="create-btn"
+
+                    onClick={() => {
+                      const limit = getSubscriptionLimit("manager", subscription);
+                      if (limit !== Infinity && managers.length >= limit) {
+                        setLimitModal({ type: "manager", limit });
+                        return;
+                      }
+                      setNmError({}); setShowMgrPass(false); setModal("manager");
+                      fetchSubscription(); // refresh in background, don't block opening the form
+                    }}
+
+                    style={{ opacity: isUsageAtLimit("manager", managers.length) ? 0.5 : 1 }}
+
+                  >
+
+                    <i className="ti ti-plus"></i> Add Manager
+
+                  </button>
+
+                </div>
+
+              )}
+
+              {validActive === "subadmins" && <button className="create-btn" onClick={() => { setNsError({}); setShowSubPass(false); setModal("subadmin"); }}><i className="ti ti-plus"></i> Add Partner</button>}
+
+
+
+
+
+              {/* Profile Toggle (re-using topbar logic) */}
+
+              <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} className="mob-topbar-hide" style={{ background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, padding: "6px 12px", display: "flex", alignItems: "center", gap: 8, cursor: "pointer", flexShrink: 0, marginLeft: 8 }}>
+
+                <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} style={{ cursor: "pointer" }} title="Click to upload logo">
 
                   {companyLogo ? (
 
-                    <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "100px", objectFit: "contain", flexShrink: 0, display: "block", borderRadius: 10, background: "#fff", border: "1.5px solid var(--app-border)" }} />
+                    <img src={companyLogo} alt="logo" style={{ height: 28, width: "auto", objectFit: "contain", flexShrink: 0, borderRadius: 6 }} onError={() => setCompanyLogo(null)} />
 
                   ) : (
 
-                    <div style={{ width: 38, height: 38, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", fontWeight: 800, fontSize: 13 }}>{initials}</div>
+                    <div style={{ width: 28, height: 28, background: "var(--teal)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 10 }}>{initials}</div>
 
                   )}
 
                 </div>
 
-              </div>
-
-            </div>
-
-          </>
-
-        )}
-
-      </div>
-
-
-
-      <div className="main">
-
-        {/* Topbar */}
-
-        <div className="topbar no-print" style={validActive === "dashboard" && !isDesktopWidth ? { display: "none", padding: 0, minHeight: 0 } : undefined}>
-
-          <div className="search-wrap">
-
-
-
-
-
-          </div>
-          <div className="topbar-right">
-
-            <div className="topbar-icon" onClick={() => { const next = !showNotifPanel; setShowNotifPanel(next); fetchPendingLeaves(); fetchNotifications(); if (next) markAllNotificationsRead(); }} style={{ position: 'relative', cursor: 'pointer' }}>
-              <i className="ti ti-bell"></i>
-              {unreadNotifCount > 0 && (
-                <span style={{ position: 'absolute', top: -6, right: -6, minWidth: 16, height: 16, padding: '0 3px', background: '#EF4444', borderRadius: 10, border: '1.5px solid #fff', zIndex: 2, boxSizing: 'border-box', color: '#fff', fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>{unreadNotifCount > 99 ? '99+' : unreadNotifCount}</span>
-              )}
-              {showNotifPanel && (
-                <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: 44, right: 0, width: 380, background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', border: '1px solid #E2E8F0', zIndex: 99999, overflow: 'hidden' }}>
-                  <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--app-accent, var(--app-accent, #00BCD4))' }}>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <i className="ti ti-bell"></i> Notifications
-                      {pendingLeaves.length > 0 && <span style={{ background: '#EF4444', color: '#fff', borderRadius: 20, padding: '2px 8px', fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length}</span>}
-                    </div>
-                    <button onClick={() => setShowNotifPanel(false)} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 26, height: 26, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
-                  </div>
-                  <div style={{ maxHeight: 420, overflowY: 'auto', padding: '12px 16px' }}>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: '#718096', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 10 }}>
-                      <i className="ti ti-user-x" style={{ marginRight: 5, color: 'var(--app-accent)' }}></i> Leave Requests
-                    </div>
-                    {pendingLeaves.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: '20px 0', color: '#A0AEC0', fontSize: 13 }}>
-                        <i className="ti ti-bell-off" style={{ fontSize: 28, display: 'block', marginBottom: 8, opacity: 0.4 }}></i>
-                        No pending notifications
-                      </div>
-                    ) : (
-                      pendingLeaves.map((l, i) => {
-                        const initials = l.employeeName ? l.employeeName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'EE';
-                        const colors = ['#f59e0b', '#a855f7', '#0ea5e9', '#ec4899', '#22c55e'];
-                        const bg = colors[i % colors.length];
-                        const detail = `${l.type || 'Leave'} · ${l.from || ''} ${l.to ? '- ' + l.to : ''}`;
-                        return (
-                          <div key={l._id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: i === pendingLeaves.length - 1 ? 'none' : '1px solid #F0F4F8' }}>
-                            <div style={{ width: 38, height: 38, borderRadius: '50%', background: bg, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, flexShrink: 0 }}>{initials}</div>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontSize: 13, fontWeight: 700, color: '#1A2332' }}>{l.employeeName}</div>
-                              <div style={{ fontSize: 11, color: '#718096', marginTop: 2 }}>{detail}</div>
-                              <span style={{ display: 'inline-block', marginTop: 4, background: '#FEF3C7', color: '#D97706', borderRadius: 20, padding: '2px 8px', fontSize: 10, fontWeight: 800 }}>Pending</span>
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
-                              <button onClick={() => handleApproveLeave(l._id)} style={{ background: '#DCFCE7', color: '#166534', border: 'none', padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-                                <i className="ti ti-check"></i> Approve
-                              </button>
-                              <button onClick={() => handleRejectLeave(l._id)} style={{ background: '#FEF2F2', color: '#DC2626', border: 'none', padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-                                <i className="ti ti-x"></i> Reject
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
-                  <div style={{ padding: '12px 16px', borderTop: '1px solid #E2E8F0', textAlign: 'center' }}>
-                    <button onClick={() => setShowNotifPanel(false)} style={{ background: 'none', border: 'none', color: ' var(--app-accent, var(--app-accent, #00BCD4))', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
-                      Close
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="topbar-icon" onClick={() => setActive("settings")}><i className="ti ti-settings"></i></div>
-
-            {/* Dynamic Action Buttons based on validActive */}
-            {validActive === "clients" && (
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-
+                <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text)" }}>{displayName}</span>
 
               </div>
-
-            )}
-
-            {validActive === "employees" && (
-
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-
-              </div>
-
-            )}
-
-            {/* New Project button moved above Overall Value card */}
-
-            {validActive === "managers" && (
-
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-
-
-
-                <button
-
-                  className="create-btn"
-
-                  onClick={() => {
-                    const limit = getSubscriptionLimit("manager", subscription);
-                    if (limit !== Infinity && managers.length >= limit) {
-                      setLimitModal({ type: "manager", limit });
-                      return;
-                    }
-                    setNmError({}); setShowMgrPass(false); setModal("manager");
-                    fetchSubscription(); // refresh in background, don't block opening the form
-                  }}
-
-                  style={{ opacity: isUsageAtLimit("manager", managers.length) ? 0.5 : 1 }}
-
-                >
-
-                  <i className="ti ti-plus"></i> Add Manager
-
-                </button>
-
-              </div>
-
-            )}
-
-            {validActive === "subadmins" && <button className="create-btn" onClick={() => { setNsError({}); setShowSubPass(false); setModal("subadmin"); }}><i className="ti ti-plus"></i> Add Partner</button>}
-
-
-
-
-
-            {/* Profile Toggle (re-using topbar logic) */}
-
-            <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} className="mob-topbar-hide" style={{ background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, padding: "6px 12px", display: "flex", alignItems: "center", gap: 8, cursor: "pointer", flexShrink: 0, marginLeft: 8 }}>
-
-              <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} style={{ cursor: "pointer" }} title="Click to upload logo">
-
-                {companyLogo ? (
-
-                  <img src={companyLogo} alt="logo" style={{ height: 28, width: "auto", objectFit: "contain", flexShrink: 0, borderRadius: 6 }} onError={() => setCompanyLogo(null)} />
-
-                ) : (
-
-                  <div style={{ width: 28, height: 28, background: "var(--teal)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 10 }}>{initials}</div>
-
-                )}
-
-              </div>
-
-              <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text)" }}>{displayName}</span>
 
             </div>
 
           </div>
 
-        </div>
+
+
+          <div className="content" style={validActive === "dashboard" && !isDesktopWidth ? { padding: 0 } : undefined}>
+
+            {trialToast && (
+              <div style={{ position: "fixed", top: 24, left: "50%", width: "max-content", marginLeft: "auto", marginRight: "auto", right: 0, zIndex: 9999, background: "#fff", border: "1.5px solid #00BCD4", borderRadius: 14, padding: "14px 26px", fontSize: 14, fontWeight: 800, color: "#0097A7", boxShadow: "0 10px 32px rgba(0,188,212,0.25), 0 4px 12px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", gap: 10 }}>
+                <i className="ti ti-circle-check" style={{ fontSize: 18, color: "#00BCD4" }}></i> Free Trial Activated
+              </div>
+            )}
+            {/* Trial toast trigger runs once via useEffect below, not inline during render */}
+
+            {subscriptionChecked && !isInFreeTrial() && !subscription && (
+              <div style={{ background: '#FEE2E2', color: '#DC2626', padding: '10px 20px', borderRadius: 10, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
+                <span><i className="ti ti-alert-circle" style={{ marginRight: 8 }}></i>Choose a subscription plan to continue.</span>
+                <button onClick={() => { setForceUpgradeTab(true); setActive('mysubscriptions'); }} style={{ background: '#DC2626', color: '#fff', border: 'none', borderRadius: 8, padding: '5px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>Upgrade Now</button>
+              </div>
+            )}
+            <EmployeeSubscriptionWarning user={user} trigger={subscription?.updatedAt || subscription?._id} onRenew={() => { setForceUpgradeTab(true); setActive("mysubscriptions"); setTimeout(() => { const el = document.querySelector('.plan-card, .plans-grid, [class*="upgrade"]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 400); }} />
 
 
 
-        <div className="content" style={validActive === "dashboard" && !isDesktopWidth ? { padding: 0 } : undefined}>
-
-          {trialToast && (
-            <div style={{ position: "fixed", top: 24, left: "50%", width: "max-content", marginLeft: "auto", marginRight: "auto", right: 0, zIndex: 9999, background: "#fff", border: "1.5px solid #00BCD4", borderRadius: 14, padding: "14px 26px", fontSize: 14, fontWeight: 800, color: "#0097A7", boxShadow: "0 10px 32px rgba(0,188,212,0.25), 0 4px 12px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", gap: 10 }}>
-              <i className="ti ti-circle-check" style={{ fontSize: 18, color: "#00BCD4" }}></i> Free Trial Activated
-            </div>
-          )}
-          {/* Trial toast trigger runs once via useEffect below, not inline during render */}
-
-          {subscriptionChecked && !isInFreeTrial() && !subscription && (
-            <div style={{ background: '#FEE2E2', color: '#DC2626', padding: '10px 20px', borderRadius: 10, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
-              <span><i className="ti ti-alert-circle" style={{ marginRight: 8 }}></i>Choose a subscription plan to continue.</span>
-              <button onClick={() => { setForceUpgradeTab(true); setActive('mysubscriptions'); }} style={{ background: '#DC2626', color: '#fff', border: 'none', borderRadius: 8, padding: '5px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>Upgrade Now</button>
-            </div>
-          )}
-          <EmployeeSubscriptionWarning user={user} trigger={subscription?.updatedAt || subscription?._id} onRenew={() => { setForceUpgradeTab(true); setActive("mysubscriptions"); setTimeout(() => { const el = document.querySelector('.plan-card, .plans-grid, [class*="upgrade"]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 400); }} />
-
-
-
-          {/* ── Dashboard ── */}{validActive === "dashboard" && (
-            <>
-              {/* MOBILE DASHBOARD (visible only under 768px) */}
-              <div className="mobile-dashboard-view" style={{ display: "none", width: "100vw", marginLeft: "calc(50% - 50vw)", marginRight: "calc(50% - 50vw)", marginTop: 0 }}>
-                <style>{`
+            {/* ── Dashboard ── */}{validActive === "dashboard" && (
+              <>
+                {/* MOBILE DASHBOARD (visible only under 768px) */}
+                <div className="mobile-dashboard-view" style={{ display: "none", width: "100vw", marginLeft: "calc(50% - 50vw)", marginRight: "calc(50% - 50vw)", marginTop: 0 }}>
+                  <style>{`
     @media (max-width: 768px) {
       .mobile-dashboard-view { display: block !important; }
       .desktop-dashboard-view { display: none !important; }
@@ -10129,377 +10281,412 @@ return (
     }
   `}</style>
 
-                {/* HERO HEADER — glass + gradient mesh */}
-                <div style={{
-                  position: "relative",
-                  zIndex: 1,
-                  background: "linear-gradient(160deg, var(--app-accent) 0%, #0f7a8a 60%, #0a5a68 100%)",
-                  borderRadius: "0",
-                  margin: "0",
-                  padding: "18px 18px 90px",
+                  {/* HERO HEADER — glass + gradient mesh */}
+                  <div style={{
+                    position: "relative",
+                    zIndex: 1,
+                    background: "linear-gradient(160deg, var(--app-accent) 0%, #0f7a8a 60%, #0a5a68 100%)",
+                    borderRadius: "0",
+                    margin: "0",
+                    padding: "18px 18px 90px",
 
-                  color: "#fff",
-                  overflow: "hidden"
-                }}>
-                  {/* decorative mesh blobs */}
-                  <div style={{ position: "absolute", top: -60, right: -40, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, var(--app-accent) 0%, transparent 70%)", opacity: 0.35, filter: "blur(10px)" }} />
-                  <div style={{ position: "absolute", bottom: -80, left: -30, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, #7c3aed 0%, transparent 70%)", opacity: 0.25, filter: "blur(14px)" }} />
+                    color: "#fff",
+                    overflow: "hidden"
+                  }}>
+                    {/* decorative mesh blobs */}
+                    <div style={{ position: "absolute", top: -60, right: -40, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, var(--app-accent) 0%, transparent 70%)", opacity: 0.35, filter: "blur(10px)" }} />
+                    <div style={{ position: "absolute", bottom: -80, left: -30, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, #7c3aed 0%, transparent 70%)", opacity: 0.25, filter: "blur(14px)" }} />
 
-                  <div style={{ position: "relative", zIndex: 2 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                      <div onClick={() => setSidebarOpen(true)} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
-                        <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.12)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
-                          {companyLogo ? (
-                            <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                          ) : (
-                            <i className="ti ti-building" style={{ fontSize: 18, color: "#fff" }}></i>
-                          )}
-                        </div>
-                        <div
-                          data-profile-anchor="true"
-                          onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }}
-                          style={{ fontSize: 15, fontWeight: 800, color: "#fff", cursor: "pointer" }}
-                        >
-                          {(user?.companyName || user?.name || "Business")}
-                        </div>
-                      </div>
-                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                        <div style={{ position: "relative" }}>
-                          <div onClick={() => { setMobNotifExpanded(v => !v); fetchPendingLeaves(); }} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.08)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-                            <i className="ti ti-bell" style={{ fontSize: 17 }}></i>
-                            {pendingLeaves.length > 0 && (
-                              <span style={{ position: "absolute", top: 5, right: 6, width: 8, height: 8, borderRadius: "50%", background: "#ff4d6d", boxShadow: "0 0 0 2px #0f0a29" }}></span>
+                    <div style={{ position: "relative", zIndex: 2 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                        <div onClick={() => setSidebarOpen(true)} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+                          <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.12)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+                            {companyLogo ? (
+                              <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                            ) : (
+                              <i className="ti ti-building" style={{ fontSize: 18, color: "#fff" }}></i>
                             )}
                           </div>
-                          {mobNotifExpanded && (
-                            <>
-                              <div onClick={() => setMobNotifExpanded(false)} style={{ position: "fixed", inset: 0, zIndex: 4998 }} />
-                              <div style={{ position: "absolute", top: 50, right: 0, width: 300, maxHeight: 380, overflowY: "auto", background: "#fff", borderRadius: 16, boxShadow: "0 12px 32px rgba(15,10,41,0.25)", border: "1px solid rgba(0,0,0,0.05)", zIndex: 4999 }}>
-                                <div style={{ padding: "12px 16px", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", gap: 6 }}>
-                                  <i className="ti ti-bell" style={{ color: "var(--app-accent)" }}></i>
-                                  <span style={{ fontSize: 13, fontWeight: 800, color: "#0f1c2e" }}>Notifications</span>
-                                  {pendingLeaves.length > 0 && <span style={{ background: "#EF4444", color: "#fff", borderRadius: 20, padding: "2px 7px", fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length}</span>}
-                                </div>
-                                <div style={{ padding: "6px 14px 12px" }}>
-                                  {pendingLeaves.length === 0 ? (
-                                    <div style={{ textAlign: "center", padding: "14px 0", color: "#A0AEC0", fontSize: 12.5 }}>No pending notifications</div>
-                                  ) : (
-                                    pendingLeaves.map((l, i) => {
-                                      const initials = l.employeeName ? l.employeeName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'EE';
-                                      const colors = ['#f59e0b', '#a855f7', '#0ea5e9', '#ec4899', '#22c55e'];
-                                      const bg = colors[i % colors.length];
-                                      const detail = `${l.type || 'Leave'} · ${l.from || ''} ${l.to ? '- ' + l.to : ''}`;
-                                      return (
-                                        <div key={l._id || i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", borderBottom: i === pendingLeaves.length - 1 ? "none" : "1px solid #F0F4F8" }}>
-                                          <div style={{ width: 30, height: 30, borderRadius: "50%", background: bg, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{initials}</div>
-                                          <div style={{ flex: 1, minWidth: 0 }}>
-                                            <div style={{ fontSize: 12, fontWeight: 700, color: "#1A2332" }}>{l.employeeName}</div>
-                                            <div style={{ fontSize: 10, color: "#718096", marginTop: 1 }}>{detail}</div>
-                                          </div>
-                                          <div style={{ display: "flex", flexDirection: "column", gap: 3, flexShrink: 0 }}>
-                                            <button onClick={() => handleApproveLeave(l._id)} style={{ background: "#DCFCE7", color: "#166534", border: "none", padding: "3px 7px", borderRadius: 6, fontSize: 9.5, fontWeight: 700, cursor: "pointer" }}>Approve</button>
-                                            <button onClick={() => handleRejectLeave(l._id)} style={{ background: "#FEF2F2", color: "#DC2626", border: "none", padding: "3px 7px", borderRadius: 6, fontSize: 9.5, fontWeight: 700, cursor: "pointer" }}>Reject</button>
-                                          </div>
-                                        </div>
-                                      );
-                                    })
-                                  )}
-                                </div>
-                              </div>
-                            </>
-                          )}
+                          <div
+                            data-profile-anchor="true"
+                            onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }}
+                            style={{ fontSize: 15, fontWeight: 800, color: "#fff", cursor: "pointer" }}
+                          >
+                            {(user?.companyName || user?.name || "Business")}
+                          </div>
                         </div>
+                        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                          <div style={{ position: "relative" }}>
+                            <div onClick={() => { setMobNotifExpanded(v => !v); fetchPendingLeaves(); }} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.08)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                              <i className="ti ti-bell" style={{ fontSize: 17 }}></i>
+                              {pendingLeaves.length > 0 && (
+                                <span style={{ position: "absolute", top: 5, right: 6, width: 8, height: 8, borderRadius: "50%", background: "#ff4d6d", boxShadow: "0 0 0 2px #0f0a29" }}></span>
+                              )}
+                            </div>
+                            {mobNotifExpanded && (
+                              <>
+                                <div onClick={() => setMobNotifExpanded(false)} style={{ position: "fixed", inset: 0, zIndex: 4998 }} />
+                                <div style={{ position: "absolute", top: 50, right: 0, width: 300, maxHeight: 380, overflowY: "auto", background: "#fff", borderRadius: 16, boxShadow: "0 12px 32px rgba(15,10,41,0.25)", border: "1px solid rgba(0,0,0,0.05)", zIndex: 4999 }}>
+                                  <div style={{ padding: "12px 16px", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", gap: 6 }}>
+                                    <i className="ti ti-bell" style={{ color: "var(--app-accent)" }}></i>
+                                    <span style={{ fontSize: 13, fontWeight: 800, color: "#0f1c2e" }}>Notifications</span>
+                                    {pendingLeaves.length > 0 && <span style={{ background: "#EF4444", color: "#fff", borderRadius: 20, padding: "2px 7px", fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length}</span>}
+                                  </div>
+                                  <div style={{ padding: "6px 14px 12px" }}>
+                                    {pendingLeaves.length === 0 ? (
+                                      <div style={{ textAlign: "center", padding: "14px 0", color: "#A0AEC0", fontSize: 12.5 }}>No pending notifications</div>
+                                    ) : (
+                                      pendingLeaves.map((l, i) => {
+                                        const initials = l.employeeName ? l.employeeName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'EE';
+                                        const colors = ['#f59e0b', '#a855f7', '#0ea5e9', '#ec4899', '#22c55e'];
+                                        const bg = colors[i % colors.length];
+                                        const detail = `${l.type || 'Leave'} · ${l.from || ''} ${l.to ? '- ' + l.to : ''}`;
+                                        return (
+                                          <div key={l._id || i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", borderBottom: i === pendingLeaves.length - 1 ? "none" : "1px solid #F0F4F8" }}>
+                                            <div style={{ width: 30, height: 30, borderRadius: "50%", background: bg, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{initials}</div>
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                              <div style={{ fontSize: 12, fontWeight: 700, color: "#1A2332" }}>{l.employeeName}</div>
+                                              <div style={{ fontSize: 10, color: "#718096", marginTop: 1 }}>{detail}</div>
+                                            </div>
+                                            <div style={{ display: "flex", flexDirection: "column", gap: 3, flexShrink: 0 }}>
+                                              <button onClick={() => handleApproveLeave(l._id)} style={{ background: "#DCFCE7", color: "#166534", border: "none", padding: "3px 7px", borderRadius: 6, fontSize: 9.5, fontWeight: 700, cursor: "pointer" }}>Approve</button>
+                                              <button onClick={() => handleRejectLeave(l._id)} style={{ background: "#FEF2F2", color: "#DC2626", border: "none", padding: "3px 7px", borderRadius: 6, fontSize: 9.5, fontWeight: 700, cursor: "pointer" }}>Reject</button>
+                                            </div>
+                                          </div>
+                                        );
+                                      })
+                                    )}
+                                  </div>
+                                </div>
+                              </>
+                            )}
+                          </div>
 
+                        </div>
+                      </div>
+
+
+                      <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 6 }}>
+                        <span style={{ fontSize: 42, fontWeight: 900, letterSpacing: -1, background: "linear-gradient(90deg,#fff,#c7d2fe)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                          Rs.{(totalRevenue || 0).toLocaleString()}
+                        </span>
+                        <span style={{ background: "rgba(74,222,128,0.15)", color: "#4ade80", fontSize: 12, fontWeight: 800, padding: "5px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 4 }}>
+                          <i className="ti ti-trending-up"></i> 12%
+                        </span>
+                      </div>
+
+                      <div style={{ height: 60, marginTop: 10 }}>
+                        <svg viewBox="0 0 300 60" width="100%" height="100%" preserveAspectRatio="none">
+                          <defs>
+                            <linearGradient id="mobAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.35" />
+                              <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+                            </linearGradient>
+                          </defs>
+                          <path d="M0,45 L50,40 L100,48 L150,18 L200,26 L250,12 L300,20 L300,60 L0,60 Z" fill="url(#mobAreaGrad)" />
+                          <polyline fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points="0,45 50,40 100,48 150,18 200,26 250,12 300,20" />
+                        </svg>
                       </div>
                     </div>
-
-
-                    <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 6 }}>
-                      <span style={{ fontSize: 42, fontWeight: 900, letterSpacing: -1, background: "linear-gradient(90deg,#fff,#c7d2fe)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                        Rs.{(totalRevenue || 0).toLocaleString()}
-                      </span>
-                      <span style={{ background: "rgba(74,222,128,0.15)", color: "#4ade80", fontSize: 12, fontWeight: 800, padding: "5px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 4 }}>
-                        <i className="ti ti-trending-up"></i> 12%
-                      </span>
-                    </div>
-
-                    <div style={{ height: 60, marginTop: 10 }}>
-                      <svg viewBox="0 0 300 60" width="100%" height="100%" preserveAspectRatio="none">
-                        <defs>
-                          <linearGradient id="mobAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.35" />
-                            <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
-                          </linearGradient>
-                        </defs>
-                        <path d="M0,45 L50,40 L100,48 L150,18 L200,26 L250,12 L300,20 L300,60 L0,60 Z" fill="url(#mobAreaGrad)" />
-                        <polyline fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points="0,45 50,40 100,48 150,18 200,26 250,12 300,20" />
-                      </svg>
-                    </div>
                   </div>
-                </div>
 
-                {/* HORIZONTAL SCROLLING PROJECT CARDS — overlaps the bottom of the hero card */}
-                {projectsWithProgress.length > 0 && (
-                  <div style={{ position: "relative", margin: "-40px 0 0", zIndex: 20 }}>
-                    <div
-                      id="mobProjectsScroller"
-                      style={{ position: "relative", zIndex: 21, display: "flex", gap: 12, overflowX: "auto", justifyContent: projectsWithProgress.length > 2 ? "flex-start" : "center", padding: "0 calc(50% - 150px) 10px", WebkitOverflowScrolling: "touch" }}
-                    >
-                      {projectsWithProgress.map((p, i) => {
-                        const pct = Number(p.progress) || 0;
-                        const circumference = 2 * Math.PI * 18;
-                        const offset = circumference - (pct / 100) * circumference;
-                        const budget = formatCurrency(p.budget, p.currency);
-                        return (
-                          <div
-                            key={p._id || p.id || i}
-                            onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
-                            style={{ flex: "0 0 auto", width: 380, boxSizing: "border-box", background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.1)", border: "1px solid rgba(0,0,0,0.03)", padding: "14px 16px", display: "flex", gap: 12, cursor: "pointer" }}
-                          >
-                            <div style={{ position: "relative", width: 44, height: 44, flexShrink: 0 }}>
-                              <svg width="44" height="44" viewBox="0 0 44 44">
-                                <circle cx="22" cy="22" r="18" fill="none" stroke="#f1f5f9" strokeWidth="4" />
-                                <circle
-                                  cx="22" cy="22" r="18" fill="none"
-                                  stroke="var(--app-accent)" strokeWidth="4"
-                                  strokeDasharray={circumference}
-                                  strokeDashoffset={offset}
-                                  strokeLinecap="round"
-                                  transform="rotate(-90 22 22)"
-                                />
-                              </svg>
-                              <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10.5, fontWeight: 800, color: "#0f1c2e" }}>
-                                {pct}%
+                  {/* HORIZONTAL SCROLLING PROJECT CARDS — overlaps the bottom of the hero card */}
+                  {projectsWithProgress.length > 0 && (
+                    <div style={{ position: "relative", margin: "-40px 0 0", zIndex: 20 }}>
+                      <div
+                        id="mobProjectsScroller"
+                        style={{ position: "relative", zIndex: 21, display: "flex", gap: 12, overflowX: "auto", justifyContent: projectsWithProgress.length > 2 ? "flex-start" : "center", padding: "0 calc(50% - 150px) 10px", WebkitOverflowScrolling: "touch" }}
+                      >
+                        {projectsWithProgress.map((p, i) => {
+                          const pct = Number(p.progress) || 0;
+                          const circumference = 2 * Math.PI * 18;
+                          const offset = circumference - (pct / 100) * circumference;
+                          const budget = formatCurrency(p.budget, p.currency);
+                          return (
+                            <div
+                              key={p._id || p.id || i}
+                              onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
+                              style={{ flex: "0 0 auto", width: 380, boxSizing: "border-box", background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.1)", border: "1px solid rgba(0,0,0,0.03)", padding: "14px 16px", display: "flex", gap: 12, cursor: "pointer" }}
+                            >
+                              <div style={{ position: "relative", width: 44, height: 44, flexShrink: 0 }}>
+                                <svg width="44" height="44" viewBox="0 0 44 44">
+                                  <circle cx="22" cy="22" r="18" fill="none" stroke="#f1f5f9" strokeWidth="4" />
+                                  <circle
+                                    cx="22" cy="22" r="18" fill="none"
+                                    stroke="var(--app-accent)" strokeWidth="4"
+                                    strokeDasharray={circumference}
+                                    strokeDashoffset={offset}
+                                    strokeLinecap="round"
+                                    transform="rotate(-90 22 22)"
+                                  />
+                                </svg>
+                                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10.5, fontWeight: 800, color: "#0f1c2e" }}>
+                                  {pct}%
+                                </div>
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                    {p.name}
+                                  </div>
+                                  <span style={{ fontSize: 9.5, fontWeight: 700, color: "#16a34a", background: "#dcfce7", padding: "2px 8px", borderRadius: 20, flexShrink: 0 }}>
+                                    {p.status || "Active"}
+                                  </span>
+                                </div>
+                                {(() => {
+                                  const budgetNum = Number(p.budget) || 0;
+                                  const spentNum = (p.expenses || []).reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
+                                  const budgetPct = budgetNum > 0 ? Math.min(100, Math.round((spentNum / budgetNum) * 100)) : 0;
+                                  return (
+                                    <div>
+                                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginBottom: 2 }}>
+                                        <span>Budget Used</span>
+                                        <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
+                                      </div>
+                                      <div style={{ height: 5, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
+                                        <div style={{ width: `${budgetPct}%`, height: "100%", background: "#7c3aed", borderRadius: 4 }} />
+                                      </div>
+                                    </div>
+                                  );
+                                })()}
+                                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#94a3b8" }}>
+                                  <span>Start: {p.start ? new Date(p.start).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "—"}</span>
+                                  <span style={{ color: "#dc2626", fontWeight: 600 }}>End: {(p.end || p.deadline) ? new Date(p.end || p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "—"}</span>
+                                </div>
                               </div>
                             </div>
-                            <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 6 }}>
-                              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                  {p.name}
-                                </div>
-                                <span style={{ fontSize: 9.5, fontWeight: 700, color: "#16a34a", background: "#dcfce7", padding: "2px 8px", borderRadius: 20, flexShrink: 0 }}>
-                                  {p.status || "Active"}
-                                </span>
-                              </div>
-                              {(() => {
-                                const budgetNum = Number(p.budget) || 0;
-                                const spentNum = (p.expenses || []).reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
-                                const budgetPct = budgetNum > 0 ? Math.min(100, Math.round((spentNum / budgetNum) * 100)) : 0;
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* FLOATING STAT STRIP — draggable reorder, sits below hero (no overlap) */}
+                  <div style={{ margin: "16px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
+                    {mobStatCardOrder.map((s, i) => (
+                      <div
+                        key={s.id}
+                        className="mob-card"
+                        draggable
+                        onDragStart={() => setDraggingStatCard(s.id)}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={() => {
+                          if (!draggingStatCard || draggingStatCard === s.id) { setDraggingStatCard(null); return; }
+                          setMobStatCardOrder(prev => {
+                            const arr = [...prev];
+                            const fromIdx = arr.findIndex(c => c.id === draggingStatCard);
+                            const toIdx = arr.findIndex(c => c.id === s.id);
+                            const [moved] = arr.splice(fromIdx, 1);
+                            arr.splice(toIdx, 0, moved);
+                            return arr;
+                          });
+                          setDraggingStatCard(null);
+                        }}
+                        onDragEnd={() => setDraggingStatCard(null)}
+                        onClick={() => openMobilePopup(s.id)}
+                        style={{ animationDelay: `${i * 60}ms`, background: "#fff", borderRadius: 18, aspectRatio: "1 / 1", padding: "6px 6px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)", cursor: "grab", opacity: draggingStatCard === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
+                      >
+                        <div style={{ width: 40, height: 40, borderRadius: 12, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 2px", color: "#fff", fontSize: 19, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
+                          <i className={`ti ${s.icon}`}></i>
+                        </div>
+                        <div style={{ fontSize: 16, fontWeight: 900, color: "#0f0a29" }}>{s.val}</div>
+                        <div style={{ fontSize: 9.5, color: "#94a3b8", fontWeight: 700, marginTop: 1 }}>{s.label}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <MobilePopup id="mobClients" title="Clients">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4, color: "#fff" }}>{clients.length} total</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.75)", marginBottom: 16 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} Active Clients</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {clients.map((c, i) => (
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8 }}>
+                          <span style={{ fontWeight: 600, color: "#fff" }}>{c.name || c.clientName || c.companyName || "Client"}</span>
+                          <span style={{ color: "rgba(255,255,255,0.75)" }}>{c.status || "-"}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </MobilePopup>
+                  <MobilePopup id="mobProjects" title="Projects">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{projects.length} total</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {projectsWithProgress.map((p, i) => (
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8 }}>
+                          <span style={{ fontWeight: 600, color: "#fff" }}>{p.name}</span>
+                          <span style={{ color: "rgba(255,255,255,0.75)" }}>{p.progress || 0}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  </MobilePopup>
+
+                  <MobilePopup id="mobTeam" title="Team">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{employees.length} staff</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {employees.map((e, i) => (
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8 }}>
+                          <span style={{ fontWeight: 600, color: "#fff" }}>{e.name}</span>
+                          <span style={{ color: "rgba(255,255,255,0.75)" }}>{e.role || "Employee"}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </MobilePopup>
+
+
+
+                  <MobilePopup id="mobRevenue" title="Revenue This Month">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4, color: "#fff" }}></div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.75)" }}>Total income this year: {formatShortCurrency(income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0))}</div>
+                  </MobilePopup>
+
+                  <MobilePopup id="mobUnpaidInvoices" title="Unpaid Invoices">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length} pending</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").map((inv, i) => (
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8 }}>
+                          <span style={{ fontWeight: 600, color: "#fff" }}>{inv.clientName || inv.client || "Client"}</span>
+                          <span style={{ color: "rgba(255,255,255,0.75)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </MobilePopup>
+
+                  {/* NEW DRAGGABLE ROW — Unpaid Invoices, Invoices, Proposals, Quotations */}
+                  <div style={{ margin: "10px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
+                    {mobSecondRowOrder.map((s, i) => (
+                      <div
+                        key={s.id}
+                        className="mob-card"
+                        draggable
+                        onDragStart={() => setDraggingSecondRow(s.id)}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={() => {
+                          if (!draggingSecondRow || draggingSecondRow === s.id) { setDraggingSecondRow(null); return; }
+                          setMobSecondRowOrder(prev => {
+                            const arr = [...prev];
+                            const fromIdx = arr.findIndex(c => c.id === draggingSecondRow);
+                            const toIdx = arr.findIndex(c => c.id === s.id);
+                            const [moved] = arr.splice(fromIdx, 1);
+                            arr.splice(toIdx, 0, moved);
+                            return arr;
+                          });
+                          setDraggingSecondRow(null);
+                        }}
+                        onDragEnd={() => setDraggingSecondRow(null)}
+                        onClick={() => openMobilePopup(s.popupId)}
+                        style={{ animationDelay: `${i * 60}ms`, background: "#fff", borderRadius: 18, aspectRatio: "1 / 1", padding: "10px 6px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)", cursor: "grab", opacity: draggingSecondRow === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
+                      >
+                        <div style={{ width: 38, height: 38, borderRadius: 12, background: s.grad, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 2px", fontSize: 18, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
+                          <i className={`ti ${s.icon}`}></i>
+                        </div>
+                        <div style={{ fontSize: 16, fontWeight: 900, color: "#0f0a29" }}>{s.val}</div>
+                        <div style={{ fontSize: 9.5, color: "#94a3b8", fontWeight: 700, marginTop: 1 }}>{s.label}</div>
+                      </div>
+                    ))}
+                  </div>
+
+
+
+                  {/* QUICK ACTION CARDS — proper dashboard-card style, tap opens popup */}
+                  <div style={{ margin: "16px 16px 0" }}>
+                    <div style={{ background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.12)", border: "1px solid rgba(0,0,0,0.03)", overflow: "hidden" }}>
+                      <div style={{ padding: "14px 16px", borderBottom: clientResponsesExpanded ? "1px solid #f1f5f9" : "none", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          <i className="ti ti-clipboard-check" style={{ color: "var(--app-accent)" }}></i>
+                          <span style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e" }}>Recent Activity</span>
+                        </div>
+                        <span onClick={() => setClientResponsesExpanded(v => !v)} style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 800, cursor: "pointer" }}>
+                          {clientResponsesExpanded ? "▼" : "▲"}
+                        </span>
+                      </div>
+                      {clientResponsesExpanded && (
+                        <div style={{ padding: "6px 16px 14px" }}>
+                          {(() => {
+                            const approvalItems = allApprovals
+                              .filter(a => a.status === "approved" || a.status === "rejected")
+                              .map(a => ({
+                                kind: "approval",
+                                key: a._id,
+                                sortDate: a.respondedAt ? new Date(a.respondedAt) : new Date(0),
+                                data: a,
+                              }));
+
+                            const invoiceItems = invoices
+                              .filter(inv => {
+                                const s = (inv.status || "").toLowerCase();
+                                return s === "paid" || s === "overdue" || s === "pending" || s === "sent";
+                              })
+                              .map(inv => ({
+                                kind: "invoice",
+                                key: inv._id || inv.invoiceNo,
+                                sortDate: inv.updatedAt ? new Date(inv.updatedAt) : (inv.date ? new Date(inv.date) : new Date(0)),
+                                data: inv,
+                              }));
+
+                            const combined = [...approvalItems, ...invoiceItems]
+                              .filter(item => !dismissedActivityKeys.includes(String(item.key)))
+                              .sort((x, y) => y.sortDate - x.sortDate)
+                              .slice(0, 20);
+
+                            if (combined.length === 0) {
+                              return <div style={{ textAlign: "center", padding: "16px 0", color: "#A0AEC0", fontSize: 13 }}>No client responses yet</div>;
+                            }
+
+                            return combined.map((item, i) => {
+                              if (item.kind === "approval") {
+                                const a = item.data;
+                                const isApproved = a.status === "approved";
                                 return (
-                                  <div>
-                                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginBottom: 2 }}>
-                                      <span>Budget Used</span>
-                                      <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
+                                  <div key={item.key || i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 0", borderBottom: i === combined.length - 1 ? "none" : "1px solid #F0F4F8" }}>
+                                    <div style={{ width: 30, height: 30, borderRadius: "50%", background: isApproved ? "#DCFCE7" : "#FEE2E2", color: isApproved ? "#16a34a" : "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 14 }}>
+                                      <i className={`ti ${isApproved ? "ti-check" : "ti-x"}`}></i>
                                     </div>
-                                    <div style={{ height: 5, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
-                                      <div style={{ width: `${budgetPct}%`, height: "100%", background: "#7c3aed", borderRadius: 4 }} />
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                      <div style={{ fontSize: 12.5, fontWeight: 700, color: "#1A2332" }}>
+                                        {a.title || "Update"} — <span style={{ color: isApproved ? "#16a34a" : "#dc2626" }}>{isApproved ? "Approved" : "Rejected"}</span>
+                                      </div>
+                                      {a.desc && <div style={{ fontSize: 11, color: "#718096", marginTop: 2 }}>{a.desc}</div>}
+                                      {!isApproved && a.rejectReason && (
+                                        <div style={{ fontSize: 11, color: "#dc2626", marginTop: 3, background: "#FEF2F2", padding: "4px 8px", borderRadius: 6 }}>
+                                          Reason: {a.rejectReason}
+                                        </div>
+                                      )}
+                                      <div style={{ fontSize: 10, color: "#A0AEC0", marginTop: 3 }}>
+                                        {a.respondedAt ? new Date(a.respondedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}
+                                      </div>
                                     </div>
+                                    <span
+                                      onClick={() => setDismissedActivityKeys(prev => [...prev, String(item.key)])}
+                                      style={{ fontSize: 14, color: "var(--app-muted)", fontWeight: 700, cursor: "pointer", flexShrink: 0, padding: "4px 8px", lineHeight: 1 }}
+                                    >
+                                      ✕
+                                    </span>
                                   </div>
                                 );
-                              })()}
-                              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#94a3b8" }}>
-                                <span>Start: {p.start ? new Date(p.start).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "—"}</span>
-                                <span style={{ color: "#dc2626", fontWeight: 600 }}>End: {(p.end || p.deadline) ? new Date(p.end || p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "—"}</span>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
+                              }
 
-                {/* FLOATING STAT STRIP — draggable reorder, sits below hero (no overlap) */}
-                <div style={{ margin: "16px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
-                  {mobStatCardOrder.map((s, i) => (
-                    <div
-                      key={s.id}
-                      className="mob-card"
-                      draggable
-                      onDragStart={() => setDraggingStatCard(s.id)}
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={() => {
-                        if (!draggingStatCard || draggingStatCard === s.id) { setDraggingStatCard(null); return; }
-                        setMobStatCardOrder(prev => {
-                          const arr = [...prev];
-                          const fromIdx = arr.findIndex(c => c.id === draggingStatCard);
-                          const toIdx = arr.findIndex(c => c.id === s.id);
-                          const [moved] = arr.splice(fromIdx, 1);
-                          arr.splice(toIdx, 0, moved);
-                          return arr;
-                        });
-                        setDraggingStatCard(null);
-                      }}
-                      onDragEnd={() => setDraggingStatCard(null)}
-                      onClick={() => openMobilePopup(s.id)}
-                      style={{ animationDelay: `${i * 60}ms`, background: "#fff", borderRadius: 18, aspectRatio: "1 / 1", padding: "6px 6px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)", cursor: "grab", opacity: draggingStatCard === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
-                    >
-                      <div style={{ width: 40, height: 40, borderRadius: 12, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 2px", color: "#fff", fontSize: 19, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
-                        <i className={`ti ${s.icon}`}></i>
-                      </div>
-                      <div style={{ fontSize: 16, fontWeight: 900, color: "#0f0a29" }}>{s.val}</div>
-                      <div style={{ fontSize: 9.5, color: "#94a3b8", fontWeight: 700, marginTop: 1 }}>{s.label}</div>
-                    </div>
-                  ))}
-                </div>
-
-                <MobilePopup id="mobClients" title="Clients">
-                  <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4, color: "#fff" }}>{clients.length} total</div>
-                  <div style={{ fontSize: 13, color: "rgba(255,255,255,0.75)", marginBottom: 16 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} Active Clients</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    {clients.map((c, i) => (
-                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8 }}>
-                        <span style={{ fontWeight: 600, color: "#fff" }}>{c.name || c.clientName || c.companyName || "Client"}</span>
-                        <span style={{ color: "rgba(255,255,255,0.75)" }}>{c.status || "-"}</span>
-                      </div>
-                    ))}
-                  </div>
-                </MobilePopup>
-                <MobilePopup id="mobProjects" title="Projects">
-                  <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{projects.length} total</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    {projectsWithProgress.map((p, i) => (
-                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8 }}>
-                        <span style={{ fontWeight: 600, color: "#fff" }}>{p.name}</span>
-                        <span style={{ color: "rgba(255,255,255,0.75)" }}>{p.progress || 0}%</span>
-                      </div>
-                    ))}
-                  </div>
-                </MobilePopup>
-
-                <MobilePopup id="mobTeam" title="Team">
-                  <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{employees.length} staff</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    {employees.map((e, i) => (
-                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8 }}>
-                        <span style={{ fontWeight: 600, color: "#fff" }}>{e.name}</span>
-                        <span style={{ color: "rgba(255,255,255,0.75)" }}>{e.role || "Employee"}</span>
-                      </div>
-                    ))}
-                  </div>
-                </MobilePopup>
-
-
-
-                <MobilePopup id="mobRevenue" title="Revenue This Month">
-                  <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4, color: "#fff" }}></div>
-                  <div style={{ fontSize: 13, color: "rgba(255,255,255,0.75)" }}>Total income this year: {formatShortCurrency(income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0))}</div>
-                </MobilePopup>
-
-                <MobilePopup id="mobUnpaidInvoices" title="Unpaid Invoices">
-                  <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length} pending</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    {invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").map((inv, i) => (
-                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8 }}>
-                        <span style={{ fontWeight: 600, color: "#fff" }}>{inv.clientName || inv.client || "Client"}</span>
-                        <span style={{ color: "rgba(255,255,255,0.75)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
-                      </div>
-                    ))}
-                  </div>
-                </MobilePopup>
-
-                {/* NEW DRAGGABLE ROW — Unpaid Invoices, Invoices, Proposals, Quotations */}
-                <div style={{ margin: "10px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
-                  {mobSecondRowOrder.map((s, i) => (
-                    <div
-                      key={s.id}
-                      className="mob-card"
-                      draggable
-                      onDragStart={() => setDraggingSecondRow(s.id)}
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={() => {
-                        if (!draggingSecondRow || draggingSecondRow === s.id) { setDraggingSecondRow(null); return; }
-                        setMobSecondRowOrder(prev => {
-                          const arr = [...prev];
-                          const fromIdx = arr.findIndex(c => c.id === draggingSecondRow);
-                          const toIdx = arr.findIndex(c => c.id === s.id);
-                          const [moved] = arr.splice(fromIdx, 1);
-                          arr.splice(toIdx, 0, moved);
-                          return arr;
-                        });
-                        setDraggingSecondRow(null);
-                      }}
-                      onDragEnd={() => setDraggingSecondRow(null)}
-                      onClick={() => openMobilePopup(s.popupId)}
-                      style={{ animationDelay: `${i * 60}ms`, background: "#fff", borderRadius: 18, aspectRatio: "1 / 1", padding: "10px 6px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)", cursor: "grab", opacity: draggingSecondRow === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
-                    >
-                      <div style={{ width: 38, height: 38, borderRadius: 12, background: s.grad, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 2px", fontSize: 18, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
-                        <i className={`ti ${s.icon}`}></i>
-                      </div>
-                      <div style={{ fontSize: 16, fontWeight: 900, color: "#0f0a29" }}>{s.val}</div>
-                      <div style={{ fontSize: 9.5, color: "#94a3b8", fontWeight: 700, marginTop: 1 }}>{s.label}</div>
-                    </div>
-                  ))}
-                </div>
-
-
-
-                {/* QUICK ACTION CARDS — proper dashboard-card style, tap opens popup */}
-                <div style={{ margin: "16px 16px 0" }}>
-                  <div style={{ background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.12)", border: "1px solid rgba(0,0,0,0.03)", overflow: "hidden" }}>
-                    <div style={{ padding: "14px 16px", borderBottom: clientResponsesExpanded ? "1px solid #f1f5f9" : "none", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        <i className="ti ti-clipboard-check" style={{ color: "var(--app-accent)" }}></i>
-                        <span style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e" }}>Recent Activity</span>
-                      </div>
-                      <span onClick={() => setClientResponsesExpanded(v => !v)} style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 800, cursor: "pointer" }}>
-                        {clientResponsesExpanded ? "▼" : "▲"}
-                      </span>
-                    </div>
-                    {clientResponsesExpanded && (
-                      <div style={{ padding: "6px 16px 14px" }}>
-                        {(() => {
-                          const approvalItems = allApprovals
-                            .filter(a => a.status === "approved" || a.status === "rejected")
-                            .map(a => ({
-                              kind: "approval",
-                              key: a._id,
-                              sortDate: a.respondedAt ? new Date(a.respondedAt) : new Date(0),
-                              data: a,
-                            }));
-
-                          const invoiceItems = invoices
-                            .filter(inv => {
+                              const inv = item.data;
                               const s = (inv.status || "").toLowerCase();
-                              return s === "paid" || s === "overdue" || s === "pending" || s === "sent";
-                            })
-                            .map(inv => ({
-                              kind: "invoice",
-                              key: inv._id || inv.invoiceNo,
-                              sortDate: inv.updatedAt ? new Date(inv.updatedAt) : (inv.date ? new Date(inv.date) : new Date(0)),
-                              data: inv,
-                            }));
-
-                          const combined = [...approvalItems, ...invoiceItems]
-                            .filter(item => !dismissedActivityKeys.includes(String(item.key)))
-                            .sort((x, y) => y.sortDate - x.sortDate)
-                            .slice(0, 20);
-
-                          if (combined.length === 0) {
-                            return <div style={{ textAlign: "center", padding: "16px 0", color: "#A0AEC0", fontSize: 13 }}>No client responses yet</div>;
-                          }
-
-                          return combined.map((item, i) => {
-                            if (item.kind === "approval") {
-                              const a = item.data;
-                              const isApproved = a.status === "approved";
+                              const cfg = s === "paid"
+                                ? { icon: "ti-cash", bg: "#DCFCE7", color: "#16a34a", label: "Paid" }
+                                : s === "overdue"
+                                  ? { icon: "ti-alert-circle", bg: "#FEE2E2", color: "#dc2626", label: "Overdue" }
+                                  : s === "sent"
+                                    ? { icon: "ti-send", bg: "#DBEAFE", color: "#1d4ed8", label: "Sent" }
+                                    : { icon: "ti-clock", bg: "#FEF3C7", color: "#b45309", label: "Pending" };
                               return (
                                 <div key={item.key || i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 0", borderBottom: i === combined.length - 1 ? "none" : "1px solid #F0F4F8" }}>
-                                  <div style={{ width: 30, height: 30, borderRadius: "50%", background: isApproved ? "#DCFCE7" : "#FEE2E2", color: isApproved ? "#16a34a" : "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 14 }}>
-                                    <i className={`ti ${isApproved ? "ti-check" : "ti-x"}`}></i>
+                                  <div style={{ width: 30, height: 30, borderRadius: "50%", background: cfg.bg, color: cfg.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 14 }}>
+                                    <i className={`ti ${cfg.icon}`}></i>
                                   </div>
                                   <div style={{ flex: 1, minWidth: 0 }}>
                                     <div style={{ fontSize: 12.5, fontWeight: 700, color: "#1A2332" }}>
-                                      {a.title || "Update"} — <span style={{ color: isApproved ? "#16a34a" : "#dc2626" }}>{isApproved ? "Approved" : "Rejected"}</span>
+                                      Invoice {inv.invoiceNo || ""} — <span style={{ color: cfg.color }}>{cfg.label}</span>
                                     </div>
-                                    {a.desc && <div style={{ fontSize: 11, color: "#718096", marginTop: 2 }}>{a.desc}</div>}
-                                    {!isApproved && a.rejectReason && (
-                                      <div style={{ fontSize: 11, color: "#dc2626", marginTop: 3, background: "#FEF2F2", padding: "4px 8px", borderRadius: 6 }}>
-                                        Reason: {a.rejectReason}
-                                      </div>
-                                    )}
+                                    <div style={{ fontSize: 11, color: "#718096", marginTop: 2 }}>
+                                      {inv.clientName || inv.client || "Client"}
+                                    </div>
                                     <div style={{ fontSize: 10, color: "#A0AEC0", marginTop: 3 }}>
-                                      {a.respondedAt ? new Date(a.respondedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}
+                                      {inv.date ? new Date(inv.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}
                                     </div>
                                   </div>
                                   <span
@@ -10510,2078 +10697,1985 @@ return (
                                   </span>
                                 </div>
                               );
-                            }
-
-                            const inv = item.data;
-                            const s = (inv.status || "").toLowerCase();
-                            const cfg = s === "paid"
-                              ? { icon: "ti-cash", bg: "#DCFCE7", color: "#16a34a", label: "Paid" }
-                              : s === "overdue"
-                                ? { icon: "ti-alert-circle", bg: "#FEE2E2", color: "#dc2626", label: "Overdue" }
-                                : s === "sent"
-                                  ? { icon: "ti-send", bg: "#DBEAFE", color: "#1d4ed8", label: "Sent" }
-                                  : { icon: "ti-clock", bg: "#FEF3C7", color: "#b45309", label: "Pending" };
-                            return (
-                              <div key={item.key || i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 0", borderBottom: i === combined.length - 1 ? "none" : "1px solid #F0F4F8" }}>
-                                <div style={{ width: 30, height: 30, borderRadius: "50%", background: cfg.bg, color: cfg.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 14 }}>
-                                  <i className={`ti ${cfg.icon}`}></i>
-                                </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ fontSize: 12.5, fontWeight: 700, color: "#1A2332" }}>
-                                    Invoice {inv.invoiceNo || ""} — <span style={{ color: cfg.color }}>{cfg.label}</span>
-                                  </div>
-                                  <div style={{ fontSize: 11, color: "#718096", marginTop: 2 }}>
-                                    {inv.clientName || inv.client || "Client"}
-                                  </div>
-                                  <div style={{ fontSize: 10, color: "#A0AEC0", marginTop: 3 }}>
-                                    {inv.date ? new Date(inv.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}
-                                  </div>
-                                </div>
-                                <span
-                                  onClick={() => setDismissedActivityKeys(prev => [...prev, String(item.key)])}
-                                  style={{ fontSize: 14, color: "var(--app-muted)", fontWeight: 700, cursor: "pointer", flexShrink: 0, padding: "4px 8px", lineHeight: 1 }}
-                                >
-                                  ✕
-                                </span>
-                              </div>
-                            );
-                          });
-                        })()}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* QUICK ACTION CARDS — proper dashboard-card style, tap opens popup */}
-                <div style={{ padding: "22px 16px 6px", display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}></div>
-                <MobilePopup id="qaQuote" title="Quotations">
-                  <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{(quotations || []).length} total</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                    {(quotations || []).map((q, i) => (
-                      <div key={q._id || q.id || i} style={{ borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 10 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                          <span style={{ fontWeight: 700, fontSize: 13, color: "#fff" }}>{q.qt?.quoteNo || q.quoteNo || q.clientName || "Quotation"}</span>
-                          <span style={{ color: (q.status || "").toLowerCase() === "approved" ? "#bbf7d0" : "rgba(255,255,255,0.75)", fontWeight: (q.status || "").toLowerCase() === "approved" ? 800 : 600, fontSize: 11 }}>{(q.status || "draft").toUpperCase()}</span>
+                            });
+                          })()}
                         </div>
-                        {q.reviewComment && (
-                          <div style={{ fontSize: 11, color: "#fff", marginTop: 3 }}>
-                            <i className="ti ti-message-2" style={{ fontSize: 11 }}></i> {q.reviewComment}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </MobilePopup>
-
-                <MobilePopup id="qaProposal" title="Proposals">
-                  <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{(proposalsList || []).length} total</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                    {(proposalsList || []).map((p, i) => (
-                      <div key={p._id || p.id || i} style={{ borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 10 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                          <span style={{ fontWeight: 700, fontSize: 13, color: "#fff" }}>{p.title || "Proposal"}</span>
-                          <span style={{ color: (p.status || "").toLowerCase() === "approved" ? "#bbf7d0" : "rgba(255,255,255,0.75)", fontWeight: (p.status || "").toLowerCase() === "approved" ? 800 : 600, fontSize: 11 }}>{(p.status || "draft").toUpperCase()}</span>
-                        </div>
-                        {p.reviewComment && (
-                          <div style={{ fontSize: 11, color: "#fff", marginTop: 3 }}>
-                            <i className="ti ti-message-2" style={{ fontSize: 11 }}></i> {p.reviewComment}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </MobilePopup>
-
-                <MobilePopup id="qaInvoice" title="Invoices">
-                  <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{invoices.length} total</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    {invoices.slice(0, 10).map((inv, i) => (
-                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8 }}>
-                        <span style={{ fontWeight: 600, color: "#fff" }}>{inv.clientName || inv.client || "Client"}</span>
-                        <span style={{ color: "rgba(255,255,255,0.75)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
-                      </div>
-                    ))}
-                  </div>
-                </MobilePopup>
-
-                <MobilePopup id="qaClient" title="Clients">
-                  <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{clients.length} total</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    {clients.slice(0, 10).map((c, i) => (
-                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
-                        <span style={{ fontWeight: 600 }}>{c.name || c.companyName || "Client"}</span>
-                        <span style={{ color: "rgba(15,28,46,0.5)" }}>{c.status || "-"}</span>
-                      </div>
-                    ))}
-                  </div>
-                </MobilePopup>
-
-                <MobilePopup id="qaProject" title="Projects">
-                  <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{projectsWithProgress.length} total</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    {projectsWithProgress.slice(0, 10).map((p, i) => (
-                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
-                        <span style={{ fontWeight: 600 }}>{p.name}</span>
-                        <span style={{ color: "rgba(15,28,46,0.5)" }}>{p.progress || 0}%</span>
-                      </div>
-                    ))}
-                  </div>
-                </MobilePopup>
-
-
-
-
-                {/* FLOATING BOTTOM NAV — glass pill */}
-                <div style={{ position: "fixed", bottom: 14, left: 14, right: 14, background: "rgba(15,10,41,0.92)", backdropFilter: "blur(16px)", borderRadius: 24, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "10px 6px", zIndex: 4000, boxShadow: "0 12px 32px rgba(15,10,41,0.35)" }}>
-                  {[
-                    { icon: "ti-file-invoice", label: "Invoice", key: "invoices" },
-                    { icon: "ti-folder", label: "Projects", key: "projects" },
-                    { icon: null, label: "", key: "add" },
-                    { icon: "ti-users", label: "Clients", key: "clients" },
-                    { icon: "ti-dots", label: "More", key: "settings" },
-                  ].map((n, i) => n.key === "add" ? (
-                    <div key={i} onClick={() => setShowMobileAddMenu(true)} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#26d0ce)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", border: "3px solid #0f0a29" }}>+</div>
-                  ) : (
-                    <div key={i} onClick={() => {
-                      if (n.key === "invoices") {
-                        setJumpProject(null);
-                        setJumpInvoice(null);
-                        setInvoicePrefill(null);
-                        setSidebarNavClickId(id => id + 1);
-                      }
-                      if (n.key === "invoices" || n.key === "projects" || n.key === "clients") {
-                        setOpenedFromMobileAddMenu(true);
-                      }
-                      setActive(n.key);
-                    }} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: (active === n.key || (n.key === "invoices" && active === "invoices")) ? "var(--app-accent)" : "rgba(255,255,255,0.5)", padding: "4px 10px" }}>
-                      <i className={`ti ${n.icon}`} style={{ fontSize: 19 }}></i>
-                      <span style={{ fontSize: 9.5, fontWeight: 700 }}>{n.label}</span>
+                      )}
                     </div>
-                  ))}
-                </div>
+                  </div>
 
-                {showMobileAddMenu && (
-                  <div
-                    onClick={() => setShowMobileAddMenu(false)}
-                    style={{ position: "fixed", inset: 0, background: "rgba(15,10,41,0.55)", zIndex: 4500, display: "flex", alignItems: "flex-end", justifyContent: "center" }}
-                  >
-                    <div
-                      onClick={(e) => e.stopPropagation()}
-                      style={{ background: "#fff", borderRadius: "20px 20px 0 0", width: "100%", maxWidth: 480, padding: "20px 16px 28px", boxShadow: "0 -4px 24px rgba(0,0,0,0.2)" }}
-                    >
-                      <div style={{ width: 40, height: 4, borderRadius: 2, background: "#e2e8f0", margin: "0 auto 18px" }} />
-                      {[
-                        { icon: "ti-building", label: "Add Client", action: () => { setNcError({}); setShowClientPass(false); setOpenedFromMobileAddMenu(true); setActive("addClient"); } },
-                        { icon: "ti-file-invoice", label: "Add Invoice", action: () => { setJumpProject(null); setJumpInvoice(null); setInvoicePrefill(null); setSidebarNavClickId(id => id + 1); setOpenedFromMobileAddMenu(true); setActive("invoices"); } },
-                        { icon: "ti-briefcase", label: "Add Project", action: () => { setJumpProject(null); setOpenedFromMobileAddMenu(true); setActive("create-project"); } },
-                      ].map((opt, idx) => (
-                        <div
-                          key={idx}
-                          onClick={() => { setShowMobileAddMenu(false); opt.action(); }}
-                          style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 12px", borderRadius: 14, cursor: "pointer", marginBottom: idx < 2 ? 8 : 0 }}
-                          onTouchStart={e => e.currentTarget.style.background = "#f8fafc"}
-                        >
-                          <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--app-accent)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
-                            <i className={`ti ${opt.icon}`}></i>
+                  {/* QUICK ACTION CARDS — proper dashboard-card style, tap opens popup */}
+                  <div style={{ padding: "22px 16px 6px", display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}></div>
+                  <MobilePopup id="qaQuote" title="Quotations">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{(quotations || []).length} total</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                      {(quotations || []).map((q, i) => (
+                        <div key={q._id || q.id || i} style={{ borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 10 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                            <span style={{ fontWeight: 700, fontSize: 13, color: "#fff" }}>{q.qt?.quoteNo || q.quoteNo || q.clientName || "Quotation"}</span>
+                            <span style={{ color: (q.status || "").toLowerCase() === "approved" ? "#bbf7d0" : "rgba(255,255,255,0.75)", fontWeight: (q.status || "").toLowerCase() === "approved" ? 800 : 600, fontSize: 11 }}>{(q.status || "draft").toUpperCase()}</span>
                           </div>
-                          <div style={{ fontSize: 15, fontWeight: 700, color: "#0f1c2e" }}>+ {opt.label}</div>
+                          {q.reviewComment && (
+                            <div style={{ fontSize: 11, color: "#fff", marginTop: 3 }}>
+                              <i className="ti ti-message-2" style={{ fontSize: 11 }}></i> {q.reviewComment}
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="desktop-dashboard-view">
-
-                {/* Theme Picker - Dashboard Page */}
-
-                <div style={{ position: "fixed", bottom: 28, right: 28, zIndex: 5000 }}>
-
-                  {showThemePicker && (
-
-                    <div style={{
-
-                      position: "absolute", bottom: 56, right: 0,
-
-                      background: "#fff", borderRadius: 18, padding: 20,
-
-                      boxShadow: "0 20px 60px rgba(0,0,0,0.18)", border: "1.5px solid var(--app-border)",
-
-                      width: 300, maxHeight: "70vh", overflowY: "auto"
-
-                    }}>
-
-                      <div style={{ fontSize: 13, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 14 }}>
-
-                        Choose Theme
-
-                      </div>
-
-                      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
-
-                        {Object.entries(THEMES).map(([key, t]) => (
-
-                          <button key={key} onClick={() => { setAppTheme(key); setShowThemePicker(false); }}
-
-                            style={{
-
-                              border: appTheme === key ? `2.5px solid ${t.dot}` : "2px solid var(--app-border)",
-
-                              borderRadius: 12, padding: "10px 6px", background: appTheme === key ? `${t.dot}15` : "#fafafa",
-
-                              cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
-
-                              fontFamily: "inherit", transition: "all 0.15s"
-
-                            }}>
-
-                            <div style={{ width: 28, height: 28, borderRadius: "50%", background: t.dot, boxShadow: `0 3px 8px ${t.dot}50` }} />
-
-                            <span style={{ fontSize: 10, fontWeight: 700, color: appTheme === key ? t.dot : "#64748b" }}>
-
-                              {t.label}
-
-                            </span>
-
-                          </button>
-
-                        ))}
-
-                      </div>
-
-
-
-                      {/* Custom Color Picker Section */}
-
-                      <div style={{ marginTop: 16, borderTop: "1.5px solid var(--app-border)", paddingTop: 14 }}>
-
-                        <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>
-
-                          🎯 Custom Color
-
-                        </div>
-
-                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-
-                          <div style={{ position: "relative", flexShrink: 0 }}>
-
-                            <div style={{
-
-                              width: 42, height: 42, borderRadius: 12,
-
-                              background: customColor,
-
-                              border: appTheme === "custom" ? `2.5px solid ${customColor}` : "2px solid var(--app-border)",
-
-                              boxShadow: `0 4px 12px ${customColor}40`,
-
-                              cursor: "pointer", transition: "all 0.2s",
-
-                              display: "flex", alignItems: "center", justifyContent: "center"
-
-                            }}
-
-                              onClick={() => document.getElementById("customColorInput")?.click()}
-
-                            >
-
-                              <span style={{ fontSize: 16 }}></span>
-
-                            </div>
-
-                            <input
-
-                              id="customColorInput"
-
-                              type="color"
-
-                              value={customColor}
-
-                              onChange={(e) => {
-
-                                setCustomColor(e.target.value);
-
-                                setAppTheme("custom");
-
-                              }}
-
-                              style={{
-
-                                position: "absolute", top: 0, left: 0, width: 42, height: 42,
-
-                                opacity: 0, cursor: "pointer", border: "none"
-
-                              }}
-
-                            />
-
+                  </MobilePopup>
+
+                  <MobilePopup id="qaProposal" title="Proposals">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{(proposalsList || []).length} total</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                      {(proposalsList || []).map((p, i) => (
+                        <div key={p._id || p.id || i} style={{ borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 10 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                            <span style={{ fontWeight: 700, fontSize: 13, color: "#fff" }}>{p.title || "Proposal"}</span>
+                            <span style={{ color: (p.status || "").toLowerCase() === "approved" ? "#bbf7d0" : "rgba(255,255,255,0.75)", fontWeight: (p.status || "").toLowerCase() === "approved" ? 800 : 600, fontSize: 11 }}>{(p.status || "draft").toUpperCase()}</span>
                           </div>
-
-                          <div style={{ flex: 1 }}>
-
-                            <div style={{ fontSize: 12, fontWeight: 700, color: appTheme === "custom" ? customColor : "#64748b" }}>
-
-                              {appTheme === "custom" ? "Custom Active" : "Pick any color"}
-
+                          {p.reviewComment && (
+                            <div style={{ fontSize: 11, color: "#fff", marginTop: 3 }}>
+                              <i className="ti ti-message-2" style={{ fontSize: 11 }}></i> {p.reviewComment}
                             </div>
-
-                            <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
-
-                              {customColor.toUpperCase()}
-
-                            </div>
-
-                          </div>
-
-                          {appTheme === "custom" && (
-
-                            <div style={{
-
-                              width: 20, height: 20, borderRadius: "50%",
-                              background: "#22c55e", boxShadow: "0 0 6px #22c55e80",
-                              display: "flex", alignItems: "center", justifyContent: "center",
-                              color: "#fff", fontSize: 12, fontWeight: 900, flexShrink: 0
-
-                            }}>✓</div>
-
                           )}
+                        </div>
+                      ))}
+                    </div>
+                  </MobilePopup>
+
+                  <MobilePopup id="qaInvoice" title="Invoices">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{invoices.length} total</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {invoices.slice(0, 10).map((inv, i) => (
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8 }}>
+                          <span style={{ fontWeight: 600, color: "#fff" }}>{inv.clientName || inv.client || "Client"}</span>
+                          <span style={{ color: "rgba(255,255,255,0.75)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </MobilePopup>
+
+                  <MobilePopup id="qaClient" title="Clients">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{clients.length} total</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {clients.slice(0, 10).map((c, i) => (
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
+                          <span style={{ fontWeight: 600 }}>{c.name || c.companyName || "Client"}</span>
+                          <span style={{ color: "rgba(15,28,46,0.5)" }}>{c.status || "-"}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </MobilePopup>
+
+                  <MobilePopup id="qaProject" title="Projects">
+                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{projectsWithProgress.length} total</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {projectsWithProgress.slice(0, 10).map((p, i) => (
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
+                          <span style={{ fontWeight: 600 }}>{p.name}</span>
+                          <span style={{ color: "rgba(15,28,46,0.5)" }}>{p.progress || 0}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  </MobilePopup>
+
+
+
+
+                  {/* FLOATING BOTTOM NAV — glass pill */}
+                  <div style={{ position: "fixed", bottom: 14, left: 14, right: 14, background: "rgba(15,10,41,0.92)", backdropFilter: "blur(16px)", borderRadius: 24, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "10px 6px", zIndex: 4000, boxShadow: "0 12px 32px rgba(15,10,41,0.35)" }}>
+                    {[
+                      { icon: "ti-file-invoice", label: "Invoice", key: "invoices" },
+                      { icon: "ti-folder", label: "Projects", key: "projects" },
+                      { icon: null, label: "", key: "add" },
+                      { icon: "ti-users", label: "Clients", key: "clients" },
+                      { icon: "ti-dots", label: "More", key: "settings" },
+                    ].map((n, i) => n.key === "add" ? (
+                      <div key={i} onClick={() => setShowMobileAddMenu(true)} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#26d0ce)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", border: "3px solid #0f0a29" }}>+</div>
+                    ) : (
+                      <div key={i} onClick={() => {
+                        if (n.key === "invoices") {
+                          setJumpProject(null);
+                          setJumpInvoice(null);
+                          setInvoicePrefill(null);
+                          setSidebarNavClickId(id => id + 1);
+                        }
+                        if (n.key === "invoices" || n.key === "projects" || n.key === "clients") {
+                          setOpenedFromMobileAddMenu(true);
+                        }
+                        setActive(n.key);
+                      }} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: (active === n.key || (n.key === "invoices" && active === "invoices")) ? "var(--app-accent)" : "rgba(255,255,255,0.5)", padding: "4px 10px" }}>
+                        <i className={`ti ${n.icon}`} style={{ fontSize: 19 }}></i>
+                        <span style={{ fontSize: 9.5, fontWeight: 700 }}>{n.label}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {showMobileAddMenu && (
+                    <div
+                      onClick={() => setShowMobileAddMenu(false)}
+                      style={{ position: "fixed", inset: 0, background: "rgba(15,10,41,0.55)", zIndex: 4500, display: "flex", alignItems: "flex-end", justifyContent: "center" }}
+                    >
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ background: "#fff", borderRadius: "20px 20px 0 0", width: "100%", maxWidth: 480, padding: "20px 16px 28px", boxShadow: "0 -4px 24px rgba(0,0,0,0.2)" }}
+                      >
+                        <div style={{ width: 40, height: 4, borderRadius: 2, background: "#e2e8f0", margin: "0 auto 18px" }} />
+                        {[
+                          { icon: "ti-building", label: "Add Client", action: () => { setNcError({}); setShowClientPass(false); setOpenedFromMobileAddMenu(true); setActive("addClient"); } },
+                          { icon: "ti-file-invoice", label: "Add Invoice", action: () => { setJumpProject(null); setJumpInvoice(null); setInvoicePrefill(null); setSidebarNavClickId(id => id + 1); setOpenedFromMobileAddMenu(true); setActive("invoices"); } },
+                          { icon: "ti-briefcase", label: "Add Project", action: () => { setJumpProject(null); setOpenedFromMobileAddMenu(true); setActive("create-project"); } },
+                        ].map((opt, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => { setShowMobileAddMenu(false); opt.action(); }}
+                            style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 12px", borderRadius: 14, cursor: "pointer", marginBottom: idx < 2 ? 8 : 0 }}
+                            onTouchStart={e => e.currentTarget.style.background = "#f8fafc"}
+                          >
+                            <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--app-accent)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                              <i className={`ti ${opt.icon}`}></i>
+                            </div>
+                            <div style={{ fontSize: 15, fontWeight: 700, color: "#0f1c2e" }}>+ {opt.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="desktop-dashboard-view">
+
+                  {/* Theme Picker - Dashboard Page */}
+
+                  <div style={{ position: "fixed", bottom: 28, right: 28, zIndex: 5000 }}>
+
+                    {showThemePicker && (
+
+                      <div style={{
+
+                        position: "absolute", bottom: 56, right: 0,
+
+                        background: "#fff", borderRadius: 18, padding: 20,
+
+                        boxShadow: "0 20px 60px rgba(0,0,0,0.18)", border: "1.5px solid var(--app-border)",
+
+                        width: 300, maxHeight: "70vh", overflowY: "auto"
+
+                      }}>
+
+                        <div style={{ fontSize: 13, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 14 }}>
+
+                          Choose Theme
 
                         </div>
 
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
 
+                          {Object.entries(THEMES).map(([key, t]) => (
 
-                        {/* Quick custom color presets */}
-
-                        <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
-
-                          {["#2563eb", "#0891b2", "#059669", "#d97706", "#dc2626", "#db2777", "#7c2d12", "#4f46e5", "#0f766e", "#b91c1c"].map(c => (
-
-                            <div key={c} onClick={() => { setCustomColor(c); setAppTheme("custom"); setShowThemePicker(false); }}
+                            <button key={key} onClick={() => { setAppTheme(key); setShowThemePicker(false); }}
 
                               style={{
 
-                                width: 22, height: 22, borderRadius: 6, background: c, cursor: "pointer",
+                                border: appTheme === key ? `2.5px solid ${t.dot}` : "2px solid var(--app-border)",
 
-                                border: customColor === c && appTheme === "custom" ? "2px solid #fff" : "2px solid transparent",
+                                borderRadius: 12, padding: "10px 6px", background: appTheme === key ? `${t.dot}15` : "#fafafa",
 
-                                boxShadow: customColor === c && appTheme === "custom" ? `0 0 0 2px ${c}, 0 2px 8px ${c}50` : `0 1px 4px ${c}30`,
+                                cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
 
-                                transition: "all 0.15s"
+                                fontFamily: "inherit", transition: "all 0.15s"
 
-                              }}
+                              }}>
 
-                            />
+                              <div style={{ width: 28, height: 28, borderRadius: "50%", background: t.dot, boxShadow: `0 3px 8px ${t.dot}50` }} />
+
+                              <span style={{ fontSize: 10, fontWeight: 700, color: appTheme === key ? t.dot : "#64748b" }}>
+
+                                {t.label}
+
+                              </span>
+
+                            </button>
 
                           ))}
 
                         </div>
 
-                      </div>
-
-                    </div>
-
-                  )}
-
-                  <button onClick={() => setShowThemePicker(v => !v)}
-                    style={{
-                      width: 48, height: 48, borderRadius: "50%",
-                      background: appTheme === "custom"
-                        ? `linear-gradient(135deg, ${customColor}, ${customColor}dd)`
-                        : `linear-gradient(135deg, ${THEMES[appTheme]?.accent}, ${THEMES[appTheme]?.dot})`,
-                      border: "none", color: "#fff", fontSize: 20, cursor: "pointer",
-                      boxShadow: `0 6px 20px ${appTheme === "custom" ? customColor : (THEMES[appTheme]?.dot || "var(--app-accent)")}60`,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      transition: "all 0.2s"
-                    }}>
-                    🎨
-                  </button>
-                  <button
-                    onClick={() => { const ph = (user?.phone || "").replace(/\D/g, ""); window.open(ph ? "https://wa.me/" + ph : "https://web.whatsapp.com/", "_blank"); }}
-                    title="Open WhatsApp"
-                    style={{
-                      width: 48, height: 48, borderRadius: "50%",
-                      background: "#25D366",
-                      border: "none", cursor: "pointer",
-                      boxShadow: "0 6px 20px rgba(37,211,102,0.6)",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      transition: "all 0.2s", padding: 0,
-                      marginTop: 12
-                    }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 32 32" fill="none">
-                      <path d="M16 1C7.7 1 1 7.7 1 16c0 2.7.7 5.2 2 7.4L1 31l7.9-2c2.1 1.1 4.5 1.8 7.1 1.8 8.3 0 15-6.7 15-15S24.3 1 16 1z" fill="#fff" />
-                      <path d="M16 3.5C9 3.5 3.5 9 3.5 16c0 2.5.7 4.8 1.9 6.8l.3.5-1.3 4.7 4.9-1.3.5.3C11.6 28.1 13.7 28.5 16 28.5c7 0 12.5-5.5 12.5-12.5S23 3.5 16 3.5z" fill="#25D366" />
-                      <path d="M11.5 9.5c-.3-.7-.6-.7-.9-.7h-.7c-.3 0-.7.1-1.1.5-.4.4-1.5 1.5-1.5 3.6s1.6 4.2 1.8 4.5c.2.3 3 4.7 7.4 6.4 3.7 1.4 4.4 1.1 5.2 1 .8 0 2.5-1 2.8-2 .4-1 .4-1.8.3-2-.1-.2-.4-.3-.8-.5-.4-.2-2.5-1.2-2.8-1.3-.4-.1-.6-.2-.9.2-.3.4-1 1.3-1.3 1.6-.2.3-.5.3-.8.1-.4-.2-1.6-.6-3-1.9-1.1-1-1.9-2.2-2.1-2.6-.2-.4 0-.6.2-.8.2-.2.4-.4.5-.7.2-.2.2-.4.4-.7.1-.2 0-.5-.1-.7-.2-.2-.9-2.2-1.2-3z" fill="#fff" />
-                    </svg>
-                  </button>
-                </div>
 
 
+                        {/* Custom Color Picker Section */}
 
+                        <div style={{ marginTop: 16, borderTop: "1.5px solid var(--app-border)", paddingTop: 14 }}>
 
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>
 
+                            🎯 Custom Color
 
+                          </div>
 
+                          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
 
+                            <div style={{ position: "relative", flexShrink: 0 }}>
 
+                              <div style={{
 
+                                width: 42, height: 42, borderRadius: 12,
 
+                                background: customColor,
 
-                {dashTasksProj ? (
+                                border: appTheme === "custom" ? `2.5px solid ${customColor}` : "2px solid var(--app-border)",
 
-                  <div style={{ display: "flex", flexDirection: "column", gap: "16px", height: "100%", marginTop: "10px" }}>
+                                boxShadow: `0 4px 12px ${customColor}40`,
 
-                    <div>
+                                cursor: "pointer", transition: "all 0.2s",
 
+                                display: "flex", alignItems: "center", justifyContent: "center"
 
+                              }}
 
-                    </div>
+                                onClick={() => document.getElementById("customColorInput")?.click()}
 
-                    <div style={{ flex: 1 }}>
-
-                      <ModernEmployeeProjectDetails
-
-                        project={dashTasksProj}
-
-                        tasks={tasks.filter(t => (t.project || t.projectId) === (dashTasksProj._id || dashTasksProj.id))}
-
-                        user={user}
-
-                        onBack={() => setDashTasksProj(null)}
-
-                        onMessageTeam={() => setActive("messaging")}
-
-                      />
-
-                    </div>
-
-                  </div>
-
-                ) : (
-
-                  <>
-
-                    {/* EXACT TEMPLATE LAYOUT - DYNAMIC */}
-
-                    {(() => {
-
-                      const activeProjCount = projects.filter(p => p.status === "Active" || p.status === "Pending").length;
-
-                      const pendingInvCount = invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length;
-
-                      const totalIncome = totalRevenue;
-
-                      const totalInvAmt = invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").reduce((sum, i) => sum + (Number(i.grandTotal) || 0), 0);
-
-
-
-                      return (
-
-                        <div style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: 12, fontFamily: "'Nunito', sans-serif" }}>
-
-
-
-                          {/* TOP CARDS ROW */}
-
-                          <div style={{ display: "grid", gridTemplateColumns: isDesktopWidth ? "repeat(5, 1fr)" : "repeat(2, 1fr)", gap: isDesktopWidth ? 20 : 12 }}>
-
-
-                            <div
-                              onMouseEnter={() => isDesktopWidth && setHoverPopupSection('revenue')}
-                              onMouseLeave={() => isDesktopWidth && setHoverPopupSection(null)}
-                              style={{ position: "relative", background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}
-                            >
-                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-                                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "#0097A7", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
-                                    <i className="ti ti-currency-rupee"></i>
-                                  </div>
-                                  <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
-                                    {formatShortCurrency(totalIncome)}
-                                  </div>
-                                </div>
-                                {totalIncome > 0 && (
-                                  <div style={{ background: "#e6fbf9", color: "#0097A7", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-                                    <i className="ti ti-trending-up"></i> Active
-                                  </div>
-                                )}
-                              </div>
-                              <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Revenue This Month</div>
-                              <HoverPopup id="revenue" title="Revenue This Month">
-                                <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>{formatShortCurrency(totalIncome)}</div>
-                                <div style={{ fontSize: 12, color: "rgba(15,28,46,0.5)" }}>Total income this year: {formatShortCurrency(totalIncome)}</div>
-                              </HoverPopup>
-                            </div>
-
-
-                            {/* Clients Card */}
-                            <div
-                              onMouseEnter={() => isDesktopWidth && setHoverPopupSection('clients')}
-                              onMouseLeave={() => isDesktopWidth && setHoverPopupSection(null)}
-                              style={{ position: "relative" }}
-                            >
-                              <MobileCardArrow id="clients" />
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-                                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
-                                      <i className="ti ti-users"></i>
-                                    </div>
-                                    <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
-                                      {clients.length}
-                                    </div>
-                                  </div>
-                                  {clients.length > 0 && (
-                                    <div style={{ background: "#dcfce7", color: "#166534", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-                                      <i className="ti ti-trending-up"></i> {clients.filter(c => (c.status || "").toLowerCase() === "active").length} active
-                                    </div>
-                                  )}
-                                </div>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Total Clients</div>
-                              </div>
-                              <HoverPopup id="clients" title="Total Clients">
-                                <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>{clients.length} total</div>
-                                <div style={{ fontSize: 12, color: "rgba(15,28,46,0.5)", marginBottom: 12 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} Active Clients</div>
-                                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                                  {clients.slice(0, 8).map((c, i) => (
-                                    <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 6 }}>
-                                      <span style={{ fontWeight: 600 }}>{c.name || c.companyName || "Client"}</span>
-                                      <span style={{ color: "rgba(15,28,46,0.5)" }}>{c.status || "-"}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </HoverPopup>
-                              <MobilePopup id="clients" title="Total Clients">
-                                <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>{clients.length} total</div>
-                                <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", marginBottom: 16 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} Active Clients</div>
-                                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                                  {clients.map((c, i) => (
-                                    <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
-                                      <span style={{ fontWeight: 600 }}>{c.name || c.companyName || "Client"}</span>
-                                      <span style={{ color: "rgba(15,28,46,0.5)" }}>{c.status || "-"}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </MobilePopup>
-                            </div>
-
-
-
-                            {/* Projects Card */}
-                            <div
-                              onMouseEnter={() => isDesktopWidth && setHoverPopupSection('activeProjects')}
-                              onMouseLeave={() => isDesktopWidth && setHoverPopupSection(null)}
-                              style={{ position: "relative" }}
-                            >
-                              <MobileCardArrow id="activeProjects" />
-                              <div
-                                onClick={(e) => { e.stopPropagation(); if (!isDesktopWidth) openMobilePopup('activeProjects'); }}
-                                style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column", cursor: "pointer" }}
                               >
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-                                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37,99,235,0.1)", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
-                                      <i className="ti ti-folder"></i>
-                                    </div>
-                                    <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
-                                      {projects.length}
-                                    </div>
-                                  </div>
-                                  {projects.length > 0 && (
-                                    <div style={{ background: "#f1f5f9", color: "#64748b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-                                      {activeProjCount} Active
-                                    </div>
-                                  )}
-                                </div>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Projects</div>
-                              </div>
-                              {(() => {
-                                const statusMeta = (raw) => {
-                                  const s = (raw || "").toLowerCase().replace(/[\s_-]/g, "");
-                                  if (["active", "inprogress", "inreview", "started"].includes(s)) return { label: "Active", color: "#16a34a" };
-                                  if (["onhold", "hold", "paused", "suspended"].includes(s)) return { label: "On Hold", color: "#7c3aed" };
-                                  if (["completed", "done", "delivered", "closed"].includes(s)) return { label: "Completed", color: "#2563eb" };
-                                  if (["overdue", "late"].includes(s)) return { label: "Overdue", color: "#dc2626" };
-                                  return { label: raw || "On Hold", color: "#7c3aed" };
-                                };
-                                return (
-                                  <>
-                                    <HoverPopup id="activeProjects" title="Projects">
-                                      <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{projects.length} total</div>
-                                      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                                        {projectsWithProgress.slice(0, 8).map((p, i) => {
-                                          const meta = statusMeta(p.status);
-                                          const badgeBg = meta.color === "#16a34a" ? "#dcfce7" : meta.color === "#7c3aed" ? "#f3e8ff" : meta.color === "#2563eb" ? "#dbeafe" : meta.color === "#dc2626" ? "#fee2e2" : "#f3e8ff";
-                                          return (
-                                            <div key={p._id || p.id || i} style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 10 }}>
-                                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                                                <div style={{ fontWeight: 700, fontSize: 13 }}>{p.name}</div>
-                                                <span style={{ background: badgeBg, color: meta.color, padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{meta.label}</span>
-                                              </div>
-                                              <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 3 }}>
-                                                Due {(p.end || p.deadline) ? new Date(p.end || p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}
-                                              </div>
-                                              <div style={{ height: 4, background: "#f1f5f9", borderRadius: 3, marginTop: 6, overflow: "hidden" }}>
-                                                <div style={{ width: `${p.progress || 0}%`, height: "100%", background: meta.color, borderRadius: 3 }}></div>
-                                              </div>
-                                            </div>
-                                          );
-                                        })}
-                                      </div>
-                                    </HoverPopup>
 
-                                    <MobilePopup id="activeProjects" title="Projects">
-                                      <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{projects.length} total</div>
-                                      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                                        {projectsWithProgress.map((p, idx) => {
-                                          const meta = statusMeta(p.status);
-                                          const badgeBg = meta.color === "#16a34a" ? "#dcfce7" : meta.color === "#7c3aed" ? "#f3e8ff" : meta.color === "#2563eb" ? "#dbeafe" : meta.color === "#dc2626" ? "#fee2e2" : "#f3e8ff";
-                                          return (
-                                            <div key={p._id || p.id || idx} style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 10 }}>
-                                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                                                <div style={{ fontWeight: 700, fontSize: 13 }}>{p.name}</div>
-                                                <span style={{ background: badgeBg, color: meta.color, padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{meta.label}</span>
-                                              </div>
-                                              <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 3 }}>
-                                                Due {(p.end || p.deadline) ? new Date(p.end || p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}
-                                              </div>
-                                              <div style={{ height: 4, background: "#f1f5f9", borderRadius: 3, marginTop: 6, overflow: "hidden" }}>
-                                                <div style={{ width: `${p.progress || 0}%`, height: "100%", background: meta.color, borderRadius: 3 }}></div>
-                                              </div>
-                                            </div>
-                                          );
-                                        })}
-                                      </div>
-                                    </MobilePopup>
-                                  </>
-                                );
-                              })()}
+                                <span style={{ fontSize: 16 }}></span>
+
+                              </div>
+
+                              <input
+
+                                id="customColorInput"
+
+                                type="color"
+
+                                value={customColor}
+
+                                onChange={(e) => {
+
+                                  setCustomColor(e.target.value);
+
+                                  setAppTheme("custom");
+
+                                }}
+
+                                style={{
+
+                                  position: "absolute", top: 0, left: 0, width: 42, height: 42,
+
+                                  opacity: 0, cursor: "pointer", border: "none"
+
+                                }}
+
+                              />
+
                             </div>
 
+                            <div style={{ flex: 1 }}>
 
+                              <div style={{ fontSize: 12, fontWeight: 700, color: appTheme === "custom" ? customColor : "#64748b" }}>
 
-                            {/* Invoices Card */}
-                            <div
-                              onMouseEnter={() => isDesktopWidth && setHoverPopupSection('unpaidInvoices')}
-                              onMouseLeave={() => isDesktopWidth && setHoverPopupSection(null)}
-                              style={{ position: "relative" }}
-                            >
-                              <MobileCardArrow id="unpaidInvoices" />
-                              <div
-                                onClick={() => !isDesktopWidth && openMobilePopup('unpaidInvoices')}
-                                style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column", cursor: isDesktopWidth ? "default" : "pointer" }}
-                              >
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-                                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
-                                      <i className="ti ti-file-invoice"></i>
-                                    </div>
-                                    <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
-                                      {pendingInvCount}
-                                    </div>
-                                  </div>
-                                  {pendingInvCount > 0 && (
-                                    <div style={{ background: "#fef2f2", color: "#991b1b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-                                      <i className="ti ti-trending-down"></i> {invoices.filter(i => (i.status || "").toLowerCase() === "overdue").length > 0 ? "overdue" : "pending"}
-                                    </div>
-                                  )}
-                                </div>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Unpaid Invoices</div>
+                                {appTheme === "custom" ? "Custom Active" : "Pick any color"}
+
                               </div>
-                              <HoverPopup id="unpaidInvoices" title="Unpaid Invoices">
-                                <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{pendingInvCount} pending</div>
-                                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                                  {invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").slice(0, 8).map((inv, i) => (
-                                    <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 6 }}>
-                                      <span style={{ fontWeight: 600 }}>{inv.clientName || inv.client || "Client"}</span>
-                                      <span style={{ color: "rgba(15,28,46,0.5)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </HoverPopup>
-                              <MobilePopup id="unpaidInvoices" title="Unpaid Invoices">
-                                <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{pendingInvCount} pending</div>
-                                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                                  {invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").map((inv, i) => (
-                                    <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
-                                      <span style={{ fontWeight: 600 }}>{inv.clientName || inv.client || "Client"}</span>
-                                      <span style={{ color: "rgba(15,28,46,0.5)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </MobilePopup>
+
+                              <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
+
+                                {customColor.toUpperCase()}
+
+                              </div>
+
                             </div>
 
+                            {appTheme === "custom" && (
 
-                            {/* Employees Card */}
-                            <div
-                              onMouseEnter={() => isDesktopWidth && setHoverPopupSection('employees')}
-                              onMouseLeave={() => isDesktopWidth && setHoverPopupSection(null)}
-                              style={{ position: "relative" }}
-                            >
-                              <MobileCardArrow id="employees" />
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-                                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(124,58,237,0.1)", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
-                                      <i className="ti ti-user-circle"></i>
-                                    </div>
-                                    <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
-                                      {employees.length}
-                                    </div>
-                                  </div>
-                                  {employees.length > 0 && (
-                                    <div style={{ background: "#f3e8ff", color: "#6b21a8", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-                                      <i className="ti ti-trending-up"></i> {employees.length}
-                                    </div>
-                                  )}
-                                </div>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Employees</div>
-                              </div>
-                              <HoverPopup id="employees" title="Employees">
-                                <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{employees.length} staff</div>
-                                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                                  {employees.slice(0, 8).map((e, i) => (
-                                    <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 6 }}>
-                                      <span style={{ fontWeight: 600 }}>{e.name}</span>
-                                      <span style={{ color: "rgba(15,28,46,0.5)" }}>{e.role || "Employee"}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </HoverPopup>
-                              <MobilePopup id="employees" title="Employees">
-                                <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>{employees.length} staff</div>
-                                <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 16 }}>
-                                  {employees.map((e, i) => (
-                                    <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
-                                      <span style={{ fontWeight: 600 }}>{e.name}</span>
-                                      <span style={{ color: "rgba(15,28,46,0.5)" }}>{e.role || "Employee"}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </MobilePopup>
-                            </div>
+                              <div style={{
 
+                                width: 20, height: 20, borderRadius: "50%",
+                                background: "#22c55e", boxShadow: "0 0 6px #22c55e80",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                color: "#fff", fontSize: 12, fontWeight: 900, flexShrink: 0
 
+                              }}>✓</div>
+
+                            )}
 
                           </div>
 
 
 
-                          {/* MAIN CONTENT AREA */}
+                          {/* Quick custom color presets */}
 
-                          <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "stretch" }}>
+                          <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
 
+                            {["#2563eb", "#0891b2", "#059669", "#d97706", "#dc2626", "#db2777", "#7c2d12", "#4f46e5", "#0f766e", "#b91c1c"].map(c => (
 
+                              <div key={c} onClick={() => { setCustomColor(c); setAppTheme("custom"); setShowThemePicker(false); }}
 
-                            {/* LEFT COLUMN */}
+                                style={{
 
-                            <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+                                  width: 22, height: 22, borderRadius: 6, background: c, cursor: "pointer",
 
+                                  border: customColor === c && appTheme === "custom" ? "2px solid #fff" : "2px solid transparent",
 
+                                  boxShadow: customColor === c && appTheme === "custom" ? `0 0 0 2px ${c}, 0 2px 8px ${c}50` : `0 1px 4px ${c}30`,
 
-                              {/* Total Revenue Bar Chart Placeholder */}
+                                  transition: "all 0.15s"
 
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+                                }}
 
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
+                              />
 
-                                  <div>
-
-                                    <div style={{ fontSize: 13, color: "rgba(15,28,46,0.6)", fontWeight: 700, marginBottom: 4 }}>Total Revenue</div>
-
-                                    <div style={{ fontSize: 24, fontWeight: 800, color: "#0f1c2e" }}>{formatShortCurrency(totalIncome)} <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(15,28,46,0.4)" }}>this year</span></div>
-
-                                  </div>
-
-                                  <div style={{ display: "flex", gap: 16, fontSize: 12, fontWeight: 700 }}>
-
-                                    <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(15,28,46,0.8)" }}>
-
-                                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--app-accent)" }}></div> Revenue
-
-                                    </div>
-
-                                    <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(15,28,46,0.8)" }}>
-
-
-
-                                    </div>
-
-                                  </div>
-
-                                </div>
-
-                                <div style={{ height: 180, display: "flex", alignItems: "flex-end", gap: 12, paddingBottom: 10 }}>
-
-                                  {totalIncome > 0 ? (
-                                    [30, 45, 35, 60, 40, 75].map((h, i) => (
-
-                                      <div key={i} style={{ flex: 1, display: "flex", gap: 4, height: "100%", alignItems: "flex-end", padding: "0 4px" }}>
-
-                                        <div style={{ flex: 1, background: "var(--app-accent)", height: `${h}%`, borderRadius: "4px 4px 0 0" }}></div>
-
-                                        <div style={{ flex: 1, background: "rgba(var(--app-accent-rgb,0,188,212),0.2)", height: `${h * 0.4}%`, borderRadius: "4px 4px 0 0" }}></div>
-
-                                      </div>
-
-                                    ))
-                                  ) : (
-                                    [0, 0, 0, 0, 0, 0].map((h, i) => (
-
-                                      <div key={i} style={{ flex: 1, display: "flex", gap: 4, height: "100%", alignItems: "flex-end", padding: "0 4px" }}>
-
-                                        <div style={{ flex: 1, background: "rgba(15,28,46,0.06)", height: "2px", borderRadius: "4px 4px 0 0" }}></div>
-
-                                        <div style={{ flex: 1, background: "rgba(15,28,46,0.03)", height: "2px", borderRadius: "4px 4px 0 0" }}></div>
-
-                                      </div>
-
-                                    ))
-                                  )}
-
-                                </div>
-
-                                <div style={{ display: "flex", justifyContent: "space-between", padding: "0 10px", fontSize: 11, color: "rgba(15,28,46,0.4)", fontWeight: 700 }}>
-
-                                  <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
-
-                                </div>
-
-                              </div>
-
-                              {/* Active Projects (moved directly under the chart, no gap) */}
-
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-
-                                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
-
-                                    <i className="ti ti-folder" style={{ color: "var(--app-accent)" }}></i> Active Projects
-
-                                  </div>
-
-                                  <div onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)", cursor: "pointer" }}>
-
-                                    View All
-
-                                  </div>
-
-                                </div>
-
-                                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-                                  {projects.filter(p => p.status === "Active" || p.status === "Pending").slice(0, 5).map((p, idx) => {
-
-                                    const colors = ["var(--app-accent)", "var(--app-accent)", "var(--app-accent)", "var(--app-accent)", "var(--app-accent)"];
-
-                                    const bColor = colors[idx % colors.length];
-
-                                    const progress = p.progress || 25;
-
-                                    const barColor = progress > 70 ? "#16a34a" : progress > 40 ? "#f59e0b" : "#dc2626";
-
-                                    const badgeText = "IN PROGRESS";
-
-                                    const badgeColor = "var(--app-accent)";
-
-                                    return (
-
-                                      <div key={p._id} onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 16, borderBottom: idx === 4 ? "none" : "1px solid rgba(0,0,0,0.04)", cursor: "pointer" }}>
-
-                                        <div style={{ display: "flex", gap: 12 }}>
-
-                                          <div style={{ width: 3, background: bColor, borderRadius: 2 }}></div>
-
-                                          <div>
-
-                                            <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{p.name || p.title}</div>
-
-                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{clients.find(c => c._id === p.clientId)?.clientName || "Internal"} Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
-
-                                          </div>
-
-                                        </div>
-
-                                        <div style={{ width: 100, textAlign: "right" }}>
-
-                                          <div style={{ display: "inline-block", color: badgeColor, background: `${badgeColor}15`, padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800, marginBottom: 8, letterSpacing: "0.5px" }}>
-
-                                            {badgeText}
-
-                                          </div>
-
-                                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-
-                                            <div style={{ flex: 1, height: 4, background: "rgba(0,0,0,0.06)", borderRadius: 2 }}>
-
-                                              <div style={{ width: `${progress}%`, height: "100%", background: barColor, borderRadius: 2 }}></div>
-
-                                            </div>
-
-                                            <div style={{ fontSize: 11, fontWeight: 800, color: barColor }}>{progress}%</div>
-
-                                          </div>
-
-                                        </div>
-
-                                      </div>
-
-                                    );
-
-                                  })}
-
-                                  {projects.filter(p => p.status === "Active" || p.status === "Pending").length === 0 && (
-
-                                    <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No active projects</div>
-
-                                  )}
-
-                                </div>
-
-                              </div>
-
-                            </div>
-
-                            {/* RIGHT COLUMN */}
-
-                            <div style={{ display: "flex", flexDirection: "column", gap: 24, height: "100%" }}>
-
-
-
-                              {/* Quick Access */}
-
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-
-                                <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
-
-                                  <i className="ti ti-bolt" style={{ color: "#0097A7" }}></i> Quick Access
-
-                                </div>
-
-                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-
-                                  {[
-
-                                    { icon: "ti-users", color: "#0097A7", bg: "rgba(0,188,212,0.1)", label: "Clients", sub: `${clients.length} total`, act: "clients" },
-
-                                    { icon: "ti-user-circle", color: "#7c3aed", bg: "rgba(124,58,237,0.1)", label: "Employees", sub: `${employees.length} staff`, act: "employees" },
-
-                                    { icon: "ti-file-invoice", color: "#16a34a", bg: "rgba(22,163,74,0.1)", label: "Invoices", sub: `${pendingInvCount} unpaid`, act: "invoices" },
-
-                                    { icon: "ti-receipt", color: "#2563eb", bg: "rgba(37,99,235,0.1)", label: "Quotations", sub: "Builder", act: "quotations" },
-
-                                    { icon: "ti-report-money", color: "#d97706", bg: "rgba(217,119,6,0.1)", label: "Proposals", sub: "Creator", act: "proposals" },
-
-                                    { icon: "ti-template", color: "#db2777", bg: "rgba(219,39,119,0.1)", label: "Templates", sub: "Designer", act: "templates" },
-
-                                    { icon: "ti-messages", color: "#0097A7", bg: "rgba(0,188,212,0.1)", label: "Messages", sub: "Internal", act: "messaging" },
-
-                                    { icon: "ti-world", color: "#16a34a", bg: "rgba(22,163,74,0.1)", label: "Client Portal", sub: "External", act: "clients" },
-
-                                    { icon: "ti-wallet", color: "#2563eb", bg: "rgba(37,99,235,0.1)", label: "Accounts", sub: "Income/Exp", act: "accounts" },
-
-
-
-                                  ].map((q, i) => (
-                                    <div key={i} onClick={() => setActive(q.act)} style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderRadius: 12, border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s" }}>
-                                      <div style={{ width: 34, height: 34, borderRadius: 10, background: q.bg, color: q.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>
-                                        <i className={`ti ${q.icon}`}></i>
-                                      </div>
-                                      <div>
-                                        <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>{q.label}</div>
-                                        <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{q.sub}</div>
-                                      </div>
-                                    </div>
-                                  ))}
-                                  <div
-                                    onClick={() => { const ph = (user?.phone || "").replace(/\D/g, ""); window.open(ph ? "https://wa.me/" + ph : "https://web.whatsapp.com/", "_blank"); }}
-                                    style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderRadius: 12, border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s" }}
-                                    onMouseEnter={e => e.currentTarget.style.background = "rgba(37,211,102,0.06)"}
-                                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                                  >
-                                    <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(37,211,102,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
-                                      💬
-                                    </div>
-                                    <div>
-                                      <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>WhatsApp</div>
-                                      <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>Open Chat</div>
-                                    </div>
-                                  </div>                              </div>
-                              </div>
-
-                              {/* Team Section */}
-
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", height: "100%", display: "flex", flexDirection: "column" }}>
-
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-
-                                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
-
-                                    <i className="ti ti-user-circle" style={{ color: "#0097A7" }}></i> Team
-
-                                  </div>
-
-                                  <div onClick={() => setActive("employees")} style={{ fontSize: 13, fontWeight: 700, color: "#0097A7", cursor: "pointer" }}>
-
-                                    View All
-
-                                  </div>
-
-                                </div>
-
-                                <div style={{ display: "flex", flexDirection: "column", gap: 16, overflowY: "auto", flex: 1 }}>
-
-                                  {employees.slice(0, 3).map(e => (
-                                    <div key={e._id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-
-                                      <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,  var(--app-accent, var(--app-accent, #00BCD4)), #0097A7)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800 }}>
-
-                                        {(e.name || "E")[0].toUpperCase()}
-
-                                      </div>
-
-                                      <div style={{ flex: 1 }}>
-
-                                        <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{e.name}</div>
-
-                                        <div style={{ fontSize: 12, color: "rgba(15,28,46,0.5)" }}>{e.role || "Employee"}</div>
-
-                                      </div>
-
-                                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#16a34a" }}></div>
-
-                                    </div>
-
-                                  ))}
-
-                                  {employees.length === 0 && <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center" }}>No team members</div>}
-
-                                </div>
-
-                              </div>
-
-
-
-                            </div>
-
-                          </div>
-
-
-
-                          {/* SECONDARY CONTENT AREA */}
-
-                          <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "stretch", marginTop: 0 }}>
-
-
-                            {/* LEFT COLUMN 2 */}
-                            <div style={{ display: "flex", flexDirection: "column", gap: 8, height: "100%" }}>
-
-
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", height: "100%", display: "flex", flexDirection: "column" }}>
-
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-
-                                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
-
-                                    <i className="ti ti-user-x" style={{ color: "var(--app-accent)" }}></i> Leave Requests
-
-                                    <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length} PENDING</span>
-
-                                  </div>
-
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent, #00BCD4)", cursor: "pointer" }}>
-
-                                    HR Panel
-
-                                  </div>
-
-                                </div>
-
-                                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-                                  {pendingLeaves.map((l, i) => {
-
-                                    const initials = l.employeeName ? l.employeeName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : "EE";
-
-                                    const colors = ["#f59e0b", "#a855f7", "#0ea5e9", "#ec4899", "#22c55e"];
-
-                                    const bg = colors[i % colors.length];
-
-                                    const getDuration = () => {
-
-                                      if (!l.from || !l.to) return "";
-
-                                      try {
-
-                                        const d1 = new Date(l.from);
-
-                                        const d2 = new Date(l.to);
-
-                                        if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return "";
-
-                                        const diffTime = Math.abs(d2 - d1);
-
-                                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-
-                                        return ` (${diffDays}d)`;
-
-                                      } catch (err) { return ""; }
-
-                                    };
-
-                                    const detail = `${l.type || "Leave"} ${l.from} - ${l.to}${getDuration()}`;
-
-
-
-                                    return (
-
-                                      <div key={l._id || i} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: 16, borderBottom: i === pendingLeaves.length - 1 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
-
-                                        <div style={{ width: 36, height: 36, borderRadius: "50%", background: bg, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>
-
-                                          {initials}
-
-                                        </div>
-
-                                        <div style={{ flex: 1 }}>
-
-                                          <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{l.employeeName}</div>
-
-                                          <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{detail}</div>
-
-                                        </div>
-
-                                        <div style={{ display: "flex", gap: 8 }}>
-
-                                          <button onClick={() => handleApproveLeave(l._id)} style={{ background: "#dcfce7", color: "#166534", border: "none", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
-
-                                            <i className="ti ti-check"></i> Approve
-
-                                          </button>
-
-                                          <button onClick={() => handleRejectLeave(l._id)} style={{ background: "#fef2f2", color: "#dc2626", border: "none", padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
-
-                                            <i className="ti ti-x"></i>
-
-                                          </button>
-
-                                        </div>
-
-                                      </div>
-
-                                    );
-
-                                  })}
-
-                                  {pendingLeaves.length === 0 && (
-
-                                    <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No pending leave requests.</div>
-
-                                  )}
-
-                                </div>
-
-                              </div>
-
-                            </div>
-
-
-
-                            {/* RIGHT COLUMN 2 */}
-
-                            <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-
-
-
-                              {/* Overdue Tasks */}
-
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-
-                                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
-
-                                    <i className="ti ti-alert-circle" style={{ color: "var(--app-accent, #00BCD4)" }}></i> Overdue Tasks
-
-                                    <span style={{ background: "#fef2f2", color: "#dc2626", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>
-
-                                      {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).length}
-
-                                    </span>
-
-                                  </div>
-
-                                  <div onClick={() => { setSidebarOverride("dashboard"); setActive("tasks"); }} style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent, #00BCD4)", cursor: "pointer" }}>
-
-                                    All Tasks
-
-                                  </div>
-
-                                </div>
-
-                                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-                                  {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).slice(0, 5).map((t, idx) => (
-
-                                    <div key={t._id} style={{ display: "flex", alignItems: "flex-start", gap: 12, paddingBottom: 16, borderBottom: idx === 4 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
-
-                                      <input type="checkbox" style={{ marginTop: 2, accentColor: "var(--app-accent, #00BCD4)" }} />
-
-                                      <div style={{ flex: 1 }}>
-
-                                        <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e", marginBottom: 2 }}>{t.title}</div>
-
-                                        <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{employees.find(e => e._id === t.assignee)?.name || "Unassigned"} Due {t.deadline ? new Date(t.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
-
-                                      </div>
-
-                                      <div style={{ background: "#fef2f2", color: "#dc2626", padding: "4px 8px", borderRadius: 6, fontSize: 9, fontWeight: 800, letterSpacing: "0.5px" }}>HIGH</div>
-
-                                    </div>
-
-                                  ))}
-
-                                  {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).length === 0 && <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", padding: "10px 0" }}>No overdue tasks.</div>}
-
-                                </div>
-
-                              </div>
-
-                              {/* Doc Requests (Dynamic from backend) */}
-
-                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-
-                                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
-
-                                    <i className="ti ti-file-description" style={{ color: "var(--app-accent, #00BCD4)" }}></i> Doc Requests
-
-                                    <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{employeeDocs.filter(d => d.status === "PENDING").length} PENDING</span>
-
-                                  </div>
-
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent, #00BCD4)", cursor: "pointer" }}>
-
-                                    Manage
-
-                                  </div>
-
-                                </div>
-
-                                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-                                  {employeeDocs.map((d, i) => {
-
-                                    const docName = d.docType === "pan" ? "PAN Card" : d.docType === "aadhaar" ? "Aadhaar Card" : d.docType === "passbook" ? "Bank Passbook" : d.docType === "itr" ? "ITR Document" : d.docType;
-
-                                    const styleConfig =
-
-                                      d.docType === "pan" ? { bg: "#f1f5f9", c: "#0ea5e9" } :
-
-                                        d.docType === "passbook" ? { bg: "#f3e8ff", c: "#a855f7" } :
-
-                                          d.docType === "aadhaar" ? { bg: "#dcfce7", c: "#22c55e" } :
-
-                                            { bg: "#fef3c7", c: "#d97706" };
-
-
-
-                                    const isPending = d.status === "PENDING";
-
-                                    const statusColor = d.status === "APPROVED" ? "#16a34a" : d.status === "REJECTED" ? "#dc2626" : "#ea580c";
-
-
-
-                                    return (
-
-                                      <div key={d._id || i} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: 16, borderBottom: i === employeeDocs.length - 1 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
-
-                                        <div style={{ width: 32, height: 32, borderRadius: 8, background: styleConfig.bg, color: styleConfig.c, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>
-
-                                          <i className="ti ti-file-info"></i>
-
-                                        </div>
-
-                                        <div style={{ flex: 1 }}>
-
-                                          <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>{docName}</div>
-
-                                          <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{d.employeeName}</div>
-
-                                        </div>
-
-                                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-
-                                          <a href={d.url} target="_blank" rel="noreferrer" style={{ background: "#f1f5f9", color: "#64748b", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
-
-                                            <i className="ti ti-eye"></i> View
-
-                                          </a>
-
-                                          {isPending ? (
-
-                                            <>
-
-                                              <button onClick={() => handleApproveDoc(d._id)} style={{ background: "#dcfce7", color: "#166534", border: "none", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
-
-                                                Approve
-
-                                              </button>
-
-                                              <button onClick={() => handleRejectDoc(d._id)} style={{ background: "#fef2f2", color: "#dc2626", border: "none", padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
-
-                                                Reject
-
-                                              </button>
-
-                                            </>
-
-                                          ) : (
-
-                                            <div style={{ color: statusColor, fontSize: 10, fontWeight: 800, letterSpacing: "0.5px" }}>{d.status}</div>
-
-                                          )}
-
-                                        </div>
-
-                                      </div>
-
-                                    );
-
-                                  })}
-
-                                  {employeeDocs.length === 0 && (
-
-                                    <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No document requests.</div>
-
-                                  )}
-
-                                </div>
-
-                              </div>
-
-                            </div>
+                            ))}
 
                           </div>
 
                         </div>
 
-                      );
+                      </div>
 
-                    })()}
+                    )}
 
+                    <button onClick={() => setShowThemePicker(v => !v)}
+                      style={{
+                        width: 48, height: 48, borderRadius: "50%",
+                        background: appTheme === "custom"
+                          ? `linear-gradient(135deg, ${customColor}, ${customColor}dd)`
+                          : `linear-gradient(135deg, ${THEMES[appTheme]?.accent}, ${THEMES[appTheme]?.dot})`,
+                        border: "none", color: "#fff", fontSize: 20, cursor: "pointer",
+                        boxShadow: `0 6px 20px ${appTheme === "custom" ? customColor : (THEMES[appTheme]?.dot || "var(--app-accent)")}60`,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        transition: "all 0.2s"
+                      }}>
+                      🎨
+                    </button>
+                    <button
+                      onClick={() => { const ph = (user?.phone || "").replace(/\D/g, ""); window.open(ph ? "https://wa.me/" + ph : "https://web.whatsapp.com/", "_blank"); }}
+                      title="Open WhatsApp"
+                      style={{
+                        width: 48, height: 48, borderRadius: "50%",
+                        background: "#25D366",
+                        border: "none", cursor: "pointer",
+                        boxShadow: "0 6px 20px rgba(37,211,102,0.6)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        transition: "all 0.2s", padding: 0,
+                        marginTop: 12
+                      }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <path d="M16 1C7.7 1 1 7.7 1 16c0 2.7.7 5.2 2 7.4L1 31l7.9-2c2.1 1.1 4.5 1.8 7.1 1.8 8.3 0 15-6.7 15-15S24.3 1 16 1z" fill="#fff" />
+                        <path d="M16 3.5C9 3.5 3.5 9 3.5 16c0 2.5.7 4.8 1.9 6.8l.3.5-1.3 4.7 4.9-1.3.5.3C11.6 28.1 13.7 28.5 16 28.5c7 0 12.5-5.5 12.5-12.5S23 3.5 16 3.5z" fill="#25D366" />
+                        <path d="M11.5 9.5c-.3-.7-.6-.7-.9-.7h-.7c-.3 0-.7.1-1.1.5-.4.4-1.5 1.5-1.5 3.6s1.6 4.2 1.8 4.5c.2.3 3 4.7 7.4 6.4 3.7 1.4 4.4 1.1 5.2 1 .8 0 2.5-1 2.8-2 .4-1 .4-1.8.3-2-.1-.2-.4-.3-.8-.5-.4-.2-2.5-1.2-2.8-1.3-.4-.1-.6-.2-.9.2-.3.4-1 1.3-1.3 1.6-.2.3-.5.3-.8.1-.4-.2-1.6-.6-3-1.9-1.1-1-1.9-2.2-2.1-2.6-.2-.4 0-.6.2-.8.2-.2.4-.4.5-.7.2-.2.2-.4.4-.7.1-.2 0-.5-.1-.7-.2-.2-.9-2.2-1.2-3z" fill="#fff" />
+                      </svg>
+                    </button>
+                  </div>
 
-                  </>)
-                }
-              </div>
-            </>
-          )}
 
 
 
-          {/* ── Pages using new components ── */}
 
-          {validActive === "create-project" && (
 
-            <ModernProjectCreator
 
-              key="create"
 
-              editProject={null}
 
-              clients={clients}
 
-              employees={employees}
 
-              prefillClient={jumpProject?._prefillClient ? clients.find(c => (c.clientName || c.name) === jumpProject._prefillClient) : null}
 
-              onBack={() => {
-                if (openedFromMobileAddMenu) {
-                  setOpenedFromMobileAddMenu(false);
-                  setSidebarOverride(null);
-                  setJumpProject(null);
-                  setActive("dashboard");
-                  return;
-                }
-                const returnTo = sidebarOverride || "projects";
-                setSidebarOverride(null);
-                setJumpProject(null);
-                setActive(returnTo);
-              }}
-              onSuccess={async (newProj) => {
+                  {dashTasksProj ? (
 
-                const saved = newProj?.project || newProj;
+                    <div style={{ display: "flex", flexDirection: "column", gap: "16px", height: "100%", marginTop: "10px" }}>
 
-                await fetchProjects();
+                      <div>
 
-                if (sidebarOverride === "invoices") {
-                  setSidebarOverride(null);
-                  setJumpProject(null);
-                  setInvoicePrefill(prev => ({ ...(prev || {}), project: saved?.name || "", _t: Date.now() }));
-                  setActive("invoices");
-                  return;
-                }
 
-                setJumpProject(saved);
-                setFromEditProject(false);
-                setProjectDetailsReadOnly(false);
-                setActive("project-details");
 
-              }}
+                      </div>
 
-              onAddEmployeeClick={() => {
-                const limit = getSubscriptionLimit("employee", subscription);
-                if (limit !== Infinity && employees.length >= limit) {
-                  setLimitModal({ type: "employee", limit });
-                  return;
-                }
-                setNeError({}); setModal("employee");
-                fetchSubscription();
-              }}
+                      <div style={{ flex: 1 }}>
 
-            />
+                        <ModernEmployeeProjectDetails
 
-          )}
+                          project={dashTasksProj}
 
+                          tasks={tasks.filter(t => (t.project || t.projectId) === (dashTasksProj._id || dashTasksProj.id))}
 
+                          user={user}
 
-          {validActive === "edit-project" && jumpProject && (
+                          onBack={() => setDashTasksProj(null)}
 
-            <ModernProjectCreator
+                          onMessageTeam={() => setActive("messaging")}
 
-              key={jumpProject._id || jumpProject.id}
+                        />
 
-              editProject={jumpProject}
+                      </div>
 
-              clients={clients}
+                    </div>
 
-              employees={employees}
+                  ) : (
 
-              onAddEmployeeClick={() => {
-                const limit = getSubscriptionLimit("employee", subscription);
-                if (limit !== Infinity && employees.length >= limit) {
-                  setLimitModal({ type: "employee", limit });
-                  return;
-                }
-                setNeError({}); setModal("employee");
-                fetchSubscription();
-              }}
+                    <>
 
-              onBack={() => { const returnTo = sidebarOverride || "projects"; setSidebarOverride(null); setActive(returnTo); }}
+                      {/* EXACT TEMPLATE LAYOUT - DYNAMIC */}
 
-              onSuccess={async (updatedProj) => {
-                if (updatedProj?._deleted) {
-                  setProjects(prev => prev.filter(p => (p._id || p.id) !== updatedProj._id));
-                  setJumpProject(null);
-                  setSidebarOverride(null);
-                  setActive("projects");
-                  return;
-                }
+                      {(() => {
 
-                const pid = jumpProject._id || jumpProject.id;
-                let fresh = updatedProj || jumpProject;
+                        const activeProjCount = projects.filter(p => p.status === "Active" || p.status === "Pending").length;
 
-                try {
-                  const res = await axios.get(`${BASE_URL}/api/projects/${pid}`);
-                  fresh = res.data?.project || res.data || fresh;
-                } catch (err) {
-                  console.error("Failed to refetch project after update:", err);
-                }
+                        const pendingInvCount = invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length;
 
-                await fetchProjects();
+                        const totalIncome = totalRevenue;
 
-                setSidebarOverride(null);
+                        const totalInvAmt = invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").reduce((sum, i) => sum + (Number(i.grandTotal) || 0), 0);
 
-                setJumpProject(fresh);
 
-                setProjectDetailsReadOnly(false);
 
-                setActive("project-details");
+                        return (
 
-              }} />
+                          <div style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: 12, fontFamily: "'Nunito', sans-serif" }}>
 
-          )}
 
-          {validActive === "project-details" && jumpProject && (
 
-            <ModernProjectDetails
+                            {/* TOP CARDS ROW */}
+
+                            <div style={{ display: "grid", gridTemplateColumns: isDesktopWidth ? "repeat(5, 1fr)" : "repeat(2, 1fr)", gap: isDesktopWidth ? 20 : 12 }}>
+
+
+                              <div
+                                onMouseEnter={() => isDesktopWidth && setHoverPopupSection('revenue')}
+                                onMouseLeave={() => isDesktopWidth && setHoverPopupSection(null)}
+                                style={{ position: "relative", background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}
+                              >
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "#0097A7", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                      <i className="ti ti-currency-rupee"></i>
+                                    </div>
+                                    <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
+                                      {formatShortCurrency(totalIncome)}
+                                    </div>
+                                  </div>
+                                  {totalIncome > 0 && (
+                                    <div style={{ background: "#e6fbf9", color: "#0097A7", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                      <i className="ti ti-trending-up"></i> Active
+                                    </div>
+                                  )}
+                                </div>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Revenue This Month</div>
+                                <HoverPopup id="revenue" title="Revenue This Month">
+                                  <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>{formatShortCurrency(totalIncome)}</div>
+                                  <div style={{ fontSize: 12, color: "rgba(15,28,46,0.5)" }}>Total income this year: {formatShortCurrency(totalIncome)}</div>
+                                </HoverPopup>
+                              </div>
+
+
+                              {/* Clients Card */}
+                              <div
+                                onMouseEnter={() => isDesktopWidth && setHoverPopupSection('clients')}
+                                onMouseLeave={() => isDesktopWidth && setHoverPopupSection(null)}
+                                style={{ position: "relative" }}
+                              >
+                                <MobileCardArrow id="clients" />
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                      <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                        <i className="ti ti-users"></i>
+                                      </div>
+                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
+                                        {clients.length}
+                                      </div>
+                                    </div>
+                                    {clients.length > 0 && (
+                                      <div style={{ background: "#dcfce7", color: "#166534", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                        <i className="ti ti-trending-up"></i> {clients.filter(c => (c.status || "").toLowerCase() === "active").length} active
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Total Clients</div>
+                                </div>
+                                <HoverPopup id="clients" title="Total Clients">
+                                  <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>{clients.length} total</div>
+                                  <div style={{ fontSize: 12, color: "rgba(15,28,46,0.5)", marginBottom: 12 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} Active Clients</div>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                                    {clients.slice(0, 8).map((c, i) => (
+                                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 6 }}>
+                                        <span style={{ fontWeight: 600 }}>{c.name || c.companyName || "Client"}</span>
+                                        <span style={{ color: "rgba(15,28,46,0.5)" }}>{c.status || "-"}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </HoverPopup>
+                                <MobilePopup id="clients" title="Total Clients">
+                                  <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>{clients.length} total</div>
+                                  <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", marginBottom: 16 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} Active Clients</div>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                                    {clients.map((c, i) => (
+                                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
+                                        <span style={{ fontWeight: 600 }}>{c.name || c.companyName || "Client"}</span>
+                                        <span style={{ color: "rgba(15,28,46,0.5)" }}>{c.status || "-"}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </MobilePopup>
+                              </div>
+
+
+
+                              {/* Projects Card */}
+                              <div
+                                onMouseEnter={() => isDesktopWidth && setHoverPopupSection('activeProjects')}
+                                onMouseLeave={() => isDesktopWidth && setHoverPopupSection(null)}
+                                style={{ position: "relative" }}
+                              >
+                                <MobileCardArrow id="activeProjects" />
+                                <div
+                                  onClick={(e) => { e.stopPropagation(); if (!isDesktopWidth) openMobilePopup('activeProjects'); }}
+                                  style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column", cursor: "pointer" }}
+                                >
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                      <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37,99,235,0.1)", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                        <i className="ti ti-folder"></i>
+                                      </div>
+                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
+                                        {projects.length}
+                                      </div>
+                                    </div>
+                                    {projects.length > 0 && (
+                                      <div style={{ background: "#f1f5f9", color: "#64748b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                        {activeProjCount} Active
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Projects</div>
+                                </div>
+                                {(() => {
+                                  const statusMeta = (raw) => {
+                                    const s = (raw || "").toLowerCase().replace(/[\s_-]/g, "");
+                                    if (["active", "inprogress", "inreview", "started"].includes(s)) return { label: "Active", color: "#16a34a" };
+                                    if (["onhold", "hold", "paused", "suspended"].includes(s)) return { label: "On Hold", color: "#7c3aed" };
+                                    if (["completed", "done", "delivered", "closed"].includes(s)) return { label: "Completed", color: "#2563eb" };
+                                    if (["overdue", "late"].includes(s)) return { label: "Overdue", color: "#dc2626" };
+                                    return { label: raw || "On Hold", color: "#7c3aed" };
+                                  };
+                                  return (
+                                    <>
+                                      <HoverPopup id="activeProjects" title="Projects">
+                                        <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{projects.length} total</div>
+                                        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                          {projectsWithProgress.slice(0, 8).map((p, i) => {
+                                            const meta = statusMeta(p.status);
+                                            const badgeBg = meta.color === "#16a34a" ? "#dcfce7" : meta.color === "#7c3aed" ? "#f3e8ff" : meta.color === "#2563eb" ? "#dbeafe" : meta.color === "#dc2626" ? "#fee2e2" : "#f3e8ff";
+                                            return (
+                                              <div key={p._id || p.id || i} style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 10 }}>
+                                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                                                  <div style={{ fontWeight: 700, fontSize: 13 }}>{p.name}</div>
+                                                  <span style={{ background: badgeBg, color: meta.color, padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{meta.label}</span>
+                                                </div>
+                                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 3 }}>
+                                                  Due {(p.end || p.deadline) ? new Date(p.end || p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}
+                                                </div>
+                                                <div style={{ height: 4, background: "#f1f5f9", borderRadius: 3, marginTop: 6, overflow: "hidden" }}>
+                                                  <div style={{ width: `${p.progress || 0}%`, height: "100%", background: meta.color, borderRadius: 3 }}></div>
+                                                </div>
+                                              </div>
+                                            );
+                                          })}
+                                        </div>
+                                      </HoverPopup>
+
+                                      <MobilePopup id="activeProjects" title="Projects">
+                                        <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{projects.length} total</div>
+                                        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                          {projectsWithProgress.map((p, idx) => {
+                                            const meta = statusMeta(p.status);
+                                            const badgeBg = meta.color === "#16a34a" ? "#dcfce7" : meta.color === "#7c3aed" ? "#f3e8ff" : meta.color === "#2563eb" ? "#dbeafe" : meta.color === "#dc2626" ? "#fee2e2" : "#f3e8ff";
+                                            return (
+                                              <div key={p._id || p.id || idx} style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 10 }}>
+                                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                                                  <div style={{ fontWeight: 700, fontSize: 13 }}>{p.name}</div>
+                                                  <span style={{ background: badgeBg, color: meta.color, padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{meta.label}</span>
+                                                </div>
+                                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 3 }}>
+                                                  Due {(p.end || p.deadline) ? new Date(p.end || p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}
+                                                </div>
+                                                <div style={{ height: 4, background: "#f1f5f9", borderRadius: 3, marginTop: 6, overflow: "hidden" }}>
+                                                  <div style={{ width: `${p.progress || 0}%`, height: "100%", background: meta.color, borderRadius: 3 }}></div>
+                                                </div>
+                                              </div>
+                                            );
+                                          })}
+                                        </div>
+                                      </MobilePopup>
+                                    </>
+                                  );
+                                })()}
+                              </div>
+
+
+
+                              {/* Invoices Card */}
+                              <div
+                                onMouseEnter={() => isDesktopWidth && setHoverPopupSection('unpaidInvoices')}
+                                onMouseLeave={() => isDesktopWidth && setHoverPopupSection(null)}
+                                style={{ position: "relative" }}
+                              >
+                                <MobileCardArrow id="unpaidInvoices" />
+                                <div
+                                  onClick={() => !isDesktopWidth && openMobilePopup('unpaidInvoices')}
+                                  style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column", cursor: isDesktopWidth ? "default" : "pointer" }}
+                                >
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                      <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(220,38,38,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                        <i className="ti ti-file-invoice"></i>
+                                      </div>
+                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
+                                        {pendingInvCount}
+                                      </div>
+                                    </div>
+                                    {pendingInvCount > 0 && (
+                                      <div style={{ background: "#fef2f2", color: "#991b1b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                        <i className="ti ti-trending-down"></i> {invoices.filter(i => (i.status || "").toLowerCase() === "overdue").length > 0 ? "overdue" : "pending"}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Unpaid Invoices</div>
+                                </div>
+                                <HoverPopup id="unpaidInvoices" title="Unpaid Invoices">
+                                  <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{pendingInvCount} pending</div>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                                    {invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").slice(0, 8).map((inv, i) => (
+                                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 6 }}>
+                                        <span style={{ fontWeight: 600 }}>{inv.clientName || inv.client || "Client"}</span>
+                                        <span style={{ color: "rgba(15,28,46,0.5)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </HoverPopup>
+                                <MobilePopup id="unpaidInvoices" title="Unpaid Invoices">
+                                  <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{pendingInvCount} pending</div>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                                    {invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").map((inv, i) => (
+                                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
+                                        <span style={{ fontWeight: 600 }}>{inv.clientName || inv.client || "Client"}</span>
+                                        <span style={{ color: "rgba(15,28,46,0.5)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </MobilePopup>
+                              </div>
+
+
+                              {/* Employees Card */}
+                              <div
+                                onMouseEnter={() => isDesktopWidth && setHoverPopupSection('employees')}
+                                onMouseLeave={() => isDesktopWidth && setHoverPopupSection(null)}
+                                style={{ position: "relative" }}
+                              >
+                                <MobileCardArrow id="employees" />
+                                <div style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                      <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(124,58,237,0.1)", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                        <i className="ti ti-user-circle"></i>
+                                      </div>
+                                      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
+                                        {employees.length}
+                                      </div>
+                                    </div>
+                                    {employees.length > 0 && (
+                                      <div style={{ background: "#f3e8ff", color: "#6b21a8", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                        <i className="ti ti-trending-up"></i> {employees.length}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(15,28,46,0.6)" }}>Employees</div>
+                                </div>
+                                <HoverPopup id="employees" title="Employees">
+                                  <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{employees.length} staff</div>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                                    {employees.slice(0, 8).map((e, i) => (
+                                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 6 }}>
+                                        <span style={{ fontWeight: 600 }}>{e.name}</span>
+                                        <span style={{ color: "rgba(15,28,46,0.5)" }}>{e.role || "Employee"}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </HoverPopup>
+                                <MobilePopup id="employees" title="Employees">
+                                  <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>{employees.length} staff</div>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 16 }}>
+                                    {employees.map((e, i) => (
+                                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 8 }}>
+                                        <span style={{ fontWeight: 600 }}>{e.name}</span>
+                                        <span style={{ color: "rgba(15,28,46,0.5)" }}>{e.role || "Employee"}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </MobilePopup>
+                              </div>
+
+
+
+                            </div>
+
+                            {!isDesktopWidth && <MobileTealActionsSection />}
+
+                            {isDesktopWidth && (<>
+                              {/* MAIN CONTENT AREA */}
+
+                              <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "stretch" }}>
+
+
+
+                                {/* LEFT COLUMN */}
+
+                                <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+
+
+
+                                  {/* Total Revenue Bar Chart Placeholder */}
+
+                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
+
+                                      <div>
+
+                                        <div style={{ fontSize: 13, color: "rgba(15,28,46,0.6)", fontWeight: 700, marginBottom: 4 }}>Total Revenue</div>
+
+                                        <div style={{ fontSize: 24, fontWeight: 800, color: "#0f1c2e" }}>{formatShortCurrency(totalIncome)} <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(15,28,46,0.4)" }}>this year</span></div>
+
+                                      </div>
+
+                                      <div style={{ display: "flex", gap: 16, fontSize: 12, fontWeight: 700 }}>
+
+                                        <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(15,28,46,0.8)" }}>
+
+                                          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--app-accent)" }}></div> Revenue
+
+                                        </div>
+
+                                        <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(15,28,46,0.8)" }}>
+
+
+
+                                        </div>
+
+                                      </div>
+
+                                    </div>
+
+                                    <div style={{ height: 180, display: "flex", alignItems: "flex-end", gap: 12, paddingBottom: 10 }}>
+
+                                      {totalIncome > 0 ? (
+                                        [30, 45, 35, 60, 40, 75].map((h, i) => (
+
+                                          <div key={i} style={{ flex: 1, display: "flex", gap: 4, height: "100%", alignItems: "flex-end", padding: "0 4px" }}>
+
+                                            <div style={{ flex: 1, background: "var(--app-accent)", height: `${h}%`, borderRadius: "4px 4px 0 0" }}></div>
+
+                                            <div style={{ flex: 1, background: "rgba(var(--app-accent-rgb,0,188,212),0.2)", height: `${h * 0.4}%`, borderRadius: "4px 4px 0 0" }}></div>
+
+                                          </div>
+
+                                        ))
+                                      ) : (
+                                        [0, 0, 0, 0, 0, 0].map((h, i) => (
+
+                                          <div key={i} style={{ flex: 1, display: "flex", gap: 4, height: "100%", alignItems: "flex-end", padding: "0 4px" }}>
+
+                                            <div style={{ flex: 1, background: "rgba(15,28,46,0.06)", height: "2px", borderRadius: "4px 4px 0 0" }}></div>
+
+                                            <div style={{ flex: 1, background: "rgba(15,28,46,0.03)", height: "2px", borderRadius: "4px 4px 0 0" }}></div>
+
+                                          </div>
+
+                                        ))
+                                      )}
+
+                                    </div>
+
+                                    <div style={{ display: "flex", justifyContent: "space-between", padding: "0 10px", fontSize: 11, color: "rgba(15,28,46,0.4)", fontWeight: 700 }}>
+
+                                      <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+
+                                    </div>
+
+                                  </div>
+
+                                  {/* Active Projects (moved directly under the chart, no gap) */}
+
+                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+
+                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+
+                                        <i className="ti ti-folder" style={{ color: "var(--app-accent)" }}></i> Active Projects
+
+                                      </div>
+
+                                      <div onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)", cursor: "pointer" }}>
+
+                                        View All
+
+                                      </div>
+
+                                    </div>
 
-              key={jumpProject._id || jumpProject.id}
+                                    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
-              project={jumpProject}
+                                      {projects.filter(p => p.status === "Active" || p.status === "Pending").slice(0, 5).map((p, idx) => {
 
-              tasks={tasks}
+                                        const colors = ["var(--app-accent)", "var(--app-accent)", "var(--app-accent)", "var(--app-accent)", "var(--app-accent)"];
 
-              employees={employees}
+                                        const bColor = colors[idx % colors.length];
 
-              user={user}
+                                        const progress = p.progress || 25;
 
-              clients={clients}
+                                        const barColor = progress > 70 ? "#16a34a" : progress > 40 ? "#f59e0b" : "#dc2626";
 
-              fromClientContext={sidebarOverride === "clients"}
+                                        const badgeText = "IN PROGRESS";
 
-              showBackLabel={sidebarOverride === "dashboard"}
+                                        const badgeColor = "var(--app-accent)";
 
-              scrollContainerRef={mainScrollRef}
+                                        return (
 
-              onAddEmployeeClick={() => {
-                const limit = getSubscriptionLimit("employee", subscription);
-                if (limit !== Infinity && employees.length >= limit) {
-                  setLimitModal({ type: "employee", limit });
-                  return;
-                }
-                setNeError({}); setModal("employee");
-              }}
+                                          <div key={p._id} onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 16, borderBottom: idx === 4 ? "none" : "1px solid rgba(0,0,0,0.04)", cursor: "pointer" }}>
 
-              autoOpenInvoice={autoOpenInvoice}
+                                            <div style={{ display: "flex", gap: 12 }}>
 
-              onAutoOpenInvoiceDone={() => setAutoOpenInvoice(false)}
-              onAddClient={() => {
-                setNcError({});
-                setShowClientPass(false);
-                setSidebarOverride(null);
-                setActive("addClient");
-              }}
-              onDelete={async () => {
+                                              <div style={{ width: 3, background: bColor, borderRadius: 2 }}></div>
 
-                try {
+                                              <div>
 
-                  await axios.delete(`${BASE_URL}/api/projects/${jumpProject._id}`);
+                                                <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{p.name || p.title}</div>
 
-                  fetchProjects();
+                                                <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{clients.find(c => c._id === p.clientId)?.clientName || "Internal"} Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
 
-                  setActive("projects");
+                                              </div>
 
-                } catch (e) { console.error(e); }
+                                            </div>
 
-              }}
+                                            <div style={{ width: 100, textAlign: "right" }}>
 
-              hideTopActions={projectDetailsReadOnly}
+                                              <div style={{ display: "inline-block", color: badgeColor, background: `${badgeColor}15`, padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800, marginBottom: 8, letterSpacing: "0.5px" }}>
+
+                                                {badgeText}
+
+                                              </div>
+
+                                              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
 
-              onBack={() => {
-                setFromEditProject(false);
-                const returnTo = sidebarOverride || "projects";
-                setSidebarOverride(null);
-                setActive(returnTo);
-              }}
+                                                <div style={{ flex: 1, height: 4, background: "rgba(0,0,0,0.06)", borderRadius: 2 }}>
 
-              onEdit={(updatedProj) => {
+                                                  <div style={{ width: `${progress}%`, height: "100%", background: barColor, borderRadius: 2 }}></div>
 
-                setFromEditProject(false);
+                                                </div>
 
-                setSidebarOpen(false);
+                                                <div style={{ fontSize: 11, fontWeight: 800, color: barColor }}>{progress}%</div>
 
-                if (updatedProj) setJumpProject(updatedProj);
+                                              </div>
 
-                startNavTransition(() => setActive("edit-project"));
+                                            </div>
 
-              }}
+                                          </div>
 
-              onUpdate={async (payload) => {
-                try {
-                  if (payload && payload._id) {
-                    const res = await axios.put(`${BASE_URL}/api/projects/${payload._id}`, payload);
-                    const saved = res.data?.project || res.data;
-                    await fetchProjects();
-                    await fetchTasks();
-                    const returnTo = sidebarOverride || "projects";
-                    setSidebarOverride(null);
-                    setActive(returnTo);
-                    return saved;
-                  } else {
-                    await fetchProjects();
-                    await fetchTasks();
+                                        );
+
+                                      })}
+
+                                      {projects.filter(p => p.status === "Active" || p.status === "Pending").length === 0 && (
+
+                                        <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No active projects</div>
+
+                                      )}
+
+                                    </div>
+
+                                  </div>
+
+                                </div>
+
+                                {/* RIGHT COLUMN */}
+
+                                <div style={{ display: "flex", flexDirection: "column", gap: 24, height: "100%" }}>
+
+
+
+                                  {/* Quick Access */}
+
+                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+
+                                    <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
+
+                                      <i className="ti ti-bolt" style={{ color: "#0097A7" }}></i> Quick Access
+
+                                    </div>
+
+                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+
+                                      {[
+
+                                        { icon: "ti-users", color: "#0097A7", bg: "rgba(0,188,212,0.1)", label: "Clients", sub: `${clients.length} total`, act: "clients" },
+
+                                        { icon: "ti-user-circle", color: "#7c3aed", bg: "rgba(124,58,237,0.1)", label: "Employees", sub: `${employees.length} staff`, act: "employees" },
+
+                                        { icon: "ti-file-invoice", color: "#16a34a", bg: "rgba(22,163,74,0.1)", label: "Invoices", sub: `${pendingInvCount} unpaid`, act: "invoices" },
+
+                                        { icon: "ti-receipt", color: "#2563eb", bg: "rgba(37,99,235,0.1)", label: "Quotations", sub: "Builder", act: "quotations" },
+
+                                        { icon: "ti-report-money", color: "#d97706", bg: "rgba(217,119,6,0.1)", label: "Proposals", sub: "Creator", act: "proposals" },
+
+                                        { icon: "ti-template", color: "#db2777", bg: "rgba(219,39,119,0.1)", label: "Templates", sub: "Designer", act: "templates" },
+
+                                        { icon: "ti-messages", color: "#0097A7", bg: "rgba(0,188,212,0.1)", label: "Messages", sub: "Internal", act: "messaging" },
+
+                                        { icon: "ti-world", color: "#16a34a", bg: "rgba(22,163,74,0.1)", label: "Client Portal", sub: "External", act: "clients" },
+
+                                        { icon: "ti-wallet", color: "#2563eb", bg: "rgba(37,99,235,0.1)", label: "Accounts", sub: "Income/Exp", act: "accounts" },
+
+
+
+                                      ].map((q, i) => (
+                                        <div key={i} onClick={() => setActive(q.act)} style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderRadius: 12, border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s" }}>
+                                          <div style={{ width: 34, height: 34, borderRadius: 10, background: q.bg, color: q.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>
+                                            <i className={`ti ${q.icon}`}></i>
+                                          </div>
+                                          <div>
+                                            <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>{q.label}</div>
+                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{q.sub}</div>
+                                          </div>
+                                        </div>
+                                      ))}
+                                      <div
+                                        onClick={() => { const ph = (user?.phone || "").replace(/\D/g, ""); window.open(ph ? "https://wa.me/" + ph : "https://web.whatsapp.com/", "_blank"); }}
+                                        style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderRadius: 12, border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s" }}
+                                        onMouseEnter={e => e.currentTarget.style.background = "rgba(37,211,102,0.06)"}
+                                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                                      >
+                                        <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(37,211,102,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                                          💬
+                                        </div>
+                                        <div>
+                                          <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>WhatsApp</div>
+                                          <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>Open Chat</div>
+                                        </div>
+                                      </div>                              </div>
+                                  </div>
+
+                                  {/* Team Section */}
+
+                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", height: "100%", display: "flex", flexDirection: "column" }}>
+
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+
+                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+
+                                        <i className="ti ti-user-circle" style={{ color: "#0097A7" }}></i> Team
+
+                                      </div>
+
+                                      <div onClick={() => setActive("employees")} style={{ fontSize: 13, fontWeight: 700, color: "#0097A7", cursor: "pointer" }}>
+
+                                        View All
+
+                                      </div>
+
+                                    </div>
+
+                                    <div style={{ display: "flex", flexDirection: "column", gap: 16, overflowY: "auto", flex: 1 }}>
+
+                                      {employees.slice(0, 3).map(e => (
+                                        <div key={e._id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+
+                                          <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,  var(--app-accent, var(--app-accent, #00BCD4)), #0097A7)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800 }}>
+
+                                            {(e.name || "E")[0].toUpperCase()}
+
+                                          </div>
+
+                                          <div style={{ flex: 1 }}>
+
+                                            <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{e.name}</div>
+
+                                            <div style={{ fontSize: 12, color: "rgba(15,28,46,0.5)" }}>{e.role || "Employee"}</div>
+
+                                          </div>
+
+                                          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#16a34a" }}></div>
+
+                                        </div>
+
+                                      ))}
+
+                                      {employees.length === 0 && <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center" }}>No team members</div>}
+
+                                    </div>
+
+                                  </div>
+
+
+
+                                </div>
+
+                              </div>
+
+
+
+                              {/* SECONDARY CONTENT AREA */}
+
+                              <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24, alignItems: "stretch", marginTop: 0 }}>
+
+
+                                {/* LEFT COLUMN 2 */}
+                                <div style={{ display: "flex", flexDirection: "column", gap: 8, height: "100%" }}>
+
+
+                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", height: "100%", display: "flex", flexDirection: "column" }}>
+
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+
+                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+
+                                        <i className="ti ti-user-x" style={{ color: "var(--app-accent)" }}></i> Leave Requests
+
+                                        <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length} PENDING</span>
+
+                                      </div>
+
+                                      <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent, #00BCD4)", cursor: "pointer" }}>
+
+                                        HR Panel
+
+                                      </div>
+
+                                    </div>
+
+                                    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+                                      {pendingLeaves.map((l, i) => {
+
+                                        const initials = l.employeeName ? l.employeeName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : "EE";
+
+                                        const colors = ["#f59e0b", "#a855f7", "#0ea5e9", "#ec4899", "#22c55e"];
+
+                                        const bg = colors[i % colors.length];
+
+                                        const getDuration = () => {
+
+                                          if (!l.from || !l.to) return "";
+
+                                          try {
+
+                                            const d1 = new Date(l.from);
+
+                                            const d2 = new Date(l.to);
+
+                                            if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return "";
+
+                                            const diffTime = Math.abs(d2 - d1);
+
+                                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+                                            return ` (${diffDays}d)`;
+
+                                          } catch (err) { return ""; }
+
+                                        };
+
+                                        const detail = `${l.type || "Leave"} ${l.from} - ${l.to}${getDuration()}`;
+
+
+
+                                        return (
+
+                                          <div key={l._id || i} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: 16, borderBottom: i === pendingLeaves.length - 1 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
+
+                                            <div style={{ width: 36, height: 36, borderRadius: "50%", background: bg, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>
+
+                                              {initials}
+
+                                            </div>
+
+                                            <div style={{ flex: 1 }}>
+
+                                              <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{l.employeeName}</div>
+
+                                              <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{detail}</div>
+
+                                            </div>
+
+                                            <div style={{ display: "flex", gap: 8 }}>
+
+                                              <button onClick={() => handleApproveLeave(l._id)} style={{ background: "#dcfce7", color: "#166534", border: "none", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+
+                                                <i className="ti ti-check"></i> Approve
+
+                                              </button>
+
+                                              <button onClick={() => handleRejectLeave(l._id)} style={{ background: "#fef2f2", color: "#dc2626", border: "none", padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+
+                                                <i className="ti ti-x"></i>
+
+                                              </button>
+
+                                            </div>
+
+                                          </div>
+
+                                        );
+
+                                      })}
+
+                                      {pendingLeaves.length === 0 && (
+
+                                        <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No pending leave requests.</div>
+
+                                      )}
+
+                                    </div>
+
+                                  </div>
+
+                                </div>
+
+
+
+                                {/* RIGHT COLUMN 2 */}
+
+                                <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+
+
+
+                                  {/* Overdue Tasks */}
+
+                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+
+                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+
+                                        <i className="ti ti-alert-circle" style={{ color: "var(--app-accent, #00BCD4)" }}></i> Overdue Tasks
+
+                                        <span style={{ background: "#fef2f2", color: "#dc2626", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>
+
+                                          {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).length}
+
+                                        </span>
+
+                                      </div>
+
+                                      <div onClick={() => { setSidebarOverride("dashboard"); setActive("tasks"); }} style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent, #00BCD4)", cursor: "pointer" }}>
+
+                                        All Tasks
+
+                                      </div>
+
+                                    </div>
+
+                                    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+                                      {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).slice(0, 5).map((t, idx) => (
+
+                                        <div key={t._id} style={{ display: "flex", alignItems: "flex-start", gap: 12, paddingBottom: 16, borderBottom: idx === 4 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
+
+                                          <input type="checkbox" style={{ marginTop: 2, accentColor: "var(--app-accent, #00BCD4)" }} />
+
+                                          <div style={{ flex: 1 }}>
+
+                                            <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e", marginBottom: 2 }}>{t.title}</div>
+
+                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{employees.find(e => e._id === t.assignee)?.name || "Unassigned"} Due {t.deadline ? new Date(t.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}</div>
+
+                                          </div>
+
+                                          <div style={{ background: "#fef2f2", color: "#dc2626", padding: "4px 8px", borderRadius: 6, fontSize: 9, fontWeight: 800, letterSpacing: "0.5px" }}>HIGH</div>
+
+                                        </div>
+
+                                      ))}
+
+                                      {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).length === 0 && <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", padding: "10px 0" }}>No overdue tasks.</div>}
+
+                                    </div>
+
+                                  </div>
+
+                                  {/* Doc Requests (Dynamic from backend) */}
+
+                                  <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+
+                                      <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+
+                                        <i className="ti ti-file-description" style={{ color: "var(--app-accent, #00BCD4)" }}></i> Doc Requests
+
+                                        <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{employeeDocs.filter(d => d.status === "PENDING").length} PENDING</span>
+
+                                      </div>
+
+                                      <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent, #00BCD4)", cursor: "pointer" }}>
+
+                                        Manage
+
+                                      </div>
+
+                                    </div>
+
+                                    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+                                      {employeeDocs.map((d, i) => {
+
+                                        const docName = d.docType === "pan" ? "PAN Card" : d.docType === "aadhaar" ? "Aadhaar Card" : d.docType === "passbook" ? "Bank Passbook" : d.docType === "itr" ? "ITR Document" : d.docType;
+
+                                        const styleConfig =
+
+                                          d.docType === "pan" ? { bg: "#f1f5f9", c: "#0ea5e9" } :
+
+                                            d.docType === "passbook" ? { bg: "#f3e8ff", c: "#a855f7" } :
+
+                                              d.docType === "aadhaar" ? { bg: "#dcfce7", c: "#22c55e" } :
+
+                                                { bg: "#fef3c7", c: "#d97706" };
+
+
+
+                                        const isPending = d.status === "PENDING";
+
+                                        const statusColor = d.status === "APPROVED" ? "#16a34a" : d.status === "REJECTED" ? "#dc2626" : "#ea580c";
+
+
+
+                                        return (
+
+                                          <div key={d._id || i} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: 16, borderBottom: i === employeeDocs.length - 1 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
+
+                                            <div style={{ width: 32, height: 32, borderRadius: 8, background: styleConfig.bg, color: styleConfig.c, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>
+
+                                              <i className="ti ti-file-info"></i>
+
+                                            </div>
+
+                                            <div style={{ flex: 1 }}>
+
+                                              <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>{docName}</div>
+
+                                              <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{d.employeeName}</div>
+
+                                            </div>
+
+                                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+
+                                              <a href={d.url} target="_blank" rel="noreferrer" style={{ background: "#f1f5f9", color: "#64748b", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
+
+                                                <i className="ti ti-eye"></i> View
+
+                                              </a>
+
+                                              {isPending ? (
+
+                                                <>
+
+                                                  <button onClick={() => handleApproveDoc(d._id)} style={{ background: "#dcfce7", color: "#166534", border: "none", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+
+                                                    Approve
+
+                                                  </button>
+
+                                                  <button onClick={() => handleRejectDoc(d._id)} style={{ background: "#fef2f2", color: "#dc2626", border: "none", padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+
+                                                    Reject
+
+                                                  </button>
+
+                                                </>
+
+                                              ) : (
+
+                                                <div style={{ color: statusColor, fontSize: 10, fontWeight: 800, letterSpacing: "0.5px" }}>{d.status}</div>
+
+                                              )}
+
+                                            </div>
+
+                                          </div>
+
+                                        );
+
+                                      })}
+
+                                      {employeeDocs.length === 0 && (
+
+                                        <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No document requests.</div>
+
+                                      )}
+
+                                    </div>
+
+                                  </div>
+
+                                </div>
+
+                              </div>
+                            </>)}
+
+                          </div>);
+
+                      })()}
+
+
+                    </>)
                   }
-                } catch (e) {
-                  console.error("Failed to update project:", e);
-                }
-              }}
-
-              fetchTasks={fetchTasks}
-
-              fetchProjects={fetchProjects}
-
-              onMessageTeam={() => setActive("messaging")}
-
-              onNewProposal={(proj) => {
-                setProposalPrefillProject(proj);
-                setProposalReturnProject(proj);
-                setSidebarOverride("projects");
-                setActive("proposals");
-              }}
-              onNewQuotation={(proj) => {
-                setQuotationPrefillProject(proj);
-                setQuotationReturnProject(proj);
-                setSidebarOverride("projects");
-                setActive("quotations");
-              }}
-              onViewQuotation={(entry) => {
-                setQuotationViewEntry(entry);
-                setSidebarOverride("projects");
-                setActive("quotations");
-              }}
-              onViewProposal={(entry) => {
-                setProposalViewEntry(entry);
-                setSidebarOverride("projects");
-                setActive("proposals");
-              }}
-
-              onNewInvoice={(proj, editInv) => {
-                if (!proj) return;
-                setPrevActiveBeforeInvoice(active);
-                setJumpInvoice(null);
-                setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now(), ...(editInv ? { editData: editInv, projectId: proj._id } : {}) });
-                setSidebarNavClickId(id => id + 1);
-                setSidebarOverride("projects");
-                setActive("invoices");
-              }}
-              onViewInvoice={(entry) => {
-                setJumpInvoice({ ...entry, _t: Date.now() });
-              }}
-
-
-
-
-              onLogTime={async (hours) => {
-
-                try {
-
-                  const current = Number(jumpProject?.loggedHours || 0);
-
-                  const updated = current + Number(hours || 0);
-
-                  await axios.put(`${BASE_URL}/api/projects/${jumpProject._id}`, { loggedHours: updated });
-
-                  setJumpProject(prev => ({ ...prev, loggedHours: updated }));
-
-                  fetchProjects();
-
-                } catch (e) { console.error(e); }
-
-              }}
-
-            />
-
-          )}
-
-          {validActive === "addClient" && <AddClientView onBack={() => { if (openedFromMobileAddMenu) { setOpenedFromMobileAddMenu(false); setActive("dashboard"); } else if (returnToCalendar) { setReturnToCalendar(false); setSidebarOverride(null); setActive("calendar"); } else if (returnToQuotation) { setReturnToQuotation(false); setSidebarOverride(null); setActive("quotations"); } else if (returnToProposals) { setReturnToProposals(false); setSidebarOverride(null); setActive("proposals"); } else { setActive("clients"); } }} onClientAdded={(client, replaceTempId) => {
-            setClients(prev => {
-              let updated;
-              if (replaceTempId) {
-                // Server-confirmed client arrived — swap out the optimistic temp record
-                updated = prev.map(c => c._id === replaceTempId ? client : c);
-              } else if (prev.some(c => c._id === client._id)) {
-                updated = prev;
-              } else {
-                // First call: either the optimistic temp client, or (in older flows)
-                // the final client directly — append only if it isn't already present.
-                updated = [...prev, client];
-              }
-              try {
-                const cid = resolveSubadminId();
-                if (cid) localStorage.setItem("cached_clients_" + cid, JSON.stringify(updated));
-              } catch { }
-              return updated;
-            });
-            if (returnToCalendar) {
-              setReturnToCalendar(false);
-              setSidebarOverride(null);
-              setCalendarNewClientName(client.clientName || client.name || "");
-              setActive("calendar");
-              return;
-            }
-            if (returnToQuotation) {
-              setReturnToQuotation(false);
-              setSidebarOverride(null);
-              setQuotationNewClientName(client.clientName || client.name || "");
-              setActive("quotations");
-              return;
-            }
-            if (returnToProposals) {
-              setReturnToProposals(false);
-              setSidebarOverride(null);
-              setProposalNewClientName(client.clientName || client.name || "");
-              setActive("proposals");
-              return;
-            }
-            // Make sure the newly added client is the one shown/selected —
-            // otherwise the Clients page keeps whatever client was open
-            // before, making the new one look like it "vanished" into
-            // another client's card.
-            setPendingNewClientId(client._id);
-            setActiveClientIdForReturn(client._id);
-            setActive("clients");
-          }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || accentColor} />}
+                </div>
+              </>
+            )}
 
-          {showAddClientModal && (
-            <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={() => setShowAddClientModal(false)}>
-              <div style={{ background: "#fff", borderRadius: 16, width: "100%", maxWidth: 720, maxHeight: "90vh", overflowY: "auto" }} onClick={e => e.stopPropagation()}>
-                <AddClientView
-                  onBack={() => { setReturnToProposals(false); setShowAddClientModal(false); }}
-                  onClientAdded={(client, replaceTempId) => {
-                    setClients(prev => {
-                      if (replaceTempId) return prev.map(c => c._id === replaceTempId ? client : c);
-                      if (prev.some(c => c._id === client._id)) return prev;
-                      return [...prev, client];
-                    });
-                    setReturnToProposals(false);
-                    setProposalNewClientName(client.clientName || client.name || "");
-                    setShowAddClientModal(false);
-                  }}
-                  user={user}
-                  themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || accentColor}
-                />
-              </div>
-            </div>
-          )}
 
-          {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} isFetching={!clientsLoaded} onBack={openedFromMobileAddMenu ? () => { setOpenedFromMobileAddMenu(false); setActive("dashboard"); } : null} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }} onAddClient={() => {
 
-            const limit = getSubscriptionLimit("client");
+            {/* ── Pages using new components ── */}
 
-            setActive("addClient");
+            {validActive === "create-project" && (
 
-          }} triggerCrop={triggerCrop}
-            onCreateProject={(proj, isEdit) => {
+              <ModernProjectCreator
 
-              setSidebarOverride("clients");
+                key="create"
 
-              const activeC = proj?._id
-                ? clients.find(c => c._id === proj._id)
-                : clients.find(c => (c.clientName || c.name) === proj?.client);
-              if (activeC) setActiveClientIdForReturn(activeC._id);
+                editProject={null}
 
-              if (isEdit && proj) {
+                clients={clients}
 
-                setJumpProject({ ...proj, _fromClientPage: true });
+                employees={employees}
 
-                setSidebarOpen(false);
+                prefillClient={jumpProject?._prefillClient ? clients.find(c => (c.clientName || c.name) === jumpProject._prefillClient) : null}
 
-                startNavTransition(() => setActive("edit-project"));
+                onBack={() => {
+                  if (openedFromMobileAddMenu) {
+                    setOpenedFromMobileAddMenu(false);
+                    setSidebarOverride(null);
+                    setJumpProject(null);
+                    setActive("dashboard");
+                    return;
+                  }
+                  const returnTo = sidebarOverride || "projects";
+                  setSidebarOverride(null);
+                  setJumpProject(null);
+                  setActive(returnTo);
+                }}
+                onSuccess={async (newProj) => {
 
-              } else {
+                  const saved = newProj?.project || newProj;
 
-                if (activeC) {
+                  await fetchProjects();
 
-                  setJumpProject({
+                  if (sidebarOverride === "invoices") {
+                    setSidebarOverride(null);
+                    setJumpProject(null);
+                    setInvoicePrefill(prev => ({ ...(prev || {}), project: saved?.name || "", _t: Date.now() }));
+                    setActive("invoices");
+                    return;
+                  }
 
-                    _prefillClient: activeC.clientName || activeC.name,
+                  setJumpProject(saved);
+                  setFromEditProject(false);
+                  setProjectDetailsReadOnly(false);
+                  setActive("project-details");
 
-                    _prefillContactName: activeC.contactPersonName || "",
+                }}
 
-                    _prefillContactNo: activeC.contactPersonNo || "",
+                onAddEmployeeClick={() => {
+                  const limit = getSubscriptionLimit("employee", subscription);
+                  if (limit !== Infinity && employees.length >= limit) {
+                    setLimitModal({ type: "employee", limit });
+                    return;
+                  }
+                  setNeError({}); setModal("employee");
+                  fetchSubscription();
+                }}
 
-                    _prefillEmail: activeC.email || "",
+              />
 
-                  });
+            )}
 
-                }
 
-                setActive("create-project");
 
-              }
+            {validActive === "edit-project" && jumpProject && (
 
-            }} user={user} />}
+              <ModernProjectCreator
 
+                key={jumpProject._id || jumpProject.id}
 
+                editProject={jumpProject}
 
-          {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projectsWithProgress} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} user={user} clients={clients} onAddEmployeeClick={() => {
-            const limit = getSubscriptionLimit("employee", subscription);
-            if (limit !== Infinity && employees.length >= limit) {
-              setLimitModal({ type: "employee", limit });
-              return;
-            }
-            setNeError({}); setModal("employee");
-            fetchSubscription();
-          }} />}
+                clients={clients}
 
-          {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
+                employees={employees}
 
-          {validActive === "projects" && <ProjectsPage
+                onAddEmployeeClick={() => {
+                  const limit = getSubscriptionLimit("employee", subscription);
+                  if (limit !== Infinity && employees.length >= limit) {
+                    setLimitModal({ type: "employee", limit });
+                    return;
+                  }
+                  setNeError({}); setModal("employee");
+                  fetchSubscription();
+                }}
 
-            onBack={() => { setSidebarOverride(null); setOpenedFromMobileAddMenu(false); setActive("dashboard"); }}
+                onBack={() => { const returnTo = sidebarOverride || "projects"; setSidebarOverride(null); setActive(returnTo); }}
 
-            projects={projects}
+                onSuccess={async (updatedProj) => {
+                  if (updatedProj?._deleted) {
+                    setProjects(prev => prev.filter(p => (p._id || p.id) !== updatedProj._id));
+                    setJumpProject(null);
+                    setSidebarOverride(null);
+                    setActive("projects");
+                    return;
+                  }
 
-            tasks={tasks}
+                  const pid = jumpProject._id || jumpProject.id;
+                  let fresh = updatedProj || jumpProject;
 
-            setProjects={setProjects}
+                  try {
+                    const res = await axios.get(`${BASE_URL}/api/projects/${pid}`);
+                    fresh = res.data?.project || res.data || fresh;
+                  } catch (err) {
+                    console.error("Failed to refetch project after update:", err);
+                  }
 
-            clients={clients}
+                  await fetchProjects();
 
-            employees={employees}
+                  setSidebarOverride(null);
 
-            jumpProject={jumpProject}
+                  setJumpProject(fresh);
 
-            setJumpProject={setJumpProject}
+                  setProjectDetailsReadOnly(false);
 
-            config={config}
+                  setActive("project-details");
 
-            onViewTasks={(proj) => {
+                }} />
 
-              if (!proj) return;
+            )}
 
-              startNavTransition(() => {
+            {validActive === "project-details" && jumpProject && (
 
-                setSelectedProjectForTasks(proj);
+              <ModernProjectDetails
 
-                setActive("tasks");
+                key={jumpProject._id || jumpProject.id}
 
-              });
+                project={jumpProject}
 
-            }}
+                tasks={tasks}
 
-            onViewProject={(proj) => {
+                employees={employees}
 
-              if (!proj) return;
+                user={user}
 
-              startNavTransition(() => {
+                clients={clients}
 
-                setJumpProject(proj);
+                fromClientContext={sidebarOverride === "clients"}
 
-                setProjectDetailsReadOnly(false);
+                showBackLabel={sidebarOverride === "dashboard"}
 
-                setActive("project-details");
+                scrollContainerRef={mainScrollRef}
 
-              });
+                onAddEmployeeClick={() => {
+                  const limit = getSubscriptionLimit("employee", subscription);
+                  if (limit !== Infinity && employees.length >= limit) {
+                    setLimitModal({ type: "employee", limit });
+                    return;
+                  }
+                  setNeError({}); setModal("employee");
+                }}
 
-            }}
+                autoOpenInvoice={autoOpenInvoice}
 
-            user={user}
+                onAutoOpenInvoiceDone={() => setAutoOpenInvoice(false)}
+                onAddClient={() => {
+                  setNcError({});
+                  setShowClientPass(false);
+                  setSidebarOverride(null);
+                  setActive("addClient");
+                }}
+                onDelete={async () => {
 
-            fetchTasks={fetchTasks}
+                  try {
 
-            onCreateProject={() => { setSidebarOverride("clients"); setActive("create-project"); }}
+                    await axios.delete(`${BASE_URL}/api/projects/${jumpProject._id}`);
 
-            onEditProject={(p) => {
+                    fetchProjects();
 
-              setSidebarOpen(false);
+                    setActive("projects");
 
-              setJumpProject(p);
+                  } catch (e) { console.error(e); }
 
-              startNavTransition(() => setActive("edit-project"));
+                }}
 
-            }}
+                hideTopActions={projectDetailsReadOnly}
 
-            setActive={setActive}
+                onBack={() => {
+                  setFromEditProject(false);
+                  const returnTo = sidebarOverride || "projects";
+                  setSidebarOverride(null);
+                  setActive(returnTo);
+                }}
 
-            setInvoicePrefill={setInvoicePrefill}
+                onEdit={(updatedProj) => {
 
-            setJumpInvoice={setJumpInvoice}
+                  setFromEditProject(false);
 
-            fetchProjects={fetchProjects}
+                  setSidebarOpen(false);
 
-            setPrevActiveBeforeInvoice={setPrevActiveBeforeInvoice}
+                  if (updatedProj) setJumpProject(updatedProj);
 
-            onAddEmployee={() => {
+                  startNavTransition(() => setActive("edit-project"));
 
-              const limit = getSubscriptionLimit("employee");
+                }}
 
-              if (subscription && employees.length >= limit) {
-
-                setLimitModal({ type: "employee", limit });
-
-                return;
-
-              }
-
-              setReturnToModal(null); setModal("employee");
-
-            }}
-
-          />}
-
-
-
-          {validActive === "subadmins" && <SubadminsPage subadmins={subadmins} setSubadmins={setSubadmins} employees={employees} managers={managers} quotations={quotations} />}
-
-
-
-          {validActive === "invoices" && <InvoiceCreator key={`invoices-${sidebarNavClickId}`} forceListView={false} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { if (openedFromMobileAddMenu) { setOpenedFromMobileAddMenu(false); setActive("dashboard"); return; } if (jumpProject) { setSidebarOverride(sidebarOverride || "projects"); setActive("project-details"); return; } const returnTo = sidebarOverride || prevActiveBeforeInvoice || "dashboard"; setSidebarOverride(null); setActive(returnTo); }} onSaveSuccess={() => {
-            if (jumpProject && (jumpProject._id || jumpProject.id)) {
-              setSidebarOverride(sidebarOverride || "projects");
-              setActive("project-details");
-              if (typeof setInvoicePrefill === "function") setInvoicePrefill(null);
-              setSidebarNavClickId(id => id + 1);
-              return;
-            }
-            if (!jumpInvoice && !newInvoicePrefill && !jumpInvoicePrefill) {
-              setSidebarOverride(null);
-              setActive("invoices");
-              return;
-            }
-            const returnTo = sidebarOverride || prevActiveBeforeInvoice || "projects";
-            setSidebarOverride(null);
-            setActive(returnTo);
-          }} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill || jumpInvoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => {
-
-            const limit = getSubscriptionLimit("client");
-
-            if (subscription && clients.length >= limit) {
-
-              setLimitModal({ type: "client", limit });
-
-              return;
-
-            }
-
-            setAddClientFromInvoice(true);
-            setReturnToModal(modal); setModal("client");
-
-          }} onAddProject={() => { setJumpProject(null); setSidebarOverride("invoices"); setActive("create-project"); }} />}
-          {validActive !== "invoices" && jumpInvoice && (
-            <InvoiceCreator
-              key={`invoice-overlay-${jumpInvoice._id || jumpInvoice.id || jumpInvoice.invoiceNo}-${jumpInvoice._t || 0}`}
-              forceListView={false}
-              onConsumeForceListView={() => { }}
-              user={user}
-              clients={clients}
-              projects={projects}
-              companyLogo={companyLogo}
-              companyName={companyNameStr}
-              onLogoChange={onLogoChange}
-              jumpInvoice={jumpInvoice}
-              onBack={() => setJumpInvoice(null)}
-              onSaveSuccess={() => setJumpInvoice(null)}
-              onAddClient={() => { }}
-              onAddProject={() => { }}
-            />
-          )}
-          {validActive === "quotations" && <QuotationCreatorModern key={quotationViewEntry ? `view-${quotationViewEntry._id || quotationViewEntry.id}` : (quotationReturnProject ? `new-${quotationReturnProject._id}` : 'list')} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} prefillProject={quotationPrefillProject} onPrefillConsumed={() => setQuotationPrefillProject(null)} initialViewEntry={quotationViewEntry} onBackOverride={quotationViewEntry ? () => { setQuotationViewEntry(null); setSidebarOverride(null); setActive("project-details"); } : null} onReturnToProject={quotationReturnProject ? () => { const p = quotationReturnProject; setQuotationReturnProject(null); setJumpProject(p); setSidebarOverride(null); setActive("project-details"); } : null} onAddClient={() => {
-
-            setNcError({}); setShowClientPass(false);
-            setReturnToQuotation(true);
-            setSidebarOverride("quotations");
-            setActive("addClient");
-
-          }} onAddProject={() => { setPrevActiveBeforeInvoice(active); setActive("create-project"); }} newlyAddedClientName={quotationNewClientName} />}
-
-          {validActive === "proposals" && <ProjectProposalCreator key={proposalViewEntry ? `view-${proposalViewEntry._id || proposalViewEntry.id}` : 'list'} clients={clients} companyLogo={companyLogo} companyName={companyNameStr} prefillProject={proposalPrefillProject} onPrefillConsumed={() => setProposalPrefillProject(null)} initialViewProposal={proposalViewEntry} onBackOverride={proposalViewEntry ? () => { setProposalViewEntry(null); setSidebarOverride(null); setActive("project-details"); } : null} onReturnToProject={proposalReturnProject ? () => { const p = proposalReturnProject; setProposalReturnProject(null); setJumpProject(p); setSidebarOverride(null); setActive("project-details"); } : null} onAddClient={() => { setShowCropModal(false); setNcError({}); setShowClientPass(false); setReturnToProposals(true); setSidebarOverride("proposals"); setActive("addClient"); }} newlyAddedClientName={proposalNewClientName} triggerCrop={triggerCrop} />}
-
-          {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
-
-          {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} onSelectProject={(p) => setSelectedProjectForTasks(p)} autoOpenAddModal={autoOpenTaskModal} onAddModalOpened={(val) => setAutoOpenTaskModal(!!val)} />}
-
-          {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={companyId} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} THEME={currentTheme} onAddProject={() => { setReturnToCalendar(true); setSidebarOverride("calendar"); setActive("create-project"); }} onAddClient={() => { setNcError({}); setShowClientPass(false); setReturnToCalendar(true); setSidebarOverride("calendar"); setActive("addClient"); }} newlyAddedClientName={calendarNewClientName} newlyAddedProjectName={calendarNewProjectName} />}
-
-          {validActive === "messaging" && <MessagingPage user={user} />}
-
-          {validActive === "settings" && (
-            <SettingsPage
-              user={user}
-              appTheme={appTheme}
-              setAppTheme={setAppTheme}
-              themes={THEMES}
-              customColor={customColor}
-              setCustomColor={setCustomColor}
-              onLogoChange={onLogoChange}
-              triggerCrop={triggerCrop}
-              onProfileUpdate={(updatedUser) => setUser(updatedUser)}
-              THEME={currentTheme}
-              onBack={() => setActive("dashboard")}
-            />
-
-          )}
-
-
-          {validActive === "accounts" && <AccountsPage onBack={() => setActive("dashboard")} THEME={currentTheme} initialTab="overview" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
-
-          {validActive === "payments" && <AccountsPage THEME={currentTheme} initialTab="income" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
-
-          {validActive === "expenses" && <AccountsPage THEME={currentTheme} initialTab="expenses" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
-
-          {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
-
-          {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
-
-          {validActive === "templates" && (
-
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
-
-              <iframe
-
-                id="template-designer-frame"
-
-                src={`/template-designer.html?v=2`}
-
-                style={{ width: "100%", height: "100%", border: "none", flex: 1 }}
-
-                title="Template Designer"
-
-                onLoad={(e) => {
-
-                  const frame = e.target.contentWindow;
-
-                  frame.postMessage({
-
-                    type: 'SET_DATA',
-
-                    clients: clients.map(c => c.clientName || c.name),
-
-                    employees: employees.map(emp => ({ name: emp.name, id: emp._id || emp.id })),
-
-                    quotations: quotations,
-
-                    company: {
-
-                      name: user?.companyName || "",
-
-                      logoUrl: user?.logoUrl || "",
-
-                      email: user?.email || "",
-
-                      phone: user?.phone || "",
-
+                onUpdate={async (payload) => {
+                  try {
+                    if (payload && payload._id) {
+                      const res = await axios.put(`${BASE_URL}/api/projects/${payload._id}`, payload);
+                      const saved = res.data?.project || res.data;
+                      await fetchProjects();
+                      await fetchTasks();
+                      const returnTo = sidebarOverride || "projects";
+                      setSidebarOverride(null);
+                      setActive(returnTo);
+                      return saved;
+                    } else {
+                      await fetchProjects();
+                      await fetchTasks();
                     }
+                  } catch (e) {
+                    console.error("Failed to update project:", e);
+                  }
+                }}
 
-                  }, '*');
+                fetchTasks={fetchTasks}
 
-                  frame.postMessage({ type: 'SET_THEME', color: currentTheme.accent }, '*');
+                fetchProjects={fetchProjects}
+
+                onMessageTeam={() => setActive("messaging")}
+
+                onNewProposal={(proj) => {
+                  setProposalPrefillProject(proj);
+                  setProposalReturnProject(proj);
+                  setSidebarOverride("projects");
+                  setActive("proposals");
+                }}
+                onNewQuotation={(proj) => {
+                  setQuotationPrefillProject(proj);
+                  setQuotationReturnProject(proj);
+                  setSidebarOverride("projects");
+                  setActive("quotations");
+                }}
+                onViewQuotation={(entry) => {
+                  setQuotationViewEntry(entry);
+                  setSidebarOverride("projects");
+                  setActive("quotations");
+                }}
+                onViewProposal={(entry) => {
+                  setProposalViewEntry(entry);
+                  setSidebarOverride("projects");
+                  setActive("proposals");
+                }}
+
+                onNewInvoice={(proj, editInv) => {
+                  if (!proj) return;
+                  setPrevActiveBeforeInvoice(active);
+                  setJumpInvoice(null);
+                  setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now(), ...(editInv ? { editData: editInv, projectId: proj._id } : {}) });
+                  setSidebarNavClickId(id => id + 1);
+                  setSidebarOverride("projects");
+                  setActive("invoices");
+                }}
+                onViewInvoice={(entry) => {
+                  setJumpInvoice({ ...entry, _t: Date.now() });
+                }}
+
+
+
+
+                onLogTime={async (hours) => {
+
+                  try {
+
+                    const current = Number(jumpProject?.loggedHours || 0);
+
+                    const updated = current + Number(hours || 0);
+
+                    await axios.put(`${BASE_URL}/api/projects/${jumpProject._id}`, { loggedHours: updated });
+
+                    setJumpProject(prev => ({ ...prev, loggedHours: updated }));
+
+                    fetchProjects();
+
+                  } catch (e) { console.error(e); }
 
                 }}
 
               />
 
-            </div>
+            )}
 
-          )}
+            {validActive === "addClient" && <AddClientView onBack={() => { if (openedFromMobileAddMenu) { setOpenedFromMobileAddMenu(false); setActive("dashboard"); } else if (returnToCalendar) { setReturnToCalendar(false); setSidebarOverride(null); setActive("calendar"); } else if (returnToQuotation) { setReturnToQuotation(false); setSidebarOverride(null); setActive("quotations"); } else if (returnToProposals) { setReturnToProposals(false); setSidebarOverride(null); setActive("proposals"); } else { setActive("clients"); } }} onClientAdded={(client, replaceTempId) => {
+              setClients(prev => {
+                let updated;
+                if (replaceTempId) {
+                  // Server-confirmed client arrived — swap out the optimistic temp record
+                  updated = prev.map(c => c._id === replaceTempId ? client : c);
+                } else if (prev.some(c => c._id === client._id)) {
+                  updated = prev;
+                } else {
+                  // First call: either the optimistic temp client, or (in older flows)
+                  // the final client directly — append only if it isn't already present.
+                  updated = [...prev, client];
+                }
+                try {
+                  const cid = resolveSubadminId();
+                  if (cid) localStorage.setItem("cached_clients_" + cid, JSON.stringify(updated));
+                } catch { }
+                return updated;
+              });
+              if (returnToCalendar) {
+                setReturnToCalendar(false);
+                setSidebarOverride(null);
+                setCalendarNewClientName(client.clientName || client.name || "");
+                setActive("calendar");
+                return;
+              }
+              if (returnToQuotation) {
+                setReturnToQuotation(false);
+                setSidebarOverride(null);
+                setQuotationNewClientName(client.clientName || client.name || "");
+                setActive("quotations");
+                return;
+              }
+              if (returnToProposals) {
+                setReturnToProposals(false);
+                setSidebarOverride(null);
+                setProposalNewClientName(client.clientName || client.name || "");
+                setActive("proposals");
+                return;
+              }
+              // Make sure the newly added client is the one shown/selected —
+              // otherwise the Clients page keeps whatever client was open
+              // before, making the new one look like it "vanished" into
+              // another client's card.
+              setPendingNewClientId(client._id);
+              setActiveClientIdForReturn(client._id);
+              setActive("clients");
+            }} user={user} themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || accentColor} />}
+
+            {showAddClientModal && (
+              <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={() => setShowAddClientModal(false)}>
+                <div style={{ background: "#fff", borderRadius: 16, width: "100%", maxWidth: 720, maxHeight: "90vh", overflowY: "auto" }} onClick={e => e.stopPropagation()}>
+                  <AddClientView
+                    onBack={() => { setReturnToProposals(false); setShowAddClientModal(false); }}
+                    onClientAdded={(client, replaceTempId) => {
+                      setClients(prev => {
+                        if (replaceTempId) return prev.map(c => c._id === replaceTempId ? client : c);
+                        if (prev.some(c => c._id === client._id)) return prev;
+                        return [...prev, client];
+                      });
+                      setReturnToProposals(false);
+                      setProposalNewClientName(client.clientName || client.name || "");
+                      setShowAddClientModal(false);
+                    }}
+                    user={user}
+                    themeColor={getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || accentColor}
+                  />
+                </div>
+              </div>
+            )}
+
+            {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} isFetching={!clientsLoaded} onBack={openedFromMobileAddMenu ? () => { setOpenedFromMobileAddMenu(false); setActive("dashboard"); } : null} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }} onAddClient={() => {
+
+              const limit = getSubscriptionLimit("client");
+
+              setActive("addClient");
+
+            }} triggerCrop={triggerCrop}
+              onCreateProject={(proj, isEdit) => {
+
+                setSidebarOverride("clients");
+
+                const activeC = proj?._id
+                  ? clients.find(c => c._id === proj._id)
+                  : clients.find(c => (c.clientName || c.name) === proj?.client);
+                if (activeC) setActiveClientIdForReturn(activeC._id);
+
+                if (isEdit && proj) {
+
+                  setJumpProject({ ...proj, _fromClientPage: true });
+
+                  setSidebarOpen(false);
+
+                  startNavTransition(() => setActive("edit-project"));
+
+                } else {
+
+                  if (activeC) {
+
+                    setJumpProject({
+
+                      _prefillClient: activeC.clientName || activeC.name,
+
+                      _prefillContactName: activeC.contactPersonName || "",
+
+                      _prefillContactNo: activeC.contactPersonNo || "",
+
+                      _prefillEmail: activeC.email || "",
+
+                    });
+
+                  }
+
+                  setActive("create-project");
+
+                }
+
+              }} user={user} />}
 
 
 
-          {validActive === "letterhead" && (
+            {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projectsWithProgress} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} user={user} clients={clients} onAddEmployeeClick={() => {
+              const limit = getSubscriptionLimit("employee", subscription);
+              if (limit !== Infinity && employees.length >= limit) {
+                setLimitModal({ type: "employee", limit });
+                return;
+              }
+              setNeError({}); setModal("employee");
+              fetchSubscription();
+            }} />}
 
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%", background: "#F5FAFA" }}>
+            {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
 
-              <iframe
+            {validActive === "projects" && <ProjectsPage
 
-                key="letterhead-frame"
+              onBack={() => { setSidebarOverride(null); setOpenedFromMobileAddMenu(false); setActive("dashboard"); }}
 
-                id="letterhead-frame"
+              projects={projects}
 
-                src={`/template-designer.html?v=1#lh`}
+              tasks={tasks}
 
-                style={{ width: "100%", height: "100%", border: "none", flex: 1, display: "block" }}
+              setProjects={setProjects}
 
-                title="Letterhead Designer"
+              clients={clients}
 
-                onLoad={(e) => {
+              employees={employees}
 
-                  const frame = e.target.contentWindow;
+              jumpProject={jumpProject}
 
-                  // Small delay to ensure iframe is fully ready
+              setJumpProject={setJumpProject}
 
-                  setTimeout(() => {
+              config={config}
+
+              onViewTasks={(proj) => {
+
+                if (!proj) return;
+
+                startNavTransition(() => {
+
+                  setSelectedProjectForTasks(proj);
+
+                  setActive("tasks");
+
+                });
+
+              }}
+
+              onViewProject={(proj) => {
+
+                if (!proj) return;
+
+                startNavTransition(() => {
+
+                  setJumpProject(proj);
+
+                  setProjectDetailsReadOnly(false);
+
+                  setActive("project-details");
+
+                });
+
+              }}
+
+              user={user}
+
+              fetchTasks={fetchTasks}
+
+              onCreateProject={() => { setSidebarOverride("clients"); setActive("create-project"); }}
+
+              onEditProject={(p) => {
+
+                setSidebarOpen(false);
+
+                setJumpProject(p);
+
+                startNavTransition(() => setActive("edit-project"));
+
+              }}
+
+              setActive={setActive}
+
+              setInvoicePrefill={setInvoicePrefill}
+
+              setJumpInvoice={setJumpInvoice}
+
+              fetchProjects={fetchProjects}
+
+              setPrevActiveBeforeInvoice={setPrevActiveBeforeInvoice}
+
+              onAddEmployee={() => {
+
+                const limit = getSubscriptionLimit("employee");
+
+                if (subscription && employees.length >= limit) {
+
+                  setLimitModal({ type: "employee", limit });
+
+                  return;
+
+                }
+
+                setReturnToModal(null); setModal("employee");
+
+              }}
+
+            />}
+
+
+
+            {validActive === "subadmins" && <SubadminsPage subadmins={subadmins} setSubadmins={setSubadmins} employees={employees} managers={managers} quotations={quotations} />}
+
+
+
+            {validActive === "invoices" && <InvoiceCreator key={`invoices-${sidebarNavClickId}`} forceListView={false} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { if (openedFromMobileAddMenu) { setOpenedFromMobileAddMenu(false); setActive("dashboard"); return; } if (jumpProject) { setSidebarOverride(sidebarOverride || "projects"); setActive("project-details"); return; } const returnTo = sidebarOverride || prevActiveBeforeInvoice || "dashboard"; setSidebarOverride(null); setActive(returnTo); }} onSaveSuccess={() => {
+              if (jumpProject && (jumpProject._id || jumpProject.id)) {
+                setSidebarOverride(sidebarOverride || "projects");
+                setActive("project-details");
+                if (typeof setInvoicePrefill === "function") setInvoicePrefill(null);
+                setSidebarNavClickId(id => id + 1);
+                return;
+              }
+              if (!jumpInvoice && !newInvoicePrefill && !jumpInvoicePrefill) {
+                setSidebarOverride(null);
+                setActive("invoices");
+                return;
+              }
+              const returnTo = sidebarOverride || prevActiveBeforeInvoice || "projects";
+              setSidebarOverride(null);
+              setActive(returnTo);
+            }} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill || jumpInvoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => {
+
+              const limit = getSubscriptionLimit("client");
+
+              if (subscription && clients.length >= limit) {
+
+                setLimitModal({ type: "client", limit });
+
+                return;
+
+              }
+
+              setAddClientFromInvoice(true);
+              setReturnToModal(modal); setModal("client");
+
+            }} onAddProject={() => { setJumpProject(null); setSidebarOverride("invoices"); setActive("create-project"); }} />}
+            {validActive !== "invoices" && jumpInvoice && (
+              <InvoiceCreator
+                key={`invoice-overlay-${jumpInvoice._id || jumpInvoice.id || jumpInvoice.invoiceNo}-${jumpInvoice._t || 0}`}
+                forceListView={false}
+                onConsumeForceListView={() => { }}
+                user={user}
+                clients={clients}
+                projects={projects}
+                companyLogo={companyLogo}
+                companyName={companyNameStr}
+                onLogoChange={onLogoChange}
+                jumpInvoice={jumpInvoice}
+                onBack={() => setJumpInvoice(null)}
+                onSaveSuccess={() => setJumpInvoice(null)}
+                onAddClient={() => { }}
+                onAddProject={() => { }}
+              />
+            )}
+            {validActive === "quotations" && <QuotationCreatorModern key={quotationViewEntry ? `view-${quotationViewEntry._id || quotationViewEntry.id}` : (quotationReturnProject ? `new-${quotationReturnProject._id}` : 'list')} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} prefillProject={quotationPrefillProject} onPrefillConsumed={() => setQuotationPrefillProject(null)} initialViewEntry={quotationViewEntry} onBackOverride={quotationViewEntry ? () => { setQuotationViewEntry(null); setSidebarOverride(null); setActive("project-details"); } : null} onReturnToProject={quotationReturnProject ? () => { const p = quotationReturnProject; setQuotationReturnProject(null); setJumpProject(p); setSidebarOverride(null); setActive("project-details"); } : null} onAddClient={() => {
+
+              setNcError({}); setShowClientPass(false);
+              setReturnToQuotation(true);
+              setSidebarOverride("quotations");
+              setActive("addClient");
+
+            }} onAddProject={() => { setPrevActiveBeforeInvoice(active); setActive("create-project"); }} newlyAddedClientName={quotationNewClientName} />}
+
+            {validActive === "proposals" && <ProjectProposalCreator key={proposalViewEntry ? `view-${proposalViewEntry._id || proposalViewEntry.id}` : 'list'} clients={clients} companyLogo={companyLogo} companyName={companyNameStr} prefillProject={proposalPrefillProject} onPrefillConsumed={() => setProposalPrefillProject(null)} initialViewProposal={proposalViewEntry} onBackOverride={proposalViewEntry ? () => { setProposalViewEntry(null); setSidebarOverride(null); setActive("project-details"); } : null} onReturnToProject={proposalReturnProject ? () => { const p = proposalReturnProject; setProposalReturnProject(null); setJumpProject(p); setSidebarOverride(null); setActive("project-details"); } : null} onAddClient={() => { setShowCropModal(false); setNcError({}); setShowClientPass(false); setReturnToProposals(true); setSidebarOverride("proposals"); setActive("addClient"); }} newlyAddedClientName={proposalNewClientName} triggerCrop={triggerCrop} />}
+
+            {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
+
+            {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} onSelectProject={(p) => setSelectedProjectForTasks(p)} autoOpenAddModal={autoOpenTaskModal} onAddModalOpened={(val) => setAutoOpenTaskModal(!!val)} />}
+
+            {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={companyId} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} THEME={currentTheme} onAddProject={() => { setReturnToCalendar(true); setSidebarOverride("calendar"); setActive("create-project"); }} onAddClient={() => { setNcError({}); setShowClientPass(false); setReturnToCalendar(true); setSidebarOverride("calendar"); setActive("addClient"); }} newlyAddedClientName={calendarNewClientName} newlyAddedProjectName={calendarNewProjectName} />}
+
+            {validActive === "messaging" && <MessagingPage user={user} />}
+
+            {validActive === "settings" && (
+              <SettingsPage
+                user={user}
+                appTheme={appTheme}
+                setAppTheme={setAppTheme}
+                themes={THEMES}
+                customColor={customColor}
+                setCustomColor={setCustomColor}
+                onLogoChange={onLogoChange}
+                triggerCrop={triggerCrop}
+                onProfileUpdate={(updatedUser) => setUser(updatedUser)}
+                THEME={currentTheme}
+                onBack={() => setActive("dashboard")}
+              />
+
+            )}
+
+
+            {validActive === "accounts" && <AccountsPage onBack={() => setActive("dashboard")} THEME={currentTheme} initialTab="overview" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+
+            {validActive === "payments" && <AccountsPage THEME={currentTheme} initialTab="income" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+
+            {validActive === "expenses" && <AccountsPage THEME={currentTheme} initialTab="expenses" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+
+            {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
+
+            {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
+
+            {validActive === "templates" && (
+
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
+
+                <iframe
+
+                  id="template-designer-frame"
+
+                  src={`/template-designer.html?v=2`}
+
+                  style={{ width: "100%", height: "100%", border: "none", flex: 1 }}
+
+                  title="Template Designer"
+
+                  onLoad={(e) => {
+
+                    const frame = e.target.contentWindow;
 
                     frame.postMessage({
 
                       type: 'SET_DATA',
 
-                      clients: clients.map(c => ({ name: c.clientName || c.name, id: c._id || c.id })),
+                      clients: clients.map(c => c.clientName || c.name),
 
                       employees: employees.map(emp => ({ name: emp.name, id: emp._id || emp.id })),
+
+                      quotations: quotations,
 
                       company: {
 
@@ -12599,113 +12693,321 @@ return (
 
                     frame.postMessage({ type: 'SET_THEME', color: currentTheme.accent }, '*');
 
-                  }, 300);
+                  }}
 
-                }}
-
-              />
-
-            </div>
-
-          )}
-
-
-
-          {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={async () => { await fetchSubscription(); setForceUpgradeTab(false); setActive("dashboard"); }} initialTab={forceUpgradeTab || enforceMySubscriptions ? "upgrade" : "overview"} preloadedSubscription={subscription} onTabChange={() => setForceUpgradeTab(false)} packagesList={packages} />}
-
-          {validActive === "reports" && <ReportsPage THEME={currentTheme} clients={clients} projects={projects} employees={employees} managers={managers} income={income} expenses={expenses} />}
-
-          {validActive === "packages" && <PackagesPage packages={packages} onViewPackage={handleViewPackage} onEditPackage={(user?.role !== "subadmin" && user?.role !== "sub_admin" && user?.role !== "sub-admin") ? handleEditPackage : undefined} onSubscribe={() => setActive("mysubscriptions")} THEME={currentTheme} />}
-
-          {validActive === "vendors" && <VendorsPage vendors={vendors} setVendors={setVendors} onAddVendorClick={() => { setNvError({}); setModal("vendor_add"); }} />}
-
-          {validActive === "rolePermissions" && <RolePermissionDashboard />}
-
-          {profileDropdownOpen && (
-
-            <div
-
-              data-profile-menu="true"
-
-              style={{
-
-                position: "fixed",
-
-                top: "72px",
-
-                right: "16px",
-
-                zIndex: 10050,
-
-                background: "#fff",
-
-                border: "1px solid #e2e8f0",
-
-                borderRadius: 12,
-
-                boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
-
-                overflow: "hidden",
-
-                minWidth: 220,
-
-                maxWidth: 280,
-
-              }}
-
-            >
-
-              {/* Current Account Header */}
-
-              <div style={{ padding: "12px 14px", borderBottom: "1px solid #f1f5f9", background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))" }}>
-
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-
-                  {companyLogo ? (
-
-                    <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "100px", objectFit: "contain", flexShrink: 0, background: "#fff", display: "block", borderRadius: 10, border: "1px solid #f1f5f9" }} />
-
-                  ) : (
-
-                    <div style={{ width: 38, height: 38, borderRadius: 10, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 14 }}>{initials}</div>
-
-                  )}
-
-                  <div style={{ flex: 1, minWidth: 0 }}>
-
-                    <div style={{ fontSize: 13, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</div>
-
-                    <div style={{ fontSize: 11, color: "var(--app-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.email}</div>
-
-                  </div>
-
-                  <span style={{ fontSize: 12 }}>✓</span>
-
-                </div>
+                />
 
               </div>
 
+            )}
 
 
-              {/* Other Saved Accounts */}
 
-              {accounts.length > 1 && (
+            {validActive === "letterhead" && (
 
-                <div style={{ maxHeight: 180, overflowY: "auto" }}>
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%", background: "#F5FAFA" }}>
 
-                  {accounts.filter(a => a.email !== user?.email).map((account, idx) => {
+                <iframe
 
-                    const accName = account?.name || account?.email?.split("@")[0] || "User";
+                  key="letterhead-frame"
 
-                    const accInitials = accName.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+                  id="letterhead-frame"
 
-                    return (
+                  src={`/template-designer.html?v=1#lh`}
+
+                  style={{ width: "100%", height: "100%", border: "none", flex: 1, display: "block" }}
+
+                  title="Letterhead Designer"
+
+                  onLoad={(e) => {
+
+                    const frame = e.target.contentWindow;
+
+                    // Small delay to ensure iframe is fully ready
+
+                    setTimeout(() => {
+
+                      frame.postMessage({
+
+                        type: 'SET_DATA',
+
+                        clients: clients.map(c => ({ name: c.clientName || c.name, id: c._id || c.id })),
+
+                        employees: employees.map(emp => ({ name: emp.name, id: emp._id || emp.id })),
+
+                        company: {
+
+                          name: user?.companyName || "",
+
+                          logoUrl: user?.logoUrl || "",
+
+                          email: user?.email || "",
+
+                          phone: user?.phone || "",
+
+                        }
+
+                      }, '*');
+
+                      frame.postMessage({ type: 'SET_THEME', color: currentTheme.accent }, '*');
+
+                    }, 300);
+
+                  }}
+
+                />
+
+              </div>
+
+            )}
+
+
+
+            {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={async () => { await fetchSubscription(); setForceUpgradeTab(false); setActive("dashboard"); }} initialTab={forceUpgradeTab || enforceMySubscriptions ? "upgrade" : "overview"} preloadedSubscription={subscription} onTabChange={() => setForceUpgradeTab(false)} packagesList={packages} />}
+
+            {validActive === "reports" && <ReportsPage THEME={currentTheme} clients={clients} projects={projects} employees={employees} managers={managers} income={income} expenses={expenses} />}
+
+            {validActive === "packages" && <PackagesPage packages={packages} onViewPackage={handleViewPackage} onEditPackage={(user?.role !== "subadmin" && user?.role !== "sub_admin" && user?.role !== "sub-admin") ? handleEditPackage : undefined} onSubscribe={() => setActive("mysubscriptions")} THEME={currentTheme} />}
+
+            {validActive === "vendors" && <VendorsPage vendors={vendors} setVendors={setVendors} onAddVendorClick={() => { setNvError({}); setModal("vendor_add"); }} />}
+
+            {validActive === "rolePermissions" && <RolePermissionDashboard />}
+
+            {profileDropdownOpen && (
+
+              <div
+
+                data-profile-menu="true"
+
+                style={{
+
+                  position: "fixed",
+
+                  top: "72px",
+
+                  right: "16px",
+
+                  zIndex: 10050,
+
+                  background: "#fff",
+
+                  border: "1px solid #e2e8f0",
+
+                  borderRadius: 12,
+
+                  boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
+
+                  overflow: "hidden",
+
+                  minWidth: 220,
+
+                  maxWidth: 280,
+
+                }}
+
+              >
+
+                {/* Current Account Header */}
+
+                <div style={{ padding: "12px 14px", borderBottom: "1px solid #f1f5f9", background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))" }}>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+
+                    {companyLogo ? (
+
+                      <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "100px", objectFit: "contain", flexShrink: 0, background: "#fff", display: "block", borderRadius: 10, border: "1px solid #f1f5f9" }} />
+
+                    ) : (
+
+                      <div style={{ width: 38, height: 38, borderRadius: 10, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 14 }}>{initials}</div>
+
+                    )}
+
+                    <div style={{ flex: 1, minWidth: 0 }}>
+
+                      <div style={{ fontSize: 13, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</div>
+
+                      <div style={{ fontSize: 11, color: "var(--app-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.email}</div>
+
+                    </div>
+
+                    <span style={{ fontSize: 12 }}>✓</span>
+
+                  </div>
+
+                </div>
+
+
+
+                {/* Other Saved Accounts */}
+
+                {accounts.length > 1 && (
+
+                  <div style={{ maxHeight: 180, overflowY: "auto" }}>
+
+                    {accounts.filter(a => a.email !== user?.email).map((account, idx) => {
+
+                      const accName = account?.name || account?.email?.split("@")[0] || "User";
+
+                      const accInitials = accName.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+
+                      return (
+
+                        <button
+
+                          key={account.email || idx}
+
+                          onClick={() => switchAccount(account)}
+
+                          style={{
+
+                            width: "100%",
+
+                            background: "none",
+
+                            border: "none",
+
+                            padding: "10px 14px",
+
+                            cursor: "pointer",
+
+                            fontSize: 13,
+
+                            fontWeight: 600,
+
+                            fontFamily: "inherit",
+
+                            color: T.text,
+
+                            display: "flex",
+
+                            alignItems: "center",
+
+                            gap: 10,
+
+                            borderBottom: "1px solid #f8fafc",
+
+                            textAlign: "left",
+
+                          }}
+
+                          onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
+
+                          onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+
+                        >
+
+                          <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 12, flexShrink: 0 }}>
+
+                            {account?.logoUrl ? <img src={account.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 2, background: "#fff" }} /> : <span>{accInitials}</span>}
+
+                          </div>
+
+                          <div style={{ flex: 1, minWidth: 0 }}>
+
+                            <div style={{ fontSize: 12, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{accName}</div>
+
+                            <div style={{ fontSize: 10, color: "#94a3b8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{account?.email}</div>
+
+                          </div>
+
+                        </button>
+
+                      );
+
+                    })}
+
+
+
+                  </div>
+
+                )}
+
+
+
+                {/* Menu Options */}
+
+                <div style={{ borderTop: "1px solid #f1f5f9" }}>
+
+                  <button
+
+                    onClick={() => {
+
+                      setProfileDropdownOpen(false);
+
+                      setShowProfile(true);
+
+                    }}
+
+                    style={{
+
+                      width: "100%",
+
+                      background: "none",
+
+                      border: "none",
+
+                      padding: "10px 14px",
+
+                      cursor: "pointer",
+
+                      fontSize: 13,
+
+                      fontWeight: 700,
+
+                      fontFamily: "inherit",
+
+                      color: T.text,
+
+                      display: "flex",
+
+                      alignItems: "center",
+
+                      gap: 10,
+
+                    }}
+
+                    onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
+
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+
+                  >
+
+                    <span style={{ fontSize: 14 }}>👤</span>Profile
+
+                  </button>
+
+                  {(isAdmin ||
+
+                    user?.businessLimit?.toLowerCase().includes("multiple") ||
+
+                    user?.businessLimit?.toLowerCase().includes("unlimited") ||
+
+                    subscription?.businessLimit?.toLowerCase().includes("multiple") ||
+
+                    subscription?.businessLimit?.toLowerCase().includes("unlimited") ||
+
+                    subscription?.features?.some(f => f.toLowerCase().includes("multiple")) ||
+
+                    packages.some(p => p.assignedSubadmins?.includes(user?.id || user?._id) &&
+
+                      (p.businessLimit?.toLowerCase().includes("multiple") ||
+
+                        p.features?.some(f => f.toLowerCase().includes("multiple"))))
+
+                  ) && (
 
                       <button
 
-                        key={account.email || idx}
+                        onClick={() => {
 
-                        onClick={() => switchAccount(account)}
+                          setProfileDropdownOpen(false);
+
+                          setAccountAuthTab("login");
+
+                          setAccountAuthOpen(true);
+
+                        }}
 
                         style={{
 
@@ -12721,7 +13023,7 @@ return (
 
                           fontSize: 13,
 
-                          fontWeight: 600,
+                          fontWeight: 700,
 
                           fontFamily: "inherit",
 
@@ -12733,1314 +13035,69 @@ return (
 
                           gap: 10,
 
-                          borderBottom: "1px solid #f8fafc",
-
-                          textAlign: "left",
+                          borderTop: "1px solid #f8fafc",
 
                         }}
 
-                        onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
+                        onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
 
-                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
 
                       >
 
-                        <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 12, flexShrink: 0 }}>
-
-                          {account?.logoUrl ? <img src={account.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 2, background: "#fff" }} /> : <span>{accInitials}</span>}
-
-                        </div>
-
-                        <div style={{ flex: 1, minWidth: 0 }}>
-
-                          <div style={{ fontSize: 12, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{accName}</div>
-
-                          <div style={{ fontSize: 10, color: "#94a3b8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{account?.email}</div>
-
-                        </div>
+                        <span style={{ fontSize: 14 }}>➕</span> Add Account
 
                       </button>
 
-                    );
-
-                  })}
-
-
-
-                </div>
-
-              )}
-
-
-
-              {/* Menu Options */}
-
-              <div style={{ borderTop: "1px solid #f1f5f9" }}>
-
-                <button
-
-                  onClick={() => {
-
-                    setProfileDropdownOpen(false);
-
-                    setShowProfile(true);
-
-                  }}
-
-                  style={{
-
-                    width: "100%",
-
-                    background: "none",
-
-                    border: "none",
-
-                    padding: "10px 14px",
-
-                    cursor: "pointer",
-
-                    fontSize: 13,
-
-                    fontWeight: 700,
-
-                    fontFamily: "inherit",
-
-                    color: T.text,
-
-                    display: "flex",
-
-                    alignItems: "center",
-
-                    gap: 10,
-
-                  }}
-
-                  onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
-
-                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-
-                >
-
-                  <span style={{ fontSize: 14 }}>👤</span>Profile
-
-                </button>
-
-                {(isAdmin ||
-
-                  user?.businessLimit?.toLowerCase().includes("multiple") ||
-
-                  user?.businessLimit?.toLowerCase().includes("unlimited") ||
-
-                  subscription?.businessLimit?.toLowerCase().includes("multiple") ||
-
-                  subscription?.businessLimit?.toLowerCase().includes("unlimited") ||
-
-                  subscription?.features?.some(f => f.toLowerCase().includes("multiple")) ||
-
-                  packages.some(p => p.assignedSubadmins?.includes(user?.id || user?._id) &&
-
-                    (p.businessLimit?.toLowerCase().includes("multiple") ||
-
-                      p.features?.some(f => f.toLowerCase().includes("multiple"))))
-
-                ) && (
-
-                    <button
-
-                      onClick={() => {
-
-                        setProfileDropdownOpen(false);
-
-                        setAccountAuthTab("login");
-
-                        setAccountAuthOpen(true);
-
-                      }}
-
-                      style={{
-
-                        width: "100%",
-
-                        background: "none",
-
-                        border: "none",
-
-                        padding: "10px 14px",
-
-                        cursor: "pointer",
-
-                        fontSize: 13,
-
-                        fontWeight: 700,
-
-                        fontFamily: "inherit",
-
-                        color: T.text,
-
-                        display: "flex",
-
-                        alignItems: "center",
-
-                        gap: 10,
-
-                        borderTop: "1px solid #f8fafc",
-
-                      }}
-
-                      onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
-
-                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-
-                    >
-
-                      <span style={{ fontSize: 14 }}>➕</span> Add Account
-
-                    </button>
-
-                  )}
-
-                <button
-
-                  onClick={() => {
-
-                    setProfileDropdownOpen(false);
-
-                    handleLogout();
-
-                  }}
-
-                  style={{
-
-                    width: "100%",
-
-                    background: "none",
-
-                    border: "none",
-
-                    padding: "10px 14px",
-
-                    cursor: "pointer",
-
-                    fontSize: 13,
-
-                    fontWeight: 700,
-
-                    fontFamily: "inherit",
-
-                    color: "#ef4444",
-
-                    display: "flex",
-
-                    alignItems: "center",
-
-                    gap: 10,
-
-                    borderTop: "1px solid #f8fafc",
-
-                  }}
-
-                  onMouseEnter={e => e.currentTarget.style.background = "#fef2f2"}
-
-                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-
-                >
-
-                  <span style={{ fontSize: 14 }}>🚪</span> Logout            </button>
-
-              </div>
-
-            </div>
-
-          )}
-
-
-
-          {accountAuthOpen && (
-
-            <div style={{ position: "fixed", inset: 0, zIndex: 10060 }}>
-
-              <button
-
-                onClick={() => setAccountAuthOpen(false)}
-
-                style={{
-
-                  position: "absolute",
-
-                  top: 16,
-
-                  right: 16,
-
-                  zIndex: 10061,
-
-                  background: "rgba(255,255,255,0.22)",
-
-                  border: "1.5px solid rgba(255,255,255,0.35)",
-
-                  color: "#fff",
-
-                  borderRadius: 10,
-
-                  width: 36,
-
-                  height: 36,
-
-                  cursor: "pointer",
-
-                  fontWeight: 900,
-
-                  fontSize: 14,
-
-                }}
-
-              >
-
-                ✕
-
-              </button>
-
-              <AuthPage setUser={handleAuthSetUser} initialTab={accountAuthTab} />
-
-            </div>
-
-          )}
-
-
-
-          {showProfile && <ProfileModal
-
-            user={user}
-
-            setUser={setUser}
-
-            onClose={() => setShowProfile(false)}
-
-            onLogout={handleLogout}
-
-            companyLogo={companyLogo}
-
-            onLogoChange={onLogoChange}
-
-            paymentHistory={paymentHistory}
-
-            projects={projects}
-
-            invoices={invoices}
-
-            onLogoUpload={handleHeaderLogoUpload}
-
-          />}
-
-
-
-
-
-          {/* ── Add Client Modal ── */}
-
-          {limitModal && <LimitReachedModal type={limitModal.type} limit={limitModal.limit} onClose={() => setLimitModal(null)} onUpgrade={() => { setLimitModal(null); setForceUpgradeTab(true); setActive("mysubscriptions"); }} />}
-          {modal === "client" && <Mdl title={clientSuccessData ? "Yes Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); setAddClientFromInvoice(false); }} maxWidth={clientSuccessData ? 460 : 780}>
-            {clientSuccessData ? (
-
-              <div style={{ textAlign: "center", padding: "5px 0" }}>
-
-                <div style={{ width: 54, height: 54, background: "linear-gradient(135deg,#dcfce7,#bbf7d0)", color: "#16a34a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 14px", boxShadow: "0 6px 15px rgba(22,163,74,0.12)" }}>✓</div>
-
-                <h3 style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 8 }}>Registration Successful!</h3>
-
-                <p style={{ fontSize: 13, color: "#64748b", marginBottom: 16, lineHeight: 1.4, maxWidth: 340, margin: "0 auto 16px" }}>
-
-                  The client account for <strong style={{ color: T.primary }}>{clientSuccessData.name}</strong> has been created.
-
-                  Share these credentials securely.
-
-                </p>
-
-
-
-                <div style={{ background: "linear-gradient(135deg,#f8fafc,#f1f5f9)", border: "1.5px solid #e2e8f0", borderRadius: 12, padding: "16px", marginBottom: 20, textAlign: "left", boxShadow: "inset 0 1px 3px rgba(0,0,0,0.02)" }}>
-
-                  <div style={{ marginBottom: 12 }}>
-
-                    <div style={{ fontSize: 9, color: "#64748b", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: 0.8 }}>LOGIN EMAIL</div>
-
-                    <div style={{ fontSize: 14, fontWeight: 700, color: T.text, background: "#fff", padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0" }}>{clientSuccessData.email}</div>
-
-                  </div>
-
-                  <div>
-
-                    <div style={{ fontSize: 9, color: "#64748b", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: 0.8 }}>TEMPORARY PASSWORD</div>
-
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-muted)", background: "#fff", padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0", fontFamily: "monospace" }}>{clientSuccessData.password || "Not set (optional)"}</div>
-
-                  </div>
-
-                </div>
-
-
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    )}
 
                   <button
 
                     onClick={() => {
 
-                      const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password || "Not set"}\n\nLogin URL: ${window.location.origin}\n\nPlease change your password after your first login.`;
+                      setProfileDropdownOpen(false);
 
-                      navigator.clipboard.writeText(text);
-
-                      toast.success("📋 Credentials copied!");
-
-                    }}
-
-                    style={{ width: "100%", background: "var(--app-accent-gradient)", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(var(--app-accent-rgb),0.2)", transition: "all 0.2s" }}
-
-                  >
-
-                    📋 Copy Login Details
-
-                  </button>
-
-
-
-                  <button
-
-                    onClick={() => {
-
-                      const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password || "Not set"}\n\nLogin URL: ${window.location.origin}`;
-
-                      const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-
-                      window.open(wpUrl, "_blank");
-
-                    }}
-
-                    style={{ width: "100%", background: "#25D366", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(37,211,102,0.2)" }}
-
-                  >
-
-                    <span style={{ fontSize: 16 }}>💬</span> Share via WhatsApp
-
-                  </button>
-
-
-
-                  <button
-
-                    onClick={() => { setModal(null); setClientSuccessData(null); }}
-
-                    style={{ width: "100%", background: "transparent", border: "1.2px solid var(--app-border)", color: "#64748b", borderRadius: 10, padding: "10px", fontWeight: 700, cursor: "pointer", fontSize: 12, marginTop: 6 }}
-
-                  >
-
-                    Close
-
-                  </button>
-
-                </div>
-
-              </div>
-
-            ) : (
-
-              <>
-
-                <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-
-                  <div
-
-                    onClick={() => {
-
-                      const input = document.createElement('input');
-
-                      input.type = 'file';
-
-                      input.accept = 'image/*';
-
-                      input.onchange = (e) => triggerCrop(e, (croppedImage) => setNc(p => ({ ...p, logoUrl: croppedImage })), 1);
-
-                      input.click();
+                      handleLogout();
 
                     }}
 
                     style={{
 
-                      position: "relative",
+                      width: "100%",
+
+                      background: "none",
+
+                      border: "none",
+
+                      padding: "10px 14px",
 
                       cursor: "pointer",
-
-                      width: "auto",
-
-                      height: "auto",
-
-                      maxWidth: "100%",
-
-                      display: "flex",
-
-                      flexDirection: "column",
-
-                      alignItems: "center"
-
-                    }}
-
-                  >
-
-                    <div style={{
-
-                      padding: nc.logoUrl ? 4 : 24,
-
-                      borderRadius: 20,
-
-                      background: "#fff",
-
-                      border: "2.5px dashed var(--app-border)",
-
-                      display: "flex",
-
-                      alignItems: "center",
-
-                      justifyContent: "center",
-
-                      minWidth: 100,
-
-                      minHeight: 100,
-
-                      overflow: "hidden",
-
-                      boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
-
-                      transition: "all 0.3s ease"
-
-                    }}>
-
-                      {nc.logoUrl ? (
-
-                        <img
-
-                          src={nc.logoUrl}
-
-                          alt="Logo"
-
-                          style={{
-
-                            width: "auto",
-
-                            height: "auto",
-
-                            maxWidth: "240px",
-
-                            maxHeight: "120px",
-
-                            objectFit: "contain",
-
-                            display: "block",
-
-                            borderRadius: 12
-
-                          }}
-
-                        />
-
-                      ) : (
-                        <div style={{
-                          padding: nc.logoUrl ? 4 : 24,
-                          borderRadius: 20,
-                          background: "#fff",
-                          border: "2.5px dashed var(--app-border)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          minWidth: 100,
-                          minHeight: 100,
-                          overflow: "hidden",
-                          boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
-                          transition: "all 0.3s ease"
-                        }}>
-                          {nc.logoUrl ? (
-                            <img
-                              src={nc.logoUrl}
-                              alt="Logo"
-                              style={{
-                                width: "auto",
-                                height: "auto",
-                                maxWidth: "240px",
-                                maxHeight: "120px",
-                                objectFit: "contain",
-                                display: "block",
-                                borderRadius: 12
-                              }}
-                            />
-                          ) : (
-                            <div style={{ textAlign: "center" }}>
-                              <div style={{
-                                width: 60,
-                                height: 60,
-                                borderRadius: 14,
-                                background: "var(--app-accent, #00BCD4)",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                margin: "0 auto 10px"
-                              }}>
-                                📷
-                              </div>
-                              <div style={{ fontSize: 10, fontWeight: 800, color: "#607D86", textTransform: "uppercase", letterSpacing: 1 }}>Upload Logo</div>
-                            </div>)}
-                        </div>
-
-                      )}
-
-                    </div>
-
-                    <div style={{
-
-                      position: "absolute", bottom: -10, right: -10,
-
-                      width: 36, height: 36, borderRadius: "50%",
-
-                      background: "var(--app-accent)", color: "#fff",
-
-                      display: "flex", alignItems: "center", justifyContent: "center",
-
-                      fontSize: 16, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.4)",
-
-                      border: "3px solid #fff"
-
-                    }}>📷</div>
-
-                  </div>
-
-                </div>
-
-                {/* ── CLIENT TYPE ── */}
-
-                <div style={{ marginBottom: 16 }}>
-
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 8 }}>Client Type <span style={{ color: '#EF5350' }}>*</span></div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
-
-                    {[{ val: 'b2b', icon: '🏢', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: '👤', label: 'B2C', sub: 'Individual person' }, { val: 'freelancer', icon: '💼', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
-
-                      <div key={t.val} onClick={() => setNc(p => ({ ...p, clientType: t.val }))}
-
-                        style={{ border: `2px solid ${nc.clientType === t.val ? ' var(--app-accent, var(--app-accent, #00BCD4))' : '#E0E6EA'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? 'var(--teal-light, var(--teal-light, #E0F7FA))' : '#F4F6F8', transition: 'all .15s', position: 'relative' }}>
-
-                        {nc.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: ' var(--app-accent, var(--app-accent, #00BCD4))', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
-
-                        <div style={{ fontSize: 22, marginBottom: 4 }}>{t.icon}</div>
-
-                        <div style={{ fontSize: 12, fontWeight: 700, color: nc.clientType === t.val ? '#007B8A' : '#1A2332' }}>{t.label}</div>
-
-                        <div style={{ fontSize: 10, color: '#94A3B0', marginTop: 2 }}>{t.sub}</div>
-
-                      </div>
-                    ))}
-
-                  </div>
-
-                </div>
-
-
-
-                {/* ── BASIC INFO ── */}
-
-                <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-
-                  <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-building" style={{ color: '#fff', fontSize: 16 }}></i></span> Basic Info</div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
-
-                    <Fld label="Client / Display Name *" value={nc.name} onChange={v => { setNc({ ...nc, name: v }); setNcError(p => ({ ...p, name: '' })); }} error={ncError.name} />
-
-                    <Fld label="Company Name" value={nc.company} onChange={v => setNc({ ...nc, company: v })} />
-
-                    <Fld label="Category / Industry" value={nc.category} onChange={v => { setNc({ ...nc, category: v }); saveCustomCategory(v); }} options={['', 'Web Development', 'Mobile App Development', 'UI/UX Design', 'Digital Marketing', 'IT Consulting', 'E-commerce', 'Healthcare', 'Education', 'Finance', 'Real Estate', 'Manufacturing', 'Retail', 'Logistics', 'Media & Entertainment', ...customCategories]} allowCustom={true} />
-
-                    <Fld label="Company Tax / GST No." value={nc.gstNumber} onChange={v => setNc({ ...nc, gstNumber: v })} />
-
-                    <Fld label="Client Source" value={nc.source} onChange={v => setNc({ ...nc, source: v })} options={['', 'Referral', 'Website / Organic', 'Social Media', 'Cold Outreach', 'LinkedIn', 'Event / Conference', 'Google Ads', 'Word of Mouth']} allowCustom={true} />
-
-                    <Fld label="Onboarded On" value={nc.onboardedOn} onChange={v => setNc({ ...nc, onboardedOn: v })} type="date" disabled={true} />
-
-                    <Fld label="Status" value={nc.status} onChange={v => setNc({ ...nc, status: v })} options={['Active', 'Inactive']} />
-
-                  </div>
-
-                </div>
-
-
-
-                {/* ── PRIMARY CONTACT ── */}
-
-                <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-
-                  <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-phone-call" style={{ color: '#fff', fontSize: 16 }}></i></span> Primary Contact</div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
-
-                    <Fld label="Contact Person Name" value={nc.contactPersonName} onChange={v => setNc({ ...nc, contactPersonName: v })} />
-
-                    <Fld label="Designation" value={nc.designation || ''} onChange={v => setNc({ ...nc, designation: v })} />
-
-                    <Fld label="Email *" value={nc.email} onChange={v => { setNc({ ...nc, email: v }); setNcError(p => ({ ...p, email: '' })); }} type="email" error={ncError.email} />
-
-                    <Fld label="Alt. Email" value={nc.altEmail || ''} onChange={v => setNc({ ...nc, altEmail: v })} type="email" />
-
-                    <Fld label="Contact Person Mobile" value={nc.contactPersonNo} onChange={v => setNc({ ...nc, contactPersonNo: v })} />
-
-                    <Fld label="Office Phone" value={nc.phone} onChange={v => setNc({ ...nc, phone: v })} />
-
-                  </div>
-
-                </div>
-
-
-
-                {/* ── ADDRESS ── */}
-
-                <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-
-                  <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-map-pin" style={{ color: '#fff', fontSize: 16 }}></i></span> Address</div>
-
-                  <div style={{ marginBottom: 12 }}><Fld label="Street / Building Address" value={nc.address} onChange={v => setNc({ ...nc, address: v })} /></div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
-
-                    <Fld label="City" value={nc.city} onChange={v => setNc({ ...nc, city: v })} />
-
-                    <Fld label="State / Province" value={nc.state} onChange={v => setNc({ ...nc, state: v })} />
-
-                    <Fld label="Pincode / ZIP" value={nc.pincode} onChange={v => setNc({ ...nc, pincode: v })} />
-
-                    <Fld label="Country" value={nc.country} onChange={v => setNc({ ...nc, country: v })} options={['India', 'United States', 'United Kingdom', 'United Arab Emirates', 'Singapore', 'Australia', 'Canada', 'Germany', 'France']} allowCustom={true} />
-
-                  </div>
-
-                </div>
-
-
-                {/* ── ONLINE PRESENCE ── */}
-
-                {/* ── ONLINE PRESENCE ── */}
-                <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <i className="ti ti-link" style={{ color: '#fff', fontSize: 16 }}></i>
-                    </span>
-                    Online Presence
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
-                    <Fld label="Website URL" value={nc.website} onChange={v => setNc({ ...nc, website: v })} />
-                    <Fld label="LinkedIn Profile" value={nc.linkedin} onChange={v => setNc({ ...nc, linkedin: v })} />
-                  </div>
-                </div>
-
-
-
-                {/* ── BILLING & TERMS ── */}
-
-                <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-
-                  <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-credit-card" style={{ color: '#fff', fontSize: 16 }}></i></span> Billing & Terms</div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
-
-                    <Fld label="Billing Currency" value={nc.billingCurrency} onChange={v => { setNc({ ...nc, billingCurrency: v }); saveCustomCurrency(v); }} options={['INR — Indian Rupee', 'USD — US Dollar', 'GBP — British Pound', 'EUR — Euro', 'AED — UAE Dirham', 'SGD — Singapore Dollar', 'AUD — Australian Dollar', ...customCurrencies]} allowCustom={true} />
-
-                    <Fld label="Payment Terms" value={nc.paymentTerms} onChange={v => setNc({ ...nc, paymentTerms: v })} options={['', 'Due on receipt', 'Net 7', 'Net 15', 'Net 30', 'Net 45', 'Net 60', '50% Advance + 50% on delivery']} allowCustom={true} />
-
-                    <Fld label="Credit Limit" value={nc.creditLimit} onChange={v => setNc({ ...nc, creditLimit: v })} type="number" />
-
-                    <Fld label="Preferred Payment Mode" value={nc.preferredPaymentMode} onChange={v => setNc({ ...nc, preferredPaymentMode: v })} options={['', 'Bank Transfer / NEFT', 'UPI', 'Cheque', 'Credit Card', 'Cash', 'PayPal', 'Stripe']} allowCustom={true} />
-
-                  </div>
-
-                </div>
-
-
-
-                {/* ── PORTAL ACCESS ── */}
-
-                <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-
-                  <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Search Portal Access</div>
-
-                  <div style={{ position: 'relative', marginBottom: 4 }}>
-
-                    <input type={showClientPass ? 'text' : 'password'} value={nc.password} onChange={e => setNc({ ...nc, password: e.target.value })}
-
-                      style={{ width: '100%', border: `1.5px solid ${ncError.password ? '#EF4444' : 'var(--app-border)'}`, borderRadius: 10, padding: '10px 46px 10px 14px', fontSize: 13, color: T.text, background: 'var(--app-bg)', boxSizing: 'border-box', outline: 'none' }}
-
-                      placeholder="Set client portal password *" />
-
-                    <button type="button" onClick={() => setShowClientPass(!showClientPass)} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--app-muted)', fontSize: 11, fontWeight: 700, fontFamily: 'inherit' }}>{showClientPass ? 'HIDE' : 'SHOW'}</button>
-
-                  </div>
-
-                  {ncError.password && <div style={{ fontSize: 11, color: '#EF4444', marginTop: 4 }}>Warning {ncError.password}</div>}
-
-                </div>
-
-
-
-                {/* ── INTERNAL NOTES ── */}
-
-                <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
-
-                  <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-notes" style={{ color: '#fff', fontSize: 16 }}></i></span> Internal Notes</div>
-
-                  <textarea value={nc.notes} onChange={e => setNc({ ...nc, notes: e.target.value })}
-
-                    style={{ width: '100%', border: '1.5px solid #E0E6EA', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: T.text, background: '#fff', boxSizing: 'border-box', outline: 'none', minHeight: 70, resize: 'vertical', fontFamily: 'inherit' }}
-
-                    placeholder="Any internal context,  instructions, or notes..." />
-
-                </div>
-
-
-
-                <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
-
-                  <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-
-                  <button onClick={addClient} disabled={saveLoading} style={{ ...B("var(--app-accent)"), opacity: saveLoading ? 0.7 : 1 }}>{saveLoading ? "Saving..." : "Add Client"}</button>
-
-                </div>
-
-              </>
-
-            )}
-
-          </Mdl>}
-
-
-
-          {/* ── Add Employee Modal ── */}
-
-          {modal === "employee" && <Mdl title="Add New Employee" onClose={() => setModal(null)}>
-
-            <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-
-              <Fld label="Full Name *" value={ne.name} onChange={v => { setNe({ ...ne, name: v }); setNeError(p => ({ ...p, name: "" })); }} error={neError.name} name="name" />
-              <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} name="email" dataField="email" />
-
-              <Fld label="Phone Number" value={ne.phone} onChange={v => setNe({ ...ne, phone: v })} />
-
-              {ne.role === "Custom" || (ne.role && ne.role !== "employee" && !DEPARTMENT_OPTIONS.includes(ne.role)) ? (
-                <div style={{ marginBottom: 14 }} data-field="role">
-                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ROLE / POSITION</label>
-                  <input
-                    type="text"
-                    value={ne.role === "Custom" ? "" : ne.role}
-                    onChange={e => setNe({ ...ne, role: e.target.value })}
-                    placeholder="Enter custom role/position"
-                    style={{ width: "100%", border: `1.5px solid ${neError.role ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none", fontFamily: "inherit" }}
-                    autoFocus
-                  />
-                  <button type="button" onClick={() => setNe({ ...ne, role: "" })} style={{ marginTop: 6, background: "none", border: "none", color: "var(--app-accent)", fontSize: 11, fontWeight: 700, cursor: "pointer", padding: 0 }}>← Back to dropdown</button>
-                  {neError.role && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.role}</div>}
-                </div>
-              ) : (
-                <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v })} options={[...DEPARTMENT_OPTIONS, "Custom"]} error={neError.role} dataField="role" />
-              )}
-
-              <Fld label="Department" value={ne.department} onChange={v => setNe({ ...ne, department: v })} />
-
-              <Fld label="Salary" value={ne.salary} onChange={v => setNe({ ...ne, salary: v })} />
-
-              <Fld label="Date of Birth" value={ne.dateOfBirth} onChange={v => setNe({ ...ne, dateOfBirth: v })} type="date" />
-
-              <Fld label="Joining Date" value={ne.joiningDate} onChange={v => setNe({ ...ne, joiningDate: v })} type="date" />
-
-              <Fld label="Marital Status" value={ne.maritalStatus} onChange={v => setNe({ ...ne, maritalStatus: v })} options={["Unmarried", "Married"]} />
-
-              <Fld label="Status *" value={ne.status} onChange={v => { setNe({ ...ne, status: v }); setNeError(p => ({ ...p, status: "" })); }} options={["Select Status", "Active", "Inactive"]} error={neError.status} dataField="status" placeholder="Select Status" />
-
-            </div>
-
-            <Fld label="Address" value={ne.address} onChange={v => setNe({ ...ne, address: v })} />
-
-
-
-            <div style={{ marginTop: 14 }}>
-
-              <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
-
-              <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-
-                <Fld label="Bank Name" value={ne.bankName} onChange={v => setNe({ ...ne, bankName: v })} />
-
-                <Fld label="IFSC Code" value={ne.ifscCode} onChange={v => setNe({ ...ne, ifscCode: v })} />
-
-                <Fld label="Account Number" value={ne.accountNumber} onChange={v => setNe({ ...ne, accountNumber: v })} />
-
-                <Fld label="Branch Name" value={ne.branchName} onChange={v => setNe({ ...ne, branchName: v })} />
-
-              </div>
-
-            </div>
-
-            <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-              <div style={{ marginBottom: 14 }}>
-                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
-                <div style={{ position: "relative" }}>
-                  <input id="emp-fld-password" type={showEmpPass ? "text" : "password"} value={ne.password} onChange={e => { setNe({ ...ne, password: e.target.value }); setNeError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set employee login password" />
-                  <button type="button" onClick={() => setShowEmpPass(!showEmpPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEmpPass ? "HIDE" : "SHOW"}</button>
-                </div>
-                {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.password}</div>}
-              </div>
-              <div style={{ marginBottom: 14 }}>
-                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CONFIRM PASSWORD *</label>
-                <div style={{ position: "relative" }}>
-                  <input type={showEmpConfirmPass ? "text" : "password"} value={ne.confirmPassword || ""} onChange={e => { setNe({ ...ne, confirmPassword: e.target.value }); setNeError(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.confirmPassword ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter password" />
-                  <button type="button" onClick={() => setShowEmpConfirmPass(!showEmpConfirmPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEmpConfirmPass ? "HIDE" : "SHOW"}</button>
-                </div>
-                {neError.confirmPassword && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.confirmPassword}</div>}
-              </div>
-            </div>
-
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6, flexWrap: "wrap" }}>
-
-
-              <button onClick={addEmployee} disabled={empSaveLoading} style={{ ...B("var(--app-accent)"), opacity: empSaveLoading ? 0.7 : 1 }}>{empSaveLoading ? "Saving..." : "Add Employee"}</button>
-
-            </div>
-
-          </Mdl>}
-
-
-
-          {/* ── Add Project Modal ── */}
-          {modal === "project" && <Mdl title="Create New Project" onClose={() => { setModal(null); setPrefillClient(null); }}>
-            <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-              <Fld label="Project Name *" value={np.name} onChange={v => { setNp({ ...np, name: v }); setNpError(p => ({ ...p, name: "" })); }} error={npError.name} />
-              <div style={{ marginBottom: 14 }}>
-                <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CLIENT *</label>
-                {(prefillClient || (editProject && editProject._fromClientPage)) ? (
-                  <div style={{ border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "var(--app-text, #333)", background: "var(--app-bg)", fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 16 }}>👤</span>
-                    <span>{np.client}</span>
-                    <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--app-accent)", background: "rgba(124,58,237,0.08)", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>Auto-filled</span>
-                  </div>
-                ) : (
-                  <ClientDropdown
-                    clients={clients}
-                    value={np.client}
-                    onChange={v => {
-                      const sel = clients.find(c => (c.clientName || c.name) === v);
-                      setNp({
-                        ...np,
-                        client: v,
-                        clientId: sel?._id || sel?.id || "",
-                        companyName: sel?.companyName || sel?.company || np.companyName,
-                        phone: sel?.phone || np.phone,
-                        address: sel?.address || np.address,
-                        contactPersonName: sel?.contactPersonName || np.contactPersonName,
-                        contactPersonNo: sel?.contactPersonNo || np.contactPersonNo,
-                        contactEmail: sel?.email || np.contactEmail,
-                      });
-                      setNpError(p => ({ ...p, client: "" }));
-                    }}
-                    error={npError.client}
-                    onAddClient={() => { setModal("client"); setNcError({}); setShowClientPass(false); }}
-                  />
-                )}
-                {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {npError.client}</div>}
-              </div>
-
-              <Fld label="Contact Person Name" value={np.contactPersonName} onChange={v => setNp({ ...np, contactPersonName: v })} />
-
-              <Fld label="Purpose" value={np.purpose} onChange={v => setNp({ ...np, purpose: v })} />
-              <Fld label="Company Name" value={np.companyName} onChange={v => setNp({ ...np, companyName: v })} />
-              <Fld label="Contact Person Name" value={np.contactPersonName} onChange={v => setNp({ ...np, contactPersonName: v })} />
-              <Fld label="Contact Person No" value={np.contactPersonNo} onChange={v => setNp({ ...np, contactPersonNo: v })} />
-              <Fld label="Contact Email" value={np.contactEmail} onChange={v => setNp({ ...np, contactEmail: v })} />
-              <Fld label="Phone" value={np.phone} onChange={v => setNp({ ...np, phone: v })} />
-              <Fld label="Address" value={np.address} onChange={v => setNp({ ...np, address: v })} />
-              <div style={{ marginBottom: 14 }}>
-
-                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>BUDGET</label>
-
-                <div style={{ display: "flex", gap: 8 }}>
-
-                  <select
-
-                    value={np.currency}
-
-                    onChange={e => setNp({ ...np, currency: e.target.value })}
-
-                    style={{ width: 80, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
-
-                  >
-
-                    {["Rs.", "$", "‚¬", "£", "¥", "AED", "SAR", "QAR", "CAD", "AUD", "SGD", "KWD", "BHD", "OMR"].map(c => <option key={c} value={c}>{c}</option>)}
-
-                  </select>
-
-                  <input
-
-                    type="text"
-
-                    value={np.budget}
-
-                    onChange={e => { const val = e.target.value; if (val && !/^[\d.]*$/.test(val)) return; setNp({ ...np, budget: val }); }}
-
-                    style={{ flex: 1, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
-
-                    placeholder="0.00"
-
-                  />
-
-                </div>
-
-              </div>
-
-              <Fld label="Start Date" value={np.start} onChange={v => setNp({ ...np, start: v })} type="date" />
-
-              <Fld label="End Date" value={np.end} onChange={v => setNp({ ...np, end: v })} type="date" />
-
-              <Fld label=" Team Members" value={np.team} onChange={v => setNp({ ...np, team: v })} />
-
-              <Fld
-
-                label="Status"
-
-                value={np.status}
-
-                onChange={v => {
-
-                  let updatedProgress = np.progress || 0;
-
-                  if (v.toLowerCase() === "completed" || v.toLowerCase() === "done") {
-
-                    updatedProgress = 100;
-
-                  } else if (v.toLowerCase() === "pending") {
-
-                    updatedProgress = 0;
-
-                  } else if (v.toLowerCase() === "in progress" && (np.progress || 0) === 0) {
-
-                    updatedProgress = 50;
-
-                  }
-
-                  setNp({ ...np, status: v, progress: updatedProgress });
-
-                }}
-
-                options={["Active", "On Hold", "Completed", "Overdue"]}
-
-                allowCustom={true}
-
-              />
-
-              <Fld
-
-                label="Progress (%)"
-
-                value={np.progress || 0}
-
-                type="number"
-
-                placeholder="0"
-
-                onChange={v => {
-
-                  let val = Number(v);
-
-                  if (val < 0) val = 0;
-
-                  if (val > 100) val = 100;
-
-                  setNp(prev => ({ ...prev, progress: val }));
-
-                }}
-
-              />
-
-            </div>
-
-            <Fld label="Description" value={np.description} onChange={v => setNp({ ...np, description: v })} />
-
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
-
-              <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-
-              <button onClick={addProject} disabled={projSaveLoading} style={{ ...B("var(--app-accent)"), opacity: projSaveLoading ? 0.7 : 1 }}>{projSaveLoading ? "Saving..." : "Add Project"}</button>
-
-            </div>
-
-          </Mdl>}
-
-
-
-          {/* ── Add Manager Modal ── */}
-
-          {modal === "manager" && <Mdl title="Add New Manager" onClose={() => setModal(null)}>
-
-            <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-
-              <Fld label="Manager Name *" value={nm.managerName} onChange={v => { setNm({ ...nm, managerName: v }); setNmError(p => ({ ...p, managerName: "" })); }} error={nmError.managerName} />
-
-              <Fld label="Email *" value={nm.email} onChange={v => { setNm({ ...nm, email: v }); setNmError(p => ({ ...p, email: "" })); }} type="email" error={nmError.email} />
-
-              <Fld label="Phone Number" value={nm.phone} onChange={v => setNm({ ...nm, phone: v })} />
-
-              <Fld label="Role" value={nm.role} onChange={v => setNm({ ...nm, role: v })} />
-
-              <Fld label="Department" value={nm.department} onChange={v => setNm({ ...nm, department: v })} />
-
-              <Fld label="Status" value={nm.status} onChange={v => setNm({ ...nm, status: v })} options={["Active", "Inactive"]} />
-
-            </div>
-
-            <Fld label="Address" value={nm.address} onChange={v => setNm({ ...nm, address: v })} />
-
-            <div style={{ marginBottom: 14 }}>
-
-              <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
-
-              <div style={{ position: "relative" }}>
-
-                <input type={showMgrPass ? "text" : "password"} value={nm.password} onChange={e => { setNm({ ...nm, password: e.target.value }); setNmError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nmError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set manager password" />
-
-                <button type="button" onClick={() => setShowMgrPass(!showMgrPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showMgrPass ? "HIDE" : "SHOW"}</button>
-
-              </div>
-
-              {nmError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {nmError.password}</div>}
-
-            </div>
-
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
-
-              <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-
-              <button onClick={addManager} disabled={mgrSaveLoading} style={{ ...B("var(--app-accent)"), opacity: mgrSaveLoading ? 0.7 : 1 }}>{mgrSaveLoading ? "Saving..." : "Save Manager "}</button>
-
-            </div>
-
-          </Mdl>}
-
-
-
-          {/* ── Add Subadmin Modal ── */}
-
-          {modal === "subadmin" && <Mdl title="Add New Subadmin" onClose={() => setModal(null)}>
-
-            <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-
-              <Fld label="Full Name *" value={ns.name} onChange={v => { setNs({ ...ns, name: v }); setNsError(p => ({ ...p, name: "" })); }} error={nsError.name} />
-
-              <Fld label="Email *" value={ns.email} onChange={v => { setNs({ ...ns, email: v }); setNsError(p => ({ ...p, email: "" })); }} type="email" error={nsError.email} />
-
-              <Fld label="Phone" value={ns.phone} onChange={v => setNs({ ...ns, phone: v })} />
-
-              <Fld label="Status" value={ns.status} onChange={v => setNs({ ...ns, status: v })} options={["Active", "Inactive"]} />
-
-              <Fld label="Company Name" value={ns.companyName} onChange={v => setNs({ ...ns, companyName: v })} placeholder="Company name" />
-
-              <Fld label="Company Type" value={ns.companyType} onChange={v => setNs({ ...ns, companyType: v })} options={["IT", "Software", "Services", "Consulting", "Other"]} />
-
-              <Fld label="No. of Employees" value={ns.employeeCount} onChange={v => setNs({ ...ns, employeeCount: v })} options={["0-10", "11-50", "51-100", "100+"]} />
-
-              <Fld label="Client Limit *" type="number" value={ns.clientLimit} onChange={v => setNs({ ...ns, clientLimit: v })} />
-
-              <Fld label="Employee Limit *" type="number" value={ns.employeeLimit} onChange={v => setNs({ ...ns, employeeLimit: v })} />
-
-            </div>
-
-            <div style={{ marginBottom: 14 }}>
-
-              <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
-
-              <div style={{ position: "relative" }}>
-
-                <input type={showSubPass ? "text" : "password"} value={ns.password} onChange={e => { setNs({ ...ns, password: e.target.value }); setNsError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nsError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set subadmin password" />
-
-                <button type="button" onClick={() => setShowSubPass(!showSubPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showSubPass ? "HIDE" : "SHOW"}</button>
-
-              </div>
-
-              {nsError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {nsError.password}</div>}
-
-            </div>
-
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
-
-              <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-
-              <button onClick={addSubadmin} disabled={subSaveLoading} style={{ ...B("var(--app-accent)"), opacity: subSaveLoading ? 0.7 : 1 }}>{subSaveLoading ? "Saving..." : "Save Subadmin "}</button>
-
-            </div>
-
-          </Mdl>}
-
-
-
-          {/* ── Add Package Modal ── */}
-
-          {modal === "package_add" && <Mdl title="Add New Package" onClose={() => setModal(null)} maxWidth={700}>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
-
-              <Fld label="Package Title *" value={npkg.title} onChange={v => { setNpkg({ ...npkg, title: v }); setPkgError(p => ({ ...p, title: "" })); }} error={pkgError.title} />
-
-              <Fld label="Icon (Emoji)" value={npkg.icon} onChange={v => setNpkg({ ...npkg, icon: v })} placeholder="e.g. 📦" />
-
-
-
-              <Fld label="Description" value={npkg.description} onChange={v => setNpkg({ ...npkg, description: v })} />
-
-            </div>
-
-
-
-            <div style={{ background: "#f8fafc", padding: 18, borderRadius: 16, border: "1px solid #f1f5f9", margin: "14px 0" }}>
-
-              <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>PRICING OPTIONS</div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
-
-                <Fld label="Monthly Price" value={npkg.monthlyPrice} onChange={v => setNpkg({ ...npkg, monthlyPrice: v })} placeholder="e.g. Rs.999" />
-
-                <Fld label="Quarterly Price" value={npkg.quarterlyPrice} onChange={v => setNpkg({ ...npkg, quarterlyPrice: v })} placeholder="e.g. Rs.2,499" />
-
-                <Fld label="Half-Yearly Price" value={npkg.halfYearlyPrice} onChange={v => setNpkg({ ...npkg, halfYearlyPrice: v })} placeholder="e.g. Rs.4,499" />
-
-                <Fld label="Annual Price" value={npkg.annualPrice} onChange={v => setNpkg({ ...npkg, annualPrice: v })} placeholder="e.g. Rs.7,999" />
-
-              </div>
-
-            </div>
-
-
-
-            <div style={{ background: "#fdf2f8", padding: 18, borderRadius: 16, border: "#fce7f3", margin: "14px 0" }}>
-
-              <div style={{ fontSize: 11, color: "#be185d", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>BUSINESS MANAGEMENT</div>
-
-              <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
-
-                {["Single business manage", "Multiple business manage"].map(mode => (
-
-                  <button
-
-                    key={mode}
-
-                    onClick={() => setNpkg({ ...npkg, businessLimit: mode })}
-
-                    style={{
-
-                      flex: 1,
-
-                      padding: "12px",
-
-                      borderRadius: 12,
-
-                      border: npkg.businessLimit === mode ? "1.5px solid #7c3aed" : "1.5px solid #e2e8f0",
-
-                      background: npkg.businessLimit === mode ? "#f5f3ff" : "#fff",
-
-                      color: npkg.businessLimit === mode ? "#7c3aed" : "#64748b",
 
                       fontSize: 13,
 
                       fontWeight: 700,
 
-                      cursor: "pointer",
+                      fontFamily: "inherit",
 
-                      transition: "all 0.2s"
+                      color: "#ef4444",
+
+                      display: "flex",
+
+                      alignItems: "center",
+
+                      gap: 10,
+
+                      borderTop: "1px solid #f8fafc",
 
                     }}
 
+                    onMouseEnter={e => e.currentTarget.style.background = "#fef2f2"}
+
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+
                   >
 
-                    {npkg.businessLimit === mode ? "✓ " : ""}{mode}
-
-                  </button>
-
-                ))}
-
-              </div>
-
-
-
-              <div style={{ fontSize: 11, color: "#be185d", fontWeight: 800, letterSpacing: 1, marginBottom: 12, marginTop: 12 }}>RESOURCE LIMITS</div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
-
-                <Fld label="MANAGER LIMIT (TYPE NUMBER)" value={npkg.managerLimit} onChange={v => setNpkg({ ...npkg, managerLimit: v })} placeholder="e.g. 5 Manager or Unlimited Manager" />
-
-                <Fld label="COMPANY NAME LIMIT (CLIENTS)" value={npkg.clientLimit} onChange={v => setNpkg({ ...npkg, clientLimit: v })} placeholder="e.g. 10 Company manage or Unlimited" />
-
-                <Fld label="EMPLOYEE LIMIT" value={npkg.employeeLimit} onChange={v => setNpkg({ ...npkg, employeeLimit: v })} placeholder="e.g. 50 Employee manage or Unlimited" />
-
-              </div>
-
-            </div>
-
-
-
-            <div style={{ marginBottom: 14 }}>
-
-              <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>FEATURES (Comma separated)</label>
-
-              <textarea
-
-                value={npkg.features}
-
-                onChange={e => setNpkg({ ...npkg, features: e.target.value })}
-
-                style={{ width: "100%", height: 80, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", resize: "none" }}
-
-                placeholder="e.g. Unlimited Company Names, Premium Support, Custom Branding"
-
-              />
-
-            </div>
-
-
-
-            {user?.role === "admin" && (
-
-              <div style={{ marginBottom: 14 }}>
-
-                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGN TO SUBADMINS (ONLY ASSIGNED WILL SEE THIS)</label>
-
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: 12, border: "1.5px solid var(--app-border)", borderRadius: 10, background: "var(--app-bg)" }}>
-
-                  {subadmins.map(s => (
-
-                    <label key={s._id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.text, cursor: "pointer", background: npkg.assignedSubadmins.includes(s._id) ? "rgba(124, 58, 237, 0.1)" : "transparent", padding: "4px 8px", borderRadius: 6 }}>
-
-                      <input
-
-                        type="checkbox"
-
-                        checked={npkg.assignedSubadmins.includes(s._id)}
-
-                        onChange={() => {
-
-                          const current = npkg.assignedSubadmins || [];
-
-                          const next = current.includes(s._id) ? current.filter(id => id !== s._id) : [...current, s._id];
-
-                          setNpkg({ ...npkg, assignedSubadmins: next });
-
-                        }}
-
-                      />
-
-                      {s.name}
-
-                    </label>
-
-                  ))}
-
-                  {subadmins.length === 0 && <div style={{ fontSize: 12, color: "var(--app-muted)" }}>No subadmins found</div>}
+                    <span style={{ fontSize: 14 }}>🚪</span> Logout            </button>
 
                 </div>
 
@@ -14050,155 +13107,944 @@ return (
 
 
 
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+            {accountAuthOpen && (
 
-              <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+              <div style={{ position: "fixed", inset: 0, zIndex: 10060 }}>
 
-              <button onClick={addPackage} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Creating..." : "Create Package "}</button>
+                <button
 
-            </div>
+                  onClick={() => setAccountAuthOpen(false)}
 
-          </Mdl>}
+                  style={{
+
+                    position: "absolute",
+
+                    top: 16,
+
+                    right: 16,
+
+                    zIndex: 10061,
+
+                    background: "rgba(255,255,255,0.22)",
+
+                    border: "1.5px solid rgba(255,255,255,0.35)",
+
+                    color: "#fff",
+
+                    borderRadius: 10,
+
+                    width: 36,
+
+                    height: 36,
+
+                    cursor: "pointer",
+
+                    fontWeight: 900,
+
+                    fontSize: 14,
+
+                  }}
+
+                >
+
+                  ✕
+
+                </button>
+
+                <AuthPage setUser={handleAuthSetUser} initialTab={accountAuthTab} />
+
+              </div>
+
+            )}
 
 
 
-          {modal === "vendor_add" && <Mdl title="Add New Vendor" onClose={() => setModal(null)}>
+            {showProfile && <ProfileModal
 
-            <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+              user={user}
 
-              <Fld label="Vendor Name *" value={nv.vendorName} onChange={v => { setNv({ ...nv, vendorName: v }); setNvError(p => ({ ...p, vendorName: "" })); }} error={nvError.vendorName} />
+              setUser={setUser}
 
-              <Fld label="Product Name *" value={nv.vendorProduct} onChange={v => { setNv({ ...nv, vendorProduct: v }); setNvError(p => ({ ...p, vendorProduct: "" })); }} error={nvError.vendorProduct} />
+              onClose={() => setShowProfile(false)}
 
-              <Fld label="Required Amount *" value={nv.amountTaxGst} type="number" onChange={v => { setNv({ ...nv, amountTaxGst: v }); setNvError(p => ({ ...p, amountTaxGst: "" })); }} error={nvError.amountTaxGst} />
+              onLogout={handleLogout}
 
-              <Fld label="Paid Amount *" value={nv.paidAmount} type="number" onChange={v => { setNv({ ...nv, paidAmount: v }); setNvError(p => ({ ...p, paidAmount: "" })); }} error={nvError.paidAmount} />
+              companyLogo={companyLogo}
 
-              <Fld label="Date of Purchase" value={nv.dateOfPurchase} type="date" onChange={v => setNv({ ...nv, dateOfPurchase: v })} />
+              onLogoChange={onLogoChange}
 
-              <Fld label="Mode of Payment" value={nv.modeOfPayment} onChange={v => setNv({ ...nv, modeOfPayment: v })} options={["Cash", "Bank Transfer", "UPI", "Cheque"]} />
+              paymentHistory={paymentHistory}
 
-            </div>
+              projects={projects}
 
-            <Fld label="Product Description" value={nv.productDescription} onChange={v => setNv({ ...nv, productDescription: v })} />
+              invoices={invoices}
 
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
+              onLogoUpload={handleHeaderLogoUpload}
 
-              <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-
-              <button onClick={addVendor} disabled={vendorSaveLoading} style={{ ...B("var(--app-accent)"), opacity: vendorSaveLoading ? 0.7 : 1 }}>{vendorSaveLoading ? "Saving..." : "Save Vendor "}</button>
-
-            </div>
-
-          </Mdl>}
+            />}
 
 
 
-          {/* ── View Package Modal ── */}
 
-          {viewPackage && (
 
-            <Mdl title={`Package Details: ${viewPackage.title}`} onClose={() => setViewPackage(null)} maxWidth={500}>
+            {/* ── Add Client Modal ── */}
 
-              <div style={{ padding: "10px 0" }}>
+            {limitModal && <LimitReachedModal type={limitModal.type} limit={limitModal.limit} onClose={() => setLimitModal(null)} onUpgrade={() => { setLimitModal(null); setForceUpgradeTab(true); setActive("mysubscriptions"); }} />}
+            {modal === "client" && <Mdl title={clientSuccessData ? "Yes Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); setAddClientFromInvoice(false); }} maxWidth={clientSuccessData ? 460 : 780}>
+              {clientSuccessData ? (
 
-                <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
+                <div style={{ textAlign: "center", padding: "5px 0" }}>
 
-                  <div style={{ width: 56, height: 56, borderRadius: "50%", background: "var(--app-accent-gradient)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>
+                  <div style={{ width: 54, height: 54, background: "linear-gradient(135deg,#dcfce7,#bbf7d0)", color: "#16a34a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 14px", boxShadow: "0 6px 15px rgba(22,163,74,0.12)" }}>✓</div>
 
-                    {viewPackage.icon || "📦"}
+                  <h3 style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 8 }}>Registration Successful!</h3>
+
+                  <p style={{ fontSize: 13, color: "#64748b", marginBottom: 16, lineHeight: 1.4, maxWidth: 340, margin: "0 auto 16px" }}>
+
+                    The client account for <strong style={{ color: T.primary }}>{clientSuccessData.name}</strong> has been created.
+
+                    Share these credentials securely.
+
+                  </p>
+
+
+
+                  <div style={{ background: "linear-gradient(135deg,#f8fafc,#f1f5f9)", border: "1.5px solid #e2e8f0", borderRadius: 12, padding: "16px", marginBottom: 20, textAlign: "left", boxShadow: "inset 0 1px 3px rgba(0,0,0,0.02)" }}>
+
+                    <div style={{ marginBottom: 12 }}>
+
+                      <div style={{ fontSize: 9, color: "#64748b", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: 0.8 }}>LOGIN EMAIL</div>
+
+                      <div style={{ fontSize: 14, fontWeight: 700, color: T.text, background: "#fff", padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0" }}>{clientSuccessData.email}</div>
+
+                    </div>
+
+                    <div>
+
+                      <div style={{ fontSize: 9, color: "#64748b", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: 0.8 }}>TEMPORARY PASSWORD</div>
+
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-muted)", background: "#fff", padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0", fontFamily: "monospace" }}>{clientSuccessData.password || "Not set (optional)"}</div>
+
+                    </div>
 
                   </div>
 
-                  <div>
 
-                    <div style={{ fontSize: 18, fontWeight: 800, color: T.text }}>{viewPackage.title}</div>
 
-                    <div style={{ fontSize: 13, color: "var(--app-muted)" }}>{viewPackage.type === "free" ? "Free Package" : "Paid Package"}</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+
+                    <button
+
+                      onClick={() => {
+
+                        const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password || "Not set"}\n\nLogin URL: ${window.location.origin}\n\nPlease change your password after your first login.`;
+
+                        navigator.clipboard.writeText(text);
+
+                        toast.success("📋 Credentials copied!");
+
+                      }}
+
+                      style={{ width: "100%", background: "var(--app-accent-gradient)", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(var(--app-accent-rgb),0.2)", transition: "all 0.2s" }}
+
+                    >
+
+                      📋 Copy Login Details
+
+                    </button>
+
+
+
+                    <button
+
+                      onClick={() => {
+
+                        const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password || "Not set"}\n\nLogin URL: ${window.location.origin}`;
+
+                        const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+
+                        window.open(wpUrl, "_blank");
+
+                      }}
+
+                      style={{ width: "100%", background: "#25D366", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(37,211,102,0.2)" }}
+
+                    >
+
+                      <span style={{ fontSize: 16 }}>💬</span> Share via WhatsApp
+
+                    </button>
+
+
+
+                    <button
+
+                      onClick={() => { setModal(null); setClientSuccessData(null); }}
+
+                      style={{ width: "100%", background: "transparent", border: "1.2px solid var(--app-border)", color: "#64748b", borderRadius: 10, padding: "10px", fontWeight: 700, cursor: "pointer", fontSize: 12, marginTop: 6 }}
+
+                    >
+
+                      Close
+
+                    </button>
 
                   </div>
 
                 </div>
 
+              ) : (
 
+                <>
 
-                <InfoRow icon="📄" label="Description" value={viewPackage.description} />
+                  <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
 
-                <InfoRow icon="📅" label="Duration" value={`${viewPackage.no_of_days || viewPackage.noOfDays || 30} days`} />
+                    <div
 
-                <InfoRow icon="💰" label="Price" value={viewPackage.type === "free" ? "Free" : `Rs.${viewPackage.price || 0}`} />
+                      onClick={() => {
 
-                <InfoRow icon="" label="Plan Duration" value={viewPackage.planDuration || "Monthly"} />
+                        const input = document.createElement('input');
 
-                <InfoRow icon="🏢" label="Business" value={viewPackage.businessLimit || ""} />
+                        input.type = 'file';
 
-                <InfoRow icon="👨‍💼" label="Manager" value={viewPackage.managerLimit || ""} />
+                        input.accept = 'image/*';
 
-                <InfoRow icon="Team" label="Clients (Company Name)" value={viewPackage.clientLimit || ""} />
+                        input.onchange = (e) => triggerCrop(e, (croppedImage) => setNc(p => ({ ...p, logoUrl: croppedImage })), 1);
 
-                <InfoRow icon="👤" label="Employee" value={viewPackage.employeeLimit || ""} />
+                        input.click();
 
-                <InfoRow icon="📊" label="Status" value={viewPackage.status || "Active"} />
+                      }}
 
+                      style={{
 
+                        position: "relative",
 
-                {viewPackage.features && viewPackage.features.length > 0 && (
+                        cursor: "pointer",
 
-                  <div style={{ marginTop: 20 }}>
+                        width: "auto",
 
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)", marginBottom: 10 }}>FEATURES</div>
+                        height: "auto",
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                        maxWidth: "100%",
 
-                      {(Array.isArray(viewPackage.features) ? viewPackage.features : viewPackage.features.split('\\n')).map((f, i) => (
+                        display: "flex",
 
-                        <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: T.text }}>
+                        flexDirection: "column",
 
-                          <span style={{ color: "#22c55e" }}>✓</span> {f}
+                        alignItems: "center"
+
+                      }}
+
+                    >
+
+                      <div style={{
+
+                        padding: nc.logoUrl ? 4 : 24,
+
+                        borderRadius: 20,
+
+                        background: "#fff",
+
+                        border: "2.5px dashed var(--app-border)",
+
+                        display: "flex",
+
+                        alignItems: "center",
+
+                        justifyContent: "center",
+
+                        minWidth: 100,
+
+                        minHeight: 100,
+
+                        overflow: "hidden",
+
+                        boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
+
+                        transition: "all 0.3s ease"
+
+                      }}>
+
+                        {nc.logoUrl ? (
+
+                          <img
+
+                            src={nc.logoUrl}
+
+                            alt="Logo"
+
+                            style={{
+
+                              width: "auto",
+
+                              height: "auto",
+
+                              maxWidth: "240px",
+
+                              maxHeight: "120px",
+
+                              objectFit: "contain",
+
+                              display: "block",
+
+                              borderRadius: 12
+
+                            }}
+
+                          />
+
+                        ) : (
+                          <div style={{
+                            padding: nc.logoUrl ? 4 : 24,
+                            borderRadius: 20,
+                            background: "#fff",
+                            border: "2.5px dashed var(--app-border)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            minWidth: 100,
+                            minHeight: 100,
+                            overflow: "hidden",
+                            boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
+                            transition: "all 0.3s ease"
+                          }}>
+                            {nc.logoUrl ? (
+                              <img
+                                src={nc.logoUrl}
+                                alt="Logo"
+                                style={{
+                                  width: "auto",
+                                  height: "auto",
+                                  maxWidth: "240px",
+                                  maxHeight: "120px",
+                                  objectFit: "contain",
+                                  display: "block",
+                                  borderRadius: 12
+                                }}
+                              />
+                            ) : (
+                              <div style={{ textAlign: "center" }}>
+                                <div style={{
+                                  width: 60,
+                                  height: 60,
+                                  borderRadius: 14,
+                                  background: "var(--app-accent, #00BCD4)",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  margin: "0 auto 10px"
+                                }}>
+                                  📷
+                                </div>
+                                <div style={{ fontSize: 10, fontWeight: 800, color: "#607D86", textTransform: "uppercase", letterSpacing: 1 }}>Upload Logo</div>
+                              </div>)}
+                          </div>
+
+                        )}
+
+                      </div>
+
+                      <div style={{
+
+                        position: "absolute", bottom: -10, right: -10,
+
+                        width: 36, height: 36, borderRadius: "50%",
+
+                        background: "var(--app-accent)", color: "#fff",
+
+                        display: "flex", alignItems: "center", justifyContent: "center",
+
+                        fontSize: 16, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.4)",
+
+                        border: "3px solid #fff"
+
+                      }}>📷</div>
+
+                    </div>
+
+                  </div>
+
+                  {/* ── CLIENT TYPE ── */}
+
+                  <div style={{ marginBottom: 16 }}>
+
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 8 }}>Client Type <span style={{ color: '#EF5350' }}>*</span></div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+
+                      {[{ val: 'b2b', icon: '🏢', label: 'B2B', sub: 'Company / Business' }, { val: 'b2c', icon: '👤', label: 'B2C', sub: 'Individual person' }, { val: 'freelancer', icon: '💼', label: 'Freelancer', sub: 'Consultant / Solo' }].map(t => (
+
+                        <div key={t.val} onClick={() => setNc(p => ({ ...p, clientType: t.val }))}
+
+                          style={{ border: `2px solid ${nc.clientType === t.val ? ' var(--app-accent, var(--app-accent, #00BCD4))' : '#E0E6EA'}`, borderRadius: 10, padding: '12px 8px', textAlign: 'center', cursor: 'pointer', background: nc.clientType === t.val ? 'var(--teal-light, var(--teal-light, #E0F7FA))' : '#F4F6F8', transition: 'all .15s', position: 'relative' }}>
+
+                          {nc.clientType === t.val && <span style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: '50%', background: ' var(--app-accent, var(--app-accent, #00BCD4))', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}></span>}
+
+                          <div style={{ fontSize: 22, marginBottom: 4 }}>{t.icon}</div>
+
+                          <div style={{ fontSize: 12, fontWeight: 700, color: nc.clientType === t.val ? '#007B8A' : '#1A2332' }}>{t.label}</div>
+
+                          <div style={{ fontSize: 10, color: '#94A3B0', marginTop: 2 }}>{t.sub}</div>
 
                         </div>
-
                       ))}
 
                     </div>
 
                   </div>
 
+
+
+                  {/* ── BASIC INFO ── */}
+
+                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-building" style={{ color: '#fff', fontSize: 16 }}></i></span> Basic Info</div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+
+                      <Fld label="Client / Display Name *" value={nc.name} onChange={v => { setNc({ ...nc, name: v }); setNcError(p => ({ ...p, name: '' })); }} error={ncError.name} />
+
+                      <Fld label="Company Name" value={nc.company} onChange={v => setNc({ ...nc, company: v })} />
+
+                      <Fld label="Category / Industry" value={nc.category} onChange={v => { setNc({ ...nc, category: v }); saveCustomCategory(v); }} options={['', 'Web Development', 'Mobile App Development', 'UI/UX Design', 'Digital Marketing', 'IT Consulting', 'E-commerce', 'Healthcare', 'Education', 'Finance', 'Real Estate', 'Manufacturing', 'Retail', 'Logistics', 'Media & Entertainment', ...customCategories]} allowCustom={true} />
+
+                      <Fld label="Company Tax / GST No." value={nc.gstNumber} onChange={v => setNc({ ...nc, gstNumber: v })} />
+
+                      <Fld label="Client Source" value={nc.source} onChange={v => setNc({ ...nc, source: v })} options={['', 'Referral', 'Website / Organic', 'Social Media', 'Cold Outreach', 'LinkedIn', 'Event / Conference', 'Google Ads', 'Word of Mouth']} allowCustom={true} />
+
+                      <Fld label="Onboarded On" value={nc.onboardedOn} onChange={v => setNc({ ...nc, onboardedOn: v })} type="date" disabled={true} />
+
+                      <Fld label="Status" value={nc.status} onChange={v => setNc({ ...nc, status: v })} options={['Active', 'Inactive']} />
+
+                    </div>
+
+                  </div>
+
+
+
+                  {/* ── PRIMARY CONTACT ── */}
+
+                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-phone-call" style={{ color: '#fff', fontSize: 16 }}></i></span> Primary Contact</div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+
+                      <Fld label="Contact Person Name" value={nc.contactPersonName} onChange={v => setNc({ ...nc, contactPersonName: v })} />
+
+                      <Fld label="Designation" value={nc.designation || ''} onChange={v => setNc({ ...nc, designation: v })} />
+
+                      <Fld label="Email *" value={nc.email} onChange={v => { setNc({ ...nc, email: v }); setNcError(p => ({ ...p, email: '' })); }} type="email" error={ncError.email} />
+
+                      <Fld label="Alt. Email" value={nc.altEmail || ''} onChange={v => setNc({ ...nc, altEmail: v })} type="email" />
+
+                      <Fld label="Contact Person Mobile" value={nc.contactPersonNo} onChange={v => setNc({ ...nc, contactPersonNo: v })} />
+
+                      <Fld label="Office Phone" value={nc.phone} onChange={v => setNc({ ...nc, phone: v })} />
+
+                    </div>
+
+                  </div>
+
+
+
+                  {/* ── ADDRESS ── */}
+
+                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-map-pin" style={{ color: '#fff', fontSize: 16 }}></i></span> Address</div>
+
+                    <div style={{ marginBottom: 12 }}><Fld label="Street / Building Address" value={nc.address} onChange={v => setNc({ ...nc, address: v })} /></div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+
+                      <Fld label="City" value={nc.city} onChange={v => setNc({ ...nc, city: v })} />
+
+                      <Fld label="State / Province" value={nc.state} onChange={v => setNc({ ...nc, state: v })} />
+
+                      <Fld label="Pincode / ZIP" value={nc.pincode} onChange={v => setNc({ ...nc, pincode: v })} />
+
+                      <Fld label="Country" value={nc.country} onChange={v => setNc({ ...nc, country: v })} options={['India', 'United States', 'United Kingdom', 'United Arab Emirates', 'Singapore', 'Australia', 'Canada', 'Germany', 'France']} allowCustom={true} />
+
+                    </div>
+
+                  </div>
+
+
+                  {/* ── ONLINE PRESENCE ── */}
+
+                  {/* ── ONLINE PRESENCE ── */}
+                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <i className="ti ti-link" style={{ color: '#fff', fontSize: 16 }}></i>
+                      </span>
+                      Online Presence
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+                      <Fld label="Website URL" value={nc.website} onChange={v => setNc({ ...nc, website: v })} />
+                      <Fld label="LinkedIn Profile" value={nc.linkedin} onChange={v => setNc({ ...nc, linkedin: v })} />
+                    </div>
+                  </div>
+
+
+
+                  {/* ── BILLING & TERMS ── */}
+
+                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-credit-card" style={{ color: '#fff', fontSize: 16 }}></i></span> Billing & Terms</div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 18px' }}>
+
+                      <Fld label="Billing Currency" value={nc.billingCurrency} onChange={v => { setNc({ ...nc, billingCurrency: v }); saveCustomCurrency(v); }} options={['INR — Indian Rupee', 'USD — US Dollar', 'GBP — British Pound', 'EUR — Euro', 'AED — UAE Dirham', 'SGD — Singapore Dollar', 'AUD — Australian Dollar', ...customCurrencies]} allowCustom={true} />
+
+                      <Fld label="Payment Terms" value={nc.paymentTerms} onChange={v => setNc({ ...nc, paymentTerms: v })} options={['', 'Due on receipt', 'Net 7', 'Net 15', 'Net 30', 'Net 45', 'Net 60', '50% Advance + 50% on delivery']} allowCustom={true} />
+
+                      <Fld label="Credit Limit" value={nc.creditLimit} onChange={v => setNc({ ...nc, creditLimit: v })} type="number" />
+
+                      <Fld label="Preferred Payment Mode" value={nc.preferredPaymentMode} onChange={v => setNc({ ...nc, preferredPaymentMode: v })} options={['', 'Bank Transfer / NEFT', 'UPI', 'Cheque', 'Credit Card', 'Cash', 'PayPal', 'Stripe']} allowCustom={true} />
+
+                    </div>
+
+                  </div>
+
+
+
+                  {/* ── PORTAL ACCESS ── */}
+
+                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Search Portal Access</div>
+
+                    <div style={{ position: 'relative', marginBottom: 4 }}>
+
+                      <input type={showClientPass ? 'text' : 'password'} value={nc.password} onChange={e => setNc({ ...nc, password: e.target.value })}
+
+                        style={{ width: '100%', border: `1.5px solid ${ncError.password ? '#EF4444' : 'var(--app-border)'}`, borderRadius: 10, padding: '10px 46px 10px 14px', fontSize: 13, color: T.text, background: 'var(--app-bg)', boxSizing: 'border-box', outline: 'none' }}
+
+                        placeholder="Set client portal password *" />
+
+                      <button type="button" onClick={() => setShowClientPass(!showClientPass)} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--app-muted)', fontSize: 11, fontWeight: 700, fontFamily: 'inherit' }}>{showClientPass ? 'HIDE' : 'SHOW'}</button>
+
+                    </div>
+
+                    {ncError.password && <div style={{ fontSize: 11, color: '#EF4444', marginTop: 4 }}>Warning {ncError.password}</div>}
+
+                  </div>
+
+
+
+                  {/* ── INTERNAL NOTES ── */}
+
+                  <div style={{ background: '#F4F6F8', borderRadius: 12, border: '1px solid #E0E6EA', padding: '14px 16px', marginBottom: 14 }}>
+
+                    <div style={{ fontSize: 11, fontWeight: 700, color: ' var(--app-accent, var(--app-accent, #00BCD4))', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ background: ' var(--app-accent, var(--app-accent, #00BCD4))', borderRadius: 8, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><i className="ti ti-notes" style={{ color: '#fff', fontSize: 16 }}></i></span> Internal Notes</div>
+
+                    <textarea value={nc.notes} onChange={e => setNc({ ...nc, notes: e.target.value })}
+
+                      style={{ width: '100%', border: '1.5px solid #E0E6EA', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: T.text, background: '#fff', boxSizing: 'border-box', outline: 'none', minHeight: 70, resize: 'vertical', fontFamily: 'inherit' }}
+
+                      placeholder="Any internal context,  instructions, or notes..." />
+
+                  </div>
+
+
+
+                  <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
+
+                    <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+
+                    <button onClick={addClient} disabled={saveLoading} style={{ ...B("var(--app-accent)"), opacity: saveLoading ? 0.7 : 1 }}>{saveLoading ? "Saving..." : "Add Client"}</button>
+
+                  </div>
+
+                </>
+
+              )}
+
+            </Mdl>}
+
+
+
+            {/* ── Add Employee Modal ── */}
+
+            {modal === "employee" && <Mdl title="Add New Employee" onClose={() => setModal(null)}>
+
+              <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+
+                <Fld label="Full Name *" value={ne.name} onChange={v => { setNe({ ...ne, name: v }); setNeError(p => ({ ...p, name: "" })); }} error={neError.name} name="name" />
+                <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} name="email" dataField="email" />
+
+                <Fld label="Phone Number" value={ne.phone} onChange={v => setNe({ ...ne, phone: v })} />
+
+                {ne.role === "Custom" || (ne.role && ne.role !== "employee" && !DEPARTMENT_OPTIONS.includes(ne.role)) ? (
+                  <div style={{ marginBottom: 14 }} data-field="role">
+                    <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ROLE / POSITION</label>
+                    <input
+                      type="text"
+                      value={ne.role === "Custom" ? "" : ne.role}
+                      onChange={e => setNe({ ...ne, role: e.target.value })}
+                      placeholder="Enter custom role/position"
+                      style={{ width: "100%", border: `1.5px solid ${neError.role ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none", fontFamily: "inherit" }}
+                      autoFocus
+                    />
+                    <button type="button" onClick={() => setNe({ ...ne, role: "" })} style={{ marginTop: 6, background: "none", border: "none", color: "var(--app-accent)", fontSize: 11, fontWeight: 700, cursor: "pointer", padding: 0 }}>← Back to dropdown</button>
+                    {neError.role && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.role}</div>}
+                  </div>
+                ) : (
+                  <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v })} options={[...DEPARTMENT_OPTIONS, "Custom"]} error={neError.role} dataField="role" />
                 )}
 
+                <Fld label="Department" value={ne.department} onChange={v => setNe({ ...ne, department: v })} />
+
+                <Fld label="Salary" value={ne.salary} onChange={v => setNe({ ...ne, salary: v })} />
+
+                <Fld label="Date of Birth" value={ne.dateOfBirth} onChange={v => setNe({ ...ne, dateOfBirth: v })} type="date" />
+
+                <Fld label="Joining Date" value={ne.joiningDate} onChange={v => setNe({ ...ne, joiningDate: v })} type="date" />
+
+                <Fld label="Marital Status" value={ne.maritalStatus} onChange={v => setNe({ ...ne, maritalStatus: v })} options={["Unmarried", "Married"]} />
+
+                <Fld label="Status *" value={ne.status} onChange={v => { setNe({ ...ne, status: v }); setNeError(p => ({ ...p, status: "" })); }} options={["Select Status", "Active", "Inactive"]} error={neError.status} dataField="status" placeholder="Select Status" />
+
               </div>
 
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
+              <Fld label="Address" value={ne.address} onChange={v => setNe({ ...ne, address: v })} />
 
-                <button onClick={() => setViewPackage(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 20px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>✕</button>
+
+
+              <div style={{ marginTop: 14 }}>
+
+                <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
+
+                <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+
+                  <Fld label="Bank Name" value={ne.bankName} onChange={v => setNe({ ...ne, bankName: v })} />
+
+                  <Fld label="IFSC Code" value={ne.ifscCode} onChange={v => setNe({ ...ne, ifscCode: v })} />
+
+                  <Fld label="Account Number" value={ne.accountNumber} onChange={v => setNe({ ...ne, accountNumber: v })} />
+
+                  <Fld label="Branch Name" value={ne.branchName} onChange={v => setNe({ ...ne, branchName: v })} />
+
+                </div>
 
               </div>
 
-            </Mdl>
+              <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
+                  <div style={{ position: "relative" }}>
+                    <input id="emp-fld-password" type={showEmpPass ? "text" : "password"} value={ne.password} onChange={e => { setNe({ ...ne, password: e.target.value }); setNeError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set employee login password" />
+                    <button type="button" onClick={() => setShowEmpPass(!showEmpPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEmpPass ? "HIDE" : "SHOW"}</button>
+                  </div>
+                  {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.password}</div>}
+                </div>
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CONFIRM PASSWORD *</label>
+                  <div style={{ position: "relative" }}>
+                    <input type={showEmpConfirmPass ? "text" : "password"} value={ne.confirmPassword || ""} onChange={e => { setNe({ ...ne, confirmPassword: e.target.value }); setNeError(p => ({ ...p, confirmPassword: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.confirmPassword ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Re-enter password" />
+                    <button type="button" onClick={() => setShowEmpConfirmPass(!showEmpConfirmPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEmpConfirmPass ? "HIDE" : "SHOW"}</button>
+                  </div>
+                  {neError.confirmPassword && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {neError.confirmPassword}</div>}
+                </div>
+              </div>
 
-          )}
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6, flexWrap: "wrap" }}>
+
+
+                <button onClick={addEmployee} disabled={empSaveLoading} style={{ ...B("var(--app-accent)"), opacity: empSaveLoading ? 0.7 : 1 }}>{empSaveLoading ? "Saving..." : "Add Employee"}</button>
+
+              </div>
+
+            </Mdl>}
 
 
 
-          {/* ── Edit Package Modal ── */}
+            {/* ── Add Project Modal ── */}
+            {modal === "project" && <Mdl title="Create New Project" onClose={() => { setModal(null); setPrefillClient(null); }}>
+              <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+                <Fld label="Project Name *" value={np.name} onChange={v => { setNp({ ...np, name: v }); setNpError(p => ({ ...p, name: "" })); }} error={npError.name} />
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CLIENT *</label>
+                  {(prefillClient || (editProject && editProject._fromClientPage)) ? (
+                    <div style={{ border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "var(--app-text, #333)", background: "var(--app-bg)", fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 16 }}>👤</span>
+                      <span>{np.client}</span>
+                      <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--app-accent)", background: "rgba(124,58,237,0.08)", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>Auto-filled</span>
+                    </div>
+                  ) : (
+                    <ClientDropdown
+                      clients={clients}
+                      value={np.client}
+                      onChange={v => {
+                        const sel = clients.find(c => (c.clientName || c.name) === v);
+                        setNp({
+                          ...np,
+                          client: v,
+                          clientId: sel?._id || sel?.id || "",
+                          companyName: sel?.companyName || sel?.company || np.companyName,
+                          phone: sel?.phone || np.phone,
+                          address: sel?.address || np.address,
+                          contactPersonName: sel?.contactPersonName || np.contactPersonName,
+                          contactPersonNo: sel?.contactPersonNo || np.contactPersonNo,
+                          contactEmail: sel?.email || np.contactEmail,
+                        });
+                        setNpError(p => ({ ...p, client: "" }));
+                      }}
+                      error={npError.client}
+                      onAddClient={() => { setModal("client"); setNcError({}); setShowClientPass(false); }}
+                    />
+                  )}
+                  {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {npError.client}</div>}
+                </div>
 
-          {editPackage && (
+                <Fld label="Contact Person Name" value={np.contactPersonName} onChange={v => setNp({ ...np, contactPersonName: v })} />
 
-            <Mdl title={`Edit Package: ${editPackage.title}`} onClose={() => setEditPackage(null)} maxWidth={700}>
+                <Fld label="Purpose" value={np.purpose} onChange={v => setNp({ ...np, purpose: v })} />
+                <Fld label="Company Name" value={np.companyName} onChange={v => setNp({ ...np, companyName: v })} />
+                <Fld label="Contact Person Name" value={np.contactPersonName} onChange={v => setNp({ ...np, contactPersonName: v })} />
+                <Fld label="Contact Person No" value={np.contactPersonNo} onChange={v => setNp({ ...np, contactPersonNo: v })} />
+                <Fld label="Contact Email" value={np.contactEmail} onChange={v => setNp({ ...np, contactEmail: v })} />
+                <Fld label="Phone" value={np.phone} onChange={v => setNp({ ...np, phone: v })} />
+                <Fld label="Address" value={np.address} onChange={v => setNp({ ...np, address: v })} />
+                <div style={{ marginBottom: 14 }}>
+
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>BUDGET</label>
+
+                  <div style={{ display: "flex", gap: 8 }}>
+
+                    <select
+
+                      value={np.currency}
+
+                      onChange={e => setNp({ ...np, currency: e.target.value })}
+
+                      style={{ width: 80, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
+
+                    >
+
+                      {["Rs.", "$", "‚¬", "£", "¥", "AED", "SAR", "QAR", "CAD", "AUD", "SGD", "KWD", "BHD", "OMR"].map(c => <option key={c} value={c}>{c}</option>)}
+
+                    </select>
+
+                    <input
+
+                      type="text"
+
+                      value={np.budget}
+
+                      onChange={e => { const val = e.target.value; if (val && !/^[\d.]*$/.test(val)) return; setNp({ ...np, budget: val }); }}
+
+                      style={{ flex: 1, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
+
+                      placeholder="0.00"
+
+                    />
+
+                  </div>
+
+                </div>
+
+                <Fld label="Start Date" value={np.start} onChange={v => setNp({ ...np, start: v })} type="date" />
+
+                <Fld label="End Date" value={np.end} onChange={v => setNp({ ...np, end: v })} type="date" />
+
+                <Fld label=" Team Members" value={np.team} onChange={v => setNp({ ...np, team: v })} />
+
+                <Fld
+
+                  label="Status"
+
+                  value={np.status}
+
+                  onChange={v => {
+
+                    let updatedProgress = np.progress || 0;
+
+                    if (v.toLowerCase() === "completed" || v.toLowerCase() === "done") {
+
+                      updatedProgress = 100;
+
+                    } else if (v.toLowerCase() === "pending") {
+
+                      updatedProgress = 0;
+
+                    } else if (v.toLowerCase() === "in progress" && (np.progress || 0) === 0) {
+
+                      updatedProgress = 50;
+
+                    }
+
+                    setNp({ ...np, status: v, progress: updatedProgress });
+
+                  }}
+
+                  options={["Active", "On Hold", "Completed", "Overdue"]}
+
+                  allowCustom={true}
+
+                />
+
+                <Fld
+
+                  label="Progress (%)"
+
+                  value={np.progress || 0}
+
+                  type="number"
+
+                  placeholder="0"
+
+                  onChange={v => {
+
+                    let val = Number(v);
+
+                    if (val < 0) val = 0;
+
+                    if (val > 100) val = 100;
+
+                    setNp(prev => ({ ...prev, progress: val }));
+
+                  }}
+
+                />
+
+              </div>
+
+              <Fld label="Description" value={np.description} onChange={v => setNp({ ...np, description: v })} />
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
+
+                <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+
+                <button onClick={addProject} disabled={projSaveLoading} style={{ ...B("var(--app-accent)"), opacity: projSaveLoading ? 0.7 : 1 }}>{projSaveLoading ? "Saving..." : "Add Project"}</button>
+
+              </div>
+
+            </Mdl>}
+
+
+
+            {/* ── Add Manager Modal ── */}
+
+            {modal === "manager" && <Mdl title="Add New Manager" onClose={() => setModal(null)}>
+
+              <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+
+                <Fld label="Manager Name *" value={nm.managerName} onChange={v => { setNm({ ...nm, managerName: v }); setNmError(p => ({ ...p, managerName: "" })); }} error={nmError.managerName} />
+
+                <Fld label="Email *" value={nm.email} onChange={v => { setNm({ ...nm, email: v }); setNmError(p => ({ ...p, email: "" })); }} type="email" error={nmError.email} />
+
+                <Fld label="Phone Number" value={nm.phone} onChange={v => setNm({ ...nm, phone: v })} />
+
+                <Fld label="Role" value={nm.role} onChange={v => setNm({ ...nm, role: v })} />
+
+                <Fld label="Department" value={nm.department} onChange={v => setNm({ ...nm, department: v })} />
+
+                <Fld label="Status" value={nm.status} onChange={v => setNm({ ...nm, status: v })} options={["Active", "Inactive"]} />
+
+              </div>
+
+              <Fld label="Address" value={nm.address} onChange={v => setNm({ ...nm, address: v })} />
+
+              <div style={{ marginBottom: 14 }}>
+
+                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
+
+                <div style={{ position: "relative" }}>
+
+                  <input type={showMgrPass ? "text" : "password"} value={nm.password} onChange={e => { setNm({ ...nm, password: e.target.value }); setNmError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nmError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set manager password" />
+
+                  <button type="button" onClick={() => setShowMgrPass(!showMgrPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showMgrPass ? "HIDE" : "SHOW"}</button>
+
+                </div>
+
+                {nmError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {nmError.password}</div>}
+
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
+
+                <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+
+                <button onClick={addManager} disabled={mgrSaveLoading} style={{ ...B("var(--app-accent)"), opacity: mgrSaveLoading ? 0.7 : 1 }}>{mgrSaveLoading ? "Saving..." : "Save Manager "}</button>
+
+              </div>
+
+            </Mdl>}
+
+
+
+            {/* ── Add Subadmin Modal ── */}
+
+            {modal === "subadmin" && <Mdl title="Add New Subadmin" onClose={() => setModal(null)}>
+
+              <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+
+                <Fld label="Full Name *" value={ns.name} onChange={v => { setNs({ ...ns, name: v }); setNsError(p => ({ ...p, name: "" })); }} error={nsError.name} />
+
+                <Fld label="Email *" value={ns.email} onChange={v => { setNs({ ...ns, email: v }); setNsError(p => ({ ...p, email: "" })); }} type="email" error={nsError.email} />
+
+                <Fld label="Phone" value={ns.phone} onChange={v => setNs({ ...ns, phone: v })} />
+
+                <Fld label="Status" value={ns.status} onChange={v => setNs({ ...ns, status: v })} options={["Active", "Inactive"]} />
+
+                <Fld label="Company Name" value={ns.companyName} onChange={v => setNs({ ...ns, companyName: v })} placeholder="Company name" />
+
+                <Fld label="Company Type" value={ns.companyType} onChange={v => setNs({ ...ns, companyType: v })} options={["IT", "Software", "Services", "Consulting", "Other"]} />
+
+                <Fld label="No. of Employees" value={ns.employeeCount} onChange={v => setNs({ ...ns, employeeCount: v })} options={["0-10", "11-50", "51-100", "100+"]} />
+
+                <Fld label="Client Limit *" type="number" value={ns.clientLimit} onChange={v => setNs({ ...ns, clientLimit: v })} />
+
+                <Fld label="Employee Limit *" type="number" value={ns.employeeLimit} onChange={v => setNs({ ...ns, employeeLimit: v })} />
+
+              </div>
+
+              <div style={{ marginBottom: 14 }}>
+
+                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
+
+                <div style={{ position: "relative" }}>
+
+                  <input type={showSubPass ? "text" : "password"} value={ns.password} onChange={e => { setNs({ ...ns, password: e.target.value }); setNsError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nsError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set subadmin password" />
+
+                  <button type="button" onClick={() => setShowSubPass(!showSubPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showSubPass ? "HIDE" : "SHOW"}</button>
+
+                </div>
+
+                {nsError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>Warning {nsError.password}</div>}
+
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
+
+                <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+
+                <button onClick={addSubadmin} disabled={subSaveLoading} style={{ ...B("var(--app-accent)"), opacity: subSaveLoading ? 0.7 : 1 }}>{subSaveLoading ? "Saving..." : "Save Subadmin "}</button>
+
+              </div>
+
+            </Mdl>}
+
+
+
+            {/* ── Add Package Modal ── */}
+
+            {modal === "package_add" && <Mdl title="Add New Package" onClose={() => setModal(null)} maxWidth={700}>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
 
-                <Fld label="Package Title *" value={editPkgForm.title} onChange={v => setEditPkgForm({ ...editPkgForm, title: v })} />
+                <Fld label="Package Title *" value={npkg.title} onChange={v => { setNpkg({ ...npkg, title: v }); setPkgError(p => ({ ...p, title: "" })); }} error={pkgError.title} />
 
-                <Fld label="Icon (Emoji)" value={editPkgForm.icon} onChange={v => setEditPkgForm({ ...editPkgForm, icon: v })} />
+                <Fld label="Icon (Emoji)" value={npkg.icon} onChange={v => setNpkg({ ...npkg, icon: v })} placeholder="e.g. 📦" />
 
-                <Fld label="Type" value={editPkgForm.type} onChange={v => setEditPkgForm({ ...editPkgForm, type: v })} options={["free", "paid"]} />
 
-                <Fld label="Price" value={editPkgForm.price} onChange={v => setEditPkgForm({ ...editPkgForm, price: v })} disabled={editPkgForm.type === "free"} />
 
-                <Fld label="Number of Days *" value={editPkgForm.noOfDays} onChange={v => setEditPkgForm({ ...editPkgForm, noOfDays: v })} />
-
-                <Fld label="Status" value={editPkgForm.status} onChange={v => setEditPkgForm({ ...editPkgForm, status: v })} options={["Active", "Inactive"]} />
+                <Fld label="Description" value={npkg.description} onChange={v => setNpkg({ ...npkg, description: v })} />
 
               </div>
 
@@ -14206,7 +14052,27 @@ return (
 
               <div style={{ background: "#f8fafc", padding: 18, borderRadius: 16, border: "1px solid #f1f5f9", margin: "14px 0" }}>
 
-                <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>BUSINESS MANAGEMENT</div>
+                <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>PRICING OPTIONS</div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
+
+                  <Fld label="Monthly Price" value={npkg.monthlyPrice} onChange={v => setNpkg({ ...npkg, monthlyPrice: v })} placeholder="e.g. Rs.999" />
+
+                  <Fld label="Quarterly Price" value={npkg.quarterlyPrice} onChange={v => setNpkg({ ...npkg, quarterlyPrice: v })} placeholder="e.g. Rs.2,499" />
+
+                  <Fld label="Half-Yearly Price" value={npkg.halfYearlyPrice} onChange={v => setNpkg({ ...npkg, halfYearlyPrice: v })} placeholder="e.g. Rs.4,499" />
+
+                  <Fld label="Annual Price" value={npkg.annualPrice} onChange={v => setNpkg({ ...npkg, annualPrice: v })} placeholder="e.g. Rs.7,999" />
+
+                </div>
+
+              </div>
+
+
+
+              <div style={{ background: "#fdf2f8", padding: 18, borderRadius: 16, border: "#fce7f3", margin: "14px 0" }}>
+
+                <div style={{ fontSize: 11, color: "#be185d", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>BUSINESS MANAGEMENT</div>
 
                 <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
 
@@ -14216,7 +14082,7 @@ return (
 
                       key={mode}
 
-                      onClick={() => setEditPkgForm({ ...editPkgForm, businessLimit: mode })}
+                      onClick={() => setNpkg({ ...npkg, businessLimit: mode })}
 
                       style={{
 
@@ -14226,11 +14092,11 @@ return (
 
                         borderRadius: 12,
 
-                        border: editPkgForm.businessLimit === mode ? "1.5px solid #7c3aed" : "1.5px solid #e2e8f0",
+                        border: npkg.businessLimit === mode ? "1.5px solid #7c3aed" : "1.5px solid #e2e8f0",
 
-                        background: editPkgForm.businessLimit === mode ? "#f5f3ff" : "#fff",
+                        background: npkg.businessLimit === mode ? "#f5f3ff" : "#fff",
 
-                        color: editPkgForm.businessLimit === mode ? "#7c3aed" : "#64748b",
+                        color: npkg.businessLimit === mode ? "#7c3aed" : "#64748b",
 
                         fontSize: 13,
 
@@ -14244,7 +14110,7 @@ return (
 
                     >
 
-                      {editPkgForm.businessLimit === mode ? "✓ " : ""}{mode}
+                      {npkg.businessLimit === mode ? "✓ " : ""}{mode}
 
                     </button>
 
@@ -14254,17 +14120,15 @@ return (
 
 
 
-                <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12, marginTop: 12 }}>PACKAGE LIMITS</div>
+                <div style={{ fontSize: 11, color: "#be185d", fontWeight: 800, letterSpacing: 1, marginBottom: 12, marginTop: 12 }}>RESOURCE LIMITS</div>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
 
-                  <Fld label="Plan Duration" value={editPkgForm.planDuration} onChange={v => setEditPkgForm({ ...editPkgForm, planDuration: v })} options={["Monthly", "90 Days", "Yearly"]} />
+                  <Fld label="MANAGER LIMIT (TYPE NUMBER)" value={npkg.managerLimit} onChange={v => setNpkg({ ...npkg, managerLimit: v })} placeholder="e.g. 5 Manager or Unlimited Manager" />
 
-                  <Fld label="MANAGER LIMIT (TYPE NUMBER)" value={editPkgForm.managerLimit} onChange={v => setEditPkgForm({ ...editPkgForm, managerLimit: v })} placeholder="e.g. 5 Manager or Unlimited Manager" />
+                  <Fld label="COMPANY NAME LIMIT (CLIENTS)" value={npkg.clientLimit} onChange={v => setNpkg({ ...npkg, clientLimit: v })} placeholder="e.g. 10 Company manage or Unlimited" />
 
-                  <Fld label="COMPANY NAME LIMIT (CLIENTS)" value={editPkgForm.clientLimit} onChange={v => setEditPkgForm({ ...editPkgForm, clientLimit: v })} placeholder="e.g. 10 Company manage or Unlimited" />
-
-                  <Fld label="EMPLOYEE LIMIT" value={editPkgForm.employeeLimit} onChange={v => setEditPkgForm({ ...editPkgForm, employeeLimit: v })} placeholder="e.g. 50 Employee manage or Unlimited" />
+                  <Fld label="EMPLOYEE LIMIT" value={npkg.employeeLimit} onChange={v => setNpkg({ ...npkg, employeeLimit: v })} placeholder="e.g. 50 Employee manage or Unlimited" />
 
                 </div>
 
@@ -14274,17 +14138,17 @@ return (
 
               <div style={{ marginBottom: 14 }}>
 
-                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>DESCRIPTION</label>
+                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>FEATURES (Comma separated)</label>
 
                 <textarea
 
-                  value={editPkgForm.description}
+                  value={npkg.features}
 
-                  onChange={e => setEditPkgForm({ ...editPkgForm, description: e.target.value })}
+                  onChange={e => setNpkg({ ...npkg, features: e.target.value })}
 
                   style={{ width: "100%", height: 80, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", resize: "none" }}
 
-                  placeholder="Package description..."
+                  placeholder="e.g. Unlimited Company Names, Premium Support, Custom Branding"
 
                 />
 
@@ -14302,21 +14166,21 @@ return (
 
                     {subadmins.map(s => (
 
-                      <label key={s._id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.text, cursor: "pointer", background: editPkgForm.assignedSubadmins?.includes(s._id) ? "rgba(124, 58, 237, 0.1)" : "transparent", padding: "4px 8px", borderRadius: 6 }}>
+                      <label key={s._id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.text, cursor: "pointer", background: npkg.assignedSubadmins.includes(s._id) ? "rgba(124, 58, 237, 0.1)" : "transparent", padding: "4px 8px", borderRadius: 6 }}>
 
                         <input
 
                           type="checkbox"
 
-                          checked={editPkgForm.assignedSubadmins?.includes(s._id)}
+                          checked={npkg.assignedSubadmins.includes(s._id)}
 
                           onChange={() => {
 
-                            const current = editPkgForm.assignedSubadmins || [];
+                            const current = npkg.assignedSubadmins || [];
 
                             const next = current.includes(s._id) ? current.filter(id => id !== s._id) : [...current, s._id];
 
-                            setEditPkgForm({ ...editPkgForm, assignedSubadmins: next });
+                            setNpkg({ ...npkg, assignedSubadmins: next });
 
                           }}
 
@@ -14340,37 +14204,435 @@ return (
 
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
 
-                <button onClick={() => setEditPackage(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+                <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
 
-                <button onClick={savePackageEdit} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Saving..." : "Save Changes "}</button>
+                <button onClick={addPackage} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Creating..." : "Create Package "}</button>
 
               </div>
 
-            </Mdl>
-
-          )}
+            </Mdl>}
 
 
 
-          {viewProject && (
+            {modal === "vendor_add" && <Mdl title="Add New Vendor" onClose={() => setModal(null)}>
 
-            <Mdl title="Project Details" onClose={() => setViewProject(null)} maxWidth={550}>
+              <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
 
-              <div style={{ background: "#fff", borderRadius: 16 }}>
+                <Fld label="Vendor Name *" value={nv.vendorName} onChange={v => { setNv({ ...nv, vendorName: v }); setNvError(p => ({ ...p, vendorName: "" })); }} error={nvError.vendorName} />
 
-                {/* Header Info */}
+                <Fld label="Product Name *" value={nv.vendorProduct} onChange={v => { setNv({ ...nv, vendorProduct: v }); setNvError(p => ({ ...p, vendorProduct: "" })); }} error={nvError.vendorProduct} />
 
-                <div style={{ background: "var(--app-bg)", padding: "20px 24px", borderRadius: 16, marginBottom: 18, border: "1px solid var(--app-border)" }}>
+                <Fld label="Required Amount *" value={nv.amountTaxGst} type="number" onChange={v => { setNv({ ...nv, amountTaxGst: v }); setNvError(p => ({ ...p, amountTaxGst: "" })); }} error={nvError.amountTaxGst} />
 
-                  <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 8 }}>{viewProject.name}</h2>
+                <Fld label="Paid Amount *" value={nv.paidAmount} type="number" onChange={v => { setNv({ ...nv, paidAmount: v }); setNvError(p => ({ ...p, paidAmount: "" })); }} error={nvError.paidAmount} />
 
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <Fld label="Date of Purchase" value={nv.dateOfPurchase} type="date" onChange={v => setNv({ ...nv, dateOfPurchase: v })} />
 
-                    <Badge label={viewProject.status || "Pending"} />
+                <Fld label="Mode of Payment" value={nv.modeOfPayment} onChange={v => setNv({ ...nv, modeOfPayment: v })} options={["Cash", "Bank Transfer", "UPI", "Cheque"]} />
 
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--app-muted)", fontSize: 13, fontWeight: 600 }}>
+              </div>
 
-                      <span>Team</span> {viewProject.client}
+              <Fld label="Product Description" value={nv.productDescription} onChange={v => setNv({ ...nv, productDescription: v })} />
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
+
+                <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+
+                <button onClick={addVendor} disabled={vendorSaveLoading} style={{ ...B("var(--app-accent)"), opacity: vendorSaveLoading ? 0.7 : 1 }}>{vendorSaveLoading ? "Saving..." : "Save Vendor "}</button>
+
+              </div>
+
+            </Mdl>}
+
+
+
+            {/* ── View Package Modal ── */}
+
+            {viewPackage && (
+
+              <Mdl title={`Package Details: ${viewPackage.title}`} onClose={() => setViewPackage(null)} maxWidth={500}>
+
+                <div style={{ padding: "10px 0" }}>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
+
+                    <div style={{ width: 56, height: 56, borderRadius: "50%", background: "var(--app-accent-gradient)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>
+
+                      {viewPackage.icon || "📦"}
+
+                    </div>
+
+                    <div>
+
+                      <div style={{ fontSize: 18, fontWeight: 800, color: T.text }}>{viewPackage.title}</div>
+
+                      <div style={{ fontSize: 13, color: "var(--app-muted)" }}>{viewPackage.type === "free" ? "Free Package" : "Paid Package"}</div>
+
+                    </div>
+
+                  </div>
+
+
+
+                  <InfoRow icon="📄" label="Description" value={viewPackage.description} />
+
+                  <InfoRow icon="📅" label="Duration" value={`${viewPackage.no_of_days || viewPackage.noOfDays || 30} days`} />
+
+                  <InfoRow icon="💰" label="Price" value={viewPackage.type === "free" ? "Free" : `Rs.${viewPackage.price || 0}`} />
+
+                  <InfoRow icon="" label="Plan Duration" value={viewPackage.planDuration || "Monthly"} />
+
+                  <InfoRow icon="🏢" label="Business" value={viewPackage.businessLimit || ""} />
+
+                  <InfoRow icon="👨‍💼" label="Manager" value={viewPackage.managerLimit || ""} />
+
+                  <InfoRow icon="Team" label="Clients (Company Name)" value={viewPackage.clientLimit || ""} />
+
+                  <InfoRow icon="👤" label="Employee" value={viewPackage.employeeLimit || ""} />
+
+                  <InfoRow icon="📊" label="Status" value={viewPackage.status || "Active"} />
+
+
+
+                  {viewPackage.features && viewPackage.features.length > 0 && (
+
+                    <div style={{ marginTop: 20 }}>
+
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)", marginBottom: 10 }}>FEATURES</div>
+
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+
+                        {(Array.isArray(viewPackage.features) ? viewPackage.features : viewPackage.features.split('\\n')).map((f, i) => (
+
+                          <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: T.text }}>
+
+                            <span style={{ color: "#22c55e" }}>✓</span> {f}
+
+                          </div>
+
+                        ))}
+
+                      </div>
+
+                    </div>
+
+                  )}
+
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
+
+                  <button onClick={() => setViewPackage(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 20px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>✕</button>
+
+                </div>
+
+              </Mdl>
+
+            )}
+
+
+
+            {/* ── Edit Package Modal ── */}
+
+            {editPackage && (
+
+              <Mdl title={`Edit Package: ${editPackage.title}`} onClose={() => setEditPackage(null)} maxWidth={700}>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
+
+                  <Fld label="Package Title *" value={editPkgForm.title} onChange={v => setEditPkgForm({ ...editPkgForm, title: v })} />
+
+                  <Fld label="Icon (Emoji)" value={editPkgForm.icon} onChange={v => setEditPkgForm({ ...editPkgForm, icon: v })} />
+
+                  <Fld label="Type" value={editPkgForm.type} onChange={v => setEditPkgForm({ ...editPkgForm, type: v })} options={["free", "paid"]} />
+
+                  <Fld label="Price" value={editPkgForm.price} onChange={v => setEditPkgForm({ ...editPkgForm, price: v })} disabled={editPkgForm.type === "free"} />
+
+                  <Fld label="Number of Days *" value={editPkgForm.noOfDays} onChange={v => setEditPkgForm({ ...editPkgForm, noOfDays: v })} />
+
+                  <Fld label="Status" value={editPkgForm.status} onChange={v => setEditPkgForm({ ...editPkgForm, status: v })} options={["Active", "Inactive"]} />
+
+                </div>
+
+
+
+                <div style={{ background: "#f8fafc", padding: 18, borderRadius: 16, border: "1px solid #f1f5f9", margin: "14px 0" }}>
+
+                  <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>BUSINESS MANAGEMENT</div>
+
+                  <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+
+                    {["Single business manage", "Multiple business manage"].map(mode => (
+
+                      <button
+
+                        key={mode}
+
+                        onClick={() => setEditPkgForm({ ...editPkgForm, businessLimit: mode })}
+
+                        style={{
+
+                          flex: 1,
+
+                          padding: "12px",
+
+                          borderRadius: 12,
+
+                          border: editPkgForm.businessLimit === mode ? "1.5px solid #7c3aed" : "1.5px solid #e2e8f0",
+
+                          background: editPkgForm.businessLimit === mode ? "#f5f3ff" : "#fff",
+
+                          color: editPkgForm.businessLimit === mode ? "#7c3aed" : "#64748b",
+
+                          fontSize: 13,
+
+                          fontWeight: 700,
+
+                          cursor: "pointer",
+
+                          transition: "all 0.2s"
+
+                        }}
+
+                      >
+
+                        {editPkgForm.businessLimit === mode ? "✓ " : ""}{mode}
+
+                      </button>
+
+                    ))}
+
+                  </div>
+
+
+
+                  <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12, marginTop: 12 }}>PACKAGE LIMITS</div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
+
+                    <Fld label="Plan Duration" value={editPkgForm.planDuration} onChange={v => setEditPkgForm({ ...editPkgForm, planDuration: v })} options={["Monthly", "90 Days", "Yearly"]} />
+
+                    <Fld label="MANAGER LIMIT (TYPE NUMBER)" value={editPkgForm.managerLimit} onChange={v => setEditPkgForm({ ...editPkgForm, managerLimit: v })} placeholder="e.g. 5 Manager or Unlimited Manager" />
+
+                    <Fld label="COMPANY NAME LIMIT (CLIENTS)" value={editPkgForm.clientLimit} onChange={v => setEditPkgForm({ ...editPkgForm, clientLimit: v })} placeholder="e.g. 10 Company manage or Unlimited" />
+
+                    <Fld label="EMPLOYEE LIMIT" value={editPkgForm.employeeLimit} onChange={v => setEditPkgForm({ ...editPkgForm, employeeLimit: v })} placeholder="e.g. 50 Employee manage or Unlimited" />
+
+                  </div>
+
+                </div>
+
+
+
+                <div style={{ marginBottom: 14 }}>
+
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>DESCRIPTION</label>
+
+                  <textarea
+
+                    value={editPkgForm.description}
+
+                    onChange={e => setEditPkgForm({ ...editPkgForm, description: e.target.value })}
+
+                    style={{ width: "100%", height: 80, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", resize: "none" }}
+
+                    placeholder="Package description..."
+
+                  />
+
+                </div>
+
+
+
+                {user?.role === "admin" && (
+
+                  <div style={{ marginBottom: 14 }}>
+
+                    <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGN TO SUBADMINS (ONLY ASSIGNED WILL SEE THIS)</label>
+
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: 12, border: "1.5px solid var(--app-border)", borderRadius: 10, background: "var(--app-bg)" }}>
+
+                      {subadmins.map(s => (
+
+                        <label key={s._id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.text, cursor: "pointer", background: editPkgForm.assignedSubadmins?.includes(s._id) ? "rgba(124, 58, 237, 0.1)" : "transparent", padding: "4px 8px", borderRadius: 6 }}>
+
+                          <input
+
+                            type="checkbox"
+
+                            checked={editPkgForm.assignedSubadmins?.includes(s._id)}
+
+                            onChange={() => {
+
+                              const current = editPkgForm.assignedSubadmins || [];
+
+                              const next = current.includes(s._id) ? current.filter(id => id !== s._id) : [...current, s._id];
+
+                              setEditPkgForm({ ...editPkgForm, assignedSubadmins: next });
+
+                            }}
+
+                          />
+
+                          {s.name}
+
+                        </label>
+
+                      ))}
+
+                      {subadmins.length === 0 && <div style={{ fontSize: 12, color: "var(--app-muted)" }}>No subadmins found</div>}
+
+                    </div>
+
+                  </div>
+
+                )}
+
+
+
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+
+                  <button onClick={() => setEditPackage(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+
+                  <button onClick={savePackageEdit} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Saving..." : "Save Changes "}</button>
+
+                </div>
+
+              </Mdl>
+
+            )}
+
+
+
+            {viewProject && (
+
+              <Mdl title="Project Details" onClose={() => setViewProject(null)} maxWidth={550}>
+
+                <div style={{ background: "#fff", borderRadius: 16 }}>
+
+                  {/* Header Info */}
+
+                  <div style={{ background: "var(--app-bg)", padding: "20px 24px", borderRadius: 16, marginBottom: 18, border: "1px solid var(--app-border)" }}>
+
+                    <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 8 }}>{viewProject.name}</h2>
+
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+
+                      <Badge label={viewProject.status || "Pending"} />
+
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--app-muted)", fontSize: 13, fontWeight: 600 }}>
+
+                        <span>Team</span> {viewProject.client}
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+
+
+                  {/* Budget Row */}
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 18 }}>
+
+                    <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>💰</div>
+
+                    <div>
+
+                      <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>BUDGET</div>
+
+                      <div style={{ fontSize: 18, fontWeight: 800, color: "var(--app-sidebar)" }}>{formatCurrency(viewProject.budget, viewProject.currency)}</div>
+
+                    </div>
+
+                  </div>
+
+
+
+                  {/* Assigned Employees */}
+
+                  <div style={{ marginBottom: 18 }}>
+
+                    <h3 style={{ fontSize: 10, fontWeight: 800, color: "var(--app-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>ASSIGNED EMPLOYEES</h3>
+
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+
+                      {(() => {
+
+                        const assignedEmployees = Array.isArray(viewProject.assignedTo) ? viewProject.assignedTo : (viewProject.assignedTo ? [viewProject.assignedTo] : []);
+
+                        return assignedEmployees.length > 0 ? assignedEmployees.map((emp, idx) => (
+
+                          <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "var(--app-bg)", borderRadius: 12, border: "1px solid var(--app-border)" }}>
+
+                            <div style={{ width: 30, height: 30, borderRadius: "50%", background: "var(--app-accent-gradient)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 700 }}>{emp[0].toUpperCase()}</div>
+
+                            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)" }}>{emp}</span>
+
+                          </div>
+
+                        )) : <div style={{ color: "var(--app-muted)", fontSize: 12, fontStyle: "italic" }}>No employees assigned</div>;
+
+                      })()}
+
+                    </div>
+
+                  </div>
+
+
+
+                  {/* Purpose Row */}
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 24 }}>
+
+                    <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>🎯</div>
+
+                    <div>
+
+                      <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>PURPOSE</div>
+
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>{viewProject.purpose || "—"}</div>
+
+                    </div>
+
+                  </div>
+
+
+
+                  <div style={{ display: "flex", gap: 10 }}>
+
+                    <button onClick={() => setViewProject(null)} style={{ flex: 1, padding: "11px", background: "var(--app-accent-gradient)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>✕</button>
+
+                  </div>
+
+                </div>
+
+              </Mdl>
+
+            )}
+
+
+
+            {/* Upload File Modal */}
+
+            {uploadFileTarget && (
+
+              <Mdl title="Upload Document" onClose={() => { setUploadFileTarget(null); setUploadTargetUser(""); }}>
+
+                <div style={{ marginBottom: 16 }}>
+
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)", marginBottom: 8 }}>Selected File</div>
+
+                  <div style={{ padding: "12px 16px", background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 10, display: "flex", alignItems: "center", gap: 10 }}>
+
+                    <i className="ti ti-file" style={{ fontSize: 20, color: "var(--app-accent)" }}></i>
+
+                    <div style={{ flex: 1, minWidth: 0 }}>
+
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{uploadFileTarget.name}</div>
+
+                      <div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{(uploadFileTarget.size / 1024 / 1024).toFixed(2)} MB</div>
 
                     </div>
 
@@ -14378,234 +14640,124 @@ return (
 
                 </div>
 
+                <div style={{ marginBottom: 16 }}>
 
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>SEND TO TYPE *</label>
 
-                {/* Budget Row */}
+                  <select value={uploadTargetRole} onChange={(e) => { setUploadTargetRole(e.target.value); setUploadTargetUser(""); }} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--app-border)", background: "var(--app-bg)", color: "var(--app-text)", fontSize: 13, outline: "none", fontFamily: "inherit" }}>
 
-                <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 18 }}>
+                    <option value="client">Client</option>
 
-                  <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>💰</div>
+                    <option value="employee">Employee</option>
 
-                  <div>
-
-                    <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>BUDGET</div>
-
-                    <div style={{ fontSize: 18, fontWeight: 800, color: "var(--app-sidebar)" }}>{formatCurrency(viewProject.budget, viewProject.currency)}</div>
-
-                  </div>
+                  </select>
 
                 </div>
 
+                <div style={{ marginBottom: 24 }}>
 
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>SELECT {uploadTargetRole.toUpperCase()} *</label>
 
-                {/* Assigned Employees */}
+                  <select value={uploadTargetUser} onChange={(e) => setUploadTargetUser(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--app-border)", background: "var(--app-bg)", color: "var(--app-text)", fontSize: 13, outline: "none", fontFamily: "inherit" }}>
 
-                <div style={{ marginBottom: 18 }}>
+                    <option value="">-- Select --</option>
 
-                  <h3 style={{ fontSize: 10, fontWeight: 800, color: "var(--app-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>ASSIGNED EMPLOYEES</h3>
+                    {uploadTargetRole === "client"
 
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      ? clients.map(c => <option key={c._id || c.id} value={c.clientName || c.name}>{c.clientName || c.name}</option>)
 
-                    {(() => {
+                      : employees.map(e => <option key={e._id || e.id} value={e.name}>{e.name}</option>)
 
-                      const assignedEmployees = Array.isArray(viewProject.assignedTo) ? viewProject.assignedTo : (viewProject.assignedTo ? [viewProject.assignedTo] : []);
+                    }
 
-                      return assignedEmployees.length > 0 ? assignedEmployees.map((emp, idx) => (
-
-                        <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "var(--app-bg)", borderRadius: 12, border: "1px solid var(--app-border)" }}>
-
-                          <div style={{ width: 30, height: 30, borderRadius: "50%", background: "var(--app-accent-gradient)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 700 }}>{emp[0].toUpperCase()}</div>
-
-                          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)" }}>{emp}</span>
-
-                        </div>
-
-                      )) : <div style={{ color: "var(--app-muted)", fontSize: 12, fontStyle: "italic" }}>No employees assigned</div>;
-
-                    })()}
-
-                  </div>
+                  </select>
 
                 </div>
 
+                <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
 
+                  <button onClick={() => { setUploadFileTarget(null); setUploadTargetUser(""); }} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: "var(--app-text)", borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
+                  <button disabled={!uploadTargetUser || uploadIsSending} onClick={async () => {
+                    setUploadIsSending(true);
+                    try {
+                      const reader = new FileReader();
+                      reader.readAsDataURL(uploadFileTarget);
+                      reader.onload = async () => {
+                        const base64Data = reader.result;
+                        const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
 
-                {/* Purpose Row */}
-
-                <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 24 }}>
-
-                  <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>🎯</div>
-
-                  <div>
-
-                    <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>PURPOSE</div>
-
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>{viewProject.purpose || "—"}</div>
-
-                  </div>
-
-                </div>
-
-
-
-                <div style={{ display: "flex", gap: 10 }}>
-
-                  <button onClick={() => setViewProject(null)} style={{ flex: 1, padding: "11px", background: "var(--app-accent-gradient)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>✕</button>
-
-                </div>
-
-              </div>
-
-            </Mdl>
-
-          )}
-
-
-
-          {/* Upload File Modal */}
-
-          {uploadFileTarget && (
-
-            <Mdl title="Upload Document" onClose={() => { setUploadFileTarget(null); setUploadTargetUser(""); }}>
-
-              <div style={{ marginBottom: 16 }}>
-
-                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)", marginBottom: 8 }}>Selected File</div>
-
-                <div style={{ padding: "12px 16px", background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 10, display: "flex", alignItems: "center", gap: 10 }}>
-
-                  <i className="ti ti-file" style={{ fontSize: 20, color: "var(--app-accent)" }}></i>
-
-                  <div style={{ flex: 1, minWidth: 0 }}>
-
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{uploadFileTarget.name}</div>
-
-                    <div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{(uploadFileTarget.size / 1024 / 1024).toFixed(2)} MB</div>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-              <div style={{ marginBottom: 16 }}>
-
-                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>SEND TO TYPE *</label>
-
-                <select value={uploadTargetRole} onChange={(e) => { setUploadTargetRole(e.target.value); setUploadTargetUser(""); }} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--app-border)", background: "var(--app-bg)", color: "var(--app-text)", fontSize: 13, outline: "none", fontFamily: "inherit" }}>
-
-                  <option value="client">Client</option>
-
-                  <option value="employee">Employee</option>
-
-                </select>
-
-              </div>
-
-              <div style={{ marginBottom: 24 }}>
-
-                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>SELECT {uploadTargetRole.toUpperCase()} *</label>
-
-                <select value={uploadTargetUser} onChange={(e) => setUploadTargetUser(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--app-border)", background: "var(--app-bg)", color: "var(--app-text)", fontSize: 13, outline: "none", fontFamily: "inherit" }}>
-
-                  <option value="">-- Select --</option>
-
-                  {uploadTargetRole === "client"
-
-                    ? clients.map(c => <option key={c._id || c.id} value={c.clientName || c.name}>{c.clientName || c.name}</option>)
-
-                    : employees.map(e => <option key={e._id || e.id} value={e.name}>{e.name}</option>)
-
-                  }
-
-                </select>
-
-              </div>
-
-              <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-
-                <button onClick={() => { setUploadFileTarget(null); setUploadTargetUser(""); }} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: "var(--app-text)", borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
-                <button disabled={!uploadTargetUser || uploadIsSending} onClick={async () => {
-                  setUploadIsSending(true);
-                  try {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(uploadFileTarget);
-                    reader.onload = async () => {
-                      const base64Data = reader.result;
-                      const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
-
-                      let resolvedClientId = "";
-                      let resolvedEmployeeId = "";
-                      if (uploadTargetRole === "client") {
-                        const match = clients.find(c => (c.clientName || c.name) === uploadTargetUser);
-                        resolvedClientId = match?._id || match?.id || "";
-                      } else if (uploadTargetRole === "employee") {
-                        const match = employees.find(e => e.name === uploadTargetUser);
-                        resolvedEmployeeId = match?._id || match?.id || "";
-                      }
-
-                      await axios.post(`${BASE_URL}/api/documents`, {
-                        docType: "upload",
-                        sendTo: uploadTargetRole,
-                        client: uploadTargetUser,
-                        clientId: resolvedClientId,
-                        employeeId: resolvedEmployeeId,
-                        recipientEmail: "",
-                        htmlContent: base64Data,
-                        senderCompany: companyNameStr,
-                        companyId
-                      });
-
-                      if (uploadTargetRole === "employee" && resolvedEmployeeId) {
-                        try {
-                          await axios.post(`${BASE_URL}/api/notifications`, {
-                            userId: resolvedEmployeeId,
-                            type: "document",
-                            icon: "ti-files",
-                            text: `A new document has been shared with you`,
-                          });
-                        } catch (notifErr) {
-                          console.error("Failed to notify employee:", notifErr);
+                        let resolvedClientId = "";
+                        let resolvedEmployeeId = "";
+                        if (uploadTargetRole === "client") {
+                          const match = clients.find(c => (c.clientName || c.name) === uploadTargetUser);
+                          resolvedClientId = match?._id || match?.id || "";
+                        } else if (uploadTargetRole === "employee") {
+                          const match = employees.find(e => e.name === uploadTargetUser);
+                          resolvedEmployeeId = match?._id || match?.id || "";
                         }
-                      }
 
-                      toast.success("File uploaded successfully!");
-                      setUploadFileTarget(null);
-                      setUploadTargetUser("");
-                    };
+                        await axios.post(`${BASE_URL}/api/documents`, {
+                          docType: "upload",
+                          sendTo: uploadTargetRole,
+                          client: uploadTargetUser,
+                          clientId: resolvedClientId,
+                          employeeId: resolvedEmployeeId,
+                          recipientEmail: "",
+                          htmlContent: base64Data,
+                          senderCompany: companyNameStr,
+                          companyId
+                        });
 
-                  } catch (err) {
+                        if (uploadTargetRole === "employee" && resolvedEmployeeId) {
+                          try {
+                            await axios.post(`${BASE_URL}/api/notifications`, {
+                              userId: resolvedEmployeeId,
+                              type: "document",
+                              icon: "ti-files",
+                              text: `A new document has been shared with you`,
+                            });
+                          } catch (notifErr) {
+                            console.error("Failed to notify employee:", notifErr);
+                          }
+                        }
 
-                    console.error(err);
+                        toast.success("File uploaded successfully!");
+                        setUploadFileTarget(null);
+                        setUploadTargetUser("");
+                      };
 
-                    toast.error("Upload failed.");
+                    } catch (err) {
 
-                  } finally {
+                      console.error(err);
 
-                    setUploadIsSending(false);
+                      toast.error("Upload failed.");
 
-                  }
+                    } finally {
 
-                }} style={{ flex: 1, padding: "11px", background: (!uploadTargetUser || uploadIsSending) ? "var(--app-border)" : "var(--app-accent)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: (!uploadTargetUser || uploadIsSending) ? "var(--app-muted)" : "#fff", cursor: (!uploadTargetUser || uploadIsSending) ? "not-allowed" : "pointer", fontFamily: "inherit", transition: "all 0.2s" }}>
+                      setUploadIsSending(false);
 
-                  {uploadIsSending ? "Uploading..." : "Upload File"}
+                    }
 
-                </button>
+                  }} style={{ flex: 1, padding: "11px", background: (!uploadTargetUser || uploadIsSending) ? "var(--app-border)" : "var(--app-accent)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: (!uploadTargetUser || uploadIsSending) ? "var(--app-muted)" : "#fff", cursor: (!uploadTargetUser || uploadIsSending) ? "not-allowed" : "pointer", fontFamily: "inherit", transition: "all 0.2s" }}>
 
-              </div>
+                    {uploadIsSending ? "Uploading..." : "Upload File"}
 
-            </Mdl>
+                  </button>
 
-          )}
+                </div>
+
+              </Mdl>
+
+            )}
+
+          </div>
 
         </div>
 
-      </div>
+      </div >
 
     </div >
 
-  </div >
-
-);
+  );
 
 }

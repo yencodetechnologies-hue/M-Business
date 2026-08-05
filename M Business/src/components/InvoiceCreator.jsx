@@ -557,6 +557,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const [step, setStep] = useState(() => {
     if (jumpInvoice && (jumpInvoice._id || jumpInvoice.id)) return "preview";
     if (newInvoicePrefill) return "form";
+    if (hideLivePreview) return "form";
     if (forceListView !== undefined && forceListView !== null && forceListView !== false) return "list";
     return "list";
   });

@@ -10281,8 +10281,40 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     }
   `}</style>
 
-                  {/* HERO HEADER — glass + gradient mesh */}
-                  <div style={{
+                  {/* TEAL NAME/BELL STRIP — sits above the logo row */}
+                  <div style={{ background: "linear-gradient(160deg, var(--app-accent) 0%, #0f7a8a 100%)", padding: "14px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div
+                      data-profile-anchor="true"
+                      onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }}
+                      style={{ fontSize: 14, fontWeight: 800, color: "#fff", cursor: "pointer" }}
+                    >
+                      {(user?.companyName || user?.name || "Business")}
+                    </div>
+                    <div style={{ position: "relative" }}>
+                      <div onClick={() => { setMobNotifExpanded(v => !v); fetchPendingLeaves(); }} style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                        <i className="ti ti-bell" style={{ fontSize: 16, color: "#fff" }}></i>
+                        {pendingLeaves.length > 0 && (
+                          <span style={{ position: "absolute", top: 3, right: 4, width: 7, height: 7, borderRadius: "50%", background: "#ff4d6d", boxShadow: "0 0 0 2px #0f7a8a" }}></span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* WHITE LOGO/MENU STRIP — sits below the teal name/bell strip */}
+                  <div style={{ background: "#fff", padding: "14px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 14, background: "#ffffff", boxShadow: "0 2px 8px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.06)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+                      {companyLogo ? (
+                        <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      ) : (
+                        <i className="ti ti-building" style={{ fontSize: 18, color: "var(--app-accent, #00BCD4)" }}></i>
+                      )}
+                    </div>
+                    <div onClick={() => setSidebarOpen(true)} style={{ width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                      <i className="ti ti-menu-2" style={{ fontSize: 20, color: "var(--app-accent, #00BCD4)" }}></i>
+                    </div>
+                  </div>
+
+                  {/* HERO HEADER — glass + gradient mesh */}    <div style={{
                     position: "relative",
                     zIndex: 1,
                     background: "linear-gradient(160deg, var(--app-accent) 0%, #0f7a8a 60%, #0a5a68 100%)",
@@ -10300,33 +10332,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <div style={{ position: "relative", zIndex: 2 }}>
                       <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 20 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                          <div
-                            data-profile-anchor="true"
-                            onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }}
-                            style={{ fontSize: 15, fontWeight: 800, color: "#fff", cursor: "pointer" }}
-                          >
-                            {(user?.companyName || user?.name || "Business")}
-                          </div>
-                          <div style={{ position: "relative" }}>
-                            <div onClick={() => { setMobNotifExpanded(v => !v); fetchPendingLeaves(); }} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.08)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-                              <i className="ti ti-bell" style={{ fontSize: 17 }}></i>
-                              {pendingLeaves.length > 0 && (
-                                <span style={{ position: "absolute", top: 5, right: 6, width: 8, height: 8, borderRadius: "50%", background: "#ff4d6d", boxShadow: "0 0 0 2px #0f0a29" }}></span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
+                          <div >
+                            <div
+                              data-profile-anchor="true"
+                              onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }}
+                            >
 
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                          <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.12)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
-                            {companyLogo ? (
-                              <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                            ) : (
-                              <i className="ti ti-building" style={{ fontSize: 18, color: "#fff" }}></i>
-                            )}
-                          </div>
-                          <div onClick={() => setSidebarOpen(true)} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.08)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                            <i className="ti ti-menu-2" style={{ fontSize: 20, color: "#fff" }}></i>
+                            </div>
+
                           </div>
                         </div>
 

@@ -10278,7 +10278,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                 </div>
                                 {(() => {
                                   const budgetNum = Number(p.budget) || 0;
-                                  const spentNum = Number(p.spentAmount || p.amountSpent || 0);
+                                  const spentNum = (p.expenses || []).reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
                                   const budgetPct = budgetNum > 0 ? Math.min(100, Math.round((spentNum / budgetNum) * 100)) : 0;
                                   return (
                                     <div>

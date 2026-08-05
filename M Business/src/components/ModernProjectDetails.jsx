@@ -1372,6 +1372,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
         expenses: updatedExpenses,
         spent: newSpent,
+      }, {
+        headers: { 'x-company-id': currProject?.companyId || '' }
       });
       setExpenseAmt('');
       setShowAddExpense(false);

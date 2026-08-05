@@ -573,8 +573,6 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             notes: inv.notes || '',
             gstRate: inv.taxPercent ?? (inv.items?.[0]?.gstRate ?? 18),
             isGstIncluded: inv.taxType === 'inclusive',
-            signature: inv.signature || '',
-            signatureType: inv.signatureType || 'text',
             // Persist signature to the project's local invoices array so it
             // survives refresh/re-login even if the global Invoice record
             // update lags behind.
@@ -4797,7 +4795,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 <div id="invoice-print-area" style={{ padding: '36px 40px', background: '#fff' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
                     <div>
-                      {user?.logoUrl ? (<img src={user.logoUrl} alt="Logo" style={{ height: 70, borderRadius: 12, marginBottom: 12, objectFit: 'contain' }} />) : (<div style={{ width: 60, height: 60, borderRadius: 12, background: 'var(--app-accent, var(--app-accent, #00BCD4))', background: 'var(--app-accent, var(--app-accent, #00BCD4))', background: 'linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097A7)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}><span style={{ color: '#fff', fontWeight: 900, fontSize: 24 }}>{(user?.companyName || 'Y')[0].toUpperCase()}</span></div>)}
+                      {user?.logoUrl ? (<img src={user.logoUrl} alt="Logo" style={{ height: 70, borderRadius: 12, marginBottom: 12, objectFit: 'contain' }} />) : (<div style={{ width: 60, height: 60, borderRadius: 12, background: 'linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097A7)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}><span style={{ color: '#fff', fontWeight: 900, fontSize: 24 }}>{(user?.companyName || 'Y')[0].toUpperCase()}</span></div>)}
                       <div style={{ fontWeight: 900, fontSize: 20, color: '#0f1c2e', letterSpacing: '1px', textTransform: 'uppercase' }}>{user?.companyName || 'YOUR COMPANY'}</div>
                       <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4, lineHeight: 1.7 }}>{user?.email}<br />{user?.phone}<br />{user?.address}</div>
                     </div>

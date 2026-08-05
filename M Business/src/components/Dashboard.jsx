@@ -1834,7 +1834,77 @@ function Sidebar({ active, setActive, onLogout, open, onClose, navItems, initial
     </>
   );
 }
+// ── Mobile Project Slider ─────────────────────────────────────────────────────
+function MobileProjSlider({ projects, tasks, onViewProject }) {
+  const [page, setPage] = useState(0);
+  const ITEMS_PER_PAGE = 6;
+  const totalPages = Math.ceil(projects.length / ITEMS_PER_PAGE);
+  const touchStartX = useRef(null);
 
+  const pagedProjects = projects.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
+
+  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (diff > 50 && page < totalPages - 1) setPage(p => p + 1);
+    else if (diff < -50 && page > 0) setPage(p => p - 1);
+    touchStartX.current = null;
+  };
+
+  return (
+    <div>
+      <div
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        style={{ background: "#fff", borderRadius: 20, border: "1px solid #e2e8f0", overflow: "hidden", boxShadow: "0 4px 16px rgba(15,10,41,0.06)" }}
+      >
+        {pagedProjects.map((p, idx) => {
+          const pTasks = (tasks || []).filter(t => (t.project === p.name || t.projectId === p._id || t.projectId === p.id));
+          const doneTasks = pTasks.filter(t => t.status === "Done").length;
+          const progress = pTasks.length > 0 ? Math.round((doneTasks / pTasks.length) * 100) : (p.progress || 0);
+          const ringColor = progress >= 80 ? "#16a34a" : progress >= 40 ? "#0f766e" : "#dc2626";
+          return (
+            <div
+              key={p._id || idx}
+              onClick={() => onViewProject(p)}
+              style={{ display: "flex", alignItems: "center", gap: 14, padding: "13px 16px", borderBottom: idx === pagedProjects.length - 1 ? "none" : "1px solid #f1f5f9", cursor: "pointer" }}
+            >
+              <span style={{ width: 9, height: 9, borderRadius: "50%", background: "#29b6e8", flexShrink: 0, display: "inline-block" }}></span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13.5, fontWeight: 700, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
+                <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 1 }}>{p.status || "Active"} · {progress}%</div>
+              </div>
+              <div style={{ position: "relative", width: 36, height: 36, flexShrink: 0 }}>
+                <svg width="36" height="36" viewBox="0 0 36 36">
+                  <circle cx="18" cy="18" r="14" fill="none" stroke="#f1f5f9" strokeWidth="4" />
+                  <circle cx="18" cy="18" r="14" fill="none" stroke={ringColor} strokeWidth="4" strokeDasharray={`${(progress / 100) * 88} 88`} strokeLinecap="round" transform="rotate(-90 18 18)" />
+                </svg>
+                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8.5, fontWeight: 900, color: ringColor }}>{progress}%</div>
+              </div>
+            </div>
+          );
+        })}
+        {totalPages > 1 && (
+          <div style={{ textAlign: "center", padding: "10px 0", fontSize: 12, color: "#94a3b8", fontWeight: 700, borderTop: "1px solid #f1f5f9", background: "#fafcff" }}>
+            {page + 1} / {totalPages}
+          </div>
+        )}
+      </div>
+      {totalPages > 1 && (
+        <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 10 }}>
+          {Array.from({ length: totalPages }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setPage(i)}
+              style={{ width: i === page ? 22 : 8, height: 8, borderRadius: 4, border: "none", background: i === page ? "#0f766e" : "#cbd5e1", cursor: "pointer", transition: "all 0.2s", padding: 0 }}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 // -----------------------------------------------------------
 // MAIN DASHBOARD
 // -----------------------------------------------------------
@@ -1869,7 +1939,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   useEffect(() => { setCompanyLogo(user?.logoUrl ? user.logoUrl : (fixedLogo || null)); }, [user, fixedLogo]);
 
   const [clients, setClients] = useState([]);
-  
+
   const [nc, setNc] = useState({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", contactPersonName: "", contactPersonNo: "", gstNumber: "", logoUrl: "", clientType: "b2b", category: "", source: "", onboardedOn: new Date().toISOString().split('T')[0], city: "", state: "", pincode: "", country: "India", website: "", linkedin: "", billingCurrency: "INR — Indian Rupee", paymentTerms: "", creditLimit: "", preferredPaymentMode: "", notes: "" });
   const [ncError, setNcError] = useState({});
   const [saveLoading, setSaveLoading] = useState(false);
@@ -1973,6 +2043,72 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [mobileShowAllProjects, setMobileShowAllProjects] = useState(false);
 
   const [mobileShowInvoices, setMobileShowInvoices] = useState(false);
+
+  // ── Mobile Add Task Modal state ──────────────────────────────────────────
+  const [showMobileAddTask, setShowMobileAddTask] = useState(false);
+  const [mobileTaskProject, setMobileTaskProject] = useState("");
+  const [mobileTaskTitle, setMobileTaskTitle] = useState("");
+  const [mobileTaskDesc, setMobileTaskDesc] = useState("");
+  const [mobileTaskPriority, setMobileTaskPriority] = useState("medium");
+  const [mobileTaskDue, setMobileTaskDue] = useState("");
+  const [mobileTaskStatus, setMobileTaskStatus] = useState("Not Started");
+  const [mobileTaskMilestone, setMobileTaskMilestone] = useState("");
+  const [mobileTaskAssignTo, setMobileTaskAssignTo] = useState([]);
+  const [mobileTaskAdding, setMobileTaskAdding] = useState(false);
+  const [mobileTaskError, setMobileTaskError] = useState("");
+
+  const handleMobileAddTask = async (e) => {
+    e.preventDefault();
+    if (!mobileTaskTitle.trim()) { setMobileTaskError("Task name is required."); return; }
+    if (!mobileTaskProject) { setMobileTaskError("Please select a project."); return; }
+    if (!mobileTaskMilestone) { setMobileTaskError("Please select a milestone."); return; }
+    setMobileTaskError("");
+    setMobileTaskAdding(true);
+    try {
+      const resolvedCompanyId = user?.companyId || user?.company || user?._id || user?.id || "";
+      const companyHeaders = { headers: { "x-company-id": resolvedCompanyId } };
+
+      // Get or create a task group
+      let gId = null;
+      try {
+        const gRes = await axios.get(BASE_URL + "/api/groups");
+        gId = gRes.data && gRes.data.length > 0 ? gRes.data[0]._id : null;
+        if (!gId) {
+          const gNew = await axios.post(BASE_URL + "/api/groups", { label: "Tasks", color: "var(--app-accent, #00BCD4)" });
+          gId = gNew.data._id;
+        }
+      } catch { }
+
+      const selProject = projects.find(p => p._id === mobileTaskProject || p.name === mobileTaskProject);
+      const createRes = await axios.post(BASE_URL + "/api/tasks", {
+        title: mobileTaskTitle.trim(),
+        description: mobileTaskDesc.trim(),
+        priority: mobileTaskPriority,
+        assignTo: mobileTaskAssignTo.join(", "),
+        date: mobileTaskDue,
+        milestone: mobileTaskMilestone,
+        groupId: gId,
+        projectId: selProject?._id || mobileTaskProject,
+        status: mobileTaskStatus,
+      }, companyHeaders);
+
+      const created = createRes?.data?.task || createRes?.data;
+      if (created && created._id) {
+        setTasks(prev => [...prev, created]);
+      }
+
+      // Reset
+      setMobileTaskTitle(""); setMobileTaskDesc(""); setMobileTaskPriority("medium");
+      setMobileTaskDue(""); setMobileTaskStatus("Not Started"); setMobileTaskMilestone("");
+      setMobileTaskAssignTo([]); setMobileTaskProject("");
+      setShowMobileAddTask(false);
+    } catch (err) {
+      setMobileTaskError("Failed to add task. Please try again.");
+      console.error("Mobile add task error:", err);
+    } finally {
+      setMobileTaskAdding(false);
+    }
+  };
   useEffect(() => {
     if (validActive !== "dashboard") return;
     const timer = setTimeout(() => setMobileShowInvoices(true), 6000);
@@ -2215,16 +2351,30 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       .md-glow{animation:mdPulseGlow 4s ease-in-out infinite}
       .md-tap:active{transform:scale(.96);}
       .md-tap{transition:transform .15s ease}
+      .mob-sticky-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 9999; background: #fff; display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-bottom: 1px solid #f1f5f9; }
+      .mob-scroll-header { transition: transform 0.3s ease, opacity 0.3s ease; }
     `}</style>
 
-              {/* HERO — deep gradient mesh header */}
-              <div style={{ position: "relative", background: "radial-gradient(130% 100% at 20% -10%, #241a5e 0%, #140f38 40%, #08061a 100%)", borderRadius: "0 0 34px 34px", padding: "20px 18px 96px", color: "#fff", overflow: "hidden" }}>
+              {/* ── FIXED STICKY NAV — Logo + Hamburger (always visible) ── */}
+              <div className="mob-sticky-nav">
+                <div style={{ width: 36, height: 36, borderRadius: 9, background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+                  {companyLogo
+                    ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                    : <span style={{ color: "#0f766e", fontWeight: 800, fontSize: 11 }}>{initials}</span>}
+                </div>
+                <div className="md-tap" onClick={() => setSidebarOpen(true)} style={{ width: 36, height: 36, borderRadius: 9, background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#0f172a" }}>
+                  <i className="ti ti-menu-2" style={{ fontSize: 18 }}></i>
+                </div>
+              </div>
+
+              {/* ── HERO — scrolls away (Company Name + Notification hide on scroll) ── */}
+              <div style={{ position: "relative", background: "radial-gradient(130% 100% at 20% -10%, #241a5e 0%, #140f38 40%, #08061a 100%)", borderRadius: "0 0 34px 34px", padding: "66px 18px 96px", color: "#fff", overflow: "hidden" }}>
                 <div className="md-glow" style={{ position: "absolute", top: -70, right: -50, width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle, var(--app-accent) 0%, transparent 70%)", filter: "blur(6px)" }} />
                 <div className="md-glow" style={{ position: "absolute", bottom: -90, left: -40, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, #8b5cf6 0%, transparent 70%)", filter: "blur(10px)", animationDelay: "1.5s" }} />
 
                 <div style={{ position: "relative", zIndex: 2 }}>
-                  {/* ROW 1 — Company Name (left) + Notification (right) */}
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                  {/* ROW 1 — Company Name + Notification (scrolls away) */}
+                  <div className="mob-scroll-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
                     <div style={{ fontSize: 16, fontWeight: 800, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                       {user?.companyName || "Ylines Ecommerce"}
                     </div>
@@ -2233,17 +2383,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
                   </div>
 
-                  {/* ROW 2 — Logo (left) + Hamburger menu (right) */}
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
-                    <div style={{ width: 34, height: 34, borderRadius: 9, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
-                      {companyLogo
-                        ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-                        : <span style={{ color: T.accent, fontWeight: 800, fontSize: 11 }}>{initials}</span>}
-                    </div>
-                    <div className="md-tap" onClick={() => setSidebarOpen(true)} style={{ width: 34, height: 34, borderRadius: 9, background: "rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff" }}>
-                      <i className="ti ti-menu-2" style={{ fontSize: 17 }}></i>
-                    </div>
-                  </div>
                   <div style={{ fontSize: 12.5, color: "rgba(255,255,255,0.5)", display: "flex", alignItems: "center", gap: 6, marginBottom: 8, fontWeight: 600 }}>
                     <i className="ti ti-sparkles" style={{ color: "var(--app-accent)" }}></i> Revenue this month
                   </div>
@@ -2299,7 +2438,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <i className="ti ti-file-invoice"></i> Create Invoice
                   </button>
                   <button
-                    onClick={() => setActive("tasks")}
+                    onClick={() => { setMobileTaskProject(""); setMobileTaskTitle(""); setMobileTaskDesc(""); setMobileTaskPriority("medium"); setMobileTaskDue(""); setMobileTaskStatus("Not Started"); setMobileTaskMilestone(""); setMobileTaskAssignTo([]); setMobileTaskError(""); setShowMobileAddTask(true); }}
                     style={{ flex: 1, background: "rgba(255,255,255,0.15)", color: "#fff", border: "1.5px solid rgba(255,255,255,0.4)", borderRadius: 12, padding: "12px", fontSize: 13, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
                   >
                     <i className="ti ti-checklist"></i> Add Task
@@ -2323,44 +2462,77 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 {!mobileShowInvoices ? (
                   <>
-                    <div style={{ display: "flex", gap: 12, overflowX: "auto", paddingBottom: 6, WebkitOverflowScrolling: "touch", scrollSnapType: "x mandatory" }}>
-                      {(mobileShowAllProjects ? projects : projects.slice(0, 3)).map((p, idx) => {
-                        const pTasks = (tasks || []).filter(t => (t.project === p.name || t.projectId === p._id || t.projectId === p.id));
-                        const doneTasks = pTasks.length > 0 ? pTasks.filter(t => t.status === "Done").length : 0;
-                        const progress = pTasks.length > 0 ? Math.round((doneTasks / pTasks.length) * 100) : (p.progress || 0);
-                        const ringColor = progress >= 80 ? "#16a34a" : progress >= 40 ? "#0f766e" : "#dc2626";
-                        return (
-                          <div
-                            key={p._id || p.id || idx}
-                            className="md-card"
-                            style={{ flex: "0 0 82%", scrollSnapAlign: "start", background: "#fff", borderRadius: 20, padding: "16px", boxShadow: "0 4px 16px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", cursor: "pointer" }}
-                            onClick={() => { setViewProject(null); setTimeout(() => setViewProject(p), 0); }}
-                          >
-                            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                              <div style={{ position: "relative", width: 50, height: 50, flexShrink: 0 }}>
-                                <svg width="50" height="50" viewBox="0 0 50 50">
-                                  <circle cx="25" cy="25" r="21" fill="none" stroke="#f1f5f9" strokeWidth="5" />
-                                  <circle cx="25" cy="25" r="21" fill="none" stroke={ringColor} strokeWidth="5" strokeDasharray={`${(progress / 100) * 132} 132`} strokeLinecap="round" transform="rotate(-90 25 25)" />
-                                </svg>
-                                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: ringColor }}>{progress}%</div>
-                              </div>
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f0a29", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
-                                <div style={{ fontSize: 11.5, color: "#94a3b8", marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
-                                  <i className="ti ti-building" style={{ fontSize: 12 }}></i>{p.client || "Internal"}
-                                </div>
-                                <div style={{ height: 6, background: "#f1f5f9", borderRadius: 3, marginTop: 9, overflow: "hidden" }}>
-                                  <div style={{ width: `${progress}%`, height: "100%", background: `linear-gradient(90deg, ${ringColor}, ${ringColor}cc)`, borderRadius: 3 }}></div>
-                                </div>
-                              </div>
+                    {(() => {
+                      const ITEMS_PER_PAGE = 6;
+                      const visibleProjects = mobileShowAllProjects ? projects : projects.slice(0, 3);
+                      const totalPages = Math.ceil(projects.length / ITEMS_PER_PAGE);
+                      const [mobProjPage, setMobProjPage] = window.__mobProjPageState || [0, () => { }];
+
+                      // Page state stored in a ref-like way on window to avoid extra useState inside JSX
+                      if (!window.__mobProjPageState) {
+                        window.__mobProjPageStateSetter = null;
+                      }
+
+                      const pagedProjects = mobileShowAllProjects
+                        ? projects.slice(mobProjPage * ITEMS_PER_PAGE, (mobProjPage + 1) * ITEMS_PER_PAGE)
+                        : projects.slice(0, 3);
+
+                      return (
+                        <>
+                          {/* Collapsed: horizontal swipe carousel, 3 cards visible */}
+                          {!mobileShowAllProjects && (
+                            <div style={{ display: "flex", gap: 12, overflowX: "auto", paddingBottom: 6, WebkitOverflowScrolling: "touch", scrollSnapType: "x mandatory", scrollbarWidth: "none", msOverflowStyle: "none" }}>
+                              <style>{`.mob-proj-scroll::-webkit-scrollbar{display:none}`}</style>
+                              {projects.slice(0, 3).map((p, idx) => {
+                                const pTasks = (tasks || []).filter(t => (t.project === p.name || t.projectId === p._id || t.projectId === p.id));
+                                const doneTasks = pTasks.length > 0 ? pTasks.filter(t => t.status === "Done").length : 0;
+                                const progress = pTasks.length > 0 ? Math.round((doneTasks / pTasks.length) * 100) : (p.progress || 0);
+                                const ringColor = progress >= 80 ? "#16a34a" : progress >= 40 ? "#0f766e" : "#dc2626";
+                                return (
+                                  <div
+                                    key={p._id || p.id || idx}
+                                    className="md-card"
+                                    style={{ flex: "0 0 82%", scrollSnapAlign: "start", background: "#fff", borderRadius: 20, padding: "16px", boxShadow: "0 4px 16px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", cursor: "pointer" }}
+                                    onClick={() => { setViewProject(null); setTimeout(() => setViewProject(p), 0); }}
+                                  >
+                                    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                                      <div style={{ position: "relative", width: 50, height: 50, flexShrink: 0 }}>
+                                        <svg width="50" height="50" viewBox="0 0 50 50">
+                                          <circle cx="25" cy="25" r="21" fill="none" stroke="#f1f5f9" strokeWidth="5" />
+                                          <circle cx="25" cy="25" r="21" fill="none" stroke={ringColor} strokeWidth="5" strokeDasharray={`${(progress / 100) * 132} 132`} strokeLinecap="round" transform="rotate(-90 25 25)" />
+                                        </svg>
+                                        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: ringColor }}>{progress}%</div>
+                                      </div>
+                                      <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f0a29", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
+                                        <div style={{ fontSize: 11.5, color: "#94a3b8", marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
+                                          <i className="ti ti-building" style={{ fontSize: 12 }}></i>{p.client || "Internal"}
+                                        </div>
+                                        <div style={{ height: 6, background: "#f1f5f9", borderRadius: 3, marginTop: 9, overflow: "hidden" }}>
+                                          <div style={{ width: `${progress}%`, height: "100%", background: `linear-gradient(90deg, ${ringColor}, ${ringColor}cc)`, borderRadius: 3 }}></div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                              {projects.length === 0 && (
+                                <div style={{ textAlign: "center", padding: "30px 0", color: "#94a3b8", fontSize: 13, width: "100%" }}>No projects yet</div>
+                              )}
                             </div>
-                          </div>
-                        );
-                      })}
-                      {projects.length === 0 && (
-                        <div style={{ textAlign: "center", padding: "30px 0", color: "#94a3b8", fontSize: 13, width: "100%" }}>No projects yet</div>
-                      )}
-                    </div>
+                          )}
+
+                          {/* Expanded: paginated list matching screenshot 3 & 4 */}
+                          {mobileShowAllProjects && (
+                            <MobileProjSlider
+                              projects={projects}
+                              tasks={tasks}
+                              onViewProject={(p) => { setViewProject(null); setTimeout(() => setViewProject(p), 0); }}
+                            />
+                          )}
+                        </>
+                      );
+                    })()}
 
                     {projects.length > 3 && (
                       <button
@@ -2368,7 +2540,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         style={{ width: "100%", marginTop: 12, background: "#f0fdfa", border: "1px solid #99f6e4", color: "#0f766e", borderRadius: 12, padding: "10px", fontSize: 12.5, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
                       >
                         <i className={`ti ti-chevron-${mobileShowAllProjects ? "up" : "down"}`}></i>
-                        {mobileShowAllProjects ? "See Less" : `See All (${projects.length})`}
+                        {mobileShowAllProjects ? "▲ See less" : `▼ See All (${projects.length})`}
                       </button>
                     )}
                   </>
@@ -2422,9 +2594,156 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   </div>
                 ))}
               </div>
-            </div>
+              {/* ── Mobile Add Task Modal ──────────────────────────────── */}
+              {showMobileAddTask && (
+                <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 12px" }}>
+                  <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 460, padding: 24, boxShadow: "0 20px 60px rgba(0,0,0,0.25)", boxSizing: "border-box", maxHeight: "92vh", overflowY: "auto" }}>
+                    <h3 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 800, color: "#0f172a" }}>Add New Task</h3>
+                    <form onSubmit={handleMobileAddTask}>
 
-            {/* ══════════ DESKTOP DASHBOARD (unchanged) ══════════ */}
+                      {/* Project selector — extra field for Dashboard context */}
+                      <div style={{ marginBottom: 12 }}>
+                        <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Project *</label>
+                        <select
+                          required
+                          value={mobileTaskProject}
+                          onChange={e => { setMobileTaskProject(e.target.value); setMobileTaskMilestone(""); }}
+                          style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13, color: "#0f172a", background: "#fff" }}
+                        >
+                          <option value="">-- Select Project --</option>
+                          {projects.map((p, i) => <option key={p._id || i} value={p._id}>{p.name}</option>)}
+                        </select>
+                      </div>
+
+                      {/* Task Name */}
+                      <div style={{ marginBottom: 12 }}>
+                        <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Task Name *</label>
+                        <input
+                          type="text"
+                          value={mobileTaskTitle}
+                          onChange={e => setMobileTaskTitle(e.target.value)}
+                          placeholder="Enter task title"
+                          required
+                          style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13 }}
+                        />
+                      </div>
+
+                      {/* Description */}
+                      <div style={{ marginBottom: 12 }}>
+                        <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Description</label>
+                        <textarea
+                          value={mobileTaskDesc}
+                          onChange={e => setMobileTaskDesc(e.target.value)}
+                          placeholder="Enter details..."
+                          style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", resize: "vertical", minHeight: 64, boxSizing: "border-box", fontSize: 13 }}
+                        />
+                      </div>
+
+                      {/* Priority + Due Date */}
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+                        <div>
+                          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Priority</label>
+                          <select value={mobileTaskPriority} onChange={e => setMobileTaskPriority(e.target.value)} style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13 }}>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Due Date</label>
+                          <input type="date" value={mobileTaskDue} onChange={e => setMobileTaskDue(e.target.value)} style={{ width: "100%", padding: "9px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", background: "#fff", fontFamily: "inherit", fontSize: 13, cursor: "pointer" }} />
+                        </div>
+                      </div>
+
+                      {/* Status + Milestone */}
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+                        <div>
+                          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Status</label>
+                          <select value={mobileTaskStatus} onChange={e => setMobileTaskStatus(e.target.value)} style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13 }}>
+                            <option value="Not Started">Not Started</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                            <option value="On Hold">On Hold</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Link to Milestone *</label>
+                          <select
+                            required
+                            value={mobileTaskMilestone}
+                            onChange={e => setMobileTaskMilestone(e.target.value)}
+                            style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13 }}
+                          >
+                            <option value="">-- Select Milestone --</option>
+                            {(() => {
+                              const selProj = projects.find(p => p._id === mobileTaskProject || p.name === mobileTaskProject);
+                              return (selProj?.milestones || []).map((m, i) => <option key={i} value={m.name}>{m.name}</option>);
+                            })()}
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Team Members */}
+                      <div style={{ marginBottom: 16 }}>
+                        <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Select Team Members</label>
+                        <div style={{ width: "100%", maxHeight: 150, overflowY: "auto", padding: "8px", borderRadius: 8, border: "1.5px solid #e2e8f0", boxSizing: "border-box", background: "#fff" }}>
+                          {(() => {
+                            const selProj = projects.find(p => p._id === mobileTaskProject || p.name === mobileTaskProject);
+                            const assigned = selProj?.assignedTo || selProj?.team || [];
+                            const filtered = (employees || []).filter(emp => {
+                              const n = emp.name || emp.employeeName || "";
+                              return assigned.length === 0 || assigned.includes(n);
+                            });
+                            if (filtered.length === 0) return <div style={{ fontSize: 12, color: "#94a3b8", padding: "4px" }}>No employees assigned to this project.</div>;
+                            return filtered.map(emp => {
+                              const name = emp.name || emp.employeeName || "";
+                              if (!name) return null;
+                              const checked = mobileTaskAssignTo.includes(name);
+                              return (
+                                <label key={emp._id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 4px", fontSize: 13, color: "#0f172a", cursor: "pointer" }}>
+                                  <input
+                                    type="checkbox"
+                                    checked={checked}
+                                    onChange={() => setMobileTaskAssignTo(prev => checked ? prev.filter(n => n !== name) : [...prev, name])}
+                                  />
+                                  {name}{emp.role ? ` (${emp.role})` : ""}
+                                </label>
+                              );
+                            });
+                          })()}
+                        </div>
+                        <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 4 }}>Select one or more team members.</div>
+                      </div>
+
+                      {/* Error message */}
+                      {mobileTaskError && (
+                        <div style={{ fontSize: 12, color: "#ef4444", marginBottom: 12, padding: "8px 12px", background: "#fef2f2", borderRadius: 8, border: "1px solid #fecaca" }}>
+                          {mobileTaskError}
+                        </div>
+                      )}
+
+                      {/* Actions */}
+                      <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+                        <button
+                          type="button"
+                          onClick={() => setShowMobileAddTask(false)}
+                          style={{ padding: "10px 20px", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "#fff", color: "#64748b", fontWeight: 700, fontSize: 13, cursor: "pointer" }}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={mobileTaskAdding}
+                          style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#0f766e,#14b8a6)", color: "#fff", fontWeight: 800, fontSize: 13, cursor: mobileTaskAdding ? "not-allowed" : "pointer", opacity: mobileTaskAdding ? 0.7 : 1 }}
+                        >
+                          {mobileTaskAdding ? "Adding..." : "Add Task"}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+            </div>
             <div className="desktop-dashboard-view">
               <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 18 }}>
                 {[{ t: "Total Clients", v: clients.length, i: "Team", c: "var(--app-accent)" }, { t: "Employees", v: employees.length, i: "‍Job", c: "var(--app-accent)" }, { t: "Managers", v: managers.length, i: "‍Job", c: "#f59e0b" }, { t: "Projects", v: projects.length, i: "Folder", c: "var(--app-muted)" }, { t: "Invoices", v: INVOICES.length, i: "", c: "#22C55E" }].map(({ t, v, i, c }) => (

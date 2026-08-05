@@ -10618,6 +10618,36 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         <div style={{ fontSize: 13, fontWeight: 800, color: "#0f0a29" }}>{s.label}</div>
                         <div style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 600, marginTop: 1 }}>{s.val}</div>
                       </div>))}
+                    {mobSecondRowOrder.map((s, i) => (
+                      <div
+                        key={s.id}
+                        className="mob-card"
+                        draggable
+                        onDragStart={() => setDraggingSecondRow(s.id)}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={() => {
+                          if (!draggingSecondRow || draggingSecondRow === s.id) { setDraggingSecondRow(null); return; }
+                          setMobSecondRowOrder(prev => {
+                            const arr = [...prev];
+                            const fromIdx = arr.findIndex(c => c.id === draggingSecondRow);
+                            const toIdx = arr.findIndex(c => c.id === s.id);
+                            const [moved] = arr.splice(fromIdx, 1);
+                            arr.splice(toIdx, 0, moved);
+                            return arr;
+                          });
+                          setDraggingSecondRow(null);
+                        }}
+                        onDragEnd={() => setDraggingSecondRow(null)}
+                        onClick={() => openMobilePopup(s.popupId)}
+                        style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, padding: "4px 4px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingSecondRow === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
+                      >
+                        <div style={{ width: 72, height: 72, borderRadius: 18, background: s.grad, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", fontSize: 30, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
+                          <i className={`ti ${s.icon}`}></i>
+                        </div>
+                        <div style={{ fontSize: 13, fontWeight: 800, color: "#0f0a29" }}>{s.label}</div>
+                        <div style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 600, marginTop: 1 }}>{s.val}</div>
+                      </div>
+                    ))}
                   </div>
 
                   <MobilePopup id="mobClients" title="Clients">
@@ -10675,39 +10705,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
                   </MobilePopup>
 
-                  {/* NEW DRAGGABLE ROW — Unpaid Invoices, Invoices, Proposals, Quotations */}
-                  <div style={{ margin: "14px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
-                    {mobSecondRowOrder.map((s, i) => (
-                      <div
-                        key={s.id}
-                        className="mob-card"
-                        draggable
-                        onDragStart={() => setDraggingSecondRow(s.id)}
-                        onDragOver={(e) => e.preventDefault()}
-                        onDrop={() => {
-                          if (!draggingSecondRow || draggingSecondRow === s.id) { setDraggingSecondRow(null); return; }
-                          setMobSecondRowOrder(prev => {
-                            const arr = [...prev];
-                            const fromIdx = arr.findIndex(c => c.id === draggingSecondRow);
-                            const toIdx = arr.findIndex(c => c.id === s.id);
-                            const [moved] = arr.splice(fromIdx, 1);
-                            arr.splice(toIdx, 0, moved);
-                            return arr;
-                          });
-                          setDraggingSecondRow(null);
-                        }}
-                        onDragEnd={() => setDraggingSecondRow(null)}
-                        onClick={() => openMobilePopup(s.popupId)}
-                        style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, padding: "4px 4px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingSecondRow === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
-                      >
-                        <div style={{ width: 72, height: 72, borderRadius: 18, background: s.grad, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", fontSize: 30, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
-                          <i className={`ti ${s.icon}`}></i>
-                        </div>
-                        <div style={{ fontSize: 13, fontWeight: 800, color: "#0f0a29" }}>{s.label}</div>
-                        <div style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 600, marginTop: 1 }}>{s.val}</div>
-                      </div>
-                    ))}
-                  </div>
+
 
 
 

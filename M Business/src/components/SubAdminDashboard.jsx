@@ -10481,7 +10481,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     <div style={{ marginTop: 10, background: "#fff", borderRadius: 16, boxShadow: "0 10px 30px rgba(15,10,41,0.08)", border: "1px solid rgba(0,0,0,0.03)", overflow: "hidden" }}>
                       <MobIdleInvoiceArmer projectsWithProgress={projectsWithProgress} mobShowInvoiceList={mobShowInvoiceList} setMobShowInvoiceList={setMobShowInvoiceList} />
-                      {(mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).map((p, idx, arr) => {
+                      {!mobShowInvoiceList && (mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).map((p, idx, arr) => {
                         const progress = p.progress || 0;
                         const priority = p.priority || "medium";
                         const priorityColors = priority === "high" ? { bg: "#FEE2E2", fg: "#DC2626" } : priority === "low" ? { bg: "#D1FAE5", fg: "#059669" } : { bg: "#FEF3C7", fg: "#D97706" };

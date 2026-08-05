@@ -7045,6 +7045,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [mobShowAllProjects, setMobShowAllProjects] = useState(false);
   const [showMobileInvoiceModal, setShowMobileInvoiceModal] = useState(false);
   const [showMobileTaskModal, setShowMobileTaskModal] = useState(false);
+
   const [mobCarouselIdx, setMobCarouselIdx] = useState(0);
   const [mobShowInvoiceList, setMobShowInvoiceList] = useState(false);
   const mobIdleTimerRef = useRef(null);
@@ -10289,12 +10290,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <div
                       data-profile-anchor="true"
                       onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }}
-                      style={{ fontSize: 14, fontWeight: 800, color: "#fff", cursor: "pointer" }}
+                      style={{ fontSize: 14, fontWeight: 800, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", height: 44 }}
                     >
                       {(user?.companyName || user?.name || "Business")}
                     </div>
                     <div style={{ position: "relative" }}>
-                      <div onClick={() => { setMobNotifExpanded(v => !v); fetchPendingLeaves(); }} style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                      <div onClick={() => { setMobNotifExpanded(v => !v); fetchPendingLeaves(); }} style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
                         <i className="ti ti-bell" style={{ fontSize: 16, color: "#fff" }}></i>
                         {pendingLeaves.length > 0 && (
                           <span style={{ position: "absolute", top: 3, right: 4, width: 7, height: 7, borderRadius: "50%", background: "#ff4d6d", boxShadow: "0 0 0 2px #0f7a8a" }}></span>
@@ -10303,8 +10304,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
                   </div>
 
-                  {/* WHITE LOGO/MENU STRIP — sits below the teal name/bell strip */}
-                  <div style={{ background: "#fff", padding: "14px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  {/* WHITE LOGO/MENU STRIP — sits below the teal name/bell strip, stays fixed while scrolling */}
+                  <div style={{ background: "#fff", padding: "12px 14px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 200, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
                     <div style={{ width: 44, height: 44, borderRadius: 14, background: "#ffffff", boxShadow: "0 2px 8px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.06)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
                       {companyLogo ? (
                         <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -10455,7 +10456,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           Create Invoice
                         </button>
                         <button
-                          onClick={() => { if (!projectsWithProgress[0]) { setActive("projects"); return; } setAutoOpenTaskModal(true); }}
+                          onClick={() => { if (!projectsWithProgress[0]) { setActive("projects"); return; } setJumpProject(projectsWithProgress[0]); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setAutoOpenTaskModal(true); setActive("project-details"); }}
                           style={{ flex: 1, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(0,188,212,0.3)" }}
                         >
                           Add Task
@@ -10469,20 +10470,49 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
 
                     <div style={{ marginTop: 10, background: "#fff", borderRadius: 16, boxShadow: "0 10px 30px rgba(15,10,41,0.08)", border: "1px solid rgba(0,0,0,0.03)", overflow: "hidden" }}>
-                      {(mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).map((p, idx, arr) => (
-                        <div
-                          key={p._id || idx}
-                          onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
-                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", borderBottom: idx === arr.length - 1 ? "none" : "1px solid #f1f5f9", cursor: "pointer" }}
-                        >
-                          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--app-accent, #00BCD4)", flexShrink: 0 }} />
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
-                            <div style={{ fontSize: 11, color: "#94a3b8" }}>{p.status || "Active"} · {p.progress || 0}%</div>
+                      {(mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).map((p, idx, arr) => {
+                        const progress = p.progress || 0;
+                        const priority = p.priority || "medium";
+                        const priorityColors = priority === "high" ? { bg: "#FEE2E2", fg: "#DC2626" } : priority === "low" ? { bg: "#D1FAE5", fg: "#059669" } : { bg: "#FEF3C7", fg: "#D97706" };
+                        const clientObj = clients.find(c => c._id === p.clientId || c._id === p.client);
+                        const clientLabel = clientObj?.companyName || clientObj?.name || p.clientName || "";
+                        const deadline = p.deadline || p.end;
+                        return (
+                          <div
+                            key={p._id || idx}
+                            onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
+                            style={{ padding: "14px", borderBottom: idx === arr.length - 1 ? "none" : "1px solid #f1f5f9", cursor: "pointer" }}
+                          >
+                            <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+                              <span style={{ display: "flex", alignItems: "center", gap: 4, padding: "3px 9px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: "#D1FAE5", color: "#059669" }}>
+                                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#059669" }} />
+                                {p.status || "Active"}
+                              </span>
+                              {p.category && <span style={{ padding: "3px 9px", borderRadius: 20, fontSize: 11, fontWeight: 600, background: "#E0F7FA", color: "#0097A7" }}>{p.category}</span>}
+                              <span style={{ marginLeft: "auto", padding: "3px 9px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: priorityColors.bg, color: priorityColors.fg }}>
+                                {priority.charAt(0).toUpperCase() + priority.slice(1)}
+                              </span>
+                            </div>
+                            <div style={{ fontSize: 15, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>{p.name}</div>
+                            {clientLabel && (
+                              <div style={{ fontSize: 12, color: "#64748b", display: "flex", alignItems: "center", gap: 4, marginBottom: 10 }}>
+                                <i className="ti ti-building" style={{ fontSize: 13 }}></i> {clientLabel}
+                              </div>
+                            )}
+                            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: "#64748b", marginBottom: 4 }}>
+                              <span>Progress</span>
+                              <span style={{ fontWeight: 800, color: "#0f1c2e" }}>{progress}%</span>
+                            </div>
+                            <div style={{ height: 6, background: "#f1f5f9", borderRadius: 4, marginBottom: 10 }}>
+                              <div style={{ width: `${progress}%`, height: "100%", background: "var(--app-accent, #00BCD4)", borderRadius: 4 }} />
+                            </div>
+                            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#94a3b8" }}>
+                              {p.start && <span><i className="ti ti-calendar" style={{ fontSize: 12, marginRight: 3 }}></i>Start: {new Date(p.start).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>}
+                              {deadline && <span style={{ color: "#dc2626", fontWeight: 700 }}>Deadline: {new Date(deadline).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>}
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                      {projectsWithProgress.length === 0 && (
+                        );
+                      })} {projectsWithProgress.length === 0 && (
                         <div style={{ padding: "16px 0", textAlign: "center", color: "#94a3b8", fontSize: 13 }}>No projects yet</div>
                       )}
                     </div>
@@ -10490,7 +10520,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     {projectsWithProgress.length > 3 && (
                       <button
                         onClick={() => setMobShowAllProjects(v => !v)}
-                        style={{ width: "100%", marginTop: 8, marginBottom: 0, background: "#fff", border: "1.5px solid var(--app-accent, #00BCD4)", color: "var(--app-accent, #00BCD4)", borderRadius: 10, padding: "8px 0", fontSize: 12.5, fontWeight: 800, cursor: "pointer" }}
+                        style={{ width: "100%", marginTop: 8, marginBottom: -4, background: "#fff", border: "1.5px solid var(--app-accent, #00BCD4)", color: "var(--app-accent, #00BCD4)", borderRadius: 10, padding: "8px 0", fontSize: 12.5, fontWeight: 800, cursor: "pointer" }}
                       >
                         {mobShowAllProjects ? "▲ See Less" : `▼ See All ${projectsWithProgress.length} projects`}
                       </button>
@@ -10498,7 +10528,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   </div>
 
                   {/* FLOATING STAT STRIP — draggable reorder, sits below hero (no overlap) */}
-                  <div style={{ margin: "16px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
+                  <div style={{ margin: "8px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
                     {mobStatCardOrder.map((s, i) => (
                       <div
                         key={s.id}
@@ -10819,8 +10849,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-                  {/* FLOATING BOTTOM NAV — glass pill (portaled to body so it always stays fixed to the viewport) */}
-                  {createPortal(
+                  {/* FLOATING BOTTOM NAV — glass pill (portaled to body so it always stays fixed to the viewport, mobile only) */}
+                  {!isDesktopWidth && createPortal(
                     <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#0f0a29", borderRadius: 0, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "12px 6px", zIndex: 4000, boxShadow: "0 -2px 12px rgba(0,0,0,0.15)" }}>
                       {[
                         { icon: "ti-file-invoice", label: "Invoice", key: "invoices" },
@@ -12663,8 +12693,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             {!isDesktopWidth && (projectsWithProgress[0]) && (
               <div style={{ position: "fixed", left: 0, top: 0, width: 1, height: 1, opacity: 0, pointerEvents: "none", overflow: "visible", zIndex: -1 }}>
                 <ModernProjectDetails
-                  key={`mobile-task-${(jumpProject || projectsWithProgress[0])._id || (jumpProject || projectsWithProgress[0]).id}`}
-                  project={jumpProject || projectsWithProgress[0]}
+                  key={`mobile-task-${projectsWithProgress[0]._id || projectsWithProgress[0].id}`}
+                  project={projectsWithProgress[0]}
                   tasks={tasks}
                   employees={employees}
                   user={user}

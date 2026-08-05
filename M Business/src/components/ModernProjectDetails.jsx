@@ -4338,7 +4338,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
       {/* Add Task Modal */} {
         showAddTaskModal && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 99995, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99995, background: 'rgba(15,23,42,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ background: '#fff', borderRadius: P.radius, width: 'min(360px, 92vw)', padding: 14, boxShadow: '0 8px 32px rgba(0,0,0,0.15)', boxSizing: 'border-box', maxHeight: '80vh', overflowY: 'auto' }}>
               <h3 style={{ margin: '0 0 10px', fontSize: 16, color: P.textDark }}>{editingTask ? 'Edit Task' : 'Add New Task'}</h3>
               <form onSubmit={handleCreateTask}>

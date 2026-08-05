@@ -7050,7 +7050,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     useEffect(() => {
       if (mobShowInvoiceList) return;
       if (!projectsWithProgress || projectsWithProgress.length === 0) return;
-      const timer = setTimeout(() => setMobShowInvoiceList(true), 4000);
+      const timer = setTimeout(() => setMobShowInvoiceList(true), 5000);
       return () => clearTimeout(timer);
     }, [projectsWithProgress, mobShowInvoiceList, setMobShowInvoiceList]);
     return null;
@@ -10466,7 +10466,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           Create Invoice
                         </button>
                         <button
-                          onClick={() => { if (!projectsWithProgress[0]) { setActive("projects"); return; } setAutoOpenTaskModal(true); }}
+                          onClick={() => { if (!projectsWithProgress[0]) { setActive("projects"); return; } setJumpProject(projectsWithProgress[0]); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setAutoOpenTaskModal(true); setActive("project-details"); }}
                           style={{ flex: 1, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(0,188,212,0.3)" }}
                         >
                           Add Task
@@ -10597,7 +10597,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         }}
                         onDragEnd={() => setDraggingStatCard(null)}
                         onClick={() => openMobilePopup(s.id)}
-                        style={{ animationDelay: `${i * 60}ms`, background: "#fff", borderRadius: 18, aspectRatio: "1 / 1", padding: "6px 6px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)", cursor: "grab", opacity: draggingStatCard === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
+                        style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, aspectRatio: "1 / 1", padding: "6px 6px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingStatCard === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                       >
                         <div style={{ width: 40, height: 40, borderRadius: 12, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 2px", color: "#fff", fontSize: 19, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
                           <i className={`ti ${s.icon}`}></i>
@@ -10686,7 +10686,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         }}
                         onDragEnd={() => setDraggingSecondRow(null)}
                         onClick={() => openMobilePopup(s.popupId)}
-                        style={{ animationDelay: `${i * 60}ms`, background: "#fff", borderRadius: 18, aspectRatio: "1 / 1", padding: "10px 6px", boxShadow: "0 10px 30px rgba(15,10,41,0.12)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)", cursor: "grab", opacity: draggingSecondRow === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
+                        style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, aspectRatio: "1 / 1", padding: "10px 6px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingSecondRow === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                       >
                         <div style={{ width: 38, height: 38, borderRadius: 12, background: s.grad, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 2px", fontSize: 18, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
                           <i className={`ti ${s.icon}`}></i>

@@ -2142,33 +2142,27 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       <Sidebar active={validActive} setActive={setActive} onLogout={handleLogout} open={sidebarOpen} onClose={() => setSidebarOpen(false)} navItems={navItems} initials={initials} companyName={companyNameStr} companyLogo={companyLogo} setSidebarInvoiceClick={setSidebarInvoiceClick} />
 
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
-        <div className="mob-topbar" style={{ display: validActive === "dashboard" ? "none" : "flex", flexDirection: "column", background: "#fff", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#0d0b26", padding: "10px 16px" }}>
-            <span style={{ fontWeight: 700, fontSize: 14, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{companyNameStr}</span>
-            <div style={{ width: 32, height: 32, borderRadius: 9, background: "rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
-              <i className="ti ti-bell" style={{ fontSize: 15, color: "#fff" }}></i>
+        <div className="mob-topbar" style={{ display: validActive === "dashboard" ? "none" : "flex", flexDirection: "column", background: "#0d0b26", padding: "16px 16px 14px", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)" }}>
+          {/* ROW 1 — Company Name (left) + Notification (right) */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <div style={{ fontSize: 16, fontWeight: 800, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              {companyNameStr}
+            </div>
+            <div className="md-tap" style={{ width: 38, height: 38, borderRadius: 12, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, color: "#fff" }}>
+              <i className="ti ti-bell" style={{ fontSize: 17 }}></i>
             </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 16px" }}>
-            <div onClick={() => setShowProfile(true)} style={{
-              height: 34,
-              width: companyLogo ? "auto" : 34,
-              minWidth: 34,
-              background: "#fff",
-              border: "1px solid #e2e8f0",
-              borderRadius: 8,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              overflow: "hidden",
-              padding: companyLogo ? "0 6px" : 0
-            }}>
-              {companyLogo ? <img src={companyLogo} alt="logo" style={{ height: "80%", width: "auto", objectFit: "contain" }} /> : <span style={{ color: T.accent, fontWeight: 800 }}>{initials}</span>}
+
+          {/* ROW 2 — Logo (left) + Hamburger menu (right) */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div onClick={() => setShowProfile(true)} style={{ width: 38, height: 38, borderRadius: 10, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0, cursor: "pointer" }}>
+              {companyLogo
+                ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                : <span style={{ color: T.accent, fontWeight: 800, fontSize: 12 }}>{initials}</span>}
             </div>
-            <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "#0d0b26", padding: "2px 6px", lineHeight: 1 }}>
-              <i className="ti ti-menu-2"></i>
-            </button>
+            <div className="md-tap" onClick={() => setSidebarOpen(true)} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff" }}>
+              <i className="ti ti-menu-2" style={{ fontSize: 18 }}></i>
+            </div>
           </div>
         </div>
 
@@ -2229,24 +2223,24 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 <div style={{ position: "relative", zIndex: 2 }}>
                   {/* ROW 1 — Company Name (left) + Notification (right) */}
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                    <div style={{ fontSize: 16, fontWeight: 800, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                       {user?.companyName || "Ylines Ecommerce"}
                     </div>
-                    <div className="md-tap" style={{ width: 38, height: 38, borderRadius: 12, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
-                      <i className="ti ti-bell" style={{ fontSize: 17 }}></i>
+                    <div className="md-tap" style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, color: "#fff" }}>
+                      <i className="ti ti-bell" style={{ fontSize: 16 }}></i>
                     </div>
                   </div>
 
                   {/* ROW 2 — Logo (left) + Hamburger menu (right) */}
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
-                    <div style={{ width: 38, height: 38, borderRadius: 10, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+                    <div style={{ width: 34, height: 34, borderRadius: 9, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
                       {companyLogo
                         ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-                        : <span style={{ color: T.accent, fontWeight: 800, fontSize: 12 }}>{initials}</span>}
+                        : <span style={{ color: T.accent, fontWeight: 800, fontSize: 11 }}>{initials}</span>}
                     </div>
-                    <div className="md-tap" onClick={() => setSidebarOpen(true)} style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                      <i className="ti ti-menu-2" style={{ fontSize: 18 }}></i>
+                    <div className="md-tap" onClick={() => setSidebarOpen(true)} style={{ width: 34, height: 34, borderRadius: 9, background: "rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff" }}>
+                      <i className="ti ti-menu-2" style={{ fontSize: 17 }}></i>
                     </div>
                   </div>
                   <div style={{ fontSize: 12.5, color: "rgba(255,255,255,0.5)", display: "flex", alignItems: "center", gap: 6, marginBottom: 8, fontWeight: 600 }}>

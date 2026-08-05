@@ -7153,29 +7153,34 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 <div style={{ fontSize: 15, fontWeight: 800, color: "#0f1c2e" }}>Projects</div>
               </div>
 
-              <div
-                onScroll={handleCarouselScroll}
-                style={{ display: "flex", gap: 12, overflowX: "auto", scrollSnapType: "x mandatory", paddingBottom: 6, WebkitOverflowScrolling: "touch" }}
-              >
+              <div style={{ display: "flex", flexDirection: "column" }}>
                 {visibleProjects.map((p, idx) => {
-                  const progress = p.progress || 25;
-                  const barColor = progress > 70 ? "#16a34a" : progress > 40 ? "#f59e0b" : "#dc2626";
+                  const clientLabelP = clients.find(c => c._id === p.clientId || c._id === p.client)?.companyName
+                    || clients.find(c => c._id === p.clientId || c._id === p.client)?.clientName
+                    || p.clientName || "";
+                  const status = p.status || "Active";
+                  const statusMeta = (() => {
+                    const s = status.toLowerCase();
+                    if (s === "completed" || s === "done") return { color: "#16a34a", bg: "#dcfce7" };
+                    if (s === "on hold" || s === "paused") return { color: "#d97706", bg: "#fff7ed" };
+                    if (s === "cancelled") return { color: "#dc2626", bg: "#fef2f2" };
+                    return { color: "#16a34a", bg: "#dcfce7" };
+                  })();
                   return (
                     <div
                       key={p._id || idx}
                       onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }}
-                      style={{ minWidth: "85%", scrollSnapAlign: "start", background: "#fff", borderRadius: 16, padding: 18, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.04)", cursor: "pointer" }}
+                      style={{ background: "#fff", borderRadius: 16, padding: "16px 18px", boxShadow: "0 4px 14px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, cursor: "pointer" }}
                     >
-                      <div style={{ fontSize: 15, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>{p.name || p.title}</div>
-                      <div style={{ fontSize: 12, color: "rgba(15,28,46,0.5)", marginBottom: 12 }}>
-                        {clients.find(c => c._id === p.clientId)?.clientName || "Internal"} · Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "TBA"}
-                      </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <div style={{ flex: 1, height: 5, background: "rgba(0,0,0,0.06)", borderRadius: 3 }}>
-                          <div style={{ width: `${progress}%`, height: "100%", background: barColor, borderRadius: 3 }}></div>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {p.name || p.title}
                         </div>
-                        <div style={{ fontSize: 11, fontWeight: 800, color: barColor }}>{progress}%</div>
+                        {clientLabelP ? (
+                          <div style={{ fontSize: 12.5, color: "var(--app-accent, #00BCD4)", marginTop: 3, fontWeight: 500 }}>{clientLabelP}</div>
+                        ) : null}
                       </div>
+                      <span style={{ background: statusMeta.bg, color: statusMeta.color, padding: "6px 14px", borderRadius: 20, fontSize: 12.5, fontWeight: 700, flexShrink: 0 }}>{status}</span>
                     </div>
                   );
                 })}
@@ -10498,53 +10503,73 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       </div>
                     )}
 
-                    <div style={{ marginTop: 10, background: "#fff", borderRadius: 16, boxShadow: "0 10px 30px rgba(15,10,41,0.08)", border: "1px solid rgba(0,0,0,0.03)", overflow: "hidden" }}>
-                      <MobIdleInvoiceArmer projectsWithProgress={projectsWithProgress} invoices={invoices} mobShowInvoiceList={mobShowInvoiceList} setMobShowInvoiceList={setMobShowInvoiceList} />
-                      {!mobShowInvoiceList && (mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).map((p, idx, arr) => {
-                        const progress = p.progress || 0;
-                        const priority = p.priority || "medium";
-                        const priorityColors = priority === "high" ? { bg: "#FEE2E2", fg: "#DC2626" } : priority === "low" ? { bg: "#D1FAE5", fg: "#059669" } : { bg: "#FEF3C7", fg: "#D97706" };
-                        const clientObj = clients.find(c => c._id === p.clientId || c._id === p.client);
-                        const clientLabel = clientObj?.companyName || clientObj?.name || p.clientName || "";
-                        const deadline = p.deadline || p.end;
-                        return (
-                          <div
-                            key={p._id || idx}
-                            onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
-                            style={{ padding: "10px 12px", borderBottom: idx === arr.length - 1 ? "none" : "1px solid #f1f5f9", cursor: "pointer" }}
-                          >
-                            <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginBottom: 5 }}>
-                              <span style={{ display: "flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#D1FAE5", color: "#059669" }}>
-                                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#059669" }} />
-                                {p.status || "Active"}
-                              </span>
-                              {p.category && <span style={{ padding: "2px 8px", borderRadius: 20, fontSize: 10, fontWeight: 600, background: "#E0F7FA", color: "#0097A7" }}>{p.category}</span>}
-                              <span style={{ marginLeft: "auto", padding: "2px 8px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: priorityColors.bg, color: priorityColors.fg }}>
-                                {priority.charAt(0).toUpperCase() + priority.slice(1)}
-                              </span>
-                            </div>
-                            <div style={{ fontSize: 13.5, fontWeight: 800, color: "#0f1c2e", marginBottom: 2 }}>{p.name}</div>
-                            {clientLabel && (
-                              <div style={{ fontSize: 11, color: "#64748b", display: "flex", alignItems: "center", gap: 4, marginBottom: 6 }}>
-                                <i className="ti ti-building" style={{ fontSize: 12 }}></i> {clientLabel}
+                    <div
+                      id="mobProjectsScroller"
+                      style={{ marginTop: 10, display: "flex", gap: 12, overflowX: "auto", scrollSnapType: "x mandatory", paddingBottom: 6, WebkitOverflowScrolling: "touch" }}
+                    >
+                      <div
+                        id="mobProjectsScroller"
+                        style={{ marginTop: 10, display: "flex", gap: 12, overflowX: "auto", scrollSnapType: "x mandatory", paddingBottom: 6, WebkitOverflowScrolling: "touch" }}
+                      >
+                        <MobIdleInvoiceArmer projectsWithProgress={projectsWithProgress} invoices={invoices} mobShowInvoiceList={mobShowInvoiceList} setMobShowInvoiceList={setMobShowInvoiceList} />
+                        {!mobShowInvoiceList && (mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).map((p, idx) => {
+                          const pct = Number(p.progress) || 0;
+                          const circumference = 2 * Math.PI * 18;
+                          const offset = circumference - (pct / 100) * circumference;
+                          const budgetNum = Number(p.budget) || 0;
+                          const spentNum = (p.expenses || []).reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
+                          const budgetPct = budgetNum > 0 ? Math.min(100, Math.round((spentNum / budgetNum) * 100)) : 0;
+                          return (
+                            <div
+                              key={p._id || idx}
+                              onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
+                              style={{ flex: "0 0 auto", width: 380, maxWidth: "85%", scrollSnapAlign: "start", boxSizing: "border-box", background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.1)", border: "1px solid rgba(0,0,0,0.03)", padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}
+                            >
+                              <div style={{ position: "relative", width: 44, height: 44, flexShrink: 0, alignSelf: "center" }}>
+                                <svg width="44" height="44" viewBox="0 0 44 44">
+                                  <circle cx="22" cy="22" r="18" fill="none" stroke="#f1f5f9" strokeWidth="4" />
+                                  <circle
+                                    cx="22" cy="22" r="18" fill="none"
+                                    stroke="var(--app-accent)" strokeWidth="4"
+                                    strokeDasharray={circumference}
+                                    strokeDashoffset={offset}
+                                    strokeLinecap="round"
+                                    transform="rotate(-90 22 22)"
+                                  />
+                                </svg>
+                                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10.5, fontWeight: 800, color: "#0f1c2e" }}>
+                                  {pct}%
+                                </div>
                               </div>
-                            )}
-                            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10.5, color: "#64748b", marginBottom: 3 }}>
-                              <span>Progress</span>
-                              <span style={{ fontWeight: 800, color: "#0f1c2e" }}>{progress}%</span>
+                              <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                    {p.name}
+                                  </div>
+                                  <span style={{ fontSize: 9.5, fontWeight: 700, color: "#16a34a", background: "#dcfce7", padding: "2px 8px", borderRadius: 20, flexShrink: 0 }}>
+                                    {p.status || "Active"}
+                                  </span>
+                                </div>
+                                <div>
+                                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginBottom: 2 }}>
+                                    <span>Budget Used</span>
+                                    <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
+                                  </div>
+                                  <div style={{ height: 5, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
+                                    <div style={{ width: `${budgetPct}%`, height: "100%", background: "#7c3aed", borderRadius: 4 }} />
+                                  </div>
+                                </div>
+                                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#94a3b8" }}>
+                                  <span>Start: {p.start ? new Date(p.start).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "—"}</span>
+                                  <span style={{ color: "#dc2626", fontWeight: 600 }}>End: {(p.end || p.deadline) ? new Date(p.end || p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "—"}</span>
+                                </div>
+                              </div>
                             </div>
-                            <div style={{ height: 5, background: "#f1f5f9", borderRadius: 4, marginBottom: 6 }}>
-                              <div style={{ width: `${progress}%`, height: "100%", background: "var(--app-accent, #00BCD4)", borderRadius: 4 }} />
-                            </div>
-                            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#94a3b8" }}>
-                              {p.start && <span><i className="ti ti-calendar" style={{ fontSize: 11, marginRight: 3 }}></i>Start: {new Date(p.start).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>}
-                              {deadline && <span style={{ color: "#dc2626", fontWeight: 700 }}>Deadline: {new Date(deadline).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>}
-                            </div>
-                          </div>
-                        );
-                      })} {projectsWithProgress.length === 0 && (
-                        <div style={{ padding: "16px 0", textAlign: "center", color: "#94a3b8", fontSize: 13 }}>No projects yet</div>
-                      )}
+                          );
+                        })} {projectsWithProgress.length === 0 && (
+                          <div style={{ padding: "16px 0", textAlign: "center", color: "#94a3b8", fontSize: 13, width: "100%" }}>No projects yet</div>
+                        )}
+                      </div>
                     </div>
 
                     {mobShowInvoiceList && (invoices || []).length > 0 && (

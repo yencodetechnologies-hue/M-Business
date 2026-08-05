@@ -7044,15 +7044,32 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   // ── Mobile: Teal actions + project carousel + auto-swap invoice list ──
   const [mobShowAllProjects, setMobShowAllProjects] = useState(false);
   const [mobShowInvoiceList, setMobShowInvoiceList] = useState(false);
+  useEffect(() => {
+    if (typeof window !== "undefined") window.__setMobShowAllProjects = setMobShowAllProjects;
+  }, []);
   const mobIdleTimerRef = useRef(null);
 
-  const MobIdleInvoiceArmer = ({ projectsWithProgress, mobShowInvoiceList, setMobShowInvoiceList }) => {
+  const MobIdleInvoiceArmer = ({ projectsWithProgress, invoices, mobShowInvoiceList, setMobShowInvoiceList }) => {
     useEffect(() => {
-      if (mobShowInvoiceList) return;
-      if (!projectsWithProgress || projectsWithProgress.length === 0) return;
-      const timer = setTimeout(() => setMobShowInvoiceList(true), 5000);
+      const hasProjects = projectsWithProgress && projectsWithProgress.length > 0;
+      const hasInvoices = invoices && invoices.length > 0;
+      if (!hasProjects) return;
+      if (mobShowInvoiceList && !hasInvoices) {
+        setMobShowInvoiceList(false);
+        return;
+      }
+      const timer = setTimeout(() => {
+        if (!mobShowInvoiceList && !hasInvoices) return;
+        setMobShowInvoiceList(v => {
+          const next = !v;
+          if (!next && typeof window !== "undefined" && window.__setMobShowAllProjects) {
+            window.__setMobShowAllProjects(false);
+          }
+          return next;
+        });
+      }, 5000);
       return () => clearTimeout(timer);
-    }, [projectsWithProgress, mobShowInvoiceList, setMobShowInvoiceList]);
+    }, [projectsWithProgress, invoices, mobShowInvoiceList, setMobShowInvoiceList]);
     return null;
   };
   const [showMobileInvoiceModal, setShowMobileInvoiceModal] = useState(false);
@@ -10275,7 +10292,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             {/* ── Dashboard ── */}{validActive === "dashboard" && (
               <>
                 {/* MOBILE DASHBOARD (visible only under 768px) */}
-                <div className="mobile-dashboard-view" style={{ display: "none", width: "100vw", marginLeft: "calc(50% - 50vw)", marginRight: "calc(50% - 50vw)", marginTop: 0 }}>
+                <div className="mobile-dashboard-view" style={{ display: "none", width: "100vw", marginLeft: "calc(50% - 50vw)", marginRight: "calc(50% - 50vw)", marginTop: 0, background: "#ffffff" }}>
                   <style>{`
     @media (max-width: 768px) {
       .mobile-dashboard-view { display: block !important; }
@@ -10475,12 +10492,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
                     <div style={{ marginTop: 14, height: 8, background: "rgba(0,188,212,0.12)", marginLeft: -16, marginRight: -16 }} />
 
-                    <div style={{ marginTop: 14, display: "flex" }}>
-                      <span style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e" }}>Projects</span>
-                    </div>
+                    {!mobShowInvoiceList && (
+                      <div style={{ marginTop: 14, display: "flex" }}>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e" }}>Projects</span>
+                      </div>
+                    )}
 
                     <div style={{ marginTop: 10, background: "#fff", borderRadius: 16, boxShadow: "0 10px 30px rgba(15,10,41,0.08)", border: "1px solid rgba(0,0,0,0.03)", overflow: "hidden" }}>
-                      <MobIdleInvoiceArmer projectsWithProgress={projectsWithProgress} mobShowInvoiceList={mobShowInvoiceList} setMobShowInvoiceList={setMobShowInvoiceList} />
+                      <MobIdleInvoiceArmer projectsWithProgress={projectsWithProgress} invoices={invoices} mobShowInvoiceList={mobShowInvoiceList} setMobShowInvoiceList={setMobShowInvoiceList} />
                       {!mobShowInvoiceList && (mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).map((p, idx, arr) => {
                         const progress = p.progress || 0;
                         const priority = p.priority || "medium";
@@ -10528,39 +10547,33 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       )}
                     </div>
 
-                    {mobShowInvoiceList && (
+                    {mobShowInvoiceList && (invoices || []).length > 0 && (
                       <div style={{ marginTop: 4 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                          <span style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e" }}>Invoice List</span>
-                          <span onClick={() => setMobShowInvoiceList(false)} style={{ fontSize: 11.5, fontWeight: 700, color: "var(--app-accent, #00BCD4)", cursor: "pointer" }}>Back to Projects</span>
-                        </div>
-                        {[
-                          { key: "unpaid", label: "Unpaid", color: "#d97706", bg: "#fff7ed" },
-                          { key: "overdue", label: "Overdue", color: "#dc2626", bg: "#fef2f2" },
-                          { key: "partpaid", label: "Part Paid", color: "#7c3aed", bg: "#f3e8ff" },
-                        ].map(g => {
-                          const list = (invoices || []).filter(i => {
-                            const s = (i.status || "").toLowerCase();
-                            if (g.key === "unpaid") return s === "pending" || s === "unpaid";
-                            if (g.key === "overdue") return s === "overdue";
-                            if (g.key === "partpaid") return s === "part paid" || s === "partpaid" || s === "part-paid";
-                            return false;
-                          });
-                          return (
-                            <div key={g.key} style={{ background: "#fff", borderRadius: 14, padding: 14, border: "1px solid rgba(0,0,0,0.06)", marginBottom: 10 }}>
-                              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: list.length ? 8 : 0 }}>
-                                <span style={{ background: g.bg, color: g.color, padding: "4px 10px", borderRadius: 8, fontSize: 11, fontWeight: 800 }}>{g.label}</span>
-                                <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>{list.length}</span>
-                              </div>
-                              {list.slice(0, 5).map((inv, i) => (
-                                <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, padding: "5px 0", borderTop: i === 0 ? "1px solid #f1f5f9" : "none" }}>
-                                  <span style={{ fontWeight: 600 }}>{inv.clientName || inv.client || "Client"}</span>
-                                  <span style={{ color: "#94a3b8" }}>{inv.grandTotal ? `₹${inv.grandTotal}` : ""}</span>
+                        {(() => {
+                          const statusMeta = (raw) => {
+                            const s = (raw || "").toLowerCase();
+                            if (s === "paid") return { label: "Paid", color: "#16a34a", bg: "#dcfce7" };
+                            if (s === "overdue") return { label: "Overdue", color: "#dc2626", bg: "#fef2f2" };
+                            if (s === "part paid" || s === "partpaid" || s === "part-paid") return { label: "Part Paid", color: "#7c3aed", bg: "#f3e8ff" };
+                            return { label: "Unpaid", color: "#d97706", bg: "#fff7ed" };
+                          };
+                          return (invoices || []).slice(0, 20).map((inv, i) => {
+                            const meta = statusMeta(inv.status);
+                            return (
+                              <div key={inv._id || inv.invoiceNo || i} style={{ background: "#fff", borderRadius: 14, padding: "12px 14px", border: "1px solid rgba(0,0,0,0.06)", marginBottom: 8, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                                <div style={{ minWidth: 0 }}>
+                                  <div style={{ fontSize: 12.5, fontWeight: 700, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                    {inv.invoiceNo ? `Invoice ${inv.invoiceNo}` : (inv.clientName || inv.client || "Invoice")}
+                                  </div>
+                                  {inv.clientName || inv.client ? (
+                                    <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>{inv.clientName || inv.client}</div>
+                                  ) : null}
                                 </div>
-                              ))}
-                            </div>
-                          );
-                        })}
+                                <span style={{ background: meta.bg, color: meta.color, padding: "4px 10px", borderRadius: 20, fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{meta.label}</span>
+                              </div>
+                            );
+                          });
+                        })()}
                       </div>
                     )}
 

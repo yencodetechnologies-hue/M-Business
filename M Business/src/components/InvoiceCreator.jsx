@@ -1821,7 +1821,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
 
             <div>
-              {onBack && (
+              {onBack && !hideLivePreview && (
                 <div onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--app-accent)", fontWeight: 800, fontSize: 14, cursor: "pointer", marginBottom: 10 }}>
                   <i className="ti ti-chevron-left"></i> Back
                 </div>
@@ -2920,7 +2920,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
       </div>
       {/* Bottom save buttons */}
-         <div style={{ display: "flex", gap: 10, marginBottom: 32 }}>
+      <div style={{ display: "flex", gap: 10, marginBottom: 32 }}>
         <button onClick={handleSaveDraft} disabled={!!saving}
           style={{ padding: "13px", background: draftSaved ? "#22c55e" : "#fff", border: `1.5px solid ${draftSaved ? "#22c55e" : "#e5e7eb"}`, borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: saving ? "not-allowed" : "pointer", color: draftSaved ? "#fff" : "#374151", fontFamily: "inherit", transition: "all 0.3s" }}>
           {saving === "draft" ? "Saving…" : draftSaved ? "Success Saved as Draft!" : " Save Draft"}

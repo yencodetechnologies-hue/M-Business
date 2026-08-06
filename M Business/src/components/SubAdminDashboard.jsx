@@ -6943,6 +6943,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [openedFromMobileAddMenu, setOpenedFromMobileAddMenuState] = useState(() => {
     try { return sessionStorage.getItem('mb_openedFromMobileAddMenu') === '1'; } catch { return false; }
   });
+  const [openedFromDashboardPopup, setOpenedFromDashboardPopup] = useState(false);
   const setOpenedFromMobileAddMenu = (val) => {
     try {
       if (val) sessionStorage.setItem('mb_openedFromMobileAddMenu', '1');
@@ -11114,6 +11115,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             closeMobilePopup();
                             setJumpProject(p);
                             setProjectDetailsReadOnly(false);
+                            setOpenedFromDashboardPopup(true);
                             setActive("project-details");
                           }}
                           style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8, cursor: "pointer" }}
@@ -12751,7 +12753,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   fetchSubscription();
                 }}
 
-                onBack={() => { const returnTo = sidebarOverride || "projects"; setSidebarOverride(null); setActive(returnTo); }}
+                onBack={() => { setSidebarOverride(null); setActive("dashboard"); }}
 
                 onSuccess={async (updatedProj) => {
                   if (updatedProj?._deleted) {
@@ -12850,6 +12852,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 onBack={() => {
                   setFromEditProject(false);
+                  if (sidebarOverride === "dashboard") {
+                    setSidebarOverride(null);
+                    setActive("dashboard");
+                    return;
+                  }
                   const returnTo = sidebarOverride || "projects";
                   setSidebarOverride(null);
                   setActive(returnTo);
@@ -13025,7 +13032,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               </div>
             )}
 
-            {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} isFetching={!clientsLoaded} onBack={openedFromMobileAddMenu ? () => { setOpenedFromMobileAddMenu(false); setActive("dashboard"); } : null} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }} onAddClient={() => {
+            {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} invoices={invoices} tasks={tasks} activeClientIdForReturn={activeClientIdForReturn} onActiveClientIdRestored={() => setActiveClientIdForReturn(null)} newClientId={pendingNewClientId} onNewClientShown={() => setPendingNewClientId(null)} isFetching={!clientsLoaded} onBack={() => { setOpenedFromMobileAddMenu(false); setActive("dashboard"); }} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }} onAddClient={() => {
 
               const limit = getSubscriptionLimit("client");
 
@@ -13187,7 +13194,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {validActive === "invoices" && <InvoiceCreator key={`invoices-${sidebarNavClickId}`} forceListView={false} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { if (openedFromMobileAddMenu) { setOpenedFromMobileAddMenu(false); setActive("dashboard"); return; } if (jumpProject) { setSidebarOverride(sidebarOverride || "projects"); setActive("project-details"); return; } const returnTo = sidebarOverride || prevActiveBeforeInvoice || "dashboard"; setSidebarOverride(null); setActive(returnTo); }} onSaveSuccess={() => {
+            {validActive === "invoices" && <InvoiceCreator key={`invoices-${sidebarNavClickId}`} forceListView={false} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { setSidebarOverride(null); setActive("dashboard"); }} onSaveSuccess={() => {
               if (jumpProject && (jumpProject._id || jumpProject.id)) {
                 setSidebarOverride(sidebarOverride || "projects");
                 setActive("project-details");
@@ -13287,7 +13294,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 onAddProject={() => { }}
               />
             )}
-            {validActive === "quotations" && <QuotationCreatorModern key={quotationViewEntry ? `view-${quotationViewEntry._id || quotationViewEntry.id}` : (quotationReturnProject ? `new-${quotationReturnProject._id}` : 'list')} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} prefillProject={quotationPrefillProject} onPrefillConsumed={() => setQuotationPrefillProject(null)} initialViewEntry={quotationViewEntry} onBackOverride={quotationViewEntry ? () => { setQuotationViewEntry(null); setSidebarOverride(null); setActive("project-details"); } : null} onReturnToProject={quotationReturnProject ? () => { const p = quotationReturnProject; setQuotationReturnProject(null); setJumpProject(p); setSidebarOverride(null); setActive("project-details"); } : null} onAddClient={() => {
+            {validActive === "quotations" && <QuotationCreatorModern key={quotationViewEntry ? `view-${quotationViewEntry._id || quotationViewEntry.id}` : (quotationReturnProject ? `new-${quotationReturnProject._id}` : 'list')} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} prefillProject={quotationPrefillProject} onPrefillConsumed={() => setQuotationPrefillProject(null)} initialViewEntry={quotationViewEntry} onBackOverride={quotationViewEntry ? () => { setQuotationViewEntry(null); setSidebarOverride(null); setActive("project-details"); } : () => setActive("dashboard")} onReturnToProject={quotationReturnProject ? () => { const p = quotationReturnProject; setQuotationReturnProject(null); setJumpProject(p); setSidebarOverride(null); setActive("project-details"); } : null} onAddClient={() => {
 
               setNcError({}); setShowClientPass(false);
               setReturnToQuotation(true);
@@ -13296,7 +13303,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
             }} onAddProject={() => { setPrevActiveBeforeInvoice(active); setActive("create-project"); }} newlyAddedClientName={quotationNewClientName} />}
 
-            {validActive === "proposals" && <ProjectProposalCreator key={proposalViewEntry ? `view-${proposalViewEntry._id || proposalViewEntry.id}` : 'list'} clients={clients} companyLogo={companyLogo} companyName={companyNameStr} prefillProject={proposalPrefillProject} onPrefillConsumed={() => setProposalPrefillProject(null)} initialViewProposal={proposalViewEntry} onBackOverride={proposalViewEntry ? () => { setProposalViewEntry(null); setSidebarOverride(null); setActive("project-details"); } : null} onReturnToProject={proposalReturnProject ? () => { const p = proposalReturnProject; setProposalReturnProject(null); setJumpProject(p); setSidebarOverride(null); setActive("project-details"); } : null} onAddClient={() => { setShowCropModal(false); setNcError({}); setShowClientPass(false); setReturnToProposals(true); setSidebarOverride("proposals"); setActive("addClient"); }} newlyAddedClientName={proposalNewClientName} triggerCrop={triggerCrop} />}
+            {validActive === "proposals" && <ProjectProposalCreator key={proposalViewEntry ? `view-${proposalViewEntry._id || proposalViewEntry.id}` : 'list'} clients={clients} companyLogo={companyLogo} companyName={companyNameStr} prefillProject={proposalPrefillProject} onPrefillConsumed={() => setProposalPrefillProject(null)} initialViewProposal={proposalViewEntry} onBackOverride={proposalViewEntry ? () => { setProposalViewEntry(null); setSidebarOverride(null); setActive("project-details"); } : () => setActive("dashboard")} onReturnToProject={proposalReturnProject ? () => { const p = proposalReturnProject; setProposalReturnProject(null); setJumpProject(p); setSidebarOverride(null); setActive("project-details"); } : null} onAddClient={() => { setShowCropModal(false); setNcError({}); setShowClientPass(false); setReturnToProposals(true); setSidebarOverride("proposals"); setActive("addClient"); }} newlyAddedClientName={proposalNewClientName} triggerCrop={triggerCrop} />}
 
             {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
 

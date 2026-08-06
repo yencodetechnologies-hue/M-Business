@@ -11391,7 +11391,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   {/* FLOATING BOTTOM NAV — glass pill (portaled to body so it always stays fixed to the viewport, mobile only) */}
                   {!isDesktopWidth && createPortal(
-                    <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#0f0a29", borderRadius: 0, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "12px 6px", zIndex: 4000, boxShadow: "0 -2px 12px rgba(0,0,0,0.15)" }}>
+                    <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "var(--app-accent)", borderRadius: 0, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "12px 6px", zIndex: 4000, boxShadow: "0 -2px 12px rgba(0,0,0,0.15)", position: "fixed" }}>
                       {[
                         { icon: "ti-file-invoice", label: "Invoice", key: "invoices" },
                         { icon: "ti-folder", label: "Projects", key: "projects" },
@@ -11399,7 +11399,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         { icon: "ti-users", label: "Clients", key: "clients" },
                         { icon: "ti-dots", label: "More", key: "settings" },
                       ].map((n, i) => n.key === "add" ? (
-                        <div key={i} onClick={() => setShowMobileAddMenu(true)} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#26d0ce)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(0,188,212,0.5)" }}>+</div>
+                        <div key={i} onClick={() => setShowMobileAddMenu(true)} style={{ width: 52, height: 52, borderRadius: "50%", background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, lineHeight: 1, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", position: "absolute", top: -30, left: "50%", transform: "translateX(-50%)" }}>+</div>
                       ) : (
                         <div key={i} onClick={() => {
                           if (n.key === "invoices") {
@@ -11412,7 +11412,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             setOpenedFromMobileAddMenu(true);
                           }
                           setActive(n.key);
-                        }} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: (active === n.key || (n.key === "invoices" && active === "invoices")) ? "var(--app-accent)" : "rgba(255,255,255,0.5)", padding: "4px 10px" }}>
+                        }} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: (active === n.key || (n.key === "invoices" && active === "invoices")) ? "#fff" : "#fff", padding: "4px 10px" }}>
                           <i className={`ti ${n.icon}`} style={{ fontSize: 19 }}></i>
                           <span style={{ fontSize: 9.5, fontWeight: 700 }}>{n.label}</span>
                         </div>

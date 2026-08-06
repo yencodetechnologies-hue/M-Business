@@ -1316,6 +1316,28 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
           <div style={{ fontSize: 11, color: "#A0B8BE", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.companyName || c.company || "—"}</div>
 
         </div>
+        {(() => {
+          const parseAmt = (val) => {
+            if (val === undefined || val === null) return 0;
+            if (typeof val === "number") return val;
+            const num = Number(String(val).replace(/[^0-9.-]+/g, ""));
+            return isNaN(num) ? 0 : num;
+          };
+          const budgetNum = parseAmt(c.budget);
+          const spentNum = (c.expenses || []).reduce((sum, exp) => sum + parseAmt(exp.amount), 0);
+          const budgetPct = budgetNum > 0 ? Math.min(100, Math.round((spentNum / budgetNum) * 100)) : 0;
+          return (
+            <div style={{ marginTop: 6 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#94a3b8" }}>
+                <span>Budget Used</span>
+                <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
+              </div>
+              <div style={{ height: 4, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
+                <div style={{ width: `${budgetPct}%`, height: "100%", background: "#7c3aed", borderRadius: 4 }} />
+              </div>
+            </div>
+          );
+        })()}
 
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
 
@@ -7456,12 +7478,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <div
                       key={p._id || idx}
                       onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }}
-                      style={{ boxSizing: "border-box", background: "#fff", borderRadius: 16, padding: "16px 18px", boxShadow: "0 4px 14px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", marginBottom: 12, cursor: "pointer" }}
+                      style={{ background: "#fff", borderRadius: 16, padding: "16px 18px", boxShadow: "0 4px 14px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", marginBottom: 12, cursor: "pointer", display: "flex", flexDirection: "column", gap: 10 }}
                     >
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                         <div style={{ minWidth: 0 }}>
                           <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                            {p.name || p.title}
+                            {p.name}
                           </div>
                           {clientLabelP ? (
                             <div style={{ fontSize: 12.5, color: "var(--app-accent, #00BCD4)", marginTop: 3, fontWeight: 500 }}>{clientLabelP}</div>
@@ -7469,19 +7491,18 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         </div>
                         <span style={{ background: statusMeta.bg, color: statusMeta.color, padding: "6px 14px", borderRadius: 20, fontSize: 12.5, fontWeight: 700, flexShrink: 0 }}>{status}</span>
                       </div>
-                      <div style={{ marginTop: 10 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#94a3b8", marginBottom: 4 }}>
+                      <div>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#94a3b8", marginBottom: 3 }}>
                           <span>Budget Used</span>
-                          <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetUsedPct}%</span>
+                          <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
                         </div>
-                        <div style={{ height: 6, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
-                          <div style={{ width: `${budgetUsedPct}%`, height: "100%", background: "#7c3aed", borderRadius: 4 }} />
+                        <div style={{ height: 5, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
+                          <div style={{ width: `${budgetPct}%`, height: "100%", background: "#7c3aed", borderRadius: 4 }} />
                         </div>
                       </div>
                     </div>
                   );
-                })}
-              </div>
+                })}            </div>
               {allProjects.length > 3 && (
                 <button
                   onClick={() => setMobShowAllProjects(v => !v)}
@@ -10720,22 +10741,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
                               style={{ flex: "0 0 auto", width: 380, boxSizing: "border-box", background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.1)", border: "1px solid rgba(0,0,0,0.03)", padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}
                             >
-                              <div style={{ position: "relative", width: 44, height: 44, flexShrink: 0, alignSelf: "center" }}>
-                                <svg width="44" height="44" viewBox="0 0 44 44">
-                                  <circle cx="22" cy="22" r="18" fill="none" stroke="#f1f5f9" strokeWidth="4" />
-                                  <circle
-                                    cx="22" cy="22" r="18" fill="none"
-                                    stroke="var(--app-accent)" strokeWidth="4"
-                                    strokeDasharray={circumference}
-                                    strokeDashoffset={offset}
-                                    strokeLinecap="round"
-                                    transform="rotate(-90 22 22)"
-                                  />
-                                </svg>
-                                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10.5, fontWeight: 800, color: "#0f1c2e" }}>
-                                  {pct}%
-                                </div>
-                              </div>
+
                               <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 6 }}>
                                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                                   <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
@@ -10746,25 +10752,29 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                   </span>
                                 </div>
                                 {(() => {
-                                  const budgetNum = Number(p.budget) || 0;
-                                  const spentNum = (p.expenses || []).reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
-                                  const budgetPct = budgetNum > 0 ? Math.min(100, Math.round((spentNum / budgetNum) * 100)) : 0;
+                                  const pQuote = (quotations || []).find(q => {
+                                    const qProjName = (q.qt?.project || q.project || "").trim().toLowerCase();
+                                    return qProjName && qProjName === (p.name || "").trim().toLowerCase();
+                                  });
+                                  if (!pQuote) return null;
                                   return (
                                     <div>
-                                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginBottom: 2 }}>
-                                        <span>Budget Used</span>
-                                        <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
+                                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8" }}>
+                                        <span>Quotation No.</span>
+                                        <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{pQuote.qt?.quoteNo || pQuote.quoteNo || "—"}</span>
                                       </div>
-                                      <div style={{ height: 5, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
-                                        <div style={{ width: `${budgetPct}%`, height: "100%", background: "#7c3aed", borderRadius: 4 }} />
+                                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginTop: 2 }}>
+                                        <span>Quotation Amount</span>
+                                        <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{formatCurrency(pQuote.total || pQuote.qt?.total, pQuote.qt?.currency)}</span>
+                                      </div>
+                                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginTop: 2 }}>
+                                        <span>Sent To</span>
+                                        <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{pQuote.qt?.client || pQuote.client || pQuote.clientName || "—"}</span>
                                       </div>
                                     </div>
                                   );
                                 })()}
-                                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#94a3b8" }}>
-                                  <span>Start: {p.start ? new Date(p.start).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "—"}</span>
-                                  <span style={{ color: "#dc2626", fontWeight: 600 }}>End: {(p.end || p.deadline) ? new Date(p.end || p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "—"}</span>
-                                </div>
+
                               </div>
                             </div>
                           );
@@ -10941,8 +10951,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         return (
                           <div
                             key={p._id || idx}
-                            onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
-                            style={{ background: "#fff", borderRadius: 16, padding: "16px 18px", boxShadow: "0 4px 14px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", marginBottom: 12, cursor: "pointer" }}
+                            onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }}
+                            style={{ background: "#fff", borderRadius: 16, padding: "16px 18px", boxShadow: "0 4px 14px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", marginBottom: 12, cursor: "pointer", display: "flex", flexDirection: "column", gap: 10 }}
                           >
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                               <div style={{ minWidth: 0 }}>
@@ -10955,12 +10965,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               </div>
                               <span style={{ background: statusMeta.bg, color: statusMeta.color, padding: "6px 14px", borderRadius: 20, fontSize: 12.5, fontWeight: 700, flexShrink: 0 }}>{status}</span>
                             </div>
-                            <div style={{ marginTop: 10 }}>
-                              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#94a3b8", marginBottom: 4 }}>
+                            <div>
+                              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#94a3b8", marginBottom: 3 }}>
                                 <span>Budget Used</span>
                                 <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
                               </div>
-                              <div style={{ height: 6, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
+                              <div style={{ height: 5, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
                                 <div style={{ width: `${budgetPct}%`, height: "100%", background: "#7c3aed", borderRadius: 4 }} />
                               </div>
                             </div>
@@ -11310,7 +11320,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           style={{ borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 10, cursor: "pointer" }}
                         >
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                            <span style={{ fontWeight: 700, fontSize: 13, color: "#fff" }}>{q.qt?.quoteNo || q.quoteNo || q.clientName || "Quotation"}</span>
+                            <span style={{ fontWeight: 700, fontSize: 13, color: "#fff" }}>{formatCurrency(q.total || q.qt?.total || q.amount, q.qt?.currency)}</span>
                             <span style={{ color: (q.status || "").toLowerCase() === "approved" ? "#bbf7d0" : "rgba(255,255,255,0.75)", fontWeight: (q.status || "").toLowerCase() === "approved" ? 800 : 600, fontSize: 11 }}>{(q.status || "draft").toUpperCase()}</span>
                           </div>
                           {q.reviewComment && (

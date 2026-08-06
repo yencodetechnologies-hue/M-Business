@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useTransition, useCallback } from "react";
 
 import React from "react";
 import { createPortal } from "react-dom";
-
+import ReactDOM from "react-dom";
 import "./DashboardModern.css";
 
 import axios from "axios";
@@ -7000,12 +7000,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   // Reusable popup overlay for mobile card details
   const MobilePopup = ({ id, title, children }) => {
     if (mobilePopupSection !== id) return null;
-    return (
+    return ReactDOM.createPortal(
       <div
         onClick={closeMobilePopup}
         style={{
-          position: "fixed", inset: 0, background: "rgba(15,28,46,0.55)",
-          zIndex: 9999, display: "flex", alignItems: "flex-end", justifyContent: "center",
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          width: "100vw", height: "100vh",
+          background: "rgba(15,28,46,0.55)",
+          zIndex: 999999, display: "flex", alignItems: "flex-end", justifyContent: "center",
         }}
       >
         <div
@@ -7021,7 +7023,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           </div>
           {children}
         </div>
-      </div>
+      </div>,
+      document.getElementById("root") || document.body
     );
   };
 
@@ -11086,7 +11089,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <div style={{ fontSize: 13, color: "rgba(255,255,255,0.75)", marginBottom: 16 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} Active Clients</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {clients.map((c, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8 }}>
+                        <div
+                          key={i}
+                          onClick={() => {
+                            setActiveClientIdForReturn(c._id);
+                            closeMobilePopup();
+                            setActive("clients");
+                          }}
+                          style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8, cursor: "pointer" }}
+                        >
                           <span style={{ fontWeight: 600, color: "#fff" }}>{c.name || c.clientName || c.companyName || "Client"}</span>
                           <span style={{ color: "rgba(255,255,255,0.75)" }}>{c.status || "-"}</span>
                         </div>
@@ -11753,13 +11764,20 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                   <div style={{ fontSize: 12, color: "rgba(15,28,46,0.5)", marginBottom: 12 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} Active Clients</div>
                                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                                     {clients.slice(0, 8).map((c, i) => (
-                                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 6 }}>
+                                      <div
+                                        key={i}
+                                        onClick={() => {
+                                          setActiveClientIdForReturn(c._id);
+                                          setHoverPopupSection(null);
+                                          setActive("clients");
+                                        }}
+                                        style={{ display: "flex", justifyContent: "space-between", fontSize: 12, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 6, cursor: "pointer" }}
+                                      >
                                         <span style={{ fontWeight: 600 }}>{c.name || c.companyName || "Client"}</span>
                                         <span style={{ color: "rgba(15,28,46,0.5)" }}>{c.status || "-"}</span>
                                       </div>
                                     ))}
-                                  </div>
-                                </HoverPopup>
+                                  </div>   </HoverPopup>
                                 <MobilePopup id="clients" title="Total Clients">
                                   <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>{clients.length} total</div>
                                   <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", marginBottom: 16 }}>{clients.filter(c => (c.status || "").toLowerCase() === "active").length} Active Clients</div>

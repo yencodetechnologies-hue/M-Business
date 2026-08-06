@@ -10997,6 +10997,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     {mobShowInvoiceList && (invoices || []).length > 0 && (
                       <div style={{ marginTop: 4 }}>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: "#0f1c2e", marginBottom: 12 }}>Invoices</div>
                         {(() => {
                           const statusMeta = (raw) => {
                             const s = (raw || "").toLowerCase();
@@ -11005,32 +11006,34 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             if (s === "part paid" || s === "partpaid" || s === "part-paid") return { label: "Part Paid", color: "#7c3aed", bg: "#f3e8ff" };
                             return { label: "Unpaid", color: "#d97706", bg: "#fff7ed" };
                           };
-                          return (invoices || []).slice(0, 20).map((inv, i) => {
-                            const meta = statusMeta(inv.status);
-                            return (
-                              <div
-                                key={inv._id || inv.invoiceNo || i}
-                                onClick={() => {
-                                  setJumpProject(null);
-                                  setPrevActiveBeforeInvoice(active);
-                                  setJumpInvoice({ ...inv, _t: Date.now() });
-                                  setMobShowInvoiceList(false);
-                                  setActive("invoices");
-                                }}
-                                style={{ background: "#fff", borderRadius: 16, padding: "16px 18px", boxShadow: "0 4px 14px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, cursor: "pointer" }}
-                              >
-                                <div style={{ minWidth: 0 }}>
-                                  <div style={{ fontSize: 12.5, fontWeight: 700, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                    {inv.invoiceNo ? `Invoice ${inv.invoiceNo}` : (inv.clientName || inv.client || "Invoice")}
+                          return (invoices || [])
+                            .filter(inv => (inv.status || "").toLowerCase() !== "paid")
+                            .slice(0, 20).map((inv, i) => {
+                              const meta = statusMeta(inv.status);
+                              return (
+                                <div
+                                  key={inv._id || inv.invoiceNo || i}
+                                  onClick={() => {
+                                    setJumpProject(null);
+                                    setPrevActiveBeforeInvoice(active);
+                                    setJumpInvoice({ ...inv, _t: Date.now() });
+                                    setMobShowInvoiceList(false);
+                                    setActive("invoices");
+                                  }}
+                                  style={{ background: "#fff", borderRadius: 16, padding: "16px 18px", boxShadow: "0 4px 14px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, cursor: "pointer" }}
+                                >
+                                  <div style={{ minWidth: 0 }}>
+                                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                      {inv.invoiceNo ? `Invoice ${inv.invoiceNo}` : (inv.clientName || inv.client || "Invoice")}
+                                    </div>
+                                    {inv.clientName || inv.client ? (
+                                      <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>{inv.clientName || inv.client}</div>
+                                    ) : null}
                                   </div>
-                                  {inv.clientName || inv.client ? (
-                                    <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>{inv.clientName || inv.client}</div>
-                                  ) : null}
+                                  <span style={{ background: meta.bg, color: meta.color, padding: "4px 10px", borderRadius: 20, fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{meta.label}</span>
                                 </div>
-                                <span style={{ background: meta.bg, color: meta.color, padding: "4px 10px", borderRadius: 20, fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{meta.label}</span>
-                              </div>
-                            );
-                          });
+                              );
+                            });
                         })()}
                       </div>
                     )}

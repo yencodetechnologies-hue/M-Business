@@ -963,11 +963,22 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const [filterMode, setFilterMode] = useState("all");
   const [sortMode, setSortMode] = useState("newest");
 
-  const [activeClientId, setActiveClientId] = useState(null);
+  const [activeClientId, setActiveClientId] = useState(() => {
+    try {
+      const saved = localStorage.getItem("activeClientId_subadmin");
+      if (saved) return saved;
+    } catch { }
+    return clients?.[0]?._id || null;
+  });
 
   // Keep the saved selection in sync so a page refresh (or re-login) reopens
   // the same client instead of falling back to the first one in the list.
-  // (removed persistence — clients list should not auto-open a client)
+  useEffect(() => {
+    try {
+      if (activeClientId) localStorage.setItem("activeClientId_subadmin", activeClientId);
+      else localStorage.removeItem("activeClientId_subadmin");
+    } catch { }
+  }, [activeClientId]);
   const [isLoading, setIsLoading] = useState(!!isFetching);
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -1032,12 +1043,22 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   }, [isFetching]);
 
   useEffect(() => {
-    if (!activeClientId) return;
+    // Only auto-select a client when none is selected yet (e.g. right after
+    // the client list first loads), or when the currently selected client
+    // was removed entirely from `clients`. Changing the card/tab filter
+    // should narrow the visible list without touching which client's
+    // details are currently shown.
+    if (!activeClientId) {
+      if (filtered.length > 0) setActiveClientId(filtered[0]._id);
+      return;
+    }
     const stillExists = clients.some(c => c._id === activeClientId);
     if (!stillExists) {
-      setActiveClientId(null);
+      setActiveClientId(filtered.length > 0 ? filtered[0]._id : null);
     }
-  }, [clients]); useEffect(() => {
+  }, [clients]);
+  // Restore exact client active before navigating to create/edit project
+  useEffect(() => {
     if (activeClientIdForReturn) {
       setActiveClientId(activeClientIdForReturn);
       setActiveTab("overview");
@@ -1295,28 +1316,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
           <div style={{ fontSize: 11, color: "#A0B8BE", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.companyName || c.company || "—"}</div>
 
         </div>
-        {(() => {
-          const parseAmt = (val) => {
-            if (val === undefined || val === null) return 0;
-            if (typeof val === "number") return val;
-            const num = Number(String(val).replace(/[^0-9.-]+/g, ""));
-            return isNaN(num) ? 0 : num;
-          };
-          const budgetNum = parseAmt(c.budget);
-          const spentNum = (c.expenses || []).reduce((sum, exp) => sum + parseAmt(exp.amount), 0);
-          const budgetPct = budgetNum > 0 ? Math.min(100, Math.round((spentNum / budgetNum) * 100)) : 0;
-          return (
-            <div style={{ marginTop: 6 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#0f1c2e" }}>
-                <span>Budget Used</span>
-                <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
-              </div>
-              <div style={{ height: 4, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
-                <div style={{ width: `${budgetPct}%`, height: "100%", background: "#7c3aed", borderRadius: 4 }} />
-              </div>
-            </div>
-          );
-        })()}
+
 
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
 
@@ -6982,16 +6982,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const [draggingStatCard, setDraggingStatCard] = useState(null);
   const [mobStatCardOrder, setMobStatCardOrder] = useState([
-    { id: "mobClients", icon: "ti-users", label: "Clients", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
-    { id: "mobProjects", icon: "ti-folder", label: "Projects", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
-    { id: "mobTeam", icon: "ti-user-circle", label: "Team", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
-    { id: "mobRevenue", icon: "ti-currency-rupee", label: "Revenue", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "mobClients", page: "clients", icon: "ti-users", label: "Clients", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "mobProjects", page: "projects", icon: "ti-folder", label: "Projects", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "mobTeam", page: "employees", icon: "ti-user-circle", label: "Team", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "mobRevenue", page: "accounts", icon: "ti-currency-rupee", label: "Revenue", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
 
   ]);
   const [draggingSecondRow, setDraggingSecondRow] = useState(null);
   const projectCarouselIndexRef = useRef(0);
   const [mobSecondRowOrder, setMobSecondRowOrder] = useState([
-    { id: "unpaidInv", popupId: "mobUnpaidInvoices", icon: "ti-file-invoice", label: "Unpaid Invoices", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "unpaidInv", popupId: "mobUnpaidInvoices", page: "invoices", icon: "ti-file-invoice", label: "Unpaid Invoices", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "totalInv", popupId: "qaInvoice", page: "invoices", icon: "ti-file-invoice", label: "Invoices", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "totalProp", popupId: "qaProposal", page: "proposals", icon: "ti-clipboard-list", label: "Proposals", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "totalQuote", popupId: "qaQuote", page: "quotations", icon: "ti-receipt", label: "Quotations", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
     { id: "totalInv", popupId: "qaInvoice", icon: "ti-file-invoice", label: "Invoices", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
     { id: "totalProp", popupId: "qaProposal", icon: "ti-clipboard-list", label: "Proposals", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
     { id: "totalQuote", popupId: "qaQuote", icon: "ti-receipt", label: "Quotations", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
@@ -7048,9 +7051,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   // ── Mobile: Teal actions + project carousel + auto-swap invoice list ──
   const [mobShowAllProjects, setMobShowAllProjects] = useState(false);
-  const [mobShowAllInvoicesList, setMobShowAllInvoicesList] = useState(false);
   const [mobShowInvoiceList, setMobShowInvoiceList] = useState(false);
-  const [mobListPage, setMobListPage] = useState(null);
   const [showDashboardAddTaskModal, setShowDashboardAddTaskModal] = useState(false);
 
   const [dashboardTaskTitle, setDashboardTaskTitle] = useState("");
@@ -10713,10 +10714,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           id="mobProjectsScroller"
                           style={{ position: "relative", zIndex: 21, display: "flex", gap: 12, overflowX: "auto", justifyContent: projectsWithProgress.length > 2 ? "flex-start" : "center", padding: "0 calc(50% - 150px) 10px", WebkitOverflowScrolling: "touch" }}
                         >
-                          {projectsWithProgress.filter(p => (quotations || []).some(q => {
-                            const qProjName = (q.qt?.project || q.project || "").trim().toLowerCase();
-                            return qProjName && qProjName === (p.name || "").trim().toLowerCase();
-                          })).map((p, i) => {
+                          {projectsWithProgress.map((p, i) => {
                             const pct = Number(p.progress) || 0;
                             const circumference = 2 * Math.PI * 18;
                             const offset = circumference - (pct / 100) * circumference;
@@ -10751,7 +10749,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                     });
                                     if (!pQuote) return null;
                                     return (
-                                      <div style={{ marginTop: 4, paddingTop: 6 }}>
+                                      <div style={{ marginTop: 4, paddingTop: 6, borderTop: "1px dashed #e2e8f0" }}>
                                         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8" }}>
                                           <span>Quotation No.</span>
                                           <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{pQuote.qt?.quoteNo || pQuote.quoteNo || "—"}</span>
@@ -10964,7 +10962,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                   ) : null}
                                 </div>
                                 <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 700, color: "#0f1c2e", marginBottom: 3 }}>
+                                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#0f1c2e", marginBottom: 3 }}>
                                     <span>Budget Used</span>
                                     <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
                                   </div>
@@ -10983,17 +10981,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
                     {mobShowInvoiceList && (invoices || []).length > 0 && (
                       <div style={{ marginTop: 4 }}>
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                          <span style={{ fontSize: 15, fontWeight: 800, color: "#0f1c2e" }}>Invoices</span>
-                          {(invoices || []).filter(inv => (inv.status || "").toLowerCase() !== "paid").length > 3 && (
-                            <span
-                              onClick={() => setMobShowAllInvoicesList(v => !v)}
-                              style={{ color: "var(--app-accent, #00BCD4)", fontSize: 14, fontWeight: 800, cursor: "pointer" }}
-                            >
-                              {mobShowAllInvoicesList ? "▲" : "▼"}
-                            </span>
-                          )}
-                        </div>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: "#0f1c2e", marginBottom: 12 }}>Invoices</div>
                         <div style={{ background: "#f0f8ff", border: "1px solid #bae0f7", borderRadius: 12, overflow: "hidden", minHeight: 210 }}>
                           {(() => {
                             const statusMeta = (raw) => {
@@ -11003,9 +10991,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               if (s === "part paid" || s === "partpaid" || s === "part-paid") return { label: "Part Paid", color: "#7c3aed", bg: "#f3e8ff" };
                               return { label: "Unpaid", color: "#d97706", bg: "#fff7ed" };
                             };
-                            const allRows = (invoices || [])
-                              .filter(inv => (inv.status || "").toLowerCase() !== "paid");
-                            const rows = mobShowAllInvoicesList ? allRows : allRows.slice(0, 3);
+                            const rows = (invoices || [])
+                              .filter(inv => (inv.status || "").toLowerCase() !== "paid")
+                              .slice(0, 20);
                             return rows.map((inv, i) => {
                               const meta = statusMeta(inv.status);
                               return (
@@ -11062,7 +11050,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           setDraggingStatCard(null);
                         }}
                         onDragEnd={() => setDraggingStatCard(null)}
-                        onClick={() => setActive(s.id.replace(/^mob/, "").toLowerCase())}
+                        onClick={() => openMobilePopup(s.id)}
                         style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, padding: "4px 4px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingStatCard === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                       >
                         <div style={{ width: 72, height: 72, borderRadius: 18, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", color: "#fff", fontSize: 30, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
@@ -11091,7 +11079,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           setDraggingSecondRow(null);
                         }}
                         onDragEnd={() => setDraggingSecondRow(null)}
-                        onClick={() => setActive(s.page)}
+                        onClick={() => openMobilePopup(s.popupId)}
                         style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, padding: "4px 4px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingSecondRow === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                       >
                         <div style={{ width: 72, height: 72, borderRadius: 18, background: s.grad, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", fontSize: 30, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
@@ -11102,31 +11090,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       </div>
                     ))}
                   </div>
-                  {mobListPage === "clients" && (
-                    <div style={{ padding: 16 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-                        <span onClick={() => setMobListPage(null)} style={{ cursor: "pointer", fontSize: 20 }}>←</span>
-                        <span style={{ fontSize: 18, fontWeight: 800 }}>Clients</span>
-                      </div>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                        {clients.map((c, i) => (
-                          <div
-                            key={i}
-                            onClick={() => {
-                              setActiveClientIdForReturn(c._id);
-                              setMobListPage(null);
-                              setActive("clients");
-                            }}
-                            style={{ padding: 14, background: "#f0f8ff", borderRadius: 10, cursor: "pointer" }}
-                          >
-                            <div style={{ fontWeight: 700 }}>{c.name || c.clientName || c.companyName}</div>
-                            <div style={{ fontSize: 12, color: "#94a3b8" }}>{c.status || "-"}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
 
                   <MobilePopup id="mobClients" title="Clients">
                     <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4, color: "#fff" }}>{clients.length} total</div>
@@ -15511,7 +15474,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             )}
 
           </div>
-          {!isDesktopWidth && ["clients", "employees", "managers", "projects", "invoices", "quotations", "proposals", "project-details", "edit-project", "create-project"].includes(validActive) && (
+          {!isDesktopWidth && ["employees", "managers", "projects", "invoices", "quotations", "proposals", "project-details", "edit-project", "create-project"].includes(validActive) && (
             <div
               onClick={() => setActive("dashboard")}
               style={{ display: "flex", alignItems: "center", gap: 6, padding: "12px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)", background: "#fff", borderBottom: "1px solid var(--app-border)" }}

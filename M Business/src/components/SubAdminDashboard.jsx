@@ -11325,7 +11325,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{(proposalsList || []).length} total</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                       {(proposalsList || []).map((p, i) => (
-                        <div key={p._id || p.id || i} style={{ borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 10 }}>
+                        <div
+                          key={p._id || p.id || i}
+                          onClick={() => { closeMobilePopup(); setProposalViewEntry(p); setSidebarOverride("dashboard"); setActive("proposals"); }}
+                          style={{ borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 10, cursor: "pointer" }}
+                        >
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
                             <span style={{ fontWeight: 700, fontSize: 13, color: "#fff" }}>{p.title || "Proposal"}</span>
                             <span style={{ color: (p.status || "").toLowerCase() === "approved" ? "#bbf7d0" : "rgba(255,255,255,0.75)", fontWeight: (p.status || "").toLowerCase() === "approved" ? 800 : 600, fontSize: 11 }}>{(p.status || "draft").toUpperCase()}</span>
@@ -11395,7 +11399,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         { icon: "ti-users", label: "Clients", key: "clients" },
                         { icon: "ti-dots", label: "More", key: "settings" },
                       ].map((n, i) => n.key === "add" ? (
-                        <div key={i} onClick={() => setShowMobileAddMenu(true)} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#26d0ce)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", border: "3px solid #0f0a29" }}>+</div>
+                        <div key={i} onClick={() => setShowMobileAddMenu(true)} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#26d0ce)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(0,188,212,0.5)" }}>+</div>
                       ) : (
                         <div key={i} onClick={() => {
                           if (n.key === "invoices") {

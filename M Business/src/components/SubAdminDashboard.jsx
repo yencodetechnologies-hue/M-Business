@@ -7137,7 +7137,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <i className="ti ti-file-invoice"></i> Create Invoice
             </button>
             <button
-              onClick={() => { setJumpProject(projectsWithProgress[0] || null); setActive("project-details"); setOpenAddTaskOnLoad(true); }}
+              onClick={() => setShowDashboardAddTaskModal(true)}
               style={{ flex: 1, background: "rgba(255,255,255,0.18)", color: "#fff", border: "1.5px solid rgba(255,255,255,0.5)", borderRadius: 12, padding: "12px 0", fontSize: 14, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
             >
               <i className="ti ti-plus"></i> Add Task
@@ -10542,103 +10542,88 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                     <div
                       id="mobProjectsScroller"
-                      style={{ marginTop: 10, display: "flex", gap: 12, overflowX: "auto", scrollSnapType: "x mandatory", paddingBottom: 6, WebkitOverflowScrolling: "touch" }}
+                      style={{ marginTop: 10, display: "flex", flexDirection: "column" }}
                     >
-                      <div
-                        id="mobProjectsScroller"
-                        style={{ marginTop: 10, display: "flex", gap: 12, overflowX: "auto", scrollSnapType: "x mandatory", paddingBottom: 6, WebkitOverflowScrolling: "touch" }}
-                      >
-                        <MobIdleInvoiceArmer projectsWithProgress={projectsWithProgress} invoices={invoices} mobShowInvoiceList={mobShowInvoiceList} setMobShowInvoiceList={setMobShowInvoiceList} />
-                        {!mobShowInvoiceList && (mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).map((p, idx) => {
-                          const pct = Number(p.progress) || 0;
-                          const circumference = 2 * Math.PI * 18;
-                          const offset = circumference - (pct / 100) * circumference;
+                      <MobIdleInvoiceArmer projectsWithProgress={projectsWithProgress} invoices={invoices} mobShowInvoiceList={mobShowInvoiceList} setMobShowInvoiceList={setMobShowInvoiceList} />
+                      {!mobShowInvoiceList && (mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).map((p, idx) => {
+                        const parseAmt = (val) => {
+                          if (val === undefined || val === null) return 0;
+                          if (typeof val === "number") return val;
+                          const num = Number(String(val).replace(/[^0-9.-]+/g, ""));
+                          return isNaN(num) ? 0 : num;
+                        };
+                        const pNameLower = (p.name || "").trim().toLowerCase();
+                        const projInvoicesForCard = (invoices || []).filter(inv => {
+                          const invProjId = inv.projectId || inv.project_id;
+                          if (invProjId && p._id && invProjId === p._id) return true;
+                          const invProjName = (inv.project || inv.projectName || "").trim().toLowerCase();
+                          return invProjName && invProjName === pNameLower;
+                        });
+                        const billedFromInvoicesCard = projInvoicesForCard.reduce((sum, inv) => sum + (parseAmt(inv.total) || parseAmt(inv.grandTotal) || parseAmt(inv.amount)), 0);
+                        const manualBilledCard = parseAmt(p.billed);
+                        const billedCard = projInvoicesForCard.length > 0 ? billedFromInvoicesCard : manualBilledCard;
 
-                          const parseAmt = (val) => {
-                            if (val === undefined || val === null) return 0;
-                            if (typeof val === "number") return val;
-                            const num = Number(String(val).replace(/[^0-9.-]+/g, ""));
-                            return isNaN(num) ? 0 : num;
-                          };
-                          const pNameLower = (p.name || "").trim().toLowerCase();
-                          const projInvoicesForCard = (invoices || []).filter(inv => {
-                            const invProjId = inv.projectId || inv.project_id;
-                            if (invProjId && p._id && invProjId === p._id) return true;
-                            const invProjName = (inv.project || inv.projectName || "").trim().toLowerCase();
-                            return invProjName && invProjName === pNameLower;
-                          });
-                          const billedFromInvoicesCard = projInvoicesForCard.reduce((sum, inv) => sum + (parseAmt(inv.total) || parseAmt(inv.grandTotal) || parseAmt(inv.amount)), 0);
-                          const manualBilledCard = parseAmt(p.billed);
-                          const billedCard = projInvoicesForCard.length > 0 ? billedFromInvoicesCard : manualBilledCard;
+                        const autoAdditionalTotalCard = (p.additionalCharges || []).reduce((sum, a) => sum + parseAmt(a.amount), 0);
+                        const autoMilestoneTotalCard = (p.milestonePayments || []).reduce((sum, m) => sum + parseAmt(m.amount), 0);
+                        const autoBudgetAmtCard = billedCard + autoAdditionalTotalCard + autoMilestoneTotalCard;
+                        const manualBudgetCard = p.budget !== undefined && p.budget !== null && p.budget !== "" && Number(p.budget) > 0 ? Number(p.budget) : 0;
+                        const remainingBudgetCard = parseAmt(p.remainingBudget ?? p.remaining);
+                        const derivedBudgetFromRemaining = remainingBudgetCard > 0 ? (parseAmt(p.spentAmount ?? p.spent) + remainingBudgetCard) : 0;
+                        const budgetNum = manualBudgetCard > 0
+                          ? manualBudgetCard
+                          : (derivedBudgetFromRemaining > 0 ? derivedBudgetFromRemaining : autoBudgetAmtCard);
 
-                          const autoAdditionalTotalCard = (p.additionalCharges || []).reduce((sum, a) => sum + parseAmt(a.amount), 0);
-                          const autoMilestoneTotalCard = (p.milestonePayments || []).reduce((sum, m) => sum + parseAmt(m.amount), 0);
-                          const autoBudgetAmtCard = billedCard + autoAdditionalTotalCard + autoMilestoneTotalCard;
-                          const manualBudgetCard = p.budget !== undefined && p.budget !== null && p.budget !== "" && Number(p.budget) > 0 ? Number(p.budget) : 0;
-                          const remainingBudgetCard = parseAmt(p.remainingBudget ?? p.remaining);
-                          const derivedBudgetFromRemaining = remainingBudgetCard > 0 ? (parseAmt(p.spentAmount ?? p.spent) + remainingBudgetCard) : 0;
-                          const budgetNum = manualBudgetCard > 0
-                            ? manualBudgetCard
-                            : (derivedBudgetFromRemaining > 0 ? derivedBudgetFromRemaining : autoBudgetAmtCard);
+                        const spentNum = parseAmt(p.spentAmount ?? p.spent) > 0
+                          ? parseAmt(p.spentAmount ?? p.spent)
+                          : (p.expenses || []).reduce((sum, exp) => sum + parseAmt(exp.amount), 0);
 
-                          const spentNum = parseAmt(p.spentAmount ?? p.spent) > 0
-                            ? parseAmt(p.spentAmount ?? p.spent)
-                            : (p.expenses || []).reduce((sum, exp) => sum + parseAmt(exp.amount), 0);
+                        const budgetPct = p.budgetUsedPct !== undefined && p.budgetUsedPct !== null
+                          ? Math.round(Number(p.budgetUsedPct))
+                          : (budgetNum > 0 ? Math.min(100, Math.round((spentNum / budgetNum) * 100)) : 0);
 
-                          const budgetPct = p.budgetUsedPct !== undefined && p.budgetUsedPct !== null
-                            ? Math.round(Number(p.budgetUsedPct))
-                            : (budgetNum > 0 ? Math.min(100, Math.round((spentNum / budgetNum) * 100)) : 0);
-                          return (
-                            <div
-                              key={p._id || idx}
-                              onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
-                              style={{ flex: "0 0 auto", width: 380, maxWidth: "85%", scrollSnapAlign: "start", boxSizing: "border-box", background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.1)", border: "1px solid rgba(0,0,0,0.03)", padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}
-                            >
-                              <div style={{ position: "relative", width: 44, height: 44, flexShrink: 0, alignSelf: "center" }}>
-                                <svg width="44" height="44" viewBox="0 0 44 44">
-                                  <circle cx="22" cy="22" r="18" fill="none" stroke="#f1f5f9" strokeWidth="4" />
-                                  <circle
-                                    cx="22" cy="22" r="18" fill="none"
-                                    stroke="var(--app-accent)" strokeWidth="4"
-                                    strokeDasharray={circumference}
-                                    strokeDashoffset={offset}
-                                    strokeLinecap="round"
-                                    transform="rotate(-90 22 22)"
-                                  />
-                                </svg>
-                                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10.5, fontWeight: 800, color: "#0f1c2e" }}>
-                                  {pct}%
+                        const clientLabelP = clients.find(c => c._id === p.clientId || c._id === p.client)?.companyName
+                          || clients.find(c => c._id === p.clientId || c._id === p.client)?.clientName
+                          || p.clientName || "";
+                        const status = p.status || "Active";
+                        const statusMeta = (() => {
+                          const s = status.toLowerCase();
+                          if (s === "on hold" || s === "paused") return { color: "#d97706", bg: "#fff7ed" };
+                          if (s === "cancelled") return { color: "#dc2626", bg: "#fef2f2" };
+                          return { color: "#16a34a", bg: "#dcfce7" };
+                        })();
+
+                        return (
+                          <div
+                            key={p._id || idx}
+                            onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
+                            style={{ background: "#fff", borderRadius: 16, padding: "16px 18px", boxShadow: "0 4px 14px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", marginBottom: 12, cursor: "pointer" }}
+                          >
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                              <div style={{ minWidth: 0 }}>
+                                <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  {p.name}
                                 </div>
+                                {clientLabelP ? (
+                                  <div style={{ fontSize: 12.5, color: "var(--app-accent, #00BCD4)", marginTop: 3, fontWeight: 500 }}>{clientLabelP}</div>
+                                ) : null}
                               </div>
-                              <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 6 }}>
-                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                    {p.name}
-                                  </div>
-                                  <span style={{ fontSize: 9.5, fontWeight: 700, color: "#16a34a", background: "#dcfce7", padding: "2px 8px", borderRadius: 20, flexShrink: 0 }}>
-                                    {p.status || "Active"}
-                                  </span>
-                                </div>
-                                <div>
-                                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginBottom: 2 }}>
-                                    <span>Budget Used</span>
-                                    <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
-                                  </div>
-                                  <div style={{ height: 5, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
-                                    <div style={{ width: `${budgetPct}%`, height: "100%", background: "#7c3aed", borderRadius: 4 }} />
-                                  </div>
-                                </div>
-                                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#94a3b8" }}>
-                                  <span>Start: {p.start ? new Date(p.start).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "—"}</span>
-                                  <span style={{ color: "#dc2626", fontWeight: 600 }}>End: {(p.end || p.deadline) ? new Date(p.end || p.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "—"}</span>
-                                </div>
+                              <span style={{ background: statusMeta.bg, color: statusMeta.color, padding: "6px 14px", borderRadius: 20, fontSize: 12.5, fontWeight: 700, flexShrink: 0 }}>{status}</span>
+                            </div>
+                            <div style={{ marginTop: 10 }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#94a3b8", marginBottom: 4 }}>
+                                <span>Budget Used</span>
+                                <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
+                              </div>
+                              <div style={{ height: 6, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
+                                <div style={{ width: `${budgetPct}%`, height: "100%", background: "#7c3aed", borderRadius: 4 }} />
                               </div>
                             </div>
-                          );
-                        })} {projectsWithProgress.length === 0 && (
-                          <div style={{ padding: "16px 0", textAlign: "center", color: "#94a3b8", fontSize: 13, width: "100%" }}>No projects yet</div>
-                        )}
-                      </div>
+                          </div>
+                        );
+                      })}
+                      {projectsWithProgress.length === 0 && (
+                        <div style={{ padding: "16px 0", textAlign: "center", color: "#94a3b8", fontSize: 13, width: "100%" }}>No projects yet</div>
+                      )}
                     </div>
 
                     {mobShowInvoiceList && (invoices || []).length > 0 && (

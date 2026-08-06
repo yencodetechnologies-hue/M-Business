@@ -10787,6 +10787,93 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         </button>
                       </div>
                     </div>
+                    {showDashboardAddTaskModal && (
+                      <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 12px" }}>
+                        <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 460, padding: 24, boxShadow: "0 20px 60px rgba(0,0,0,0.25)", boxSizing: "border-box", maxHeight: "92vh", overflowY: "auto" }}>
+                          <h3 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 800, color: "#0f172a" }}>Add New Task</h3>
+                          <form onSubmit={handleDashboardAddTask}>
+                            <div style={{ marginBottom: 12 }}>
+                              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Task Name *</label>
+                              <input
+                                type="text"
+                                value={dashboardTaskTitle}
+                                onChange={e => setDashboardTaskTitle(e.target.value)}
+                                placeholder="Enter task title"
+                                required
+                                style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13 }}
+                              />
+                            </div>
+                            <div style={{ marginBottom: 12 }}>
+                              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Description</label>
+                              <textarea
+                                value={dashboardTaskDesc}
+                                onChange={e => setDashboardTaskDesc(e.target.value)}
+                                placeholder="Enter details..."
+                                style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", resize: "vertical", minHeight: 64, boxSizing: "border-box", fontSize: 13 }}
+                              />
+                            </div>
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+                              <div>
+                                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Priority</label>
+                                <select value={dashboardTaskPriority} onChange={e => setDashboardTaskPriority(e.target.value)} style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13 }}>
+                                  <option value="low">Low</option>
+                                  <option value="medium">Medium</option>
+                                  <option value="high">High</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Due Date</label>
+                                <input type="date" value={dashboardTaskDue} onChange={e => setDashboardTaskDue(e.target.value)} style={{ width: "100%", padding: "9px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", background: "#fff", fontFamily: "inherit", fontSize: 13, cursor: "pointer" }} />
+                              </div>
+                            </div>
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+                              <div>
+                                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Status</label>
+                                <select value={dashboardTaskStatus} onChange={e => setDashboardTaskStatus(e.target.value)} style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13 }}>
+                                  <option value="Not Started">Not Started</option>
+                                  <option value="In Progress">In Progress</option>
+                                  <option value="Completed">Completed</option>
+                                  <option value="On Hold">On Hold</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Link to Milestone *</label>
+                                <select
+                                  required
+                                  value={dashboardTaskMilestone}
+                                  onChange={e => setDashboardTaskMilestone(e.target.value)}
+                                  style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #e2e8f0", outline: "none", boxSizing: "border-box", fontSize: 13 }}
+                                >
+                                  <option value="">-- Select Milestone --</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div style={{ marginBottom: 16 }}>
+                              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4 }}>Select Team Members</label>
+                              <div style={{ width: "100%", maxHeight: 150, overflowY: "auto", padding: "8px", borderRadius: 8, border: "1.5px solid #e2e8f0", boxSizing: "border-box", background: "#fff" }}>
+                                <div style={{ fontSize: 12, color: "#94a3b8", padding: "4px" }}>No employees assigned to this project.</div>
+                              </div>
+                              <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 4 }}>Select one or more team members.</div>
+                            </div>
+                            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+                              <button
+                                type="button"
+                                onClick={() => setShowDashboardAddTaskModal(false)}
+                                style={{ padding: "10px 20px", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "#fff", color: "#64748b", fontWeight: 700, fontSize: 13, cursor: "pointer" }}
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                type="submit"
+                                style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#0f766e,#14b8a6)", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer" }}
+                              >
+                                Add Task
+                              </button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    )}
                     <div style={{ marginTop: 14, height: 8, background: "rgba(0,188,212,0.12)", marginLeft: -16, marginRight: -16 }} />
 
                     {!mobShowInvoiceList && (

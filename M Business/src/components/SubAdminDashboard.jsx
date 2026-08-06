@@ -7044,11 +7044,137 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   // ── Mobile: Teal actions + project carousel + auto-swap invoice list ──
   const [mobShowAllProjects, setMobShowAllProjects] = useState(false);
   const [mobShowInvoiceList, setMobShowInvoiceList] = useState(false);
+  const [showDashboardAddTaskModal, setShowDashboardAddTaskModal] = useState(false);
   useEffect(() => {
     if (typeof window !== "undefined") window.__setMobShowAllProjects = setMobShowAllProjects;
   }, []);
   const mobIdleTimerRef = useRef(null);
+const DashboardAddTaskModal = ({ open, onClose, projects, employees, onCreated }) => {
+    const [selProjectId, setSelProjectId] = React.useState("");
+    const [title, setTitle] = React.useState("");
+    const [description, setDescription] = React.useState("");
+    const [milestone, setMilestone] = React.useState("");
+    const [priority, setPriority] = React.useState("medium");
+    const [assignTo, setAssignTo] = React.useState("");
+    const [due, setDue] = React.useState("");
+    const [saving, setSaving] = React.useState(false);
 
+    React.useEffect(() => {
+      if (open) {
+        setSelProjectId(""); setTitle(""); setDescription(""); setMilestone("");
+        setPriority("medium"); setAssignTo(""); setDue(""); setSaving(false);
+      }
+    }, [open]);
+
+    if (!open) return null;
+
+    const selProject = (projects || []).find(p => p._id === selProjectId);
+    const milestonesArr = (selProject && selProject.milestones) || [];
+
+    const getOrCreateGroupId = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/api/groups`);
+        if (res.data && res.data.length > 0) return res.data[0]._id;
+        const newGroup = await axios.post(`${BASE_URL}/api/groups`, { label: "Tasks", color: "var(--app-accent, #00BCD4)" });
+        return newGroup.data._id;
+      } catch (e) {
+        console.error("Failed to get/create group:", e);
+        return null;
+      }
+    };
+
+    const handleSave = async (e) => {
+      e.preventDefault();
+      if (!title.trim()) return;
+      if (!selProjectId) { alert("Please select a project."); return; }
+      if (!milestone) { alert("Please select a milestone to link this task to."); return; }
+      setSaving(true);
+      try {
+        const gId = await getOrCreateGroupId();
+        if (!gId) { alert("Could not find or create a task group."); setSaving(false); return; }
+        const resolvedCompanyId = user?.companyId || user?.company || user?._id || user?.id || selProject?.companyId || "";
+        const companyHeaders = { headers: { "x-company-id": resolvedCompanyId } };
+        const createRes = await axios.post(`${BASE_URL}/api/tasks`, {
+          title: title.trim(),
+          description: description.trim(),
+          priority,
+          assignTo,
+          date: due,
+          milestone,
+          groupId: gId,
+          projectId: selProjectId,
+          status: "Not Started"
+        }, companyHeaders);
+        const created = createRes?.data?.task || createRes?.data;
+        onClose();
+        if (onCreated) onCreated(created);
+      } catch (err) {
+        console.error("Failed to create task:", err);
+        alert("Failed to create task.");
+      } finally {
+        setSaving(false);
+      }
+    };
+
+    return (
+      <div style={{ position: "fixed", inset: 0, background: "rgba(15,10,41,0.45)", zIndex: 9999, display: "flex", alignItems: "flex-end", justifyContent: "center" }} onClick={onClose}>
+        <div style={{ background: "#fff", borderRadius: "20px 20px 0 0", width: "100%", maxWidth: 480, maxHeight: "88vh", overflowY: "auto", padding: 20 }} onClick={e => e.stopPropagation()}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+            <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e" }}>Add Task</div>
+            <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, color: "#94a3b8", cursor: "pointer" }}>&times;</button>
+          </div>
+          <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>Project</label>
+              <select value={selProjectId} onChange={e => { setSelProjectId(e.target.value); setMilestone(""); }} required style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #e2e8f0", marginTop: 4 }}>
+                <option value="">Select project</option>
+                {(projects || []).map(p => <option key={p._id} value={p._id}>{p.name || p.title}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>Task Title</label>
+              <input value={title} onChange={e => setTitle(e.target.value)} required style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #e2e8f0", marginTop: 4 }} />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>Description</label>
+              <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #e2e8f0", marginTop: 4 }} />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>Milestone</label>
+              <select value={milestone} onChange={e => setMilestone(e.target.value)} required disabled={!selProjectId} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #e2e8f0", marginTop: 4 }}>
+                <option value="">Select milestone</option>
+                {milestonesArr.map((m, i) => <option key={i} value={m.name || m.title || m}>{m.name || m.title || m}</option>)}
+              </select>
+            </div>
+            <div style={{ display: "flex", gap: 12 }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>Priority</label>
+                <select value={priority} onChange={e => setPriority(e.target.value)} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #e2e8f0", marginTop: 4 }}>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>Due Date</label>
+                <input type="date" value={due} onChange={e => setDue(e.target.value)} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #e2e8f0", marginTop: 4 }} />
+              </div>
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>Assign To</label>
+              <select value={assignTo} onChange={e => setAssignTo(e.target.value)} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #e2e8f0", marginTop: 4 }}>
+                <option value="">Unassigned</option>
+                {(employees || []).map((emp, i) => <option key={i} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName}</option>)}
+              </select>
+            </div>
+            <button type="submit" disabled={saving} style={{ marginTop: 8, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 14, fontWeight: 800, cursor: "pointer" }}>
+              {saving ? "Saving..." : "Save Task"}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  };
   const MobIdleInvoiceArmer = ({ projectsWithProgress, invoices, mobShowInvoiceList, setMobShowInvoiceList }) => {
     useEffect(() => {
       const hasProjects = projectsWithProgress && projectsWithProgress.length > 0;

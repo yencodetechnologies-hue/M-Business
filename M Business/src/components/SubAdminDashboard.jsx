@@ -7069,6 +7069,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   // ── Mobile: Teal actions + project carousel + auto-swap invoice list ──
   const [mobShowAllProjects, setMobShowAllProjects] = useState(false);
+  const [mobShowAllInvoicesList, setMobShowAllInvoicesList] = useState(false);
   const [mobShowInvoiceList, setMobShowInvoiceList] = useState(false);
   const [showDashboardAddTaskModal, setShowDashboardAddTaskModal] = useState(false);
 
@@ -11002,7 +11003,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
                     {mobShowInvoiceList && (invoices || []).length > 0 && (
                       <div style={{ marginTop: 4 }}>
-                        <div style={{ fontSize: 15, fontWeight: 800, color: "#0f1c2e", marginBottom: 12 }}>Invoices</div>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                          <span style={{ fontSize: 15, fontWeight: 800, color: "#0f1c2e" }}>Invoices</span>
+                          {(invoices || []).filter(inv => (inv.status || "").toLowerCase() !== "paid").length > 3 && (
+                            <span
+                              onClick={() => setMobShowAllInvoicesList(v => !v)}
+                              style={{ color: "var(--app-accent, #00BCD4)", fontSize: 14, fontWeight: 800, cursor: "pointer" }}
+                            >
+                              {mobShowAllInvoicesList ? "▲" : "▼"}
+                            </span>
+                          )}
+                        </div>
                         <div style={{ background: "#f0f8ff", border: "1px solid #bae0f7", borderRadius: 12, overflow: "hidden", minHeight: 210 }}>
                           {(() => {
                             const statusMeta = (raw) => {
@@ -11012,9 +11023,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               if (s === "part paid" || s === "partpaid" || s === "part-paid") return { label: "Part Paid", color: "#7c3aed", bg: "#f3e8ff" };
                               return { label: "Unpaid", color: "#d97706", bg: "#fff7ed" };
                             };
-                            const rows = (invoices || [])
-                              .filter(inv => (inv.status || "").toLowerCase() !== "paid")
-                              .slice(0, 20);
+                            const allRows = (invoices || [])
+                              .filter(inv => (inv.status || "").toLowerCase() !== "paid");
+                            const rows = mobShowAllInvoicesList ? allRows : allRows.slice(0, 3);
                             return rows.map((inv, i) => {
                               const meta = statusMeta(inv.status);
                               return (
@@ -11100,7 +11111,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           setDraggingSecondRow(null);
                         }}
                         onDragEnd={() => setDraggingSecondRow(null)}
-                        onClick={() => openMobilePopup(s.popupId)}
+                        onClick={() => setActive(s.page || s.popupId)}
                         style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, padding: "4px 4px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingSecondRow === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                       >
                         <div style={{ width: 72, height: 72, borderRadius: 18, background: s.grad, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", fontSize: 30, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>

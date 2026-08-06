@@ -1328,7 +1328,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
           const budgetPct = budgetNum > 0 ? Math.min(100, Math.round((spentNum / budgetNum) * 100)) : 0;
           return (
             <div style={{ marginTop: 6 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#94a3b8" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#0f1c2e" }}>
                 <span>Budget Used</span>
                 <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
               </div>
@@ -7417,7 +7417,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   </button>
                   <button
                     type="submit"
-                    style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#0f766e,#14b8a6)", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer" }}
+                    style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "#00BCD4", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer" }}
                   >
                     Add Task
                   </button>
@@ -7478,7 +7478,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <div
                       key={p._id || idx}
                       onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }}
-                      style={{ background: "#fff", borderRadius: 16, padding: "16px 18px", boxShadow: "0 4px 14px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", marginBottom: 12, cursor: "pointer", display: "flex", flexDirection: "column", gap: 10 }}
+                      style={{ padding: "12px 14px", borderBottom: "1px solid #bae0f7", cursor: "pointer", display: "flex", flexDirection: "column", gap: 10 }}
                     >
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                         <div style={{ minWidth: 0 }}>
@@ -7492,15 +7492,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         <span style={{ background: statusMeta.bg, color: statusMeta.color, padding: "6px 14px", borderRadius: 20, fontSize: 12.5, fontWeight: 700, flexShrink: 0 }}>{status}</span>
                       </div>
                       <div>
-                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#94a3b8", marginBottom: 3 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#0f1c2e", marginBottom: 3 }}>
                           <span>Budget Used</span>
                           <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
                         </div>
-                        <div style={{ height: 5, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
+                        <div style={{ height: 5, background: "#ffffff", borderRadius: 4, overflow: "hidden" }}>
                           <div style={{ width: `${budgetPct}%`, height: "100%", background: "#7c3aed", borderRadius: 4 }} />
                         </div>
-                      </div>
-                    </div>
+                      </div> </div>
                   );
                 })}            </div>
               {allProjects.length > 3 && (
@@ -10635,16 +10634,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   `}</style>
 
                   {/* TEAL NAME/BELL STRIP — sits above the logo row */}
-                  <div style={{ background: "linear-gradient(160deg, var(--app-accent) 0%, #0f7a8a 100%)", padding: "14px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ background: "linear-gradient(160deg, var(--app-accent) 0%, #0f7a8a 100%)", padding: "6px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div
                       data-profile-anchor="true"
                       onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }}
-                      style={{ fontSize: 14, fontWeight: 800, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", height: 44 }}
+                      style={{ fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", height: 28 }}
                     >
                       {(user?.companyName || user?.name || "Business")}
                     </div>
                     <div style={{ position: "relative" }}>
-                      <div onClick={() => { setMobNotifExpanded(v => !v); fetchPendingLeaves(); }} style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                      <div onClick={() => { setMobNotifExpanded(v => !v); fetchPendingLeaves(); }} style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
                         <i className="ti ti-bell" style={{ fontSize: 16, color: "#fff" }}></i>
                         {pendingLeaves.length > 0 && (
                           <span style={{ position: "absolute", top: 3, right: 4, width: 7, height: 7, borderRadius: "50%", background: "#ff4d6d", boxShadow: "0 0 0 2px #0f7a8a" }}></span>
@@ -10654,15 +10653,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   </div>
 
                   {/* WHITE LOGO/MENU STRIP — sits below the teal name/bell strip, stays fixed while scrolling */}
-                  <div style={{ background: "#fff", padding: "12px 14px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 200, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 14, background: "#ffffff", boxShadow: "0 2px 8px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.06)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+                  <div style={{ background: "#fff", padding: "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 200, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+                    <div style={{ width: 35, height: 35, borderRadius: 10, background: "#ffffff", boxShadow: "0 2px 8px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.06)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
                       {companyLogo ? (
                         <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                       ) : (
-                        <i className="ti ti-building" style={{ fontSize: 18, color: "var(--app-accent, #00BCD4)" }}></i>
+                        <i className="ti ti-building" style={{ fontSize: 16, color: "var(--app-accent, #00BCD4)" }}></i>
                       )}
                     </div>
-                    <div onClick={() => setSidebarOpen(true)} style={{ width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                    <div onClick={() => setSidebarOpen(true)} style={{ width: 35, height: 35, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
                       <i className="ti ti-menu-2" style={{ fontSize: 20, color: "var(--app-accent, #00BCD4)" }}></i>
                     </div>
                   </div>
@@ -10724,69 +10723,75 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   </div>
 
                   {/* HORIZONTAL SCROLLING PROJECT CARDS — overlaps the bottom of the hero card */}
-                  {projectsWithProgress.length > 0 && (
-                    <div style={{ position: "relative", margin: "-40px 0 0", zIndex: 20 }}>
-                      <div
-                        id="mobProjectsScroller"
-                        style={{ position: "relative", zIndex: 21, display: "flex", gap: 12, overflowX: "auto", justifyContent: projectsWithProgress.length > 2 ? "flex-start" : "center", padding: "0 calc(50% - 150px) 10px", WebkitOverflowScrolling: "touch" }}
-                      >
-                        {projectsWithProgress.map((p, i) => {
-                          const pct = Number(p.progress) || 0;
-                          const circumference = 2 * Math.PI * 18;
-                          const offset = circumference - (pct / 100) * circumference;
-                          const budget = formatCurrency(p.budget, p.currency);
-                          return (
-                            <div
-                              key={p._id || p.id || i}
-                              onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
-                              style={{ flex: "0 0 auto", width: 380, boxSizing: "border-box", background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.1)", border: "1px solid rgba(0,0,0,0.03)", padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}
-                            >
-                              <div style={{ position: "relative", width: 44, height: 44, flexShrink: 0, alignSelf: "center" }}>
-                                <svg width="44" height="44" viewBox="0 0 44 44">
-                                  <circle cx="22" cy="22" r="18" fill="none" stroke="#f1f5f9" strokeWidth="4" />
-                                  <circle
-                                    cx="22" cy="22" r="18" fill="none"
-                                    stroke="var(--app-accent)" strokeWidth="4"
-                                    strokeDasharray={circumference}
-                                    strokeDashoffset={offset}
-                                    strokeLinecap="round"
-                                    transform="rotate(-90 22 22)"
-                                  />
-                                </svg>
-                                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10.5, fontWeight: 800, color: "#0f1c2e" }}>
-                                  {pct}%
+                  {projectsWithProgress.length > 0 && projectsWithProgress.some(p => (quotations || []).some(q => {
+                    const qProjName = (q.qt?.project || q.project || "").trim().toLowerCase();
+                    return qProjName && qProjName === (p.name || "").trim().toLowerCase();
+                  })) && (
+                      <div style={{ position: "relative", margin: "-40px 0 0", zIndex: 20 }}>
+                        <div
+                          id="mobProjectsScroller"
+                          style={{ position: "relative", zIndex: 21, display: "flex", gap: 12, overflowX: "auto", justifyContent: projectsWithProgress.length > 2 ? "flex-start" : "center", padding: "0 calc(50% - 150px) 10px", WebkitOverflowScrolling: "touch" }}
+                        >
+                          {projectsWithProgress.filter(p => (quotations || []).some(q => {
+                            const qProjName = (q.qt?.project || q.project || "").trim().toLowerCase();
+                            return qProjName && qProjName === (p.name || "").trim().toLowerCase();
+                          })).map((p, i) => {
+                            const pct = Number(p.progress) || 0;
+                            const circumference = 2 * Math.PI * 18;
+                            const offset = circumference - (pct / 100) * circumference;
+                            const budget = formatCurrency(p.budget, p.currency);
+                            return (
+                              <div
+                                key={p._id || p.id || i}
+                                onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setActive("project-details"); }}
+                                style={{ flex: "0 0 auto", width: 380, boxSizing: "border-box", background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.1)", border: "1px solid rgba(0,0,0,0.03)", padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}
+                              >
+                                <div style={{ position: "relative", width: 44, height: 44, flexShrink: 0, alignSelf: "center" }}>
+                                  <svg width="44" height="44" viewBox="0 0 44 44">
+                                    <circle cx="22" cy="22" r="18" fill="none" stroke="#f1f5f9" strokeWidth="4" />
+                                    <circle
+                                      cx="22" cy="22" r="18" fill="none"
+                                      stroke="var(--app-accent)" strokeWidth="4"
+                                      strokeDasharray={circumference}
+                                      strokeDashoffset={offset}
+                                      strokeLinecap="round"
+                                      transform="rotate(-90 22 22)"
+                                    />
+                                  </svg>
+                                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10.5, fontWeight: 800, color: "#0f1c2e" }}>
+                                    {pct}%
+                                  </div>
                                 </div>
-                              </div>
-                              <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 6 }}>
-                                {(() => {
-                                  const pQuote = (quotations || []).find(q => {
-                                    const qProjName = (q.qt?.project || q.project || "").trim().toLowerCase();
-                                    return qProjName && qProjName === (p.name || "").trim().toLowerCase();
-                                  });
-                                  if (!pQuote) return null;
-                                  return (
-                                    <div style={{ marginTop: 4, paddingTop: 6, borderTop: "1px dashed #e2e8f0" }}>
-                                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8" }}>
-                                        <span>Quotation No.</span>
-                                        <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{pQuote.qt?.quoteNo || pQuote.quoteNo || "—"}</span>
+                                <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+                                  {(() => {
+                                    const pQuote = (quotations || []).find(q => {
+                                      const qProjName = (q.qt?.project || q.project || "").trim().toLowerCase();
+                                      return qProjName && qProjName === (p.name || "").trim().toLowerCase();
+                                    });
+                                    if (!pQuote) return null;
+                                    return (
+                                      <div style={{ marginTop: 4, paddingTop: 6 }}>
+                                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8" }}>
+                                          <span>Quotation No.</span>
+                                          <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{pQuote.qt?.quoteNo || pQuote.quoteNo || "—"}</span>
+                                        </div>
+                                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginTop: 2 }}>
+                                          <span>Quotation Amount</span>
+                                          <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{formatCurrency(pQuote.total || pQuote.qt?.total, pQuote.qt?.currency)}</span>
+                                        </div>
+                                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginTop: 2 }}>
+                                          <span>Sent To</span>
+                                          <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{pQuote.qt?.client || pQuote.client || pQuote.clientName || "—"}</span>
+                                        </div>
                                       </div>
-                                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginTop: 2 }}>
-                                        <span>Quotation Amount</span>
-                                        <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{formatCurrency(pQuote.total || pQuote.qt?.total, pQuote.qt?.currency)}</span>
-                                      </div>
-                                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginTop: 2 }}>
-                                        <span>Sent To</span>
-                                        <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{pQuote.qt?.client || pQuote.client || pQuote.clientName || "—"}</span>
-                                      </div>
-                                    </div>
-                                  );
-                                })()}
-                              </div></div>
-                          );
-                        })}
+                                    );
+                                  })()}
+                                </div></div>
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
                   {/* TEAL ACTION BAR + PROJECT LIST (image-2 style) */}
                   <div style={{ margin: "16px 16px 0" }}>
@@ -10884,7 +10889,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               </button>
                               <button
                                 type="submit"
-                                style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#0f766e,#14b8a6)", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer" }}
+                                style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "#00BCD4", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer" }}
                               >
                                 Add Task
                               </button>
@@ -10914,101 +10919,103 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       style={{ marginTop: 10, display: "flex", flexDirection: "column" }}
                     >
                       <MobIdleInvoiceArmer projectsWithProgress={projectsWithProgress} invoices={invoices} mobShowInvoiceList={mobShowInvoiceList} setMobShowInvoiceList={setMobShowInvoiceList} />
-                      {!mobShowInvoiceList && (mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).map((p, idx) => {
-                        const parseAmt = (val) => {
-                          if (val === undefined || val === null) return 0;
-                          if (typeof val === "number") return val;
-                          const num = Number(String(val).replace(/[^0-9.-]+/g, ""));
-                          return isNaN(num) ? 0 : num;
-                        };
-                        const pNameLower = (p.name || "").trim().toLowerCase();
-                        const projInvoicesForCard = (invoices || []).filter(inv => {
-                          const invProjId = inv.projectId || inv.project_id;
-                          if (invProjId && p._id && invProjId === p._id) return true;
-                          const invProjName = (inv.project || inv.projectName || "").trim().toLowerCase();
-                          return invProjName && invProjName === pNameLower;
-                        });
-                        const billedFromInvoicesCard = projInvoicesForCard.reduce((sum, inv) => sum + (parseAmt(inv.total) || parseAmt(inv.grandTotal) || parseAmt(inv.amount)), 0);
-                        const manualBilledCard = parseAmt(p.billed);
-                        const billedCard = projInvoicesForCard.length > 0 ? billedFromInvoicesCard : manualBilledCard;
+                      {!mobShowInvoiceList && (
+                        <div style={{ background: "#f0f8ff", border: "1px solid #bae0f7", borderRadius: 12, overflow: "hidden", minHeight: 210 }}>
+                          {(mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).map((p, idx) => {
+                            const parseAmt = (val) => {
+                              if (val === undefined || val === null) return 0;
+                              if (typeof val === "number") return val;
+                              const num = Number(String(val).replace(/[^0-9.-]+/g, ""));
+                              return isNaN(num) ? 0 : num;
+                            };
+                            const pNameLower = (p.name || "").trim().toLowerCase();
+                            const projInvoicesForCard = (invoices || []).filter(inv => {
+                              const invProjId = inv.projectId || inv.project_id;
+                              if (invProjId && p._id && invProjId === p._id) return true;
+                              const invProjName = (inv.project || inv.projectName || "").trim().toLowerCase();
+                              return invProjName && invProjName === pNameLower;
+                            });
+                            const billedFromInvoicesCard = projInvoicesForCard.reduce((sum, inv) => sum + (parseAmt(inv.total) || parseAmt(inv.grandTotal) || parseAmt(inv.amount)), 0);
+                            const manualBilledCard = parseAmt(p.billed);
+                            const billedCard = projInvoicesForCard.length > 0 ? billedFromInvoicesCard : manualBilledCard;
 
-                        const autoAdditionalTotalCard = (p.additionalCharges || []).reduce((sum, a) => sum + parseAmt(a.amount), 0);
-                        const autoMilestoneTotalCard = (p.milestonePayments || []).reduce((sum, m) => sum + parseAmt(m.amount), 0);
-                        const autoBudgetAmtCard = billedCard + autoAdditionalTotalCard + autoMilestoneTotalCard;
-                        const manualBudgetCard = p.budget !== undefined && p.budget !== null && p.budget !== "" && Number(p.budget) > 0 ? Number(p.budget) : 0;
-                        const remainingBudgetCard = parseAmt(p.remainingBudget ?? p.remaining);
-                        const derivedBudgetFromRemaining = remainingBudgetCard > 0 ? (parseAmt(p.spentAmount ?? p.spent) + remainingBudgetCard) : 0;
-                        const budgetNum = manualBudgetCard > 0
-                          ? manualBudgetCard
-                          : (derivedBudgetFromRemaining > 0 ? derivedBudgetFromRemaining : autoBudgetAmtCard);
+                            const autoAdditionalTotalCard = (p.additionalCharges || []).reduce((sum, a) => sum + parseAmt(a.amount), 0);
+                            const autoMilestoneTotalCard = (p.milestonePayments || []).reduce((sum, m) => sum + parseAmt(m.amount), 0);
+                            const autoBudgetAmtCard = billedCard + autoAdditionalTotalCard + autoMilestoneTotalCard;
+                            const manualBudgetCard = p.budget !== undefined && p.budget !== null && p.budget !== "" && Number(p.budget) > 0 ? Number(p.budget) : 0;
+                            const remainingBudgetCard = parseAmt(p.remainingBudget ?? p.remaining);
+                            const derivedBudgetFromRemaining = remainingBudgetCard > 0 ? (parseAmt(p.spentAmount ?? p.spent) + remainingBudgetCard) : 0;
+                            const budgetNum = manualBudgetCard > 0
+                              ? manualBudgetCard
+                              : (derivedBudgetFromRemaining > 0 ? derivedBudgetFromRemaining : autoBudgetAmtCard);
 
-                        const spentNum = parseAmt(p.spentAmount ?? p.spent) > 0
-                          ? parseAmt(p.spentAmount ?? p.spent)
-                          : (p.expenses || []).reduce((sum, exp) => sum + parseAmt(exp.amount), 0);
+                            const spentNum = parseAmt(p.spentAmount ?? p.spent) > 0
+                              ? parseAmt(p.spentAmount ?? p.spent)
+                              : (p.expenses || []).reduce((sum, exp) => sum + parseAmt(exp.amount), 0);
 
-                        const budgetPct = p.budgetUsedPct !== undefined && p.budgetUsedPct !== null
-                          ? Math.round(Number(p.budgetUsedPct))
-                          : (budgetNum > 0 ? Math.min(100, Math.round((spentNum / budgetNum) * 100)) : 0);
+                            const budgetPct = p.budgetUsedPct !== undefined && p.budgetUsedPct !== null
+                              ? Math.round(Number(p.budgetUsedPct))
+                              : (budgetNum > 0 ? Math.min(100, Math.round((spentNum / budgetNum) * 100)) : 0);
 
-                        const clientLabelP = clients.find(c => c._id === p.clientId || c._id === p.client)?.companyName
-                          || clients.find(c => c._id === p.clientId || c._id === p.client)?.clientName
-                          || p.clientName || "";
-                        const status = p.status || "Active";
-                        const statusMeta = (() => {
-                          const s = status.toLowerCase();
-                          if (s === "on hold" || s === "paused") return { color: "#d97706", bg: "#fff7ed" };
-                          if (s === "cancelled") return { color: "#dc2626", bg: "#fef2f2" };
-                          return { color: "#16a34a", bg: "#dcfce7" };
-                        })();
+                            const clientLabelP = clients.find(c => c._id === p.clientId || c._id === p.client)?.companyName
+                              || clients.find(c => c._id === p.clientId || c._id === p.client)?.clientName
+                              || p.clientName || "";
+                            const status = p.status || "Active";
+                            const statusMeta = (() => {
+                              const s = status.toLowerCase();
+                              if (s === "on hold" || s === "paused") return { color: "#d97706", bg: "#fff7ed" };
+                              if (s === "cancelled") return { color: "#dc2626", bg: "#fef2f2" };
+                              return { color: "#16a34a", bg: "#dcfce7" };
+                            })();
 
-                        return (
-                          <div
-                            key={p._id || idx}
-                            onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }}
-                            style={{ background: "#fff", borderRadius: 16, padding: "16px 18px", boxShadow: "0 4px 14px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", marginBottom: 12, cursor: "pointer", display: "flex", flexDirection: "column", gap: 10 }}
-                          >
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-                              <div style={{ minWidth: 0 }}>
-                                <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                  {p.name}
+                            return (
+                              <div
+                                key={p._id || idx}
+                                onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }}
+                                style={{ padding: "12px 14px", borderBottom: idx === (mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).length - 1 ? "none" : "1px solid #bae0f7", cursor: "pointer", display: "flex", flexDirection: "row", alignItems: "center", gap: 14 }}
+                              >
+                                <div style={{ minWidth: 0, flexShrink: 0, width: "28%" }}>
+                                  <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                    {p.name}
+                                  </div>
+                                  {clientLabelP ? (
+                                    <div style={{ fontSize: 12.5, color: "var(--app-accent, #00BCD4)", marginTop: 3, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{clientLabelP}</div>
+                                  ) : null}
                                 </div>
-                                {clientLabelP ? (
-                                  <div style={{ fontSize: 12.5, color: "var(--app-accent, #00BCD4)", marginTop: 3, fontWeight: 500 }}>{clientLabelP}</div>
-                                ) : null}
-                              </div>
-                              <span style={{ background: statusMeta.bg, color: statusMeta.color, padding: "6px 14px", borderRadius: 20, fontSize: 12.5, fontWeight: 700, flexShrink: 0 }}>{status}</span>
-                            </div>
-                            <div>
-                              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#94a3b8", marginBottom: 3 }}>
-                                <span>Budget Used</span>
-                                <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
-                              </div>
-                              <div style={{ height: 5, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
-                                <div style={{ width: `${budgetPct}%`, height: "100%", background: "#7c3aed", borderRadius: 4 }} />
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                      {projectsWithProgress.length === 0 && (
-                        <div style={{ padding: "16px 0", textAlign: "center", color: "#94a3b8", fontSize: 13, width: "100%" }}>No projects yet</div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 700, color: "#0f1c2e", marginBottom: 3 }}>
+                                    <span>Budget Used</span>
+                                    <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
+                                  </div>
+                                  <div style={{ height: 5, background: "#ffffff", borderRadius: 4, overflow: "hidden" }}>
+                                    <div style={{ width: `${budgetPct}%`, height: "100%", background: "#7c3aed", borderRadius: 4 }} />
+                                  </div>
+                                </div>
+                                <span style={{ background: statusMeta.bg, color: statusMeta.color, padding: "6px 14px", borderRadius: 20, fontSize: 12.5, fontWeight: 700, flexShrink: 0 }}>{status}</span> </div>
+                            );
+                          })}
+                          {projectsWithProgress.length === 0 && (
+                            <div style={{ padding: "16px 0", textAlign: "center", color: "#94a3b8", fontSize: 13, width: "100%" }}>No projects yet</div>
+                          )}
+                        </div>
                       )}
                     </div>
-
                     {mobShowInvoiceList && (invoices || []).length > 0 && (
                       <div style={{ marginTop: 4 }}>
                         <div style={{ fontSize: 15, fontWeight: 800, color: "#0f1c2e", marginBottom: 12 }}>Invoices</div>
-                        {(() => {
-                          const statusMeta = (raw) => {
-                            const s = (raw || "").toLowerCase();
-                            if (s === "paid") return { label: "Paid", color: "#16a34a", bg: "#dcfce7" };
-                            if (s === "overdue") return { label: "Overdue", color: "#dc2626", bg: "#fef2f2" };
-                            if (s === "part paid" || s === "partpaid" || s === "part-paid") return { label: "Part Paid", color: "#7c3aed", bg: "#f3e8ff" };
-                            return { label: "Unpaid", color: "#d97706", bg: "#fff7ed" };
-                          };
-                          return (invoices || [])
-                            .filter(inv => (inv.status || "").toLowerCase() !== "paid")
-                            .slice(0, 20).map((inv, i) => {
+                        <div style={{ background: "#f0f8ff", border: "1px solid #bae0f7", borderRadius: 12, overflow: "hidden", minHeight: 210 }}>
+                          {(() => {
+                            const statusMeta = (raw) => {
+                              const s = (raw || "").toLowerCase();
+                              if (s === "paid") return { label: "Paid", color: "#16a34a", bg: "#dcfce7" };
+                              if (s === "overdue") return { label: "Overdue", color: "#dc2626", bg: "#fef2f2" };
+                              if (s === "part paid" || s === "partpaid" || s === "part-paid") return { label: "Part Paid", color: "#7c3aed", bg: "#f3e8ff" };
+                              return { label: "Unpaid", color: "#d97706", bg: "#fff7ed" };
+                            };
+                            const rows = (invoices || [])
+                              .filter(inv => (inv.status || "").toLowerCase() !== "paid")
+                              .slice(0, 20);
+                            return rows.map((inv, i) => {
                               const meta = statusMeta(inv.status);
                               return (
                                 <div
@@ -11020,7 +11027,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                     setMobShowInvoiceList(false);
                                     setActive("invoices");
                                   }}
-                                  style={{ background: "#fff", borderRadius: 16, padding: "16px 18px", boxShadow: "0 4px 14px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, cursor: "pointer" }}
+                                  style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "12px 14px", borderBottom: i === rows.length - 1 ? "none" : "1px solid #bae0f7", cursor: "pointer" }}
                                 >
                                   <div style={{ minWidth: 0 }}>
                                     <div style={{ fontSize: 12.5, fontWeight: 700, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
@@ -11034,7 +11041,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                 </div>
                               );
                             });
-                        })()}
+                          })()}
+                        </div>
                       </div>
                     )}
 
@@ -11193,7 +11201,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
                   {/* QUICK ACTION CARDS — proper dashboard-card style, tap opens popup */}
-                  {clientResponsesExpanded && (
+                  {
                     <div style={{ margin: "16px 16px 0", position: "relative", zIndex: 1 }}>
                       <div style={{ background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.12)", border: "1px solid rgba(0,0,0,0.03)", overflow: "hidden" }}>
                         <div onClick={() => setClientResponsesExpanded(v => !v)} style={{ padding: "14px 16px", borderBottom: clientResponsesExpanded ? "1px solid #f1f5f9" : "none", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
@@ -11310,12 +11318,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         )}
                       </div>
                     </div>
-                  )}
+                  }
 
                   {/* QUICK ACTION CARDS — proper dashboard-card style, tap opens popup */}
                   <div style={{ padding: "22px 16px 6px", display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}></div>
-                  <MobilePopup id="qaQuote" title="Quotations">
-                    <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{(quotations || []).length} total</div>
+                  <MobilePopup id="qaQuote" title="Quotations"> <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{(quotations || []).length} total</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                       {(quotations || []).map((q, i) => (
                         <div
@@ -11411,7 +11418,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   {/* FLOATING BOTTOM NAV — glass pill (portaled to body so it always stays fixed to the viewport, mobile only) */}
                   {!isDesktopWidth && createPortal(
-                    <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "var(--app-accent)", borderRadius: 0, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "12px 6px", zIndex: 4000, boxShadow: "0 -2px 12px rgba(0,0,0,0.15)", position: "fixed" }}>
+                    <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "var(--app-accent, #00BCD4)", borderRadius: 0, display: "flex", justifyContent: "space-around", alignItems: "center", padding: "12px 6px", zIndex: 4000, boxShadow: "0 -2px 12px rgba(0,0,0,0.15)", position: "fixed" }}>
                       {[
                         { icon: "ti-file-invoice", label: "Invoice", key: "invoices" },
                         { icon: "ti-folder", label: "Projects", key: "projects" },
@@ -11419,7 +11426,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         { icon: "ti-users", label: "Clients", key: "clients" },
                         { icon: "ti-dots", label: "More", key: "settings" },
                       ].map((n, i) => n.key === "add" ? (
-                        <div key={i} onClick={() => setShowMobileAddMenu(true)} style={{ width: 52, height: 52, borderRadius: "50%", background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, lineHeight: 1, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", position: "absolute", top: -30, left: "50%", transform: "translateX(-50%)" }}>+</div>
+                        <div key={i} onClick={() => setShowMobileAddMenu(true)} style={{ width: 52, height: 52, borderRadius: "50%", background: "var(--app-accent, #00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, lineHeight: 1, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", position: "absolute", top: -30, left: "50%", transform: "translateX(-50%)" }}>+</div>
                       ) : (
                         <div key={i} onClick={() => {
                           if (n.key === "invoices") {

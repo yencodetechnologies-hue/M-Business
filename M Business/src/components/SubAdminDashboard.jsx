@@ -11840,7 +11840,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                             const meta = statusMeta(p.status);
                                             const badgeBg = meta.color === "#16a34a" ? "#dcfce7" : meta.color === "#7c3aed" ? "#f3e8ff" : meta.color === "#2563eb" ? "#dbeafe" : meta.color === "#dc2626" ? "#fee2e2" : "#f3e8ff";
                                             return (
-                                              <div key={p._id || p.id || i} style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 10 }}>
+                                              <div
+                                                key={p._id || p.id || i}
+                                                onClick={() => {
+                                                  setHoverPopupSection(null);
+                                                  setJumpProject(p);
+                                                  setProjectDetailsReadOnly(false);
+                                                  setActive("project-details");
+                                                }}
+                                                style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 10, cursor: "pointer" }}
+                                              >
                                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
                                                   <div style={{ fontWeight: 700, fontSize: 13 }}>{p.name}</div>
                                                   <span style={{ background: badgeBg, color: meta.color, padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{meta.label}</span>
@@ -11919,12 +11928,18 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                   <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{pendingInvCount} pending</div>
                                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                                     {invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").slice(0, 8).map((inv, i) => (
-                                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 6 }}>
+                                      <div
+                                        key={i}
+                                        onClick={() => {
+                                          setHoverPopupSection(null);
+                                          setActive("invoices");
+                                        }}
+                                        style={{ display: "flex", justifyContent: "space-between", fontSize: 12, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 6, cursor: "pointer" }}
+                                      >
                                         <span style={{ fontWeight: 600 }}>{inv.clientName || inv.client || "Client"}</span>
                                         <span style={{ color: "rgba(15,28,46,0.5)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
                                       </div>
-                                    ))}
-                                  </div>
+                                    ))}</div>
                                 </HoverPopup>
                                 <MobilePopup id="unpaidInvoices" title="Unpaid Invoices">
                                   <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>{pendingInvCount} pending</div>
@@ -11969,12 +11984,18 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                   <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{employees.length} staff</div>
                                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                                     {employees.slice(0, 8).map((e, i) => (
-                                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 6 }}>
+                                      <div
+                                        key={i}
+                                        onClick={() => {
+                                          setHoverPopupSection(null);
+                                          setActive("team");
+                                        }}
+                                        style={{ display: "flex", justifyContent: "space-between", fontSize: 12, borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 6, cursor: "pointer" }}
+                                      >
                                         <span style={{ fontWeight: 600 }}>{e.name}</span>
                                         <span style={{ color: "rgba(15,28,46,0.5)" }}>{e.role || "Employee"}</span>
                                       </div>
-                                    ))}
-                                  </div>
+                                    ))}    </div>
                                 </HoverPopup>
                                 <MobilePopup id="employees" title="Employees">
                                   <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>{employees.length} staff</div>

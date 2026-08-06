@@ -11174,71 +11174,107 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
                   {/* QUICK ACTION CARDS — proper dashboard-card style, tap opens popup */}
-                  <div style={{ margin: "16px 16px 0" }}>
-                    <div style={{ background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.12)", border: "1px solid rgba(0,0,0,0.03)", overflow: "hidden" }}>
-                      <div style={{ padding: "14px 16px", borderBottom: clientResponsesExpanded ? "1px solid #f1f5f9" : "none", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                          <i className="ti ti-clipboard-check" style={{ color: "var(--app-accent)" }}></i>
-                          <span style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e" }}>Recent Activity</span>
+                  {clientResponsesExpanded && (
+                    <div style={{ margin: "16px 16px 0", position: "relative", zIndex: 1 }}>
+                      <div style={{ background: "#fff", borderRadius: 18, boxShadow: "0 10px 30px rgba(15,10,41,0.12)", border: "1px solid rgba(0,0,0,0.03)", overflow: "hidden" }}>
+                        <div onClick={() => setClientResponsesExpanded(v => !v)} style={{ padding: "14px 16px", borderBottom: clientResponsesExpanded ? "1px solid #f1f5f9" : "none", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                            <i className="ti ti-clipboard-check" style={{ color: "var(--app-accent)" }}></i>
+                            <span style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e" }}>Recent Activity</span>
+                          </div>
+                          <span style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 800 }}>
+                            {clientResponsesExpanded ? "▲" : "▼"}
+                          </span>
                         </div>
-                        <span onClick={() => setClientResponsesExpanded(v => !v)} style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 800, cursor: "pointer" }}>
-                          {clientResponsesExpanded ? "▲" : "▼"}
-                        </span>
-                      </div>
-                      {clientResponsesExpanded && (
-                        <div style={{ padding: "6px 16px 14px", maxHeight: 400, overflowY: "auto" }}>
-                          {(() => {
-                            const approvalItems = allApprovals
-                              .filter(a => a.status === "approved" || a.status === "rejected")
-                              .map(a => ({
-                                kind: "approval",
-                                key: a._id,
-                                sortDate: a.respondedAt ? new Date(a.respondedAt) : new Date(0),
-                                data: a,
-                              }));
+                        {clientResponsesExpanded && (
+                          <div style={{ padding: "6px 16px 14px", maxHeight: 400, overflowY: "auto" }}>
+                            {(() => {
+                              const approvalItems = allApprovals
+                                .filter(a => a.status === "approved" || a.status === "rejected")
+                                .map(a => ({
+                                  kind: "approval",
+                                  key: a._id,
+                                  sortDate: a.respondedAt ? new Date(a.respondedAt) : new Date(0),
+                                  data: a,
+                                }));
 
-                            const invoiceItems = invoices
-                              .filter(inv => {
+                              const invoiceItems = invoices
+                                .filter(inv => {
+                                  const s = (inv.status || "").toLowerCase();
+                                  return s === "paid" || s === "overdue" || s === "pending" || s === "sent";
+                                })
+                                .map(inv => ({
+                                  kind: "invoice",
+                                  key: inv._id || inv.invoiceNo,
+                                  sortDate: inv.updatedAt ? new Date(inv.updatedAt) : (inv.date ? new Date(inv.date) : new Date(0)),
+                                  data: inv,
+                                }));
+
+                              const combined = [...approvalItems, ...invoiceItems]
+                                .filter(item => !dismissedActivityKeys.includes(String(item.key)))
+                                .sort((x, y) => y.sortDate - x.sortDate)
+                                .slice(0, 20);
+
+                              if (combined.length === 0) {
+                                return <div style={{ textAlign: "center", padding: "16px 0", color: "#A0AEC0", fontSize: 13 }}>No client responses yet</div>;
+                              }
+
+                              return combined.map((item, i) => {
+                                if (item.kind === "approval") {
+                                  const a = item.data;
+                                  const isApproved = a.status === "approved";
+                                  return (
+                                    <div key={item.key || i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 0", borderBottom: i === combined.length - 1 ? "none" : "1px solid #F0F4F8" }}>
+                                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: isApproved ? "#DCFCE7" : "#FEE2E2", color: isApproved ? "#16a34a" : "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 14 }}>
+                                        <i className={`ti ${isApproved ? "ti-check" : "ti-x"}`}></i>
+                                      </div>
+                                      <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ fontSize: 12.5, fontWeight: 700, color: "#1A2332" }}>
+                                          {a.title || "Update"} — <span style={{ color: isApproved ? "#16a34a" : "#dc2626" }}>{isApproved ? "Approved" : "Rejected"}</span>
+                                        </div>
+                                        {a.desc && <div style={{ fontSize: 11, color: "#718096", marginTop: 2 }}>{a.desc}</div>}
+                                        {!isApproved && a.rejectReason && (
+                                          <div style={{ fontSize: 11, color: "#dc2626", marginTop: 3, background: "#FEF2F2", padding: "4px 8px", borderRadius: 6 }}>
+                                            Reason: {a.rejectReason}
+                                          </div>
+                                        )}
+                                        <div style={{ fontSize: 10, color: "#A0AEC0", marginTop: 3 }}>
+                                          {a.respondedAt ? new Date(a.respondedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}
+                                        </div>
+                                      </div>
+                                      <span
+                                        onClick={() => setDismissedActivityKeys(prev => [...prev, String(item.key)])}
+                                        style={{ fontSize: 14, color: "var(--app-muted)", fontWeight: 700, cursor: "pointer", flexShrink: 0, padding: "4px 8px", lineHeight: 1 }}
+                                      >
+                                        ✕
+                                      </span>
+                                    </div>
+                                  );
+                                }
+
+                                const inv = item.data;
                                 const s = (inv.status || "").toLowerCase();
-                                return s === "paid" || s === "overdue" || s === "pending" || s === "sent";
-                              })
-                              .map(inv => ({
-                                kind: "invoice",
-                                key: inv._id || inv.invoiceNo,
-                                sortDate: inv.updatedAt ? new Date(inv.updatedAt) : (inv.date ? new Date(inv.date) : new Date(0)),
-                                data: inv,
-                              }));
-
-                            const combined = [...approvalItems, ...invoiceItems]
-                              .filter(item => !dismissedActivityKeys.includes(String(item.key)))
-                              .sort((x, y) => y.sortDate - x.sortDate)
-                              .slice(0, 20);
-
-                            if (combined.length === 0) {
-                              return <div style={{ textAlign: "center", padding: "16px 0", color: "#A0AEC0", fontSize: 13 }}>No client responses yet</div>;
-                            }
-
-                            return combined.map((item, i) => {
-                              if (item.kind === "approval") {
-                                const a = item.data;
-                                const isApproved = a.status === "approved";
+                                const cfg = s === "paid"
+                                  ? { icon: "ti-cash", bg: "#DCFCE7", color: "#16a34a", label: "Paid" }
+                                  : s === "overdue"
+                                    ? { icon: "ti-alert-circle", bg: "#FEE2E2", color: "#dc2626", label: "Overdue" }
+                                    : s === "sent"
+                                      ? { icon: "ti-send", bg: "#DBEAFE", color: "#1d4ed8", label: "Sent" }
+                                      : { icon: "ti-clock", bg: "#FEF3C7", color: "#b45309", label: "Pending" };
                                 return (
                                   <div key={item.key || i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 0", borderBottom: i === combined.length - 1 ? "none" : "1px solid #F0F4F8" }}>
-                                    <div style={{ width: 30, height: 30, borderRadius: "50%", background: isApproved ? "#DCFCE7" : "#FEE2E2", color: isApproved ? "#16a34a" : "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 14 }}>
-                                      <i className={`ti ${isApproved ? "ti-check" : "ti-x"}`}></i>
+                                    <div style={{ width: 30, height: 30, borderRadius: "50%", background: cfg.bg, color: cfg.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 14 }}>
+                                      <i className={`ti ${cfg.icon}`}></i>
                                     </div>
                                     <div style={{ flex: 1, minWidth: 0 }}>
                                       <div style={{ fontSize: 12.5, fontWeight: 700, color: "#1A2332" }}>
-                                        {a.title || "Update"} — <span style={{ color: isApproved ? "#16a34a" : "#dc2626" }}>{isApproved ? "Approved" : "Rejected"}</span>
+                                        Invoice {inv.invoiceNo || ""} — <span style={{ color: cfg.color }}>{cfg.label}</span>
                                       </div>
-                                      {a.desc && <div style={{ fontSize: 11, color: "#718096", marginTop: 2 }}>{a.desc}</div>}
-                                      {!isApproved && a.rejectReason && (
-                                        <div style={{ fontSize: 11, color: "#dc2626", marginTop: 3, background: "#FEF2F2", padding: "4px 8px", borderRadius: 6 }}>
-                                          Reason: {a.rejectReason}
-                                        </div>
-                                      )}
+                                      <div style={{ fontSize: 11, color: "#718096", marginTop: 2 }}>
+                                        {inv.clientName || inv.client || "Client"}
+                                      </div>
                                       <div style={{ fontSize: 10, color: "#A0AEC0", marginTop: 3 }}>
-                                        {a.respondedAt ? new Date(a.respondedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}
+                                        {inv.date ? new Date(inv.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}
                                       </div>
                                     </div>
                                     <span
@@ -11249,47 +11285,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                     </span>
                                   </div>
                                 );
-                              }
-
-                              const inv = item.data;
-                              const s = (inv.status || "").toLowerCase();
-                              const cfg = s === "paid"
-                                ? { icon: "ti-cash", bg: "#DCFCE7", color: "#16a34a", label: "Paid" }
-                                : s === "overdue"
-                                  ? { icon: "ti-alert-circle", bg: "#FEE2E2", color: "#dc2626", label: "Overdue" }
-                                  : s === "sent"
-                                    ? { icon: "ti-send", bg: "#DBEAFE", color: "#1d4ed8", label: "Sent" }
-                                    : { icon: "ti-clock", bg: "#FEF3C7", color: "#b45309", label: "Pending" };
-                              return (
-                                <div key={item.key || i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 0", borderBottom: i === combined.length - 1 ? "none" : "1px solid #F0F4F8" }}>
-                                  <div style={{ width: 30, height: 30, borderRadius: "50%", background: cfg.bg, color: cfg.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 14 }}>
-                                    <i className={`ti ${cfg.icon}`}></i>
-                                  </div>
-                                  <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "#1A2332" }}>
-                                      Invoice {inv.invoiceNo || ""} — <span style={{ color: cfg.color }}>{cfg.label}</span>
-                                    </div>
-                                    <div style={{ fontSize: 11, color: "#718096", marginTop: 2 }}>
-                                      {inv.clientName || inv.client || "Client"}
-                                    </div>
-                                    <div style={{ fontSize: 10, color: "#A0AEC0", marginTop: 3 }}>
-                                      {inv.date ? new Date(inv.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}
-                                    </div>
-                                  </div>
-                                  <span
-                                    onClick={() => setDismissedActivityKeys(prev => [...prev, String(item.key)])}
-                                    style={{ fontSize: 14, color: "var(--app-muted)", fontWeight: 700, cursor: "pointer", flexShrink: 0, padding: "4px 8px", lineHeight: 1 }}
-                                  >
-                                    ✕
-                                  </span>
-                                </div>
-                              );
-                            });
-                          })()}
-                        </div>
-                      )}
+                              });
+                            })()}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* QUICK ACTION CARDS — proper dashboard-card style, tap opens popup */}
                   <div style={{ padding: "22px 16px 6px", display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}></div>

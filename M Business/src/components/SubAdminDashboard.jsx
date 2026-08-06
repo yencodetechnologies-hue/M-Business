@@ -7049,7 +7049,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     if (typeof window !== "undefined") window.__setMobShowAllProjects = setMobShowAllProjects;
   }, []);
   const mobIdleTimerRef = useRef(null);
-const DashboardAddTaskModal = ({ open, onClose, projects, employees, onCreated }) => {
+  const DashboardAddTaskModal = ({ open, onClose, projects, employees, onCreated }) => {
     const [selProjectId, setSelProjectId] = React.useState("");
     const [title, setTitle] = React.useState("");
     const [description, setDescription] = React.useState("");
@@ -10651,7 +10651,7 @@ const DashboardAddTaskModal = ({ open, onClose, projects, employees, onCreated }
                           Create Invoice
                         </button>
                         <button
-                          onClick={() => { if (!projectsWithProgress[0]) { setActive("projects"); return; } setJumpProject(projectsWithProgress[0]); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setAutoOpenTaskModal(true); setActive("project-details"); }}
+                          onClick={() => setShowDashboardAddTaskModal(true)}
                           style={{ flex: 1, background: "var(--app-accent, #00BCD4)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 0", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(0,188,212,0.3)" }}
                         >
                           Add Task

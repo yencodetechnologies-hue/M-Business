@@ -7161,31 +7161,68 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   const status = p.status || "Active";
                   const statusMeta = (() => {
                     const s = status.toLowerCase();
-                    if (s === "completed" || s === "done") return { color: "#16a34a", bg: "#dcfce7" };
                     if (s === "on hold" || s === "paused") return { color: "#d97706", bg: "#fff7ed" };
                     if (s === "cancelled") return { color: "#dc2626", bg: "#fef2f2" };
                     return { color: "#16a34a", bg: "#dcfce7" };
                   })();
+
+                  // ── Same Budget Used calculation as ModernProjectDetails.jsx ──
+                  const parseAmt = (val) => {
+                    if (val === undefined || val === null) return 0;
+                    if (typeof val === "number") return val;
+                    const num = Number(String(val).replace(/[^0-9.-]+/g, ""));
+                    return isNaN(num) ? 0 : num;
+                  };
+                  const pName = (p.name || "").trim().toLowerCase();
+                  const projInvoices = (invoices || []).filter(inv => {
+                    const invProjId = inv.projectId || inv.project_id;
+                    if (invProjId && p._id && invProjId === p._id) return true;
+                    const invProjName = (inv.project || inv.projectName || "").trim().toLowerCase();
+                    return invProjName && invProjName === pName;
+                  });
+                  const billedFromInvoices = projInvoices.reduce((sum, inv) => sum + (parseAmt(inv.total) || parseAmt(inv.grandTotal) || parseAmt(inv.amount)), 0);
+                  const manualBilled = parseAmt(p.billed);
+                  const billed = projInvoices.length > 0 ? billedFromInvoices : manualBilled;
+
+                  const autoAdditionalTotal = (p.additionalCharges || []).reduce((sum, a) => sum + parseAmt(a.amount), 0);
+                  const autoMilestoneTotal = (p.milestonePayments || []).reduce((sum, m) => sum + parseAmt(m.amount), 0);
+                  const autoBudgetAmt = billed + autoAdditionalTotal + autoMilestoneTotal;
+                  const manualBudget = p.budget !== undefined && p.budget !== null && p.budget !== "" && Number(p.budget) > 0 ? Number(p.budget) : 0;
+                  const budgetAmt = manualBudget > 0 ? manualBudget : autoBudgetAmt;
+
+                  const spent = (p.expenses || []).reduce((sum, exp) => sum + parseAmt(exp.amount), 0);
+                  const budgetUsedPct = budgetAmt > 0 ? Math.min(Math.round((spent / budgetAmt) * 100), 100) : 0;
+
                   return (
                     <div
                       key={p._id || idx}
                       onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }}
-                      style={{ background: "#fff", borderRadius: 16, padding: "16px 18px", boxShadow: "0 4px 14px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, cursor: "pointer" }}
+                      style={{ boxSizing: "border-box", background: "#fff", borderRadius: 16, padding: "16px 18px", boxShadow: "0 4px 14px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", marginBottom: 12, cursor: "pointer" }}
                     >
-                      <div style={{ minWidth: 0 }}>
-                        <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                          {p.name || p.title}
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {p.name || p.title}
+                          </div>
+                          {clientLabelP ? (
+                            <div style={{ fontSize: 12.5, color: "var(--app-accent, #00BCD4)", marginTop: 3, fontWeight: 500 }}>{clientLabelP}</div>
+                          ) : null}
                         </div>
-                        {clientLabelP ? (
-                          <div style={{ fontSize: 12.5, color: "var(--app-accent, #00BCD4)", marginTop: 3, fontWeight: 500 }}>{clientLabelP}</div>
-                        ) : null}
+                        <span style={{ background: statusMeta.bg, color: statusMeta.color, padding: "6px 14px", borderRadius: 20, fontSize: 12.5, fontWeight: 700, flexShrink: 0 }}>{status}</span>
                       </div>
-                      <span style={{ background: statusMeta.bg, color: statusMeta.color, padding: "6px 14px", borderRadius: 20, fontSize: 12.5, fontWeight: 700, flexShrink: 0 }}>{status}</span>
+                      <div style={{ marginTop: 10 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#94a3b8", marginBottom: 4 }}>
+                          <span>Budget Used</span>
+                          <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetUsedPct}%</span>
+                        </div>
+                        <div style={{ height: 6, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
+                          <div style={{ width: `${budgetUsedPct}%`, height: "100%", background: "#7c3aed", borderRadius: 4 }} />
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
               </div>
-
               {allProjects.length > 3 && (
                 <button
                   onClick={() => setMobShowAllProjects(v => !v)}
@@ -10516,9 +10553,41 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           const pct = Number(p.progress) || 0;
                           const circumference = 2 * Math.PI * 18;
                           const offset = circumference - (pct / 100) * circumference;
-                          const budgetNum = Number(p.budget) || 0;
-                          const spentNum = (p.expenses || []).reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
-                          const budgetPct = budgetNum > 0 ? Math.min(100, Math.round((spentNum / budgetNum) * 100)) : 0;
+
+                          const parseAmt = (val) => {
+                            if (val === undefined || val === null) return 0;
+                            if (typeof val === "number") return val;
+                            const num = Number(String(val).replace(/[^0-9.-]+/g, ""));
+                            return isNaN(num) ? 0 : num;
+                          };
+                          const pNameLower = (p.name || "").trim().toLowerCase();
+                          const projInvoicesForCard = (invoices || []).filter(inv => {
+                            const invProjId = inv.projectId || inv.project_id;
+                            if (invProjId && p._id && invProjId === p._id) return true;
+                            const invProjName = (inv.project || inv.projectName || "").trim().toLowerCase();
+                            return invProjName && invProjName === pNameLower;
+                          });
+                          const billedFromInvoicesCard = projInvoicesForCard.reduce((sum, inv) => sum + (parseAmt(inv.total) || parseAmt(inv.grandTotal) || parseAmt(inv.amount)), 0);
+                          const manualBilledCard = parseAmt(p.billed);
+                          const billedCard = projInvoicesForCard.length > 0 ? billedFromInvoicesCard : manualBilledCard;
+
+                          const autoAdditionalTotalCard = (p.additionalCharges || []).reduce((sum, a) => sum + parseAmt(a.amount), 0);
+                          const autoMilestoneTotalCard = (p.milestonePayments || []).reduce((sum, m) => sum + parseAmt(m.amount), 0);
+                          const autoBudgetAmtCard = billedCard + autoAdditionalTotalCard + autoMilestoneTotalCard;
+                          const manualBudgetCard = p.budget !== undefined && p.budget !== null && p.budget !== "" && Number(p.budget) > 0 ? Number(p.budget) : 0;
+                          const remainingBudgetCard = parseAmt(p.remainingBudget ?? p.remaining);
+                          const derivedBudgetFromRemaining = remainingBudgetCard > 0 ? (parseAmt(p.spentAmount ?? p.spent) + remainingBudgetCard) : 0;
+                          const budgetNum = manualBudgetCard > 0
+                            ? manualBudgetCard
+                            : (derivedBudgetFromRemaining > 0 ? derivedBudgetFromRemaining : autoBudgetAmtCard);
+
+                          const spentNum = parseAmt(p.spentAmount ?? p.spent) > 0
+                            ? parseAmt(p.spentAmount ?? p.spent)
+                            : (p.expenses || []).reduce((sum, exp) => sum + parseAmt(exp.amount), 0);
+
+                          const budgetPct = p.budgetUsedPct !== undefined && p.budgetUsedPct !== null
+                            ? Math.round(Number(p.budgetUsedPct))
+                            : (budgetNum > 0 ? Math.min(100, Math.round((spentNum / budgetNum) * 100)) : 0);
                           return (
                             <div
                               key={p._id || idx}
@@ -10585,7 +10654,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           return (invoices || []).slice(0, 20).map((inv, i) => {
                             const meta = statusMeta(inv.status);
                             return (
-                              <div key={inv._id || inv.invoiceNo || i} style={{ background: "#fff", borderRadius: 14, padding: "12px 14px", border: "1px solid rgba(0,0,0,0.06)", marginBottom: 8, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                              <div
+                                key={inv._id || inv.invoiceNo || i}
+                                onClick={() => {
+                                  setJumpProject(null);
+                                  setPrevActiveBeforeInvoice(active);
+                                  setJumpInvoice({ ...inv, _t: Date.now() });
+                                  setMobShowInvoiceList(false);
+                                  setActive("invoices");
+                                }}
+                                style={{ background: "#fff", borderRadius: 16, padding: "16px 18px", boxShadow: "0 4px 14px rgba(15,10,41,0.06)", border: "1px solid rgba(0,0,0,0.04)", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, cursor: "pointer" }}
+                              >
                                 <div style={{ minWidth: 0 }}>
                                   <div style={{ fontSize: 12.5, fontWeight: 700, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                                     {inv.invoiceNo ? `Invoice ${inv.invoiceNo}` : (inv.clientName || inv.client || "Invoice")}

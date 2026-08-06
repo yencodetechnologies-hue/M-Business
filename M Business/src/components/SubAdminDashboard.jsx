@@ -10758,14 +10758,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                 </div>
                               </div>
                               <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 6 }}>
-                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                    {p.name}
-                                  </div>
-                                  <span style={{ fontSize: 9.5, fontWeight: 700, color: "#16a34a", background: "#dcfce7", padding: "2px 8px", borderRadius: 20, flexShrink: 0 }}>
-                                    {p.status || "Active"}
-                                  </span>
-                                </div>
                                 {(() => {
                                   const pQuote = (quotations || []).find(q => {
                                     const qProjName = (q.qt?.project || q.project || "").trim().toLowerCase();

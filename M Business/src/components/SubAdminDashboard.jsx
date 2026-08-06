@@ -963,22 +963,11 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const [filterMode, setFilterMode] = useState("all");
   const [sortMode, setSortMode] = useState("newest");
 
-  const [activeClientId, setActiveClientId] = useState(() => {
-    try {
-      const saved = localStorage.getItem("activeClientId_subadmin");
-      if (saved) return saved;
-    } catch { }
-    return clients?.[0]?._id || null;
-  });
+  const [activeClientId, setActiveClientId] = useState(null);
 
   // Keep the saved selection in sync so a page refresh (or re-login) reopens
   // the same client instead of falling back to the first one in the list.
-  useEffect(() => {
-    try {
-      if (activeClientId) localStorage.setItem("activeClientId_subadmin", activeClientId);
-      else localStorage.removeItem("activeClientId_subadmin");
-    } catch { }
-  }, [activeClientId]);
+  // (removed persistence — clients list should not auto-open a client)
   const [isLoading, setIsLoading] = useState(!!isFetching);
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -1043,22 +1032,12 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   }, [isFetching]);
 
   useEffect(() => {
-    // Only auto-select a client when none is selected yet (e.g. right after
-    // the client list first loads), or when the currently selected client
-    // was removed entirely from `clients`. Changing the card/tab filter
-    // should narrow the visible list without touching which client's
-    // details are currently shown.
-    if (!activeClientId) {
-      if (filtered.length > 0) setActiveClientId(filtered[0]._id);
-      return;
-    }
+    if (!activeClientId) return;
     const stillExists = clients.some(c => c._id === activeClientId);
     if (!stillExists) {
-      setActiveClientId(filtered.length > 0 ? filtered[0]._id : null);
+      setActiveClientId(null);
     }
-  }, [clients]);
-  // Restore exact client active before navigating to create/edit project
-  useEffect(() => {
+  }, [clients]); useEffect(() => {
     if (activeClientIdForReturn) {
       setActiveClientId(activeClientIdForReturn);
       setActiveTab("overview");

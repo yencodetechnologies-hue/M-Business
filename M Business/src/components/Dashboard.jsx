@@ -1909,7 +1909,7 @@ function MobileProjSlider({ projects, tasks, onViewProject }) {
 // MAIN DASHBOARD
 // -----------------------------------------------------------
 export default function Dashboard({ setUser, user, fixedLogo }) {
-  const [active, setActive] = useState(() => localStorage.getItem("activeTab_dashboard") || "dashboard");
+  const [active, setActive] = useState("dashboard");
   const [sidebarInvoiceClick, setSidebarInvoiceClick] = useState(false);
   useEffect(() => { localStorage.setItem("activeTab_dashboard", active); }, [active]);
   const [modal, setModal] = useState(() => localStorage.getItem("openModal_dashboard") || null);

@@ -11108,24 +11108,38 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{projects.length} total</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {projectsWithProgress.map((p, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8 }}>
+                        <div
+                          key={i}
+                          onClick={() => {
+                            closeMobilePopup();
+                            setJumpProject(p);
+                            setProjectDetailsReadOnly(false);
+                            setActive("project-details");
+                          }}
+                          style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8, cursor: "pointer" }}
+                        >
                           <span style={{ fontWeight: 600, color: "#fff" }}>{p.name}</span>
                           <span style={{ color: "rgba(255,255,255,0.75)" }}>{p.progress || 0}%</span>
                         </div>
-                      ))}
-                    </div>
+                      ))}</div>
                   </MobilePopup>
 
                   <MobilePopup id="mobTeam" title="Team">
                     <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{employees.length} staff</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {employees.map((e, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8 }}>
+                        <div
+                          key={i}
+                          onClick={() => {
+                            closeMobilePopup();
+                            setActive("team");
+                          }}
+                          style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8, cursor: "pointer" }}
+                        >
                           <span style={{ fontWeight: 600, color: "#fff" }}>{e.name}</span>
                           <span style={{ color: "rgba(255,255,255,0.75)" }}>{e.role || "Employee"}</span>
                         </div>
-                      ))}
-                    </div>
+                      ))}    </div>
                   </MobilePopup>
 
 
@@ -11139,12 +11153,18 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").length} pending</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {invoices.filter(i => (i.status || "").toLowerCase() === "pending" || (i.status || "").toLowerCase() === "overdue").map((inv, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8 }}>
+                        <div
+                          key={i}
+                          onClick={() => {
+                            closeMobilePopup();
+                            setActive("invoices");
+                          }}
+                          style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8, cursor: "pointer" }}
+                        >
                           <span style={{ fontWeight: 600, color: "#fff" }}>{inv.clientName || inv.client || "Client"}</span>
                           <span style={{ color: "rgba(255,255,255,0.75)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
                         </div>
-                      ))}
-                    </div>
+                      ))} </div>
                   </MobilePopup>
 
 
@@ -11275,7 +11295,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{(quotations || []).length} total</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                       {(quotations || []).map((q, i) => (
-                        <div key={q._id || q.id || i} style={{ borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 10 }}>
+                        <div
+                          key={q._id || q.id || i}
+                          onClick={() => {
+                            closeMobilePopup();
+                            setActive("quotations");
+                          }}
+                          style={{ borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 10, cursor: "pointer" }}
+                        >
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
                             <span style={{ fontWeight: 700, fontSize: 13, color: "#fff" }}>{q.qt?.quoteNo || q.quoteNo || q.clientName || "Quotation"}</span>
                             <span style={{ color: (q.status || "").toLowerCase() === "approved" ? "#bbf7d0" : "rgba(255,255,255,0.75)", fontWeight: (q.status || "").toLowerCase() === "approved" ? 800 : 600, fontSize: 11 }}>{(q.status || "draft").toUpperCase()}</span>
@@ -11313,12 +11340,18 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: "#fff" }}>{invoices.length} total</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {invoices.slice(0, 10).map((inv, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8 }}>
+                        <div
+                          key={i}
+                          onClick={() => {
+                            closeMobilePopup();
+                            setActive("invoices");
+                          }}
+                          style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8, cursor: "pointer" }}
+                        >
                           <span style={{ fontWeight: 600, color: "#fff" }}>{inv.clientName || inv.client || "Client"}</span>
                           <span style={{ color: "rgba(255,255,255,0.75)" }}>{formatCurrency(inv.grandTotal, inv.currency)}</span>
                         </div>
-                      ))}
-                    </div>
+                      ))} </div>
                   </MobilePopup>
 
                   <MobilePopup id="qaClient" title="Clients">
@@ -15403,7 +15436,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             )}
 
           </div>
-
+          {!isDesktopWidth && ["clients", "employees", "managers", "projects", "invoices", "quotations", "proposals", "project-details", "edit-project", "create-project"].includes(validActive) && (
+            <div
+              onClick={() => setActive("dashboard")}
+              style={{ display: "flex", alignItems: "center", gap: 6, padding: "12px 16px", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--app-accent, #00BCD4)", background: "#fff", borderBottom: "1px solid var(--app-border)" }}
+            >
+              <i className="ti ti-arrow-left" style={{ fontSize: 16 }}></i> Back to Dashboard
+            </div>
+          )}
         </div>
 
       </div >

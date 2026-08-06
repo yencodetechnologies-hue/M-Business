@@ -7071,6 +7071,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [mobShowAllProjects, setMobShowAllProjects] = useState(false);
   const [mobShowAllInvoicesList, setMobShowAllInvoicesList] = useState(false);
   const [mobShowInvoiceList, setMobShowInvoiceList] = useState(false);
+  const [mobListPage, setMobListPage] = useState(null);
   const [showDashboardAddTaskModal, setShowDashboardAddTaskModal] = useState(false);
 
   const [dashboardTaskTitle, setDashboardTaskTitle] = useState("");
@@ -11082,7 +11083,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           setDraggingStatCard(null);
                         }}
                         onDragEnd={() => setDraggingStatCard(null)}
-                        onClick={() => openMobilePopup(s.id)}
+                        onClick={() => setActive(s.id.replace(/^mob/, "").toLowerCase())}
                         style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, padding: "4px 4px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingStatCard === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                       >
                         <div style={{ width: 72, height: 72, borderRadius: 18, background: s.grad, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", color: "#fff", fontSize: 30, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
@@ -11111,7 +11112,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           setDraggingSecondRow(null);
                         }}
                         onDragEnd={() => setDraggingSecondRow(null)}
-                        onClick={() => setActive(s.page || s.popupId)}
+                        onClick={() => setActive(s.page)}
                         style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, padding: "4px 4px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingSecondRow === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                       >
                         <div style={{ width: 72, height: 72, borderRadius: 18, background: s.grad, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", fontSize: 30, boxShadow: "0 6px 14px rgba(0,0,0,0.15)" }}>
@@ -11122,6 +11123,31 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       </div>
                     ))}
                   </div>
+                  {mobListPage === "clients" && (
+                    <div style={{ padding: 16 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+                        <span onClick={() => setMobListPage(null)} style={{ cursor: "pointer", fontSize: 20 }}>←</span>
+                        <span style={{ fontSize: 18, fontWeight: 800 }}>Clients</span>
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                        {clients.map((c, i) => (
+                          <div
+                            key={i}
+                            onClick={() => {
+                              setActiveClientIdForReturn(c._id);
+                              setMobListPage(null);
+                              setActive("clients");
+                            }}
+                            style={{ padding: 14, background: "#f0f8ff", borderRadius: 10, cursor: "pointer" }}
+                          >
+                            <div style={{ fontWeight: 700 }}>{c.name || c.clientName || c.companyName}</div>
+                            <div style={{ fontSize: 12, color: "#94a3b8" }}>{c.status || "-"}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
 
                   <MobilePopup id="mobClients" title="Clients">
                     <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4, color: "#fff" }}>{clients.length} total</div>

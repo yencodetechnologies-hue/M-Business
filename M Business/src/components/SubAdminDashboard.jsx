@@ -11182,11 +11182,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           <span style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e" }}>Recent Activity</span>
                         </div>
                         <span onClick={() => setClientResponsesExpanded(v => !v)} style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 800, cursor: "pointer" }}>
-                          {clientResponsesExpanded ? "▼" : "▲"}
+                          {clientResponsesExpanded ? "▲" : "▼"}
                         </span>
                       </div>
                       {clientResponsesExpanded && (
-                        <div style={{ padding: "6px 16px 14px" }}>
+                        <div style={{ padding: "6px 16px 14px", maxHeight: 400, overflowY: "auto" }}>
                           {(() => {
                             const approvalItems = allApprovals
                               .filter(a => a.status === "approved" || a.status === "rejected")
@@ -11329,8 +11329,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           key={p._id || p.id || i}
                           onClick={() => { closeMobilePopup(); setProposalViewEntry(p); setSidebarOverride("dashboard"); setActive("proposals"); }}
                           style={{ borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 10, cursor: "pointer" }}
-                        >
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                        >            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
                             <span style={{ fontWeight: 700, fontSize: 13, color: "#fff" }}>{p.title || "Proposal"}</span>
                             <span style={{ color: (p.status || "").toLowerCase() === "approved" ? "#bbf7d0" : "rgba(255,255,255,0.75)", fontWeight: (p.status || "").toLowerCase() === "approved" ? 800 : 600, fontSize: 11 }}>{(p.status || "draft").toUpperCase()}</span>
                           </div>

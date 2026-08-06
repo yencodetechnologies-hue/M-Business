@@ -11115,7 +11115,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             closeMobilePopup();
                             setJumpProject(p);
                             setProjectDetailsReadOnly(false);
-                            setOpenedFromDashboardPopup(true);
+                            setSidebarOverride("dashboard");
                             setActive("project-details");
                           }}
                           style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 8, cursor: "pointer" }}
@@ -11881,6 +11881,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                                   setHoverPopupSection(null);
                                                   setJumpProject(p);
                                                   setProjectDetailsReadOnly(false);
+                                                  setSidebarOverride("dashboard");
                                                   setActive("project-details");
                                                 }}
                                                 style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: 10, cursor: "pointer" }}

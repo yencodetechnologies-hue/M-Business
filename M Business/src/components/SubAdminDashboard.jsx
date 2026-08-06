@@ -10767,44 +10767,29 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                   </span>
                                 </div>
                                 {(() => {
-                                  const budgetNum = Number(p.budget) || 0;
-                                  const spentNum = (p.expenses || []).reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
-                                  const budgetPct = budgetNum > 0 ? Math.min(100, Math.round((spentNum / budgetNum) * 100)) : 0;
                                   const pQuote = (quotations || []).find(q => {
                                     const qProjName = (q.qt?.project || q.project || "").trim().toLowerCase();
                                     return qProjName && qProjName === (p.name || "").trim().toLowerCase();
                                   });
+                                  if (!pQuote) return null;
                                   return (
-                                    <div>
-                                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginBottom: 2 }}>
-                                        <span>Budget Used</span>
-                                        <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
+                                    <div style={{ marginTop: 4, paddingTop: 6, borderTop: "1px dashed #e2e8f0" }}>
+                                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8" }}>
+                                        <span>Quotation No.</span>
+                                        <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{pQuote.qt?.quoteNo || pQuote.quoteNo || "—"}</span>
                                       </div>
-                                      <div style={{ height: 5, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
-                                        <div style={{ width: `${budgetPct}%`, height: "100%", background: "#7c3aed", borderRadius: 4 }} />
+                                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginTop: 2 }}>
+                                        <span>Quotation Amount</span>
+                                        <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{formatCurrency(pQuote.total || pQuote.qt?.total, pQuote.qt?.currency)}</span>
                                       </div>
-                                      {pQuote && (
-                                        <div style={{ marginTop: 6, paddingTop: 6, borderTop: "1px dashed #e2e8f0" }}>
-                                          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8" }}>
-                                            <span>Quotation No.</span>
-                                            <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{pQuote.qt?.quoteNo || pQuote.quoteNo || "—"}</span>
-                                          </div>
-                                          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginTop: 2 }}>
-                                            <span>Quotation Amount</span>
-                                            <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{formatCurrency(pQuote.total || pQuote.qt?.total, pQuote.qt?.currency)}</span>
-                                          </div>
-                                          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginTop: 2 }}>
-                                            <span>Sent To</span>
-                                            <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{pQuote.qt?.client || pQuote.client || pQuote.clientName || "—"}</span>
-                                          </div>
-                                        </div>
-                                      )}
+                                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: "#94a3b8", marginTop: 2 }}>
+                                        <span>Sent To</span>
+                                        <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{pQuote.qt?.client || pQuote.client || pQuote.clientName || "—"}</span>
+                                      </div>
                                     </div>
                                   );
                                 })()}
-
-                              </div>
-                            </div>
+                              </div></div>
                           );
                         })}
                       </div>

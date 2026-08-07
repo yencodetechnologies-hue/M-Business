@@ -2195,41 +2195,46 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
     const initials = (name) => (name || "?").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
 
-    return (
+ return (
       <div className="clients-list-only-root" style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
 
-        <div style={{ fontSize: 15, fontWeight: 800, color: "#1A2332", marginBottom: 12 }}>
-          Total Clients: <span style={{ color: "var(--app-accent, #00BCD4)" }}>{clients.length}</span>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 14, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Clients</div>
+            <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{clients.length}</div>
+          </div>
+          <div style={{ width: 46, height: 46, borderRadius: 13, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <i className="ti ti-users" style={{ fontSize: 22, color: "#fff" }} />
+          </div>
         </div>
 
-        <div style={{ position: "relative", marginBottom: 10 }}>
-          <i className="ti ti-search" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", fontSize: 14, color: "#A0B8BE" }} />
+        <div style={{ position: "relative", marginBottom: 12 }}>
+          <i className="ti ti-search" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, color: "#A0B8BE" }} />
           <input
             type="text"
             placeholder="Search clients..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ width: "100%", padding: "10px 12px 10px 34px", border: "1.5px solid #E0EEF0", borderRadius: 10, fontSize: 13, outline: "none", background: "#fff", color: "#1A2E35", boxSizing: "border-box" }}
+            style={{ width: "100%", padding: "12px 12px 12px 38px", border: "none", borderRadius: 12, fontSize: 13, outline: "none", background: "#fff", color: "#1A2E35", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(15,28,46,0.06)" }}
           />
         </div>
 
-        <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
+        <div style={{ display: "flex", gap: 8, marginBottom: 16, overflowX: "auto" }}>
           {["all", "active", "inactive"].map(f => (
             <button
               key={f}
               onClick={() => setFilterMode(f)}
               style={{
-                flex: 1,
-                padding: "8px 4px",
-                borderRadius: 9,
-                border: "none",
+                padding: "7px 16px",
+                borderRadius: 20,
+                border: filterMode === f ? "none" : "1.5px solid #E0EEF0",
                 fontSize: 12,
                 fontWeight: 700,
                 cursor: "pointer",
                 textTransform: "capitalize",
-                background: filterMode === f ? "var(--app-accent, #00BCD4)" : "#fff",
+                background: filterMode === f ? "#1A2332" : "#fff",
                 color: filterMode === f ? "#fff" : "#607D86",
-                boxShadow: filterMode === f ? "none" : "0 1px 4px rgba(15,28,46,0.05)",
+                whiteSpace: "nowrap",
                 transition: "all 0.15s ease"
               }}
             >
@@ -2239,11 +2244,11 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
         </div>
 
         {mListFiltered.length === 0 ? (
-          <div style={{ padding: "36px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 12, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+          <div style={{ padding: "40px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
             No clients found.
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
             {mListFiltered.map((c, i) => {
               const bc = badgeCfg(c.status);
               const name = c.clientName || c.name || "—";
@@ -2252,44 +2257,39 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                   key={c._id || i}
                   onClick={() => { setActiveClientId(c._id); setActiveTab("overview"); }}
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
                     background: "#fff",
-                    borderRadius: 12,
-                    padding: "12px 14px",
-                    boxShadow: "0 2px 8px rgba(15,28,46,0.06)",
+                    borderRadius: 16,
+                    padding: "16px",
+                    boxShadow: "0 3px 14px rgba(15,28,46,0.07)",
                     cursor: "pointer",
                     boxSizing: "border-box",
-                    maxWidth: "100%"
+                    borderLeft: `4px solid ${bc.fg}`
                   }}
                 >
-                  <div style={{
-                    width: 38, height: 38, borderRadius: 10, flexShrink: 0,
-                    background: "rgba(0,188,212,0.12)", color: "var(--app-accent, #00BCD4)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 13, fontWeight: 800
-                  }}>
-                    {initials(name)}
-                  </div>
-
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 13.5, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                      {name}
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div style={{
+                        width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
+                        background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", color: "#fff",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 14, fontWeight: 800
+                      }}>
+                        {initials(name)}
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14.5 }}>{name}</div>
+                                 </div>
                     </div>
-                    <div style={{ fontSize: 11, color: "#94A7AF", fontWeight: 600, marginTop: 2 }}>
-                      #{i + 1}
-                    </div>
+                    <span style={{
+                      fontWeight: 700, fontSize: 10.5, padding: "5px 12px", borderRadius: 20,
+                      background: bc.bg, color: bc.fg, flexShrink: 0, whiteSpace: "nowrap"
+                    }}>
+                      {c.status || "Active"}
+                    </span>
                   </div>
-
-                  <span style={{
-                    fontWeight: 700, fontSize: 10.5, padding: "4px 10px", borderRadius: 20,
-                    background: bc.bg, color: bc.fg, flexShrink: 0, whiteSpace: "nowrap"
-                  }}>
-                    {c.status || "Active"}
-                  </span>
-
-                  <i className="ti ti-chevron-right" style={{ fontSize: 15, color: "#C2D0D4", flexShrink: 0 }} />
+                  <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #00BCD4)", fontSize: 12, fontWeight: 700 }}>
+                    View details <i className="ti ti-chevron-right" style={{ fontSize: 13 }} />
+                  </div>
                 </div>
               );
             })}
@@ -2298,7 +2298,6 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       </div>
     );
   }
-
   return (
     <div className="clients-page-root" style={{ display: "flex", flexDirection: "column", minHeight: "100%", height: "auto", overflowY: "auto", overflowX: "hidden", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 100%)", padding: "24px 28px" }}>
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
@@ -4768,38 +4767,66 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
       const ok = (status || "Active").toLowerCase() === "active";
       return ok ? { bg: "#dcfce7", fg: "#16a34a" } : { bg: "#fef2f2", fg: "#dc2626" };
     };
-    return (
+return (
       <div style={{ padding: "16px 14px", background: "#F5F8FA", minHeight: "100%", boxSizing: "border-box", maxWidth: "100%", overflowX: "hidden" }}>
-        <div style={{ fontSize: 15, fontWeight: 800, color: "#1A2332", marginBottom: 14 }}>
-          Total Projects: <span style={{ color: "var(--app-accent, #00BCD4)" }}>{plist.length}</span>
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", borderRadius: 16, padding: "16px 18px", marginBottom: 16, boxShadow: "0 6px 18px rgba(0,188,212,0.25)" }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 0.5, textTransform: "uppercase" }}>Total Projects</div>
+            <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{plist.length}</div>
+          </div>
+          <div style={{ width: 46, height: 46, borderRadius: 13, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <i className="ti ti-folder" style={{ fontSize: 22, color: "#fff" }} />
+          </div>
         </div>
+
         {plist.length === 0 ? (
-          <div style={{ padding: "36px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 12, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
+          <div style={{ padding: "40px 16px", textAlign: "center", color: "#A0B8BE", fontSize: 13, fontWeight: 600, background: "#fff", borderRadius: 16, boxShadow: "0 2px 10px rgba(15,28,46,0.05)" }}>
             No projects found.
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
             {plist.map((p, i) => {
               const bc = badgeCfg(p.status);
               return (
                 <div
                   key={p._id || p.id || i}
                   onClick={() => onViewProject && onViewProject(p)}
-                  style={{ display: "flex", alignItems: "center", gap: 12, background: "#fff", borderRadius: 12, padding: "12px 14px", boxShadow: "0 2px 8px rgba(15,28,46,0.06)", cursor: "pointer", boxSizing: "border-box", maxWidth: "100%" }}
+                  style={{
+                    background: "#fff",
+                    borderRadius: 16,
+                    padding: "16px",
+                    boxShadow: "0 3px 14px rgba(15,28,46,0.07)",
+                    cursor: "pointer",
+                    boxSizing: "border-box",
+                    borderLeft: `4px solid ${bc.fg}`
+                  }}
                 >
-                  <div style={{ width: 38, height: 38, borderRadius: 10, flexShrink: 0, background: "rgba(0,188,212,0.12)", color: "var(--app-accent, #00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>
-                    {initials(p.name)}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 13.5, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                      {p.name || "—"}
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div style={{
+                        width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
+                        background: "linear-gradient(135deg, var(--app-accent, #00BCD4), #0891b2)", color: "#fff",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 14, fontWeight: 800
+                      }}>
+                        {initials(p.name)}
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14.5 }}>{p.name || "—"}</div>
+
+                      </div>
                     </div>
-                    <div style={{ fontSize: 11, color: "#94A7AF", fontWeight: 600, marginTop: 2 }}>#{i + 1}</div>
+                    <span style={{
+                      fontWeight: 700, fontSize: 10.5, padding: "5px 12px", borderRadius: 20,
+                      background: bc.bg, color: bc.fg, flexShrink: 0, whiteSpace: "nowrap"
+                    }}>
+                      {p.status || "Active"}
+                    </span>
                   </div>
-                  <span style={{ fontWeight: 700, fontSize: 10.5, padding: "4px 10px", borderRadius: 20, background: bc.bg, color: bc.fg, flexShrink: 0, whiteSpace: "nowrap" }}>
-                    {p.status || "Active"}
-                  </span>
-                  <i className="ti ti-chevron-right" style={{ fontSize: 15, color: "#C2D0D4", flexShrink: 0 }} />
+                  <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 4, color: "var(--app-accent, #00BCD4)", fontSize: 12, fontWeight: 700 }}>
+                    View details <i className="ti ti-chevron-right" style={{ fontSize: 13 }} />
+                  </div>
                 </div>
               );
             })}
@@ -6269,6 +6296,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
                         className={`nav-item ${on ? 'active' : ''}`}
                         onClick={() => {
                           if (sub.key === "tasks") setSelectedProjectForTasks(null);
+                     
                           if (sub.key === "invoices") {
                             setJumpProject(null);
                             setJumpInvoicePrefill(null);

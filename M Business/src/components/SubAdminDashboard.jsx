@@ -11226,6 +11226,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         onClick={() => {
                           if (s.id === "mobTeam") { setActive("employees"); return; }
                           if (s.id === "mobRevenue") { setActive("payments"); return; }
+                          if (s.id === "mobClients") { window.__fullClientsList = false; }
                           setActive(s.id.replace(/^mob/, "").toLowerCase());
                         }}
                         style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, padding: "4px 4px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingStatCard === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
@@ -12514,6 +12515,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                             setJumpInvoice(null);
                                             setInvoicePrefill(null);
                                             setSidebarNavClickId(id => id + 1);
+                                          }
+                                          if (q.act === "clients") {
+                                            window.__fullClientsList = false;
                                           }
                                           setActive(q.act);
                                         }} style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderRadius: 12, border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s" }}>

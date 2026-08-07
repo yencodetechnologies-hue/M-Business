@@ -1023,7 +1023,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
 
 
-  const activeClient = clients.find(c => c._id === activeClientId) || filtered[0] || null;
+  const activeClient = clients.find(c => c._id === activeClientId) || null;
 
 
 
@@ -2142,6 +2142,30 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const totalClients = clients.length;
   const activeClientsCount = clients.filter(c => (c.status || "Active").toLowerCase() === "active").length;
   const inactiveClientsCount = clients.filter(c => (c.status || "").toLowerCase() === "inactive").length;
+
+  if (!activeClient) {
+    return (
+      <div className="clients-list-only-root" style={{ padding: "24px 28px" }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
+          Total Clients: {clients.length}
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {clients.map((c, i) => (
+            <div
+              key={c._id || i}
+              onClick={() => { setActiveClientId(c._id); setActiveTab("overview"); }}
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", border: "1.5px solid #E0EEF0", borderRadius: 12, cursor: "pointer", background: "#fff" }}
+            >
+              <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{c.clientName || c.name || "—"}</span>
+              <span style={{ fontWeight: 700, fontSize: 12, color: (c.status || "Active").toLowerCase() === "active" ? "#16a34a" : "#dc2626" }}>
+                {c.status || "Active"}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="clients-page-root" style={{ display: "flex", flexDirection: "column", minHeight: "100%", height: "auto", overflowY: "auto", overflowX: "hidden", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 100%)", padding: "24px 28px" }}>

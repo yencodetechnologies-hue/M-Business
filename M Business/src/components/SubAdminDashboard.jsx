@@ -10794,7 +10794,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       <div style={{ position: "relative", margin: "-40px 0 0", zIndex: 20 }}>
                         <div
                           id="mobProjectsScroller"
-                          style={{ position: "relative", zIndex: 21, display: "flex", gap: 12, overflowX: "auto", justifyContent: projectsWithProgress.length > 2 ? "flex-start" : "center", padding: "0 calc(50% - 150px) 10px", WebkitOverflowScrolling: "touch" }}
+                          style={{ position: "relative", zIndex: 21, display: "flex", gap: 12, overflowX: "auto", justifyContent: projectsWithProgress.length > 2 ? "flex-start" : "center", padding: "0 calc(50% - 190px) 10px", WebkitOverflowScrolling: "touch" }}
                         >
                           {projectsWithProgress.filter(p => (quotations || []).some(q => {
                             const qProjName = (q.qt?.project || q.project || "").trim().toLowerCase();

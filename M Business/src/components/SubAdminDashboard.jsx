@@ -2172,19 +2172,35 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
         <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
           Total Clients: {clients.length}
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {clients.map((c, i) => (
-            <div
-              key={c._id || i}
-              onClick={() => { setActiveClientId(c._id); setActiveTab("overview"); }}
-              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", border: "1.5px solid #E0EEF0", borderRadius: 12, cursor: "pointer", background: "#fff" }}
-            >
-              <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{c.clientName || c.name || "—"}</span>
-              <span style={{ fontWeight: 700, fontSize: 12, color: (c.status || "Active").toLowerCase() === "active" ? "#16a34a" : "#dc2626" }}>
-                {c.status || "Active"}
-              </span>
-            </div>
-          ))}
+        <div style={{ background: "#E0F7FA", border: "1px solid #B2EBF2", borderRadius: 12, overflow: "hidden" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr>
+                <th style={{ textAlign: "left", padding: "10px 14px", fontSize: 11, fontWeight: 800, color: "#607D86", borderBottom: "1px solid #B2EBF2" }}>S.No.</th>
+                <th style={{ textAlign: "left", padding: "10px 14px", fontSize: 11, fontWeight: 800, color: "#607D86", borderBottom: "1px solid #B2EBF2" }}>Client Name</th>
+                <th style={{ textAlign: "right", padding: "10px 14px", fontSize: 11, fontWeight: 800, color: "#607D86", borderBottom: "1px solid #B2EBF2" }}>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {clients.map((c, i) => (
+                <tr
+                  key={c._id || i}
+                  onClick={() => { setActiveClientId(c._id); setActiveTab("overview"); }}
+                  style={{ cursor: "pointer", borderBottom: i === clients.length - 1 ? "none" : "1px solid #B2EBF2" }}
+                >
+                  <td style={{ padding: "12px 14px", fontSize: 12, color: "#607D86", fontWeight: 600 }}>{i + 1}</td>
+                  <td style={{ padding: "12px 14px" }}>
+                    <span style={{ fontWeight: 800, color: "#0f1c2e", fontSize: 14 }}>{c.clientName || c.name || "—"}</span>
+                  </td>
+                  <td style={{ padding: "12px 14px", textAlign: "right" }}>
+                    <span style={{ fontWeight: 700, fontSize: 12, padding: "4px 12px", borderRadius: 20, background: (c.status || "Active").toLowerCase() === "active" ? "#dcfce7" : "#fef2f2", color: (c.status || "Active").toLowerCase() === "active" ? "#16a34a" : "#dc2626" }}>
+                      {c.status || "Active"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     );
@@ -4641,11 +4657,9 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
     );
   }
-}
 
-function _UnusedOldProjectsBody() {
   return (
-    <div style={{ display: "none" }}>
+    <div>
       <ModernProjectsView
 
         projects={projectsWithProgress}

@@ -11150,6 +11150,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         onDragEnd={() => setDraggingStatCard(null)}
                         onClick={() => {
                           if (s.id === "mobTeam") { setActive("employees"); return; }
+                          if (s.id === "mobRevenue") { setActive("payments"); return; }
                           setActive(s.id.replace(/^mob/, "").toLowerCase());
                         }}
                         style={{ animationDelay: `${i * 60}ms`, background: "transparent", borderRadius: 0, padding: "4px 4px", boxShadow: "none", textAlign: "center", border: "none", cursor: "grab", opacity: draggingStatCard === s.id ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}

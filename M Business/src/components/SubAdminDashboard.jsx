@@ -10774,19 +10774,18 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         </span>
                       </div>
 
-                      <div style={{ height: 60, marginTop: 10 }}>
-                        <svg viewBox="0 0 300 60" width="100%" height="100%" preserveAspectRatio="none">
-                          <defs>
-                            <linearGradient id="mobAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.35" />
-                              <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
-                            </linearGradient>
-                          </defs>
-                          <path d="M0,45 L50,40 L100,48 L150,18 L200,26 L250,12 L300,20 L300,60 L0,60 Z" fill="url(#mobAreaGrad)" />
-                          <polyline fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points="0,45 50,40 100,48 150,18 200,26 250,12 300,20" />
-                        </svg>
-                      </div>
-                    </div>
+                     <div style={{ height: 60, marginTop: 10 }}>
+  <svg viewBox="0 0 300 60" width="100%" height="100%" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="mobAreaGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#ffffff" stopOpacity="0.4" />
+        <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+      </linearGradient>
+    </defs>
+    <path d="M0,45 C25,42 25,40 50,40 C75,40 75,50 100,48 C125,46 125,20 150,18 C175,16 175,28 200,26 C225,24 225,10 250,12 C275,14 275,18 300,20 L300,60 L0,60 Z" fill="url(#mobAreaGrad)" />
+    <path d="M0,45 C25,42 25,40 50,40 C75,40 75,50 100,48 C125,46 125,20 150,18 C175,16 175,28 200,26 C225,24 225,10 250,12 C275,14 275,18 300,20" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+</div> </div>
                   </div>
 
                   {/* HORIZONTAL SCROLLING PROJECT CARDS — overlaps the bottom of the hero card */}

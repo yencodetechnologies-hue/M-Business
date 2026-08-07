@@ -2166,7 +2166,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const activeClientsCount = clients.filter(c => (c.status || "Active").toLowerCase() === "active").length;
   const inactiveClientsCount = clients.filter(c => (c.status || "").toLowerCase() === "inactive").length;
 
-  if (!activeClient) {
+  if (!activeClient && typeof window !== "undefined" && window.innerWidth < 769) {
     return (
       <div className="clients-list-only-root" style={{ padding: "24px 28px" }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
@@ -3176,27 +3176,29 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
   const inactiveCount = employees.filter(e => e.status === "Inactive" || e.status === "Rejected").length;
 
-  return (
-    <div style={{ padding: "24px 28px" }}>
-      <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
-        Total Team: {employees.length}
+  if (typeof window !== "undefined" && window.innerWidth < 769) {
+    return (
+      <div style={{ padding: "24px 28px" }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
+          Total Team: {employees.length}
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {employees.map((e, i) => (
+            <div
+              key={e._id || i}
+              onClick={() => { setViewEmp(e); loadEmpDocs(e); }}
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", border: "1.5px solid #E0EEF0", borderRadius: 12, cursor: "pointer", background: "#fff" }}
+            >
+              <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{e.name || "—"}</span>
+              <span style={{ fontWeight: 700, fontSize: 12, color: (e.status === "Active" || e.status === "Approved") ? "#16a34a" : "#dc2626" }}>
+                {e.status || "Active"}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {employees.map((e, i) => (
-          <div
-            key={e._id || i}
-            onClick={() => { setViewEmp(e); loadEmpDocs(e); }}
-            style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", border: "1.5px solid #E0EEF0", borderRadius: 12, cursor: "pointer", background: "#fff" }}
-          >
-            <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{e.name || "—"}</span>
-            <span style={{ fontWeight: 700, fontSize: 12, color: (e.status === "Active" || e.status === "Approved") ? "#16a34a" : "#dc2626" }}>
-              {e.status || "Active"}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+    );
+  }
 }
 
 function _EmployeesPageOriginalBody() {
@@ -4613,32 +4615,34 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
 
 
-  return (
+  if (typeof window !== "undefined" && window.innerWidth < 769) {
+    return (
 
-    <div style={{ padding: "24px 28px" }}>
+      <div style={{ padding: "24px 28px" }}>
 
-      <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
-        Total Projects: {(projectsWithProgress || []).length}
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>
+          Total Projects: {(projectsWithProgress || []).length}
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {(projectsWithProgress || []).map((p, i) => (
+            <div
+              key={p._id || p.id || i}
+              onClick={() => onViewProject && onViewProject(p)}
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", border: "1.5px solid #E0EEF0", borderRadius: 12, cursor: "pointer", background: "#fff" }}
+            >
+              <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{p.name || "—"}</span>
+              <span style={{ fontWeight: 700, fontSize: 12, color: (p.status || "Active").toLowerCase() === "active" ? "#16a34a" : "#dc2626" }}>
+                {p.status || "Active"}
+              </span>
+            </div>
+          ))}
+        </div>
+
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {(projectsWithProgress || []).map((p, i) => (
-          <div
-            key={p._id || p.id || i}
-            onClick={() => onViewProject && onViewProject(p)}
-            style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", border: "1.5px solid #E0EEF0", borderRadius: 12, cursor: "pointer", background: "#fff" }}
-          >
-            <span style={{ fontWeight: 700, color: "#1A2332", fontSize: 14 }}>{p.name || "—"}</span>
-            <span style={{ fontWeight: 700, fontSize: 12, color: (p.status || "Active").toLowerCase() === "active" ? "#16a34a" : "#dc2626" }}>
-              {p.status || "Active"}
-            </span>
-          </div>
-        ))}
-      </div>
-
-    </div>
-
-  );
+    );
+  }
 }
 
 function _UnusedOldProjectsBody() {
@@ -13360,7 +13364,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
 
-            {validActive === "invoices" && <InvoicesListPage invoices={invoices} onViewInvoice={(inv) => { setJumpInvoice({ ...inv, _t: Date.now() }); setPrevActiveBeforeInvoice("invoices"); setActive("invoiceDetails"); }} />}
+            {validActive === "invoices" && typeof window !== "undefined" && window.innerWidth < 769 && <InvoicesListPage invoices={invoices} onViewInvoice={(inv) => { setJumpInvoice({ ...inv, _t: Date.now() }); setPrevActiveBeforeInvoice("invoices"); setActive("invoiceDetails"); }} />}
+
+            {validActive === "invoices" && !(typeof window !== "undefined" && window.innerWidth < 769) && <InvoiceCreator key={`invoices-full-${sidebarNavClickId}`} forceListView={true} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { setSidebarOverride(null); setActive("dashboard"); }} onSaveSuccess={() => { setActive("invoices"); }} jumpInvoice={null} newInvoicePrefill={invoicePrefill || jumpInvoicePrefill} newClientName={pendingInvoiceClientName} onNewClientConsumed={() => setPendingInvoiceClientName(null)} onAddClient={() => { }} onAddProject={() => { setJumpProject(null); setActive("create-project"); }} />}
 
             {validActive === "invoiceDetails" && <InvoiceCreator key={`invoices-${sidebarNavClickId}`} forceListView={false} onConsumeForceListView={() => { }} user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => { setSidebarOverride(null); setActive("dashboard"); }} onSaveSuccess={() => {
               if (jumpProject && (jumpProject._id || jumpProject.id)) {

@@ -1770,7 +1770,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   const activeCount = proposals.filter(p => p.status === "sent" || p.status === "negotiation" || p.status === "pending").length;
   const decided = proposals.filter(p => ["won", "approved", "lost", "rejected"].includes(p.status)).length;
   const successRate = decided > 0 ? Math.round((wonCount / decided) * 100) : 0;
-  if (view === "list" && !window.__fullProposalsList) {
+  if (view === "list" && !window.__fullProposalsList && typeof window !== "undefined" && window.innerWidth < 769) {
     return (
       <div style={{ padding: "24px 28px" }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: "#607D86", marginBottom: 16 }}>

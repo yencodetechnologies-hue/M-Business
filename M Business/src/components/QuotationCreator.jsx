@@ -910,7 +910,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
   const lbl = { display: "block", fontSize: 12, color: "var(--app-muted)", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" };
 
   // ---------- LIST ----------
-  if (step === "list" && !window.__fullQuotationsList) {
+  if (step === "list" && !window.__fullQuotationsList && typeof window !== "undefined" && window.innerWidth < 769) {
     const enrichedMinimal = qtList.map((e) => {
       const expiry = e.qt?.expiryDate || e.expiryDate;
       let status = e.status || "draft";

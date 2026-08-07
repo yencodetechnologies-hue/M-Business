@@ -73,7 +73,7 @@ new_block = '''      {/* Invoice Preview Modal - Full Template */}
                       {user?.logoUrl ? (
                         <img src={user.logoUrl} alt="logo" style={{ height: 70, borderRadius: 10, marginBottom: 10, objectFit: 'contain' }} />
                       ) : (
-                        <div style={{ height: 56, width: 56, background: `linear-gradient(135deg,${accentColor},#0097A7)`, borderRadius: 10, marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 900, color: '#fff' }}>
+                        <div style={{ height: 56, width: 56, background: `linear-gradient(135deg,${accentColor},#00BCD4)`, borderRadius: 10, marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 900, color: '#fff' }}>
                           {(user?.companyName || currProject?.client || 'Y')[0].toUpperCase()}
                         </div>
                       )}

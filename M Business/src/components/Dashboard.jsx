@@ -520,7 +520,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
                 setViewClient(null);
                 if (onCreateProject) onCreateProject(c);
               }}
-              style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#26C281,#0097A7)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}
+              style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#26C281,#00BCD4)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}
             >+ Add Project</button>
             <button onClick={() => { setViewClient(null); openEdit(viewClient); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
             <button onClick={() => { setViewClient(null); setDeleteTarget(viewClient); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Delete</button>
@@ -2414,7 +2414,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <div style={{ margin: "-72px 16px 0", position: "relative", zIndex: 5, display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
                 {[
                   { icon: "ti-users", label: "Clients", val: clients.length, grad: "linear-gradient(135deg,#7c3aed,#a78bfa)" },
-                  { icon: "ti-folder", label: "Projects", val: projects.length, grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+                  { icon: "ti-folder", label: "Projects", val: projects.length, grad: "linear-gradient(135deg,var(--app-accent),#00BCD4)" },
                   { icon: "ti-user-circle", label: "Team", val: employees.length, grad: "linear-gradient(135deg,#f59e0b,#fbbf24)" },
                 ].map((s, i) => (
                   <div key={i} className="md-card" style={{ animationDelay: `${i * 70}ms`, background: "#fff", borderRadius: 18, padding: "14px 8px", boxShadow: "0 10px 30px rgba(15,10,41,0.14)", textAlign: "center", border: "1px solid rgba(0,0,0,0.03)" }}>
@@ -2586,7 +2586,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   { icon: "ti-users", label: "Clients", key: "clients" },
                   { icon: "ti-dots", label: "More", key: "settings" },
                 ].map((n, i) => n.key === "add" ? (
-                  <div key={i} className="md-tap" onClick={() => setActive("projects")} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#26d0ce)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", border: "3px solid #08061a", cursor: "pointer" }}>+</div>
+                  <div key={i} className="md-tap" onClick={() => setActive("projects")} style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, marginTop: -30, boxShadow: "0 10px 24px rgba(0,188,212,0.5)", border: "3px solid #08061a", cursor: "pointer" }}>+</div>
                 ) : (
                   <div key={i} className="md-tap" onClick={() => setActive(n.key)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: active === n.key ? "var(--app-accent)" : "rgba(255,255,255,0.5)", padding: "4px 10px", cursor: "pointer" }}>
                     <i className={`ti ${n.icon}`} style={{ fontSize: 19 }}></i>
@@ -2840,7 +2840,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "M Business"} />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
           {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} onSelectProject={(p) => setSelectedProjectForTasks(p)} autoOpenAddModal={autoOpenTaskModal} onAddModalOpened={(val) => setAutoOpenTaskModal(!!val)} />}
-          {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} THEME={{ accent: "#00BCD4", gradient: "linear-gradient(135deg, #00BCD4, #0097A7)", muted: "#607D86", card: "#FFFFFF", bg: "#F5FAFA", border: "#E0EEF0", text: "#1A2E35" }} />}
+          {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} THEME={{ accent: "#00BCD4", gradient: "linear-gradient(135deg, #00BCD4, #00BCD4)", muted: "#607D86", card: "#FFFFFF", bg: "#F5FAFA", border: "#E0EEF0", text: "#1A2E35" }} />}
           {validActive === "messaging" && <MessagingPage user={user} />}
           {validActive === "settings" && <SettingsPage THEME={T} user={user} triggerCrop={triggerCrop} onProfileUpdate={(updates) => { const updated = { ...user, ...updates }; setUser(updated); try { localStorage.setItem("user", JSON.stringify(updated)); } catch { } }} />}
 

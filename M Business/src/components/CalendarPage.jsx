@@ -15,7 +15,7 @@ const EMPTY = { name: "", project: "", client: "", date: "", start: "", end: "",
 export default function CalendarPage({ projects = [], tasks = [], clients = [], companyId, onUpdateProject, onUpdateTask, config, user, THEME, onAddProject, onAddClient, newlyAddedClientName, newlyAddedProjectName }) {
   const finalTheme = {
     accent: "var(--app-accent, #00BCD4)",
-    gradient: "var(--app-accent-gradient, linear-gradient(135deg, #00BCD4, #0097A7))",
+    gradient: "var(--app-accent-gradient, linear-gradient(135deg, #00BCD4, #00BCD4))",
     muted: "var(--app-muted, #607D86)",
     card: "#FFFFFF",
     bg: "var(--app-bg, #F5FAFA)",

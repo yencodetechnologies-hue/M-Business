@@ -4,7 +4,7 @@ import { BASE_URL, FRONTEND_URL } from '../config';
 
 // ── palette -------------------------------------------------------
 const P = {
-  primary: ' var(--app-accent, var(--app-accent, #00BCD4))', primaryDark: '#0097A7', primaryLight: 'var(--teal-light, var(--teal-light, #E0F7FA))', primaryMid: '#B2EBF2',
+  primary: ' var(--app-accent, var(--app-accent, #00BCD4))', primaryDark: '#00BCD4', primaryLight: 'var(--teal-light, var(--teal-light, #E0F7FA))', primaryMid: '#B2EBF2',
   textDark: '#1A2332', textMid: '#4A5568', textLight: '#718096',
   bg: '#F0F4F8', white: '#FFFFFF', border: '#E2E8F0',
   green: '#26C281', greenLight: '#D1FAE5',

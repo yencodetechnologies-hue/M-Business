@@ -36,7 +36,7 @@ const MILESTONE_OPTIONS = [
 
 // ── Shared Colors ──
 const P = {
-  primary: ' var(--app-accent, var(--app-accent, #00BCD4))', primaryDark: '#0097A7', primaryLight: 'var(--teal-light, var(--teal-light, #E0F7FA))', primaryMid: '#B2EBF2',
+  primary: ' var(--app-accent, var(--app-accent, #00BCD4))', primaryDark: '#00BCD4', primaryLight: 'var(--teal-light, var(--teal-light, #E0F7FA))', primaryMid: '#B2EBF2',
   textDark: '#1A2332', textMid: '#4A5568', textLight: '#718096',
   bg: '#F0F4F8', white: '#FFFFFF', border: '#E2E8F0',
   green: '#26C281', greenLight: '#D1FAE5', orange: '#F59E0B', orangeLight: '#FEF3C7',
@@ -2411,7 +2411,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                         <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: ' var(--app-accent, #00BCD4)' }}>{inv.invoiceNo || `INV-00${i + 1}`}</td>
                         <td style={{ padding: '12px 14px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                            <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#0097A7', color: '#fff', fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#00BCD4', color: '#fff', fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                               {(inv.client || currProject.client || '?')[0]?.toUpperCase()}
                             </div>
                             <span style={{ fontSize: 12, fontWeight: 700, color: '#374151' }}>{inv.client || currProject.client || '—'}</span>
@@ -3891,7 +3891,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: ' var(--app-accent, #00BCD4)' }}>{inv.invoiceNo || `INV-00${i + 1}`}</td>
                                   <td style={{ padding: '12px 14px' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                      <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#0097A7', color: '#fff', fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                      <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#00BCD4', color: '#fff', fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                                         {(inv.client || currProject.client || '?')[0]?.toUpperCase()}
                                       </div>
                                       <span style={{ fontSize: 12, fontWeight: 700, color: '#374151' }}>{inv.client || currProject.client || '—'}</span>
@@ -4797,7 +4797,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                 <div id="invoice-print-area" style={{ padding: '36px 40px', background: '#fff' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
                     <div>
-                      {user?.logoUrl ? (<img src={user.logoUrl} alt="Logo" style={{ height: 70, borderRadius: 12, marginBottom: 12, objectFit: 'contain' }} />) : (<div style={{ width: 60, height: 60, borderRadius: 12, background: 'linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097A7)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}><span style={{ color: '#fff', fontWeight: 900, fontSize: 24 }}>{(user?.companyName || 'Y')[0].toUpperCase()}</span></div>)}
+                      {user?.logoUrl ? (<img src={user.logoUrl} alt="Logo" style={{ height: 70, borderRadius: 12, marginBottom: 12, objectFit: 'contain' }} />) : (<div style={{ width: 60, height: 60, borderRadius: 12, background: 'linear-gradient(135deg, var(--app-accent, var(--app-accent, #00BCD4)),#00BCD4)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}><span style={{ color: '#fff', fontWeight: 900, fontSize: 24 }}>{(user?.companyName || 'Y')[0].toUpperCase()}</span></div>)}
                       <div style={{ fontWeight: 900, fontSize: 20, color: '#0f1c2e', letterSpacing: '1px', textTransform: 'uppercase' }}>{user?.companyName || 'YOUR COMPANY'}</div>
                       <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4, lineHeight: 1.7 }}>{user?.email}<br />{user?.phone}<br />{user?.address}</div>
                     </div>

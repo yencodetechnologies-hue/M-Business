@@ -46,7 +46,7 @@ function progGradient(cls) {
   if (cls === 'completed') return 'linear-gradient(90deg,#26C281,#059669)';
   if (cls === 'overdue') return 'linear-gradient(90deg,#FF6B6B,#DC2626)';
   if (cls === 'onhold') return 'linear-gradient(90deg,#8B5CF6,#7C3AED)';
-  return 'linear-gradient(90deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097A7)';
+  return 'linear-gradient(90deg, var(--app-accent, var(--app-accent, #00BCD4)),#00BCD4)';
 }
 
 // ─── Empty form state ------------------------------------------
@@ -633,7 +633,7 @@ export default function ModernProjectsPage({ user }) {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
                       <span className={`m-status-badge ${statusLabel.toLowerCase().replace(' ', '')}`}>{statusLabel}</span>
                       {p.priority && <span style={{ padding: '3px 9px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: p.priority === 'high' ? '#FEE2E2' : p.priority === 'low' ? '#D1FAE5' : '#FEF3C7', color: p.priority === 'high' ? '#DC2626' : p.priority === 'low' ? '#059669' : '#D97706' }}>{p.priority.charAt(0).toUpperCase() + p.priority.slice(1)}</span>}
-                      {p.category && <span style={{ padding: '3px 9px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: 'var(--teal-light, var(--teal-light, #E0F7FA))', color: '#0097A7' }}>{p.category}</span>}
+                      {p.category && <span style={{ padding: '3px 9px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: 'var(--teal-light, var(--teal-light, #E0F7FA))', color: '#00BCD4' }}>{p.category}</span>}
                     </div>
 
                     <div className="m-pc-top" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexWrap: 'nowrap' }}>
@@ -703,7 +703,7 @@ export default function ModernProjectsPage({ user }) {
                         fontSize: 12,
                         fontWeight: 800,
                         background: cls === 'active' ? 'var(--teal-light, var(--teal-light, #E0F7FA))' : cls === 'completed' ? '#D1FAE5' : cls === 'onhold' ? '#FEF3C7' : cls === 'overdue' ? '#FEE2E2' : 'var(--teal-light, var(--teal-light, #E0F7FA))',
-                        color: cls === 'active' ? '#0097A7' : cls === 'completed' ? '#065F46' : cls === 'onhold' ? '#D97706' : cls === 'overdue' ? '#DC2626' : '#0097A7',
+                        color: cls === 'active' ? '#00BCD4' : cls === 'completed' ? '#065F46' : cls === 'onhold' ? '#D97706' : cls === 'overdue' ? '#DC2626' : '#00BCD4',
                         border: `1.5px solid ${cls === 'active' ? ' var(--app-accent, var(--app-accent, #00BCD4))' : cls === 'completed' ? '#26C281' : cls === 'onhold' ? '#F59E0B' : cls === 'overdue' ? '#FF6B6B' : ' var(--app-accent, var(--app-accent, #00BCD4))'}`,
                         display: 'flex',
                         alignItems: 'center',
@@ -909,7 +909,7 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit, empl
 
           {/* ── ASSIGN TEAM MEMBERS ── */}
           <div style={{ background: '#F0F9FF', border: '1.5px solid #B2EBF2', borderRadius: 12, padding: 16 }}>
-            <label style={{ ...LBL, color: '#0097A7', marginBottom: 10 }}>
+            <label style={{ ...LBL, color: '#00BCD4', marginBottom: 10 }}>
               <i className="ti ti-users" style={{ marginRight: 5 }}></i> ASSIGN TEAM MEMBERS
             </label>
 

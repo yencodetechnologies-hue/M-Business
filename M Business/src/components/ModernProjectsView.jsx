@@ -3,7 +3,7 @@ import React, { useState, useMemo } from 'react';
 // ── Colour palette (matches M Business design system) ----------
 const P = {
   primary: ' var(--app-accent, var(--app-accent, #00BCD4))',
-  primaryDark: '#0097A7',
+  primaryDark: '#00BCD4',
   primaryLight: 'var(--teal-light, var(--teal-light, #E0F7FA))',
   primaryMid: '#B2EBF2',
   textDark: '#1A2332',

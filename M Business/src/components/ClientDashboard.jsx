@@ -2052,7 +2052,7 @@ export default function ClientDashboard({ user: userProp, setUser, portalMode = 
     .cp-root .feedback-input:focus { border-color: var(--teal); background: #fff; }
     .cp-root .feedback-input::placeholder { color: var(--text3); }
     .cp-root .feedback-submit { width: 100%; margin-top: 10px; padding: 11px; background: var(--teal); color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background .15s; box-shadow: 0 3px 10px rgba(0,188,212,.25); }
-    .cp-root .feedback-submit:hover { background: var(--app-accent-dark, #0097A7); color: #fff; }
+    .cp-root .feedback-submit:hover { background: var(--app-accent-dark, #00BCD4); color: #fff; }
 
     /* ── CONTACT CARD ── */
     .cp-root .contact-card { background: linear-gradient(135deg, #004D5E, var(--teal)); border-radius: var(--radius); padding: 22px; color: #fff; }

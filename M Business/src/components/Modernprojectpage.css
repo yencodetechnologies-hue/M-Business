@@ -1,6 +1,6 @@
 /* ModernProjectsPage.css */
 .m-add-project-card:hover {
-    border-color: #0097A7 !important;
+    border-color: #00BCD4 !important;
     transform: translateY(-3px);
     box-shadow: 0 8px 28px rgba(0, 188, 212, 0.18);
 }
@@ -601,7 +601,7 @@
 .m-add-card-hover:hover {
     transform: translateY(-3px) !important;
     box-shadow: 0 8px 28px rgba(0, 188, 212, 0.25) !important;
-    border-color: #0097A7 !important;
+    border-color: #00BCD4 !important;
 }
 
 @media (max-width: 1100px) {

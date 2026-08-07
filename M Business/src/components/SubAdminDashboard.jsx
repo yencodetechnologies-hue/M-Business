@@ -1335,7 +1335,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                 <span style={{ fontWeight: 700, color: "#0f1c2e" }}>{budgetPct}%</span>
               </div>
               <div style={{ height: 4, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
-                <div style={{ width: `${budgetPct}%`, height: "100%", background: "#7c3aed", borderRadius: 4 }} />
+                <div style={{ width: `${budgetPct}%`, height: "100%", background: "#00BCD4", borderRadius: 4 }} />
               </div>
             </div>
           );
@@ -2307,7 +2307,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 
               <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 16 }}>
 
-                <div style={{ width: 64, height: 64, borderRadius: "50%", background: activeClient.logoUrl ? "#f1f5f9" : `linear-gradient(135deg,${acColor || "#00BCD4"},${acColor || "#0097A7"})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 900, color: "#fff", flexShrink: 0, position: "relative", boxShadow: "0 4px 14px rgba(0,0,0,.15)", overflow: "hidden" }}>
+                <div style={{ width: 64, height: 64, borderRadius: "50%", background: activeClient.logoUrl ? "#f1f5f9" : `linear-gradient(135deg,${acColor || "#00BCD4"},${acColor || "#00BCD4"})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 900, color: "#fff", flexShrink: 0, position: "relative", boxShadow: "0 4px 14px rgba(0,0,0,.15)", overflow: "hidden" }}>
 
                   {activeClient.logoUrl ? <img src={activeClient.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : getAvatar(activeClient)}
 
@@ -7068,19 +7068,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const [draggingStatCard, setDraggingStatCard] = useState(null);
   const [mobStatCardOrder, setMobStatCardOrder] = useState([
-    { id: "mobClients", icon: "ti-users", label: "Clients", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
-    { id: "mobProjects", icon: "ti-folder", label: "Projects", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
-    { id: "mobTeam", icon: "ti-user-circle", label: "Team", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
-    { id: "mobRevenue", icon: "ti-currency-rupee", label: "Revenue", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "mobClients", icon: "ti-users", label: "Clients", grad: "linear-gradient(135deg,var(--app-accent),#00BCD4)" },
+    { id: "mobProjects", icon: "ti-folder", label: "Projects", grad: "linear-gradient(135deg,var(--app-accent),#00BCD4)" },
+    { id: "mobTeam", icon: "ti-user-circle", label: "Team", grad: "linear-gradient(135deg,var(--app-accent),#00BCD4)" },
+    { id: "mobRevenue", icon: "ti-currency-rupee", label: "Revenue", grad: "linear-gradient(135deg,var(--app-accent),#00BCD4)" },
 
   ]);
   const [draggingSecondRow, setDraggingSecondRow] = useState(null);
   const projectCarouselIndexRef = useRef(0);
   const [mobSecondRowOrder, setMobSecondRowOrder] = useState([
-    { id: "unpaidInv", popupId: "mobUnpaidInvoices", icon: "ti-file-invoice", label: "Unpaid Invoices", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
-    { id: "totalInv", popupId: "qaInvoice", icon: "ti-file-invoice", label: "Invoices", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
-    { id: "totalProp", popupId: "qaProposal", icon: "ti-clipboard-list", label: "Proposals", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
-    { id: "totalQuote", popupId: "qaQuote", icon: "ti-receipt", label: "Quotations", grad: "linear-gradient(135deg,var(--app-accent),#26d0ce)" },
+    { id: "unpaidInv", popupId: "mobUnpaidInvoices", icon: "ti-file-invoice", label: "Unpaid Invoices", grad: "linear-gradient(135deg,var(--app-accent),#00BCD4)" },
+    { id: "totalInv", popupId: "qaInvoice", icon: "ti-file-invoice", label: "Invoices", grad: "linear-gradient(135deg,var(--app-accent),#00BCD4)" },
+    { id: "totalProp", popupId: "qaProposal", icon: "ti-clipboard-list", label: "Proposals", grad: "linear-gradient(135deg,var(--app-accent),#00BCD4)" },
+    { id: "totalQuote", popupId: "qaQuote", icon: "ti-receipt", label: "Quotations", grad: "linear-gradient(135deg,var(--app-accent),#00BCD4)" },
   ]);
   const openMobilePopup = (key) => setMobilePopupSection(key);
   const closeMobilePopup = () => setMobilePopupSection(null);
@@ -7545,7 +7545,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <div
                       key={p._id || idx}
                       onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }}
-                      style={{ padding: "12px 14px", borderBottom: "1px solid #bae0f7", cursor: "pointer", display: "flex", flexDirection: "column", gap: 10 }}
+                      style={{ padding: "12px 14px", borderBottom: "1px solid #B2EBF2", cursor: "pointer", display: "flex", flexDirection: "column", gap: 10 }}
                     >
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                         <div style={{ minWidth: 0 }}>
@@ -10661,7 +10661,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <div className="content" style={validActive === "dashboard" && !isDesktopWidth ? { padding: 0 } : undefined}>
 
             {trialToast && (
-              <div style={{ position: "fixed", top: 24, left: "50%", width: "max-content", marginLeft: "auto", marginRight: "auto", right: 0, zIndex: 9999, background: "#fff", border: "1.5px solid #00BCD4", borderRadius: 14, padding: "14px 26px", fontSize: 14, fontWeight: 800, color: "#0097A7", boxShadow: "0 10px 32px rgba(0,188,212,0.25), 0 4px 12px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ position: "fixed", top: 24, left: "50%", width: "max-content", marginLeft: "auto", marginRight: "auto", right: 0, zIndex: 9999, background: "#fff", border: "1.5px solid #00BCD4", borderRadius: 14, padding: "14px 26px", fontSize: 14, fontWeight: 800, color: "#00BCD4", boxShadow: "0 10px 32px rgba(0,188,212,0.25), 0 4px 12px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", gap: 10 }}>
                 <i className="ti ti-circle-check" style={{ fontSize: 18, color: "#00BCD4" }}></i> Free Trial Activated
               </div>
             )}
@@ -10701,7 +10701,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   `}</style>
 
                   {/* TEAL NAME/BELL STRIP — sits above the logo row */}
-                  <div style={{ background: "linear-gradient(160deg, var(--app-accent) 0%, #0f7a8a 100%)", padding: "6px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ background: "linear-gradient(160deg, var(--app-accent) 0%, #00BCD4 100%)", padding: "6px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div
                       data-profile-anchor="true"
                       onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }}
@@ -10713,7 +10713,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       <div onClick={() => { setMobNotifExpanded(v => !v); fetchPendingLeaves(); }} style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
                         <i className="ti ti-bell" style={{ fontSize: 16, color: "#fff" }}></i>
                         {pendingLeaves.length > 0 && (
-                          <span style={{ position: "absolute", top: 3, right: 4, width: 7, height: 7, borderRadius: "50%", background: "#ff4d6d", boxShadow: "0 0 0 2px #0f7a8a" }}></span>
+                          <span style={{ position: "absolute", top: 3, right: 4, width: 7, height: 7, borderRadius: "50%", background: "#ff4d6d", boxShadow: "0 0 0 2px #00BCD4" }}></span>
                         )}
                       </div>
                     </div>
@@ -10736,7 +10736,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   {/* HERO HEADER — glass + gradient mesh */}    <div style={{
                     position: "relative",
                     zIndex: 1,
-                    background: "linear-gradient(160deg, var(--app-accent) 0%, #0f7a8a 60%, #0a5a68 100%)",
+                    background: "linear-gradient(160deg, var(--app-accent) 0%, #00BCD4 60%, #00BCD4 100%)",
                     borderRadius: "0",
                     margin: "0",
                     padding: "18px 18px 90px",
@@ -10746,7 +10746,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   }}>
                     {/* decorative mesh blobs */}
                     <div style={{ position: "absolute", top: -60, right: -40, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, var(--app-accent) 0%, transparent 70%)", opacity: 0.35, filter: "blur(10px)" }} />
-                    <div style={{ position: "absolute", bottom: -80, left: -30, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, #7c3aed 0%, transparent 70%)", opacity: 0.25, filter: "blur(14px)" }} />
+                    <div style={{ position: "absolute", bottom: -80, left: -30, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, #00BCD4 0%, transparent 70%)", opacity: 0.25, filter: "blur(14px)" }} />
 
                     <div style={{ position: "relative", zIndex: 2 }}>
                       <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 20 }}>
@@ -10766,7 +10766,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
                       <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 6 }}>
-                        <span style={{ fontSize: 42, fontWeight: 900, letterSpacing: -1, background: "linear-gradient(90deg,#fff,#c7d2fe)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                        <span style={{ fontSize: 42, fontWeight: 900, letterSpacing: -1, color: "#ffffff" }}>
                           Rs.{(totalRevenue || 0).toLocaleString()}
                         </span>
                         <span style={{ background: "rgba(74,222,128,0.15)", color: "#4ade80", fontSize: 12, fontWeight: 800, padding: "5px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 4 }}>
@@ -10987,7 +10987,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     >
                       <MobIdleInvoiceArmer projectsWithProgress={projectsWithProgress} invoices={invoices} mobShowInvoiceList={mobShowInvoiceList} setMobShowInvoiceList={setMobShowInvoiceList} />
                       {!mobShowInvoiceList && (
-                        <div style={{ background: "#f0f8ff", border: "1px solid #bae0f7", borderRadius: 12, overflow: "hidden", minHeight: 210 }}>
+                        <div style={{ background: "#E0F7FA", border: "1px solid #B2EBF2", borderRadius: 12, overflow: "hidden", minHeight: 210 }}>
                           {(mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).map((p, idx) => {
                             const parseAmt = (val) => {
                               if (val === undefined || val === null) return 0;
@@ -11039,7 +11039,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               <div
                                 key={p._id || idx}
                                 onClick={() => { setJumpProject(p); setProjectDetailsReadOnly(false); setSidebarOverride("dashboard"); setActive("project-details"); }}
-                                style={{ padding: "12px 14px", borderBottom: idx === (mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).length - 1 ? "none" : "1px solid #bae0f7", cursor: "pointer", display: "flex", flexDirection: "row", alignItems: "center", gap: 14 }}
+                                style={{ padding: "12px 14px", borderBottom: idx === (mobShowAllProjects ? projectsWithProgress : projectsWithProgress.slice(0, 3)).length - 1 ? "none" : "1px solid #B2EBF2", cursor: "pointer", display: "flex", flexDirection: "row", alignItems: "center", gap: 14 }}
                               >
                                 <div style={{ minWidth: 0, flexShrink: 0, width: "28%" }}>
                                   <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
@@ -11080,7 +11080,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             </span>
                           )}
                         </div>
-                        <div style={{ background: "#f0f8ff", border: "1px solid #bae0f7", borderRadius: 12, overflow: "hidden", minHeight: 210 }}>
+                        <div style={{ background: "#E0F7FA", border: "1px solid #B2EBF2", borderRadius: 12, overflow: "hidden", minHeight: 210 }}>
                           {(() => {
                             const statusMeta = (raw) => {
                               const s = (raw || "").toLowerCase();
@@ -11104,7 +11104,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                     setMobShowInvoiceList(false);
                                     setActive("invoices");
                                   }}
-                                  style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "12px 14px", borderBottom: i === rows.length - 1 ? "none" : "1px solid #bae0f7", cursor: "pointer" }}
+                                  style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "12px 14px", borderBottom: i === rows.length - 1 ? "none" : "1px solid #B2EBF2", cursor: "pointer" }}
                                 >
                                   <div style={{ minWidth: 0 }}>
                                     <div style={{ fontSize: 12.5, fontWeight: 700, color: "#0f1c2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
@@ -11222,7 +11222,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               setMobListPage(null);
                               setActive("clients");
                             }}
-                            style={{ padding: 14, background: "#f0f8ff", borderRadius: 10, cursor: "pointer" }}
+                            style={{ padding: 14, background: "#E0F7FA", borderRadius: 10, cursor: "pointer" }}
                           >
                             <div style={{ fontWeight: 700 }}>{c.name || c.clientName || c.companyName}</div>
                             <div style={{ fontSize: 12, color: "#94a3b8" }}>{c.status || "-"}</div>
@@ -11901,7 +11901,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               >
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
                                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "#0097A7", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,188,212,0.1)", color: "#00BCD4", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
                                       <i className="ti ti-currency-rupee"></i>
                                     </div>
                                     <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e" }}>
@@ -11909,7 +11909,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                     </div>
                                   </div>
                                   {totalIncome > 0 && (
-                                    <div style={{ background: "#e6fbf9", color: "#0097A7", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
+                                    <div style={{ background: "#e6fbf9", color: "#00BCD4", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
                                       <i className="ti ti-trending-up"></i> Active
                                     </div>
                                   )}
@@ -12394,7 +12394,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                     <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
 
-                                      <i className="ti ti-bolt" style={{ color: "#0097A7" }}></i> Quick Access
+                                      <i className="ti ti-bolt" style={{ color: "#00BCD4" }}></i> Quick Access
 
                                     </div>
 
@@ -12402,7 +12402,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                       {[
 
-                                        { icon: "ti-users", color: "#0097A7", bg: "rgba(0,188,212,0.1)", label: "Clients", sub: `${clients.length} total`, act: "clients" },
+                                        { icon: "ti-users", color: "#00BCD4", bg: "rgba(0,188,212,0.1)", label: "Clients", sub: `${clients.length} total`, act: "clients" },
 
                                         { icon: "ti-user-circle", color: "#7c3aed", bg: "rgba(124,58,237,0.1)", label: "Employees", sub: `${employees.length} staff`, act: "employees" },
 
@@ -12414,7 +12414,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                         { icon: "ti-template", color: "#db2777", bg: "rgba(219,39,119,0.1)", label: "Templates", sub: "Designer", act: "templates" },
 
-                                        { icon: "ti-messages", color: "#0097A7", bg: "rgba(0,188,212,0.1)", label: "Messages", sub: "Internal", act: "messaging" },
+                                        { icon: "ti-messages", color: "#00BCD4", bg: "rgba(0,188,212,0.1)", label: "Messages", sub: "Internal", act: "messaging" },
 
                                         { icon: "ti-world", color: "#16a34a", bg: "rgba(22,163,74,0.1)", label: "Client Portal", sub: "External", act: "clients" },
 
@@ -12465,11 +12465,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                                       <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
 
-                                        <i className="ti ti-user-circle" style={{ color: "#0097A7" }}></i> Team
+                                        <i className="ti ti-user-circle" style={{ color: "#00BCD4" }}></i> Team
 
                                       </div>
 
-                                      <div onClick={() => setActive("employees")} style={{ fontSize: 13, fontWeight: 700, color: "#0097A7", cursor: "pointer" }}>
+                                      <div onClick={() => setActive("employees")} style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
 
                                         View All
 
@@ -12482,7 +12482,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                       {employees.slice(0, 3).map(e => (
                                         <div key={e._id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
 
-                                          <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,  var(--app-accent, var(--app-accent, #00BCD4)), #0097A7)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800 }}>
+                                          <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,  var(--app-accent, var(--app-accent, #00BCD4)), #00BCD4)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800 }}>
 
                                             {(e.name || "E")[0].toUpperCase()}
 

@@ -552,7 +552,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
         .ed-doc-btn.view { background: #E0F2FE; color: #0284C7; }
         .ed-doc-btn.view:hover { background: #BAE6FD; }
         .ed-doc-btn.download { background: var(--teal); color: #fff; }
-        .ed-doc-btn.download:hover { background: #0097A7; }
+        .ed-doc-btn.download:hover { background: #00BCD4; }
         .ed-docs-sub { font-size: 10px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
         .ed-docs-sub span { background: var(--teal); color: #fff; border-radius: 10px; padding: 1px 7px; font-size: 10px; }
         .ed-empty { text-align: center; padding: 24px 0; color: #94A3B8; font-size: 12px; font-weight: 600; }
@@ -995,7 +995,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeacti
               </button>
               <button onClick={handleAddLeave} disabled={leaveSaving}
                 style={{
-                  flex: 1, padding: '11px', background: 'linear-gradient(135deg,var(--app-accent),#0097A7)', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#fff', cursor: leaveSaving ? 'not - allowed' : 'pointer', fontFamily: 'inherit', opacity: leaveSaving ? 0.7 : 1
+                  flex: 1, padding: '11px', background: 'linear-gradient(135deg,var(--app-accent),#00BCD4)', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#fff', cursor: leaveSaving ? 'not - allowed' : 'pointer', fontFamily: 'inherit', opacity: leaveSaving ? 0.7 : 1
                 }}>
                 {leaveSaving ? 'Saving...' : '+ Add Leave'}
               </button>

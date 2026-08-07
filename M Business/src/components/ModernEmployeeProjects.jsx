@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const primary = ' var(--app-accent, var(--app-accent, #00BCD4))';
-const primaryDark = '#0097A7';
+const primaryDark = '#00BCD4';
 const primaryLight = 'var(--teal-light, #E0F7FA)';
 const primaryMid = '#B2EBF2';
 const textDark = '#1A2332';
@@ -72,7 +72,7 @@ const css = [
 ].join('\n');
 
 const STRIPES = [
-  { bg: 'linear-gradient(90deg, var(--app-accent, var(--app-accent, #00BCD4)),#0097A7)', cls: '' },
+  { bg: 'linear-gradient(90deg, var(--app-accent, var(--app-accent, #00BCD4)),#00BCD4)', cls: '' },
   { bg: 'linear-gradient(90deg,#8B5CF6,#7C3AED)', cls: 'p' },
   { bg: 'linear-gradient(90deg,#26C281,#059669)', cls: 'g' },
 ];

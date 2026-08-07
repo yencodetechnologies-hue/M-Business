@@ -10774,18 +10774,21 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         </span>
                       </div>
 
-                     <div style={{ height: 60, marginTop: 10 }}>
-  <svg viewBox="0 0 300 60" width="100%" height="100%" preserveAspectRatio="none">
-    <defs>
-      <linearGradient id="mobAreaGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="#ffffff" stopOpacity="0.4" />
-        <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
-      </linearGradient>
-    </defs>
-    <path d="M0,45 C25,42 25,40 50,40 C75,40 75,50 100,48 C125,46 125,20 150,18 C175,16 175,28 200,26 C225,24 225,10 250,12 C275,14 275,18 300,20 L300,60 L0,60 Z" fill="url(#mobAreaGrad)" />
-    <path d="M0,45 C25,42 25,40 50,40 C75,40 75,50 100,48 C125,46 125,20 150,18 C175,16 175,28 200,26 C225,24 225,10 250,12 C275,14 275,18 300,20" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-</div> </div>
+                      <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
+                        <div style={{ flex: 1, background: "rgba(255,255,255,0.14)", borderRadius: 14, padding: "12px 14px", backdropFilter: "blur(6px)" }}>
+                          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.75)", fontWeight: 600, marginBottom: 4 }}>This Month</div>
+                          <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>Rs.{(totalRevenue || 0).toLocaleString()}</div>
+                        </div>
+                        <div style={{ flex: 1, background: "rgba(255,255,255,0.14)", borderRadius: 14, padding: "12px 14px", backdropFilter: "blur(6px)" }}>
+                          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.75)", fontWeight: 600, marginBottom: 4 }}>Projects</div>
+                          <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>{projectsWithProgress.length || 0}</div>
+                        </div>
+                        <div style={{ flex: 1, background: "rgba(255,255,255,0.14)", borderRadius: 14, padding: "12px 14px", backdropFilter: "blur(6px)" }}>
+                          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.75)", fontWeight: 600, marginBottom: 4 }}>Clients</div>
+                          <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>{clients.length || 0}</div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   {/* HORIZONTAL SCROLLING PROJECT CARDS — overlaps the bottom of the hero card */}
@@ -12092,7 +12095,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               >
                                 <MobileCardArrow id="unpaidInvoices" />
                                 <div
-                                  onClick={() => { if (!isDesktopWidth) { openMobilePopup('unpaidInvoices'); return; } setActive('unpaidInvoices'); }}
+                                  onClick={() => !isDesktopWidth && openMobilePopup('unpaidInvoices')}
                                   style={{ background: "#ffffff", borderRadius: 16, padding: 20, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column", cursor: isDesktopWidth ? "default" : "pointer" }}
                                 >
                                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
